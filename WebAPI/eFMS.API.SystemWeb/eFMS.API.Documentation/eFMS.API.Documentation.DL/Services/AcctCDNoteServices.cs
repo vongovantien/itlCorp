@@ -5,6 +5,7 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Infrastructure.Extensions;
@@ -1296,6 +1297,61 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddDataSource(listCharge);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
+            return result;
+        }
+
+        public AcctCDNoteExportResult GetDataExportOpsCDNote(Guid jobId, string cdNo, Guid officeId)
+        {
+            var cdNoteDetail = GetCDNoteDetails(jobId, cdNo);
+            var result = new AcctCDNoteExportResult();
+            if (cdNoteDetail != null)
+            {
+                IQueryable<CustomsDeclaration> _customClearances = customsDeclarationRepository.Get(x => x.JobNo == cdNoteDetail.JobNo);
+                CustomsDeclaration _clearance = null;
+                if (_customClearances.Count() > 0 || _customClearances != null)
+                {
+                    _clearance = _customClearances.OrderBy(x => x.ClearanceDate).FirstOrDefault();
+                }
+
+                result.CDNo = cdNoteDetail.CDNote.Code;
+                result.PartnerNameEn = cdNoteDetail.PartnerNameEn;
+                result.BillingAddress = cdNoteDetail.PartnerShippingAddress;
+                result.Taxcode = cdNoteDetail.PartnerTaxcode;
+                result.ClearanceNo = _clearance?.ClearanceNo;
+                result.GW = cdNoteDetail.GW;
+                result.CBM = cdNoteDetail.CBM;
+                result.HBL = cdNoteDetail.MbLadingNo;
+                result.Cont = cdNoteDetail.HbConstainers;
+                result.WareHouseName = cdNoteDetail.WarehouseName;
+
+                result.ListCharges = new List<ExportCDNoteModel>();
+                foreach (var item in cdNoteDetail.ListSurcharges)
+                {
+                    var cdNote = new ExportCDNoteModel();
+                    decimal _exchangeRateToVND = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    _exchangeRateToVND = item.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? 1 : _exchangeRateToVND;
+                    decimal? fee = Math.Round(((item.UnitPrice * item.Quantity) * _exchangeRateToVND).Value);
+                    decimal? vat = item.Vatrate != null ? (item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((fee * item.Vatrate) / 100)) : 0;
+                    cdNote.Type = item.Type;
+                    cdNote.Description = item.NameEn;
+                    cdNote.VATInvoiceNo = item.InvoiceNo;
+                    cdNote.Amount = fee;
+                    cdNote.Notes = item.Notes;
+                    cdNote.VATAmount = Math.Round(vat.Value);
+                    cdNote.TotalAmount = fee + vat;
+                    cdNote.Notes = item.Notes;
+                    result.ListCharges.Add(cdNote);
+                }
+
+                //Lấy thông tin Office của User Login
+                var officeOfUser = GetInfoOfficeOfUser(officeId);
+                result.BankNameEn = officeOfUser?.BankNameEn ?? string.Empty;
+                result.OfficeEn = officeOfUser?.BranchNameEn ?? string.Empty;
+                result.BankAddressEn = officeOfUser?.BankAddressEn ?? string.Empty;
+                result.BankAccountNameEn = officeOfUser?.BankAccountNameEn ?? string.Empty;
+                result.SwiftCode = officeOfUser?.SwiftCode ?? string.Empty;
+                result.BankAccountVND = officeOfUser?.BankAccountVnd ?? string.Empty;
+            }
             return result;
         }
 

@@ -10,14 +10,15 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
-                    <button class="btn btn-sm btn-default  m-btn--icon" (click)="preview()">
-                        <span>
-                            <i class="la la-file-text-o"></i>
-                            <span>
-                                Preview
-                            </span>
-                        </span>
-                    </button>
+                    <div class="dropdown m-dropdown m-dropdown--inline">
+                        <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown">
+                            <i class="la la-download"></i>Export<span class="caret"></span>
+                        </button>
+                        <div class="dropdown-menu" role="menu" aria-labelledby="button-nested">
+                            <a class="dropdown-item pointer" (click)="preview()">Debit Note Preview</a>
+                            <a class="dropdown-item pointer" (click)="exportCDNote()">Debite Note Excel</a>
+                        </div>                    
+                    </div>
                 </div>
             </div>
             <div class="modal-body">

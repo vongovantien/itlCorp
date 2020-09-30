@@ -420,5 +420,30 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// Export Ops Debit Note
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportOpsCdNote")]
+        [HttpGet]
+        public async Task<IActionResult> ExportOpsCdNote(Guid jobId, string cdNo, Guid officeId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.GetDataCDNoteExportUrl + jobId + "&cdNo=" + cdNo + "&officeId=" + officeId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<AcctCDNoteExportResult>();
+            if (dataObjects.Result == null)
+            {
+                return Ok();
+            }
+            var stream = new DocumentationHelper().GenerateCDNoteDetailExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            string fileName = "Export OPS Debit Note.xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
     }
 }

@@ -19,6 +19,8 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormatKgs = "#,##0 \"KGS\"";
         const string numberFormatVND = "_-* #,##0.000_-;-* #,##0.000_-;_-* \"-\"??_-;_-@_-_(_)";
         const string numberFormats = "#,##0";
+        const string CURRENCY_LOCAL = "VND";
+        const string CURRENCY_USD = "USD";
 
         public Stream CreateEManifestExcelFile(CsTransactionDetailModel transactionDetail, Stream stream = null)
         {
@@ -1538,7 +1540,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressToMerge].Style.Font.Bold = true;
 
             string addressTotalCont20 = workSheet.Cells[address, 20].Start.Address;
-            workSheet.Cells[addressTotalCont20].Value = overview.Select(t=>t.Cont20).Sum();
+            workSheet.Cells[addressTotalCont20].Value = overview.Select(t => t.Cont20).Sum();
             string addressTotalCont40 = workSheet.Cells[address, 21].Start.Address;
             workSheet.Cells[addressTotalCont40].Value = overview.Select(t => t.Cont40).Sum();
             string addressTotalCont40HC = workSheet.Cells[address, 22].Start.Address;
@@ -1551,7 +1553,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressTotalCW].Value = overview.Select(t => t.CW).Sum();
             string addressTotalCBM = workSheet.Cells[address, 26].Start.Address;
             workSheet.Cells[addressTotalCBM].Value = overview.Select(t => t.CBM).Sum();
-            string addressTotalSellFreight= workSheet.Cells[address, 27].Start.Address;
+            string addressTotalSellFreight = workSheet.Cells[address, 27].Start.Address;
             workSheet.Cells[addressTotalSellFreight].Value = overview.Select(t => t.TotalSellFreight).Sum();
             workSheet.Cells[addressTotalSellFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
@@ -1575,7 +1577,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressTotalBuyFreight].Value = overview.Select(t => t.TotalBuyFreight).Sum();
             workSheet.Cells[addressTotalBuyFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyTrucking= workSheet.Cells[address, 33].Start.Address;
+            string addressTotalBuyTrucking = workSheet.Cells[address, 33].Start.Address;
             workSheet.Cells[addressTotalBuyTrucking].Value = overview.Select(t => t.TotalBuyTrucking).Sum();
             workSheet.Cells[addressTotalBuyTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
@@ -1788,7 +1790,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A6:S6"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             for (int c = 3; c < 22; c++)
             {
-                workSheet.Cells[6, c-2].Value = headers[c];
+                workSheet.Cells[6, c - 2].Value = headers[c];
             }
             int rowStart = 7;
             for (int i = 0; i < listData.Count; i++)
@@ -1816,7 +1818,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[rowStart, 17].Value = listData[i].TotalRevenue;
                     workSheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
                 }
-                if (listData[i].TotalCost != null )
+                if (listData[i].TotalCost != null)
                 {
                     workSheet.Cells[rowStart, 18].Value = listData[i].TotalCost;
                     workSheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat;
@@ -1830,15 +1832,15 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 rowStart += 1;
             }
-            workSheet.Cells[rowStart, 1, rowStart , 16].Merge = true;
-            workSheet.Cells[rowStart, 1, rowStart , 16].Value = "TOTAL";
-            workSheet.Cells[rowStart, 1, rowStart , 16].Style.Font.Bold = true;
-            workSheet.Cells[rowStart, 1, rowStart , 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[rowStart , 17].Value = listData.Select(t => t.TotalRevenue).Sum();
-            workSheet.Cells[rowStart , 17].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 1, rowStart, 16].Merge = true;
+            workSheet.Cells[rowStart, 1, rowStart, 16].Value = "TOTAL";
+            workSheet.Cells[rowStart, 1, rowStart, 16].Style.Font.Bold = true;
+            workSheet.Cells[rowStart, 1, rowStart, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[rowStart, 17].Value = listData.Select(t => t.TotalRevenue).Sum();
+            workSheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[rowStart, 17].Style.Font.Bold = true;
-            workSheet.Cells[rowStart , 18].Value = listData.Select(t => t.TotalCost).Sum();
-            workSheet.Cells[rowStart , 18].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 18].Value = listData.Select(t => t.TotalCost).Sum();
+            workSheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[rowStart, 18].Style.Font.Bold = true;
             workSheet.Cells[rowStart, 19].Value = listData.Select(t => t.JobProfit).Sum();
             workSheet.Cells[rowStart, 19].Style.Numberformat.Format = numberFormat;
@@ -2559,7 +2561,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("Summary Of Revenue");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    BinddingDataSummaryOfRevenue(workSheet, criteria , obj);
+                    BinddingDataSummaryOfRevenue(workSheet, criteria, obj);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -2820,7 +2822,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         }
                         else
                         {
-                            workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.VATAmount != null ?  itemCharge.VATAmount : null;
+                            workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.VATAmount != null ? itemCharge.VATAmount : null;
                             workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                         }
                         workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
@@ -2917,8 +2919,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[addressStartContent, 15].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[addressStartContent, 15].Style.Font.Bold = true;
 
-                workSheet.Cells[addressStartContent, 16].Value = totalVATNormalCharge != null ? totalVATNormalCharge : null  ;
-                if(totalVATNormalCharge == 0)
+                workSheet.Cells[addressStartContent, 16].Value = totalVATNormalCharge != null ? totalVATNormalCharge : null;
+                if (totalVATNormalCharge == 0)
                 {
                     workSheet.Cells[addressStartContent, 16].Value = null;
                 }
@@ -3052,7 +3054,324 @@ namespace eFMS.API.ReportData.FormatExcel
 
             //In đậm & căn giữa value list 
             workSheet.Cells["A5:K" + (5 + housebillDailyExport.Count)].Style.Font.Bold = true;
-            workSheet.Cells["A5:K" +  (5 + housebillDailyExport.Count)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A5:K" + (5 + housebillDailyExport.Count)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
+
+        #region Export Credit Debit Note Detail
+        // Generate Soa Supplier
+        public Stream GenerateCDNoteDetailExcel(AcctCDNoteExportResult cdNoteModel, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Debit Note");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BinddingDataCDNoteDetailExport(workSheet, cdNoteModel);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BinddingDataCDNoteDetailExport(ExcelWorksheet workSheet, AcctCDNoteExportResult cdNoteModel)
+        {
+            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            {
+                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                //add the image to row 1, column B
+                excelImage.SetPosition(0, 0, 1, 0);
+            }
+
+            List<string> titles = new List<string>()
+            {
+               "GIẤY ĐỀ NGHỊ THANH TOÁN / DEBIT NOTE", //0
+               "Số: ", //1
+               "Tên khách hàng", //2
+               "Địa chỉ", //3
+               "MST:", //4
+               "Số tờ khai:", //5
+               "Trọng lượng (KGS):", //6
+               "CBM:", //7
+               "Hợp đồng số:", //8
+               "Vận đơn số", //9
+               "Cont:", //10
+               "Giao hàng về:" //11
+            };
+
+            List<string> headerTable = new List<string>()
+            {
+                "No", //0
+                "Chi tiết / Description", //1
+                "Hóa đơn/ \nInv No.", //2
+                "Số tiền/ Amount (VND)", //3
+                "Chi phí/ \nFee", //4
+                "Thuế GTGT/ \nVAT", //5
+                "Tổng cộng/ \nTotal", //6
+                "Ghi chú/ \nNote" //7
+            };
+
+            // Custom With Column
+            workSheet.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Column(2).Width = 10; //Cột B
+            workSheet.Column(2).Width = 15; //Cột C
+            workSheet.Column(6).Width = 10; //Cột F
+            workSheet.Column(6).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Column(7).Width = 20; //Cột G
+            workSheet.Column(8).Width = 20; //Cột H
+            workSheet.Column(9).Width = 20; //Cột I
+            workSheet.Column(10).Width = 17; //Cột J
+
+            // Title
+            workSheet.Cells["A8:J8"].Merge = true;
+            workSheet.Cells["A8"].Style.Font.SetFromFont(new Font("Arial", 16, FontStyle.Bold));
+            workSheet.Cells["A8"].Value = titles[0];
+            workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells["A9:J9"].Merge = true;
+            workSheet.Cells["A9"].Style.Font.SetFromFont(new Font("Arial", 10));
+            workSheet.Cells["A9"].Value = titles[1] + cdNoteModel.CDNo;
+            // Tên KH
+            workSheet.Cells["A10"].Value = titles[2];
+            workSheet.Cells["C10"].Value = cdNoteModel.PartnerNameEn?.ToUpper();
+            workSheet.Cells["C10"].Style.Font.Bold = true;
+            // Địa chỉ
+            workSheet.Cells["A11"].Value = titles[3];
+            workSheet.Cells["C11"].Value = cdNoteModel.BillingAddress;
+            workSheet.Cells["C11"].Style.Font.Bold = true;
+            // MST
+            workSheet.Cells["A12"].Value = titles[4];
+            workSheet.Cells["C12"].Value = cdNoteModel.Taxcode?.ToUpper();
+            // Số tờ khai
+            workSheet.Cells["A13"].Value = titles[5];
+            workSheet.Cells["C13"].Value = cdNoteModel.ClearanceNo?.ToUpper();
+            // Trọng lượng
+            workSheet.Cells["A14"].Value = titles[6];
+            workSheet.Cells["C14"].Value = cdNoteModel.GW;
+            workSheet.Cells["C14"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["C14"].Style.Numberformat.Format = numberFormat;
+            // CMB
+            workSheet.Cells["A15"].Value = titles[7];
+            workSheet.Cells["C15"].Value = cdNoteModel.CBM;
+            workSheet.Cells["C15"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["C15"].Style.Numberformat.Format = numberFormat;
+
+            workSheet.Cells["A10:A15"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            // Soo61 HĐ
+            workSheet.Cells["G13"].Value = titles[8];
+            // Số vận đơn
+            workSheet.Cells["G14"].Value = titles[9];
+            workSheet.Cells["H14"].Value = cdNoteModel.HBL;
+            // Cont
+            workSheet.Cells["G15"].Value = titles[10];
+            workSheet.Cells["H15"].Value = cdNoteModel.Cont;
+            workSheet.Cells["I15"].Value = titles[11];
+            workSheet.Cells["J15"].Value = cdNoteModel.WareHouseName?.ToUpper(); // Giao hàng về
+            workSheet.Cells["A10:J15"].Style.Font.SetFromFont(new Font("Arial", 10));
+
+            // header0
+            workSheet.Cells["A17:A19"].Merge = true;
+            workSheet.Cells["A17"].Value = headerTable[0];
+            // header1
+            workSheet.Cells["B17:E19"].Merge = true;
+            workSheet.Cells["B17"].Value = headerTable[1];
+            // header2
+            workSheet.Cells["F17:F19"].Merge = true;
+            workSheet.Cells["F17:F19"].Style.WrapText = true;
+            workSheet.Cells["F17"].Value = headerTable[2];
+            // header3
+            workSheet.Cells["G17:I17"].Merge = true;
+            workSheet.Cells["G17"].Value = headerTable[3];
+            // header4
+            workSheet.Cells["G18:G19"].Merge = true;
+            workSheet.Cells["G18:G19"].Style.WrapText = true;
+            workSheet.Cells["G18"].Value = headerTable[4];
+            // header5
+            workSheet.Cells["H18:H19"].Merge = true;
+            workSheet.Cells["H18:H19"].Style.WrapText = true;
+            workSheet.Cells["H18"].Value = headerTable[5];
+            // header6
+            workSheet.Cells["I18:I19"].Merge = true;
+            workSheet.Cells["I18:I19"].Style.WrapText = true;
+            workSheet.Cells["I18"].Value = headerTable[6];
+            // header7
+            workSheet.Cells["J17:J19"].Merge = true;
+            workSheet.Cells["J17:J19"].Style.WrapText = true;
+            workSheet.Cells["J17"].Value = headerTable[7];
+            workSheet.Cells["A17:J19"].Style.Font.SetFromFont(new Font("Arial", 8, FontStyle.Bold));
+            workSheet.Cells["A17:J19"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A17:J19"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["J17:J19"].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["J17:J19"].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+
+            // Detail of table
+            // Chi hộ/ Pay on behalf of customer(Type=OBH)
+            workSheet.Cells["A20"].Value = "I";
+            workSheet.Cells["A20"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["B20:F20"].Merge = true;
+            workSheet.Cells["B20"].Value = "Chi hộ/ Pay on behalf of customer";
+            workSheet.Cells["A20:J20"].Style.Font.SetFromFont(new Font("Arial", 9, FontStyle.Bold));
+            var surchargeOBHLst = cdNoteModel.ListCharges.Where(x => x.Type == "OBH").ToList();
+            int addressStartGroup1 = 21;
+            int countOBH = surchargeOBHLst.Count();
+            int addressLastRow = addressStartGroup1 + countOBH - 1;
+            if (countOBH > 0)
+            {
+                workSheet.Cells[addressStartGroup1, 1, addressStartGroup1 + countOBH, 10].Style.Font.SetFromFont(new Font("Arial", 8));
+                workSheet.Cells[addressStartGroup1, 1, addressStartGroup1 + countOBH, 10].Style.WrapText = true;
+                workSheet.Cells[addressStartGroup1, 1, addressStartGroup1 + countOBH, 10].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                for (int i = 0; i < countOBH; i++)
+                {
+                    var item = surchargeOBHLst[i];
+                    workSheet.Cells[i + addressStartGroup1, 1].Value = i + 1;
+                    workSheet.Cells[i + addressStartGroup1, 2].Value = item.Description;
+                    workSheet.Cells[i + addressStartGroup1, 2, i + addressStartGroup1, 5].Merge = true;
+                    workSheet.Cells[i + addressStartGroup1, 6].Value = item.VATInvoiceNo;
+                    workSheet.Cells[i + addressStartGroup1, 7].Value = item.Amount;
+                    workSheet.Cells[i + addressStartGroup1, 7].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 8].Value = item.VATAmount;
+                    workSheet.Cells[i + addressStartGroup1, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 9].Value = item.TotalAmount;
+                    workSheet.Cells[i + addressStartGroup1, 9].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 10].Value = item.Notes;
+                }
+                // Border
+                workSheet.Cells[21, 1, addressLastRow, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[22, 1, addressLastRow, 10].Style.Border.Top.Style = ExcelBorderStyle.Dotted;
+            }
+            decimal? sumFee = 0, sumVat = 0;
+            decimal? totalFee = surchargeOBHLst.Select(x => x.Amount).Sum();
+            decimal? totalVat = surchargeOBHLst.Select(x => x.VATAmount).Sum();
+            decimal? total = totalFee + totalVat;
+            sumFee += totalFee;
+            sumVat += totalVat;
+            workSheet.Cells["G20"].Value = totalFee;
+            workSheet.Cells["G20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["H20"].Value = totalVat;
+            workSheet.Cells["H20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["I20"].Value = total;
+            workSheet.Cells["I20"].Style.Numberformat.Format = numberFormat;
+            // Border
+            workSheet.Cells[17, 1, 20, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[17, 1, 20, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[20, 1, 20, 10].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+            // Phí dịch vụ & vận chuyển/ Logistics Services(Type!=OBH)
+            int addressStartGroup2 = addressStartGroup1 + countOBH;
+            workSheet.Cells[addressStartGroup2, 1].Value = "II";
+            workSheet.Cells[addressStartGroup2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[addressStartGroup2, 2, addressStartGroup2, 6].Merge = true;
+            workSheet.Cells[addressStartGroup2, 2].Value = "Phí dịch vụ & vận chuyển/ Logistics Services";
+            workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Font.SetFromFont(new Font("Arial", 9, FontStyle.Bold));
+            var surchargeNotOBHLst = cdNoteModel.ListCharges.Where(x => x.Type != "OBH").ToList();
+            totalFee = surchargeNotOBHLst.Select(x => x.Amount).Sum();
+            totalVat = surchargeNotOBHLst.Select(x => x.VATAmount).Sum();
+            total = totalFee + totalVat;
+            sumFee += totalFee;
+            sumVat += totalVat;
+            workSheet.Cells[addressStartGroup2, 7].Value = totalFee;
+            workSheet.Cells[addressStartGroup2, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 8].Value = totalVat;
+            workSheet.Cells[addressStartGroup2, 8].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 9].Value = total;
+            workSheet.Cells[addressStartGroup2, 9].Style.Numberformat.Format = numberFormat;
+            // Border
+            workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            int countNotOBH = surchargeNotOBHLst.Count();
+            addressStartGroup2 += 1;
+            if (countNotOBH > 0)
+            {
+                workSheet.Cells[addressStartGroup2, 1, addressStartGroup2 + countNotOBH, 10].Style.Font.SetFromFont(new Font("Arial", 8));
+                workSheet.Cells[addressStartGroup2, 1, addressStartGroup2 + countNotOBH, 10].Style.WrapText = true;
+                workSheet.Cells[addressStartGroup2, 1, addressStartGroup2 + countNotOBH, 10].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                addressLastRow = addressStartGroup2 + countNotOBH - 1;
+                workSheet.Cells[addressStartGroup2, 1, addressLastRow, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[addressStartGroup2, 1, addressLastRow, 10].Style.Border.Top.Style = ExcelBorderStyle.Dotted;
+
+                for (int i = 0; i < countNotOBH; i++)
+                {
+                    var item = surchargeNotOBHLst[i];
+                    workSheet.Cells[i + addressStartGroup2, 1].Value = i + 1;
+                    workSheet.Cells[i + addressStartGroup2, 2].Value = item.Description;
+                    workSheet.Cells[i + addressStartGroup2, 2, i + addressStartGroup2, 5].Merge = true;
+                    workSheet.Cells[i + addressStartGroup2, 6].Value = item.VATInvoiceNo;
+                    workSheet.Cells[i + addressStartGroup2, 7].Value = item.Amount;
+                    workSheet.Cells[i + addressStartGroup2, 7].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 8].Value = item.VATAmount;
+                    workSheet.Cells[i + addressStartGroup2, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 9].Value = item.TotalAmount;
+                    workSheet.Cells[i + addressStartGroup2, 9].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 10].Value = item.Notes;
+                }
+            }
+
+            // Tổng chi phí / Total in charge (I) + (II)
+            int addressOfTotal = addressStartGroup2 + countNotOBH;
+            workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Font.SetFromFont(new Font("Arial", 8, FontStyle.Bold));
+            workSheet.Cells[addressOfTotal, 2, addressOfTotal, 5].Merge = true;
+            workSheet.Cells[addressOfTotal, 2].Value = "Tổng chi phí / Total in charge (I) + (II):";
+            workSheet.Cells[addressOfTotal, 7].Value = sumFee;
+            workSheet.Cells[addressOfTotal, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 8].Value = sumVat;
+            workSheet.Cells[addressOfTotal, 8].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 9].Value = sumFee + sumVat;
+            workSheet.Cells[addressOfTotal, 9].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            addressLastRow = addressOfTotal + 1;
+
+            string footer = "Vui lòng chuyển tiền vào tài khoản của chúng tôi như sau/Please transfer funds to our account as follow:";
+            workSheet.Cells[addressLastRow, 1, addressLastRow + 12, 1].Style.Font.SetFromFont(new Font("Arial", 10));
+            workSheet.Cells[addressLastRow, 1, addressLastRow + 7, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells[addressLastRow, 1].Value = footer;
+            if (!string.IsNullOrEmpty(cdNoteModel.BankNameEn))
+            {
+                addressLastRow += 1;
+                footer = "Ngân hàng/Bank: " + cdNoteModel.BankNameEn.ToUpper();
+                workSheet.Cells[addressLastRow, 1].Value = footer;
+            }
+            if (!string.IsNullOrEmpty(cdNoteModel.BankAddressEn))
+            {
+                addressLastRow += 1;
+                footer = cdNoteModel.BankAddressEn.ToUpper();
+                workSheet.Cells[addressLastRow, 1].Value = footer;
+            }
+            if (!string.IsNullOrEmpty(cdNoteModel.BankAccountNameEn))
+            {
+                addressLastRow += 1;
+                footer = "Chủ tài khoản/ower account: " + cdNoteModel.BankAccountNameEn.ToUpper();
+                workSheet.Cells[addressLastRow, 1].Value = footer;
+            }
+            if (!string.IsNullOrEmpty(cdNoteModel.SwiftCode))
+            {
+                addressLastRow += 1;
+                footer = "SWIFT CODE: " + cdNoteModel.SwiftCode.ToUpper();
+                workSheet.Cells[addressLastRow, 1].Value = footer;
+            }
+            if (!string.IsNullOrEmpty(cdNoteModel.BankAccountVND))
+            {
+                addressLastRow += 1;
+                footer = "Tài khoản/Account: " + cdNoteModel.BankAccountVND.ToUpper();
+                workSheet.Cells[addressLastRow, 1].Value = footer;
+            }
+            addressLastRow += 2;
+            workSheet.Cells[addressLastRow, 8, addressLastRow + 1, 10].Merge = true;
+            workSheet.Cells[addressLastRow, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[addressLastRow, 8].Style.WrapText = true;
+            workSheet.Cells[addressLastRow, 8].Value = "For and on behalf of\n" + cdNoteModel.OfficeEn?.ToUpper();
+            workSheet.Cells[addressLastRow, 8].Style.Font.SetFromFont(new Font("Calibri", 11));
+            workSheet.Cells[addressLastRow + 2, 8].Value = "Date";
+            workSheet.Cells[addressLastRow + 3, 8].Value = "Authorizied signature";
+        }
+        #endregion
     }
 }
