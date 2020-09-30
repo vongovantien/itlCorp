@@ -14,9 +14,7 @@ export const initialState: IAccountingManagementListState = {
     isLoading: false,
     isLoaded: false,
     dataSearch: null
-
 };
-
 
 export const accountingManagementListReducer = createReducer(
     initialState,
@@ -37,7 +35,7 @@ export const accountingManagementListReducer = createReducer(
     )
 );
 
-export function accountingListReducer(state: IAccountingManagementListState | undefined, action: Action) {
+export function reducer(state: IAccountingManagementListState | undefined, action: Action) {
     return accountingManagementListReducer(state, action);
 }
 
