@@ -3,14 +3,14 @@ import { IAdvancePaymentSearchParamsState, reducer } from "./advance-payment.red
 
 export * from './advance-payment.reducer';
 export interface IAdvancePaymentState {
-    searchParams: IAdvancePaymentSearchParamsState;
+    adv: IAdvancePaymentSearchParamsState;
 }
 
 
 // * SELECTOR
 export const advancePaymentState = createFeatureSelector<IAdvancePaymentState>('advance-payment');
-export const getAdvancePaymentSearchParamsState = createSelector(advancePaymentState, (state: IAdvancePaymentState) => state && state.searchParams);
+export const getAdvancePaymentSearchParamsState = createSelector(advancePaymentState, (state: IAdvancePaymentState) => state && state.adv && state.adv.searchParams);
 
 export const reducers: ActionReducerMap<IAdvancePaymentState> = {
-    searchParams: reducer
+    adv: reducer
 };

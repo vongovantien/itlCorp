@@ -6,7 +6,8 @@ import { User, Currency } from 'src/app/shared/models';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getAdvancePaymentSearchParamsState, IAdvancePaymentState, reducer } from '../../store/reducers';
 import { SearchList } from '../../store/actions';
@@ -51,7 +52,20 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     ngOnInit() {
         this.initForm();
         this.initDataInform();
+        this._store.select(getAdvancePaymentSearchParamsState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (Object.keys(data).length === 0 && data.constructor === Object) {
 
+                    } else {
+                        this.onSearch.emit(data);
+                        this.setDataSearchFromRedux(data);
+                    }
+                }
+            );
     }
 
     initForm() {
@@ -87,22 +101,21 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
         this.getUserLogged();
         this.getCurrency();
-        this.getUsers();
+        //this.getUsers();
     }
 
     setDataSearchFromRedux(data: any) {
-        console.log("data: ", data);
+
         this.formSearch.patchValue({
             referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
-            requester: !!data.requester ? this.requesters.filter(e => e.id === data.requester) : [],
+
             requestDate: !!data.requestDateFrom && !!data.requestDateTo ? { startDate: new Date(data.requestDateFrom), endDate: new Date(data.requestDateTo) } : null,
             modifiedDate: !!data.advanceModifiedDateFrom && !!data.advanceModifiedDateTo ? { startDate: new Date(data.advanceModifiedDateFrom), endDate: new Date(data.advanceModifiedDateTo) } : null,
-            // statusApproval: data.statusApproval === "All" || null ? null : data.statusApproval,
-            // statusPayment: data.statusPayment === "All" || null ? null : data.statusPayment,
-            // paymentMethod: data.paymentMethod === "All" || null ? null : data.paymentMethod,
-            //currencyId: !!data.currencyId ? this.currencies.filter(e => e.id === data.currencyId) : [],
-        });
+            statusApproval: !!data.statusApproval && data.statusApproval !== 'All' ? this.statusApprovals.filter(e => e.value === data.statusApproval)[0] : null,
+            statusPayment: !!data.statusPayment && data.statusPayment !== 'All' ? this.statusPayments.filter(e => e.value === data.statusPayment)[0] : null,
+            paymentMethod: !!data.paymentMethod && data.paymentMethod !== 'All' ? this.paymentMethods.filter(e => e.value === data.paymentMethod)[0] : null,
 
+        });
     }
 
     onSubmit() {
@@ -118,13 +131,10 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             currencyId: !!this.currencyId.value ? this.currencyId.value.id : 'All',
             requester: this.requester.value.length > 0 ? this.requester.value[0].id : this.userLogged.id
         };
+
         this.onSearch.emit(body);
 
         this._store.dispatch(SearchList({ payload: body }));
-    }
-
-    bindValueFormSearch(data: any) {
-
     }
 
     getUserLogged() {
@@ -159,12 +169,30 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     }
 
     getCurrency() {
-        this._catalogueRepo.getListCurrency()
-            .subscribe(
-                (res) => {
-                    this.currencies = res;
+        combineLatest([
+            this._catalogueRepo.getListCurrency(),
+            this._systemRepo.getSystemUsers({}),
+            this._store.select(getAdvancePaymentSearchParamsState)
+        ]).pipe(
+            map((cur, param) => ({ ...cur, param }))
+        ).subscribe(
+            (res) => {
+                this.currencies = res[0] || [];
+                this.requesters = res[1].map((item: any) => ({ text: item.username, id: item.id }));
+
+                if (Object.keys(res[2]).length === 0 && res[2].constructor === Object) {
+                    this.requester.setValue([this.requesters.filter(stf => stf.id === this.userLogged.id)[0]]);
+                    this.currencyId.setValue(null);
+                } else {
+                    const requesterTemp = [this.requesters.filter(e => e.id === res[2].requester)[0]];
+                    const currencyTemp = this.currencies.filter(e => e.id === res[2].currencyId)[0];
+
+                    this.requester.setValue(requesterTemp);
+                    this.currencyId.setValue(currencyTemp);
+
                 }
-            );
+            }
+        );
     }
 
     search() {
@@ -182,26 +210,26 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.resetFormControl(this.currencyId);
 
         this._store.dispatch(SearchList({
-            payload: { requester: this.userLogged.id }
+            payload: {}
         }));
         this.onSearch.emit(<any>{ requester: this.userLogged.id });
     }
 
-    getUsers() {
-        this._systemRepo.getSystemUsers({})
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { }),
-            ).subscribe(
-                (users: any) => {
-                    if (!!users) {
-                        this.requesters = users.map((item: any) => ({ text: item.username, id: item.id }));
-                        this.requesterActive = [this.requesters.filter(stf => stf.id === this.userLogged.id)[0]];
-                        this.requester.setValue(this.requesterActive);
-                    }
-                },
-            );
-    }
+    // getUsers() {
+    //     this._systemRepo.getSystemUsers({})
+    //         .pipe(
+    //             catchError(this.catchError),
+    //             finalize(() => { }),
+    //         ).subscribe(
+    //             (users: any) => {
+    //                 if (!!users) {
+    //                     this.requesters = users.map((item: any) => ({ text: item.username, id: item.id }));
+    //                     this.requesterActive = [this.requesters.filter(stf => stf.id === this.userLogged.id)[0]];
+    //                     this.requester.setValue(this.requesterActive);
+    //                 }
+    //             },
+    //         );
+    // }
 
     onRemoveDataFormInfo(data: any, type: string) {
         if (type === 'requester') {

@@ -6,7 +6,9 @@ import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { getSettlementPaymentSearchParamsState, ISettlementPaymentState } from '../store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'settle-payment-form-search',
@@ -38,7 +40,7 @@ export class SettlementFormSearchComponent extends AppForm {
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
-
+        private _store: Store<ISettlementPaymentState>,
     ) {
         super();
         this.requestSearch = this.onSubmit;
@@ -48,6 +50,13 @@ export class SettlementFormSearchComponent extends AppForm {
         this.initForm();
         this.initDataInform();
         this.getCurrency();
+        this._store.select(getSettlementPaymentSearchParamsState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((res: any) => {
+
+            });
     }
 
     getCurrency() {

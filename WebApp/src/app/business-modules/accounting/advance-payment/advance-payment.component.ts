@@ -88,28 +88,8 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
-        //this.getListAdvancePayment();
-        // * Update form search from store
-        this._store.select(getAdvancePaymentSearchParamsState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (Object.keys(data.searchParams).length === 0 && data.searchParams.constructor === Object) {
+        this.getListAdvancePayment();
 
-                    } else {
-                        console.log("else: ", data)
-                        this.dataSearch = data.searchParams;
-                        this.setDataForFormSearch();
-                    }
-                    this.getListAdvancePayment();
-                }
-            );
-    }
-
-    setDataForFormSearch() {
-        this.formSearch.setDataSearchFromRedux(this.dataSearch);
     }
 
     onSearchAdvPayment(data: any) {
@@ -121,7 +101,7 @@ export class AdvancePaymentComponent extends AppList {
     getListAdvancePayment() {
         this.isLoading = true;
         this._progressRef.start();
-        console.log("dataSearch before call api: ", this.dataSearch);
+
         this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
             .pipe(
                 catchError(this.catchError),
