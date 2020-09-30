@@ -130,6 +130,21 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Data Export Details CD Note
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <param name="cdNo"></param>
+        /// <param name="officeId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("ExportOpsCdNote")]
+        public IActionResult ExportOpsCdNote(Guid jobId, string cdNo, Guid officeId)
+        {
+            var data = cdNoteServices.GetDataExportOpsCDNote(jobId, cdNo, officeId);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// check allow delete an existed item
         /// </summary>
         /// <param name="cdNoteId"></param>

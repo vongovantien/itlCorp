@@ -1,7 +1,7 @@
 import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { ReportPreviewComponent } from 'src/app/shared/common';
@@ -36,6 +36,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -195,4 +196,21 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             );
     }
 
+    exportCDNote() {
+        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, userLogged.officeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
+                },
+            );
+    }
 }
