@@ -2,18 +2,18 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AppPage } from 'src/app/app.base';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
+import { AppForm } from '@app';
 
 @Component({
     selector: 'soa-search-box',
     templateUrl: './search-box-soa.component.html',
 })
-export class StatementOfAccountSearchComponent extends AppPage {
+export class StatementOfAccountSearchComponent extends AppForm {
 
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
 
@@ -47,6 +47,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
         private _dataService: DataService
     ) {
         super();
+        this.requestReset = this.reset;
     }
 
     ngOnInit(): void {
