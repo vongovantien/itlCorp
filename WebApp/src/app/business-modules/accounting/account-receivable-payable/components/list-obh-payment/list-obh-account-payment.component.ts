@@ -10,7 +10,7 @@ import { SortService } from '@services';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { PaymentModel, AccountingPaymentModel } from '@models';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 
 import { catchError, finalize } from 'rxjs/operators';
 
@@ -97,7 +97,7 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
     }
 
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/import-obh"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/import-obh`]);
     }
 
     exportExcel() {

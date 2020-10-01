@@ -19,6 +19,7 @@ import {
 import * as fromShareBussiness from './../../../share-business/store';
 
 import { catchError, takeUntil } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-job-fcl-export',
@@ -155,7 +156,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/sea-fcl-export/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -193,7 +194,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/sea-fcl-export/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -202,6 +203,6 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-fcl-export"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}`]);
     }
 }

@@ -12,6 +12,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
 import { catchError } from 'rxjs/operators';
 import { InitShipmentOtherChargeAction } from '@share-bussiness';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -83,7 +84,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     }
 
     onCancel() {
-        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}`]);
     }
 
     saveHBLSeparate() {

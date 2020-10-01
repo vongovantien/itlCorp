@@ -9,6 +9,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-sea-lcl-import-hbl',
@@ -52,7 +53,7 @@ export class SeaLCLImportHBLComponent extends AppShareHBLBase implements OnInit 
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl/${id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${id}`]);
                     } else {
                         this.info403Popup.show();
                     }
@@ -61,29 +62,29 @@ export class SeaLCLImportHBLComponent extends AppShareHBLBase implements OnInit 
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-lcl-import"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}`]);
     }
 
     gotoCreate() {
-        this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl/new`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/new`]);
     }
 
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }
 
     duplicateConfirm() {
-        this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], {
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
         });
     }

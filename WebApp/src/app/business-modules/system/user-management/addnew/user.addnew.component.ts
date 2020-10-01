@@ -7,6 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { finalize, catchError } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-user.addnew',
@@ -62,7 +63,7 @@ export class UserAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
-                            this._router.navigate([`home/system/user-management/${res.data}`]);
+                            this._router.navigate([`${RoutingConstants.SYSTEM.USER_MANAGEMENT}/${res.data}`]);
                         } else {
                             this._toastService.error(res.message, '');
                         }

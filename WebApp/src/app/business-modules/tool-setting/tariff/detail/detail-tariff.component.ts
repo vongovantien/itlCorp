@@ -9,6 +9,7 @@ import { TariffAdd } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SystemConstants } from 'src/constants/system.const';
 import { combineLatest } from 'rxjs';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-detail-tariff',
@@ -159,7 +160,7 @@ export class TariffDetailComponent extends TariffAddComponent {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate(["home/tool/tariff"]);
+                        this._router.navigate([`${RoutingConstants.TOOL.TARIFF}`]);
                     } else {
                         this._toastService.error(res.message);
                     }

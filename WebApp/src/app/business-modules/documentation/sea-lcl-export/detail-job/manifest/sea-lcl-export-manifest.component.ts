@@ -17,6 +17,7 @@ import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules
 import { CommonEnum } from '@enums';
 import { ShareBusinessHousebillsInManifestComponent } from 'src/app/business-modules/share-business/components';
 import { TransactionGetDetailAction, getTransactionLocked, getTransactionPermission } from '@share-bussiness';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-sea-lcl-export-manifest',
@@ -112,7 +113,7 @@ export class SeaLclExportManifestComponent extends AppList {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`]);
     }
 
     getVolumn(event) {

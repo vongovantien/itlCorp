@@ -18,6 +18,7 @@ import { ExportRepo, CatalogueRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
+import { RoutingConstants } from '@constants';
 
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 
@@ -176,7 +177,7 @@ export class PartnerComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.router.navigate([`/home/catalogue/partner-data/detail/${this.partner.id}`]);
+                        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${this.partner.id}`]);
                     } else {
                         this.info403Popup.show();
                     }
@@ -220,7 +221,7 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     addPartner() {
-        this.router.navigate(["/home/catalogue/partner-data/add"], { queryParams: { partnerType: this.criteria.partnerGroup } });
+        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/add`], { queryParams: { partnerType: this.criteria.partnerGroup } });
     }
 
     export() {

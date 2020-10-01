@@ -16,6 +16,7 @@ import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
+import { RoutingConstants } from '@constants';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -122,7 +123,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.hblDetail.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.hblDetail.jobId}/hbl`]);
 
     }
 

@@ -14,6 +14,7 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { formatDate } from '@angular/common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-advance-payment',
@@ -194,10 +195,10 @@ export class AdvancePaymentComponent extends AppList {
                     switch (adv.statusApproval) {
                         case 'New':
                         case 'Denied':
-                            this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}`]);
                             break;
                         default:
-                            this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`]);
                             break;
                     }
                 } else {

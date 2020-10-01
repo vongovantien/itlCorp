@@ -8,6 +8,7 @@ import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ReportPreviewComponent } from '@common';
+import { RoutingConstants } from '@constants';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -162,7 +163,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     back() {
-        this._router.navigate(['home/accounting/statement-of-account']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
     }
 
     export() {

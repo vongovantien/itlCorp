@@ -7,7 +7,7 @@ import { AppForm } from "src/app/app.form";
 import { SettingRepo } from "@repositories";
 import { UnlockRequestListJobComponent } from "../components/list-job-unlock-request/list-job-unlock-request.component";
 import { User, SetUnlockRequestModel } from "@models";
-import { SystemConstants } from "@constants";
+import { RoutingConstants, SystemConstants } from "@constants";
 import { CommonEnum } from "@enums";
 import { SelectItem } from "ng2-select";
 import { catchError, finalize } from "rxjs/operators";
@@ -161,7 +161,7 @@ export class UnlockRequestAddNewComponent extends AppForm {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            this._router.navigate([`home/tool/unlock-request/${res.data.id}`]);
+                            this._router.navigate([`${RoutingConstants.TOOL.UNLOCK_REQUEST}/${res.data.id}`]);
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -215,7 +215,7 @@ export class UnlockRequestAddNewComponent extends AppForm {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success('Send Request successfully', 'Save Success !', { positionClass: 'toast-bottom-right' });
-                            this._router.navigate([`home/tool/unlock-request/${res.data.id}`]);
+                            this._router.navigate([`${RoutingConstants.TOOL.UNLOCK_REQUEST}/${res.data.id}`]);
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -231,6 +231,6 @@ export class UnlockRequestAddNewComponent extends AppForm {
 
     onCancelUnlock() {
         this.confirmCancelPopup.hide();
-        this._router.navigate([`home/tool/unlock-request`]);
+        this._router.navigate([`${RoutingConstants.TOOL.UNLOCK_REQUEST}`]);
     }
 }

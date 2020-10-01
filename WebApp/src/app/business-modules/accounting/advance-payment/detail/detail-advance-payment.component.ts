@@ -10,6 +10,7 @@ import { AdvancePaymentListRequestComponent } from '../components/list-advance-p
 import { ToastrService } from 'ngx-toastr';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-advance-payment-detail',
@@ -157,7 +158,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
     }
 
     back() {
-        this._router.navigate(['home/accounting/advance-payment']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}`]);
     }
 
     previewAdvPayment() {
@@ -212,7 +213,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(`${res.data.advanceNo + ' Send request successfully'}`, 'Update Success !');
-                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}/approve`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${res.data.id}/approve`]);
 
                     } else {
                         this.handleError((data: any) => {

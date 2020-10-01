@@ -17,7 +17,7 @@ import { AccountingDetailCdNoteComponent } from '../components/popup/detail-cd-n
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { getMenuUserPermissionState, IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { AccountingConstants } from '@constants';
+import { AccountingConstants, RoutingConstants } from '@constants';
 
 
 type TAB = 'CDI' | 'VAT' | 'VOUCHER';
@@ -71,11 +71,11 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'vat': {
-                this._router.navigate([`home/accounting/management/vat-invoice`]);
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice`]);
                 break;
             }
             case 'voucher': {
-                this._router.navigate([`home/accounting/management/voucher`]);
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher`]);
                 break;
             }
         }
@@ -164,7 +164,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                         if (!!res && !!res.length) {
                             if (res.length === 1) {
                                 this._store.dispatch(SelectPartner(res[0]));
-                                this._router.navigate(["home/accounting/management/vat-invoice/new"]);
+                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice/new`]);
                                 return;
                             } else {
                                 this.selectPartnerPopup.listPartners = res;
@@ -184,7 +184,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                         if (!!res && !!res.length) {
                             if (res.length === 1) {
                                 this._store.dispatch(SelectPartner(res[0]));
-                                this._router.navigate(["home/accounting/management/voucher/new"]);
+                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/new`]);
                                 return;
                             } else {
                                 this.selectPartnerPopup.listPartners = res;
@@ -203,10 +203,10 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
 
     onSelectPartner() {
         if (this.selectedIssueType === AccountingConstants.ISSUE_TYPE.INVOICE) {
-            this._router.navigate(["home/accounting/management/vat-invoice/new"]);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice/new`]);
             return;
         }
-        this._router.navigate(["home/accounting/management/voucher/new"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/new`]);
 
     }
 }

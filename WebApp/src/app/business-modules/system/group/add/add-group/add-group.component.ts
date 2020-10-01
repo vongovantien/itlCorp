@@ -6,6 +6,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-add-group',
@@ -107,7 +108,7 @@ export class AddGroupComponent extends AppForm implements OnInit {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            this._router.navigate([`home/system/group/${res.data.id}`]);
+                            this._router.navigate([`${RoutingConstants.SYSTEM.GROUP}/${res.data.id}`]);
                             this._toastService.success(res.message, '');
                             this.isSubmitted = false;
                             // this.initForm();
@@ -119,6 +120,6 @@ export class AddGroupComponent extends AppForm implements OnInit {
         }
     }
     cancel() {
-        this._router.navigate(["home/system/group"]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.GROUP}`]);
     }
 }

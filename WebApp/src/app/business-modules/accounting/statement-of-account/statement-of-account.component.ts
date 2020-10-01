@@ -12,6 +12,7 @@ import { ToastrService } from "ngx-toastr";
 import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { Router } from "@angular/router";
+import { RoutingConstants } from "@constants";
 
 @Component({
     selector: "app-statement-of-account",
@@ -140,7 +141,7 @@ export class StatementOfAccountComponent extends AppList {
             .checkAllowGetDetailSOA(soano)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate([`/home/accounting/statement-of-account/detail/`], {
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
                         queryParams: { no: soano, currency: currency }
                     });
                 } else {

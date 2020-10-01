@@ -10,7 +10,7 @@ import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { CsTransaction, CsTransactionDetail } from '@models';
 import { CommonEnum } from '@enums';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
@@ -150,7 +150,7 @@ export class SeaConsolImportComponent extends AppList {
     }
 
     gotoCreateJob() {
-        this._router.navigate(['home/documentation/sea-consol-import/new']);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/new`]);
     }
 
     onSearchMasterBills(data: any) {
@@ -239,7 +239,7 @@ export class SeaConsolImportComponent extends AppList {
         this._documentationRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["/home/documentation/sea-consol-import", id]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}`, id]);
                 } else {
                     this.permissionPopup.show();
                 }
