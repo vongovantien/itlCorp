@@ -33,7 +33,8 @@
             "@system-constants": ["src/constants"],
             "@decorators": ["src/app/shared/decorators"],
             "@core": ["src/app/core"],
-            "@app": ["src/app"]
+            "@app": ["src/app"],
+            "@animations": ["src/app/shared/animations"]
         }
     }
 }
