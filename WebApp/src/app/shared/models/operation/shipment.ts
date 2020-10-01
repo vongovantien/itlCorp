@@ -43,6 +43,7 @@ export class Shipment {
     warehouseId: string = '';
 
     customClearances: CustomDeclaration[] = []; // * custom
+    clearanceNo: string = '';
     customerName: string = '';
     isLocked: boolean = false;
 
