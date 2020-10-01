@@ -59,7 +59,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             .subscribe(
                 (data: any) => {
                     if (Object.keys(data).length === 0 && data.constructor === Object) {
-
+                        this.onSearch.emit(<any>{ requester: this.userLogged.id });
                     } else {
                         this.onSearch.emit(data);
                         this.setDataSearchFromRedux(data);
@@ -100,7 +100,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.paymentMethods = this.getMethod();
 
         this.getUserLogged();
-        this.getCurrency();
+        this.getCurrencyAndUsers();
         //this.getUsers();
     }
 
@@ -168,7 +168,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         ];
     }
 
-    getCurrency() {
+    getCurrencyAndUsers() {
         combineLatest([
             this._catalogueRepo.getListCurrency(),
             this._systemRepo.getSystemUsers({}),
@@ -185,7 +185,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
                     this.currencyId.setValue(null);
                 } else {
                     const requesterTemp = [this.requesters.filter(e => e.id === res[2].requester)[0]];
-                    const currencyTemp = this.currencies.filter(e => e.id === res[2].currencyId)[0];
+                    const currencyTemp = this.currencies.filter(e => e.id === res[2].currencyId).length <= 0 ? null
+                        : this.currencies.filter(e => e.id === res[2].currencyId)[0];
 
                     this.requester.setValue(requesterTemp);
                     this.currencyId.setValue(currencyTemp);
