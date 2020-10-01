@@ -249,6 +249,14 @@ export class UtilityHelper {
             ['OBH', [CommonEnum.CHARGE_TYPE.OBH]],
         ]).get(type)[0];
     }
+
     findDuplicates = (arr: any) => arr.filter((item: any, index: number) => arr.indexOf(item) != index);
+
+    countBy(arr: any[], fn: any) {
+        return arr.map(typeof fn === 'function' ? fn : val => val[fn]).reduce((acc, val) => {
+            acc[val as number] = (acc[val as number] || 0) + 1;
+            return acc;
+        }, {});
+    }
 
 }
