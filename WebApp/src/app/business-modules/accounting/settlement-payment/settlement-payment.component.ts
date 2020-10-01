@@ -14,6 +14,7 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from '../compo
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
 import { SelectRequester } from '../accounting-management/store';
+import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 @Component({
     selector: 'app-settlement-payment',
@@ -26,6 +27,7 @@ export class SettlementPaymentComponent extends AppList {
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
     @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent, { static: false }) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(SettlementPaymentsPopupComponent, { static: false }) settlementPaymentsPopup: SettlementPaymentsPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     settlements: SettlementPayment[] = [];
@@ -290,44 +292,11 @@ export class SettlementPaymentComponent extends AppList {
         this.isCheckAll = this.settlements.filter(x => x.statusApproval === 'Done' && !x.voucherNo).every(x => x.isSelected === true);
     }
 
-    printMultiple() {
-        const objChecked = this.settlements.find(x => x.isSelected);
-        const settlementNos = [];
-        if (!objChecked) {
-            this.infoPopup.title = 'Cannot Print Multiple Settlement!';
-            this.infoPopup.body = 'Opps, Please check settlement to print';
-            this.infoPopup.show();
-            return;
-        } else {
-            this.settlements.forEach(item => {
-                if (item.isSelected) {
-                    settlementNos.push(item.settlementNo);
-                }
-            });
-
-            this.previewMultiple(settlementNos);
-        }
-    }
-
-    previewMultiple(settlementNos: string[]) {
-        this._progressRef.start();
-        this._accoutingRepo.previewSettlementPaymentMultiple(settlementNos)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res != null) {
-                        this.dataReport = res;
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
+    showPopupList() {
+        this.settlementPaymentsPopup.dataSearchList = this.dataSearch;
+        this.settlementPaymentsPopup.page = this.page;
+        this.settlementPaymentsPopup.pageSize = this.pageSize;
+        this.settlementPaymentsPopup.getListSettlePayment();
+        this.settlementPaymentsPopup.show();
     }
 }

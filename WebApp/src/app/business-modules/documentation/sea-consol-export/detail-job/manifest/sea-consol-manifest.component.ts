@@ -107,6 +107,7 @@ export class SeaConsolExportManifestComponent extends AppList {
     refreshManifest() {
         //this.getManifest(this.jobId);
         this.formManifest.getShipmentDetail();
+        this.isShowUpdate = false; //refresh hide preview button
         this.getHblList(this.jobId);
     }
 

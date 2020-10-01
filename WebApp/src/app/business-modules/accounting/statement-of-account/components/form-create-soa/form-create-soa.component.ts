@@ -73,6 +73,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     shipmentInput: OperationInteface.IInputShipment;
 
     numberOfShipment: number = 0;
+    airlineCode: string = '';
+
     constructor(
         private _toastService: ToastrService,
         private _dataService: DataService,
@@ -376,7 +378,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 jobIds: this.mapShipment("JOBID"),
                 hbls: this.mapShipment("HBL"),
                 mbls: this.mapShipment("MBL"),
-                customNo: this.mapShipment("CustomNo")
+                customNo: this.mapShipment("CustomNo"),
+                airlineCode: this.airlineCode
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);

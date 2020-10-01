@@ -17,8 +17,7 @@
                             <div class="form-group">
                                 <label for="">Requester</label>
                                 <ng-select formControlName="requester" [allowClear]="true"
-                                    (removed)="onRemoveDataFormInfo($event, 'requester')" [items]="requesters"
-                                    [active]="requesterActive">
+                                    (removed)="onRemoveDataFormInfo($event, 'requester')" [items]="requesters">
                                 </ng-select>
                             </div>
                         </div>
@@ -37,7 +36,7 @@
                                 <label for="">Currency</label>
                                 <select class="form-control" formControlName="currencyId">
                                     <option [ngValue]="null">All</option>
-                                    <option *ngFor="let currency of (currencies | async)" [ngValue]="currency">
+                                    <option *ngFor="let currency of (currencies)" [ngValue]="currency">
                                         {{currency.id}}
                                     </option>
                                 </select>
