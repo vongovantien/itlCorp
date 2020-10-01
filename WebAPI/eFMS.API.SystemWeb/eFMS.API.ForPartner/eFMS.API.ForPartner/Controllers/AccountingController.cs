@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
@@ -64,19 +65,35 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(data);
         }
 
-        [HttpPost("GetChargeInvoice")]
-        // [APIKeyAuth]
-        public IActionResult GetChargeInvoice([FromBody]SearchAccMngtCriteria model)
+        [HttpPut("UpdateVoucherAdvance")]
+        public IActionResult UpdateVoucherAdvance(VoucherAdvance model)
         {
-            //string apiKey = Request.Headers[AccountingConstants.API_KEY_HEADER];
-            //if (!accountingManagementService.ValidateApiKey(apiKey))
-            //{
-            //    return Unauthorized();
-            //}
-
-            List<ChargeOfAcctMngtResult> data = accountingManagementService.GetChargeInvoice(model);
-            return Ok(data);
+            return Ok(new ResultHandle { Status = true, Message = "Update Phiếu chi thành công", Data = model });
         }
 
+        [HttpPost("CreateInvoiceData")]
+        public IActionResult CreateInvoiceData(InvoiceData model)
+        {
+            return Ok(new ResultHandle{ Status = true, Message = "Tạo Hóa đơn thành công", Data = model });
+        }
+
+        [HttpPut("CancellingInvoice")]
+        public IActionResult CancellingInvoice(InvoiceInfo model)
+        {
+            return Ok(new ResultHandle { Status = true, Message = "Hủy Hóa đơn thành công", Data = model });
+        }
+
+        [HttpPut("ReplaceInvoiceData")]
+        public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model)
+        {
+            return Ok(new ResultHandle { Status = true, Message = "Thay thế Hóa đơn thành công", Data = model });
+        }
+
+        [HttpPut("RejectData")]
+        public IActionResult RejectData(RejectData model)
+        {
+            return Ok(new ResultHandle { Status = true, Message = "Reject data thành công", Data = model });
+
+        }
     }
 }

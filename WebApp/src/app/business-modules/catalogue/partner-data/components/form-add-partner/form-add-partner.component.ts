@@ -172,7 +172,10 @@ export class FormAddPartnerComponent extends AppForm {
                         }
                     } else {
                         const newCloneArray = this.partnerGroup.value.map((e) => { return { id: e.id, text: e.text } });
-                        this.partnerGroup.setValue(newCloneArray);
+                        if (newCloneArray.length < 2) {
+                            newCloneArray.push({ text: event.text, id: event.id });
+                        }
+                        this.partnerGroup.setValue([...newCloneArray]);
                     }
                 }
                 const isShowSaleMan = this.checkRequireSaleman();

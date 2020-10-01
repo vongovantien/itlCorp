@@ -10,12 +10,12 @@ import { SortService } from '@services';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { AccountingConstants, RoutingConstants } from '@constants';
-import { AccAccountingManagementResult } from '@models';
+import { AccAccountingManagementCriteria, AccAccountingManagementResult } from '@models';
 
 import { AppList } from 'src/app/app.list';
 
-import { Observable } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { accountingManagementDataSearchState, accountingManagementListLoadingState, accountingManagementListState, LoadListAccountingMngt } from '../store';
 
 
 @Component({
@@ -31,7 +31,12 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
     vouchers: AccAccountingManagementResult[] = [];
     confirmDeleteVoucherText: string;
     selectedVoucher: AccAccountingManagementResult;
-    menuSpecialPermission: Observable<any[]>;
+
+    defaultDataSearch: AccountingInterface.IDefaultSearchAcctMngt = {
+        typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.VOUCHER,
+        fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+    };
 
     constructor(
         private _router: Router,
@@ -44,7 +49,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestList = this.getListVoucher;
+        this.requestList = this.requestSearchAcctMngt;
         this.requestSort = this.sortVoucher;
     }
 
@@ -59,12 +64,28 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
             { title: 'Issued Date', field: 'datetimeCreated', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },
         ];
-        this.dataSearch = {
-            typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.VOUCHER,
-            fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-            toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-        };
+
         this.getListVoucher();
+
+        this._store.select(accountingManagementDataSearchState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (dataSearch: AccAccountingManagementCriteria) => {
+                    console.log(dataSearch);
+                    if (!!dataSearch && dataSearch.typeOfAcctManagement === AccountingConstants.ISSUE_TYPE.VOUCHER) {
+                        this.dataSearch = dataSearch;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchAcctMngt();
+                }
+            );
+
+        this.isLoading = this._store.select(accountingManagementListLoadingState);
+    }
+
+    requestSearchAcctMngt() {
+        this._store.dispatch(LoadListAccountingMngt({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     onSelectTab(tabName: string) {
@@ -81,31 +102,26 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
     }
 
     getListVoucher() {
-        this._progressRef.start();
-        this._accountingRepo.getListAcctMngt(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._store.select(accountingManagementListState)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                }),
-                map((data: CommonInterface.IResponsePaging) => {
+                takeUntil(this.ngUnsubscribe),
+                map((data: any) => {
                     return {
                         data: (data.data || []).map((item: AccAccountingManagementResult) => new AccAccountingManagementResult(item)),
-                        totalItems: data.totalItems,
+                        totalItems: data.totalItems || 0,
                     };
                 })
-            ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
+            )
+            .subscribe(
+                (res: CommonInterface.IResponsePaging | any) => {
                     this.totalItems = res.totalItems || 0;
                     this.vouchers = res.data;
-                },
+                }
             );
     }
 
     onSearchVoucher($event: any) {
         this.page = 1;
-        this.dataSearch = $event;
-        this.getListVoucher();
     }
 
     sortVoucher(sortField: string) {

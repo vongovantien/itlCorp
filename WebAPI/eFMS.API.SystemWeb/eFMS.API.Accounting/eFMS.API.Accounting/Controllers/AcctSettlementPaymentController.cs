@@ -804,5 +804,13 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctSettlementPaymentService.GetHistoryDeniedSettlement(settlementNo);
             return Ok(data);
         }
+        
+        [HttpPost("PreviewMultipleSettlementBySettlementNos")]
+        [Authorize]
+        public IActionResult PreviewMultipleSettlementBySettlementNos(List<string> settlmentNos)
+        {
+            var result = acctSettlementPaymentService.PreviewMultipleSettlement(settlmentNos);
+            return Ok(result);
+        }
     }
 }

@@ -10,7 +10,7 @@ import { ChargeOfAccountingManagementModel } from '@models';
 import { AppList } from 'src/app/app.list';
 import { IAccountingManagementState, getAccountingManagementPartnerChargeState } from '../../store';
 
-import { map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 import { AccountingRepo } from '@repositories';
 import { of } from 'rxjs';
@@ -322,6 +322,27 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 }
             );
     }
+
+    onChangeInvoiceNo(invoiceNo: string) {
+        this.updateForAllCharge('invoiceNo', invoiceNo);
+
+    }
+
+    onChangeSerieNo(serieNo: string) {
+        this.updateForAllCharge('serie', serieNo);
+    }
+
+    onChangeInvoiceDate(invoiceDate: string) {
+        this.updateForAllCharge('invoiceDate', invoiceDate);
+
+    }
+
+    updateForAllCharge(key: string, value: string) {
+        this.charges.forEach(c => {
+            c[key] = value;
+        });
+    }
+
 }
 
 interface ITotalAmountVatVnd {

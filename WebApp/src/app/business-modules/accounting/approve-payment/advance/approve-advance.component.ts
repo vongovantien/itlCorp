@@ -173,6 +173,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                 (res: any) => {
                     this.dataReport = res;
                     setTimeout(() => {
+                        this.previewPopup.frm.nativeElement.submit();
                         this.previewPopup.show();
                     }, 1000);
 

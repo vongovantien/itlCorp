@@ -57,5 +57,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid? ChargeGroup { get; set; }
         public string TransactionType { get; set; }
         public Guid? OfficeId { get; set; }
+        public decimal? AmountVnd { get; set; }
+        public decimal? VatAmountVnd { get; set; }
     }
 }

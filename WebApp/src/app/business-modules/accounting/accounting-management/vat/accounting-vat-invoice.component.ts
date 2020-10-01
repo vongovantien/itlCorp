@@ -7,15 +7,15 @@ import { formatDate } from '@angular/common';
 
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { AccAccountingManagementResult } from '@models';
 import { AccountingConstants, RoutingConstants } from '@constants';
+import { AccAccountingManagementCriteria, AccAccountingManagementResult } from '@models';
 import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 
 import { AppList } from 'src/app/app.list';
 
-import { Observable } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { accountingManagementDataSearchState, accountingManagementListLoadingState, accountingManagementListState, LoadListAccountingMngt } from '../store';
 
 
 @Component({
@@ -31,7 +31,12 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
     selectedInvoice: AccAccountingManagementResult;
 
     confirmDeleteInvoiceText: string = '';
-    menuSpecialPermission: Observable<any[]>;
+
+    defaultDataSearch: any = {
+        typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.INVOICE,
+        fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+    };
 
     constructor(
         private _router: Router,
@@ -40,11 +45,11 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
         private _sortService: SortService,
         private _exportRepo: ExportRepo,
         private _toastService: ToastrService,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestList = this.getListInvoice;
+        this.requestList = this.requestSearchAcctMngt;
         this.requestSort = this.sortInvoice;
     }
 
@@ -65,12 +70,28 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
             { title: 'Payment Status', field: 'paymentStatus', sortable: true },
 
         ];
-        this.dataSearch = {
-            typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.INVOICE,
-            fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-            toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-        };
+
         this.getListInvoice();
+
+        this._store.select(accountingManagementDataSearchState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (dataSearch: AccAccountingManagementCriteria) => {
+                    console.log(dataSearch);
+                    if (!!dataSearch && dataSearch.typeOfAcctManagement === AccountingConstants.ISSUE_TYPE.INVOICE) {
+                        this.dataSearch = dataSearch;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchAcctMngt();
+                }
+            );
+
+        this.isLoading = this._store.select(accountingManagementListLoadingState);
+    }
+
+    requestSearchAcctMngt() {
+        this._store.dispatch(LoadListAccountingMngt({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     onSelectTab(tabName: string) {
@@ -87,33 +108,26 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
     }
 
     getListInvoice() {
-        this._progressRef.start();
-        this.isLoading = true;
-        this._accountingRepo.getListAcctMngt(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._store.select(accountingManagementListState)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.isLoading = false;
-                }),
-                map((data: CommonInterface.IResponsePaging) => {
+                takeUntil(this.ngUnsubscribe),
+                map((data: any) => {
                     return {
                         data: (data.data || []).map((item: AccAccountingManagementResult) => new AccAccountingManagementResult(item)),
-                        totalItems: data.totalItems,
+                        totalItems: data.totalItems || 0,
                     };
                 })
-            ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
+            )
+            .subscribe(
+                (res: CommonInterface.IResponsePaging | any) => {
                     this.totalItems = res.totalItems || 0;
                     this.invoices = res.data;
-                },
+                }
             );
     }
 
     onSearchInvoice($event: any) {
         this.page = 1;
-        this.dataSearch = $event;
-        this.getListInvoice();
     }
 
     sortInvoice(sortField: string) {

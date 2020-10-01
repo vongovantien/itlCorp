@@ -58,10 +58,10 @@
                                                 <td class="text-success">{{voucher.creatorName}}</td>
                                             </tr>
                                         </ng-container>
-                                        <tr app-table-none-record *ngIf="!isLoading && !vouchers.length"
+                                        <tr app-table-none-record *ngIf="!(isLoading| async) && !vouchers.length"
                                             [colspan]="headers.length + 1">
                                         </tr>
-                                        <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                        <tr app-table-row-loading *ngIf="(isLoading | async)"></tr>
                                     </tbody>
                                 </table>
                             </div>
