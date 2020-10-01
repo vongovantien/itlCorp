@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
@@ -62,6 +62,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     ngOnInit() {
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
@@ -90,6 +91,7 @@ export class AdvancePaymentComponent extends AppList {
 
         this.getUserLogged();
         this.getListAdvancePayment();
+
     }
 
     onSearchAdvPayment(data: any) {
@@ -101,6 +103,7 @@ export class AdvancePaymentComponent extends AppList {
     getListAdvancePayment() {
         this.isLoading = true;
         this._progressRef.start();
+
         this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
             .pipe(
                 catchError(this.catchError),

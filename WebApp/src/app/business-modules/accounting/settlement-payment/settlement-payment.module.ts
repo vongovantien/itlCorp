@@ -32,6 +32,8 @@ import { ShareAccountingModule } from '../share-accouting.module';
 import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 import { ReportPreviewComponent } from '@common';
 import { SelectModule } from 'ng2-select';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './components/store';
 
 const routing: Routes = [
     {
@@ -102,7 +104,7 @@ const customCurrencyMaskConfig = {
         BsDropdownModule.forRoot(),
         ShareAccountingModule,
         SelectModule,
-
+        StoreModule.forFeature('settlement-payment', reducers),
     ],
     exports: [],
     declarations: [
