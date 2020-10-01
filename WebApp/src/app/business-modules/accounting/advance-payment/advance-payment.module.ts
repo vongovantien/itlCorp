@@ -23,6 +23,7 @@ import { ImportVoucherAdvancePaymentComponent } from './import/import-voucher-ad
 import { SelectModule } from 'ng2-select';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store';
+import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 const routing: Routes = [
     {
         path: "",
@@ -59,7 +60,8 @@ const COMPONENTS = [
     AdvancePaymentAddRequestPopupComponent,
     UpdatePaymentVoucherPopupComponent,
     ImportVoucherAdvancePaymentComponent,
-    AdvancePaymentFormsearchComponent
+    AdvancePaymentFormsearchComponent,
+    AdvancePaymentsPopupComponent
 ];
 
 const customCurrencyMaskConfig = {
