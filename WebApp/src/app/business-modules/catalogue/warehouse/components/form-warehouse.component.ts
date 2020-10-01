@@ -57,7 +57,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
             displayName: [],
             country: [null, Validators.required],
             province: [null, Validators.required],
-            district: [null, Validators.required],
+            district: [],
             address: [null, FormValidators.required],
             flightVesselNo: [],
             active: [true]
