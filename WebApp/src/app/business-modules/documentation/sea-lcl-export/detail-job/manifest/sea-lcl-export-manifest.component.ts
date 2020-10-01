@@ -100,6 +100,7 @@ export class SeaLclExportManifestComponent extends AppList {
         //this.getManifest(this.jobId);
         this.formManifest.getShipmentDetail();
         this.getHblList(this.jobId);
+        this.isShowUpdate = false;
     }
 
     onRefresh() {
