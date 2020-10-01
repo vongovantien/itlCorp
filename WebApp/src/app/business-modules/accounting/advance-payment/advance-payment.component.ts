@@ -258,7 +258,7 @@ export class AdvancePaymentComponent extends AppList {
                     (res: any) => {
                         if (!!res && res.lstVoucherData.length > 0) {
                             res.lstVoucherData.forEach(item => {
-                                this.messageVoucherExisted += item.advanceNo + " has existed in " + item.voucherNo + "</br>";
+                                this.messageVoucherExisted += item.advanceNo + " has existed in " + item.voucherNo + "<br>";
                             });
                             this.messageVoucherExisted += "<br>" + " Would you like to keep updating?";
                             this.confirmExistedVoucher.show();
