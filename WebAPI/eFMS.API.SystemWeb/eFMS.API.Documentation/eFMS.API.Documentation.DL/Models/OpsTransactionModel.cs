@@ -13,6 +13,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string CurentStageCode { get; set; }
         public string AgentName { get; set; }
         public string SupplierName { get; set; }
+        public string ClearanceNo { get; set; }
         public string CustomerName { get; set; }
         public PermissionAllowBase Permission { get; set; }
         public string UserCreatedName { get; set; }

@@ -17,8 +17,7 @@
                             <div class="form-group">
                                 <label for="">Requester</label>
                                 <ng-select formControlName="requester" [allowClear]="true"
-                                    (removed)="onRemoveDataFormInfo($event, 'requester')" [items]="requesters"
-                                    [active]="requesterActive">
+                                    (removed)="onRemoveDataFormInfo($event, 'requester')" [items]="requesters">
                                 </ng-select>
                             </div>
                         </div>

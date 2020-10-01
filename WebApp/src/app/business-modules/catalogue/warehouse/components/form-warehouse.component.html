@@ -1,5 +1,5 @@
 <div class="modal fade" id="edit-ware-house-modal" bsModal #popup="bs-modal">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{ title }}</h5>
@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <form class="m-form m-form m-form--state" [formGroup]="warehouseForm">
                     <div class="row">
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && code.invalid }">
                                 <label class="form-control-label">
@@ -23,7 +23,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && warehouseNameEN.invalid }">
                                 <label class="form-control-label">
@@ -37,7 +37,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && warehouseNameVN.invalid }">
                                 <label class="form-control-label">
@@ -51,7 +51,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label">
                                     Name(Abbr)
@@ -60,9 +63,7 @@
                                     autocomplete="nope" formControlName="displayName">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && country.invalid}">
                                 <label class="form-control-label">
@@ -77,7 +78,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && province.invalid }">
                                 <label class="form-control-label">
@@ -92,21 +93,21 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
-                            <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && district.invalid }">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
                                 <label class="form-control-label">
-                                    District <span class="m--font-danger">(*)</span>
+                                    District
                                 </label>
                                 <ng-select #chooseDistrict [allowClear]="true" [items]="districts"
                                     placeholder="Select district" formControlName="district">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && district.invalid">
-                                    District is required
-                                </div>
+
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && address.invalid }">
                                 <label class="form-control-label">
@@ -119,10 +120,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label">
                                     Flight/Vessel No
@@ -130,7 +128,10 @@
                                 <input type="text" class="form-control m-input" formControlName="flightVesselNo">
                             </div>
                         </div>
-                        <div class="col-lg-3" *ngIf="isUpdate">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4" *ngIf="isUpdate">
                             <div class="form-group">
                                 <label class="form-control-label"> Active </label>
                                 <div class="col-lg-8">

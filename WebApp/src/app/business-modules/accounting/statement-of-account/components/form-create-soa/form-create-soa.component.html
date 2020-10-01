@@ -145,12 +145,23 @@
                     </select>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label"></label>
-                        <div><a class="pointer" style="text-decoration: underline;"
-                                (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
-                                class="text-warning">{{numberOfShipment}} item</span></div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label">AirLine Code</label>
+                                <input type="text" class="form-control" [(ngModel)]="airlineCode">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label"></label>
+                                <div><a class="pointer" style="text-decoration: underline;"
+                                        (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
+                                        class="text-warning">{{numberOfShipment}} item</span></div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
             <div class="row form-charge">
