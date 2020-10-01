@@ -1282,7 +1282,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.Charges.ForEach(fe =>
                 {
                     decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
-                    if(exchangeRate == 1)
+                    if(exchangeRate == 1 || fe.Currency != "USD")
                     {
                         total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
                     }
