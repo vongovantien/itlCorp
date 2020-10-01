@@ -1279,22 +1279,17 @@ namespace eFMS.API.Accounting.DL.Services
             decimal total = 0;
             if (!string.IsNullOrEmpty(model.Currency))
             {
-                model.Charges.ForEach(fe =>
-                {
-                    decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
-                    if(exchangeRate == 1 || fe.Currency != "USD")
-                    {
-                        total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
-                    }
-                    else
-                    {
-                        decimal currentTotal = Math.Round(fe.AmountVnd + fe.VatAmountVnd ?? 0);
-                        total += currentTotal;
-                    }
-                });
                 if(model.Currency == "VND")
                 {
-                    total = Math.Round(total);
+                    total = model.Charges.Sum(x => x.AmountVnd ?? 0);
+                }
+                else
+                {
+                    model.Charges.ForEach(fe =>
+                    {
+                        decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
+                        total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
+                    });
                 }
             }
             return total;
