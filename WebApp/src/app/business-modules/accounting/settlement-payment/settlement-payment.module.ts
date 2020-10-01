@@ -32,6 +32,7 @@ import { ShareAccountingModule } from '../share-accouting.module';
 import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 import { ReportPreviewComponent } from '@common';
 import { SelectModule } from 'ng2-select';
+import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 const routing: Routes = [
     {
@@ -69,7 +70,8 @@ const COMPONENT = [
     SettlementTableSurchargeComponent,
     SettlementFormCopyPopupComponent,
     SettlementTableListChargePopupComponent,
-    SettlementChargeFromShipmentPopupComponent
+    SettlementChargeFromShipmentPopupComponent,
+    SettlementPaymentsPopupComponent
 ];
 
 const customCurrencyMaskConfig = {
