@@ -7,10 +7,12 @@ import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentAddRequestPopupComponent } from '../popup/add-advance-payment-request/add-advance-payment-request.popup';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { listAnimation } from '@animations';
 
 @Component({
     selector: 'adv-payment-list-request',
     templateUrl: './list-advance-payment-request.component.html',
+    animations: [listAnimation]
 })
 
 export class AdvancePaymentListRequestComponent extends AppList {

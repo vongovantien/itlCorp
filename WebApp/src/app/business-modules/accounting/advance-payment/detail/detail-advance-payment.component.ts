@@ -41,7 +41,6 @@ export class AdvancePaymentDetailComponent extends AppPage {
     }
 
     ngOnInit() {
-
         this._activedRouter.params.subscribe((param: any) => {
             if (!!param.id) {
                 this.advId = param.id;
@@ -61,10 +60,14 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
     getDetail(advanceId: string) {
         this._progressRef.start();
+        this.listRequestAdvancePaymentComponent.isLoading = true;
         this._accoutingRepo.getDetailAdvancePayment(advanceId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.listRequestAdvancePaymentComponent.isLoading = false;
+                })
             )
             .subscribe(
                 (res: any) => {

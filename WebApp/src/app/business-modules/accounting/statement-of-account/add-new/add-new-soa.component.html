@@ -90,7 +90,8 @@
                                     <span>{{charge.chargeName}}</span>
                                 </td>
                                 <td>
-                                    <span>{{charge.jobId}}</span>
+                                    <span class="pointer text-primary text-underline"
+                                        (click)="selectJobId(charge)">{{charge.jobId}}</span>
                                 </td>
                                 <td>
                                     <span>{{charge.hbl}}</span>

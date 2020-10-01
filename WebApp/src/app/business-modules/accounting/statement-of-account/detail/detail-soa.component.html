@@ -14,12 +14,13 @@
         <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
             <button id="button-nested" dropdownToggle type="button" class="btn btn-danger dropdown-toggle"
                 aria-controls="dropdown-nested">
-                <i class="la la-upload"></i>Export<span class="caret"></span>
+                <i class="la la-download"></i>Export<span class="caret"></span>
             </button>
             <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-nested">
                 <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOAAF()">Air - SOA Customer
                         Template</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOASupplierAF()">SOA Supplier For Air</a></li>
+                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOASupplierAF()">SOA Supplier For
+                        Air</a></li>
                 <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOAOPS()">SOA OPS</a></li>
                 <li role="menuitem"><a class="dropdown-item pointer" (click)="export()">For Import Bravo</a></li>
                 <li role="menuitem"><a class="dropdown-item pointer" (click)="exportExcelSOA()">Standard</a></li>
@@ -148,7 +149,7 @@
             <div class="table-wrapper">
                 <table class="table table-striped table-brand dataTable">
                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
-                    <tbody class="tbody-group">
+                    <tbody class="tbody-group" [@listAnimation]="!isLoading">
                         <ng-container *ngIf="TYPE === 'GROUP'">
                             <ng-container
                                 *ngFor="let groupShipment of soa.groupShipments ; let i = index; trackBy: trackByFn">
@@ -235,7 +236,7 @@
                             </ng-container>
                         </ng-container>
                         <ng-container *ngIf="TYPE === 'LIST'">
-                            <tr *ngIf="!isLoading && !soa.chargeShipments.length">
+                            <tr *ngIf="!isLoading && !!soa && !soa.chargeShipments.length">
                                 <td colspan="100">
                                     <div class="no-data">
                                         <i class="flaticon-coins"></i>
