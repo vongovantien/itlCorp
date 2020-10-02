@@ -189,7 +189,8 @@ export class AirExportManifestComponent extends AppList {
                 volume: this.formManifest.volume.value,
                 weight: this.formManifest.weight.value,
                 manifestIssuer: this.formManifest.agent.value,
-                csTransactionDetails: this.housebills
+                csTransactionDetails: this.housebills,
+                manifestShipper: this.formManifest.shipperDescription.value
             };
             this._documentationRepo.AddOrUpdateManifest(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -322,7 +323,8 @@ export class AirExportManifestComponent extends AppList {
             volume: this.formManifest.volume.value,
             weight: this.formManifest.weight.value,
             manifestIssuer: this.formManifest.agent.value,
-            csTransactionDetails: this.housebills.filter(x => x.isRemoved === false)
+            csTransactionDetails: this.housebills.filter(x => x.isRemoved === false),
+            manifestShipper: this.formManifest.shipperDescription.value
         };
         this._documentationRepo.previewAirExportManifest(body)
             .pipe(
