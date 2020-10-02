@@ -327,7 +327,7 @@ namespace eFMS.API.Catalogue.Controllers
             ContractFileUploadModel model = new ContractFileUploadModel
             {
                 Files = files,
-                FolderName = folderName,
+                FolderName = "Catalogue",
                 PartnerId = partnerId,
                 ChildId = contractId
             };
