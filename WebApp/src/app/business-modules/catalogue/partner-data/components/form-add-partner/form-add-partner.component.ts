@@ -155,29 +155,26 @@ export class FormAddPartnerComponent extends AppForm {
                 this.getBillingProvinces(event.id, !!this.provinceId.value && this.provinceId.value.length > 0 ? this.provinceId.value[0].id : null);
                 break;
             case 'category':
+
+                // case: current value === All
                 if (event.id === 'ALL') {
-                    const temp = [{ text: event.text, id: event.id }];
-                    this.partnerGroup.setValue([...temp]);
+                    const temp = { text: event.text, id: event.id };
+                    this.partnerGroup.setValue([temp]);
                 } else {
-                    const index = [...this.partnerGroup.value].findIndex(e => e.id === 'ALL');
-                    const length = [...this.partnerGroup.value].length;
-                    if (index >= 0) {
-                        if (length < 2) {
-                            const cloneArray = this.partnerGroup.value.filter(e => e.id !== 'ALL');
-                            cloneArray.push({ text: event.text, id: event.id });
-                            this.partnerGroup.setValue([...cloneArray]);
-                        } else {
-                            const cloneArray = this.partnerGroup.value.filter(e => e.id !== 'ALL');
-                            this.partnerGroup.setValue([...cloneArray]);
-                        }
+                    // check partnerGroup existed yet.
+                    const checkExistAll = [...this.partnerGroup.value].filter(e => e.id === 'ALL');
+                    // 
+                    if (checkExistAll.length <= 0) {
+                        // don't anything at here
                     } else {
-                        const newCloneArray = this.partnerGroup.value.map((e) => { return { id: e.id, text: e.text } });
-                        if (newCloneArray.length < 2) {
-                            newCloneArray.push({ text: event.text, id: event.id });
-                        }
-                        this.partnerGroup.setValue([...newCloneArray]);
+                        // partnerGroup added current item, so filter delete current item, to avoid duplicate.
+                        const removeAllArray = [...this.partnerGroup.value].filter(e => e.id !== 'ALL' && e.id !== event.id);
+
+                        removeAllArray.push({ id: event.id, text: event.text });
+                        this.partnerGroup.setValue(removeAllArray);
                     }
                 }
+                //
                 const isShowSaleMan = this.checkRequireSaleman();
                 this.requireSaleman.emit(isShowSaleMan);
                 break;

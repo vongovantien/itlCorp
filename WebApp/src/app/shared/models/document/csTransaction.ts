@@ -97,10 +97,8 @@ export class CsTransaction extends BaseModel {
     agentData: AgentData = null;
     creatorOffice: OfficeData = null;
     groupEmail: string = null;
-
-    //
+    mawbShipper: string = null;
     airlineInfo: string = null;
-
     isHawb: boolean = false;
 
     constructor(object?: any) {

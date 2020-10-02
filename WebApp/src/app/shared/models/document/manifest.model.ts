@@ -27,4 +27,5 @@ export class CsManifest {
   polName: string = null;
   podName: string = null;
   csMawbcontainers: Container[] = null;
+  manifestShipper: string = null;
 }

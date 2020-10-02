@@ -440,7 +440,7 @@ export class PartnerDetailComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.router.navigate(["/home/catalogue/partner-data"]);
+                        // this.router.navigate(["/home/catalogue/partner-data"]);
                     } else {
                         this._toastService.warning(res.message);
                     }
