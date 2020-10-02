@@ -77,8 +77,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var query = from sale in data
                         join user in sysUser on sale.SaleManId equals user.Id
                         select new { sale, user };
-
-
             List<CatContractModel> results = new List<CatContractModel>();
             if (data.Count() == 0) return null;
 
@@ -86,35 +84,24 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 CatContractModel saleman = mapper.Map<CatContractModel>(item.sale);
                 SysCompany company = sysCompanyRepository.Get(x => x.Id == saleman.CompanyId)?.FirstOrDefault();
-                //var arrToQuery = saleman.OfficeId.ToArray();
-                //SysOffice office = sysOfficeRepository.Get(x => arrToQuery.Contains(x.Id))?.FirstOrDefault();
-                //SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.OfficeId)?.FirstOrDefault();
                 if (company != null)
                 {
                     saleman.CompanyNameAbbr = company.BunameAbbr;
                     saleman.CompanyNameEn = company.BunameEn;
                     saleman.CompanyNameVn = company.BunameVn;
                 }
-
-                //if (office != null)
-                //{
-                //    saleman.OfficeNameEn = office.BranchNameEn;
-                //    saleman.OfficeNameAbbr = office.ShortName;
-                //    saleman.OfficeNameVn = office.BranchNameVn;
-                //}\
                 var officeIds = saleman.OfficeId.Split(";").ToList();
                 if(officeIds.Count() > 0)
                 {
                     foreach (var officeId in officeIds)
                     {
-                        saleman.OfficeNameAbbr += sysOfficeRepository.Get(x => x.Id == new Guid(officeId)).Select(t => t.ShortName).FirstOrDefault() + ";";
+                        saleman.OfficeNameAbbr += sysOfficeRepository.Get(x => x.Id == new Guid(officeId)).Select(t => t.ShortName).FirstOrDefault() + "; ";
                     }
                 }
                 if (saleman.OfficeNameAbbr.Length > 0)
                 {
-                    saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 1);
+                    saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 2);
                 }
-
                 saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
@@ -152,6 +139,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.ContractType = entity.ContractType;
                     model.ContractNo = entity.ContractNo;
                     model.SalesmanId = entity.SaleManId;
+                    model.UserCreatedContract = contract.UserCreated;
                     SendMailActiveSuccess(model, string.Empty);
                 }
                 ClearCache();
@@ -171,28 +159,28 @@ namespace eFMS.API.Catalogue.DL.Services
                     switch (item)
                     {
                         case "AE":
-                            ContractServicesName += "Air Export;";
+                            ContractServicesName += "Air Export; ";
                             break;
                         case "AI":
-                            ContractServicesName += "Air Import;";
+                            ContractServicesName += "Air Import; ";
                             break;
                         case "SFE":
-                            ContractServicesName += "Sea FCL Export;";
+                            ContractServicesName += "Sea FCL Export; ";
                             break;
                         case "SLE":
-                            ContractServicesName += "Sea LCL Export;";
+                            ContractServicesName += "Sea LCL Export; ";
                             break;
                         case "SLI":
-                            ContractServicesName += "Sea LCL Import;";
+                            ContractServicesName += "Sea LCL Import; ";
                             break;
                         case "CL":
-                            ContractServicesName += "Custom Logistic;";
+                            ContractServicesName += "Custom Logistic; ";
                             break;
                         case "IT":
-                            ContractServicesName += "Trucking;";
+                            ContractServicesName += "Trucking; ";
                             break;
                         default:
-                            ContractServicesName = "Air Export;Air Import;Sea FCL Export;Sea LCL Export;Sea LCL Import;Custom Logistic;Trucking ";
+                            ContractServicesName = "Air Export; Air Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking ";
                             break;
                     }
                 }
@@ -200,7 +188,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             if (!string.IsNullOrEmpty(ContractServicesName))
             {
-                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 1);
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
             }
             return ContractServicesName;
         }
@@ -226,6 +214,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
+                    modelPartner.UserCreatedContract = entity.UserCreated;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -700,13 +689,14 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private void SendMailActiveSuccess(CatPartnerModel partner, string type)
         {
-            string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreatedContract).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoSalesman = sysEmployeeRepository.Get(e => e.Id == employeeIdSalemans)?.FirstOrDefault();
+            List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
 
             // info send to and cc
@@ -774,7 +764,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     lstCc = lstTo;
                 }
                 lstCc.Add(objInfoSalesman?.Email);
-                SendMail.Send(subject, body, lstTo, null, null, lstCc);
+                SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
             }
             else
             {
@@ -803,13 +793,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 List<string> lstCc = new List<string>
                 {
                 };
-
                 lstCc.Add(objInfoSalesman?.Email);
-                SendMail.Send(subject, body, lstTo, null, null, lstCc);
-
+                SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
             }
-
-
         }
 
         public bool SendMailRejectComment(string partnerId, string contractId, string comment, string partnerType)
@@ -931,7 +917,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.webUrl.Value.Url ;
+            string path = this.ApiUrl.Value.Url ;
             try
             {
                 var list = new List<SysImage>();
