@@ -343,7 +343,7 @@ namespace eFMS.API.Documentation.DL.Services
                 IQueryable<CatPlace> ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
 
                 data.ToList().ForEach(x => {
-                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate)
+                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate).ThenBy(cus => cus.ClearanceNo)
                     .Select(cus => cus.ClearanceNo).FirstOrDefault();
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
