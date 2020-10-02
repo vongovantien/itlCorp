@@ -227,11 +227,14 @@ namespace eFMS.API.Documentation.DL.Services
             List<MasterAirwayBillReport> airWayBills = new List<MasterAirwayBillReport>();
             if (data != null)
             {
+                CsTransaction csTransaction = csTransactionRepo.Get(x => x.Id == data.JobId).FirstOrDefault();
+
                 var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
                 var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
-                var airlineId = csTransactionRepo.Get(x => x.Id == data.JobId).FirstOrDefault()?.ColoaderId;
+                var airlineId = csTransaction.ColoaderId;
                 string nameEn = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.PartnerNameEn;
-                awb.AirlineAbbrName = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName ; // Name ABBR
+                //awb.AirlineAbbrName = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName ; // Name ABBR
+                awb.AirlineAbbrName = csTransaction.AirlineInfo;
                 awb.CarrierNameEn = !string.IsNullOrEmpty(nameEn) ? " - " + nameEn : string.Empty;
                 awb.MAWB = data.Mblno1 + "-" + data.Mblno3;
                 awb.MBLNO1 = data.Mblno1;
