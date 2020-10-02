@@ -160,6 +160,19 @@ export class JobConstants {
             { id: 'Red', text: 'Red' },
             { id: 'Green', text: 'Green' },
             { id: 'Yellow', text: 'Yellow' }
+        ],
+        AIRLIGHTCODEMAPPING: <CommonInterface.INg2Select[]>[
+            { id: '235', text: 'TURKISH CARGO' },
+            { id: '180', text: 'KOREAN AIR' },
+            { id: '205', text: `ALL NIPPON AIRWAYS CO.,LTD\n3-5-10 HANEDA AIRPORT  OOTA-KU` },
+            { id: '176', text: `EMIRATES AIRLINES\nGROUP HDQ AIRPORT ROAD\nP.O.BOX: 686 DEIRA DUBAI\nUNITED ARAB EMIRATE` },
+            { id: '157', text: 'QATAR CARGO' },
+            { id: '828', text: 'HONGKONG AIR CARGO' },
+            { id: '988', text: `CABLE ADDRESS: ASIANA AIRLINES\nAsiana Town, #47 Osoe-Dong, Gangseo-Gu, Seoul, Korea` },
+            { id: '230', text: 'COPA AIRLINES' },
+            { id: '125', text: 'BRITISH AIRWAYS WORLD CARGO' },
+            { id: '014', text: 'AIR CANADA CARGO' },
+            { id: '876', text: 'SICHUAN AIRLINES' },
         ]
     };
 
