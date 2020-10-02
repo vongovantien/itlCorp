@@ -1,19 +1,21 @@
 import { Component, ViewChild } from '@angular/core';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
-import { AccountingRepo, CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { SOA, SOASearchCharge, Charge, Surcharge } from 'src/app/shared/models';
+import { AccountingRepo, CatalogueRepo } from '@repositories';
+import { catchError, finalize } from 'rxjs/operators';
+import { SOA, SOASearchCharge, Charge, SoaCharge } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
-import { SortService, DataService } from 'src/app/shared/services';
+import { SortService, DataService } from '@services';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
+import { listAnimation } from '@animations';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
+    animations: [listAnimation]
 })
 export class StatementOfAccountEditComponent extends AppList {
     @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;
@@ -90,10 +92,11 @@ export class StatementOfAccountEditComponent extends AppList {
 
     getDetailSOA(soaNO: string, currency: string) {
         this._progressRef.start();
+        this.isLoading = true;
         this._accoutingRepo.getDetaiLSOA(soaNO, currency)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { this._progressRef.complete(); this.isLoading = false; })
             ).subscribe(
                 (dataSoa: any) => {
                     this.soa = new SOA(dataSoa);
@@ -291,10 +294,13 @@ export class StatementOfAccountEditComponent extends AppList {
         this._accoutingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }
 
-    selectJobId(charge) {
-        console.log(charge);
+    selectJobId(charge: SoaCharge) {
         charge.isSelected = !charge.isSelected;
+        this.soa.chargeShipments.forEach((c: SoaCharge) => {
+            if (c.jobId === charge.jobId) {
+                c.isSelected = charge.isSelected;
+            }
+        })
         this.isCheckAllCharge = this.soa.chargeShipments.every((item: any) => item.isSelected);
-
     }
 }

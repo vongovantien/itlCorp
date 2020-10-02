@@ -149,7 +149,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="tbody-group">
+                    <tbody class="tbody-group" [@listAnimation]="!isLoading">
                         <tr *ngIf="!isLoading && !soa.chargeShipments.length">
                             <td colspan="100">
                                 <div class="no-data">

@@ -71,6 +71,13 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(new ResultHandle { Status = true, Message = "Update Phiếu chi thành công", Data = model });
         }
 
+
+        [HttpPut("RemoveVoucherAdvance")]
+        public IActionResult RemoveVoucherAdvance(string voucherNo)
+        {
+            return Ok(new ResultHandle { Status = true, Message = "Hủy Phiếu chi thành công", Data = voucherNo });
+        }
+
         [HttpPost("CreateInvoiceData")]
         public IActionResult CreateInvoiceData(InvoiceData model)
         {

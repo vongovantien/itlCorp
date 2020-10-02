@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { finalize, catchError, distinctUntilChanged, map } from 'rxjs/operators';
+import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { Office, Company, User } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
@@ -76,7 +76,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     idContract: string = SystemConstants.EMPTY_GUID;
     type: string = '';
     contractTypeDetail: string = '';
+    confirmChangeAgreementTypeText: string = '';
     isChangeAgrmentType: boolean = false;
+    status: boolean = false;
+    isAllowActiveContract: boolean = false;
+
 
     indexDetailContract: number = null;
 
@@ -116,7 +120,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     vaslst: CommonInterface.INg2Select[] = this.serviceTypes;
     isCollapsed: boolean = false;
 
-
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
@@ -147,6 +150,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.formGroup.controls['creditLimitRate'].setValue(120);
 
         }
+        this._store.select(getMenuUserSpecialPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: SystemInterface.ISpecialAction) => {
+                if (!!res) {
+                    this.isAllowActiveContract = res[0].isAllow;
+                    console.log(this.isAllowActiveContract);
+                }
+
+            });
 
         this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
             this.type = result.type;
@@ -351,7 +363,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.paymentMethod);
         this.setError(this.currencyId);
         this.isSubmitted = true;
-        let status = false;
+
         this.selectedContract.index = this.indexDetailContract;
         if (!this.effectiveDate.value.startDate) {
             return;
@@ -394,8 +406,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     );
             } else if (this.isUpdate && !this.isCreateNewCommercial) {
                 const body = new Contract(this.selectedContract);
-                if (this.contractTypeDetail !== this.contractType.value[0].id && this.selectedContract.active === true && this.isChangeAgrmentType === false) {
-                    status = this.statusContract;
+                if (this.contractTypeDetail !== this.contractType.value[0].id && this.selectedContract.active === true && this.isAllowActiveContract === false) { //&& this.isChangeAgrmentType === false && this.isAllowActiveContract === false) {
+                    this.status = this.statusContract;
+                    this.confirmChangeAgreementTypeText = "You have changed Agreement type " + this.contractTypeDetail + " to " + this.selectedContract.contractType + ", So your agreement will be inactive and request approval again. do you want to change it?";
                     this.confirmChangeAgreementTypePopup.show();
                     this.isChangeAgrmentType = true;
                     return;
@@ -407,23 +420,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 if (this.selectedContract.active === false) {
                     this.isChangeAgrmentType = null;
                 }
-                body.isChangeAgrmentType = this.isChangeAgrmentType;
-                this.confirmChangeAgreementTypePopup.hide();
-                this._catalogueRepo.updateContract(body)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this._toastService.success(res.message);
-                                this.onRequest.emit(this.selectedContract);
-
-                                this.removeKeyworkNg2Select();
-                                this.hide();
-                            } else {
-                                this._toastService.error(res.message);
-                            }
-                        }
-                    );
+                this.updateContract(body);
 
             } else {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
@@ -475,6 +472,35 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             }
 
         }
+    }
+
+    updateContract(body: Contract) {
+        this._catalogueRepo.updateContract(body)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.onRequest.emit(this.selectedContract);
+
+                        this.removeKeyworkNg2Select();
+                        this.hide();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
+    onSubmitChangeAgreementType() {
+        if (this.formGroup.valid) {
+            this.asignValueToModel();
+            const body = new Contract(this.selectedContract);
+            body.isChangeAgrmentType = this.isChangeAgrmentType;
+            this.confirmChangeAgreementTypePopup.hide();
+            this.updateContract(body);
+        }
+
     }
 
     getCurrentActiveService(Service: any) {

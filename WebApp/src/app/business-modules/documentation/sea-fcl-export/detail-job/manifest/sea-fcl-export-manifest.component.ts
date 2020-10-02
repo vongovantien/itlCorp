@@ -114,6 +114,7 @@ export class SeaFclExportManifestComponent extends AppList {
     refreshManifest() {
         //this.getManifest(this.jobId);
         this.formManifest.getShipmentDetail();
+        this.isShowUpdate = false;
         this.getHblList(this.jobId);
     }
 

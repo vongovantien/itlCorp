@@ -22,7 +22,7 @@ export * from './catalogue/province.model';
 export * from './catalogue/catContract.model';
 export { ChargeGroup, Charge } from './catalogue/catCharge.model';
 
-export * from './accouting/soa.model';
+export { SoaCharge, SOA } from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
 export * from './accouting/settlement-payment';
 export * from './accouting/advance-payment';

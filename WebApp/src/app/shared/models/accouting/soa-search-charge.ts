@@ -20,6 +20,9 @@ export class SOASearchCharge {
     mbls: any[] = [];
     customNo?: string[] = [];
 
+    // * Custom
+    airlineCode?: string = '';  // * để lọc phí theo job có 3 ký tự đầu MAWB.
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
