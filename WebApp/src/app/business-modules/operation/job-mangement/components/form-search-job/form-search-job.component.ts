@@ -66,9 +66,9 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.initFormSearch();
 
         this.filterTypes = [
+            { title: 'Custom No', value: 'clearanceNo' },
             { title: 'Job Id', value: 'jobNo' },
             { title: 'HBL', value: 'hwbno' },
-            { title: 'Custom No', value: 'clearanceNo' },
             { title: 'MBL', value: 'mblno' },
             { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
         ];

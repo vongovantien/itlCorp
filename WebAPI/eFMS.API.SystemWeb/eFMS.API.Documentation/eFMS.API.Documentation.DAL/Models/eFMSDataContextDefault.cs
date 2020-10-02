@@ -1939,6 +1939,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.AirlineInfo).HasMaxLength(800);
+
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 
                 entity.Property(e => e.BranchId).HasColumnName("BranchID");

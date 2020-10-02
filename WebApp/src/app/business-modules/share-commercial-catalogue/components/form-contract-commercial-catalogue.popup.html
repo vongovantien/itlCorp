@@ -445,7 +445,6 @@
 </popup-salesman-credit-limit>
 <partner-reject-popup (onSave)="onSaveReject($event)"></partner-reject-popup>
 
-<confirm-popup
-    [body]="'You have changed Agreement type to [New Agreement type], So your agreement will be inactive and request approval again. do you want to change it?'"
-    [labelConfirm]="'Yes'" (onSubmit)="onSubmit()">
+<confirm-popup [body]="confirmChangeAgreementTypeText" [labelConfirm]="'Yes'"
+    (onSubmit)="onSubmitChangeAgreementType()">
 </confirm-popup>

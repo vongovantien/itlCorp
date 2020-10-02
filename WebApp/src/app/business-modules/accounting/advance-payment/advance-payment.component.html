@@ -48,7 +48,7 @@
 
                                     </button>
                                     <button class="btn btn-cancel  m-btn--icon m-btn--uppercase"
-                                        (click)="printMultiple()">
+                                        (click)="showPopupListAdvance()">
                                         <span>
                                             <i class="la la-print"></i>
                                             <span>
@@ -251,6 +251,4 @@
 <permission-403-popup></permission-403-popup>
 <update-payment-voucher-popup (onRequest)="applyVoucher($event)"></update-payment-voucher-popup>
 <info-popup body="Opps, Please check an advance to update voucher !!'" [title]="'Cannot Update Voucher'"></info-popup>
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<advance-payments-popup></advance-payments-popup>

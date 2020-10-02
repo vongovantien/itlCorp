@@ -113,7 +113,7 @@ export class AirExportManifestComponent extends AppList {
         //this.getManifest(this.jobId);
 
         this.formManifest.getShipmentDetail();
-
+        this.isShowUpdate = false;
         this.getHblList(this.jobId);
     }
 

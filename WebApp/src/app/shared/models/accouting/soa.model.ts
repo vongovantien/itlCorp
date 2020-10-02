@@ -46,3 +46,36 @@ export class SOA {
         }
     }
 }
+
+export class SoaCharge {
+    amountCreditLocal: number;
+    amountCreditUSD: number;
+    amountDebitLocal: number;
+    amountDebitUSD: number;
+    cdNote: string;
+    chargeCode: string;
+    chargeName: string;
+    credit: number;
+    creditDebitNo: string;
+    currency: string;
+    currencyToLocal: string;
+    currencyToUSD: string;
+    customNo: string;
+    datetimeModifiedSurcharge: string;
+    debit: string;
+    hbl: string;
+    invoiceNo: string;
+    jobId: string;
+    mbl: string;
+    note: string;
+    pic: string;
+    quantity: number;
+    serviceDate: string;
+    soaNo: string;
+    type: string;
+    unit: string;
+    unitPrice: number;
+
+    // Custom
+    isSelected: boolean;
+}

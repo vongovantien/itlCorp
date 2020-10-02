@@ -42,7 +42,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="tbody-group">
+                    <tbody class="tbody-group" [@listAnimation]="!isLoading && listRequestAdvancePayment.length">
                         <tr *ngIf="!isLoading && !listRequestAdvancePayment.length">
                             <td colspan="100">
                                 <div class="no-data">

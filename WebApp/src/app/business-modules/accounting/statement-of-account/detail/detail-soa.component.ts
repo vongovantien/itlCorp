@@ -8,9 +8,11 @@ import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ReportPreviewComponent } from '@common';
+import { listAnimation } from '@animations';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
+    animations: [listAnimation]
 })
 export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
@@ -68,10 +70,11 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     getDetailSOA(soaNO: string, currency: string) {
         this._progressRef.start();
+        this.isLoading = true;
         this._accoutingRepo.getDetaiLSOA(soaNO, currency)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { this._progressRef.complete(); this.isLoading = false; })
             )
             .subscribe(
                 (res: any) => {

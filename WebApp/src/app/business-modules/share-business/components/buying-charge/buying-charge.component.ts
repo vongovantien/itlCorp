@@ -296,6 +296,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     chargeItem.unitPrice = data.unitPrice;
                     this.onChangeDataUpdateTotal(chargeItem);
                 }
+
+                // * CR: 14583
+                chargeItem.currencyId = data.currencyId || "VND";
                 break;
             case 'unit':
                 chargeItem.unitId = data.id;
