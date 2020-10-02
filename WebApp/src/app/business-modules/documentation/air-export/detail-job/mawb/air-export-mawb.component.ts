@@ -212,7 +212,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             shipperDescription: this.setDefaultShipperWithOffice(data),
                             firstCarrierBy: data.supplierName,
                             wtorValpayment: this.setDefaultWTVal(data),
-                            otherPayment: this.setDefaultWTVal(data)
+                            otherPayment: this.setDefaultWTVal(data),
+                            handingInformation: this.setDefaultHandlingInformation(data)
                         });
                     }
                     return data;
@@ -253,6 +254,13 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         return null;
     }
 
+    setDefaultHandlingInformation(shipment: CsTransaction) {
+        if ((shipment.mawb || "").substring(0, 3) === "235") {
+            return JobConstants.DEFAULT_HANDLING_TURKISH_CARGO;
+        }
+        return null;
+    }
+
     updateFormValue(data: AirwayBill) {
         const formValue = {
             issuedDate: !!data.issuedDate ? { startDate: new Date(data.issuedDate), endDate: new Date(data.issuedDate) } : null,
@@ -289,7 +297,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             transitPlaceTo2: [],
             transitPlaceBy2: [],
             flightNo: [],
-            issuranceAmount: [],
+            issuranceAmount: ['NIL'],
             chgs: [],
             dclrca: ['NVD'],
             dclrcus: ['NCV'],
