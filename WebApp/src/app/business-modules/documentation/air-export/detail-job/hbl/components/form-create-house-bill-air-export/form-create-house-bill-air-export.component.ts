@@ -224,6 +224,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                     warehouseId: shipment.warehouseId,
                                     firstCarrierBy: shipment.flightVesselName,
                                     freightPayment: !!shipment.paymentTerm ? [(this.termTypes).find(type => type.id === shipment.paymentTerm)] : null,
+                                    handingInformation: this.setDefaultHandlingInformation(shipment)
                                 });
 
                                 // *  CR 14501
@@ -265,6 +266,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     }
                 );
         }
+    }
+
+    setDefaultHandlingInformation(shipment: CsTransaction) {
+        if ((shipment.mawb || "").substring(0, 3) === "235") {
+            return JobConstants.DEFAULT_HANDLING_TURKISH_CARGO;
+        }
+        return null;
     }
 
     initForm() {
