@@ -315,8 +315,6 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.PaymentTerm).HasColumnType("decimal(18, 0)");
 
-                entity.Property(e => e.PaymentTermDate).HasColumnType("datetime");
-
                 entity.Property(e => e.RequestDate).HasColumnType("date");
 
                 entity.Property(e => e.Requester)
@@ -1786,6 +1784,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.QuantityType)
                     .HasMaxLength(10)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
                 entity.Property(e => e.SeriesNo).HasMaxLength(50);
 

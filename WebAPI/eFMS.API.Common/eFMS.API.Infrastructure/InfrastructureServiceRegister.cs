@@ -62,8 +62,8 @@ namespace eFMS.API.Infrastructure
             });
             services.Configure<AuthenticationSetting>(authSetting => {
 
-                authSetting.ApiKey
-                    = configuration.GetSection("Authentication:ApiKey").Value;
+                authSetting.PartnerShareKey
+                    = configuration.GetSection("Authentication:PartnerShareKey").Value;
                 //authSetting.Authority = configuration["Authentication.Authority").Value;
                 //authSetting.ApiSecret = configuration"Authentication.ApiSecret").Value;
                 //authSetting.ApiName = configuration.GetSection("Authentication.ApiName").Value;

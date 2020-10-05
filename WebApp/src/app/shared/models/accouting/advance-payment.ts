@@ -28,11 +28,15 @@ export class AdvancePayment {
     isChecked: boolean = false;
     voucherNo: string = '';
     voucherDate: string = '';
+    paymentTerm: number = null;
+    paymentTermDate: string = null;
 
     isRequester: boolean = false;
     isManager: boolean = false;
     isApproved: boolean = false;
     isShowBtnDeny: boolean = false;
+
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
