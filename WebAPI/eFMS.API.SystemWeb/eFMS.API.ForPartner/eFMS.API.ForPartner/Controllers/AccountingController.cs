@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
@@ -10,6 +12,7 @@ using eFMS.API.ForPartner.Infrastructure.Filters;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
 using eFMS.API.ForPartner.Service.Models;
 using ITL.NetCore.Connection.EF;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -31,26 +34,12 @@ namespace eFMS.API.ForPartner.Controllers
         /// <summary>
         /// Accounting Contructor
         /// </summary>
-        public AccountingController(IAccountingManagementService service)
+        public AccountingController(IAccountingManagementService service, 
+            IStringLocalizer<LanguageSub> localizer)
         {
             accountingManagementService = service;
+            stringLocalizer = localizer;
         }
-
-        /// <summary>
-        /// Test
-        /// </summary>
-        /// <remarks>
-        /// Remark
-        /// </remarks>
-        /// <returns></returns>
-        /// <response></response>
-        [HttpGet("Test")]
-        [APIKeyAuth]
-        public IActionResult Test()
-        {
-            return Ok("OK");
-        }
-
 
         [HttpGet("GetInvoice")]
         [APIKeyAuth]
@@ -77,22 +66,41 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(new ResultHandle { Status = true, Message = "Hủy Phiếu chi thành công", Data = voucherNo });
         }
 
+        /// <summary>
+        /// Create Invoice
+        /// </summary>
+        /// <param name="model">model to create invoice</param>
+        /// <returns></returns>
         [HttpPost("CreateInvoiceData")]
-        public IActionResult CreateInvoiceData(InvoiceData model)
+        public IActionResult CreateInvoiceData(InvoiceCreateInfo model)
         {
-            return Ok(new ResultHandle{ Status = true, Message = "Tạo Hóa đơn thành công", Data = model });
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = accountingManagementService.CreateInvoice(model);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                result.Data = null;
+                return BadRequest(result);
+            }
+            return Ok(result);          
+        }
+
+        /// <summary>
+        /// Replace Invoice (Update Invoice)
+        /// </summary>
+        /// <param name="model">model to replace invoice</param>
+        /// <returns></returns>
+        [HttpPut("ReplaceInvoiceData")]
+        public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model)
+        {
+            return Ok(new ResultHandle { Status = true, Message = "Thay thế Hóa đơn thành công", Data = model });
         }
 
         [HttpPut("CancellingInvoice")]
         public IActionResult CancellingInvoice(InvoiceInfo model)
         {
             return Ok(new ResultHandle { Status = true, Message = "Hủy Hóa đơn thành công", Data = model });
-        }
-
-        [HttpPut("ReplaceInvoiceData")]
-        public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model)
-        {
-            return Ok(new ResultHandle { Status = true, Message = "Thay thế Hóa đơn thành công", Data = model });
         }
 
         [HttpPut("RejectData")]
