@@ -14,6 +14,16 @@
             Accounting Contructor
             </summary>
         </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test(eFMS.API.ForPartner.DL.Models.VoucherAdvance,System.String)">
+            <summary>
+            Test
+            </summary>
+            <remarks>
+            Remark
+            </remarks>
+            <returns></returns>
+            <response></response>
+        </member>
         <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CreateInvoiceData(eFMS.API.ForPartner.DL.Models.InvoiceCreateInfo)">
             <summary>
             Create Invoice
