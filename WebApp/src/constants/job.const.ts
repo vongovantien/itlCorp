@@ -203,4 +203,6 @@ export class JobConstants {
         toDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
     };
 
+    public static readonly DEFAULT_HANDLING_TURKISH_CARGO = "SPX‎/‎X‎- ‎RAY USED";
+
 }
