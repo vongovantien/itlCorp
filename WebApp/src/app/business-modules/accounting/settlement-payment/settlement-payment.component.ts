@@ -78,7 +78,7 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
         this.getUserLogged();
-        this.getListSettlePayment();
+        // this.getListSettlePayment();
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 

@@ -441,7 +441,6 @@ export class PartnerDetailComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}`]);
                     } else {
                         this._toastService.warning(res.message);
                     }

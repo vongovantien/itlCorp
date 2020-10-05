@@ -54,7 +54,7 @@
                 <div class="row  div-inside bg-secondary">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':isSubmitted && (!mblno1.value || !mblno2.value || !mblno3.value)}">
-                        <label required>Master Bill of Landing</label>
+                        <label required>Master Airway Bill</label>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -104,7 +104,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label>Agent Handing</label>
+                                <label>Agent Handling</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                     [currentActiveItemId]="{ field: 'id', value: forwardingAgentId.value}"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"

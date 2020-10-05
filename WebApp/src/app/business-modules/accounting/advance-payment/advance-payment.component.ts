@@ -91,7 +91,7 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
-        this.getListAdvancePayment();
+        //this.getListAdvancePayment();
 
     }
 

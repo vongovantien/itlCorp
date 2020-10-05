@@ -57,7 +57,7 @@
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select airline"
-                                [loading]="isLoadingAirline | async" (remove)="resetFormControl(coloaderId)">
+                                [loading]="isLoadingAirline | async" (remove)="resetColoaderControl()">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -311,6 +311,16 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-12" *ngIf="type === 'export'">
+                                <div class="form-group">
+                                    <label>No HAWB</label>
+                                    <div>
+                                        <app-switch size="md" [toggle]="formGroup.controls['isHawb'].value"
+                                            (toggleChange)="formGroup.controls['isHawb'].setValue($event)"></app-switch>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -329,11 +339,9 @@
                             </div>
                             <div class="col-md-12" *ngIf="type === 'export'">
                                 <div class="form-group">
-                                    <label>No HAWB</label>
-                                    <div>
-                                        <app-switch size="md" [toggle]="formGroup.controls['isHawb'].value"
-                                            (toggleChange)="formGroup.controls['isHawb'].setValue($event)"></app-switch>
-                                    </div>
+                                    <label>Airline Information</label>
+                                    <textarea name="" id="" cols="30" rows="5" class="form-control"
+                                        formControlName="airlineInfo" placeholder="Airline Information"></textarea>
 
                                 </div>
                             </div>
@@ -342,10 +350,11 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Note</label>
-                            <textarea name="" id="" cols="30" rows="6" class="form-control" formControlName="notes"
+                            <textarea name="" id="" cols="30" rows="9" class="form-control" formControlName="notes"
                                 placeholder="notes"></textarea>
                         </div>
                     </div>
+
                 </div>
                 <ng-content></ng-content>
             </div>

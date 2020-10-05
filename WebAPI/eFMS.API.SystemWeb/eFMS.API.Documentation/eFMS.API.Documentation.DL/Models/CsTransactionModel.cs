@@ -4,7 +4,7 @@ using System;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class CsTransactionModel: CsTransaction
+    public class CsTransactionModel : CsTransaction
     {
         public string SupplierName { get; set; }
         public string AgentName { get; set; }
@@ -35,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string GroupEmail { get; set; }
         public string RoundUpMethod { get; set; }
         public string ApplyDim { get; set; }
+        public string MawbShipper { get; set; }
     }
 
     public class AgentData

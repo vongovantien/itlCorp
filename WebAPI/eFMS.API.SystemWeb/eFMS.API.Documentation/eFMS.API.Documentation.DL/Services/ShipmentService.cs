@@ -772,7 +772,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
                     }
-                    if (charGroupObj?.Name == "Other")
+                    if  (charGroupObj?.Name != "Handling" && charGroupObj?.Name != "Trucking" && charGroupObj?.Name != "Freight" && charGroupObj?.Name != "Com")
                     {
                         if (charge.KickBack == true)
                         {
@@ -784,7 +784,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
                     }
-                    if (charge.KickBack == true)
+                    if (charge.KickBack == true || charGroupObj?.Name == "Com")
                     {
                         _totalBuyAmountKB += charge.Quantity * charge.UnitPrice * _rate ?? 0;
                     }

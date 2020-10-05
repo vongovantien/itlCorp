@@ -70,10 +70,8 @@ export class AddPartnerDataComponent extends AppList {
     isDup: boolean = false;
 
     constructor(private route: ActivatedRoute,
-        private router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
-        private toastr: ToastrService,
         private _systemRepo: SystemRepo,
         private _cd: ChangeDetectorRef,
         private _toastService: ToastrService,
@@ -88,10 +86,8 @@ export class AddPartnerDataComponent extends AppList {
     }
 
     ngOnInit() {
-
         this.getComboboxData();
         this.initHeaderSalemanTable();
-
         this.route.queryParams.subscribe(prams => {
             if (prams.partnerType !== undefined) {
                 this.partnerType = Number(prams.partnerType);
@@ -101,9 +97,8 @@ export class AddPartnerDataComponent extends AppList {
                 }
             }
         });
-        // this.getDataCombobox();
-
     }
+
     ngAfterViewInit() {
         this.contractList.isActiveNewContract = false;
         this.formPartnerComponent.isUpdate = false;
@@ -122,76 +117,6 @@ export class AddPartnerDataComponent extends AppList {
             { title: 'Office', field: 'officeName', sortable: true },
             { title: 'Company', field: 'companyName', sortable: true },
         ];
-    }
-
-    closepp(param: SalemanAdd) {
-        this.salemanToAdd = param;
-        this.poupSaleman.isDetail = false;
-
-        if (this.saleMandetail.length > 0) {
-            for (const it of this.saleMandetail) {
-                this.services.forEach(item => {
-                    if (it.service === item.id) {
-                        it.service = item.id;
-                    }
-                });
-
-            }
-        }
-        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.salemanToAdd.service && saleMane.office === this.salemanToAdd.office));
-        if (this.isDup) {
-            for (const it of this.saleMandetail) {
-                this.services.forEach(item => {
-                    if (it.service === item.id) {
-                        it.service = item.id;
-                    }
-                });
-            }
-        }
-
-        if (this.salemanToAdd.service !== null && this.salemanToAdd.office !== null) {
-            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd)
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (res: any) => {
-                        if (!!res) {
-                            if (this.isDup) {
-
-                                this.toastr.error('Duplicate service, office with sale man!');
-                            } else {
-                                this.saleMandetail.push(this.salemanToAdd);
-
-                                this.poupSaleman.hide();
-
-                                /// get detail employee --- to be continue
-                                this.getEmployee(this.saleMandetail[0].saleManId);
-
-                                for (const it of this.saleMandetail) {
-                                    this.services.forEach(item => {
-                                        if (it.service === item.id) {
-                                            it.serviceName = item.text;
-                                        }
-                                    });
-                                    this.offices.forEach(item => {
-                                        if (it.office === item.id) {
-                                            it.officeName = item.branchNameEn;
-                                        }
-                                        if (it.company === item.buid) {
-                                            const objCompany = this.company.find(x => x.id === item.buid);
-                                            it.companyName = objCompany.bunameAbbr;
-                                        }
-                                    });
-                                }
-
-
-                            }
-                        }
-
-                    },
-                );
-        }
-
-
     }
 
     getDataCombobox() {
@@ -282,7 +207,6 @@ export class AddPartnerDataComponent extends AppList {
             .subscribe(
                 (res) => {
                     if (res) {
-                        // this.formPartnerComponent.parentCustomers = res.map(x => ({ "text": x.partnerNameVn, "id": x.id }));
                         this.formPartnerComponent.parentCustomers = res;
                     } else { this.formPartnerComponent.parentCustomers = []; }
                 }

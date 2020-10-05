@@ -132,7 +132,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             requester: this.requester.value.length > 0 ? this.requester.value[0].id : this.userLogged.id
         };
 
-        this.onSearch.emit(body);
+        //this.onSearch.emit(body);
 
         this._store.dispatch(SearchList({ payload: body }));
     }

@@ -635,6 +635,8 @@ namespace eFMS.API.Documentation.DL.Services
                     var group = groupRepository.Get(x => x.Id == result.GroupId).FirstOrDefault();
                     result.GroupEmail = group != null ? group.Email : string.Empty;
                 }
+                var airwayBill = airwaybillRepository.Get(x => x.JobId == id).FirstOrDefault();
+                result.MawbShipper = airwayBill?.ShipperDescription;
 
                 return result;
             }

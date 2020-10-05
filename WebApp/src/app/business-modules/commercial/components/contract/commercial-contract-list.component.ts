@@ -128,7 +128,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.partnerId = this.partnerId;
         this.formContractPopup.selectedContract.id = id;
         this.formContractPopup.openOnPartner = this.openOnPartner;
-
         this.indexlstContract = index;
         if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID && this.formContractPopup.selectedContract.id !== "") {
             this.formContractPopup.getFileContract();
@@ -155,7 +154,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             this.formContractPopup.show();
         }
     }
-
 
     getFileContract() {
         this.formContractPopup.isLoading = true;
@@ -209,53 +207,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 finalize(() => this.isLoading = false)
             )
             .subscribe(
-                (res: any[]) => {
+                (res: Contract[]) => {
                     this.contracts = res || [];
-                    console.log(this.contracts);
-                    this.contracts.forEach(element => {
-                        setTimeout(() => {
-                            if (element.saleService.includes(';')) {
-                                const arr = element.saleService.split(';');
-                                element.saleService = '';
-                                arr.forEach(item => {
-                                    element.saleService += item + '; ';
-                                });
-                                element.saleServiceName = '';
-                                arr.forEach(item => {
-                                    element.saleServiceName += this.formContractPopup.serviceTypes.find(x => x.id === item).text + "; ";
-                                });
-                                if (element.saleService.charAt(element.saleService.length - 2) === ';') {
-                                    element.saleService = element.saleService.substr(0, element.saleService.length - 2);
-                                }
-                                if (element.saleServiceName.charAt(element.saleServiceName.length - 2) === ';') {
-                                    element.saleServiceName = element.saleServiceName.substr(0, element.saleServiceName.length - 2);
-                                }
-                            }
-                            else {
-                                element.saleServiceName = element.saleService.toLowerCase();
-                                const obj = this.formContractPopup.serviceTypes.find(x => x.id === element.saleService);
-
-                                element.saleServiceName = !!obj ? obj.text : null;
-                            }
-                            if (!!element.officeId) {
-                                if (element.officeId.includes(';')) {
-                                    const arrayOffice = element.officeId.split(';');
-                                    element.officeNameEn = '';
-                                    arrayOffice.forEach(itemOffice => {
-                                        element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
-                                    });
-                                    if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
-                                        element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
-                                    }
-                                } else {
-                                    element.officeId = element.officeId.toLowerCase();
-                                    const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
-
-                                    element.officeNameEn = !!obj ? obj.text : null;
-                                }
-                            }
-                        }, 300);
-                    });
                 }
             );
     }

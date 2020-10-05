@@ -30,7 +30,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPlace> placeRepository;
         private readonly IContextBase<CsMawbcontainer> containerRepository;
-        readonly IContextBase<CatPartner> partnerRepositoty;
+        private readonly IContextBase<CatPartner> partnerRepositoty;
+        private readonly IContextBase<SysOffice> officeRepo;
+        private readonly IContextBase<SysCompany> companyRepo;
+
         ICsTransactionDetailService houseBills;
 
         public CsArrivalFrieghtChargeService(IStringLocalizer<LanguageSub> localizer,
@@ -46,7 +49,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPlace> placeRepo,
             IContextBase<CsMawbcontainer> containerRepo,
             IContextBase<CatPartner> partnerRepo,
-            ICsTransactionDetailService houseBill
+            ICsTransactionDetailService houseBill,
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<SysCompany> sysCompany
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -61,6 +66,8 @@ namespace eFMS.API.Documentation.DL.Services
             containerRepository = containerRepo;
             partnerRepositoty = partnerRepo;
             houseBills = houseBill;
+            officeRepo = sysOffice;
+            companyRepo = sysCompany;
         }
 
         #region Arrival
@@ -404,14 +411,16 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
+            var companyUser = companyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+            var officeUser = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
             var parameter = new SeaArrivalNotesReportParams();
             parameter.No = string.Empty;
             parameter.ShipperName = string.Empty;
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyName = companyUser?.BunameEn; //Company Name En of user
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.CompanyAddress1 = officeUser?.AddressEn; //Office Address En of user
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax); //Tel & Fax of Office user
+            parameter.Website = companyUser?.Website; //Website Company of user
             parameter.MAWB = houserBill != null ? (houserBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 3;
@@ -538,15 +547,16 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-
+            var companyUser = companyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+            var officeUser = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();            
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyName = companyUser?.BunameEn; //Company Name En of user
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.CompanyAddress1 = officeUser?.AddressEn; //Office Address En of user 
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax); //Tel & Fax of Office user
+            parameter.Website = companyUser?.Website; //Website Company of user
             parameter.AccountInfo = string.Empty;
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 3;
@@ -679,15 +689,18 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
             if (detail.DeliveryOrderNo == null) return new Crystal();
+
+            var companyUser = companyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+            var officeUser = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
             var parameter = new SeaDeliveryCommandParam
             {
                 Consignee = "s",
                 No = "s",
-                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyName = companyUser?.BunameEn, //Company Name En of user
                 CompanyDescription = "Company Description",
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
-                Website = DocumentConstants.COMPANY_WEBSITE,
+                CompanyAddress1 = officeUser?.AddressEn, //Office Address En of user
+                CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                Website = companyUser?.Website, //Website Company of user
                 MAWB = detail.Mawb?.ToUpper(),
                 Contact = currentUser.UserName,
                 DecimalNo = 2

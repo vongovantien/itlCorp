@@ -44,7 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IUserPermissionService permissionService;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
-
+        private readonly IContextBase<SysCompany> sysCompanyRepo;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -66,7 +66,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentOtherChargeService oChargeService,
             IUserPermissionService perService,
             IContextBase<SysOffice> sysOffice,
-            IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+            IStringLocalizer<LanguageSub> localizer,
+            IContextBase<SysCompany> sysCompany) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -1727,13 +1728,16 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 authorizeLetters.Add(authorizeLetter);
             }
+
+            var companyUser = sysCompanyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = DocumentConstants.COMPANY_NAME_LOCAL,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS_LOCAL,
-                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
-                Website = DocumentConstants.COMPANY_TAXCODE,//DocumentConstants.COMPANY_WEBSITE, (Sửa lại thành MST)
+                CompanyName = companyUser?.BunameVn, //Company Name Vn of user
+                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
+                CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,
                 PrintMonth = string.Empty,
@@ -1782,13 +1786,16 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 authorizeLetters.Add(authorizeLetter);
             }
+
+            var companyUser = sysCompanyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = DocumentConstants.COMPANY_NAME_LOCAL,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS_LOCAL,
-                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
-                Website = DocumentConstants.COMPANY_TAXCODE,//DocumentConstants.COMPANY_WEBSITE, (Sửa lại thành MST)
+                CompanyName = companyUser?.BunameVn, //Company Name Vn of user
+                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
+                CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,
                 PrintMonth = string.Empty,
