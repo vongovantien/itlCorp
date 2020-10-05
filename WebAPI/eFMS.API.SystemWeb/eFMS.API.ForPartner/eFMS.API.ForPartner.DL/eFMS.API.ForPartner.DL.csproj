@@ -7,27 +7,28 @@
     <StartupObject />
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\bin</OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.ForPartner.Service">
-      <HintPath>..\eFMS.API.ForPartner.Service\bin\Debug\netcoreapp2.2\eFMS.API.ForPartner.Service.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.ForPartner.Service.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Infrastructure">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
-      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
-      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Connection">
-      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Hosting.Abstractions">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.hosting.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.Abstractions.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\bin\netcoreapp2.2\Newtonsoft.Json.dll</HintPath>
@@ -40,7 +41,9 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="1.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="1.1.2" />
     <PackageReference Include="mongocsharpdriver" Version="2.7.2" />
   </ItemGroup>
 
