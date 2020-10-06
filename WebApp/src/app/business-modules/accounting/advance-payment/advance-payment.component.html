@@ -91,8 +91,6 @@
                                                             (change)="advancePayment.isChecked=!advancePayment.isChecked; removeAllChecked();">
                                                         <span></span>
                                                     </label>
-
-
                                                     <button
                                                         (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo, i)"
                                                         class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
@@ -157,6 +155,9 @@
                                             <td>{{advancePayment.advanceNote}}</td>
                                             <td>{{advancePayment.voucherNo}}</td>
                                             <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td class="text-success">
+                                                {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy'}}</td>
+
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row [id]="'collapse' + i"
                                             [parentId]="'#adv-payment-list-table'">
