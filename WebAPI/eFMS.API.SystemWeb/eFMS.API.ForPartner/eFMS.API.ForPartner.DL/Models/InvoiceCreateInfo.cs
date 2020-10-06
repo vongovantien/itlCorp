@@ -9,6 +9,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public string InvoiceNo { get; set; }
         public string SerieNo { get; set; }
         public DateTime InvoiceDate { get; set; }
+        public string Currency { get; set; }
         public List<ChargeInvoice> Charges { get; set; }
     }
 }

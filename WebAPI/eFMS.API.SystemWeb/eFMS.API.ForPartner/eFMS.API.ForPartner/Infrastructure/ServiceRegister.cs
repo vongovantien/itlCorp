@@ -13,10 +13,10 @@ using System;
 using eFMS.API.ForPartner.Infrastructure.Filters;
 using Microsoft.Extensions.Localization;
 using ITL.NetCore.Connection.EF;
-using eFMS.API.ForPartner.Service.Contexts;
 using LocalizationCultureCore.StringLocalizer;
-using eFMS.API.ForPartner.DL.Service;
+using eFMS.API.ForPartner.Service.Contexts;
 using eFMS.API.ForPartner.DL.IService;
+using eFMS.API.ForPartner.DL.Service;
 
 namespace eFMS.API.ForPartner.Infrastructure
 {
@@ -32,6 +32,7 @@ namespace eFMS.API.ForPartner.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             //services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
             services.AddTransient<IAccountingManagementService, AccAccountingManagementService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

@@ -15,6 +15,7 @@ using eFMS.API.Common;
 using Newtonsoft.Json;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
+using System.Collections.Generic;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -28,6 +29,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPartner> partnerRepo;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         public AccAccountingManagementService(  
             IContextBase<AccAccountingManagement> repository,
@@ -39,7 +41,9 @@ namespace eFMS.API.ForPartner.DL.Service
             ICurrentUser cUser,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IStringLocalizer<ForPartnerLanguageSub> localizer,
-            IContextBase<CatPartner> catPartner
+            IContextBase<CatPartner> catPartner,
+            ICurrencyExchangeService exchangeService,
+            IContextBase<CatCurrencyExchange> catCurrencyExchange
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -50,6 +54,7 @@ namespace eFMS.API.ForPartner.DL.Service
             surchargeRepo = csShipmentSurcharge;
             stringLocalizer = localizer;
             partnerRepo = catPartner;
+            currencyExchangeService = exchangeService;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -108,7 +113,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         #region --- CRUD INVOICE ---
-        public HandleState CreateInvoice(InvoiceCreateInfo model, string apiKey)
+        public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey)
         {
             ICurrentUser _currentUser = setCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -134,6 +139,8 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.Type = ForPartnerConstants.ACCOUNTING_INVOICE_TYPE; //Type is Invoice
                 invoice.VoucherId = GenerateVoucherId(invoice.Type, string.Empty); //Auto Gen VoucherId
                 invoice.ReferenceNo = debitCharges[0].ReferenceNo; //Cập nhật Reference No cho Invoice
+                invoice.Currency = model.Currency; //Currency of Invoice
+                invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(debitCharges, model.Currency); // Calculator Total Amount
                 invoice.UserCreated = invoice.UserModified = currentUser.UserID;
                 invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
                 invoice.GroupId = currentUser.GroupId;
@@ -157,6 +164,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surcharge.InvoiceDate = invoice.Date;
                                 surcharge.VoucherId = invoice.VoucherId;
                                 surcharge.VoucherIddate = invoice.Date;
+                                surcharge.SeriesNo = invoice.Serie;
                                 surcharge.FinalExchangeRate = charge.ExchangeRate;
                                 surcharge.ReferenceNo = charge.ReferenceNo;
                                 surcharge.DatetimeModified = DateTime.Now;
@@ -198,14 +206,65 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        public HandleState ReplaceInvoice(InvoiceUpdateInfo model, string apiKey)
+        public HandleState UpdateInvoice(InvoiceUpdateInfo model, string apiKey)
         {
             return new HandleState();
         }
 
         public HandleState DeleteInvoice(InvoiceInfo model, string apiKey)
         {
-            return new HandleState();
+            ICurrentUser _currentUser = setCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo 
+                                                 && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault(); 
+                    if (data == null) return new HandleState((object)"Không tìm thấy hóa đơn");
+
+                    HandleState hs = DataContext.Delete(x => x.ReferenceNo == model.ReferenceNo
+                                                          && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE, false);
+                    if (hs.Success)
+                    {
+                        var charges = surchargeRepo.Get(x => x.ReferenceNo == model.ReferenceNo);
+                        foreach (var charge in charges)
+                        {
+                            charge.AcctManagementId = null;
+                            charge.ReferenceNo = null;
+                            charge.InvoiceNo = null;
+                            charge.InvoiceDate = null;
+                            charge.VoucherId = null;
+                            charge.VoucherIddate = null;
+                            charge.SeriesNo = null;
+                            charge.FinalExchangeRate = null;
+                            charge.AmountVnd = charge.VatAmountVnd = null;
+                            charge.DatetimeModified = DateTime.Now;
+                            charge.UserModified = currentUser.UserID;
+                            var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);                    
+                        }
+                        
+                        var smSur = surchargeRepo.SubmitChanges();
+                        var sm = DataContext.SubmitChanges();
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
         #endregion --- CRUD INVOICE ---
 
@@ -300,6 +359,20 @@ namespace eFMS.API.ForPartner.DL.Service
             return _prefixVoucher;
         }
 
+        private decimal CalculatorTotalAmount(List<ChargeInvoice> charges, string currencyInvoice)
+        {
+            decimal total = 0;
+            if (!string.IsNullOrEmpty(currencyInvoice))
+            {
+                charges.ForEach(fe =>
+                {
+                    var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
+                    decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
+                    total += exchangeRate * surcharge.Total;
+                });                
+            }
+            return total;
+        }
         #endregion --- PRIVATE METHOD ---
     }
 }
