@@ -17,6 +17,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         public virtual DbSet<AccAccountingManagement> AccAccountingManagement { get; set; }
         public virtual DbSet<AcctAdvancePayment> AcctAdvancePayment { get; set; }
+        public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
@@ -33,7 +34,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<AccAccountingManagement>(entity =>
             {
@@ -60,6 +61,8 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
@@ -149,6 +152,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaymentMethod)
@@ -179,6 +184,47 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.VoucherNo)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatCurrencyExchange>(entity =>
+            {
+                entity.ToTable("catCurrencyExchange");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.CurrencyFromId)
+                    .HasColumnName("CurrencyFromID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CurrencyToId)
+                    .HasColumnName("CurrencyToID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.EffectiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Rate).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
