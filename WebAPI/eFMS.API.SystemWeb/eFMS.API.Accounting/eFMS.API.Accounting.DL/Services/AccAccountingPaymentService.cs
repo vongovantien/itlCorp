@@ -47,7 +47,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AccAccountingPaymentModel> GetBy(string refId)
         {
-            var data = DataContext.Get(x => x.RefId == refId).OrderBy(x => x.PaidDate);
+            var data = DataContext.Get(x => x.RefId == refId).OrderBy(x => x.PaidDate).ThenBy(x=>x.PaymentNo);
             var users = userRepository.Get();
             var results = data.Join(users, x => x.UserModified, y => y.Id, (x, y) => new AccAccountingPaymentModel
             {
