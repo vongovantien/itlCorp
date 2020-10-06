@@ -24,5 +24,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewSIF(PreviewCdNoteCriteria criteria);
         Crystal PreviewAir(PreviewCdNoteCriteria criteria);
         List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
+        HandleState CsConfirmed(string cdNo);
     }
 }

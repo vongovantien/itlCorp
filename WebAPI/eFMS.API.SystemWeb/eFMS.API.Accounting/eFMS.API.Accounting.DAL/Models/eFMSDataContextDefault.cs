@@ -165,6 +165,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 4)");
@@ -186,6 +188,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.PaymentStatus).HasMaxLength(50);
 
                 entity.Property(e => e.PaymentTerm).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
                 entity.Property(e => e.ServiceType).HasMaxLength(10);
 
@@ -307,11 +311,15 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PaymentTerm).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.RequestDate).HasColumnType("date");
 
@@ -760,6 +768,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
                 entity.Property(e => e.Obh).HasColumnName("OBH");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
@@ -1018,7 +1028,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.BillingAmount).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.BillingAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
@@ -1030,18 +1040,18 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CreditAmount).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.CreditLimit).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.CreditRate).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.CreditRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.CurrencyId)
                     .HasColumnName("CurrencyID")
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -1061,7 +1071,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
 
-                entity.Property(e => e.PaidAmount).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.PartnerId)
                     .HasColumnName("PartnerID")
@@ -1080,13 +1090,13 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.TrialCreditLimited).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.TrialCreditLimited).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.TrialEffectDate).HasColumnType("datetime");
 
                 entity.Property(e => e.TrialExpiredDate).HasColumnType("datetime");
 
-                entity.Property(e => e.UnpaidAmount).HasColumnType("decimal(16, 8)");
+                entity.Property(e => e.UnpaidAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -1783,6 +1793,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ReferenceNo).HasMaxLength(100);
+
                 entity.Property(e => e.SeriesNo).HasMaxLength(50);
 
                 entity.Property(e => e.SettlementCode)
@@ -1870,6 +1882,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("AgentID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.AirlineInfo).HasMaxLength(800);
 
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 

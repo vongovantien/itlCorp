@@ -1815,16 +1815,16 @@ namespace eFMS.API.Accounting.DL.Services
             var charge = GetChargeShipmentDocAndOperation(query, null);
             var chargeShipments = GetListChargeOfSoa(charge, soaNo, currencyLocal);
             var _groupShipments = new List<GroupShipmentModel>();
-            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC})
+            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC })
             .Select(s => new GroupShipmentModel
             {
-                    PIC = s.Key.PIC,
-                    JobId = s.Key.JobId,
-                    HBL = s.Key.HBL,
-                    MBL = s.Key.MBL,
-                    TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
-                    TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
-                    ChargeShipments = s.ToList()
+                PIC = s.Key.PIC,
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL,
+                TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
+                TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
+                ChargeShipments = s.ToList()
             }).ToList();
             data = soaDetail;
             data.GroupShipments = _groupShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
@@ -1960,7 +1960,7 @@ namespace eFMS.API.Accounting.DL.Services
                     air.FlightNo = chargeData.FlightNo;
                     air.ShippmentDate = chargeData.ShippmentDate;
                     air.AOL = port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
-                    air.Mawb = chargeData.MBL.Substring(0, 3)  + "-" + chargeData.MBL.Substring(chargeData.MBL.Length - 9);
+                    air.Mawb = chargeData.MBL.Substring(0, 3) + "-" + chargeData.MBL.Substring(chargeData.MBL.Length - 9);
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
                     air.Service = "Normal"; // tạm thời hardcode;
                     air.Pcs = chargeData.PackageQty;
@@ -1997,7 +1997,7 @@ namespace eFMS.API.Accounting.DL.Services
                         lstScreeningFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == "x-ray charge") && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
                     air.ScreeningFee = lstScreeningFee.Count() > 0 ? lstScreeningFee.Select(t => t.Debit).Sum() : null;
-                    
+
                     var lstAWBFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AWB_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAWBFee.Count() == 0)
                     {
@@ -2025,7 +2025,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         lstOTHFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    if(lstOTHFee.Count() == 0)
+                    if (lstOTHFee.Count() == 0)
                     {
                         lstOTHFee = charge.Where(x => x.HBL == item && (x.ChargeCode != AccountingConstants.CHARGE_AIR_FREIGHT_CODE
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()
@@ -2519,7 +2519,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.HWBNO = _hwbNo; //HBLNo
                 soaCharge.DateofInv = cdNote?.DatetimeCreated?.ToString("MMM dd, yy") ?? string.Empty; //Created Datetime CD Note
                 soaCharge.Order = string.Empty; //NOT USE
-                soaCharge.InvID =  charge.InvoiceNo;
+                soaCharge.InvID = charge.InvoiceNo;
                 soaCharge.Amount = _amount + _decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.Curr = soa.Currency?.Trim(); //Currency SOA
                 soaCharge.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;
@@ -2603,6 +2603,35 @@ namespace eFMS.API.Accounting.DL.Services
             var soaNo = Get(x => x.Id == soaId).FirstOrDefault()?.Soano;
             var surchargeIds = csShipmentSurchargeRepo.Get(x => x.PaySoano == soaNo || x.Soano == soaNo).Select(s => s.Id).ToList();
             return surchargeIds;
+        }
+
+        public HandleState CsConfirmed(string soaNo)
+        {
+            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
+            if (soa == null) return null;
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    soa.UserModified = currentUser.UserID;
+                    soa.DatetimeModified = DateTime.Now;
+                    soa.Status = "Cs Confirmed";
+                    soa.LastSyncDate = DateTime.Now;
+                    var hsUpdateSOA = DataContext.Update(soa, x => x.Id == soa.Id);
+                    trans.Commit();
+                    return hsUpdateSOA;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+
         }
     }
 }

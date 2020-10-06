@@ -234,6 +234,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
+                    [disabled]="CdNoteDetail.status ==='Cs Confirmed'"
                     (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                     <span>
                         <i class="la la-trash"></i>
@@ -242,12 +243,22 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-success  m-btn--icon m-btn--uppercase" [disabled]="CdNoteDetail.isLoocked"
+                <button class="btn btn-success  m-btn--icon m-btn--uppercase"
+                    [disabled]="CdNoteDetail.isLoocked || CdNoteDetail.status ==='Cs Confirmed'"
                     (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
                         <span>
                             Edit detail
+                        </span>
+                    </span>
+                </button>
+                <button class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="csConfirmed()"
+                    *ngIf="CdNoteDetail.status !== 'Cs Confirmed'">
+                    <span>
+                        <i class="la la-check"></i>
+                        <span>
+                            Confirmed
                         </span>
                     </span>
                 </button>
