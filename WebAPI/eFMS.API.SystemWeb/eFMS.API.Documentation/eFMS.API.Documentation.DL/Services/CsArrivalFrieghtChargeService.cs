@@ -419,7 +419,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyName = companyUser?.BunameEn; //Company Name En of user
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = officeUser?.AddressEn; //Office Address En of user
-            parameter.CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax); //Tel & Fax of Office user
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0} " + (char)13 + (char)10 + "Fax: {1}", officeUser?.Tel, officeUser?.Fax); //Tel & Fax of Office user
             parameter.Website = companyUser?.Website; //Website Company of user
             parameter.MAWB = houserBill != null ? (houserBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             parameter.Contact = _currentUser;

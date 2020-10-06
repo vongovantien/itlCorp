@@ -92,7 +92,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _housebill.Hwbno,
                 _consignee?.PartnerNameEn,
                 currentUser.UserName);
-            string _body = string.Format(@"<div><b>Dear Valued Customer,</b></div><div>We would like to send <b>Arrival Notice and docs in attached file</b> for your air import shipment with details as below:</div><div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MAWB#: {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HAWB#: {1}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Quantity: {2} CTNS / G.W: {3}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Flight # / ETA: {4} / {5}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Routing: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Warehouse: <b>{7}</b></div></div><p>Please check docs and confirm by return with thanks.</p><p>This is system auto email please do not reply it directly. Please confirm the attached files or inform us about any amendment by mailto: {8}</p>",
+            string _body = string.Format(@"<div><b>Dear Valued Customer,</b></div><div>We would like to send <b>Arrival Notice and docs in attached file</b> for your air import shipment with details as below:</div><div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MAWB#: {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HAWB#: {1}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Quantity: {2} CTNS / G.W: {3}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Flight # / ETA: {4} / {5}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Routing: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Warehouse: <b>{7}</b></div></div><p>Please check docs and confirm by return with thanks.</p><p>This is system auto email please do not reply it directly. Please confirm the attached files or inform us about any amendment by mail to: {8}</p>",
                 _housebill.Mawb,
                 _housebill.Hwbno,
                 _housebill.PackageQty,
@@ -148,6 +148,57 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
+        #region Mail info Sea Import - Export
+        // Mail Info: Sea Import
+        public EmailContentModel GetInfoMailHBLSeaImport(Guid hblId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            var _airlineMail = (_shipment != null) ? catPartnerRepo.Get(x => x.Id == _shipment.ColoaderId).FirstOrDefault()?.Email : string.Empty;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _warehouseName = string.Empty;
+            if (_warehouse != null)
+            {
+                if (_warehouse.Code == "TCS")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: TCS";
+                }
+                if (_warehouse.Code == "SCSC")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: SCSC";
+                }
+            }
+
+            string _subject = string.Format(@"INDO TRANS LOGISTICS: ARRIVAL NOTICE // {0} // {1} // {2} (From: {3})",
+                _housebill.Mawb,
+                _housebill.Hwbno,
+                _consignee?.PartnerNameEn,
+                currentUser.UserName);
+            string _body = string.Format(@"<div><b>Dear Valued Customer,</b></div><div>We would like to send <b>Arrival Notice and docs in attached file</b> for your air import shipment with details as below:</div><div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MAWB#: {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HAWB#: {1}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Quantity: {2} CTNS / G.W: {3}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Flight # / ETA: {4} / {5}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Routing: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Warehouse: <b>{7}</b></div></div><p>Please check docs and confirm by return with thanks.</p><p>This is system auto email please do not reply it directly. Please confirm the attached files or inform us about any amendment by mail to: {8}</p>",
+                _housebill.Mawb,
+                _housebill.Hwbno,
+                _housebill.PackageQty,
+                _housebill.GrossWeight,
+                _housebill.FlightNo,
+                (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty,
+                _housebill.Route,
+                _warehouseName,
+                _empCurrentUser?.Email);
+
+            var emailContent = new EmailContentModel();
+            emailContent.From = "Info FMS";
+            emailContent.To = _airlineMail; //Email của Airlines
+            emailContent.Cc = _empCurrentUser?.Email; //Email của Current User
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
         public EmailContentModel GetInfoMailSISeaExport(Guid jobId)
         {
             var _shipment = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
@@ -171,5 +222,6 @@ namespace eFMS.API.Documentation.DL.Services
             emailContent.AttachFiles = new List<string>();
             return emailContent;
         }
+        #endregion
     }
 }
