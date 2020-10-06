@@ -210,7 +210,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
         public HandleState DeleteInvoice(InvoiceInfo model, string apiKey)
         {
-            ICurrentUser _currentUser = setCurrentUserPartner(currentUser, apiKey);
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
             currentUser.DepartmentId = _currentUser.DepartmentId;
