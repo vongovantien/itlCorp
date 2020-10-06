@@ -22,6 +22,6 @@
         public string RequireHttpsMetadata;
         public string ApiName;
         public string ApiSecret;
-        public string ApiKey;
+        public string PartnerShareKey;
     }
 }

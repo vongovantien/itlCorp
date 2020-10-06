@@ -9,12 +9,12 @@
             Accounting Controller
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService)">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
             <summary>
             Accounting Contructor
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test(eFMS.API.ForPartner.DL.Models.VoucherAdvance,System.String)">
             <summary>
             Test
             </summary>
@@ -23,6 +23,20 @@
             </remarks>
             <returns></returns>
             <response></response>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CreateInvoiceData(eFMS.API.ForPartner.DL.Models.InvoiceCreateInfo)">
+            <summary>
+            Create Invoice
+            </summary>
+            <param name="model">model to create invoice</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.ReplaceInvoiceData(eFMS.API.ForPartner.DL.Models.InvoiceUpdateInfo)">
+            <summary>
+            Replace Invoice (Update Invoice)
+            </summary>
+            <param name="model">model to replace invoice</param>
+            <returns></returns>
         </member>
     </members>
 </doc>

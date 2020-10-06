@@ -1736,7 +1736,7 @@ namespace eFMS.API.Documentation.DL.Services
                 MAWB = data.Mawb?.ToUpper(),
                 CompanyName = companyUser?.BunameVn, //Company Name Vn of user
                 CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
-                CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,
@@ -1794,7 +1794,7 @@ namespace eFMS.API.Documentation.DL.Services
                 MAWB = data.Mawb?.ToUpper(),
                 CompanyName = companyUser?.BunameVn, //Company Name Vn of user
                 CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
-                CompanyAddress2 = string.Format(@"Tel: {0} \r\nFax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,

@@ -59,5 +59,6 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? OfficeId { get; set; }
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
+        public string ReferenceNo { get; set; }
     }
 }

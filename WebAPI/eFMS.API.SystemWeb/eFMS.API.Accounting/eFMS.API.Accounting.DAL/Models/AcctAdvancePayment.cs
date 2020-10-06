@@ -26,5 +26,6 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? CompanyId { get; set; }
         public string VoucherNo { get; set; }
         public DateTime? VoucherDate { get; set; }
+        public decimal? PaymentTerm { get; set; }
     }
 }
