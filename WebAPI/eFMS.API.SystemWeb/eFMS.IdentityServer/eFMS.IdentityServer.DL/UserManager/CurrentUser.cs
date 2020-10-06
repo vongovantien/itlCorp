@@ -22,24 +22,67 @@ namespace eFMS.IdentityServer.DL.UserManager
             userPermissionService = userPermission;
         }
 
-        public string UserID => currentUser.FirstOrDefault(x => x.Type == "id").Value;
-        public string UserName => currentUser.FirstOrDefault(x => x.Type == "userName").Value;
-        public Guid CompanyID => currentUser.FirstOrDefault(x => x.Type == "companyId").Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "companyId").Value) : Guid.Empty;
-        public Guid OfficeID => currentUser.FirstOrDefault(x => x.Type == "officeId").Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value) : Guid.Empty;
-        //public int DepartmentId => currentUser.FirstOrDefault(x => x.Type == "departmentId").Value != null ? Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value) : 0;
-        //public short GroupId => (short)(currentUser.FirstOrDefault(x => x.Type == "groupId").Value != null ? Convert.ToInt16(currentUser.FirstOrDefault(x => x.Type == "groupId").Value) : 0);
+        private string userId;
+        public string UserID
+        {
+            get
+            {
+                userId = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "id")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "id")?.Value : userId;
+                return userId;
+            }
+            set { userId = value; }
+        }
+
+        private string userName;
+        public string UserName
+        {
+            get
+            {
+                userName = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "userName")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "userName")?.Value : userName;
+                return userName;
+            }
+            set { userName = value; }
+        }
+
+        private Guid companyId;
+        public Guid CompanyID
+        {
+            get
+            {
+                companyId = currentUser.FirstOrDefault(x => x.Type == "companyId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "companyId").Value) : companyId;
+                return companyId;
+            }
+            set { companyId = value; }
+        }
+
+        private Guid officeId;
+        public Guid OfficeID
+        {
+            get
+            {
+                officeId = currentUser.FirstOrDefault(x => x.Type == "officeId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value) : officeId;
+                return officeId;
+            }
+            set { officeId = value; }
+        }
+        
         private short? groupId;
         public short? GroupId
         {
             get
             {
-                if(groupId == null && currentUser.FirstOrDefault(x => x.Type == "groupId") != null)
+                if (groupId == null && currentUser.FirstOrDefault(x => x.Type == "groupId") != null)
                 {
-                    groupId = (short)Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "groupId").Value);
+                    groupId = (short)Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "groupId")?.Value);
                 }
                 return groupId;
             }
+            set
+            {
+                groupId = value;
+            }
         }
+
         private int? departmentId;
         public int? DepartmentId
         {
@@ -55,15 +98,16 @@ namespace eFMS.IdentityServer.DL.UserManager
                     else
                     {
                         departmentId = Convert.ToInt32(_departmentId);
-                        //if(departmentId == 0)
-                        //{
-                        //    departmentId = null;
-                        //}
                     }
                 }
                 return departmentId;
             }
+            set
+            {
+                departmentId = value;
+            }
         }
+
         private List<UserPermissionModel> userPermissions;
         public List<UserPermissionModel> UserPermissions
         {

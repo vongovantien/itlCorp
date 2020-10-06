@@ -43,5 +43,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public decimal? PaymentTerm { get; set; }
         public string SourceCreated { get; set; }
         public string SourceModified { get; set; }
+        public string ReferenceNo { get; set; }
     }
 }

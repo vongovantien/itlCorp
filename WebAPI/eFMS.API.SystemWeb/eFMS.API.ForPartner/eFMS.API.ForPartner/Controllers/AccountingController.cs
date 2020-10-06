@@ -61,7 +61,7 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpGet("GetInvoice")]
         public IActionResult GetInvoice()
         {
-            string apiKey = Request.Headers[AccountingConstants.API_KEY_HEADER];
+            string apiKey = Request.Headers[ForPartnerConstants.API_KEY_HEADER];
             if (!accountingManagementService.ValidateApiKey(apiKey)){
                 return Unauthorized();
             }
@@ -95,12 +95,30 @@ namespace eFMS.API.ForPartner.Controllers
         /// Create Invoice
         /// </summary>
         /// <param name="model">model to create invoice</param>
+        /// <param name="apiKey">API Key</param>
         /// <returns></returns>
         [HttpPost("CreateInvoiceData")]
-        public IActionResult CreateInvoiceData(InvoiceCreateInfo model)
+        public IActionResult CreateInvoiceData(InvoiceCreateInfo model, [Required] string apiKey, [Required] string hash)
         {
+            //if (!accountingManagementService.ValidateApiKey(apiKey))
+            //{
+            //    return Unauthorized();
+            //}
+            //if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            //{
+            //    return Unauthorized();
+            //}
+
             if (!ModelState.IsValid) return BadRequest();
-            var hs = accountingManagementService.CreateInvoice(model);
+
+            var debitCharges = model.Charges.Where(x => x.ChargeType != ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
+            if (debitCharges.Count == 0)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Invoice don't have any charge in this period, Please check it again!" };
+                return BadRequest(_result);
+            }
+
+            var hs = accountingManagementService.CreateInvoice(model, apiKey);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -112,20 +130,33 @@ namespace eFMS.API.ForPartner.Controllers
         }
 
         /// <summary>
-        /// Replace Invoice (Update Invoice)
+        /// Replace Invoice (Delete and Create Invoice)
         /// </summary>
         /// <param name="model">model to replace invoice</param>
         /// <returns></returns>
         [HttpPut("ReplaceInvoiceData")]
-        public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model)
+        public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model, [Required] string apiKey)
         {
             return Ok(new ResultHandle { Status = true, Message = "Thay thế Hóa đơn thành công", Data = model });
         }
 
+        /// <summary>
+        /// Canceling Invoice (Delete Invoice)
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <returns></returns>
         [HttpPut("CancellingInvoice")]
-        public IActionResult CancellingInvoice(InvoiceInfo model)
+        public IActionResult CancellingInvoice(InvoiceInfo model, [Required] string apiKey)
         {
-            return Ok(new ResultHandle { Status = true, Message = "Hủy Hóa đơn thành công", Data = model });
+            var hs = accountingManagementService.DeleteInvoice(model, apiKey);            
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         [HttpPut("RejectData")]
