@@ -497,7 +497,7 @@ namespace eFMS.API.Catalogue.Controllers
                     if (DateTime.TryParse(dateEffect, out temp))
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPase = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                        dateToPase = DateTime.Parse(temp.ToString("MM/dd/yyyy"), culture);
                     }
                     else
                     {
@@ -513,7 +513,7 @@ namespace eFMS.API.Catalogue.Controllers
                     if (DateTime.TryParse(dateExpired, out temp))
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPaseExpired = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                        dateToPaseExpired = DateTime.Parse(temp.ToString("MM/dd/yyyy"), culture);
                     }
                     else
                     {
