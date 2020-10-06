@@ -66,6 +66,7 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? CompanyId { get; set; }
         public string LockedUser { get; set; }
         public bool? IsHawb { get; set; }
+        public string AirlineInfo { get; set; }
 
         public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
