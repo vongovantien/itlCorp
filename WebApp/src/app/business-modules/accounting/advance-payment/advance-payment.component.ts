@@ -78,6 +78,7 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Description', field: 'advanceNote', sortable: true },
             { title: 'Voucher No', field: 'voucherNo', sortable: true },
             { title: 'Voucher Date', field: 'voucherDate', sortable: true },
+
         ];
 
         this.headerGroupRequest = [
