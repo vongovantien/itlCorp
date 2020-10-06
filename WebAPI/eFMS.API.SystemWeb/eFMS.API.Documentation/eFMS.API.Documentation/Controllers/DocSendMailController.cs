@@ -85,5 +85,18 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get info mail housebill of Sea Import
+        /// </summary>
+        /// <param name="hblId">Housebill ID</param>
+        /// <param name="serviceId">Type of sea service</param>
+        /// <returns></returns>
+        [HttpGet("GetInfoMailHBLSeaImport")]
+        [Authorize]
+        public IActionResult GetInfoMailHBLSeaImport(Guid hblId, string serviceId)
+        {
+            var data = sendMailService.GetInfoMailHBLSeaImport(hblId, serviceId);
+            return Ok(data);
+        }
     }
 }

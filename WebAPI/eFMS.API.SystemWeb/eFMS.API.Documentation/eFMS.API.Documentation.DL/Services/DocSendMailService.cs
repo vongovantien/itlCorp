@@ -150,48 +150,64 @@ namespace eFMS.API.Documentation.DL.Services
 
         #region Mail info Sea Import - Export
         // Mail Info: Sea Import
-        public EmailContentModel GetInfoMailHBLSeaImport(Guid hblId)
+        public EmailContentModel GetInfoMailHBLSeaImport(Guid hblId, string serviceId)
         {
             var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
             if (_housebill == null) return null;
-            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
-            var _airlineMail = (_shipment != null) ? catPartnerRepo.Get(x => x.Id == _shipment.ColoaderId).FirstOrDefault()?.Email : string.Empty;
+            var _shippinglineMail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
             var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
             var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
             var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
             var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
-            var _warehouseName = string.Empty;
-            if (_warehouse != null)
-            {
-                if (_warehouse.Code == "TCS")
-                {
-                    _warehouseName = "TAN SON NHAT AIRPORT, WH: TCS";
-                }
-                if (_warehouse.Code == "SCSC")
-                {
-                    _warehouseName = "TAN SON NHAT AIRPORT, WH: SCSC";
-                }
-            }
+            var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
 
-            string _subject = string.Format(@"INDO TRANS LOGISTICS: ARRIVAL NOTICE // {0} // {1} // {2} (From: {3})",
+            var pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault()?.NameEn;
+            var pod = catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault()?.NameEn;
+            string _subject = string.Empty;
+            switch (serviceId)
+            {
+                case "SFI":
+                    {
+                        _subject = string.Format(@"ARRIVAL NOTICE- HB/L#: {0}// {1} - {2}// {3}// {4}",
+                        _housebill.Hwbno,
+                         pol,
+                         pod,
+                        _housebill.PackageContainer,
+                        _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+                    }
+                    break;
+                case "SLI":
+                    {
+                        _subject = string.Format(@"ARRIVAL NOTICE- HB/L#: {0}// {1} - {2}// {3} {4}// {5}",
+                        _housebill.Hwbno,
+                        pol,
+                        pod,
+                        _housebill.PackageQty,
+                        _housebill.PackageType,
+                        _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+                    }
+                    break;
+            }
+            string _body = string.Format(@"<div><b>Dear Client,</b></div></br><div>Please find Arrival notice in the attachment and confirm receipt.<br></br>" +
+                                        "<div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Vessel : {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;POL: {1}</div>" +
+                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;POD: {2}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MB/L#: {3}</div>" +
+                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HB/L: {4}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Shipper: {5}</div></div>" +
+                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Cnee: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Notify: {7}</div></div>" +
+                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;ETD: {8}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;ETA: {9}</div></div>",
+                _housebill.LocalVessel,
+                pol,
+                pod,
                 _housebill.Mawb,
                 _housebill.Hwbno,
+                _shipper?.PartnerNameEn,
                 _consignee?.PartnerNameEn,
-                currentUser.UserName);
-            string _body = string.Format(@"<div><b>Dear Valued Customer,</b></div><div>We would like to send <b>Arrival Notice and docs in attached file</b> for your air import shipment with details as below:</div><div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MAWB#: {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HAWB#: {1}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Quantity: {2} CTNS / G.W: {3}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Flight # / ETA: {4} / {5}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Routing: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Warehouse: <b>{7}</b></div></div><p>Please check docs and confirm by return with thanks.</p><p>This is system auto email please do not reply it directly. Please confirm the attached files or inform us about any amendment by mail to: {8}</p>",
-                _housebill.Mawb,
-                _housebill.Hwbno,
-                _housebill.PackageQty,
-                _housebill.GrossWeight,
-                _housebill.FlightNo,
-                (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty,
-                _housebill.Route,
-                _warehouseName,
-                _empCurrentUser?.Email);
+                _housebill.NotifyPartyDescription,
+                _housebill.Etd == null ? string.Empty : _housebill.Etd.Value.ToString("dd MMM").ToUpper(),
+                _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
 
             var emailContent = new EmailContentModel();
             emailContent.From = "Info FMS";
-            emailContent.To = _airlineMail; //Email của Airlines
+            emailContent.To = _shippinglineMail;
             emailContent.Cc = _empCurrentUser?.Email; //Email của Current User
             emailContent.Subject = _subject;
             emailContent.Body = _body;

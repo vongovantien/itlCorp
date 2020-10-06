@@ -285,9 +285,10 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.sendMailButtonName = "Send Arrival Notice";
                 this.getInfoMailHBLAirImport(hblId);
                 break;
-            case ChargeConstants.SFI_CODE: // Sea Full Import
+            case ChargeConstants.SFI_CODE: // Sea Import
+            case ChargeConstants.SLI_CODE:
                 this.sendMailButtonName = "Send Arrival Notice";
-                this.getInfoMailHBLAirImport(hblId);
+                this.getInfoMailHBLSeaImport(hblId, serviceId);
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 this.sendMailButtonName = "Send Pre Alert";
@@ -309,6 +310,26 @@ export class ShareBusinessReAlertComponent extends AppList {
     getInfoMailHBLAirImport(hblId: string) {
         this._progressRef.start();
         this._documentRepo.getInfoMailHBLAirImport(hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.setValue({
+                        from: res.from,
+                        to: res.to,
+                        cc: res.cc,
+                        subject: res.subject,
+                        body: res.body
+                    });
+                },
+            );
+    }
+
+    getInfoMailHBLSeaImport(hblId: string, serviceId: string) {
+        this._progressRef.start();
+        this._documentRepo.getInfoMailHBLSeaImport(hblId, serviceId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })
@@ -393,7 +414,6 @@ export class ShareBusinessReAlertComponent extends AppList {
             break;
             case ChargeConstants.SFI_CODE:
             case ChargeConstants.SLI_CODE:
-            case ChargeConstants.SCI_CODE:
             this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' })
                 .pipe(
                     catchError(this.catchError),
@@ -597,7 +617,6 @@ export class ShareBusinessReAlertComponent extends AppList {
 
             case ChargeConstants.SFI_CODE:
             case ChargeConstants.SLI_CODE:
-            case ChargeConstants.SCI_CODE:
                 {
                     this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' })
                     .pipe(

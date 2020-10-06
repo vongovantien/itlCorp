@@ -38,7 +38,7 @@ const routing: Routes = [
             },
             {
                 path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
-                data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.SFI_CODE },
+                data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.SLI_CODE },
             },
         ]
     }
