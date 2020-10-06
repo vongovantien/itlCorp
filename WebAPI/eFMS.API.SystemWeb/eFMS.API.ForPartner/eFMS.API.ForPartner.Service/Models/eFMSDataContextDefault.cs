@@ -35,7 +35,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AccAccountingManagement>(entity =>
             {
@@ -264,6 +264,47 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.Type)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatCurrencyExchange>(entity =>
+            {
+                entity.ToTable("catCurrencyExchange");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.CurrencyFromId)
+                    .HasColumnName("CurrencyFromID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CurrencyToId)
+                    .HasColumnName("CurrencyToID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.EffectiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Rate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
