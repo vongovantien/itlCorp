@@ -30,6 +30,8 @@ export class AdvancePayment {
     voucherDate: string = '';
     paymentTerm: number = null;
     paymentTermDate: string = null;
+    lastSyncDate: string = null;
+
 
     isRequester: boolean = false;
     isManager: boolean = false;

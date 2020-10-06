@@ -312,7 +312,8 @@ namespace eFMS.API.Accounting.DL.Services
                            PaymentMethod = advancePayment.PaymentMethod,
                            Amount = requestAdvance.Amount,
                            VoucherNo = advancePayment.VoucherNo,
-                           VoucherDate = advancePayment.VoucherDate
+                           VoucherDate = advancePayment.VoucherDate,
+                           LastSyncDate = advancePayment.LastSyncDate
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -333,7 +334,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.StatusApproval,
                 x.PaymentMethod,
                 x.VoucherNo,
-                x.VoucherDate
+                x.VoucherDate,
+                x.LastSyncDate 
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -355,7 +357,8 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentMethod = s.Key.PaymentMethod,
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
-                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
+                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
+                LastSyncDate = s.Key.LastSyncDate
             });
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
@@ -3236,6 +3239,46 @@ namespace eFMS.API.Accounting.DL.Services
                 advanceRequests.Add(advRequest);
             }
             return advanceRequests;
+        }
+
+        public HandleState SyncListAdvance(List<Guid> ids, out List<Guid> data)
+        {
+            HandleState result = new HandleState();
+            List<Guid> invalidAdvances = new List<Guid>();
+            if (ids.Count > 0)
+            {
+                invalidAdvances = DataContext.Get(x => ids.Contains(x.Id) && (
+                x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
+                || !string.IsNullOrEmpty(x.VoucherNo)
+                || x.LastSyncDate.HasValue
+                ))
+                    .Select(x => x.Id)
+                    .ToList();
+
+                if (invalidAdvances.Count > 0)
+                {
+                    data = invalidAdvances;
+                    return new HandleState("Danh sách advance không hợp lệ");
+                }
+
+                foreach (Guid id in ids)
+                {
+                    AcctAdvancePayment adv = DataContext.Get(x => x.Id == id)?.FirstOrDefault();
+                    if (adv != null)
+                    {
+                        adv.UserModified = currentUser.UserID;
+                        adv.DatetimeModified = DateTime.Now;
+                        adv.LastSyncDate = DateTime.Now;
+
+                        DataContext.Update(adv, x => x.Id == id, false);
+                    }
+                }
+
+                result = DataContext.SubmitChanges();
+            }
+
+            data = invalidAdvances;
+            return result;
         }
     }
 }
