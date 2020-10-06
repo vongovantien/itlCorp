@@ -9,12 +9,12 @@
             Accounting Controller
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService)">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
             <summary>
             Accounting Contructor
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test(eFMS.API.ForPartner.DL.Models.VoucherAdvance,System.String)">
             <summary>
             Test
             </summary>
@@ -23,6 +23,29 @@
             </remarks>
             <returns></returns>
             <response></response>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CreateInvoiceData(eFMS.API.ForPartner.DL.Models.InvoiceCreateInfo,System.String,System.String)">
+            <summary>
+            Create Invoice
+            </summary>
+            <param name="model">model to create invoice</param>
+            <param name="apiKey">API Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.ReplaceInvoiceData(eFMS.API.ForPartner.DL.Models.InvoiceUpdateInfo,System.String)">
+            <summary>
+            Replace Invoice (Delete and Create Invoice)
+            </summary>
+            <param name="model">model to replace invoice</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CancellingInvoice(eFMS.API.ForPartner.DL.Models.InvoiceInfo,System.String)">
+            <summary>
+            Canceling Invoice (Delete Invoice)
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>
