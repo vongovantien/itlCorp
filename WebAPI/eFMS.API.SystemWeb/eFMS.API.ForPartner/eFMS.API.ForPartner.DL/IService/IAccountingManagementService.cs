@@ -11,13 +11,10 @@ namespace eFMS.API.ForPartner.DL.IService
     {
         AccAccountingManagementModel GetById(Guid id);
         string GenerateHashStringTest(object body, string apiKey);
-        HandleState DeleteInvoice(InvoiceInfo model, string apiKey);
         HandleState UpdateVoucherAdvance(VoucherAdvance model, string apiKey);
-        HandleState CreateInvoice(InvoiceCreateInfo model, string apiKey);
-        HandleState ReplaceInvoice(InvoiceUpdateInfo model, string apiKey);
         HandleState RemoveVoucherAdvance(string voucherNo, string apiKey);
-
-
-
+        HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey);
+        HandleState UpdateInvoice(InvoiceUpdateInfo model, string apiKey);
+        HandleState DeleteInvoice(InvoiceInfo model, string apiKey);
     }
 }

@@ -109,6 +109,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("PreviewAirExportManifest")]
+        [Authorize]
         public IActionResult PreviewAirExportManifest(ManifestReportModel model)
         {
             var result = manifestService.PreviewAirExportManifest(model);

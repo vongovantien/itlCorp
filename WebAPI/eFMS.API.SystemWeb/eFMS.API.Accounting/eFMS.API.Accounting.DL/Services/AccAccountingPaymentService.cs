@@ -850,7 +850,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else
                         {
-                            item.PartnerId = partner.Id;
+                            item.PartnerId = partner.AccountNo;
                             item.RefId = soa.Id.ToString();
                             var lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
                             if (lastItem != null)

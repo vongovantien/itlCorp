@@ -823,32 +823,32 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
             {
-                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo));
+                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SoaNos != null && criteria.SoaNos.Count > 0)
             {
-                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo));
+                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.JobNos != null && criteria.JobNos.Count > 0)
             {
-                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo));
+                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl));
+                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl));
+                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
-                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode));
+                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase));
             }
 
             var charges = GetChargeForVoucher(query);

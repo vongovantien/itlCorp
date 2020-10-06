@@ -18,6 +18,7 @@ namespace eFMS.API.ForPartner.Service.Models
         public virtual DbSet<AccAccountingManagement> AccAccountingManagement { get; set; }
         public virtual DbSet<AcctAdvancePayment> AcctAdvancePayment { get; set; }
         public virtual DbSet<AcctSoa> AcctSoa { get; set; }
+        public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
