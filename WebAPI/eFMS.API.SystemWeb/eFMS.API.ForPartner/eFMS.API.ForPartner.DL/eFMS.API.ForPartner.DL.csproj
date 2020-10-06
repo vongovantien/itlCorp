@@ -30,6 +30,9 @@
     <Reference Include="ITL.NetCore.Connection">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\bin\netcoreapp2.2\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

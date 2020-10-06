@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -41,8 +43,22 @@ namespace eFMS.API.ForPartner.Controllers
             stringLocalizer = localizer;
         }
 
+        /// <summary>
+        /// Test
+        /// </summary>
+        /// <remarks>
+        /// Remark
+        /// </remarks>
+        /// <returns></returns>
+        /// <response></response>
+        [HttpPost("GenerateHash")]
+        public IActionResult Test(VoucherAdvance model,[Required] string apiKey)
+        {
+            return Ok(accountingManagementService.GenerateHashStringTest(model,apiKey));
+        }
+
+
         [HttpGet("GetInvoice")]
-        [APIKeyAuth]
         public IActionResult GetInvoice()
         {
             string apiKey = Request.Headers[AccountingConstants.API_KEY_HEADER];
@@ -54,8 +70,17 @@ namespace eFMS.API.ForPartner.Controllers
         }
 
         [HttpPut("UpdateVoucherAdvance")]
-        public IActionResult UpdateVoucherAdvance(VoucherAdvance model)
+        public IActionResult UpdateVoucherAdvance(VoucherAdvance model, [Required] string apiKey, [Required] string hash)
         {
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return Unauthorized();
+            }
+            if(!accountingManagementService.ValidateHashString(model, apiKey,hash))
+            {
+                return Unauthorized();
+
+            }
             return Ok(new ResultHandle { Status = true, Message = "Update Phiếu chi thành công", Data = model });
         }
 

@@ -9,6 +9,10 @@ using System.Linq;
 using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Hosting;
+using eFMS.API.Common.Helpers;
+using Microsoft.Extensions.Options;
+using eFMS.API.Common;
+using Newtonsoft.Json;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 
@@ -19,6 +23,8 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
         private readonly IHostingEnvironment environment;
+        private readonly IOptions<AuthenticationSetting> configSetting;
+        private readonly IContextBase<AcctAdvancePayment> acctAdvanceRepository;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPartner> partnerRepo;
@@ -26,6 +32,8 @@ namespace eFMS.API.ForPartner.DL.Service
         public AccAccountingManagementService(  
             IContextBase<AccAccountingManagement> repository,
             IContextBase<SysPartnerApi> sysPartnerApiRep,
+            IContextBase<AcctAdvancePayment> acctAdvanceRepo,
+            IOptions<AuthenticationSetting> config,
             IHostingEnvironment env,
             IMapper mapper,
             ICurrentUser cUser,
@@ -36,7 +44,10 @@ namespace eFMS.API.ForPartner.DL.Service
         {
             currentUser = cUser;
             sysPartnerApiRepository = sysPartnerApiRep;
+            acctAdvanceRepository = acctAdvanceRepo;
             environment = env;
+            configSetting = config;
+
             surchargeRepo = csShipmentSurcharge;
             stringLocalizer = localizer;
             partnerRepo = catPartner;
@@ -58,6 +69,43 @@ namespace eFMS.API.ForPartner.DL.Service
                 isValid = true;
             }
             return isValid;
+        }
+
+        public bool ValidateHashString(object body, string apiKey, string hash)
+        {
+            bool valid = false;
+            if(body != null)
+            {
+                string bodyString = JsonConvert.SerializeObject(body) + apiKey + configSetting.Value.PartnerShareKey;
+
+                string eFmsHash = Md5Helper.CreateMD5(bodyString);
+
+                if(eFmsHash == hash)
+                {
+                    valid = true;
+                }
+                else
+                {
+                    valid = false;
+                }
+
+            }
+
+            return valid;
+        }
+
+        public string GenerateHashStringTest(object body, string apiKey)
+        {
+            object data = body;
+            string bodyString = JsonConvert.SerializeObject(data) + apiKey + configSetting.Value.PartnerShareKey;
+            return Md5Helper.CreateMD5(bodyString);
+        }
+
+        public HandleState UpdateVoucherAdvance(VoucherAdvance model)
+        {
+            HandleState result = new HandleState();
+
+            return result;
         }
 
         public HandleState CreateInvoice(InvoiceCreateInfo model)

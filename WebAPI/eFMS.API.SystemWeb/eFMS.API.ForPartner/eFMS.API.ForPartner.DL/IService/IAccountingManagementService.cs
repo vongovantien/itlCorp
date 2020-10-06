@@ -9,6 +9,8 @@ namespace eFMS.API.ForPartner.DL.IService
     public interface IAccountingManagementService: IRepositoryBase<AccAccountingManagement, AccAccountingManagementModel>, IForPartnerApiService
     {
         AccAccountingManagementModel GetById(Guid id);
+        string GenerateHashStringTest(object body, string apiKey);
+        HandleState UpdateVoucherAdvance(VoucherAdvance model);
         HandleState CreateInvoice(InvoiceCreateInfo model);
         HandleState ReplaceInvoice(InvoiceUpdateInfo model);
     }
