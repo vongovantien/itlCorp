@@ -15,6 +15,8 @@ using eFMS.API.Common;
 using Newtonsoft.Json;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
+using eFMS.API.Common.Globals;
+using System.Collections.Generic;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -25,14 +27,16 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IHostingEnvironment environment;
         private readonly IOptions<AuthenticationSetting> configSetting;
         private readonly IContextBase<AcctAdvancePayment> acctAdvanceRepository;
+        private readonly IContextBase<AcctSoa> acctSOARepository;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPartner> partnerRepo;
 
-        public AccAccountingManagementService(  
+        public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
             IContextBase<SysPartnerApi> sysPartnerApiRep,
             IContextBase<AcctAdvancePayment> acctAdvanceRepo,
+            IContextBase<AcctSoa> acctSOARepo,
             IOptions<AuthenticationSetting> config,
             IHostingEnvironment env,
             IMapper mapper,
@@ -45,6 +49,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser = cUser;
             sysPartnerApiRepository = sysPartnerApiRep;
             acctAdvanceRepository = acctAdvanceRepo;
+            acctSOARepository = acctSOARepo;
             environment = env;
             configSetting = config;
             surchargeRepo = csShipmentSurcharge;
@@ -63,7 +68,7 @@ namespace eFMS.API.ForPartner.DL.Service
         {
             bool isValid = false;
             SysPartnerApi partnerAPiInfo = sysPartnerApiRepository.Get(x => x.ApiKey == apiKey).FirstOrDefault();
-            if(partnerAPiInfo != null && partnerAPiInfo.Active == true && partnerAPiInfo.Environment.ToLower() == environment.EnvironmentName.ToLower())
+            if (partnerAPiInfo != null && partnerAPiInfo.Active == true)
             {
                 isValid = true;
             }
@@ -73,13 +78,13 @@ namespace eFMS.API.ForPartner.DL.Service
         public bool ValidateHashString(object body, string apiKey, string hash)
         {
             bool valid = false;
-            if(body != null)
+            if (body != null)
             {
                 string bodyString = JsonConvert.SerializeObject(body) + apiKey + configSetting.Value.PartnerShareKey;
 
                 string eFmsHash = Md5Helper.CreateMD5(bodyString);
 
-                if(eFmsHash == hash)
+                if (eFmsHash == hash)
                 {
                     valid = true;
                 }
@@ -100,17 +105,11 @@ namespace eFMS.API.ForPartner.DL.Service
             return Md5Helper.CreateMD5(bodyString);
         }
 
-        public HandleState UpdateVoucherAdvance(VoucherAdvance model)
-        {
-            HandleState result = new HandleState();
-
-            return result;
-        }
-
+       
         #region --- CRUD INVOICE ---
         public HandleState CreateInvoice(InvoiceCreateInfo model, string apiKey)
         {
-            ICurrentUser _currentUser = setCurrentUserPartner(currentUser, apiKey);
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
             currentUser.DepartmentId = _currentUser.DepartmentId;
@@ -140,7 +139,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.DepartmentId = currentUser.DepartmentId;
                 invoice.OfficeId = currentUser.OfficeID;
                 invoice.CompanyId = currentUser.CompanyID;
-                
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -148,8 +147,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState hs = DataContext.Add(invoice, false);
                         if (hs.Success)
                         {
-                            //Cập nhật những phí của Invoice
-                            foreach(var charge in debitCharges)
+                            foreach (var charge in debitCharges)
                             {
                                 CsShipmentSurcharge surcharge = surchargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                                 surcharge.AcctManagementId = invoice.Id;
@@ -212,27 +210,22 @@ namespace eFMS.API.ForPartner.DL.Service
         #region --- PRIVATE METHOD ---
         private SysPartnerApi GetInfoPartnerByApiKey(string apiKey)
         {
-            var partnerApi = sysPartnerApiRepository.Get(x => x.ApiKey == apiKey).FirstOrDefault();
+            SysPartnerApi partnerApi = sysPartnerApiRepository.Get(x => x.ApiKey == apiKey).FirstOrDefault();
             return partnerApi;
         }
 
-        private ICurrentUser setCurrentUserPartner(ICurrentUser currentUser, string apiKey)
+        private ICurrentUser SetCurrentUserPartner(ICurrentUser currentUser, string apiKey)
         {
-            var partnerApi = GetInfoPartnerByApiKey(apiKey);
+            SysPartnerApi partnerApi = GetInfoPartnerByApiKey(apiKey);
             currentUser.UserID = (partnerApi != null) ? partnerApi.UserId.ToString() : Guid.Empty.ToString();
             currentUser.GroupId = 0;
             currentUser.DepartmentId = 0;
             currentUser.OfficeID = Guid.Empty;
             currentUser.CompanyID = Guid.Empty;
+
             return currentUser;
         }
 
-        /// <summary>
-        /// Generate Voucher ID
-        /// </summary>
-        /// <param name="acctMngtType">Invoice or Voucher</param>
-        /// <param name="voucherType">Voucher Type of Voucher</param>
-        /// <returns></returns>
         private string GenerateVoucherId(string acctMngtType, string voucherType)
         {
             if (string.IsNullOrEmpty(acctMngtType)) return string.Empty;
@@ -301,5 +294,104 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         #endregion --- PRIVATE METHOD ---
+
+        #region --- Advance ---
+        public HandleState RemoveVoucherAdvance(string voucherNo, string apiKey)
+        {
+            HandleState result = new HandleState();
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+
+            try
+            {
+                if(string.IsNullOrEmpty(voucherNo))
+                {
+                    return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+                }
+                AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.VoucherNo == voucherNo)?.FirstOrDefault();
+                if(adv == null)
+                {
+                    return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+                }
+
+                adv.VoucherNo = null;
+                adv.VoucherDate = null;
+                adv.PaymentTerm = null;
+
+                adv.UserModified = _currentUser.UserID;
+                adv.DatetimeModified = DateTime.Now;
+
+                result = acctAdvanceRepository.Update(adv, x => x.Id == adv.Id);
+
+                if (!result.Success)
+                {
+                    return new HandleState("Error");
+                }
+
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                return new HandleState("Error");
+            }
+        }
+
+        public HandleState UpdateVoucherAdvance(VoucherAdvance model, string apiKey)
+        {
+            HandleState result = new HandleState();
+
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+
+            try
+            {
+                AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.Id == model.AdvanceID)?.FirstOrDefault();
+                if (adv == null)
+                {
+                    return new HandleState("Not found advance  " + model.AdvanceNo);
+                }
+
+                if (adv.StatusApproval == ForPartnerConstants.STATUS_APPROVAL_DONE)
+                {
+                    adv.PaymentTerm = model.PaymnetTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
+                    if (model.PaymnetTerm != null)
+                    {
+                        DateTime? deadlineDate = null;
+                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymnetTerm);
+                        adv.DeadlinePayment = deadlineDate;
+                    }
+                    adv.VoucherNo = model.VoucherNo;
+                    adv.VoucherDate = model.VoucherDate;
+                    adv.UserModified = _currentUser.UserID;
+                    adv.DatetimeModified = DateTime.Now;
+
+                    result = acctAdvanceRepository.Update(adv, x => x.Id == adv.Id);
+
+                    if (!result.Success)
+                    {
+                        return new HandleState("Update fail");
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+
+        }
+
+        #endregion ---Advance ---
+
     }
 }
