@@ -1,3 +1,6 @@
 ﻿{
-  "MSG_DATA_NOT_FOUND": "Data not found"
+  "MSG_DATA_NOT_FOUND": "Data not found",
+  "MSG_INSERT_SUCCESS": "New data added",
+  "MSG_UPDATE_SUCCESS": "Data update success",
+  "MSG_DELETE_SUCCESS": "Data delete success"
 }

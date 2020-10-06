@@ -321,6 +321,7 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeModified = acc.DatetimeModified,
                            PaymentStatus = acc.PaymentStatus,
                            PaymentDueDate = acc.PaymentDueDate,
+                           LastSyncDate = acc.LastSyncDate
 
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
@@ -1902,6 +1903,26 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id,false);
+        }
+
+        public HandleState SyncVoucher(Guid voucherId)
+        {
+            HandleState result = new HandleState();
+
+            AccAccountingManagement voucher = DataContext.Get(x => x.Id == voucherId && x.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)?.FirstOrDefault();
+
+            if (voucher == null)
+            {
+                return new HandleState(stringLocalizer[AccountingLanguageSub.MSG_DATA_NOT_FOUND].Value);
+            }
+
+            voucher.UserModified = currentUser.UserID;
+            voucher.DatetimeModified = DateTime.Now;
+            voucher.LastSyncDate = DateTime.Now;
+
+            result = DataContext.Update(voucher, x => x.Id == voucherId);
+
+            return result;
         }
     }
 }

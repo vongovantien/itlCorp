@@ -34,6 +34,8 @@ export class AccAccountingManagement {
     paymentDueDate: string = null;
     totalExchangeRate: number = null;
     paymentTerm: number = null;
+    lastSyncDate: string = null;
+
 
     constructor(object?: any) {
         const self = this;

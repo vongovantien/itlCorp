@@ -452,5 +452,21 @@ namespace eFMS.API.Accounting.Controllers
             ChargeAccountingMngtTotalViewModel result = accountingService.CalculateListChargeAccountingMngt(charges);
             return Ok(result);
         }
+
+        [HttpPut]
+        [Route("SyncVoucherToAccountantSystem")]
+        [Authorize]
+        public IActionResult SyncVoucherToAccountantSystem(Guid voucherId)
+        {
+            HandleState hs = accountingService.SyncVoucher(voucherId);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value};
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }

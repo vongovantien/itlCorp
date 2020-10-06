@@ -87,5 +87,8 @@ namespace eFMS.API.Accounting.DL.IService
         List<Guid> GetSurchargeIdByHblId(Guid? hblId);
 
         List<AcctAdvanceRequestModel> GetAdvanceRequestByAdvanceNo(string advanceNo);
+
+        HandleState SyncListAdvance(List<Guid> ids, out List<Guid> data);
+
     }
 }

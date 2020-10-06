@@ -866,5 +866,21 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctAdvancePaymentService.PreviewMultipleAdvance(advanceIds);
             return Ok(result);
         }
+
+        [HttpPut("SyncAdvanceToAccountantSystem")]
+        [Authorize]
+        public IActionResult SyncAdvanceToAccountantSystem(List<Guid> Ids)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            HandleState hs = acctAdvancePaymentService.SyncListAdvance(Ids, out Ids);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
