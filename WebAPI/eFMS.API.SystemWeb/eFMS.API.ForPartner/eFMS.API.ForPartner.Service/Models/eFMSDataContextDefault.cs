@@ -83,6 +83,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.PaymentTerm).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.ReferenceNo).HasMaxLength(100);
+
                 entity.Property(e => e.ServiceType).HasMaxLength(10);
 
                 entity.Property(e => e.SourceCreated)

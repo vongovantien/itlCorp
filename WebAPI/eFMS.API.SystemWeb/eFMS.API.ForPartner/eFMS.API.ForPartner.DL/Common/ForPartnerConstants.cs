@@ -1,6 +1,6 @@
 ﻿namespace eFMS.API.ForPartner.DL.Common
 {
-    public static class AccountingConstants
+    public static class ForPartnerConstants
     {
         public static readonly string SEF_SHIPMENT = "SEF";
         public static readonly string SEF_HBL = "HBL";
@@ -23,6 +23,8 @@
         public static readonly string TYPE_CHARGE_OBH = "OBH";
         public static readonly string TYPE_CHARGE_OBH_BUY = "OBH-BUY";
         public static readonly string TYPE_CHARGE_OBH_SELL = "OBH-SELL";
+        public static readonly string TYPE_DEBIT = "DEBIT";
+        public static readonly string TYPE_CREDIT = "CREDIT";
         #endregion -- TYPE CHARGE --
 
         #region -- STATUS PAYMENT --

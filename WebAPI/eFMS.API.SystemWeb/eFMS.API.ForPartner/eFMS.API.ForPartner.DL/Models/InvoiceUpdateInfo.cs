@@ -6,6 +6,7 @@ namespace eFMS.API.ForPartner.DL.Models
     public class InvoiceUpdateInfo
     {
         public string ReferenceNo { get; set; }
+        public string PreReferenceNo { get; set; }
         public string PartnerCode { get; set; }
         public string InvoiceNo { get; set; }
         public string SerieNo { get; set; }
