@@ -45,5 +45,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string SourceModified { get; set; }
         public string ReferenceNo { get; set; }
         public DateTime? LastSyncDate { get; set; }
+        public string SyncStatus { get; set; }
     }
 }
