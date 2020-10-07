@@ -63,7 +63,6 @@ namespace eFMS.API.ForPartner.DL.Service
             currencyExchangeService = exchangeService;
         }
 
-        }
         public AccAccountingManagementModel GetById(Guid id)
         {
             AccAccountingManagement accounting = DataContext.Get(x => x.Id == id).FirstOrDefault();
@@ -111,7 +110,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return Md5Helper.CreateMD5(bodyString);
         }
 
-       
+
         #region --- CRUD INVOICE ---
         public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey)
         {
@@ -172,7 +171,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             }
 
                             //Cập nhật số RefNo cho phí OBH
-                            foreach(var charge in obhCharges)
+                            foreach (var charge in obhCharges)
                             {
                                 CsShipmentSurcharge surcharge = surchargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                                 surcharge.FinalExchangeRate = charge.ExchangeRate;
@@ -223,8 +222,8 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 try
                 {
-                    var data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo 
-                                                 && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault(); 
+                    var data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo
+                                                 && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault();
                     if (data == null) return new HandleState((object)"Không tìm thấy hóa đơn");
 
                     HandleState hs = DataContext.Delete(x => x.ReferenceNo == model.ReferenceNo
@@ -245,9 +244,9 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.AmountVnd = charge.VatAmountVnd = null;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
-                            var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);                    
+                            var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
-                        
+
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
                         trans.Commit();
@@ -363,7 +362,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
                     decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
                     total += exchangeRate * surcharge.Total;
-                });                
+                });
             }
             return total;
         }
@@ -382,12 +381,12 @@ namespace eFMS.API.ForPartner.DL.Service
 
             try
             {
-                if(string.IsNullOrEmpty(voucherNo))
+                if (string.IsNullOrEmpty(voucherNo))
                 {
                     return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
                 }
                 AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.VoucherNo == voucherNo)?.FirstOrDefault();
-                if(adv == null)
+                if (adv == null)
                 {
                     return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
                 }
@@ -469,3 +468,5 @@ namespace eFMS.API.ForPartner.DL.Service
 
     }
 }
+
+
