@@ -1937,6 +1937,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  SoaNo = s.Soano,
                                  DateSOA = s.DatetimeCreated,
                                  IssuedBy = s.UserCreated,
+                                 SoaFromDate = s.SoaformDate
                              };
             //information Partner
             var result = resultData.FirstOrDefault();

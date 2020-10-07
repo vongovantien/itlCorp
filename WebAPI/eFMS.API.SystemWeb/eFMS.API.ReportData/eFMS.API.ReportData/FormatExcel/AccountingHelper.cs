@@ -7,6 +7,7 @@ using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -1837,11 +1838,12 @@ namespace eFMS.API.ReportData.FormatExcel
                 excelImage.SetPosition(0, 0, 1, 0);
             }
 
+            string monthName = airfreightObj.SoaFromDate.HasValue ? airfreightObj.SoaFromDate.Value.ToString("MMM", CultureInfo.InvariantCulture) : string.Empty;
             List<string> headers = new List<string>()
             {
                "INDO TRANS LOGISTICS CORPORATION", //0
                "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
-               "DEBIT NOTE IN OCT 2019 ( BẢNG KÊ CƯỚC VCQT)", //2
+               "DEBIT NOTE IN " + monthName?.ToUpper() + " " + airfreightObj.SoaFromDate.Value.Year  + " (BẢNG KÊ CƯỚC VCQT)" , //2
                "TOTAL", //3
             };
 
@@ -2123,7 +2125,7 @@ namespace eFMS.API.ReportData.FormatExcel
             .Address;
 
             string idT1 = workSheet
-            .Cells[addressStartContent, 8]
+            .Cells[addressStartContent, 7]
             .Start
             .Address;
             string totalStr = idT + ":" + idT1;
@@ -2134,7 +2136,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[idT].Style.Font.Bold = true;
 
             string idPCS = workSheet
-           .Cells[addressStartContent, 9]
+           .Cells[addressStartContent, 8]
            .Start
            .Address;
             workSheet.Cells[idPCS].Value = airfreightObj.HawbAirFrieghts.Select(t => t.Pcs).Sum();
@@ -2142,7 +2144,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idGW = workSheet
-            .Cells[addressStartContent, 10]
+            .Cells[addressStartContent, 9]
             .Start
             .Address;
             workSheet.Cells[idGW].Value = airfreightObj.HawbAirFrieghts.Select(t => t.GW).Sum();
@@ -2150,7 +2152,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idCW = workSheet
-            .Cells[addressStartContent, 11]
+            .Cells[addressStartContent, 10]
             .Start
             .Address;
             workSheet.Cells[idCW].Value = airfreightObj.HawbAirFrieghts.Select(t => t.CW).Sum();
@@ -2158,7 +2160,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idAF = workSheet
-              .Cells[addressStartContent, 13]
+              .Cells[addressStartContent, 12]
               .Start
               .Address;
             workSheet.Cells[idAF].Value = airfreightObj.HawbAirFrieghts.Select(t => t.AirFreight).Sum();
@@ -2166,21 +2168,21 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idHF = workSheet
-             .Cells[addressStartContent, 18]
+             .Cells[addressStartContent, 20]
              .Start
              .Address;
             workSheet.Cells[idHF].Value = airfreightObj.HawbAirFrieghts.Select(t => t.HandlingFee).Sum();
             workSheet.Cells[idHF].Style.Numberformat.Format = numberFormat;
 
             string idNA = workSheet
-             .Cells[addressStartContent, 19]
+             .Cells[addressStartContent, 21]
              .Start
              .Address;
             workSheet.Cells[idNA].Value = airfreightObj.HawbAirFrieghts.Select(t => t.NetAmount).Sum();
             workSheet.Cells[idNA].Style.Numberformat.Format = numberFormat;
 
             string idTT = workSheet
-             .Cells[addressStartContent, 21]
+             .Cells[addressStartContent, 23]
              .Start
              .Address;
             workSheet.Cells[idTT].Value = airfreightObj.HawbAirFrieghts.Select(t => t.TotalAmount).Sum();
