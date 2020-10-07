@@ -8,8 +8,8 @@ namespace eFMS.API.ForPartner.DL.Models
     {
         public string VoucherNo { get; set; }
         public DateTime? VoucherDate { get; set; }
-        public decimal PaymnetTerm { get; set; }
+        public decimal? PaymnetTerm { get; set; }
         public string AdvanceNo { get; set; }
-        public string AdvanceID { get; set; }
+        public Guid AdvanceID { get; set; }
     }
 }

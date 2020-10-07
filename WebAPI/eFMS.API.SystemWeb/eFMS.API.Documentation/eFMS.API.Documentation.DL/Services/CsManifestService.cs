@@ -388,7 +388,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return result;
 
             var office = officeRepository.Get(f => f.Id == transaction.OfficeId).FirstOrDefault();
-            string shipperDescription = string.IsNullOrEmpty(model.ManifestShipper) ? airwayBill.ShipperDescription : model.ManifestShipper;
+            string shipperDescription = string.IsNullOrEmpty(model.ManifestShipper) ? airwayBill != null ? airwayBill.ShipperDescription : null : model.ManifestShipper;
             if (string.IsNullOrEmpty(shipperDescription))
             {
                 shipperDescription = office.BranchNameEn + "\n" + office.AddressEn;

@@ -2,16 +2,24 @@
     <app-sub-header> </app-sub-header>
     <div class="m-content">
         <div class="m-portlet">
-            <div class="m-portlet__body">
+            <div class="m-portlet__body"
+                [ngStyle]="{'font-style': (!accountingManagement.lastSyncDate ? 'italic' : '')}">
                 <div class="d-flex align-items-center justify-content-between p-1">
-                    <h3>{{accountingManagement.voucherId}}</h3>
+                    <h3>{{accountingManagement.voucherId}}
+                        <span *ngIf="!accountingManagement.lastSyncDate"
+                            class="m-badge m-badge--{{!accountingManagement.lastSyncDate ? 'danger' : 'success'}} m-badge--wide">
+                            Synced
+                        </span>
+                    </h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-permission-button type="save" title="Save" (onClick)="onSubmitSaveVoucher()">
-                            </app-permission-button>
+                            <ng-container *ngIf="!accountingManagement.lastSyncDate">
+                                <app-permission-button type="save" title="Save" (onClick)="onSubmitSaveVoucher()">
+                                </app-permission-button>
+                            </ng-container>
 
                             <app-default-button [buttonSetting]="cancelButtonSetting"
-                                (onClick)="confirmCancelPopup.show()">
+                                (onClick)="!!accountingManagement.lastSyncDate ? gotoList() : confirmCancelPopup.show()">
                             </app-default-button>
                         </div>
                     </div>

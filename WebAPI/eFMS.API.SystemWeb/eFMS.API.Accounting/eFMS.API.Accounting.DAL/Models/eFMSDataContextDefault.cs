@@ -64,7 +64,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -203,6 +203,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Status).HasMaxLength(50);
 
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
+
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.TotalExchangeRate).HasColumnType("decimal(18, 4)");
@@ -330,6 +332,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.StatusApproval)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -606,6 +610,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaidBehalfPrice).HasColumnType("decimal(18, 4)");
@@ -633,6 +639,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.StatementDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
 
@@ -696,6 +704,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaymentMethod)
@@ -718,6 +728,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.StatusApproval)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -802,6 +814,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(50)

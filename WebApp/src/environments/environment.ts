@@ -3,10 +3,17 @@ export const environment = {
         local: false,
         HOST: {
                 WEB_URL: "test.api-efms.itlvn.com",
+<<<<<<< HEAD
                 // ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
                 ACCOUNTING: "localhost:44368",
                 // DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
                 DOCUMENTATION: "localhost:44366",
+=======
+                ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
+                // ACCOUNTING: "localhost:44368",
+                DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
+                // DOCUMENTATION: "localhost:44366",
+>>>>>>> uat/21-09-2020-sprint19
                 CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
                 // CATALOGUE: "localhost:44361",
                 OPERATION: "test.api-efms.itlvn.com/Operation",

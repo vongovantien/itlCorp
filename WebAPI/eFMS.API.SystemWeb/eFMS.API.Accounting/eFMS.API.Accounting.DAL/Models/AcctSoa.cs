@@ -36,5 +36,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string PaymentNote { get; set; }
         public DateTime? PaymentDatetimeUpdated { get; set; }
         public DateTime? LastSyncDate { get; set; }
+        public string SyncStatus { get; set; }
     }
 }

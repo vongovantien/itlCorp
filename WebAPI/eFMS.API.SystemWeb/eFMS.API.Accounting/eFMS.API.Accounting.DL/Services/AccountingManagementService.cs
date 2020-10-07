@@ -321,6 +321,7 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeModified = acc.DatetimeModified,
                            PaymentStatus = acc.PaymentStatus,
                            PaymentDueDate = acc.PaymentDueDate,
+                           LastSyncDate = acc.LastSyncDate
 
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
@@ -822,32 +823,32 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
             {
-                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo));
+                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SoaNos != null && criteria.SoaNos.Count > 0)
             {
-                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo));
+                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.JobNos != null && criteria.JobNos.Count > 0)
             {
-                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo));
+                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl));
+                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl));
+                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
-                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode));
+                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase));
             }
 
             var charges = GetChargeForVoucher(query);
@@ -1902,6 +1903,26 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id,false);
+        }
+
+        public HandleState SyncVoucher(Guid voucherId)
+        {
+            HandleState result = new HandleState();
+
+            AccAccountingManagement voucher = DataContext.Get(x => x.Id == voucherId && x.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)?.FirstOrDefault();
+
+            if (voucher == null)
+            {
+                return new HandleState(stringLocalizer[AccountingLanguageSub.MSG_DATA_NOT_FOUND].Value);
+            }
+
+            voucher.UserModified = currentUser.UserID;
+            voucher.DatetimeModified = DateTime.Now;
+            voucher.LastSyncDate = DateTime.Now;
+
+            result = DataContext.Update(voucher, x => x.Id == voucherId);
+
+            return result;
         }
     }
 }
