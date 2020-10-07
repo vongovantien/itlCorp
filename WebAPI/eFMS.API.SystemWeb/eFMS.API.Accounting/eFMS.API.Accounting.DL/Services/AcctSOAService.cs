@@ -2117,7 +2117,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  PartnerBillingAddress = pat.AddressEn,
                                  PartnerTaxCode = pat.TaxCode,
                                  SoaNo = s.Soano,
-                                 DateSOA = s.DatetimeCreated,
+                                 DateSOA = s.SoaformDate,
                                  IssuedBy = s.UserCreated,
                              };
             // Partner information

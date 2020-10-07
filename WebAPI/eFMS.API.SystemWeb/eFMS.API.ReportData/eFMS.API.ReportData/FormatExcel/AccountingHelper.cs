@@ -2360,24 +2360,24 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Column(4).Width = 10; //Cột D
             workSheet.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Column(5).Width = 20; //Cột E
+            workSheet.Column(5).Width = 17; //Cột E
             workSheet.Column(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Column(6).Width = 10; //Cột F
             workSheet.Column(7).Width = 10; //Cột G
             workSheet.Column(8).Width = 15; //Cột H            
-            workSheet.Column(9).Width = 20; //Cột I
+            workSheet.Column(9).Width = 15; //Cột I
             workSheet.Column(10).Width = 12; //Cột J
             workSheet.Column(10).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Column(11).Width = 20; //Cột K
-            workSheet.Column(12).Width = 20; //Cột L
-            workSheet.Column(13).Width = 20; //Cột M
-            workSheet.Column(14).Width = 20; //Cột N
-            workSheet.Column(15).Width = 20; //Cột O
-            workSheet.Column(16).Width = 20; //Cột P
-            workSheet.Column(17).Width = 20; //Cột Q
-            workSheet.Column(18).Width = 20; //Cột R
-            workSheet.Column(19).Width = 20; //Cột S
-            workSheet.Column(20).Width = 20; //Cột T
+            workSheet.Column(11).Width = 13; //Cột K
+            workSheet.Column(12).Width = 13; //Cột L
+            workSheet.Column(13).Width = 13; //Cột M
+            workSheet.Column(14).Width = 13; //Cột N
+            workSheet.Column(15).Width = 13; //Cột O
+            workSheet.Column(16).Width = 13; //Cột P
+            workSheet.Column(17).Width = 13; //Cột Q
+            workSheet.Column(18).Width = 13; //Cột R
+            workSheet.Column(19).Width = 13; //Cột S
+            workSheet.Column(20).Width = 13; //Cột T
 
             // Header0
             workSheet.Cells["O1:T1"].Merge = true;
