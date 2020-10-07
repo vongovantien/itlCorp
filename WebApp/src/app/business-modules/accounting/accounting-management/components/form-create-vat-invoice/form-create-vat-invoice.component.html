@@ -50,7 +50,7 @@
                                     autoFormatCurrency numeric [decimals]="digitDecimal">
                             </div>
                         </div>
-                        <div class="col-lg-4 d-flex align-items-end justify-content-end">
+                        <div class="col-lg-4 d-flex align-items-end justify-content-end" *ngIf="!isReadonly">
                             <div class="form-group">
                                 <label> &nbsp; </label>
                                 <button class="btn btn-success m-btn--pill m-btn--icon m-btn--uppercase" type="button"

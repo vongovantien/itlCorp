@@ -65,6 +65,12 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                     this.updateFormVoucher(res);
                     this.updateChargeList(res);
 
+                    console.log(this.accountingManagement);
+
+                    if (!!this.accountingManagement.lastSyncDate) {
+                        this.formCreateComponent.isReadonly = true;
+                        this.listChargeComponent.isReadOnly = true;
+                    }
                 }
             );
     }

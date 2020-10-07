@@ -62,6 +62,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
             { title: 'Currency', field: 'currency', sortable: true },
             { title: 'Voucher Date', field: 'date', sortable: true },
             { title: 'Issued Date', field: 'datetimeCreated', sortable: true },
+            { title: 'Sync Date', field: 'lastSyncDate', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },
         ];
 

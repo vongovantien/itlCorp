@@ -32,5 +32,6 @@ namespace eFMS.API.Accounting.DL.IService
         CatContractInvoiceModel GetContractForInvoice(AccMngtContractInvoiceCriteria model);
         List<Guid> GetSurchargeIdByAcctMngtId(Guid? acctMngt);
         ChargeAccountingMngtTotalViewModel CalculateListChargeAccountingMngt(List<ChargeOfAccountingManagementModel> charges);
+        HandleState SyncVoucher(Guid voucherId);
     }
 }

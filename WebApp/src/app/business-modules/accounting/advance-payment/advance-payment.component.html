@@ -9,44 +9,46 @@
     <div class="m-content">
         <adv-payment-form-search (onSearch)="onSearchAdvPayment($event)"></adv-payment-form-search>
         <div class="m-portlet">
-
-            <div class="m-form">
-                <div class="m-portlet__body">
+            <div class="m-portlet__body">
+                <div class="m-form">
                     <div class="row">
-                        <div class="col-lg-8 m--align-left">
-                            <div class="form-group">
+                        <div class="col-lg-12 m--margin-bottom-10">
+                            <div class="dropdown m-dropdown m-dropdown--inline">
                                 <div class="c-button-actions">
-                                    <button (click)="showPopupUpdateVoucher()"
-                                        *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'"
-                                        class="btn btn-success m-btn--icon m-btn--uppercase">
-                                        <span>
-                                            <i class="la la-plus"></i>
-                                            <span>
-                                                Update Voucher
-                                            </span>
-                                        </span>
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                        data-toggle="dropdown">
+                                        <i class="la la-download"></i>Voucher<span class="caret"></span>
                                     </button>
-                                    <button *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'"
-                                        type="button" class="btn btn-danger m-btn--icon m-btn--uppercase"
-                                        (click)="removeSelectedVoucher()">
-                                        <span>
-                                            <i class="la la-trash"></i>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item pointer" (click)="showPopupUpdateVoucher()"
+                                            *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'">
                                             <span>
-                                                Remove Voucher
+                                                <i class="la la-plus text-success"></i>
+                                                <span>
+                                                    Update Voucher
+                                                </span>
                                             </span>
-                                        </span>
-                                    </button>
-                                    <button *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'"
-                                        class="btn btn-brand m-btn--icon m-btn--uppercase"
-                                        routerLink="/home/accounting/advance-payment/import-voucher">
-                                        <span>
-                                            <i class="la la-upload"></i>
+                                        </a>
+                                        <a class="dropdown-item pointer" (click)="removeSelectedVoucher()"
+                                            *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'">
                                             <span>
-                                                Import Voucher
+                                                <i class="la la-trash text-danger"></i>
+                                                <span>
+                                                    Remove Voucher
+                                                </span>
                                             </span>
-                                        </span>
-
-                                    </button>
+                                        </a>
+                                        <a class="dropdown-item pointer"
+                                            routerLink="/home/accounting/advance-payment/import-voucher"
+                                            *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'">
+                                            <span>
+                                                <i class="la la-upload text-primary"></i>
+                                                <span class="text-primary">
+                                                    Import Voucher
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
                                     <button class="btn btn-cancel  m-btn--icon m-btn--uppercase"
                                         (click)="showPopupListAdvance()">
                                         <span>
@@ -89,8 +91,6 @@
                                                             (change)="advancePayment.isChecked=!advancePayment.isChecked; removeAllChecked();">
                                                         <span></span>
                                                     </label>
-
-
                                                     <button
                                                         (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo, i)"
                                                         class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
@@ -155,6 +155,9 @@
                                             <td>{{advancePayment.advanceNote}}</td>
                                             <td>{{advancePayment.voucherNo}}</td>
                                             <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td class="text-success">
+                                                {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy'}}</td>
+
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row [id]="'collapse' + i"
                                             [parentId]="'#adv-payment-list-table'">
@@ -206,31 +209,9 @@
                             </table>
                         </div>
                     </perfect-scrollbar>
-                    <div class="pagination-nav">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="tatable__pager-size">
-                                    <div class="select-box">
-                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                            (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                            <ng-container
-                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                <option [ngValue]="item">{{item}} line / screen</option>
-                                            </ng-container>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                <div class="float-right">
-                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                        [(ngModel)]="page">
-                                    </pagination>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                        (onChange)="updatePagingData($event)"></app-pagination>
                 </div>
             </div>
         </div>
