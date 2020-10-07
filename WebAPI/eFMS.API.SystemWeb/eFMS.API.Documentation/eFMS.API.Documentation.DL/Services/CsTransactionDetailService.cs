@@ -88,6 +88,7 @@ namespace eFMS.API.Documentation.DL.Services
             permissionService = perService;
             sysOfficeRepo = sysOffice;
             stringLocalizer = localizer;
+            sysCompanyRepo = sysCompany;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
