@@ -18,7 +18,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaLCLImportCreateHouseBillComponent } from './create/sea-lcl-import-create-house-bill.component';
 import { SeaLCLImportDetailHouseBillComponent } from './detail/sea-lcl-import-detail-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
-
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -30,8 +30,17 @@ const routing: Routes = [
         data: { name: 'New House Bill', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: SeaLCLImportDetailHouseBillComponent,
-        data: { name: 'House Bill Detail', path: ':id', level: 5 }
+        path: ':hblId',
+        data: { name: 'House Bill Detail', path: ':id', level: 5 },
+        children: [
+            {
+                path: '', component: SeaLCLImportDetailHouseBillComponent, data: { name: "" }
+            },
+            {
+                path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
+                data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.SLI_CODE },
+            },
+        ]
     }
 ];
 

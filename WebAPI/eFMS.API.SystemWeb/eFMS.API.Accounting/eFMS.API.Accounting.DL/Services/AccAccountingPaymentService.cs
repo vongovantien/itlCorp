@@ -193,23 +193,24 @@ namespace eFMS.API.Accounting.DL.Services
                 x.invoice.ExtendDays,
                 x.invoice.ExtendNote});
             var results = resultGroups
-                            .Select(x => new AccountingPaymentModel {
-                             RefId = x.Key.RefId,
-                             PartnerId = x.Key.PartnerId,
-                             InvoiceNoReal = x.Key.InvoiceNoReal,
-                             PartnerName = x.Key.ShortName,
-                             Amount = x.Key.Amount,
-                             Currency = x.Key.Currency,
-                             IssuedDate = x.Key.IssuedDate,
-                             Serie = x.Key.Serie,
-                             DueDate = x.Key.DueDate,
-                             OverdueDays = x.Key.OverdueDays,
-                             Status = x.Key.Status,
-                             ExtendDays = x.Key.ExtendDays,
-                             ExtendNote = x.Key.ExtendNote,
-                             PaidAmount = x.Sum(c => c.PaymentAmount),
-                             UnpaidAmount = x.Sum(c => c.PaymentAmount).Value != 0 ? x.Sum(c => c.Balance) : x.Key.Amount,
-                         }).AsQueryable();
+                            .Select(x => new AccountingPaymentModel
+                            {
+                                RefId = x.Key.RefId,
+                                PartnerId = x.Key.PartnerId,
+                                InvoiceNoReal = x.Key.InvoiceNoReal,
+                                PartnerName = x.Key.ShortName,
+                                Amount = x.Key.Amount,
+                                Currency = x.Key.Currency,
+                                IssuedDate = x.Key.IssuedDate,
+                                Serie = x.Key.Serie,
+                                DueDate = x.Key.DueDate,
+                                OverdueDays = x.Key.OverdueDays,
+                                Status = x.Key.Status,
+                                ExtendDays = x.Key.ExtendDays,
+                                ExtendNote = x.Key.ExtendNote,
+                                PaidAmount = x.Sum(c => c.PaymentAmount),
+                                UnpaidAmount = x.Key.Amount - x.Sum(c => c.PaymentAmount),
+                            }).AsQueryable();
             return results;
         }
 

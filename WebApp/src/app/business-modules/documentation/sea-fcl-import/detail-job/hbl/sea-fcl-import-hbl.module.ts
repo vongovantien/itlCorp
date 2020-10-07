@@ -19,6 +19,7 @@ import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { DetailHouseBillComponent } from './detail/detail-house-bill.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -31,10 +32,19 @@ const routing: Routes = [
     {
         path: 'new', component: CreateHouseBillComponent,
         data: { name: 'New House Bill', path: ':id', level: 5 }
-    },
+    }, 
     {
-        path: ':hblId', component: DetailHouseBillComponent,
-        data: { name: 'House Bill Detail', path: ':id', level: 5 }
+        path: ':hblId',
+        data: { name: 'House Bill Detail', path: ':id', level: 5 },
+        children: [
+            {
+                path: '', component: DetailHouseBillComponent, data: { name: "" }
+            },
+            {
+                path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
+                data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.SFI_CODE },
+            },
+        ]
     }
 ];
 

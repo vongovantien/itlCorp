@@ -734,6 +734,14 @@
             <param name="jobId">Job ID</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLSeaImport(System.Guid,System.String)">
+            <summary>
+            Get info mail housebill of Sea Import
+            </summary>
+            <param name="hblId">Housebill ID</param>
+            <param name="serviceId">Type of sea service</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
             <summary>
             A base class for an MVC controller without view support.

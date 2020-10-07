@@ -14,6 +14,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaConsolImportHBLComponent } from './sea-consol-import-hbl.component';
 import { SeaConsolImportCreateHBLComponent } from './create/create-hbl-consol-import.component';
 import { SeaConsolImportDetailHBLComponent } from './detail/detail-hbl-consol-import.component';
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
