@@ -141,6 +141,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.exportCrystalHawbFrameToPdf();
                 break;
             case ChargeConstants.SFI_CODE: // Sea FCL Import
+            case ChargeConstants.SLI_CODE: // Sea LCL Import
                 this.exportCrystalArrivalNoticeToPdf(serviceId);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
@@ -617,7 +618,6 @@ export class ShareBusinessReAlertComponent extends AppList {
 
             case ChargeConstants.SFI_CODE:
             case ChargeConstants.SLI_CODE:
-                {
                     this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' })
                     .pipe(
                         catchError(this.catchError),
@@ -641,8 +641,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                             }
                         },
                     );
-                    break;
-                }
+                    break;               
             }
     }
 
@@ -818,6 +817,10 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
                 break;
+            case ChargeConstants.SFI_CODE: // Air Import
+            case ChargeConstants.SLI_CODE:              
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralArrivalNotice, this.isCheckedArrivalNotice);
+                break;   
             default:
                 break;
         }
@@ -849,6 +852,12 @@ export class ShareBusinessReAlertComponent extends AppList {
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
                 this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}/si`]);
+                break;
+            case ChargeConstants.SFI_CODE: // Sea FCL Import
+                this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/${this.hblId}`]);
+                break;
+            case ChargeConstants.SLI_CODE: // Sea LCL Import
+                this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl/${this.hblId}`]);
                 break;
             default:
                 break;
