@@ -14,7 +14,9 @@ export const environment = {
         EXPORT: "staging.api-efms.itlvn.com/Export",
         SETTING: "staging.api-efms.itlvn.com/Setting",
         INDENTITY_SERVER_URL: "http://staging.api-efms.itlvn.com/identityserver",
-        EXPORT_CRYSTAL: "http://staging.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx"
+        EXPORT_CRYSTAL: "http://staging.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
+        PARTNER_API: "test.api-efms.itlvn.com/partner",
+        ESB: "test-esb.itlvn.com:8280/bravo-itl"
     },
     AUTHORIZATION:
     {
