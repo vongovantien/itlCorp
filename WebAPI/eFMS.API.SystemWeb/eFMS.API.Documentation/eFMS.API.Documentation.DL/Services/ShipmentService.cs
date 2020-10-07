@@ -676,7 +676,13 @@ namespace eFMS.API.Documentation.DL.Services
                 {
 
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    CatChargeGroup ChargeGroupModel = new CatChargeGroup();
+                    ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                    if(ChargeGroupModel == null)
+                    {
+                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    }
+                    //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                     decimal UnitPrice = charge.UnitPrice ?? 0;
                     charge.UnitPrice = Math.Round(UnitPrice, 3);
                     //SELL
@@ -688,19 +694,19 @@ namespace eFMS.API.Documentation.DL.Services
                         _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
                     }*/
                     // tinh total phi chargeGroup freight
-                    if (charGroupObj?.Name == "Freight")
+                    if (ChargeGroupModel?.Name == "Freight")
                     {
                         _totalSellAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Trucking")
+                    if (ChargeGroupModel?.Name == "Trucking")
                     {
                         _totalSellAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Handling")
+                    if (ChargeGroupModel?.Name == "Handling")
                     {
                         _totalSellAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Other")
+                    if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight")
                     {
                         _totalSellAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
@@ -723,7 +729,13 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeBuy)
                 {
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    CatChargeGroup ChargeGroupModel = new CatChargeGroup();
+                    ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                    if (ChargeGroupModel == null)
+                    {
+                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    }
+                    //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                     decimal UnitPrice = charge.UnitPrice ?? 0;
                     charge.UnitPrice = Math.Round(UnitPrice, 3);
                     //BUY
@@ -735,7 +747,7 @@ namespace eFMS.API.Documentation.DL.Services
                         _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
                     }*/
                     // tinh total phi chargeGroup freight
-                    if (charGroupObj?.Name == "Freight")
+                    if (ChargeGroupModel?.Name == "Freight")
                     {
                         if (charge.KickBack == true)
                         {
@@ -748,7 +760,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                     }
-                    if (charGroupObj?.Name == "Trucking")
+                    if (ChargeGroupModel?.Name == "Trucking")
                     {
                         if (charge.KickBack == true)
                         {
@@ -760,7 +772,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                     }
-                    if (charGroupObj?.Name == "Handling")
+                    if (ChargeGroupModel?.Name == "Handling")
                     {
                         if (charge.KickBack == true)
                         {
@@ -772,7 +784,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
                     }
-                    if  (charGroupObj?.Name != "Handling" && charGroupObj?.Name != "Trucking" && charGroupObj?.Name != "Freight" && charGroupObj?.Name != "Com")
+                    if  (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com")
                     {
                         if (charge.KickBack == true)
                         {
@@ -784,7 +796,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
                     }
-                    if (charge.KickBack == true || charGroupObj?.Name == "Com")
+                    if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                     {
                         _totalBuyAmountKB += charge.Quantity * charge.UnitPrice * _rate ?? 0;
                     }
@@ -796,15 +808,15 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyHandling = _totalBuyAmountHandling;
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
-                if (data.TotalBuyKB > 0)
-                {
-                    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyKB;
-                    data.TotalBuyOthers = 0;
-                }
-                else
-                {
-                    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers;
-                }
+                //if (data.TotalBuyKB > 0)
+                //{
+                //    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyKB + ;
+                //    //data.TotalBuyOthers = 0;
+                //}
+                //else
+                //{
+                data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB;
+                //}
                 //data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalSellOthers + _totalBuyAmountKB;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --

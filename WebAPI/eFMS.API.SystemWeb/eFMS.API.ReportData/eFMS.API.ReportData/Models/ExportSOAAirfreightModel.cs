@@ -22,6 +22,7 @@ namespace eFMS.API.ReportData.Models
 
         public string SoaNo { get; set; }
         public DateTime? DateSOA { get; set; }
+        public DateTime? SoaFromDate { get; set; }
 
         public string IssuedBy { get; set; }
         public string ApprovedBy { get; set; }
