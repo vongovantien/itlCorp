@@ -26,17 +26,8 @@ const routing: Routes = [
         data: { name: 'New House Bill', path: ':id', level: 5 }
     },
     {
-        path: ':hblId',
-        data: { name: 'House Bill Detail', path: ':id', level: 5 },
-        children: [
-            {
-                path: '', component: SeaConsolImportDetailHBLComponent, data: { name: "" }
-            },
-            {
-                path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
-                data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.SFI_CODE },
-            },
-        ]
+        path: ':hblId', component: SeaConsolImportDetailHBLComponent,
+        data: { name: 'House Bill Detail', path: ':id', level: 5 }
     }
 ];
 
