@@ -35,10 +35,10 @@
         </member>
         <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.ReplaceInvoiceData(eFMS.API.ForPartner.DL.Models.InvoiceUpdateInfo,System.String,System.String)">
             <summary>
-            Replace Invoice (Delete and Create Invoice)
+            Replace Invoice (Delete old and Create New Invoice)
             </summary>
             <param name="model">model to replace invoice</param>
-            <param name="apiKey"></param>
+            <param name="apiKey">API Key</param>
             <param name="hash"></param>
             <returns></returns>
         </member>
@@ -46,8 +46,17 @@
             <summary>
             Canceling Invoice (Delete Invoice)
             </summary>
-            <param name="model"></param>
-            <param name="apiKey"></param>
+            <param name="model">model to canceling invoice</param>
+            <param name="apiKey">API Key</param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.RejectData(eFMS.API.ForPartner.DL.Models.RejectData,System.String,System.String)">
+            <summary>
+            Reject Data
+            </summary>
+            <param name="model">model to reject data</param>
+            <param name="apiKey">API Key</param>
             <param name="hash"></param>
             <returns></returns>
         </member>
