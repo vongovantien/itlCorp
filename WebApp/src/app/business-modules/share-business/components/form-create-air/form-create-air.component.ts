@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators, CheckboxControlValueAccessor } from '@angular/forms';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
@@ -53,6 +53,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     flightDate: AbstractControl;
     commodity: AbstractControl;
     packageType: AbstractControl;
+    //
+    airlineInfo: AbstractControl; // Airline Information
 
     shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
     billTypes: CommonInterface.INg2Select[] = [
@@ -252,6 +254,12 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             .subscribe(
                 (commodities: Commodity[]) => {
                     this.commodities = this.utility.prepareNg2SelectData(commodities, 'code', 'commodityNameEn');
+                    if (!!this.commodities.length && this.type === 'import') {
+                        const asPerBill = this.commodities.filter(e => e.id === 'CM04');
+                        if (!!asPerBill) {
+                            this.commodity.setValue(asPerBill);
+                        }
+                    }
                 },
             );
     }
@@ -306,6 +314,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             pod: [null, this.type === 'import' ? Validators.required : null],
             coloaderId: [null, this.type !== 'import' ? Validators.required : null],
             warehouseId: [],
+            airlineInfo: [],
 
             isHawb: [false]
 
@@ -330,6 +339,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.agentId = this.formGroup.controls["agentId"];
         this.warehouseId = this.formGroup.controls["warehouseId"];
         this.personalIncharge = this.formGroup.controls["personIncharge"];
+        //
+        this.airlineInfo = this.formGroup.controls["airlineInfo"];
 
         // * Handle etdchange.
         if (this.type !== 'import') {
@@ -372,10 +383,27 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
     }
 
+    resetColoaderControl() {
+        this.coloaderId.setValue(null);
+        //
+        const airlightCode: string = this.mawb.value.substring(0, 3);
+        const checkMAWBNo = JobConstants.COMMON_DATA.AIRLIGHTCODEMAPPING.filter(e => e.id === airlightCode);
+        if (checkMAWBNo.length <= 0) {
+
+            this.airlineInfo.setValue(null);
+        }
+    }
+
     onSelectDataFormInfo(data: Customer | PortIndex | any, type: string) {
         switch (type) {
             case 'supplier':
-
+                //
+                const airlightCode: string = this.mawb.value.substring(0, 3);
+                const checkMAWBNo = JobConstants.COMMON_DATA.AIRLIGHTCODEMAPPING.filter(e => e.id === airlightCode);
+                if (checkMAWBNo.length <= 0) {
+                    this.airlineInfo.setValue(data.partnerNameEn);
+                }
+                //
                 this.dimVolumePopup.$roundUp.next(data.roundUpMethod);
                 this.dimVolumePopup.$applyDIM.next(data.applyDim);
 
@@ -436,8 +464,26 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     onBlurGetAirline(data: any) {
+
         const hawb: string = data.target.value.substring(0, 3);
         if (this.mawb.valid && !!hawb) {
+            //
+            const checkAirlight = JobConstants.COMMON_DATA.AIRLIGHTCODEMAPPING.filter(e => e.id === hawb);
+            if (checkAirlight.length <= 0) {
+                // bind value of airlight field
+                let carriesTemp: Customer[] = [];
+                this.carries.subscribe((res) => { carriesTemp = res as Customer[]; });
+                //
+                const checkColoader = carriesTemp.filter(e => e.id === this.coloaderId.value);
+                if (checkColoader.length > 0) {
+                    this.airlineInfo.setValue(checkColoader[0].partnerNameEn);
+                } else {
+                    this.airlineInfo.setValue(null);
+                }
+            } else {
+                this.airlineInfo.setValue(checkAirlight[0].text);
+            }
+            //
             this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER, active: true, CoLoaderCode: hawb })
                 .subscribe(
                     (res: Customer[]) => {

@@ -40,8 +40,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         Crystal Preview(Guid advanceId);
 
-        Crystal Preview(AcctAdvancePaymentModel advance);
-        
+        Crystal PreviewMultipleAdvance(List<Guid> advanceIds);
+
         HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve);
 
         HandleState UpdateApproval(Guid advanceId);
@@ -87,5 +87,8 @@ namespace eFMS.API.Accounting.DL.IService
         List<Guid> GetSurchargeIdByHblId(Guid? hblId);
 
         List<AcctAdvanceRequestModel> GetAdvanceRequestByAdvanceNo(string advanceNo);
+
+        HandleState SyncListAdvance(List<Guid> ids, out List<Guid> data);
+
     }
 }

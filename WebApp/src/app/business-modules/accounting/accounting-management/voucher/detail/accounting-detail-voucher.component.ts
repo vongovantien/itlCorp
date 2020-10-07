@@ -64,6 +64,12 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                     this.updateFormVoucher(res);
                     this.updateChargeList(res);
 
+                    console.log(this.accountingManagement);
+
+                    if (!!this.accountingManagement.lastSyncDate) {
+                        this.formCreateComponent.isReadonly = true;
+                        this.listChargeComponent.isReadOnly = true;
+                    }
                 }
             );
     }
@@ -119,6 +125,8 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                                 if (!!c.invoiceDate) {
                                     const [day, month, year]: string[] = c.invoiceDate.split("/");
                                     c.invoiceDate = formatDate(new Date(+year, +month - 1, +day), 'yyyy-MM-dd', 'en');
+                                } else {
+                                    c.invoiceDate = null;
                                 }
                             });
                             //  * Update field
@@ -196,7 +204,11 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
 
     formatInvoiceDate(charges: ChargeOfAccountingManagementModel[]) {
         charges.forEach(c => {
-            c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
+            if (!!c.invoiceDate) {
+                c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
+            } else {
+                c.invoiceDate = null;
+            }
         });
         return charges;
     }

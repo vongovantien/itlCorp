@@ -36,6 +36,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     weight: AbstractControl;
     volume: AbstractControl;
     agent: AbstractControl;
+    shipperDescription: AbstractControl;
     freightCharges: Array<string> = ['Prepaid', 'Collect'];
     shipmentDetail: any = {}; // TODO model.
     manifest: CsManifest;
@@ -111,6 +112,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
 
                         this.agent.setValue('TYPE NAME OF AGENT WHO ASSEMBLED THIS MANIFEST: INDO TRANS LOGISTICS CORPORATION \nSIGNATURE OF ASSEMBLING AGENT: PHONE# OF ASSEMBLING AGENT: (84 - 8) 3948 6888 \nRECEIVED BY CUSTOMS');
 
+                        this.shipperDescription.setValue(this.shipmentDetail.mawbShipper === "" ? (this.shipmentDetail.creatorOffice.nameEn + '\n' + this.shipmentDetail.creatorOffice.addressEn) : this.shipmentDetail.mawbShipper);
                     }
 
                 }
@@ -145,7 +147,8 @@ export class ShareBusinessFormManifestComponent extends AppForm {
             volume: !!res.volume ? res.volume : null,
             agent: !!res.manifestIssuer ? res.manifestIssuer : null,
             pol: !!res.pol ? res.pol : null,
-            pod: !!res.pod ? res.pod : null
+            pod: !!res.pod ? res.pod : null,
+            shipperDescription: !!res.manifestShipper ? res.manifestShipper : null
         });
 
         console.log(this.formGroup.value);
@@ -167,8 +170,8 @@ export class ShareBusinessFormManifestComponent extends AppForm {
             volume: [],
             agent: [null, Validators.required],
             pol: [null, Validators.required],
-            pod: [null, Validators.required]
-
+            pod: [null, Validators.required],
+            shipperDescription: []
         }, { validator: FormValidators.comparePort });
         this.referenceNo = this.formGroup.controls['referenceNo'];
         this.supplier = this.formGroup.controls['supplier'];
@@ -184,6 +187,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
         this.agent = this.formGroup.controls['agent'];
         this.pol = this.formGroup.controls['pol'];
         this.pod = this.formGroup.controls['pod'];
+        this.shipperDescription = this.formGroup.controls['shipperDescription'];
     }
 
     selectedFreightCharge() {

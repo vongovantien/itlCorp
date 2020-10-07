@@ -65,7 +65,9 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             pol: form.pol,
             pod: form.pod,
             coloaderId: form.coloaderId,
-            warehouseId: form.warehouseId
+            warehouseId: form.warehouseId,
+
+            airlineInfo: form.airlineInfo,
         };
         const csTransaction: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         csTransaction.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;
@@ -112,6 +114,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     saveJob(body: any) {
+        console.log("test body: ", body);
         this._documenRepo.createTransaction(body)
             .pipe(
                 catchError(this.catchError),

@@ -57,7 +57,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
             displayName: [],
             country: [null, Validators.required],
             province: [null, Validators.required],
-            district: [null, Validators.required],
+            district: [],
             address: [null, FormValidators.required],
             flightVesselNo: [],
             active: [true]
@@ -107,6 +107,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
     onSubmit() {
         this.isSubmitted = true;
         const formData = this.warehouseForm.getRawValue();
+        this.district.setErrors(null);
         this.trimInputForm(formData);
         if (this.warehouseForm.valid) {
             this.setWarehouseModel();
@@ -126,7 +127,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
                     );
             }
         } else {
-            console.log(this.warehouseForm);
+            console.log("invalid: ", this.warehouseForm);
         }
     }
     setWarehouseModel() {

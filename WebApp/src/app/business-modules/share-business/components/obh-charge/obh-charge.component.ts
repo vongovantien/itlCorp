@@ -4,17 +4,17 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
-import { CatalogueRepo, DocumentationRepo, AccountingRepo } from 'src/app/shared/repositories';
-import { SortService, DataService } from 'src/app/shared/services';
+import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories';
+import { SortService } from '@services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { takeUntil, catchError, finalize, skip } from 'rxjs/operators';
-import { CsShipmentSurcharge, Partner, Charge } from 'src/app/shared/models';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { CsShipmentSurcharge, Partner, Charge, Unit } from '@models';
 
 import * as fromStore from './../../store';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { SystemConstants } from 'src/constants/system.const';
 import { ActivatedRoute } from '@angular/router';
+import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 
 @Component({
     selector: 'obh-charge',
@@ -34,7 +34,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _dataService: DataService,
         protected _accountingRepo: AccountingRepo,
         protected _activedRoute: ActivatedRoute
 
@@ -47,40 +46,40 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             _sortService,
             _ngProgressService,
             _spinner,
-            _dataService,
             _accountingRepo,
             _activedRoute);
         this._progressRef = this._ngProgressService.ref();
     }
 
     getPartner() {
-        this._dataService.currentMessage.pipe(
-            skip(1),
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (data: any = []) => {
-                this.listPartner = data[SystemConstants.CSTORAGE.PARTNER] || [];
-            });
+        this.isShowLoadingPartner = true;
+        this._spinner.show(this.spinnerpartner);
+
+        this._catalogueRepo.getListPartner(null, null, { active: true })
+            .pipe(
+                catchError(this.catchError), finalize(() => {
+                    this._spinner.hide(this.spinnerpartner);
+                    this.isShowLoadingPartner = false;
+                }))
+            .subscribe(
+                (partners: any[]) => {
+                    this.listPartner = partners;
+                }
+            );
     }
 
     getCurrency() {
-        this._dataService.currentMessage.pipe(
-            skip(1),
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (data: any = []) => {
-                this.listCurrency = data[SystemConstants.CSTORAGE.CURRENCY] || [];
-            });
+        this.listCurrency = this._store.select(getCatalogueCurrencyState);
     }
 
     getUnits() {
-        this._dataService.currentMessage.pipe(
-            skip(1),
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (data: any = []) => {
-                this.listUnits = data[SystemConstants.CSTORAGE.UNIT] || [];
-            });
+        this._store.select(getCatalogueUnitState)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (units: Unit[]) => {
+                    this.listUnits = units;
+                }
+            );
     }
 
     getSurcharge() {

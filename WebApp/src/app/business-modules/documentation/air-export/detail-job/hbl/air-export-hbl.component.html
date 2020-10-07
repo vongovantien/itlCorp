@@ -165,19 +165,21 @@
                                     <tabset class="custom-class-tab">
                                         <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                                <buying-charge service="air" showSyncOtherCharge="true"></buying-charge>
+                                                <buying-charge service="air" showSyncOtherCharge="true"
+                                                    *ngIf="selectedTabSurcharge === 'BUY'"></buying-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
                                                 <selling-charge [showSyncFreight]="false" service="air"
-                                                    [showSyncStandard]="false">
+                                                    [showSyncStandard]="false" *ngIf="selectedTabSurcharge === 'SELL'">
                                                 </selling-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                                <obh-charge service="air"></obh-charge>
+                                                <obh-charge service="air" *ngIf="selectedTabSurcharge === 'OBH'">
+                                                </obh-charge>
                                             </ng-container>
                                         </tab>
                                     </tabset>

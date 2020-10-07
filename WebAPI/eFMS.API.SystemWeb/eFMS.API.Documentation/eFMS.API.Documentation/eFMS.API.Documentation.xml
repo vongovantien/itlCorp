@@ -32,6 +32,15 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.ExportOpsCdNote(System.Guid,System.String,System.Guid)">
+            <summary>
+            Data Export Details CD Note
+            </summary>
+            <param name="jobId"></param>
+            <param name="cdNo"></param>
+            <param name="officeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
             <summary>
             check allow delete an existed item
@@ -723,6 +732,14 @@
             Get info mail shipping instruction of Sea Export
             </summary>
             <param name="jobId">Job ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLSeaImport(System.Guid,System.String)">
+            <summary>
+            Get info mail housebill of Sea Import
+            </summary>
+            <param name="hblId">Housebill ID</param>
+            <param name="serviceId">Type of sea service</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">

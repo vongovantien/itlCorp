@@ -312,7 +312,8 @@ namespace eFMS.API.Accounting.DL.Services
                            PaymentMethod = advancePayment.PaymentMethod,
                            Amount = requestAdvance.Amount,
                            VoucherNo = advancePayment.VoucherNo,
-                           VoucherDate = advancePayment.VoucherDate
+                           VoucherDate = advancePayment.VoucherDate,
+                           LastSyncDate = advancePayment.LastSyncDate
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -333,7 +334,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.StatusApproval,
                 x.PaymentMethod,
                 x.VoucherNo,
-                x.VoucherDate
+                x.VoucherDate,
+                x.LastSyncDate 
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -355,7 +357,8 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentMethod = s.Key.PaymentMethod,
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
-                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
+                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
+                LastSyncDate = s.Key.LastSyncDate
             });
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
@@ -1023,6 +1026,26 @@ namespace eFMS.API.Accounting.DL.Services
         public Crystal Preview(Guid advanceId)
         {
             Crystal result = null;
+            var acctAdvance = GetAdvancePaymentRequestReportByAdvanceId(advanceId);
+            var listAdvance = new List<AdvancePaymentRequestReport>
+            {
+                acctAdvance
+            };
+            
+            result = new Crystal
+            {
+                //ReportName = "AdvancePaymentRequest.rpt",
+                ReportName = "AdvancePaymentRequestSingle.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listAdvance);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            return result;
+        }
+        
+        private AdvancePaymentRequestReport GetAdvancePaymentRequestReportByAdvanceId(Guid advanceId)
+        {
             string strJobId = string.Empty;
             string strHbl = string.Empty;
             string strCustomNo = string.Empty;
@@ -1112,309 +1135,132 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var deptRequester = catDepartmentRepo.Get(x => x.Id == advance.DepartmentId).FirstOrDefault();
-            var acctAdvance = new AdvancePaymentRequestReport
-            {
-                AdvID = advance.AdvanceNo,
-                RefNo = "N/A",
-                AdvDate = advance.RequestDate.HasValue ? (DateTime?)advance.RequestDate.Value.Date : null,
-                AdvTo = "N/A",
-                AdvContactID = "N/A",
-                AdvContact = requesterName,//cần lấy ra username
-                AdvAddress = deptRequester?.DeptNameAbbr ?? string.Empty, //Department của Requester
-                AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum(),
-                AdvCurrency = advance.AdvanceCurrency,
-                AdvCondition = advance.AdvanceNote,
-                AdvRef = strJobId,
-                AdvHBL = strHbl,
-                AdvPaymentDate = null,
-                AdvPaymentNote = "N/A",
-                AdvDpManagerID = "N/A",
-                AdvDpManagerStickDeny = null,
-                AdvDpManagerStickApp = null,
-                AdvDpManagerName = managerName,
-                AdvDpSignDate = null,
-                AdvAcsDpManagerID = "N/A",
-                AdvAcsDpManagerStickDeny = null,
-                AdvAcsDpManagerStickApp = null,
-                AdvAcsDpManagerName = accountantName,
-                AdvAcsSignDate = null,
-                AdvBODID = "N/A",
-                AdvBODStickDeny = null,
-                AdvBODStickApp = null,
-                AdvBODName = "N/A",
-                AdvBODSignDate = null,
-                AdvCashier = "N/A",
-                AdvCashierName = "N/A",
-                CashedDate = null,
-                Saved = null,
-                SettleNo = "N/A",
-                PaidDate = null,
-                AmountSettle = 0,
-                SettleCurrency = "N/A",
-                ClearStatus = null,
-                Status = "N/A",
-                AcsApproval = null,
-                Description = "N/A",
-                JobNo = "N/A",
-                MAWB = "N/A",
-                Amount = 0,
-                Currency = "N/A",
-                ExchangeRate = 0,
-                TotalAmount = 0,
-                PaymentDate = advance.DeadlinePayment.HasValue ? (DateTime?)advance.DeadlinePayment.Value.Date : null,
-                InvoiceNo = "N/A",
-                CustomID = strCustomNo,
-                HBLNO = "N/A",
-                Norm = null,
-                Validfee = null,
-                Others = null,
-                CSApp = null,
-                CSDecline = null,
-                CSUser = "N/A",
-                CSAppDate = null,
-                Customer = customer,
-                Shipper = shipper,
-                Consignee = consignee,
-                ContQty = contQty.ToString(),
-                Noofpieces = psc,
-                UnitPieaces = "N/A",
-                GW = gw,
-                NW = nw,
-                CBM = cbm,
-                ServiceType = "N/A",
-                AdvCSName = string.Empty,
-                AdvCSSignDate = null,
-                AdvCSStickApp = null,
-                AdvCSStickDeny = null,
-                TotalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM).Select(s => s.Amount).Sum(),
-                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE).Select(s => s.Amount).Sum(),
-                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER).Select(s => s.Amount).Sum()
-            };
 
-            acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
-            acctAdvance.TotalInvoice = acctAdvance.TotalInvoice != 0 ? acctAdvance.TotalInvoice : null;
-            acctAdvance.TotalOrther = acctAdvance.TotalOrther != 0 ? acctAdvance.TotalOrther : null;
+            var acctAdvance = new AdvancePaymentRequestReport();
+            acctAdvance.AdvID = advance.AdvanceNo;
+            acctAdvance.RefNo = "N/A";
+            acctAdvance.AdvDate = advance.RequestDate.HasValue ? (DateTime?)advance.RequestDate.Value.Date : null;
+            acctAdvance.AdvTo = "N/A";
+            acctAdvance.AdvContactID = "N/A";
+            acctAdvance.AdvContact = requesterName;//cần lấy ra username
+            acctAdvance.AdvAddress = deptRequester?.DeptNameAbbr ?? string.Empty; //Department của Requester
+            acctAdvance.AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum();
+            acctAdvance.AdvCurrency = advance.AdvanceCurrency;
+            acctAdvance.AdvCondition = advance.AdvanceNote;
+            acctAdvance.AdvRef = strJobId;
+            acctAdvance.AdvHBL = strHbl;
+            acctAdvance.AdvPaymentDate = null;
+            acctAdvance.AdvPaymentNote = "N/A";
+            acctAdvance.AdvDpManagerID = "N/A";
+            acctAdvance.AdvDpManagerStickDeny = null;
+            acctAdvance.AdvDpManagerStickApp = null;
+            acctAdvance.AdvDpManagerName = managerName;
+            acctAdvance.AdvDpSignDate = null;
+            acctAdvance.AdvAcsDpManagerID = "N/A";
+            acctAdvance.AdvAcsDpManagerStickDeny = null;
+            acctAdvance.AdvAcsDpManagerStickApp = null;
+            acctAdvance.AdvAcsDpManagerName = accountantName;
+            acctAdvance.AdvAcsSignDate = null;
+            acctAdvance.AdvBODID = "N/A";
+            acctAdvance.AdvBODStickDeny = null;
+            acctAdvance.AdvBODStickApp = null;
+            acctAdvance.AdvBODName = "N/A";
+            acctAdvance.AdvBODSignDate = null;
+            acctAdvance.AdvCashier = "N/A";
+            acctAdvance.AdvCashierName = "N/A";
+            acctAdvance.CashedDate = null;
+            acctAdvance.Saved = null;
+            acctAdvance.SettleNo = "N/A";
+            acctAdvance.PaidDate = null;
+            acctAdvance.AmountSettle = 0;
+            acctAdvance.SettleCurrency = "N/A";
+            acctAdvance.ClearStatus = null;
+            acctAdvance.Status = "N/A";
+            acctAdvance.AcsApproval = null;
+            acctAdvance.Description = "N/A";
+            acctAdvance.JobNo = "N/A";
+            acctAdvance.MAWB = "N/A";
+            acctAdvance.Amount = 0;
+            acctAdvance.Currency = "N/A";
+            acctAdvance.ExchangeRate = 0;
+            acctAdvance.TotalAmount = 0;
+            acctAdvance.PaymentDate = advance.DeadlinePayment.HasValue ? (DateTime?)advance.DeadlinePayment.Value.Date : null;
+            acctAdvance.InvoiceNo = "N/A";
+            acctAdvance.CustomID = strCustomNo;
+            acctAdvance.HBLNO = "N/A";
+            acctAdvance.Norm = null;
+            acctAdvance.Validfee = null;
+            acctAdvance.Others = null;
+            acctAdvance.CSApp = null;
+            acctAdvance.CSDecline = null;
+            acctAdvance.CSUser = "N/A";
+            acctAdvance.CSAppDate = null;
+            acctAdvance.Customer = customer;
+            acctAdvance.Shipper = shipper;
+            acctAdvance.Consignee = consignee;
+            acctAdvance.ContQty = contQty.ToString();
+            acctAdvance.Noofpieces = psc;
+            acctAdvance.UnitPieaces = "N/A";
+            acctAdvance.GW = gw;
+            acctAdvance.NW = nw;
+            acctAdvance.CBM = cbm;
+            acctAdvance.ServiceType = "N/A";
+            acctAdvance.AdvCSName = string.Empty;
+            acctAdvance.AdvCSSignDate = null;
+            acctAdvance.AdvCSStickApp = null;
+            acctAdvance.AdvCSStickDeny = null;
 
-            var listAdvance = new List<AdvancePaymentRequestReport>
-            {
-                acctAdvance
-            };
+            var _totalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM).Select(s => s.Amount).Sum();
+            var _totalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE).Select(s => s.Amount).Sum();
+            var _totalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER).Select(s => s.Amount).Sum();            
+            acctAdvance.TotalNorm = _totalNorm != 0 ? _totalNorm : null;
+            acctAdvance.TotalInvoice = _totalInvoice != 0 ? _totalInvoice : null;
+            acctAdvance.TotalOrther = _totalOrther != 0 ? _totalOrther : null;            
+            acctAdvance.CompanyName = AccountingConstants.COMPANY_NAME;
+            acctAdvance.CompanyAddress = AccountingConstants.COMPANY_ADDRESS1;
+            acctAdvance.Website = AccountingConstants.COMPANY_WEBSITE;
+            acctAdvance.Contact = AccountingConstants.COMPANY_CONTACT;
 
             //Chuyển tiền Amount thành chữ
             decimal _amount = acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
             //decimal _amount2 = 3992.123M;
-
             var _currency = advance.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL ?
                        (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                     :
                     advance.AdvanceCurrency;
 
             var _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+            acctAdvance.Inword = _inword;
 
-            var parameter = new AdvancePaymentRequestReportParams
-            {
-                CompanyName = AccountingConstants.COMPANY_NAME,
-                CompanyAddress1 = AccountingConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = AccountingConstants.COMPANY_ADDRESS2,
-                Website = AccountingConstants.COMPANY_WEBSITE,
-                Contact = AccountingConstants.COMPANY_CONTACT,
-                Inword = _inword ?? string.Empty
-            };
+            return acctAdvance;
+        } 
 
-            result = new Crystal
-            {
-                ReportName = "AdvancePaymentRequest.rpt",
-                AllowPrint = true,
-                AllowExport = true
-            };
-            result.AddDataSource(listAdvance);
-            result.FormatType = ExportFormatType.PortableDocFormat;
-            result.SetParameter(parameter);
-            return result;
-        }
-
-        public Crystal Preview(AcctAdvancePaymentModel advance)
+        public Crystal PreviewMultipleAdvance(List<Guid> advanceIds)
         {
             Crystal result = null;
-            string strJobId = string.Empty;
-            string strHbl = string.Empty;
-            string strCustomNo = string.Empty;
-            int contQty = 0;
-            decimal nw = 0;
-            int psc = 0;
-            decimal cbm = 0;
-
-            if (advance == null) return null;
-
-            if (advance.AdvanceRequests.Count > 0)
+            List<AdvancePaymentMulti> advIds = new List<AdvancePaymentMulti>();
+            var listAdvance = new List<AdvancePaymentRequestReport>();
+            for (var i = 0; i < advanceIds.Count; i++)
             {
-                foreach (var jobId in advance.AdvanceRequests.GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId))
-                {
-                    //Lấy ra NW, CBM, PSC, Container Qty
-                    var ops = opsTransactionRepo.Get(x => x.JobNo == jobId).FirstOrDefault();
-                    if (ops != null)
-                    {
-                        contQty += ops.SumContainers.HasValue ? ops.SumContainers.Value : 0;
-                        nw += ops.SumNetWeight.HasValue ? ops.SumNetWeight.Value : 0;
-                        psc += ops.SumPackages.HasValue ? ops.SumPackages.Value : 0;
-                        cbm += ops.SumCbm.HasValue ? ops.SumCbm.Value : 0;
-                    }
-
-                    //Lấy ra chuỗi JobId
-                    strJobId += !string.IsNullOrEmpty(jobId) ? jobId + "," : string.Empty;
-                }
-
-                //Lấy ra chuỗi HBL
-                foreach (var hbl in advance.AdvanceRequests.GroupBy(x => x.Hbl).Select(x => x.FirstOrDefault().Hbl))
-                {
-                    strHbl += !string.IsNullOrEmpty(hbl) ? hbl + "," : string.Empty;
-                }
-
-                //Lấy ra chuỗi CustomNo
-                foreach (var customNo in advance.AdvanceRequests.GroupBy(x => x.CustomNo).Select(x => x.FirstOrDefault().CustomNo))
-                {
-                    strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : string.Empty;
-                }
-
-                strJobId += ")";
-                strJobId = strJobId.Replace(",)", string.Empty).Replace(")", string.Empty);
-                strHbl += ")";
-                strHbl = strHbl.Replace(",)", string.Empty).Replace(")", string.Empty);
-                strCustomNo += ")";
-                strCustomNo = strCustomNo.Replace(",)", string.Empty).Replace(")", string.Empty);
+                var acctAdvance = GetAdvancePaymentRequestReportByAdvanceId(advanceIds[i]);
+                listAdvance.Add(acctAdvance);
+                    
+                var advId = new AdvancePaymentMulti();
+                advId.AdvID = acctAdvance.AdvID;
+                advIds.Add(advId);
             }
-
-            //Lấy ra tên requester
-            var employeeId = sysUserRepo.Get(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
-            var requesterName = sysEmployeeRepo.Get(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
-
-            string managerName = string.Empty;
-            string accountantName = string.Empty;
-            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
-            if (approveAdvance != null)
-            {
-                managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : userBaseService.GetEmployeeByUserId(approveAdvance.Manager)?.EmployeeNameVn;
-                accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : userBaseService.GetEmployeeByUserId(approveAdvance.Accountant)?.EmployeeNameVn;
-            }
-
-            var acctAdvance = new AdvancePaymentRequestReport
-            {
-                AdvID = advance.AdvanceNo,
-                RefNo = "N/A",
-                AdvDate = advance.RequestDate.Value.Date,
-                AdvTo = "N/A",
-                AdvContactID = "N/A",
-                AdvContact = requesterName,
-                AdvAddress = string.Empty,
-                AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum(),
-                AdvCurrency = advance.AdvanceCurrency,
-                AdvCondition = advance.AdvanceNote,
-                AdvRef = strJobId,
-                AdvHBL = strHbl,
-                AdvPaymentDate = null,
-                AdvPaymentNote = "N/A",
-                AdvDpManagerID = "N/A",
-                AdvDpManagerStickDeny = null,
-                AdvDpManagerStickApp = null,
-                AdvDpManagerName = managerName,
-                AdvDpSignDate = null,
-                AdvAcsDpManagerID = "N/A",
-                AdvAcsDpManagerStickDeny = null,
-                AdvAcsDpManagerStickApp = null,
-                AdvAcsDpManagerName = accountantName,
-                AdvAcsSignDate = null,
-                AdvBODID = "N/A",
-                AdvBODStickDeny = null,
-                AdvBODStickApp = null,
-                AdvBODName = "N/A",
-                AdvBODSignDate = null,
-                AdvCashier = "N/A",
-                AdvCashierName = "N/A",
-                CashedDate = null,
-                Saved = null,
-                SettleNo = "N/A",
-                PaidDate = null,
-                AmountSettle = 0,
-                SettleCurrency = "N/A",
-                ClearStatus = null,
-                Status = "N/A",
-                AcsApproval = null,
-                Description = "N/A",
-                JobNo = "N/A",
-                MAWB = "N/A",
-                Amount = 0,
-                Currency = "N/A",
-                ExchangeRate = 0,
-                TotalAmount = 0,
-                PaymentDate = advance.DeadlinePayment.Value.Date,
-                InvoiceNo = "N/A",
-                CustomID = strCustomNo,
-                HBLNO = "N/A",
-                Norm = null,
-                Validfee = null,
-                Others = null,
-                CSApp = null,
-                CSDecline = null,
-                CSUser = "N/A",
-                CSAppDate = null,
-                Customer = string.Empty,
-                Shipper = string.Empty,
-                Consignee = string.Empty,
-                ContQty = contQty.ToString(),
-                Noofpieces = psc,
-                UnitPieaces = "N/A",
-                GW = 0,
-                NW = nw,
-                CBM = cbm,
-                ServiceType = "N/A",
-                AdvCSName = string.Empty,
-                AdvCSSignDate = null,
-                AdvCSStickApp = null,
-                AdvCSStickDeny = null,
-                TotalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM).Select(s => s.Amount).Sum(),
-                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE).Select(s => s.Amount).Sum(),
-                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER).Select(s => s.Amount).Sum()
-            };
-
-            acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
-            acctAdvance.TotalInvoice = acctAdvance.TotalInvoice != 0 ? acctAdvance.TotalInvoice : null;
-            acctAdvance.TotalOrther = acctAdvance.TotalOrther != 0 ? acctAdvance.TotalOrther : null;
-
-            var listAdvance = new List<AdvancePaymentRequestReport>
-            {
-                acctAdvance
-            };
-
-            //Chuyển tiền Amount thành chữ
-            decimal _amount = acctAdvance.AdvValue ?? 0; //acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
-
-            var _currency = advance.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL ?
-                       (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
-                    :
-                    advance.AdvanceCurrency;
-            var _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
-
-            var parameter = new AdvancePaymentRequestReportParams
-            {
-                CompanyName = AccountingConstants.COMPANY_NAME,
-                CompanyAddress1 = AccountingConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = AccountingConstants.COMPANY_ADDRESS2,
-                Website = AccountingConstants.COMPANY_WEBSITE,
-                Contact = AccountingConstants.COMPANY_CONTACT,
-                Inword = _inword
-            };
-
             result = new Crystal
             {
-                ReportName = "AdvancePaymentRequest.rpt",
+                ReportName = "AdvancePaymentRequestMulti.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
-            result.AddDataSource(listAdvance);
+            result.AddDataSource(advIds);
+            result.AddSubReport("AdvancePaymentRequestSingle.rpt", listAdvance);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            result.SetParameter(parameter);
             return result;
         }
+        
         #endregion PREVIEW ADVANCE PAYMENT
 
         #region APPROVAL ADVANCE PAYMENT        
@@ -3393,6 +3239,46 @@ namespace eFMS.API.Accounting.DL.Services
                 advanceRequests.Add(advRequest);
             }
             return advanceRequests;
+        }
+
+        public HandleState SyncListAdvance(List<Guid> ids, out List<Guid> data)
+        {
+            HandleState result = new HandleState();
+            List<Guid> invalidAdvances = new List<Guid>();
+            if (ids.Count > 0)
+            {
+                invalidAdvances = DataContext.Get(x => ids.Contains(x.Id) && (
+                x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
+                || !string.IsNullOrEmpty(x.VoucherNo)
+                || x.LastSyncDate.HasValue
+                ))
+                    .Select(x => x.Id)
+                    .ToList();
+
+                if (invalidAdvances.Count > 0)
+                {
+                    data = invalidAdvances;
+                    return new HandleState("Danh sách advance không hợp lệ");
+                }
+
+                foreach (Guid id in ids)
+                {
+                    AcctAdvancePayment adv = DataContext.Get(x => x.Id == id)?.FirstOrDefault();
+                    if (adv != null)
+                    {
+                        adv.UserModified = currentUser.UserID;
+                        adv.DatetimeModified = DateTime.Now;
+                        adv.LastSyncDate = DateTime.Now;
+
+                        DataContext.Update(adv, x => x.Id == id, false);
+                    }
+                }
+
+                result = DataContext.SubmitChanges();
+            }
+
+            data = invalidAdvances;
+            return result;
         }
     }
 }

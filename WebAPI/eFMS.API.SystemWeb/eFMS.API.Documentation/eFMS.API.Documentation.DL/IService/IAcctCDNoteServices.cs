@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -18,6 +19,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<object> GroupCDNoteByPartner(Guid Id, bool IsShipmentOperation);
         AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo);
         Crystal Preview(AcctCDNoteDetailsModel model);
+        AcctCDNoteExportResult GetDataExportOpsCDNote(Guid JobId, string cdNo, Guid officeId);
         bool CheckAllowDelete(Guid cdNoteId);
         Crystal PreviewSIF(PreviewCdNoteCriteria criteria);
         Crystal PreviewAir(PreviewCdNoteCriteria criteria);

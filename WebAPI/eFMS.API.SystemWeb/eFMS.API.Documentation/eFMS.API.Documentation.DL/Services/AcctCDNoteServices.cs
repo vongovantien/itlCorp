@@ -5,6 +5,7 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Infrastructure.Extensions;
@@ -42,9 +43,8 @@ namespace eFMS.API.Documentation.DL.Services
         ICsShipmentSurchargeService surchargeService;
         ICsTransactionDetailService transactionDetailService;
         IContextBase<CustomsDeclaration> customsDeclarationRepository;
-
-        //IOpsTransactionService opsTransactionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        private decimal _decimalNumber = Constants.DecimalNumber;
 
         public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
             IContextBase<AcctCdnote> repository, IMapper mapper, ICurrentUser user,
@@ -66,7 +66,6 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentSurchargeService surcharge,
             ICsTransactionDetailService transDetailService,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            //IOpsTransactionService opsTransService
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
@@ -89,7 +88,6 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             surchargeService = surcharge;
             transactionDetailService = transDetailService;
-            //opsTransactionService = opsTransService;
             currencyExchangeService = currencyExchange;
             customsDeclarationRepository = customsDeclarationRepo;
         }
@@ -882,9 +880,9 @@ namespace eFMS.API.Documentation.DL.Services
                         Quantity = item.Quantity,
                         QUnit = "N/A",
                         UnitPrice = item.UnitPrice ?? 0,
-                        VAT = _vatAmount ?? 0,
-                        Debit = model.TotalDebit,
-                        Credit = model.TotalCredit,
+                        VAT = (_vatAmount ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
+                        Debit = model.TotalDebit + _decimalNumber, //Cộng thêm phần thập phân
+                        Credit = model.TotalCredit + _decimalNumber, //Cộng thêm phần thập phân
                         Notes = item.Notes,
                         InputData = "N/A",
                         PONo = string.Empty,
@@ -1027,12 +1025,14 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Quantity = item.Quantity;
                     charge.Unit = item.UnitCode; //Unit Code
                     charge.QUnit = criteria.Currency;
-                    charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
-                    charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
+                    charge.UnitPrice = ((item.UnitPrice ?? 0) * _exchangeRate) + _decimalNumber; //Unit Price đã được Exchange Rate theo Currency, cộng thêm phần thập phân
+                    charge.VAT = (item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
                     var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
                     charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3);
+                    charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
                     var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
                     charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3);
+                    charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
                     listCharge.Add(charge);
                 }
             }
@@ -1136,19 +1136,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
-                    //var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
-                    /*if ((exchangeRate != null && exchangeRate.Rate != 0))
-                    {
-                        _exchangeRate = exchangeRate.Rate;
-                    }
-                    else
-                    {
-                        //Exchange Rate ngược
-                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                        _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
-                    }*/
-
+                    decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);                    
                     var charge = new AirShipperDebitNewReport();
                     charge.IndexSort = i++;
 
@@ -1187,12 +1175,14 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Quantity = item.Quantity;
                     charge.Unit = item.Unit;
                     charge.QUnit = criteria.Currency;
-                    charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
-                    charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
+                    charge.UnitPrice = ((item.UnitPrice ?? 0) * _exchangeRate) + _decimalNumber; //Unit Price đã được Exchange Rate theo Currency, cộng thêm phần thập phân
+                    charge.VAT = (item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
                     var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
                     charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3);
+                    charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
                     var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
                     charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3);
+                    charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
                     charge.ExtVND = 0; //NOT USE
                     charge.Notes = item.Notes;
 
@@ -1296,6 +1286,61 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddDataSource(listCharge);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
+            return result;
+        }
+
+        public AcctCDNoteExportResult GetDataExportOpsCDNote(Guid jobId, string cdNo, Guid officeId)
+        {
+            var cdNoteDetail = GetCDNoteDetails(jobId, cdNo);
+            var result = new AcctCDNoteExportResult();
+            if (cdNoteDetail != null)
+            {
+                IQueryable<CustomsDeclaration> _customClearances = customsDeclarationRepository.Get(x => x.JobNo == cdNoteDetail.JobNo);
+                CustomsDeclaration _clearance = null;
+                if (_customClearances.Count() > 0 || _customClearances != null)
+                {
+                    _clearance = _customClearances.OrderBy(x => x.ClearanceDate).FirstOrDefault();
+                }
+
+                result.CDNo = cdNoteDetail.CDNote.Code;
+                result.PartnerNameEn = cdNoteDetail.PartnerNameEn;
+                result.BillingAddress = cdNoteDetail.PartnerShippingAddress;
+                result.Taxcode = cdNoteDetail.PartnerTaxcode;
+                result.ClearanceNo = _clearance?.ClearanceNo;
+                result.GW = cdNoteDetail.GW;
+                result.CBM = cdNoteDetail.CBM;
+                result.HBL = cdNoteDetail.MbLadingNo;
+                result.Cont = cdNoteDetail.HbConstainers;
+                result.WareHouseName = cdNoteDetail.WarehouseName;
+
+                result.ListCharges = new List<ExportCDNoteModel>();
+                foreach (var item in cdNoteDetail.ListSurcharges)
+                {
+                    var cdNote = new ExportCDNoteModel();
+                    decimal _exchangeRateToVND = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    _exchangeRateToVND = item.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? 1 : _exchangeRateToVND;
+                    decimal? fee = Math.Round(((item.UnitPrice * item.Quantity) * _exchangeRateToVND).Value);
+                    decimal? vat = item.Vatrate != null ? (item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((fee * item.Vatrate) / 100)) : 0;
+                    cdNote.Type = item.Type;
+                    cdNote.Description = item.NameEn;
+                    cdNote.VATInvoiceNo = item.InvoiceNo;
+                    cdNote.Amount = fee;
+                    cdNote.Notes = item.Notes;
+                    cdNote.VATAmount = Math.Round(vat.Value);
+                    cdNote.TotalAmount = fee + vat;
+                    cdNote.Notes = item.Notes;
+                    result.ListCharges.Add(cdNote);
+                }
+
+                //Lấy thông tin Office của User Login
+                var officeOfUser = GetInfoOfficeOfUser(officeId);
+                result.BankNameEn = officeOfUser?.BankNameEn ?? string.Empty;
+                result.OfficeEn = officeOfUser?.BranchNameEn ?? string.Empty;
+                result.BankAddressEn = officeOfUser?.BankAddressEn ?? string.Empty;
+                result.BankAccountNameEn = officeOfUser?.BankAccountNameEn ?? string.Empty;
+                result.SwiftCode = officeOfUser?.SwiftCode ?? string.Empty;
+                result.BankAccountVND = officeOfUser?.BankAccountVnd ?? string.Empty;
+            }
             return result;
         }
 

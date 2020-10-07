@@ -11,5 +11,6 @@ namespace eFMS.API.Documentation.DL.IService
         EmailContentModel GetInfoMailHBLAirImport(Guid hblId);
         EmailContentModel GetInfoMailHBLAirExport(Guid hblId);
         EmailContentModel GetInfoMailSISeaExport(Guid jobId);
+        EmailContentModel GetInfoMailHBLSeaImport(Guid jobId, string serviceId);
     }
 }

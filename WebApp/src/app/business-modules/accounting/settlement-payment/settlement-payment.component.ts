@@ -7,13 +7,14 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, } from 'rxjs/operators';
 import { User, SettlementPayment, PartnerOfAcctManagementResult } from 'src/app/shared/models';
-import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
 import { SelectRequester } from '../accounting-management/store';
+import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 @Component({
     selector: 'app-settlement-payment',
@@ -25,6 +26,8 @@ export class SettlementPaymentComponent extends AppList {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
     @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent, { static: false }) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(SettlementPaymentsPopupComponent, { static: false }) settlementPaymentsPopup: SettlementPaymentsPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     settlements: SettlementPayment[] = [];
@@ -74,7 +77,7 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
         this.getUserLogged();
-        this.getListSettlePayment();
+        // this.getListSettlePayment();
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
@@ -210,6 +213,7 @@ export class SettlementPaymentComponent extends AppList {
                     if (res != null) {
                         this.dataReport = res;
                         setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
                             this.previewPopup.show();
                         }, 1000);
                     } else {
@@ -286,5 +290,13 @@ export class SettlementPaymentComponent extends AppList {
 
     onChangeSelectedSettlement() {
         this.isCheckAll = this.settlements.filter(x => x.statusApproval === 'Done' && !x.voucherNo).every(x => x.isSelected === true);
+    }
+
+    showPopupList() {
+        this.settlementPaymentsPopup.dataSearchList = this.dataSearch;
+        this.settlementPaymentsPopup.page = this.page;
+        this.settlementPaymentsPopup.pageSize = this.pageSize;
+        this.settlementPaymentsPopup.getListSettlePayment();
+        this.settlementPaymentsPopup.show();
     }
 }

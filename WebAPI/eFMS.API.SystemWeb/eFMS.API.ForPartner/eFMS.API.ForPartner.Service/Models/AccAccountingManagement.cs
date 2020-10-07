@@ -41,5 +41,9 @@ namespace eFMS.API.ForPartner.Service.Models
         public decimal? PaidAmount { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? PaymentTerm { get; set; }
+        public string SourceCreated { get; set; }
+        public string SourceModified { get; set; }
+        public string ReferenceNo { get; set; }
+        public DateTime? LastSyncDate { get; set; }
     }
 }

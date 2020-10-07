@@ -6,12 +6,12 @@ namespace eFMS.IdentityServer.DL.UserManager
 {
     public interface ICurrentUser
     {
-        string UserID { get; }
-        string UserName { get; }
-        Guid CompanyID { get; }
-        Guid OfficeID { get; }
-        int? DepartmentId { get; }
-        short? GroupId { get; }
+        string UserID { get; set; }
+        string UserName { get; set; }
+        Guid CompanyID { get; set; }
+        Guid OfficeID { get; set; }
+        int? DepartmentId { get; set; }
+        short? GroupId { get; set; }
         List<UserPermissionModel> UserPermissions { get; }
         UserPermissionModel UserMenuPermission { get; set; }
     }

@@ -1,3 +1,6 @@
 ﻿{
-  "MSG_DATA_NOT_FOUND": "Không tìm thấy dữ liệu"
+  "MSG_DATA_NOT_FOUND": "Không tìm thấy dữ liệu",
+  "MSG_INSERT_SUCCESS": "Thêm dữ liệu mới thành công",
+  "MSG_UPDATE_SUCCESS": "Cập nhật dữ liệu thành công",
+  "MSG_DELETE_SUCCESS": "Xóa dữ liệu thành công"
 }

@@ -314,6 +314,22 @@ export class CatalogueRepo {
             );
     }
 
+
+    rejectComment(partnerId: string, comment: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/RejectComment`, { partnerId: partnerId, comment: comment })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    rejectCommentCommercial(partnerId: string, contractId: string, comment: string, partnerType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/RejectComment`, { partnerId: partnerId, contractId: contractId, comment: comment, partnerType: partnerType })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+
     uploadFileContract(partnerId: string, contractId: string, body: any) {
         return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
             map((data: any) => data)

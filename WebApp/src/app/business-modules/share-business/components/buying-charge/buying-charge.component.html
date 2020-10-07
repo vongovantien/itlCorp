@@ -91,33 +91,26 @@
                                         || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true ;else partnerTemplate">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                        <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.partnerShortName"
                                             [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
                                     </ng-container>
                                     <ng-template #partnerTemplate>
-                                        <ng-container *ngIf="isShowLoadingPartner">
-                                            <div class="on-loading text-center">
-                                                <div class="m-loader m-loader--brand">
-                                                </div><span>Loading</span>
-                                            </div>
-                                        </ng-container>
-
-                                        <ng-container *ngIf="!isShowLoadingPartner">
-                                            <input type="text" class="dropdown-toggle form-control" readonly
-                                                [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
-                                                (click)="loadDynamicComoGrid(charge,i)"
-                                                [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
-                                                [attr.readonly]="!!charge.creditNo 
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
+                                            (click)="loadDynamicComoGrid(charge,i)"
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
+                                            [attr.readonly]="!!charge.creditNo 
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
                                                 || !!charge.paySoano
                                                 || !charge.isFromShipment 
                                                 || (isLocked | async) === true">
-                                            <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                                     charge.partnerShortName = null"
-                                                (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName 
+                                            (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName 
                                                 && !charge.paySoano 
                                                 && !charge.creditNo
                                                 && !charge.settlementCode
@@ -128,7 +121,6 @@
                                                 && !charge.settlementCode
                                                 && !charge.voucherId
                                                 && !charge.voucherIddate"> </combo-grid-icon>
-                                        </ng-container>
                                     </ng-template>
                                     <div class="dropdown-partner__content">
                                         <div class="d-flex justify-content-end dropdown-partner__header"
@@ -144,35 +136,34 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group pos-rel"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
-                                    <input type="text" class="dropdown-toggle form-control" readonly
-                                        [(ngModel)]="charge.chargeNameEn" (click)="loadDynamicComboGridCharge(charge,i)"
-                                        placeholder="Select charge" [disabled]="!!charge.creditNo 
-                                        || !!charge.settlementCode
-                                        || !!charge.voucherId
-                                        || !!charge.voucherIddate
-                                        || !!charge.paySoano
-                                        || !charge.isFromShipment 
-                                        || (isLocked | async) === true">
-                                    <combo-grid-icon (onDelete)="charge.chargeId = null; 
-                                            charge.chargeNameEn = null"
-                                        (onDropdown)="loadDynamicComboGridCharge(charge,i)" [showDelete]="!!charge.chargeId 
-                                            && !charge.paySoano 
-                                            && !charge.creditNo
-                                            && !charge.settlementCode
-                                            && !charge.voucherId
-                                            && !charge.voucherIddate" [showDropdown]="!!charge.chargeId 
-                                            && !charge.paySoano 
-                                            && !charge.creditNo
-                                            && !charge.settlementCode
-                                            && !charge.voucherId
-                                            && !charge.voucherIddate"></combo-grid-icon>
-                                    <div class="dropdown-charge">
-                                        <ng-template #containerCharge></ng-template>
+                                <ng-container *ngIf="!!charge.creditNo 
+                                    || !!charge.settlementCode
+                                    || !!charge.paySoano
+                                    || !!charge.voucherId
+                                    || !!charge.invoiceNo
+                                    || !!charge.voucherIddate
+                                    || !charge.isFromShipment 
+                                    || (isLocked | async) === true ;else chargeID">
+                                    <div class="form-group">
+                                        <input type="text" class="dropdown-toggle form-control" disabled
+                                            [(ngModel)]="charge.chargeNameEn">
                                     </div>
-
-                                </div>
+                                </ng-container>
+                                <ng-template #chargeID>
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
+                                        <div class="list-master-charge">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                                (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
+                                                [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
+                                                [dataSources]="listCharges"
+                                                [displayFields]="configComboGridCharge.displayFields" [height]="150"
+                                                placeholder="Select charge" (remove)="charge.chargeId = null">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+                                    </div>
+                                </ng-template>
                             </td>
                             <td>
                                 <div class="form-group"

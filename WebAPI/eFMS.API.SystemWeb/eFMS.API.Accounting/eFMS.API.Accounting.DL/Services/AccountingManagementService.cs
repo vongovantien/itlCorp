@@ -125,7 +125,12 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 item.InvoiceNo = null;
                                 item.InvoiceDate = null;
+                                item.VoucherId = null;
+                                item.VoucherIddate = null;
+                                item.FinalExchangeRate = null;
                             }
+
+                            item.AmountVnd = item.VatAmountVnd = null;
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
 
@@ -144,7 +149,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (string code in listSettlementCode)
                                 {
-                                    updateVoucherSettlement(code, null, null);
+                                    UpdateVoucherSettlement(code, null, null);
                                 }
 
                                 settlementPaymentRepo.SubmitChanges();
@@ -316,6 +321,7 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeModified = acc.DatetimeModified,
                            PaymentStatus = acc.PaymentStatus,
                            PaymentDueDate = acc.PaymentDueDate,
+                           LastSyncDate = acc.LastSyncDate
 
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
@@ -441,9 +447,9 @@ namespace eFMS.API.Accounting.DL.Services
             dataSell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
-                fe.AmountVnd = fe.AmountVnd != null ? fe.AmountVnd : fe.OrgAmount * fe.ExchangeRate;
-                fe.VatAmountVnd = fe.VatAmountVnd != null ? fe.VatAmountVnd : fe.OrgVatAmount * fe.ExchangeRate;
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? Math.Round(((fe.OrgAmount * fe.Vat) / 100 ?? 0),3) : Math.Abs(fe.Vat ?? 0) : 0;
+                fe.AmountVnd = Math.Round(fe.AmountVnd != null ? (fe.AmountVnd ?? 0) : (fe.OrgAmount * fe.ExchangeRate ?? 0));
+                fe.VatAmountVnd = Math.Round(fe.VatAmountVnd != null ? (fe.VatAmountVnd ?? 0) : (fe.OrgVatAmount * fe.ExchangeRate ?? 0 ));
             });
             return dataSell;
         }
@@ -657,9 +663,9 @@ namespace eFMS.API.Accounting.DL.Services
             dataBuySell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
-                fe.AmountVnd = fe.AmountVnd != null ? fe.AmountVnd : fe.OrgAmount * fe.ExchangeRate;
-                fe.VatAmountVnd = fe.VatAmountVnd != null ? fe.VatAmountVnd : fe.OrgVatAmount * fe.ExchangeRate;
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? Math.Round(((fe.OrgAmount * fe.Vat) / 100 ?? 0), 3) : Math.Abs(fe.Vat ?? 0) : 0;
+                fe.AmountVnd = Math.Round(fe.AmountVnd != null ? (fe.AmountVnd ?? 0) : (fe.OrgAmount * fe.ExchangeRate ?? 0));
+                fe.VatAmountVnd = Math.Round(fe.VatAmountVnd != null ? (fe.VatAmountVnd ?? 0) : (fe.OrgVatAmount * fe.ExchangeRate ?? 0));
             });
             return dataBuySell;
         }
@@ -792,7 +798,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataObhBuy.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? Math.Round(((fe.OrgAmount * fe.Vat) / 100 ?? 0), 3) : Math.Abs(fe.Vat ?? 0) : 0;
                 fe.AmountVnd = fe.AmountVnd != null ? fe.AmountVnd : fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.VatAmountVnd != null ? fe.VatAmountVnd : fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -817,32 +823,32 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
             {
-                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo));
+                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SoaNos != null && criteria.SoaNos.Count > 0)
             {
-                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo));
+                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.JobNos != null && criteria.JobNos.Count > 0)
             {
-                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo));
+                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl));
+                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl));
+                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
-                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode));
+                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase));
             }
 
             var charges = GetChargeForVoucher(query);
@@ -1021,7 +1027,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     foreach (string code in listSettlementCode)
                                     {
-                                        updateVoucherSettlement(code, accounting.VoucherId, accounting.Date);
+                                        UpdateVoucherSettlement(code, accounting.VoucherId, accounting.Date);
                                     }
 
                                     settlementPaymentRepo.SubmitChanges();
@@ -1179,7 +1185,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     foreach (string code in listSettlementCode)
                                     {
-                                        updateVoucherSettlement(code, accounting.VoucherId, accounting.Date);
+                                        UpdateVoucherSettlement(code, accounting.VoucherId, accounting.Date);
                                     }
 
                                     settlementPaymentRepo.SubmitChanges();
@@ -1274,11 +1280,18 @@ namespace eFMS.API.Accounting.DL.Services
             decimal total = 0;
             if (!string.IsNullOrEmpty(model.Currency))
             {
-                model.Charges.ForEach(fe =>
+                if(model.Currency == "VND")
                 {
-                    var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
-                    total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
-                });
+                    total = model.Charges.Sum(x => x.AmountVnd ?? 0);
+                }
+                else
+                {
+                    model.Charges.ForEach(fe =>
+                    {
+                        decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
+                        total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
+                    });
+                }
             }
             return total;
         }
@@ -1578,6 +1591,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion --- EXPORT ---
 
+        #region --- IMPORT ---
         public List<AcctMngtVatInvoiceImportModel> CheckVatInvoiceImport(List<AcctMngtVatInvoiceImportModel> list)
         {
             list.ForEach(item =>
@@ -1751,6 +1765,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
         }
+        #endregion --- IMPORT ---
 
         private int GetPermissionToAction(AccAccountingManagementModel model, PermissionRange permissionRange, ICurrentUser currentUser)
         {
@@ -1863,7 +1878,7 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (ChargeOfAccountingManagementModel charge in charges)
                 {
                     charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, AccountingConstants.CURRENCY_LOCAL);
-                    charge.OrgVatAmount = (charge.Vat != null) ? (charge.Vat < 101 & charge.Vat >= 0) ? ((charge.OrgAmount * charge.Vat) / 100) : Math.Abs(charge.Vat ?? 0) : 0;
+                    charge.OrgVatAmount = (charge.Vat != null) ? (charge.Vat < 101 & charge.Vat >= 0) ? Math.Round(((charge.OrgAmount * charge.Vat) / 100 ?? 0),3) : Math.Abs(charge.Vat ?? 0) : 0;
                     charge.AmountVnd = Math.Round((charge.OrgAmount ?? 0) * (charge.ExchangeRate ?? 0 ));
                     charge.VatAmountVnd = Math.Round((charge.OrgVatAmount ?? 0 ) * (charge.ExchangeRate ?? 0));
                 }
@@ -1876,7 +1891,7 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        public void updateVoucherSettlement(string _settleCode, string _voucherNo, DateTime? _voucherDate)
+        public void UpdateVoucherSettlement(string _settleCode, string _voucherNo, DateTime? _voucherDate)
         {
             AcctSettlementPayment settlement = settlementPaymentRepo.Get(x => x.SettlementNo == _settleCode).FirstOrDefault();
             if(settlement != null)
@@ -1888,6 +1903,26 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id,false);
+        }
+
+        public HandleState SyncVoucher(Guid voucherId)
+        {
+            HandleState result = new HandleState();
+
+            AccAccountingManagement voucher = DataContext.Get(x => x.Id == voucherId && x.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)?.FirstOrDefault();
+
+            if (voucher == null)
+            {
+                return new HandleState(stringLocalizer[AccountingLanguageSub.MSG_DATA_NOT_FOUND].Value);
+            }
+
+            voucher.UserModified = currentUser.UserID;
+            voucher.DatetimeModified = DateTime.Now;
+            voucher.LastSyncDate = DateTime.Now;
+
+            result = DataContext.Update(voucher, x => x.Id == voucherId);
+
+            return result;
         }
     }
 }

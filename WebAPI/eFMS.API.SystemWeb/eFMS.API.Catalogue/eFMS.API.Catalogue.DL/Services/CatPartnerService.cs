@@ -192,6 +192,41 @@ namespace eFMS.API.Catalogue.DL.Services
             return partner;
         }
 
+        public bool SendMailRejectComment(string partnerId, string comment)
+        {
+            ClearCache();
+            var partner = Get(x => x.Id == partnerId).FirstOrDefault();
+            string subject = string.Empty;
+            string linkVn = string.Empty;
+            string linkEn = string.Empty;
+            string body = string.Empty;
+
+            string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var creatorObj= sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+
+            string address = webUrl.Value.Url + "/en/#/" + "home/catalogue/partner-data/detail/" + partner.Id;
+            subject = "Reject Partner - " + partner.PartnerNameVn;
+            linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
+            linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + creatorObj.EmployeeNameVn + "," + " </br> </br>" +
+                   "<i> Your Partner " + partner.PartnerNameVn + " is rejected by AR/Accountant as info below </i> </br>" +
+                   "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" +
+                   "\t  Customer Name  / <i> Tên khách hàng: </i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                   "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                   "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
+                   + linkEn + "</br>" + linkVn + "</br> </br>" +
+                  "<i> Thanks and Regards </i>" + "</br> </br>" +
+                  "eFMS System </div>" );
+
+            List<string> lstCc = ListMailCC();
+            List<string> lstTo = new List<string>();
+
+            lstTo.Add(creatorObj?.Email);
+
+            return SendMail.Send(subject, body, lstTo, null, null, lstCc);
+        }
+
         private void SendMailRequestApproval(CatPartnerModel partner)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
@@ -250,7 +285,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstCc = ListMailCC();
 
             lstCc.Add(objInfoSalesman?.Email);
-            SendMail.Send(subject, body, lstTo, null, lstCc);
+            SendMail.Send(subject, body, lstTo, null, null, lstCc);
 
         }
 
@@ -266,7 +301,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" /*&& x.BranchId == currentUser.OfficeID*/)?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null && listEmailAR.Any())
             {
@@ -315,7 +350,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         lstToAccountant = lstCc;
                     }
-                    SendMail.Send(subject, body, lstToAccountant, null, lstCc);
+                    SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
                 }
             }
 
@@ -324,7 +359,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstToAccountant.AddRange(lstToAR);
                 if (lstToAccountant.Any())
                 {
-                    SendMail.Send(subject, body, lstToAccountant, null, lstCc);
+                    SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
                 }
             }
 
@@ -339,7 +374,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 "andy.hoa@itlvn.com",
                 "cara.oanh@itlvn.com",
                 "lynne.loc@itlvn.com",
-                "samuel.an@logtechub.com"
+                "samuel.an@logtechub.com",
+                "kenny.thuong@itlvn.com"
             };
             return lstCc;
         }

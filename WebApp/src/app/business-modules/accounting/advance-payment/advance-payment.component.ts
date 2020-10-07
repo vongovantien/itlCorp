@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
@@ -14,6 +14,7 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { formatDate } from '@angular/common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
 @Component({
     selector: 'app-advance-payment',
@@ -27,6 +28,7 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild('confirmExistedVoucher', { static: false }) confirmExistedVoucher: ConfirmPopupComponent;
     @ViewChild('confirmRemoveSelectedVoucher', { static: false }) confirmRemoveSelectedVoucher: ConfirmPopupComponent;
+    @ViewChild(AdvancePaymentsPopupComponent, { static: false }) advancePaymentsPopup: AdvancePaymentsPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
@@ -42,6 +44,7 @@ export class AdvancePaymentComponent extends AppList {
     checkAll = false;
     paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
+    dataReport: any = null;
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -59,6 +62,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     ngOnInit() {
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
@@ -74,6 +78,8 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Description', field: 'advanceNote', sortable: true },
             { title: 'Voucher No', field: 'voucherNo', sortable: true },
             { title: 'Voucher Date', field: 'voucherDate', sortable: true },
+            { title: 'Sync Date', field: 'lastSyncDate', sortable: true },
+
         ];
 
         this.headerGroupRequest = [
@@ -86,7 +92,8 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
-        this.getListAdvancePayment();
+        //this.getListAdvancePayment();
+
     }
 
     onSearchAdvPayment(data: any) {
@@ -98,6 +105,7 @@ export class AdvancePaymentComponent extends AppList {
     getListAdvancePayment() {
         this.isLoading = true;
         this._progressRef.start();
+
         this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
             .pipe(
                 catchError(this.catchError),
@@ -252,7 +260,7 @@ export class AdvancePaymentComponent extends AppList {
                     (res: any) => {
                         if (!!res && res.lstVoucherData.length > 0) {
                             res.lstVoucherData.forEach(item => {
-                                this.messageVoucherExisted += item.advanceNo + " has existed in " + item.voucherNo + "</br>";
+                                this.messageVoucherExisted += item.advanceNo + " has existed in " + item.voucherNo + "<br>";
                             });
                             this.messageVoucherExisted += "<br>" + " Would you like to keep updating?";
                             this.confirmExistedVoucher.show();
@@ -337,6 +345,13 @@ export class AdvancePaymentComponent extends AppList {
             );
     }
 
+    showPopupListAdvance() {
+        this.advancePaymentsPopup.dataSearchList = this.dataSearch;
+        this.advancePaymentsPopup.page = this.page;
+        this.advancePaymentsPopup.pageSize = this.pageSize;
+        this.advancePaymentsPopup.getListAdvancePayment();
+        this.advancePaymentsPopup.show();
+    }
 }
 
 

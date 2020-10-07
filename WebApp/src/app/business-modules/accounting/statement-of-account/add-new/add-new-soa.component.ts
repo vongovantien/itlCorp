@@ -6,7 +6,7 @@ import { AccountingRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
-import { SOASearchCharge } from 'src/app/shared/models';
+import { SoaCharge, SOASearchCharge } from '@models';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
 import { StatementOfAccountFormCreateComponent } from '../components/form-create-soa/form-create-soa.component';
@@ -149,7 +149,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
         this.dataSearch[key] = data;
     }
 
-    searchChargeWithDataSearch(dataSearch: any) {
+    searchChargeWithDataSearch(dataSearch: SOASearchCharge) {
         this.isLoading = true;
         this.dataSearch = dataSearch;
         this._accountRepo.getListChargeShipment(dataSearch)
@@ -160,13 +160,36 @@ export class StatementOfAccountAddnewComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     this.dataCharge = res;
-                    this.listCharges = res.chargeShipments || [];
                     this.totalCharge = res.totalCharge;
                     this.totalShipment = res.totalShipment;
+                    this.listCharges = res.chargeShipments || [];
+
+                    if (!!res.chargeShipments.length) {
+                        if (dataSearch.strServices.includes("AE") || dataSearch.strServices.includes("AI") || dataSearch.strCharges === "") {
+                            if (!!dataSearch.airlineCode && dataSearch.airlineCode.length === 3) {
+                                this.listCharges = res.chargeShipments.filter((charge: SoaCharge) => this.filterChargeWithAirlineCode(charge, dataSearch.airlineCode))
+                                if (!!this.listCharges.length) {
+                                    this.totalShipment = Object.keys(this.utility.countBy(this.listCharges, (x: { hbl: any; }) => x.hbl)).length; // * Count theo hbl
+                                    this.totalCharge = this.listCharges.length;
+                                } else {
+                                    this.totalShipment = 0;
+                                    this.totalCharge = 0;
+                                }
+                            }
+                        }
+                    }
 
                     this.updateDataSearch('chargeShipments', this.listCharges);
                 },
             );
+    }
+
+    filterChargeWithAirlineCode(charge: SoaCharge, code: string) {
+        return !!charge.mbl && this.isAirJob(charge.jobId) && charge.mbl.substring(0, 3).toLowerCase() === code.toLowerCase()
+    }
+
+    isAirJob(jobNo: string) {
+        return jobNo.includes("AE") || jobNo.includes("AI");
     }
 
     removeCharge() {
@@ -175,7 +198,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onUpdateMoreSOA(data: any) {
-        // this.formCreate.commondity = data.commodityGroupId;
         this.dataCharge = data;
         this.listCharges = data.chargeShipments || [];
         this.dataSearch.chargeShipments = this.listCharges;
@@ -187,6 +209,16 @@ export class StatementOfAccountAddnewComponent extends AppList {
     calculatorReceivable(surcharges: any[]) {
         const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
         this._accountRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+    }
+
+    selectJobId(charge: SoaCharge) {
+        charge.isSelected = !charge.isSelected;
+        this.listCharges.forEach((c: SoaCharge) => {
+            if (c.jobId === charge.jobId) {
+                c.isSelected = charge.isSelected;
+            }
+        })
+        this.isCheckAllCharge = this.listCharges.every((item: any) => item.isSelected);
     }
 }
 

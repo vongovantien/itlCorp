@@ -4,21 +4,21 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { CatalogueRepo, DocumentationRepo, AccountingRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup } from '@models';
 import { AppList } from 'src/app/app.list';
-import { SortService, DataService } from 'src/app/shared/services';
-import { SystemConstants } from 'src/constants/system.const';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { SortService } from '@services';
+import { SystemConstants } from '@constants';
+import { ConfirmPopupComponent } from '@common';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { CommonEnum } from '@enums';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, share, skip, map, shareReplay } from 'rxjs/operators';
+import { catchError, takeUntil, finalize, skip, map, shareReplay } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 
-import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from 'src/app/store';
+import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from '@store';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
@@ -84,7 +84,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _dataService: DataService,
         protected _accountingRepo: AccountingRepo,
         protected _activedRoute: ActivatedRoute
 
@@ -198,7 +197,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (units: Unit[]) => {
                     this.listUnits = units;
-                    this._dataService.setData(SystemConstants.CSTORAGE.UNIT, this.listUnits);
                 }
             );
     }
@@ -210,7 +208,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     getCurrency() {
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState);
-        this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, this.listCurrency);
     }
 
     getPartner() {
@@ -219,7 +216,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this._catalogueRepo.getListPartner(null, null, { active: true })
             .pipe(
-                share(),
+                shareReplay(),
                 catchError(this.catchError), finalize(() => {
                     this._spinner.hide(this.spinnerpartner);
                     this.isShowLoadingPartner = false;
@@ -227,9 +224,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartner = partners;
-
-                    // * Update BehaviorSubject messageSource.
-                    this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, this.listPartner);
                 }
             );
 
@@ -302,6 +296,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     chargeItem.unitPrice = data.unitPrice;
                     this.onChangeDataUpdateTotal(chargeItem);
                 }
+
+                // * CR: 14583
+                chargeItem.currencyId = data.currencyId || "VND";
                 break;
             case 'unit':
                 chargeItem.unitId = data.id;

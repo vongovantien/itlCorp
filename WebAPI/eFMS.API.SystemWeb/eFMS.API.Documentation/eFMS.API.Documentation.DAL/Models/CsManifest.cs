@@ -26,5 +26,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+        public string ManifestShipper { get; set; }
     }
 }

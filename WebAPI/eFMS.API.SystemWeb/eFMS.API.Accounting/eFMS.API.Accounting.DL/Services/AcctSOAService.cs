@@ -40,7 +40,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
         readonly IContextBase<SysCompany> sysCompanyRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
-
+        private decimal _decimalNumber = Constants.DecimalNumber;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -2456,7 +2456,6 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- Preview --
         public Crystal PreviewAccountStatementFull(string soaNo)
         {
-            double _decimalNumber = 0.000000001;
             //SOANo: type charge is SELL or OBH-SELL (DEBIT)
             //PaySOANo: type charge is BUY or OBH-BUY (CREDIT)
             Crystal result = null;
@@ -2521,7 +2520,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.DateofInv = cdNote?.DatetimeCreated?.ToString("MMM dd, yy") ?? string.Empty; //Created Datetime CD Note
                 soaCharge.Order = string.Empty; //NOT USE
                 soaCharge.InvID =  charge.InvoiceNo;
-                soaCharge.Amount = _amount + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                soaCharge.Amount = _amount + _decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.Curr = soa.Currency?.Trim(); //Currency SOA
                 soaCharge.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;
                 soaCharge.Vessel = string.Empty; //NOT USE
@@ -2546,7 +2545,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.Volumne = string.Empty; //NOT USE
                 soaCharge.POBH = null; //NOT USE
                 soaCharge.ROBH = (charge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? _amount : 0;
-                soaCharge.ROBH = soaCharge.ROBH + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                soaCharge.ROBH = soaCharge.ROBH + _decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.CustomNo = _customNo;
                 soaCharge.JobNo = _jobNo;
                 soaCharge.CdCode = cdNote?.Code;

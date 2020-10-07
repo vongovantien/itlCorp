@@ -34,6 +34,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState ActiveInActiveContract(Guid id,string partnerId,SalesmanCreditModel credit);
         List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list);
         HandleState Import(List<CatContractImportModel> data);
+        bool SendMailRejectComment(string partnerId, string contractId, string comment,string partnerType);
 
 
     }

@@ -36,6 +36,12 @@ namespace CommonInterface {
         totalItems: number;
     }
 
+    export interface IParamPaging {
+        page: number;
+        size: number;
+        dataSearch: any;
+    }
+
     export interface ICommonTitleValue {
         title: string;
         value: any;

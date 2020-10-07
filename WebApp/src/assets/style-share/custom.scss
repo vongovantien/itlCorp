@@ -552,7 +552,7 @@ table.dataTable {
 .modal {
     background-color: rgba(0, 0, 0, 0.5);
     .modal-content {
-        border-radius: 0;
+        border-radius: 15px;
         .modal-header {
             padding: 10px 15px;
             background-color: #3966b6;
@@ -1100,6 +1100,7 @@ table.dataTable {
 }
 
 .fms-shipment-sidebar {
+    top: 35%;
     li.m-nav-sticky__item {
         padding: 0;
         a {

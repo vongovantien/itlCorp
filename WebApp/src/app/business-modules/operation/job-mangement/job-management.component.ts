@@ -58,6 +58,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     ngOnInit() {
         this.headers = [
             { title: 'Job ID', field: 'jobNo', sortable: true },
+            { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'HBL', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
