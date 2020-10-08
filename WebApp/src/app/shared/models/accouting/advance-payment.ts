@@ -31,7 +31,7 @@ export class AdvancePayment {
     paymentTerm: number = null;
     paymentTermDate: string = null;
     lastSyncDate: string = null;
-
+    syncStatus: string = null;
 
     isRequester: boolean = false;
     isManager: boolean = false;
