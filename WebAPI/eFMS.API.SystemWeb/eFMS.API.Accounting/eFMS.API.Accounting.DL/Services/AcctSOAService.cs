@@ -2616,6 +2616,7 @@ namespace eFMS.API.Accounting.DL.Services
                     soa.UserModified = currentUser.UserID;
                     soa.DatetimeModified = DateTime.Now;
                     soa.Status = "Cs Confirmed";
+                    soa.SyncStatus = "SYNCED";
                     soa.LastSyncDate = DateTime.Now;
                     var hsUpdateSOA = DataContext.Update(soa, x => x.Id == soa.Id);
                     trans.Commit();
