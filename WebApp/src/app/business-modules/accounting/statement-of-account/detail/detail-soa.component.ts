@@ -220,6 +220,25 @@ export class StatementOfAccountDetailComponent extends AppList {
             );
     }
 
+    csConfirmed() {
+        this._progressRef.start();
+        this._accoutingRepo.csConfirmed(this.soaNO)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.success) {
+                        this._toastService.success('Cs Confirmed successfully!', '');
+                        this.soa.status = 'Cs Confirmed';
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                },
+            );
+    }
+
     // Charge keyword search
     onChangeKeyWord(keyword: string) {
         if (this.TYPE === 'GROUP') {
