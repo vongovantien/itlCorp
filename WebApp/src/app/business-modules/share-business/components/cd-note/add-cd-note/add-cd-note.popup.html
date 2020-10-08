@@ -119,7 +119,7 @@
                             <tbody class="tbody-group" *ngIf="listChargePartner.length > 0">
                                 <ng-container
                                     *ngFor="let charges of listChargePartner; let i = index; trackBy: trackByFn">
-                                    <ng-container *ngIf="!charges.isDeleted">
+                                    <ng-container>
                                         <tr class="collapse-toggle-row tgroup">
                                             <td colspan="12" *ngIf="charges.listCharges.length > 0">
                                                 <label class="m-checkbox m-checkbox--bold m-checkbox--state-brand">
@@ -139,6 +139,7 @@
                                                     <div class="table-actions">
                                                         <label class="m-checkbox">
                                                             <input type="checkbox" [(ngModel)]="charge.isSelected"
+                                                                [disabled]="charge.voucherId !== null || charge.invoiceNo !== null"
                                                                 (change)="onChangeCheckBoxItemCharge(charges)">
                                                             <span></span>
                                                         </label>

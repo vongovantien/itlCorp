@@ -174,6 +174,8 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
                             this._toastService.success(res.message);
                             this.confirmPopupDelete.hide();
                             this.onSearchVoucher(this.dataSearch);
+
+                            this.requestSearchAcctMngt();
                         } else {
                             this._toastService.error(res.message);
                         }

@@ -40,8 +40,8 @@ export class AccountingRepo {
             );
     }
 
-    csConfirmed(soaNo: string) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CsConfirmed`, {}, { soaNo: soaNo })
+    updateSyncStatusSoa(soaNo: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/UpdateSyncStatus`, {}, { soaNo: soaNo })
             .pipe(
                 map((data: any) => data)
             );
@@ -667,6 +667,12 @@ export class AccountingRepo {
 
     syncAdvanceToAccountant(list: string[]) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/SyncAdvanceToAccountantSystem`, list).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListAdvanceSyncData(list: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListAdvanceSyncData`, list).pipe(
             map((data: any) => data)
         );
     }

@@ -396,16 +396,16 @@ namespace eFMS.API.Accounting.Controllers
 
 
         /// <summary>
-        /// CS Confirmed by soa no
+        /// Update Sync Status by soa no
         /// </summary>
         /// <param name="soaNo">Soa No</param>
         /// <returns></returns>
         [HttpPut]
-        [Route("CsConfirmed")]
+        [Route("UpdateSyncStatus")]
         [Authorize]
-        public IActionResult CsConfirmed(string soaNo)
+        public IActionResult UpdateSyncStatus(string soaNo)
         {
-            var result = acctSOAService.CsConfirmed(soaNo);
+            var result = acctSOAService.UpdateSyncStatus(soaNo);
             return Ok(result);
         }
     }

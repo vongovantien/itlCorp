@@ -928,7 +928,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 fileName = model.Files.FileName;
                 string objectId = model.PartnerId;
                 await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
-                string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+                string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
                 var sysImage = new SysImage
                 {
                     Id = Guid.NewGuid(),

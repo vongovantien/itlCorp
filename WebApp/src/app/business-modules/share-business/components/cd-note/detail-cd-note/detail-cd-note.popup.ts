@@ -18,7 +18,7 @@ import { NgProgress } from "@ngx-progressbar/core";
     templateUrl: './detail-cd-note.popup.html'
 })
 export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: ShareBussinessCdNoteAddPopupComponent;
     @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
@@ -27,7 +27,8 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
 
     jobId: string = null;
     cdNote: string = null;
-    deleteMessage: string = '';
+    confirmMessage: string = '';
+    typeConfirm: string = '';
     isHouseBillID: boolean = false;
     transactionType: TransactionTypeEnum = 0;
 
@@ -74,7 +75,9 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             volume: 'Volume',
             packageQty: 'Package Quantity',
             soa: 'SOA',
-            locked: 'Locked'
+            locked: 'Locked',
+            syncStatus: 'Sync Status',
+            lastSync: 'Last Sync'
         };
 
         this.headers = [
@@ -159,8 +162,9 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.deleteMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
-                        this.confirmDeleteCdNotePopup.show();
+                        this.confirmMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
+                        this.typeConfirm = "DELETE";
+                        this.confirmCdNotePopup.show();
                     } else {
                         this.canNotDeleteCdNotePopup.show();
                     }
@@ -168,12 +172,12 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             );
     }
 
-    onDeleteCdNote() {
+    deleteCdNote() {
         this._documentationRepo.deleteCdNote(this.CdNoteDetail.cdNote.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
-                    this.confirmDeleteCdNotePopup.hide();
+                    this.confirmCdNotePopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -278,10 +282,37 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         return true;
     }
 
+    showConfirmed() {
+        this._toastService.success("Tính năng đang phát triển");
 
-    csConfirmed() {
+        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        // this.typeConfirm = "CONFIRMED";
+        // this.confirmCdNotePopup.show();
+    }
+
+    hidePreview() {
+        this.popupReport.hide();
+    }
+
+    onConfirmCdNote() {
+        if (this.typeConfirm === "DELETE") {
+            this.deleteCdNote();
+        } else if (this.typeConfirm === "CONFIRMED") {
+            this._toastService.success("Tính năng đang phát triển");
+        }
+    }
+
+    getDataCdNoteToSync() {
+
+    }
+
+    syncToAccountant() {
+        // Gọi API Bravo
+    }
+
+    updateSyncStatusCdNote() {
         this._progressRef.start();
-        this._documentationRepo.csConfirmed(this.cdNote)
+        this._documentationRepo.updateSyncStatusCdNote(this.cdNote)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })
@@ -289,17 +320,12 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             .subscribe(
                 (res: any) => {
                     if (res.success) {
-                        this._toastService.success('Cs Confirmed successfully!', '');
-                        this.CdNoteDetail.status = 'Cs Confirmed';
+                        this._toastService.success('Sync Data to Accountant System Successful!', '');
+                        this.CdNoteDetail.syncStatus = 'Synced';
                     } else {
                         this._toastService.error(res.message);
                     }
                 },
             );
     }
-
-    hidePreview() {
-        this.popupReport.hide();
-    }
-
 }
