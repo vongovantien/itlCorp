@@ -753,6 +753,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public int CheckDetailPermission(string id)
         {
+            ClearCache();
             var detail = Get(x => x.Id == id).FirstOrDefault();
             var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = null;

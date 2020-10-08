@@ -11,6 +11,7 @@ import { ModalDirective } from "ngx-bootstrap/modal";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
 import { environment } from 'src/environments/environment';
+import { NgProgress } from "@ngx-progressbar/core";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -46,9 +47,11 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
+        private _progressService: NgProgress
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -273,6 +276,26 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
 
     onSubmitForm(event) {
         return true;
+    }
+
+
+    csConfirmed() {
+        this._progressRef.start();
+        this._documentationRepo.csConfirmed(this.cdNote)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.success) {
+                        this._toastService.success('Cs Confirmed successfully!', '');
+                        this.CdNoteDetail.status = 'Cs Confirmed';
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                },
+            );
     }
 
     hidePreview() {
