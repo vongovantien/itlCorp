@@ -774,5 +774,12 @@
             <param name="soaNo">Soa No</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.CsConfirmed(System.String)">
+            <summary>
+            CS Confirmed by soa no
+            </summary>
+            <param name="soaNo">Soa No</param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

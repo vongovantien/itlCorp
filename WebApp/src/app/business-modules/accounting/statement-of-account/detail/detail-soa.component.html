@@ -3,11 +3,20 @@
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
             [routerLink]="'/home/accounting/statement-of-account/edit'"
             [queryParams]="{ no: soa.soano, currency: 'VND' }"
-            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
+            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part' && soa.status !== 'Cs Confirmed' ">
             <span>
                 <i class="la la-edit"></i>
                 <span>
                     Edit
+                </span>
+            </span>
+        </button>
+        <button class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="csConfirmed()"
+            *ngIf="soa.status !== 'Cs Confirmed'">
+            <span>
+                <i class="la la-check"></i>
+                <span>
+                    Sync
                 </span>
             </span>
         </button>

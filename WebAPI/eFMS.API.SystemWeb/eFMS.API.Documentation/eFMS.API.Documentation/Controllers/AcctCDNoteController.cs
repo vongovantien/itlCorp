@@ -197,5 +197,19 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
+
+        /// <summary>
+        /// CS Confirmed by cdNo
+        /// </summary>
+        /// <param name="cdNo">Soa No</param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("CsConfirmed")]
+        [Authorize]
+        public IActionResult CsConfirmed(string cdNo)
+        {
+            var result = cdNoteServices.CsConfirmed(cdNo);
+            return Ok(result);
+        }
     }
 }

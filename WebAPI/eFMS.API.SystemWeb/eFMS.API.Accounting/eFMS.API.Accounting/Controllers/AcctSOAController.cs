@@ -394,5 +394,19 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// CS Confirmed by soa no
+        /// </summary>
+        /// <param name="soaNo">Soa No</param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("CsConfirmed")]
+        [Authorize]
+        public IActionResult CsConfirmed(string soaNo)
+        {
+            var result = acctSOAService.CsConfirmed(soaNo);
+            return Ok(result);
+        }
     }
 }
