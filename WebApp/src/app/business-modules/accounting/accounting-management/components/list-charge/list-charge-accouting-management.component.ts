@@ -329,9 +329,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
     updateForChargerByFieldName(field: string, value: string) {
         this.charges.forEach(ele => {
-            if (!!ele[field]) {
-                // continue
-            } else {
+            if (ele[field] === null || ele[field] === "") {
                 ele[field] = value;
             }
         });
