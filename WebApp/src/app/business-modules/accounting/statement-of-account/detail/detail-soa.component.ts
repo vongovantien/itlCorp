@@ -7,7 +7,7 @@ import { SOA } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
-import { ReportPreviewComponent } from '@common';
+import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { listAnimation } from '@animations';
 @Component({
     selector: 'app-statement-of-account-detail',
@@ -16,6 +16,7 @@ import { listAnimation } from '@animations';
 })
 export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmSoaPopup: ConfirmPopupComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
 
@@ -28,6 +29,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     dataReport: any = null;
     initGroup: any[] = [];
     TYPE: string = 'LIST';
+    confirmMessage: string = '';
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -222,7 +224,7 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     csConfirmed() {
         this._progressRef.start();
-        this._accoutingRepo.csConfirmed(this.soaNO)
+        this._accoutingRepo.updateSyncStatusSoa(this.soaNO)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })
@@ -280,6 +282,30 @@ export class StatementOfAccountDetailComponent extends AppList {
         } else {
             this.TYPE = 'GROUP';
         }
+    }
+
+    showConfirmed() {
+        this._toastService.success("Tính năng đang phát triển");
+
+        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        // this.confirmSoaPopup.show();
+    }
+
+    onConfirmSoa() {
+        this._toastService.success("Tính năng đang phát triển");
+        this.confirmSoaPopup.hide();
+    }
+
+    getDataSoaToSync() {
+
+    }
+
+    syncToAccountant() {
+        // Gọi API Bravo
+    }
+
+    updateSyncStatusSoa() {
+        // Update Sync Status
     }
 }
 
