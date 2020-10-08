@@ -10,8 +10,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': isSubmitted && validateEta_FirstNotice(hbl.eta, hblArrivalNote.arrivalFirstNotice)}">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && isInvalidFirstNote}">
                         <label>First Notice</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -28,7 +27,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': isSubmitted && validateFirst_SecondNotice(hblArrivalNote.arrivalFirstNotice, hblArrivalNote.arrivalSecondNotice)}">
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && isInvalidSecondNote}">
                         <label>Second Notice</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
