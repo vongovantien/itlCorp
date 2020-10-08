@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppList } from '@app';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
 import { SortService } from '@services';
 import { AdvancePayment, AdvancePaymentRequest, BravoAdvance, User } from '@models';
 import { SystemConstants } from '@constants';
@@ -26,6 +26,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
     templateUrl: './advance-payment.component.html',
 })
 export class AdvancePaymentComponent extends AppList {
+
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
@@ -50,7 +51,7 @@ export class AdvancePaymentComponent extends AppList {
     messageVoucherExisted: string = '';
 
 
-    advanceSyncList: AdvancePayment[] = [];
+    advanceSyncList: BravoAdvance[] = [];
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -60,6 +61,7 @@ export class AdvancePaymentComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _router: Router,
         private _store: Store<IAppState>,
+        private _partnerAPI: PartnerAPIRepo
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
@@ -85,6 +87,7 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Voucher No', field: 'voucherNo', sortable: true },
             { title: 'Voucher Date', field: 'voucherDate', sortable: true },
             { title: 'Sync Date', field: 'lastSyncDate', sortable: true },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
 
         ];
 
@@ -98,7 +101,6 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
-        //this.getListAdvancePayment();
 
     }
 
@@ -360,20 +362,27 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     syncBravo() {
-        this.advanceSyncList = this.advancePayments.filter(x => x.isChecked && x.statusApproval === 'Done');
-        if (!this.advanceSyncList.length) {
+        const advanceSyncList = this.advancePayments.filter(x => x.isChecked && x.statusApproval === 'Done');
+        if (!advanceSyncList.length) {
             this._toastService.warning("Please select advance to sync");
             return;
         }
 
-        const hasSynced: boolean = this.advanceSyncList.some(x => !!x.lastSyncDate);
+        const hasSynced: boolean = advanceSyncList.some(x => !!x.lastSyncDate);
         if (hasSynced) {
-            const advanceHasSynced = this.advanceSyncList.filter(x => !!x.lastSyncDate).map(a => a.advanceNo).toString();
+            const advanceHasSynced = advanceSyncList.filter(x => !!x.lastSyncDate).map(a => a.advanceNo).toString();
             this._toastService.warning(`${advanceHasSynced} had synced, Please recheck!`);
             return;
         }
 
-        const body: BravoAdvance = new BravoAdvance();
+        const advanceIds: string[] = advanceSyncList.map(x => x.id);
+        this._accoutingRepo.getListAdvanceSyncData(advanceIds)
+            .subscribe((res: BravoAdvance[]) => {
+                this.advanceSyncList = (res || []);
+
+                console.log(this.advanceSyncList);
+            });
+
 
         // TODO API : lấy danh sách data map với bravo theo list advance
 

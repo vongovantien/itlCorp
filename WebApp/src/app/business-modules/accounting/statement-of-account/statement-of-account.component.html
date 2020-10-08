@@ -36,7 +36,7 @@
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                         title="Remove" (click)="prepareDeleteSOA(soa)"
-                                                        *ngIf="(soa.status === 'New' || soa.status === 'Need Revise') && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
+                                                        *ngIf="(soa.status === 'New' || soa.status === 'Need Revise') && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part' && soa.syncStatus !== 'Synced'">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
@@ -87,6 +87,18 @@
                                             </td>
                                             <td>
                                                 <span>{{soa.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
+                                            </td>
+                                            <td [ngSwitch]="soa.syncStatus">
+                                                <span *ngSwitchCase="'Synced'" class="text-success">
+                                                    {{soa.syncStatus}}</span>
+                                                <span *ngSwitchCase="'Rejected'" class="text-danger">
+                                                    {{soa.syncStatus}}</span>
+                                                <span *ngSwitchDefault>
+                                                    {{soa.syncStatus}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span>{{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
                                             </td>
                                         </tr>
                                         <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>

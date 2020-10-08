@@ -16,8 +16,8 @@
                         </button>
                         <div class="dropdown-menu" role="menu" aria-labelledby="button-nested">
                             <a class="dropdown-item pointer" (click)="preview()">Debit Note Preview</a>
-                            <a class="dropdown-item pointer" (click)="exportCDNote()">Debite Note Excel</a>
-                        </div>                    
+                            <a class="dropdown-item pointer" (click)="exportCDNote()">Debit Note Excel</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -26,98 +26,106 @@
                     <div class="div-inside bg-secondary m--margin-bottom-15">
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Subject To : </span>
                                     {{CdNoteDetail.partnerNameEn}}
                                 </div>
-                                <div class="d-flex">
+                                <div class="d-flex m--margin-top-5">
                                     <span class="font-weight-bold"> Address: </span>
                                     {{CdNoteDetail.partnerShippingAddress}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Tel: </span>
                                     {{CdNoteDetail.partnerTel}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Taxcode: </span>
                                     {{CdNoteDetail.partnerTaxcode}}
                                 </div>
-                                <div class="m--margin-top-10">
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold"> Port of Loading: </span>
-                                        {{ CdNoteDetail.pol }}, {{CdNoteDetail.polCountry}}
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold"> Port of Destination: </span>
-                                        {{ CdNoteDetail.pod }}, {{CdNoteDetail.podCountry}}
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold"> Package Quantity: </span>
-                                        {{ CdNoteDetail.sumPackages | number: '1.2-2' }}
-                                    </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold">Sync Status: </span>
+                                    <span [ngSwitch]="CdNoteDetail.syncStatus">
+                                        <span *ngSwitchCase="'Synced'" class="text-success m--font-bolder">
+                                            {{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchCase="'Rejected'" class="text-danger m--font-bolder">
+                                            {{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchDefault>
+                                            {{CdNoteDetail.syncStatus}}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold">Last Sync: </span>
+                                    <span>{{CdNoteDetail.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold"> Package Quantity: </span>
+                                    {{ CdNoteDetail.sumPackages | number: '1.2-2' }}
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Job ID: </span>
                                     {{CdNoteDetail.jobNo}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Master Bill of Lading No: </span>
                                     {{CdNoteDetail.mbLadingNo}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Service Mode: </span>
                                     {{CdNoteDetail.serviceMode}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Service Date: </span>
                                     {{CdNoteDetail.serviceDate | date: 'dd/MM/yyyy'}}
                                 </div>
-                                <div class="m--margin-top-10">
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold"> G.W: </span>
-                                        {{ CdNoteDetail.gw | number: '1.2-2' }}
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold">Container Quantity: </span>
-                                        {{ CdNoteDetail.sumContainers | number: '1.2-2' }}
-                                    </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold"> Port of Loading: </span>
+                                    {{ CdNoteDetail.pol }}, {{CdNoteDetail.polCountry}}
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold"> Port of Destination: </span>
+                                    {{ CdNoteDetail.pod }}, {{CdNoteDetail.podCountry}}
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold"> G.W: </span>
+                                    {{ CdNoteDetail.gw | number: '1.2-2' }}
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold">Container Quantity: </span>
+                                    {{ CdNoteDetail.sumContainers | number: '1.2-2' }}
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> House Bill of Lading No: </span>
                                     {{CdNoteDetail.hbLadingNo}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold">Product Service: </span>
                                     {{CdNoteDetail.productService}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold">Shipment Mode: </span>
                                     {{CdNoteDetail.jobNo}}
                                 </div>
-                                <div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold">Finish Date: </span>
                                     {{CdNoteDetail.etd | date: 'dd/MM/yyyy'}}
                                 </div>
-                                <div class="m--margin-top-10">
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold"> CBM: </span>
-                                        {{ CdNoteDetail.cbm | number: '1.2-2' }}
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold">SOA: </span>
-                                        {{CdNoteDetail.soaNo}}
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="font-weight-bold">
-                                            Locked:
-                                        </span>
-                                        <span
-                                            [ngClass]="CdNoteDetail.isLoocked ? 'm--font-danger' : ''">{{CdNoteDetail.isLoocked ? 'Yes' : 'No'}}</span>
-                                    </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold"> CBM: </span>
+                                    {{ CdNoteDetail.cbm | number: '1.2-2' }}
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold">SOA: </span>
+                                    {{CdNoteDetail.soaNo}}
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold">Locked: </span>
+                                    <span
+                                        [ngClass]="CdNoteDetail.isLoocked ? 'm--font-danger' : ''">{{CdNoteDetail.isLoocked ? 'Yes' : 'No'}}</span>
                                 </div>
                             </div>
                         </div>
@@ -247,6 +255,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
+                    [disabled]="CdNoteDetail.syncStatus === 'Synced'"
                     (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                     <span>
                         <i class="la la-trash"></i>
@@ -255,12 +264,22 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-success  m-btn--icon m-btn--uppercase" [disabled]="CdNoteDetail.isLoocked"
+                <button class="btn btn-success  m-btn--icon m-btn--uppercase"
+                    [disabled]="CdNoteDetail.isLoocked || CdNoteDetail.syncStatus === 'Synced'"
                     (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
                         <span>
                             Edit detail
+                        </span>
+                    </span>
+                </button>
+                <button class="btn btn-warning  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
+                    [disabled]="CdNoteDetail.syncStatus === 'Synced'">
+                    <span>
+                        <i class="la la-check"></i>
+                        <span>
+                            Confirmed
                         </span>
                     </span>
                 </button>
@@ -279,7 +298,7 @@
 
 <ops-cd-note-add-popup (onUpdate)="onUpdateCdNote($event)"></ops-cd-note-add-popup>
 
-<confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<confirm-popup (onSubmit)="onConfirmCdNote()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
 <info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>
 

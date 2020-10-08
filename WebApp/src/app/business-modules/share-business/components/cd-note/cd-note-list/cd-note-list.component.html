@@ -75,13 +75,23 @@
                             (click)="sortCdNotes('soaNo')">
                             <span>SOA</span>
                         </th>
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'syncStatus'), 'sorting_desc': (!isDesc && sortKey == 'syncStatus') }"
+                            (click)="sortCdNotes('syncStatus')">
+                            <span>Sync Status</span>
+                        </th>
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'lastSyncDate'), 'sorting_desc': (!isDesc && sortKey == 'lastSyncDate') }"
+                            (click)="sortCdNotes('lastSyncDate')">
+                            <span>Last Sync</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="tbody-group">
                     <ng-container *ngIf="!isLoading && !!cdNoteGroups.length">
                         <ng-container *ngFor="let cdNoteGroup of cdNoteGroups;  let i = index; trackBy: trackByFn">
                             <tr class="collapse-toggle-row tgroup">
-                                <td colspan="8">
+                                <td colspan="10">
                                     <label class="btn-toggle-collapse m--font-danger" title="view more"
                                         data-toggle="collapse" [attr.data-target]="'#id-cd-00' + i">
                                         <i class="la la-minus-square"></i>
@@ -92,7 +102,7 @@
                                 </td>
                             </tr>
                             <tr class="collapse-panel-row">
-                                <td colspan="8">
+                                <td colspan="10">
                                     <div class="collapse show" [id]="'id-cd-00' + i">
                                         <table class="table table-striped table-brand table-collapse-group dataTable">
                                             <tbody>
@@ -108,8 +118,8 @@
                                                             </button>
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                                *ngIf="cdNote.status !=='Cs Confirmed'" title="Remove"
-                                                                (click)="checkDeleteCdNote(cdNote.id)">
+                                                                [disabled]="cdNote.syncStatus === 'Synced'"
+                                                                title="Remove" (click)="checkDeleteCdNote(cdNote.id)">
                                                                 <i class="la la-trash"></i>
                                                             </button>
                                                         </div>
@@ -125,7 +135,6 @@
                                                         <span>{{cdNote.total_charge}}</span>
                                                     </td>
                                                     <td>
-                                                        <!-- {{cdNote.total | number:'1.3-3'}} -->
                                                         <span
                                                             *ngFor="let item of cdNote.balanceCdNote; let k = index; trackBy: trackByFn">
                                                             <span>
@@ -143,6 +152,18 @@
                                                     </td>
                                                     <td>
                                                         <span>{{cdNote.soaNo}}</span>
+                                                    </td>
+                                                    <td [ngSwitch]="cdNote.syncStatus">
+                                                        <span *ngSwitchCase="'Synced'" class="text-success">
+                                                            {{cdNote.syncStatus}}</span>
+                                                        <span *ngSwitchCase="'Rejected'" class="text-danger">
+                                                            {{cdNote.syncStatus}}</span>
+                                                        <span *ngSwitchDefault>
+                                                            {{cdNote.syncStatus}}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span>{{cdNote.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -167,4 +188,4 @@
 
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
-<info-popup [body]="'You can not delete this C/D Note, because it was issued SOA. Please recheck!'"></info-popup>
+<info-popup [body]="'You can not delete this C/D Note, because it was issued SOA/Voucher/VAT Invoice. Please recheck!'"></info-popup>

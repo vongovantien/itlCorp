@@ -797,7 +797,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
                 var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
-                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdComManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
 
                 var parameter = new DepartSaleReportParameter
                 {
@@ -878,7 +878,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
                 var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
-                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdComManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
 
                 var parameter = new QuaterSaleReportParameter
                 {
