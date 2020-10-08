@@ -61,6 +61,26 @@
                                     </span>
                                     <span>{{CdNoteDetail.hbLadingNo}}</span>
                                 </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        {{labelDetail.syncStatus}}:
+                                    </span>
+                                    <span [ngSwitch]="CdNoteDetail.syncStatus">
+                                        <span *ngSwitchCase="'Synced'" class="text-success m--font-bolder">
+                                            {{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchCase="'Rejected'" class="text-danger m--font-bolder">
+                                            {{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchDefault>
+                                            {{CdNoteDetail.syncStatus}}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        {{labelDetail.lastSync}}:
+                                    </span>
+                                    <span>{{CdNoteDetail.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                </div>
                             </div>
                             <div class="col-xl-8">
                                 <div class="row">
@@ -234,7 +254,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
-                    [disabled]="CdNoteDetail.status ==='Cs Confirmed'"
+                    [disabled]="CdNoteDetail.syncStatus === 'Synced'"
                     (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                     <span>
                         <i class="la la-trash"></i>
@@ -244,7 +264,7 @@
                     </span>
                 </button>
                 <button class="btn btn-success  m-btn--icon m-btn--uppercase"
-                    [disabled]="CdNoteDetail.isLoocked || CdNoteDetail.status ==='Cs Confirmed'"
+                    [disabled]="CdNoteDetail.isLoocked || CdNoteDetail.syncStatus === 'Synced'"
                     (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
@@ -253,8 +273,8 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="csConfirmed()"
-                    *ngIf="CdNoteDetail.status !== 'Cs Confirmed'">
+                <button class="btn btn-warning  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
+                    [disabled]="CdNoteDetail.syncStatus === 'Synced'">
                     <span>
                         <i class="la la-check"></i>
                         <span>
@@ -278,7 +298,7 @@
 
 <cd-note-add-popup (onUpdate)="onUpdateCdNote()"></cd-note-add-popup>
 
-<confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<confirm-popup (onSubmit)="onConfirmCdNote()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
 <info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>
 

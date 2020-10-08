@@ -40,8 +40,8 @@ export class AccountingRepo {
             );
     }
 
-    csConfirmed(soaNo: string) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CsConfirmed`, {}, { soaNo: soaNo })
+    updateSyncStatusSoa(soaNo: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/UpdateSyncStatus`, {}, { soaNo: soaNo })
             .pipe(
                 map((data: any) => data)
             );

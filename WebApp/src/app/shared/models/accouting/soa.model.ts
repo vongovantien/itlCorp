@@ -36,6 +36,8 @@ export class SOA {
     customer: string = '';
     commodityGroupId: any = null;
     paymentStatus: string = '';
+    lastSyncDate: string = '';
+    syncStatus: string = '';
 
     constructor(data?: any) {
         const self = this;
