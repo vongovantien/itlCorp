@@ -484,6 +484,34 @@ namespace eFMS.API.Documentation.DL.Services
             return surcharges;
         }
 
+        public HandleState CsConfirmed(string cdNo)
+        {
+            var cdNote = DataContext.Get(x => x.Code == cdNo).FirstOrDefault();
+            if (cdNote == null) return null;
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    cdNote.UserModified = currentUser.UserID;
+                    cdNote.DatetimeModified = DateTime.Now;
+                    cdNote.Status = "Cs Confirmed";
+                    var hsUpdateSOA = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
+                    trans.Commit();
+                    return hsUpdateSOA;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+
+        }
+
         public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo)
         {
             var places = placeRepository.Get();
@@ -676,6 +704,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.HbConsignees = hbConsignees; //Consignee
             soaDetails.HbChargeWeight = hbCw;
             soaDetails.FlexId = cdNote.FlexId;
+            soaDetails.Status = cdNote.Status;
             return soaDetails;
         }
 

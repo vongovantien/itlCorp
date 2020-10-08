@@ -123,7 +123,7 @@ namespace eFMS.API.ForPartner.Controllers
             var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
             if (debitCharges.Count == 0)
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để tạo hóa đơn. Vui lòng kiểm tra lại!" };
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để tạo hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
 
@@ -132,17 +132,17 @@ namespace eFMS.API.ForPartner.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Tạo mới hóa đơn thành công", Data = model };
             if (!hs.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = "Tạo mới hóa đơn thất bại" };
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() + ". Tạo mới hóa đơn thất bại", Data = model };
                 return BadRequest(_result);
             }
             return Ok(result);
         }
 
         /// <summary>
-        /// Replace Invoice (Delete and Create Invoice)
+        /// Replace Invoice (Delete old and Create New Invoice)
         /// </summary>
         /// <param name="model">model to replace invoice</param>
-        /// <param name="apiKey"></param>
+        /// <param name="apiKey">API Key</param>
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("ReplaceInvoiceData")]
@@ -163,7 +163,7 @@ namespace eFMS.API.ForPartner.Controllers
             var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
             if (debitCharges.Count == 0)
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để thay thế hóa đơn. Vui lòng kiểm tra lại!" };
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để thay thế hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
 
@@ -175,7 +175,7 @@ namespace eFMS.API.ForPartner.Controllers
             var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey);
             if (!hsDeleteInvoice.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = "Xóa hóa đơn cũ thất bại" };
+                ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = hsDeleteInvoice.Message.ToString() + ". Xóa hóa đơn cũ thất bại", Data = model };
                 return BadRequest(_result);
             }
             #endregion --- Delete Invoice Old by PreReferenceNo ---
@@ -199,7 +199,7 @@ namespace eFMS.API.ForPartner.Controllers
             ResultHandle result = new ResultHandle { Status = hsInsertInvoice.Success, Message = "Thay thế hóa đơn thành công", Data = model };
             if (!hsInsertInvoice.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hsInsertInvoice.Success, Message = "Thay thế hóa đơn thất bại", Data = model };
+                ResultHandle _result = new ResultHandle { Status = hsInsertInvoice.Success, Message = hsInsertInvoice.Message.ToString() + ". Thay thế hóa đơn thất bại", Data = model };
                 return BadRequest(_result);
             }
             return Ok(result);
@@ -208,8 +208,8 @@ namespace eFMS.API.ForPartner.Controllers
         /// <summary>
         /// Canceling Invoice (Delete Invoice)
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="apiKey"></param>
+        /// <param name="model">model to canceling invoice</param>
+        /// <param name="apiKey">API Key</param>
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("CancellingInvoice")]
@@ -230,16 +230,40 @@ namespace eFMS.API.ForPartner.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Hủy hóa đơn thành công", Data = model };
             if (!hs.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = "Hủy hóa đơn thất bại" };
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() + ". Hủy hóa đơn thất bại", Data = model };
                 return BadRequest(_result);
             }
             return Ok(result);
         }
 
+        /// <summary>
+        /// Reject Data
+        /// </summary>
+        /// <param name="model">model to reject data</param>
+        /// <param name="apiKey">API Key</param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         [HttpPut("RejectData")]
-        public IActionResult RejectData(RejectData model)
+        public IActionResult RejectData(RejectData model, [Required] string apiKey, [Required] string hash)
         {
-            return Ok(new ResultHandle { Status = true, Message = "Reject data thành công", Data = model });
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return Unauthorized();
+            }
+            //Tạm thời comment
+            //if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            //{
+            //    return Unauthorized();
+            //}
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = accountingManagementService.RejectData(model, apiKey);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Reject data thành công", Data = model };
+            if (!hs.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() + ". Reject data thất bại", Data = model };
+                return BadRequest(_result);
+            }
+            return Ok(result);
         }
     }
 }

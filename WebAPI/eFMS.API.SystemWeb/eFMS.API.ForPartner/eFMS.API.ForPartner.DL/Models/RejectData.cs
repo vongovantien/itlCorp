@@ -2,7 +2,7 @@
 {
     public class RejectData
     {
-        public string ReferenceID { get; set; } //DebitNo, Soa No
-        public string Type { get; set; } // CD Note, SOA, Voucher
+        public string ReferenceID { get; set; } //ID CDNote, ID Soa, ID Voucher, ID Advance, ID Settlement
+        public string Type { get; set; } // CDNOTE, SOA, VOUCHER, ADVANCE, SETTLEMENT
     }
 }

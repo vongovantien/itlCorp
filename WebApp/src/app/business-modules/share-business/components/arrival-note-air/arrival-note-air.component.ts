@@ -14,7 +14,7 @@ import { SystemConstants } from 'src/constants/system.const';
 
 import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail, Container, CsTransaction } from '@models';
 
-import { getTransactionLocked, GetDetailHBLAction, getTransactionDetailCsTransactionState } from '../../store';
+import { getTransactionLocked, GetDetailHBLAction, getTransactionDetailCsTransactionState, getDetailHBlState } from '../../store';
 import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-note/arrival-note.component';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
@@ -40,7 +40,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     headers: CommonInterface.IHeaderTable[];
 
     userLogged: User = new User();
-    hbl: CsTransactionDetail;
+    hbl: CsTransactionDetail = new CsTransactionDetail();
 
     listCharges: Charge[] = [];
     listUnits: Observable<Unit[]>;
@@ -57,6 +57,8 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     selectedFreightCharge: ArrivalFreightCharge;
     hblid: string;
 
+    isInvalidFirstNote: boolean = false;
+    isInvalidSecondNote: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -109,7 +111,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     this.hblArrivalNote.arrivalHeader = data.arrivalHeader;
                     this.hblArrivalNote.arrivalFooter = data.arrivalFooter;
                     this.hblArrivalNote.csArrivalFrieghtCharges = data.csArrivalFrieghtCharges || [];
-
+                    this.hblArrivalNote.hblid = data.hblid;
 
                     if (!data.arrivalNo) {
                         return this._store.select(getTransactionDetailCsTransactionState);  // * Stream 2: get shipment detail
@@ -146,7 +148,24 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             .subscribe((res) => { console.log("subscribe", res); });
 
         this.isLocked = this._store.select(getTransactionLocked);
+
+        this._store.select(getDetailHBlState)
+            .pipe(
+                skip(1),
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CsTransactionDetail) => {
+                    if (!!res) {
+                        this.hbl = res;
+                        console.log(this.hbl);
+
+                    }
+                },
+            );
     }
+
 
     configData() {
         this.headers = [
@@ -290,12 +309,33 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     }
 
     validateEta_FirstNotice(eta: any, firstNote: any) {
+        console.log(eta);
         if (!eta || !firstNote) {
             return false;
         }
         const _eta = new Date(eta).getTime();
         const _firstNote = new Date(firstNote.startDate).getTime();
         return (_firstNote < _eta) ? true : false;
+    }
+
+    checkValidateFirstNote() {
+        if (!this.validateEta_FirstNotice(this.hbl.eta, this.hblArrivalNote.arrivalFirstNotice)) {
+            this.isInvalidFirstNote = false;
+        } else {
+            this.isInvalidFirstNote = true;
+        }
+
+        return !this.isInvalidFirstNote;
+    }
+
+    checkValidateSecondtNote() {
+        if (!this.validateFirst_SecondNotice(this.hblArrivalNote.arrivalFirstNotice, this.hblArrivalNote.arrivalSecondNotice)) {
+            this.isInvalidSecondNote = false;
+        } else {
+            this.isInvalidSecondNote = true;
+        }
+
+        return !this.isInvalidSecondNote;
     }
 
     saveArrivalNote() {

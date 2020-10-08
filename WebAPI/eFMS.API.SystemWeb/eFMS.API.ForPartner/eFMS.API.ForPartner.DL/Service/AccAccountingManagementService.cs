@@ -32,6 +32,8 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPartner> partnerRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        private readonly IContextBase<AcctSettlementPayment> acctSettlementRepo;
+        private readonly IContextBase<AcctCdnote> acctCdNoteRepo;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -46,7 +48,9 @@ namespace eFMS.API.ForPartner.DL.Service
             IStringLocalizer<ForPartnerLanguageSub> localizer,
             IContextBase<CatPartner> catPartner,
             ICurrencyExchangeService exchangeService,
-            IContextBase<CatCurrencyExchange> catCurrencyExchange
+            IContextBase<CatCurrencyExchange> catCurrencyExchange,
+            IContextBase<AcctSettlementPayment> acctSettlementPayment,
+            IContextBase<AcctCdnote> acctCdnote
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -59,6 +63,8 @@ namespace eFMS.API.ForPartner.DL.Service
             stringLocalizer = localizer;
             partnerRepo = catPartner;
             currencyExchangeService = exchangeService;
+            acctSettlementRepo = acctSettlementPayment;
+            acctCdNoteRepo = acctCdnote;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -96,7 +102,6 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     valid = false;
                 }
-
             }
 
             return valid;
@@ -109,7 +114,6 @@ namespace eFMS.API.ForPartner.DL.Service
             return Md5Helper.CreateMD5(bodyString);
         }
 
-       
         #region --- CRUD INVOICE ---
         public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey)
         {
@@ -170,7 +174,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             }
 
                             //Cập nhật số RefNo cho phí OBH
-                            foreach(var charge in obhCharges)
+                            foreach (var charge in obhCharges)
                             {
                                 CsShipmentSurcharge surcharge = surchargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                                 surcharge.FinalExchangeRate = charge.ExchangeRate;
@@ -221,8 +225,8 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 try
                 {
-                    var data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo 
-                                                 && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault(); 
+                    var data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo
+                                                 && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault();
                     if (data == null) return new HandleState((object)"Không tìm thấy hóa đơn");
 
                     HandleState hs = DataContext.Delete(x => x.ReferenceNo == model.ReferenceNo
@@ -243,9 +247,9 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.AmountVnd = charge.VatAmountVnd = null;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
-                            var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);                    
+                            var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
-                        
+
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
                         trans.Commit();
@@ -361,7 +365,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
                     decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
                     total += exchangeRate * surcharge.Total;
-                });                
+                });
             }
             return total;
         }
@@ -380,12 +384,12 @@ namespace eFMS.API.ForPartner.DL.Service
 
             try
             {
-                if(string.IsNullOrEmpty(voucherNo))
+                if (string.IsNullOrEmpty(voucherNo))
                 {
                     return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
                 }
                 AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.VoucherNo == voucherNo)?.FirstOrDefault();
-                if(adv == null)
+                if (adv == null)
                 {
                     return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
                 }
@@ -464,6 +468,206 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         #endregion ---Advance ---
+
+        #region --- REJECT DATA ---
+        public HandleState RejectData(RejectData model, string apiKey)
+        {
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+
+            var result = new HandleState();
+            switch (model.Type?.ToUpper())
+            {
+                case "ADVANCE":
+                    result = RejectAdvance(model.ReferenceID);
+                    break;
+                case "SETTLEMENT":
+                    result = RejectSettlement(model.ReferenceID);
+                    break;
+                case "SOA":
+                    result = RejectSoa(model.ReferenceID);
+                    break;
+                case "CDNOTE":
+                    result = RejectCdNote(model.ReferenceID);
+                    break;
+                case "VOUCHER":
+                    result = RejectVoucher(model.ReferenceID);
+                    break;
+                default:
+                    return new HandleState((object)"Không tìm thấy loại reject");
+            }
+            return result;
+        }
+
+        private HandleState RejectAdvance(string id)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var _id = Guid.Empty;
+                    Guid.TryParse(id, out _id);
+                    var advance = acctAdvanceRepository.Get(x => x.Id == _id).FirstOrDefault();
+                    if (advance == null) return new HandleState((object)"Không tìm thấy advance");
+                    advance.SyncStatus = "REJECTED";
+                    advance.UserModified = currentUser.UserID;
+                    advance.DatetimeModified = DateTime.Now;
+                    HandleState hs = acctAdvanceRepository.Update(advance, x => x.Id == advance.Id, false);
+                    if (hs.Success)
+                    {
+                        var smAdvance = acctAdvanceRepository.SubmitChanges();
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        private HandleState RejectSettlement(string id)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var _id = Guid.Empty;
+                    Guid.TryParse(id, out _id);
+                    var settlement = acctSettlementRepo.Get(x => x.Id == _id).FirstOrDefault();
+                    if (settlement == null) return new HandleState((object)"Không tìm thấy settlement");
+                    settlement.SyncStatus = "REJECTED";
+                    settlement.UserModified = currentUser.UserID;
+                    settlement.DatetimeModified = DateTime.Now;
+                    HandleState hs = acctSettlementRepo.Update(settlement, x => x.Id == settlement.Id, false);
+                    if (hs.Success)
+                    {
+                        var smSettlement = acctSettlementRepo.SubmitChanges();
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        private HandleState RejectSoa(string id)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var _id = 0;
+                    int.TryParse(id, out _id);
+                    var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
+                    if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
+                    soa.SyncStatus = "REJECTED";
+                    soa.UserModified = currentUser.UserID;
+                    soa.DatetimeModified = DateTime.Now;
+                    HandleState hs = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
+                    if (hs.Success)
+                    {
+                        var smSoa = acctSOARepository.SubmitChanges();
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        private HandleState RejectCdNote(string id)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var _id = Guid.Empty;
+                    Guid.TryParse(id, out _id);
+                    var cdNote = acctCdNoteRepo.Get(x => x.Id == _id).FirstOrDefault();
+                    if (cdNote == null) return new HandleState((object)"Không tìm thấy CDNote");
+                    cdNote.SyncStatus = "REJECTED";
+                    cdNote.UserModified = currentUser.UserID;
+                    cdNote.DatetimeModified = DateTime.Now;
+                    HandleState hs = acctCdNoteRepo.Update(cdNote, x => x.Id == cdNote.Id, false);
+                    if (hs.Success)
+                    {
+                        var smCdNote = acctCdNoteRepo.SubmitChanges();
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        private HandleState RejectVoucher(string id)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var _id = Guid.Empty;
+                    Guid.TryParse(id, out _id);
+                    var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
+                    if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
+                    voucher.SyncStatus = "REJECTED";
+                    voucher.UserModified = currentUser.UserID;
+                    voucher.DatetimeModified = DateTime.Now;
+                    HandleState hs = DataContext.Update(voucher, x => x.Id == voucher.Id, false);
+                    if (hs.Success)
+                    {
+                        var sm = DataContext.SubmitChanges();
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+        #endregion --- REJECT DATA ---
 
     }
 }

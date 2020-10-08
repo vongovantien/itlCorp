@@ -40,6 +40,13 @@ export class AccountingRepo {
             );
     }
 
+    csConfirmed(soaNo: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CsConfirmed`, {}, { soaNo: soaNo })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
     getDetaiLSOA(soaNO: string, currency: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetBySoaNo/${soaNO}&${currency}`)
             .pipe(
@@ -654,6 +661,12 @@ export class AccountingRepo {
 
     previewSettlementPaymentMultiple(settlementNos: string[]) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/PreviewMultipleSettlementBySettlementNos`, settlementNos).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncAdvanceToAccountant(list: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/SyncAdvanceToAccountantSystem`, list).pipe(
             map((data: any) => data)
         );
     }
