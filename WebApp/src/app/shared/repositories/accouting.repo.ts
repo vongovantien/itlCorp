@@ -663,6 +663,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getListAdvanceSyncData(list: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListAdvanceSyncData`, list).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 
