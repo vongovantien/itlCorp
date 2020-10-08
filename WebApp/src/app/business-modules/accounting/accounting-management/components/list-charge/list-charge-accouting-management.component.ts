@@ -323,23 +323,17 @@ export class AccountingManagementListChargeComponent extends AppList implements 
             );
     }
 
-    onChangeInvoiceNo(invoiceNo: string) {
-        this.updateForAllCharge('invoiceNo', invoiceNo);
-
+    onBlurAnyCharge(e: any) {
+        this.updateForChargerByFieldName(e.target.name, e.target.value);
     }
 
-    onChangeSerieNo(serieNo: string) {
-        this.updateForAllCharge('serie', serieNo);
-    }
-
-    onChangeInvoiceDate(invoiceDate: string) {
-        this.updateForAllCharge('invoiceDate', invoiceDate);
-
-    }
-
-    updateForAllCharge(key: string, value: string) {
-        this.charges.forEach(c => {
-            c[key] = value;
+    updateForChargerByFieldName(field: string, value: string) {
+        this.charges.forEach(ele => {
+            if (!!ele[field]) {
+                // continue
+            } else {
+                ele[field] = value;
+            }
         });
     }
 
