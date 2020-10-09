@@ -224,7 +224,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                     warehouseId: shipment.warehouseId,
                                     firstCarrierBy: shipment.flightVesselName,
                                     freightPayment: !!shipment.paymentTerm ? [(this.termTypes).find(type => type.id === shipment.paymentTerm)] : null,
-                                    handingInformation: this.setDefaultHandlingInformation(shipment)
+                                    kgIb: 'K',
+                                    handingInformation: this.setDefaultHandlingInformation(shipment)                                   
                                 });
 
                                 // *  CR 14501
