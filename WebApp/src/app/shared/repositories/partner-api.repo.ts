@@ -9,13 +9,16 @@ export class PartnerAPIRepo {
     constructor(protected _api: ApiService) {
     }
 
+    loginBravo() {
+        return this._api.post(`${environment.HOST.ESB}/api/Login`, { username: "bravo", password: "br@vopro" }, null, { bravo: 123 });
+    }
+
     addSyncAdvanceBravo(listAdvances: BravoAdvance[]) {
         return this._api.post(`${environment.HOST.ESB}/api/Sync?func=EFMSAdvandeSyncAdd`, listAdvances);
     }
 
     updateSyncAdvanceBravo(listAdvances: BravoAdvance[]) {
         return this._api.post(`${environment.HOST.ESB}/api/Sync?func=EFMSAdvandeSyncUpdate`, listAdvances);
-
     }
 
     addSyncVoucherBravo(body: any) {
