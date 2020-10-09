@@ -196,6 +196,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
+                        this.getPagingData();
                         this.getPayments(this.selectedPayment.refNo);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
