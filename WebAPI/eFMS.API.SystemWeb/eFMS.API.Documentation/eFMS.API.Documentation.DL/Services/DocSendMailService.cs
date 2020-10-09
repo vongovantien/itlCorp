@@ -21,6 +21,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<CsShippingInstruction> csShippingInstructionRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
+        readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -30,7 +32,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<SysUser> sysUser,
             IContextBase<CatPlace> catPlace,
-            IContextBase<CsShippingInstruction> csShippingInstruction) : base(repository, mapper)
+            IContextBase<CsShippingInstruction> csShippingInstruction,
+            IContextBase<CatUnit> unitRepo,
+            IContextBase<CsMawbcontainer> csMawbcontainer) : base(repository, mapper)
         {
             currentUser = user;
             catPartnerRepo = catPartner;
@@ -39,6 +43,8 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserRepo = sysUser;
             catPlaceRepo = catPlace;
             csShippingInstructionRepository = csShippingInstruction;
+            unitRepository = unitRepo;
+            csMawbcontainerRepo = csMawbcontainer;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -178,12 +184,13 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case "SLI":
                     {
+                        var packageType = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
                         _subject = string.Format(@"ARRIVAL NOTICE- HB/L#: {0}// {1} - {2}// {3} {4}// {5}",
                         _housebill.Hwbno,
                         pol,
                         pod,
                         _housebill.PackageQty,
-                        _housebill.PackageType,
+                        packageType,
                         _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
                     }
                     break;
@@ -237,6 +244,113 @@ namespace eFMS.API.Documentation.DL.Services
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
             return emailContent;
+        }
+        #endregion
+
+        #region Mail infor Pre Alert Sea Export
+        public EmailContentModel GetInfoMailHBLPreAlerSeaExport(Guid hblId, string serviceId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault(); // Departure Airport
+            var _pod = catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault(); // Destination Airpor
+            var _saleman = sysUserRepo.Get(x => x.Id == _housebill.SaleManId).FirstOrDefault();
+            var _salemanDetail = sysEmployeeRepo.Get(x => x.Id == _saleman.EmployeeId).FirstOrDefault();
+            var _agentDetail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault();
+            var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var packageType = GetUnitNameById(_housebill.PackageType);
+            var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == _housebill.Id);
+
+            string _subject = string.Empty;
+            string _body = string.Empty;
+            if (serviceId == "SFE")
+            {
+                // Subject
+                _subject = string.Format(@"PRE ALERT –{0} – {1} // HBL: {2} // MBL: {3}// {4}// {5} // {6} // ETD: {7}",
+                _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageContainer, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+
+                // Body
+                string containerDetail = string.Empty;
+                foreach (var con in csMawbcontainers)
+                {
+                    string conType = GetUnitNameById(con.ContainerTypeId);
+                    string packType = GetUnitNameById(con.PackageTypeId);
+                    containerDetail += string.Format("<div>{0}x{1}, CTNR/SEAL NO.: {2}/{3}/{4}, {5} {6}, G.W: {7}, CBM: {8}</div>",
+                        con.Quantity, conType, con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType, con.Gw, con.Cbm);
+                }
+
+                var packageTotal = string.Empty;
+                foreach (var csMawbCon in csMawbcontainers.GroupBy(x => x.PackageTypeId))
+                {
+                    packageTotal += string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(csMawbCon.FirstOrDefault().PackageTypeId)));
+                }
+
+                string packTypeTotal = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
+                _body = string.Format(@"<div><b>Dear Sir/Madam,</b></div></br><div>Please find pre-alert docs in the attachment and confirm receipt.</div><br/>" +
+                                        "<div>POL :{0}</div><div>POD :{1}</div><br/>" +
+                                        "<div>VSL :{2}</div><div>ETD :{3}</div>" +
+                                        "<div>MBL :{4}({5}, {6})</div>" + containerDetail +
+                                        "<div>TOTAL: {7}, {8}, G.W: {9}, CBM: {10}</div>" +
+                                        "<div>HBL: {11} ({12}, {13})</div>" +
+                                        "<div>Shipper: {14}</div>" +
+                                        "<div>Cnee: {15}</div>" +
+                                        "<div>Notify: {16}</div>",
+                                        _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, _housebill.Etd.Value.ToString("dd MMM, yyyy"), _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
+                                        _housebill.PackageContainer, packageTotal, _housebill.GrossWeight, _housebill.Cbm,
+                                        _housebill.Hwbno, _housebill.Hbltype, _housebill.OceanVoyNo, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
+            }
+            else
+            {
+                // Subject
+                _subject = string.Format(@"PRE ALERT –{0} – {1} // HBL: {2} // MBL: {3}// {4} {5}// {6} // {7} // ETD: {8}",
+                _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageQty, packageType, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+
+                // Body
+                string packageDetail = string.Empty;
+                foreach (var con in csMawbcontainers)
+                {
+                    string conType = GetUnitNameById(con.ContainerTypeId);
+                    string packType = GetUnitNameById(con.PackageTypeId);
+                    packageDetail += string.Format("<div>{0} {1}, G.W: {2}, CBM: {3}</div>", con.PackageQuantity, packType, con.Gw, con.Cbm);
+                }
+
+                var packageTotal = string.Empty;
+                foreach (var csMawbCon in csMawbcontainers.GroupBy(x => x.PackageTypeId))
+                {
+                    packageTotal += string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(csMawbCon.FirstOrDefault().PackageTypeId)));
+                }
+                _body = string.Format(@"<div><b>Dear Sir/Madam,</b></div></br><div>Please find pre-alert docs in the attachment and confirm receipt.</div><br/>" +
+                                        "<div>POL :{0}</div><div>POD :{1}</div><br/>" +
+                                        "<div>VSL :{2}</div><div>ETD :{3}</div>" +
+                                        "<div>MBL :{4}({5}, {6})</div>" + packageDetail +
+                                        "<div>TOTAL: {7}, G.W: {8}, CBM: {9}</div>" +
+                                        "<div>HBL: {10} ({11}, {12})</div>" +
+                                        "<div>Shipper: {13}</div>" +
+                                        "<div>Cnee: {14}</div>" +
+                                        "<div>Notify: {15}</div>",
+                                        _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, _housebill.Etd.Value.ToString("dd MMM, yyyy"), _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
+                                        packageTotal, _housebill.GrossWeight, _housebill.Cbm,
+                                        _housebill.Hwbno, _housebill.Hbltype, _housebill.OceanVoyNo, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
+            }
+
+
+            var emailContent = new EmailContentModel();
+            emailContent.From = "Info FMS";
+            emailContent.To = _agentDetail?.Email;
+            emailContent.Cc = _salemanDetail?.Email; //Email của Current User
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+        private string GetUnitNameById(short? id)
+        {
+            var result = string.Empty;
+            var data = unitRepository.Get(g => g.Id == id).FirstOrDefault();
+            result = (data != null) ? data.UnitNameEn : string.Empty;
+            return result;
         }
         #endregion
     }

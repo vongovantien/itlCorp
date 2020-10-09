@@ -43,6 +43,8 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     sendMailButtonName: string = '';
     serviceId: string = '';
+    name: string = '';
+    isPreAlert: boolean = false;
     isExitsArrivalNotice: boolean = false;
     isCheckedArrivalNotice: boolean = false;
     isExitsManifest: boolean = false;
@@ -89,6 +91,8 @@ export class ShareBusinessReAlertComponent extends AppList {
                     this.jobId = params.jobId;
                     this.hblId = params.hblId;
                     this.serviceId = params.serviceId;
+                    this.name = params.name;
+                    this.isPreAlert = this.name === "Pre Alert";
                     this.exportFileCrystalToPdf(params.serviceId);
                     this.getContentMail(params.serviceId, params.hblId, params.jobId);
 
@@ -296,12 +300,22 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.getInfoMailHBLAirExport(hblId);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                this.sendMailButtonName = "Send S.I";
-                this.getInfoMailSISeaExport(jobId);
+                if (this.isPreAlert) {
+                    this.sendMailButtonName = "Send Pre Alert";
+                    this.getInfoMailHBLPreAlertSeaExport(jobId, serviceId);
+                } else {
+                    this.sendMailButtonName = "Send S.I";
+                    this.getInfoMailSISeaExport(jobId);
+                }
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this.sendMailButtonName = "Send S.I";
-                this.getInfoMailSISeaExport(jobId);
+                if (this.isPreAlert) {
+                    this.sendMailButtonName = "Send Pre Alert";
+                    this.getInfoMailHBLPreAlertSeaExport(jobId, serviceId);
+                } else {
+                    this.sendMailButtonName = "Send S.I";
+                    this.getInfoMailSISeaExport(jobId);
+                }
                 break;
             default:
                 break;
@@ -351,6 +365,26 @@ export class ShareBusinessReAlertComponent extends AppList {
     getInfoMailHBLAirExport(hblId: string) {
         this._progressRef.start();
         this._documentRepo.getInfoMailHBLAirExport(hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.setValue({
+                        from: res.from,
+                        to: res.to,
+                        cc: res.cc,
+                        subject: res.subject,
+                        body: res.body
+                    });
+                },
+            );
+    }
+
+    getInfoMailHBLPreAlertSeaExport(hblId: string, serviceId: string) {
+        this._progressRef.start();
+        this._documentRepo.getInfoMailHBLPreAlertSeaExport(hblId, serviceId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })

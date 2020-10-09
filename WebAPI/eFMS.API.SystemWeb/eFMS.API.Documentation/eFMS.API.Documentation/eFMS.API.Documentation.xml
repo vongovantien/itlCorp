@@ -734,6 +734,13 @@
             <param name="hblId">Housebill ID</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLPreAlerSeaExport(System.Guid,System.String)">
+            <summary>
+            Get info mail housebill of Air Export
+            </summary>
+            <param name="hblId">Housebill ID</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailSISeaExport(System.Guid)">
             <summary>
             Get info mail shipping instruction of Sea Export

@@ -832,6 +832,12 @@ export class DocumentationRepo {
         );
     }
 
+    getInfoMailHBLPreAlertSeaExport(hblId: string, serviceId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLPreAlerSeaExport`, { hblId: hblId, serviceId: serviceId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getInfoMailSISeaExport(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailSISeaExport`, { jobId: jobId }).pipe(
             map((data: any) => data)
