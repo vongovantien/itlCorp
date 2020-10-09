@@ -378,9 +378,18 @@ export class AdvancePaymentComponent extends AppList {
         const advanceIds: string[] = advanceSyncList.map(x => x.id);
         this._accoutingRepo.getListAdvanceSyncData(advanceIds)
             .subscribe((res: BravoAdvance[]) => {
-                this.advanceSyncList = (res || []);
+                if (!!res.length) {
+                    this.advanceSyncList = (res || []);
+                    console.log(this.advanceSyncList);
 
-                console.log(this.advanceSyncList);
+                    this._partnerAPI.addSyncAdvanceBravo(this.advanceSyncList).subscribe(
+                        (res: any) => {
+                            console.log(res);
+                        }
+                    )
+
+                }
+
             });
 
 
