@@ -381,9 +381,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<Guid> invalidSVouchers = new List<Guid>();
             if (ids.Count > 0)
             {
-                invalidSVouchers = DataContext.Get(x => ids.Contains(x.Id) && (
-                || x.SyncStatus == AccountingConstants.STATUS_SYNCED
-                ))
+                invalidSVouchers = DataContext.Get(x => ids.Contains(x.Id) && x.SyncStatus == AccountingConstants.STATUS_SYNCED)
                     .Select(x => x.Id)
                     .ToList();
 
