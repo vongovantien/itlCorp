@@ -52,6 +52,20 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+        [HttpPost("GetListCdNoteToSync")]
+        public IActionResult GetListCdNoteToSync(List<Guid> Ids, string type)
+        {
+            var result = accountingService.GetListCdNoteToSync(Ids, type);
+            return Ok(result);
+        }
+
+        [HttpPost("GetListSoaToSync")]
+        public IActionResult GetListSoaToSync(List<int> Ids, string type)
+        {
+            var result = accountingService.GetListSoaToSync(Ids, type);
+            return Ok(result);
+        }
+
         [HttpPut("SyncAdvanceToAccountantSystem")]
         [Authorize]
         public IActionResult SyncAdvanceToAccountantSystem(List<Guid> Ids)
