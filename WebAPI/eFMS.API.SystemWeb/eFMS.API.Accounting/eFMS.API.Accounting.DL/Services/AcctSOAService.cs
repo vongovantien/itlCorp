@@ -2087,6 +2087,10 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         air.NetAmount += air.OTH;
                     }
+                    if (air.FuelSurcharge.HasValue)
+                    {
+                        air.NetAmount += air.FuelSurcharge;
+                    }
                     var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
                     if (dataCharge.Any())
                     {
