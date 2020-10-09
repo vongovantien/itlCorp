@@ -774,12 +774,5 @@
             <param name="soaNo">Soa No</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.UpdateSyncStatus(System.String)">
-            <summary>
-            Update Sync Status by soa no
-            </summary>
-            <param name="soaNo">Soa No</param>
-            <returns></returns>
-        </member>
     </members>
 </doc>
