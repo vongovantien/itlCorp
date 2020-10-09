@@ -16,6 +16,7 @@ import { share } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
 
 import { NgxSpinnerService } from 'ngx-spinner';
+import { PartnerAPIRepo } from '../shared/repositories/partner-api.repo';
 
 
 @Component({
@@ -54,7 +55,8 @@ export class LoginComponent {
         private cookieService: CookieService,
         private _systemRepo: SystemRepo,
         private _cd: ChangeDetectorRef,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private _partnerAPI: PartnerAPIRepo
     ) {
     }
 
@@ -118,6 +120,9 @@ export class LoginComponent {
                             this.cookieService.set("__p", userInfoEncrypted.password_encrypt, 1, "/", location.hostname);
 
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
+
+                            // * Get Bravo token.
+                            this._partnerAPI.loginBravo().subscribe(console.log);
                         }
                     }).then(() => {
 
