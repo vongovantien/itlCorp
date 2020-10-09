@@ -393,20 +393,5 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSOAService.PreviewAccountStatementFull(soaNo);
             return Ok(result);
         }
-
-
-        /// <summary>
-        /// Update Sync Status by soa no
-        /// </summary>
-        /// <param name="soaNo">Soa No</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("UpdateSyncStatus")]
-        [Authorize]
-        public IActionResult UpdateSyncStatus(string soaNo)
-        {
-            var result = acctSOAService.UpdateSyncStatus(soaNo);
-            return Ok(result);
-        }
     }
 }

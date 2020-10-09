@@ -197,19 +197,6 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
-
-        /// <summary>
-        /// Update Sync Status by cdNo
-        /// </summary>
-        /// <param name="cdNo">Soa No</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("UpdateSyncStatus")]
-        [Authorize]
-        public IActionResult UpdateSyncStatus(string cdNo)
-        {
-            var result = cdNoteServices.UpdateSyncStatus(cdNo);
-            return Ok(result);
-        }
+        
     }
 }
