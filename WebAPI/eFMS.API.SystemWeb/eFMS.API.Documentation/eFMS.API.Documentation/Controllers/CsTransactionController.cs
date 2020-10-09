@@ -398,6 +398,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("PreviewSIFPLsheet")]
+        [Authorize]
         public IActionResult PreviewSIFPLsheet(Guid jobId, Guid hblId, string currency)
         {
             var result = csTransactionService.PreviewSIFFormPLsheet(jobId, hblId, currency);

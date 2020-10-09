@@ -132,7 +132,9 @@ namespace eFMS.API.Documentation.DL.Common
                 case PermissionRange.Owner:
                     if (model.PersonInCharge == currentUser.UserID
                         || model.UserCreated == currentUser.UserID
-                        || authorizeUserIds.Contains(model.PersonInCharge))
+                        || authorizeUserIds.Contains(model.PersonInCharge)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
@@ -142,7 +144,9 @@ namespace eFMS.API.Documentation.DL.Common
                         && model.DepartmentId == currentUser.DepartmentId
                         && model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.PersonInCharge))
+                        || authorizeUserIds.Contains(model.PersonInCharge)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
@@ -151,7 +155,9 @@ namespace eFMS.API.Documentation.DL.Common
                     if ((model.DepartmentId == currentUser.DepartmentId
                         && model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.PersonInCharge))
+                        || authorizeUserIds.Contains(model.PersonInCharge)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
@@ -159,14 +165,18 @@ namespace eFMS.API.Documentation.DL.Common
                 case PermissionRange.Office:
                     if ((model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.PersonInCharge))
+                        || authorizeUserIds.Contains(model.PersonInCharge)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
                     break;
                 case PermissionRange.Company:
                     if (model.CompanyId == currentUser.CompanyID
-                        || authorizeUserIds.Contains(model.PersonInCharge))
+                        || authorizeUserIds.Contains(model.PersonInCharge)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
