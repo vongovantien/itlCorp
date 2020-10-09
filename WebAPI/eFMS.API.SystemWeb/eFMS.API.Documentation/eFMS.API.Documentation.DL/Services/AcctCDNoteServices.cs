@@ -297,22 +297,18 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = currentUser.UserID;
-                        item.CreditNo = item.DebitNo = null;
+                        if (item.CreditNo == cdNote.Code)
+                        {
+                            item.CreditNo = null;
+                        }
+                        if (item.DebitNo == cdNote.Code)
+                        {
+                            item.DebitNo = null;
+                        }                        
                         var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
                     }
-
-                    //Cập nhật lại cd note code cho các charge cũ
-                    foreach (var item in model.listShipmentSurcharge.Where(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo)))
-                    {
-                        item.Cdclosed = true;
-                        item.DatetimeModified = DateTime.Now;
-                        item.UserModified = currentUser.UserID; // need update in the future 
-                        item.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
-                        var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
-                    }
-
-                    //Thêm mới cd note code cho các charge mới add
-                    foreach (var c in model.listShipmentSurcharge.Where(x => string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)))
+                    
+                    foreach (var c in model.listShipmentSurcharge)
                     {
                         var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
                         if (charge != null)
@@ -339,6 +335,7 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
+                            charge.Cdclosed = true;
                         }
                         var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                     }
@@ -463,36 +460,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surcharges = surchargeService.GetByHB(hbId);
             return surcharges;
         }
-
-        public HandleState UpdateSyncStatus(string cdNo)
-        {
-            var cdNote = DataContext.Get(x => x.Code == cdNo).FirstOrDefault();
-            if (cdNote == null) return null;
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    cdNote.UserModified = currentUser.UserID;
-                    cdNote.DatetimeModified = DateTime.Now;
-                    cdNote.SyncStatus = "Synced";
-                    cdNote.LastSyncDate = DateTime.Now;
-                    var hsUpdateSOA = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
-                    trans.Commit();
-                    return hsUpdateSOA;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
-            }
-
-        }
-
+        
         public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo)
         {
             var places = placeRepository.Get();
@@ -703,7 +671,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (cdNote.SyncStatus == "SYNCED") return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED]);
+                    if (cdNote.SyncStatus == "Synced") return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED]);
                     var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                     var isOtherSOA = charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Any();
                     if (isOtherSOA == true)

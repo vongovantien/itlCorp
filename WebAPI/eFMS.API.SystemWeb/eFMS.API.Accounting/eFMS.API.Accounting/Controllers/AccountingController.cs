@@ -46,16 +46,16 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPost("GetListSettlementSyncData")]
-        public IActionResult GetListSettlementSyncData(List<Guid> Ids)
+        public IActionResult GetListSettlementSyncData(List<Guid> ids)
         {
-            List<BravoSettlementModel> result = accountingService.GetListSettlementToSyncBravo(Ids);
+            List<BravoSettlementModel> result = accountingService.GetListSettlementToSyncBravo(ids);
             return Ok(result);
         }
 
         [HttpPost("GetListCdNoteToSync")]
-        public IActionResult GetListCdNoteToSync(List<Guid> Ids, string type)
+        public IActionResult GetListCdNoteToSync(List<Guid> ids, string type)
         {
-            var result = accountingService.GetListCdNoteToSync(Ids, type);
+            var result = accountingService.GetListCdNoteToSync(ids, type);
             return Ok(result);
         }
 
@@ -114,5 +114,38 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+        [HttpPut("SyncListCdNoteToAccountant")]
+        [Authorize]
+        public IActionResult SyncListCdNoteToAccountant(List<Guid> ids)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            HandleState hs = accountingService.SyncListCdNoteToAccountant(ids);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
+            if (!hs.Success)
+            {
+                result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPut("SyncListSoaToAccountant")]
+        [Authorize]
+        public IActionResult SyncListSoaToAccountant(List<int> ids)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            HandleState hs = accountingService.SyncListSoaToAccountant(ids);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
+            if (!hs.Success)
+            {
+                result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }

@@ -2625,34 +2625,6 @@ namespace eFMS.API.Accounting.DL.Services
             var surchargeIds = csShipmentSurchargeRepo.Get(x => x.PaySoano == soaNo || x.Soano == soaNo).Select(s => s.Id).ToList();
             return surchargeIds;
         }
-
-        public HandleState UpdateSyncStatus(string soaNo)
-        {
-            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
-            if (soa == null) return null;
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    soa.UserModified = currentUser.UserID;
-                    soa.DatetimeModified = DateTime.Now;
-                    soa.SyncStatus = "Synced";
-                    soa.LastSyncDate = DateTime.Now;
-                    var hsUpdateSOA = DataContext.Update(soa, x => x.Id == soa.Id);
-                    trans.Commit();
-                    return hsUpdateSOA;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
-            }
-
-        }
+        
     }
 }

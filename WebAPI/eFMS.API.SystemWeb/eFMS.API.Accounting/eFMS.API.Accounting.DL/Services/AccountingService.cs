@@ -85,7 +85,7 @@ namespace eFMS.API.Accounting.DL.Services
             CatUnitRepository = CatUnitRepo;
             cdNoteRepository = acctCdNote;
             soaRepository = acctSoa;
-
+            currentUser = cUser;
             // ---
 
             users = UserRepository.Get();
@@ -307,19 +307,19 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of cd note</param>
         /// <param name="type">Type: DEBIT/CREDIT/ALL</param>
         /// <returns></returns>
-        public List<SyncModel> GetListCdNoteToSync(List<Guid> Ids, string type)
+        public List<SyncModel> GetListCdNoteToSync(List<Guid> ids, string type)
         {
             List<SyncModel> data = new List<SyncModel>();
-            if (Ids == null || Ids.Count() == 0) return data;
+            if (ids == null || ids.Count() == 0) return data;
 
-            var cdNotes = cdNoteRepository.Get(x => Ids.Contains(x.Id));
-            if (type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT)
+            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
+            if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT)
             {
-                cdNotes = cdNotes.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE);
+                cdNotes = cdNotes.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_INVOICE);
             }
-            else if (type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
+            else if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
             {
-                cdNotes = cdNotes.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT);
+                cdNotes = cdNotes.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT);
             }
            
             foreach (var cdNote in cdNotes)
@@ -348,7 +348,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var charge = new ChargeSyncModel();
                     charge.RowId = surcharge.Id.ToString();
                     charge.Ma_SpHt = surcharge.JobNo;
-                    var _charge = CatChargeRepository.Get(x => x.Id == surcharge.Id).FirstOrDefault();
+                    var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
                     charge.Description = _charge?.ChargeNameVn;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
@@ -397,17 +397,17 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of soa</param>
         /// <param name="type">Type: DEBIT/CREDIT/ALL</param>
         /// <returns></returns>
-        public List<SyncModel> GetListSoaToSync(List<int> Ids, string type)
+        public List<SyncModel> GetListSoaToSync(List<int> ids, string type)
         {
             List<SyncModel> data = new List<SyncModel>();
-            if (Ids == null || Ids.Count() == 0) return data;
+            if (ids == null || ids.Count() == 0) return data;
 
-            var soas = soaRepository.Get(x => Ids.Contains(x.Id));
-            if (type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT)
+            var soas = soaRepository.Get(x => ids.Contains(x.Id));
+            if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT)
             {
                 soas = soas.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT);
             }
-            else if (type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
+            else if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
             {
                 soas = soas.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT);
             }
@@ -438,7 +438,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var charge = new ChargeSyncModel();
                     charge.RowId = surcharge.Id.ToString();
                     charge.Ma_SpHt = surcharge.JobNo;
-                    var _charge = CatChargeRepository.Get(x => x.Id == surcharge.Id).FirstOrDefault();
+                    var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
                     charge.Description = _charge?.ChargeNameVn;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
@@ -598,14 +598,68 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
         
-        public HandleState SyncListCdNoteToAccountant()
+        public HandleState SyncListCdNoteToAccountant(List<Guid> ids)
         {
-            return new HandleState();
+            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
+            if (cdNotes == null) return new HandleState((object)"Không tìm thấy cd note");
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var cdNote in cdNotes)
+                    {
+                        cdNote.UserModified = currentUser.UserID;
+                        cdNote.DatetimeModified = DateTime.Now;
+                        cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                        cdNote.LastSyncDate = DateTime.Now;
+                        var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
+                    }
+                    var sm = cdNoteRepository.SubmitChanges();
+                    trans.Commit();
+                    return sm;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
 
-        public HandleState SyncListSoaToAccountant()
+        public HandleState SyncListSoaToAccountant(List<int> ids)
         {
-            return new HandleState();
+            var soas = soaRepository.Get(x => ids.Contains(x.Id));
+            if (soas == null) return new HandleState((object)"Không tìm thấy soa");
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var soa in soas)
+                    {
+                        soa.UserModified = currentUser.UserID;
+                        soa.DatetimeModified = DateTime.Now;
+                        soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                        soa.LastSyncDate = DateTime.Now;
+                        var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
+                    }
+                    var sm = soaRepository.SubmitChanges();
+                    trans.Commit();
+                    return sm;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
         
         #region -- Private Method --
