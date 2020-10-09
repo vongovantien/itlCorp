@@ -1228,6 +1228,18 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }
+
+    handleChangeFeeType(event: any, charge: any) {
+        let feeTypeListTemp: ChargeGroup[] = [];
+        this.listChargeGroup.subscribe((res: ChargeGroup[]) => {
+            feeTypeListTemp = res;
+            const checkSelected = feeTypeListTemp.find(e => e.id === event);
+            if (!!checkSelected && checkSelected.name === 'Com') {
+                charge.kickBack = true;
+            }
+        });
+
+    }
 }
 
 interface IRecentlyCharge {

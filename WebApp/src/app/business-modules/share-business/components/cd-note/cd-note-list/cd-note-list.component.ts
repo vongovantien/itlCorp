@@ -74,6 +74,8 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             { title: 'Creator', field: 'userCreated', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'SOA', field: 'soaNo', sortable: true },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
+            { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
     }
 

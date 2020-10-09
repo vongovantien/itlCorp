@@ -370,7 +370,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (IsShipmentOperation == false)
                 {
-                    //List<CsTransactionDetail> housebills = trandetailRepositoty.Get(x => x.JobId == id).ToList();
                     var csShipment = cstransRepository.Get(x => x.Id == id)?.FirstOrDefault();
                     var houseBillPermission = transactionDetailService.GetHouseBill(csShipment.TransactionType);
                     List<CsTransactionDetail> housebills = houseBillPermission.Where(x => x.JobId == id && x.ParentId == null).ToList();
@@ -402,10 +401,6 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     var hblid = opstransRepository.Get(x => x.Id == id).FirstOrDefault()?.Hblid;
-                    //PermissionRange rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
-                    //var shipments = opsTransactionService.QueryByPermission(rangeSearch);
-                    //var hblid = shipments.Where(x => x.Id == id).FirstOrDefault()?.Hblid;
-
                     listCharges = Query(hblid.Value);
 
                     foreach (var c in listCharges)
@@ -431,24 +426,7 @@ namespace eFMS.API.Documentation.DL.Services
                     List<object> listCDNote = new List<object>();
                     foreach (var cdNote in cdNotesModel)
                     {
-                        // -to continue
-                        var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                        //decimal totalDebit = 0;
-                        //decimal totalCredit = 0;
-                        foreach (var charge in chargesOfCDNote)
-                        {
-                            /*if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE || (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PayerId))
-                            {
-                                // calculate total credit
-                                totalCredit += (decimal)(charge.Total * charge.ExchangeRate);
-                            }
-                            if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE || (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PaymentObjectId))
-                            {
-                                // calculate total debit 
-                                totalDebit += (decimal)(charge.Total * charge.ExchangeRate);
-                            }*/
-                        }
-                        // cdNote.Total = Math.Abs(totalDebit - totalCredit);
+                        var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);                       
                         cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
@@ -460,6 +438,8 @@ namespace eFMS.API.Documentation.DL.Services
                         });
                         var _balanceByCurrency = _cdCurrency.GroupBy(g => new { g.Currency }).Select(s => new { currency = s.Key.Currency, balance = s.Sum(su => su.Debit) - s.Sum(su => su.Credit), balancePositive = Math.Abs(s.Sum(su => su.Debit) - s.Sum(su => su.Credit)) });
                         cdNote.balanceCdNote = _balanceByCurrency;
+                        cdNote.SyncStatus = cdNote.SyncStatus;
+                        cdNote.LastSyncDate = cdNote.LastSyncDate;
                         listCDNote.Add(cdNote);
                     }
 
@@ -484,7 +464,7 @@ namespace eFMS.API.Documentation.DL.Services
             return surcharges;
         }
 
-        public HandleState CsConfirmed(string cdNo)
+        public HandleState UpdateSyncStatus(string cdNo)
         {
             var cdNote = DataContext.Get(x => x.Code == cdNo).FirstOrDefault();
             if (cdNote == null) return null;
@@ -494,7 +474,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     cdNote.UserModified = currentUser.UserID;
                     cdNote.DatetimeModified = DateTime.Now;
-                    cdNote.Status = "Cs Confirmed";
+                    cdNote.SyncStatus = "Synced";
+                    cdNote.LastSyncDate = DateTime.Now;
                     var hsUpdateSOA = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
                     trans.Commit();
                     return hsUpdateSOA;
@@ -705,6 +686,8 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.HbChargeWeight = hbCw;
             soaDetails.FlexId = cdNote.FlexId;
             soaDetails.Status = cdNote.Status;
+            soaDetails.SyncStatus = cdNote.SyncStatus;
+            soaDetails.LastSyncDate = cdNote.LastSyncDate;
             return soaDetails;
         }
 
@@ -720,6 +703,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
+                    if (cdNote.SyncStatus == "SYNCED") return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED]);
                     var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                     var isOtherSOA = charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Any();
                     if (isOtherSOA == true)
@@ -982,8 +966,9 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckAllowDelete(Guid cdNoteId)
         {
             var cdNote = DataContext.Get(x => x.Id == cdNoteId).FirstOrDefault();
-            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySoano))
-                                                  || (x.DebitNo == cdNote.Code && !string.IsNullOrEmpty(x.Soano)));
+            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && (!string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId)))
+                                                  || (x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId))));
+                                                  
             if (query.Any())
             {
                 return false;

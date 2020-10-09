@@ -208,7 +208,9 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         for (const group of this.listChargePartner) {
             group.isSelected = this.isCheckAllCharge;
             for (const item of group.listCharges) {
-                item.isSelected = this.isCheckAllCharge;
+                if (item.voucherId === null && item.invoiceNo === null) {
+                    item.isSelected = this.isCheckAllCharge;
+                }
             }
         }
     }
@@ -216,7 +218,9 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     onChangeCheckBoxGrpCharge(charges: any) {
         this.isCheckAllCharge = this.listChargePartner.every((item: any) => item.isSelected);
         for (const charge of charges.listCharges) {
-            charge.isSelected = charges.isSelected;
+            if (charge.voucherId === null && charge.invoiceNo === null) {
+                charge.isSelected = charges.isSelected;
+            }
         }
     }
 
@@ -230,9 +234,8 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
-                    charge.isDeleted = true;
+                    charge.isDeleted = (charge.voucherId === null && charge.invoiceNo === null);
                 }
-                if (charges.isSelected) { charges.isDeleted = true; }
             }
         }
         // Tính toán Amount Credit, Debit, Balance
@@ -248,9 +251,9 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
             for (const charges of listCharge) {
                 chargesNotDeleted = charges.listCharges.filter(group => !group.isDeleted);
                 if (chargesNotDeleted.length > 0) {
-                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: chargesNotDeleted });
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, listCharges: chargesNotDeleted });
                 } else {
-                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: [] });
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, listCharges: [] });
                 }
             }
         }

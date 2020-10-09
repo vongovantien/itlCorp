@@ -199,16 +199,16 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// CS Confirmed by cdNo
+        /// Update Sync Status by cdNo
         /// </summary>
         /// <param name="cdNo">Soa No</param>
         /// <returns></returns>
         [HttpPut]
-        [Route("CsConfirmed")]
+        [Route("UpdateSyncStatus")]
         [Authorize]
-        public IActionResult CsConfirmed(string cdNo)
+        public IActionResult UpdateSyncStatus(string cdNo)
         {
-            var result = cdNoteServices.CsConfirmed(cdNo);
+            var result = cdNoteServices.UpdateSyncStatus(cdNo);
             return Ok(result);
         }
     }

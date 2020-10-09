@@ -154,5 +154,8 @@
 
         public static readonly string STATUS_ACTIVE = "Active";
         public static readonly string STATUS_INACTIVE = "Inactive";
+
+        public static readonly string STATUS_SYNCED = "Synced";
+        public static readonly string STATUS_REJECTED = "Rejected";
     }
 }

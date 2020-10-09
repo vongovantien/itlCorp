@@ -13,14 +13,15 @@ import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.p
     templateUrl: './ops-cd-note-detail.popup.html'
 })
 export class OpsCdNoteDetailPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(OpsCdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent; @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
 
     jobId: string = null;
     cdNote: string = null;
-    deleteMessage: string = '';
+    confirmMessage: string = '';
+    typeConfirm: string = '';
     isHouseBillID: boolean = true;
 
     headers: CommonInterface.IHeaderTable[];
@@ -125,8 +126,9 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.deleteMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
-                        this.confirmDeleteCdNotePopup.show();
+                        this.confirmMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
+                        this.typeConfirm = "DELETE";
+                        this.confirmCdNotePopup.show();
                     } else {
                         this.canNotDeleteCdNotePopup.show();
                     }
@@ -134,12 +136,12 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             );
     }
 
-    onDeleteCdNote() {
+    deleteCdNote() {
         this._documentationRepo.deleteCdNote(this.CdNoteDetail.cdNote.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
-                    this.confirmDeleteCdNotePopup.hide();
+                    this.confirmCdNotePopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -209,6 +211,49 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                         this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
                     } else {
                         this._toastService.warning('No data found');
+                    }
+                },
+            );
+    }
+
+    showConfirmed() {
+        this._toastService.success("Tính năng đang phát triển");
+
+        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        // this.typeConfirm = "CONFIRMED";
+        // this.confirmCdNotePopup.show();
+    }
+
+    onConfirmCdNote() {
+        if (this.typeConfirm === "DELETE") {
+            this.deleteCdNote();
+        } else if (this.typeConfirm === "CONFIRMED") {
+            this._toastService.success("Tính năng đang phát triển");
+        }
+    }
+
+    getDataCdNoteToSync() {
+
+    }
+
+    syncToAccountant() {
+        // Gọi API Bravo
+    }
+
+    updateSyncStatusCdNote() {
+        this._progressRef.start();
+        this._documentationRepo.updateSyncStatusCdNote(this.cdNote)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.success) {
+                        this._toastService.success('Sync Data to Accountant System Successful!', '');
+                        this.CdNoteDetail.syncStatus = 'Synced';
+                    } else {
+                        this._toastService.error(res.message);
                     }
                 },
             );
