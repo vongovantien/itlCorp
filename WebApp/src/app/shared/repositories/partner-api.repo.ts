@@ -30,7 +30,22 @@ export class PartnerAPIRepo {
 
     }
 
+    addSyncInvoiceBravo(body: any) {
+        return this._api.post(`${environment.HOST.ESB}/api/Sync?func=EFMSInvoiceDataSyncAdd`, body);
+    }
 
+    updateSyncInvoiceBravo(body: any) {
+        return this._api.post(`${environment.HOST.ESB}/api/Sync?func=EFMSInvoiceDataSyncUpdate`, body);
+    }
 
+    // Add phiếu thu
+    addSyncReceiptBravo(body: any) {
+        return this._api.post(`${environment.HOST.ESB}/api/Sync?func=EFMSReceiptDataSyncAdd`, body);
+    }
+
+    // Update phiếu thu
+    updateSyncReceiptBravo(body: any) {
+        return this._api.post(`${environment.HOST.ESB}/api/Sync?func=EFMSReceiptDataSyncUpdate`, body);
+    }
 
 }

@@ -1,12 +1,13 @@
 import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo, AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
+import { SyncModel } from 'src/app/shared/models/partner-api/sync-model';
 
 @Component({
     selector: 'ops-cd-note-detail',
@@ -38,6 +39,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
+        private _accountantRepo: AccountingRepo
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -218,7 +220,6 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
 
     showConfirmed() {
         this._toastService.success("Tính năng đang phát triển");
-
         // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
         // this.typeConfirm = "CONFIRMED";
         // this.confirmCdNotePopup.show();
@@ -228,30 +229,46 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         if (this.typeConfirm === "DELETE") {
             this.deleteCdNote();
         } else if (this.typeConfirm === "CONFIRMED") {
-            this._toastService.success("Tính năng đang phát triển");
+            this.getDataCdNoteToSync();
         }
     }
 
     getDataCdNoteToSync() {
-
+        this.confirmCdNotePopup.hide();
+        const cdNoteIds: string[] = [];
+        cdNoteIds.push(this.CdNoteDetail.cdNote.id);
+        this._accountantRepo.getListCdNoteToSync(cdNoteIds, this.CdNoteDetail.cdNote.type)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: SyncModel[]) => {
+                    const data: SyncModel[] = res;
+                    this.syncToAccountant(data, cdNoteIds);
+                },
+            );
     }
 
-    syncToAccountant() {
-        // Gọi API Bravo
+    syncToAccountant(data: SyncModel[], ids: string[]) {
+        // Gọi API Bravo (Nghiệp vụ hóa đơn hoặc nghiệp vụ chi phí dựa vào Type của CD Note)
+
+        // Sync Bravo success
+        this.updateSyncStatusCdNote(ids);
     }
 
-    updateSyncStatusCdNote() {
-        this._progressRef.start();
-        this._documentationRepo.updateSyncStatusCdNote(this.cdNote)
+    updateSyncStatusCdNote(ids: string[]) {
+        // this._progressRef.start();
+        this._accountantRepo.syncCdNoteToAccountant(ids)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: any) => {
-                    if (res.success) {
+                    if (res.status) {
                         this._toastService.success('Sync Data to Accountant System Successful!', '');
-                        this.CdNoteDetail.syncStatus = 'Synced';
+                        this.getDetailCdNote(this.jobId, this.cdNote);
+                        // Gọi onDelete để refresh lại list cd note
+                        this.onDeleted.emit();
                     } else {
                         this._toastService.error(res.message);
                     }
