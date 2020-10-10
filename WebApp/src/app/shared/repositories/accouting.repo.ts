@@ -717,6 +717,18 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getListSettleSyncData(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListSettlementSyncData`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncSettleToAccountant(list: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/SyncSettlementToAccountantSystem`, list).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

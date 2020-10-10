@@ -29,6 +29,10 @@ export class SettlementPayment {
 
     voucherNo: string = null;
     voucherDate: string = null;
+
+    lastSyncDate: string = null;
+    syncStatus: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

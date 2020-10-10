@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({ providedIn: 'root' })
 export class PartnerAPIRepo {
 
+    bravoKey = { "partnerAPI": "bravo" };
     constructor(protected _api: ApiService) {
     }
 
@@ -13,39 +14,43 @@ export class PartnerAPIRepo {
         return this._api.post(`${environment.HOST.ESB}/Accounting/api/Login`, { username: "bravo", password: "br@vopro" });
     }
 
+    // TẠM Ứng
     addSyncAdvanceBravo(listAdvances: BravoAdvance[]) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSAdvandeSyncAdd`, listAdvances, null, { "partnerAPI": "bravo" });
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSAdvandeSyncAdd`, listAdvances, null, this.bravoKey);
     }
 
     updateSyncAdvanceBravo(listAdvances: BravoAdvance[]) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSAdvandeSyncUpdate`, listAdvances);
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSAdvandeSyncUpdate`, listAdvances, null, this.bravoKey);
     }
 
+    // Hoạch toán 
     addSyncVoucherBravo(body: any) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSVoucherDataSyncAdd`, body);
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSVoucherDataSyncAdd`, body, null, this.bravoKey);
     }
 
     updateSyncVoucherBravo(body: any) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSVoucherDataSyncUpdate`, body);
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSVoucherDataSyncUpdate`, body, null, this.bravoKey);
 
     }
 
+    // Hóa đơn bán hàng - Chi phí (SOA,CD,SETTLEMENT)
     addSyncInvoiceBravo(body: any) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSInvoiceDataSyncAdd`, body);
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSInvoiceDataSyncAdd`, body, null, this.bravoKey);
     }
 
     updateSyncInvoiceBravo(body: any) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSInvoiceDataSyncUpdate`, body);
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSInvoiceDataSyncUpdate`, body, null, this.bravoKey);
     }
 
-    // Add phiếu thu
+    // Phiếu thu
     addSyncReceiptBravo(body: any) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSReceiptDataSyncAdd`, body);
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSReceiptDataSyncAdd`, body, null, this.bravoKey);
     }
 
-    // Update phiếu thu
     updateSyncReceiptBravo(body: any) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSReceiptDataSyncUpdate`, body);
+        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSReceiptDataSyncUpdate`, body, null, this.bravoKey);
     }
+
+
 
 }
