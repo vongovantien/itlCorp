@@ -56,9 +56,18 @@
                                                 <td>{{voucher.currency}}</td>
                                                 <td>{{voucher.date | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{voucher.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
-                                                <td class="text-success">{{voucher.lastSyncDate | date: 'dd/MM/yyyy'}}
+                                                <td class="text-success">
+                                                    {{voucher.lastSyncDate | date: 'dd/MM/yyyy HH:mm:ss'}}
                                                 </td>
-
+                                                <td [ngSwitch]="voucher.syncStatus">
+                                                    <span *ngSwitchCase="'Synced'" class="text-success">
+                                                        {{voucher.syncStatus}}</span>
+                                                    <span *ngSwitchCase="'Rejected'" class="text-danger">
+                                                        {{voucher.syncStatus}}</span>
+                                                    <span *ngSwitchDefault>
+                                                        {{voucher.syncStatus}}
+                                                    </span>
+                                                </td>
                                                 <td class="text-success">{{voucher.creatorName}}</td>
                                             </tr>
                                         </ng-container>

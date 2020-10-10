@@ -693,6 +693,30 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getListVoucherToSync(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListVoucherSyncData`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncVoucherToAccountant(ids: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncVoucherToAccountantSystem`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListInvoicePaymentToSync(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListInvoicePaymentToSync`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListObhPaymentToSync(ids: number[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListObhPaymentToSync`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 
