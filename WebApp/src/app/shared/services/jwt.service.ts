@@ -8,6 +8,7 @@ enum STORAGE_KEY {
     ACCESS_TOKEN_STORED_AT = 'access_token_stored_at',
     ID_TOKEN = 'id_token',
     CLAIMS = 'id_token_claims_obj',
+    BRAVO_TOKEN = 'bravo_token',
 }
 
 @Injectable({ providedIn: 'root' })
@@ -47,6 +48,14 @@ export class JwtService {
 
     destroyAccessTokenStoredAt() {
         window.localStorage.removeItem(STORAGE_KEY.ACCESS_TOKEN_STORED_AT);
+    }
+
+    saveBravoToken(token: string) {
+        window.localStorage.setItem(STORAGE_KEY.BRAVO_TOKEN, token);
+    }
+
+    getBravoToken() {
+        return window.localStorage.getItem(STORAGE_KEY.BRAVO_TOKEN) || null;
     }
 
     private getExpiresToken() {
