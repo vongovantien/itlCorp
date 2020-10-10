@@ -25,14 +25,14 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
     @ViewChild(AccountPaymentUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
-
+    @ViewChild('confirmObhPaymentPopup', { static: false }) confirmObhPaymentPopup: ConfirmPopupComponent;
     @Output() onUpdateExtendDateOfOBH: EventEmitter<any> = new EventEmitter<any>();
 
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
     selectedPayment: PaymentModel;
-
+    confirmMessage: string = '';
     constructor(private _router: Router,
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
@@ -200,5 +200,35 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
                 },
             );
     }
+
+    confirmSync() {
+        this._toastService.success("Tính năng đang phát triển");
+        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        // this.confirmObhPaymentPopup.show();
+    }
+
+    onConfirmObhPayment() {
+        this.getDataObhPaymentToSync();
+    }
+
+    getDataObhPaymentToSync() {
+        this.confirmObhPaymentPopup.hide();
+        // const obhPaymentIds: number[] = [];
+        // obhPaymentIds.push();
+        // this._accountingRepo.getListObhPaymentToSync(obhPaymentIds)
+        //     .pipe(
+        //         catchError(this.catchError),
+        //     ).subscribe(
+        //         (res: BravoVoucher[]) => {
+        //             const data: BravoVoucher[] = res;
+        //             console.log(data);
+        //             this.syncToAccountant(data, obhPaymentIds);
+        //         },
+        //     );
+    }
+
+    // syncToAccountant(data: BravoVoucher[], ids: number[]) {
+    //     // Gọi API Bravo
+    // }
 }
 

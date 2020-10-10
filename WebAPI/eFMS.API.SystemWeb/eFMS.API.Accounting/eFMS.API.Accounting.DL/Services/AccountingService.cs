@@ -35,6 +35,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatUnit> CatUnitRepository;
         private readonly IContextBase<AcctCdnote> cdNoteRepository;
         private readonly IContextBase<AcctSoa> soaRepository;
+        private readonly IContextBase<AccAccountingPayment> accountingPaymentRepository;
 
         #endregion --Dependencies--
 
@@ -66,6 +67,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatUnit> CatUnitRepo,
             IContextBase<AcctCdnote> acctCdNote,
             IContextBase<AcctSoa> acctSoa,
+            IContextBase<AccAccountingPayment> accAccountingPayment,
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
         {
@@ -86,6 +88,7 @@ namespace eFMS.API.Accounting.DL.Services
             cdNoteRepository = acctCdNote;
             soaRepository = acctSoa;
             currentUser = cUser;
+            accountingPaymentRepository = accAccountingPayment;
             // ---
 
             users = UserRepository.Get();
@@ -480,6 +483,16 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
         
+        public List<object> GetListInvoicePaymentToSync(List<Guid> ids)
+        {
+            return null;
+        }
+
+        public List<object> GetListObhPaymentToSync(List<int> ids)
+        {
+            return null;
+        }
+
         public HandleState SyncListAdvanceToBravo(List<Guid> ids, out List<Guid> data)
         {
             HandleState result = new HandleState();

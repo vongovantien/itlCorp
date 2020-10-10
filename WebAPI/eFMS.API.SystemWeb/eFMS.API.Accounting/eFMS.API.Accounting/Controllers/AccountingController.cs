@@ -60,9 +60,23 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPost("GetListSoaToSync")]
-        public IActionResult GetListSoaToSync(List<int> Ids, string type)
+        public IActionResult GetListSoaToSync(List<int> ids, string type)
         {
-            var result = accountingService.GetListSoaToSync(Ids, type);
+            var result = accountingService.GetListSoaToSync(ids, type);
+            return Ok(result);
+        }
+
+        [HttpPost("GetListInvoicePaymentToSync")]
+        public IActionResult GetListInvoicePaymentToSync(List<Guid> ids)
+        {
+            var result = accountingService.GetListInvoicePaymentToSync(ids);
+            return Ok(result);
+        }
+
+        [HttpPost("GetListObhPaymentToSync")]
+        public IActionResult GetListObhPaymentToSync(List<int> ids)
+        {
+            var result = accountingService.GetListObhPaymentToSync(ids);
             return Ok(result);
         }
 
