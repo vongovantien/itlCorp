@@ -237,7 +237,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                     if (!list || !list.length) {
                         return of(-1);
                     }
-                    return this._partnerAPI.addSyncReceiptBravo(list);
+                    return this._partnerAPI.addSyncVoucherBravo(list);
                 }),
                 concatMap((bravoRes: SystemInterface.IBRavoResponse) => {
                     if (bravoRes.Success === 1) {
