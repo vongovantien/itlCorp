@@ -141,7 +141,7 @@
                         </div>
 
                     </div>
-                    <div class="form-group m-form__group" *ngIf="serviceId === 'AE'">
+                    <div class="form-group m-form__group" *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsManifest else NotManifest">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -166,7 +166,7 @@
                                     <input type="checkbox" [(ngModel)]="isCheckedHawb" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
-                                <span><a class="pointer" (click)="previewHawb()">HAWB</a></span>
+                                <span><a class="pointer" (click)="previewHawb()">{{hblRptName}}</a></span>
                             </ng-container>
                             <ng-template #NotHawb>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
@@ -179,7 +179,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group m-form__group" *ngIf="serviceId === 'SFE' || serviceId === 'SLE'">
+                    <div class="form-group m-form__group" *ngIf="!isPreAlert && (serviceId === 'SFE' || serviceId === 'SLE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsSISummary else NotSISummary">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">

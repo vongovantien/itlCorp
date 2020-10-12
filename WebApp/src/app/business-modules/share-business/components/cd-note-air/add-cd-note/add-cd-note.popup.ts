@@ -234,7 +234,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
-                    charge.isDeleted = (charge.voucherId === null && charge.invoiceNo === null);
+                    charge.isDeleted = (charge.creditNo === null || charge.debitNo === null) ? true : (charge.voucherId === null && charge.invoiceNo === null);
                 }
             }
         }

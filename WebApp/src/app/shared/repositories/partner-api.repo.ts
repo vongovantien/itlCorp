@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '../services';
 import { BravoAdvance } from '@models';
 import { environment } from 'src/environments/environment';
+import { SystemConstants } from '@constants';
 
 @Injectable({ providedIn: 'root' })
 export class PartnerAPIRepo {
 
-    bravoKey = { "partnerAPI": "bravo" };
+    private bravoKey = { [SystemConstants.EFMS_PARTNER_KEY]: "bravo" };
     constructor(protected _api: ApiService) {
     }
 
@@ -16,7 +17,7 @@ export class PartnerAPIRepo {
 
     // TẠM Ứng
     addSyncAdvanceBravo(listAdvances: BravoAdvance[]) {
-        return this._api.post(`${environment.HOST.ESB}/Accounting/api?func=EFMSAdvandeSyncAdd`, listAdvances, null, this.bravoKey);
+        return this._api.post(`${environment.HOST.ACCOUNTING}/Accounting/api?func=EFMSAdvanceSyncAdd`, listAdvances, null, this.bravoKey);
     }
 
     updateSyncAdvanceBravo(listAdvances: BravoAdvance[]) {
