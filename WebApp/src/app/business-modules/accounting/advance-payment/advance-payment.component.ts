@@ -54,7 +54,7 @@ export class AdvancePaymentComponent extends AppList {
     messageVoucherExisted: string = '';
 
 
-    advanceSyncIds: string[] = [];
+    advanceSyncIds: AccountingInterface.IRequestGuid[] = [];
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -65,7 +65,7 @@ export class AdvancePaymentComponent extends AppList {
         private _router: Router,
         private _store: Store<IAppState>,
         private _partnerAPI: PartnerAPIRepo,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
@@ -92,6 +92,7 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Voucher Date', field: 'voucherDate', sortable: true },
             { title: 'Sync Date', field: 'lastSyncDate', sortable: true },
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
+            { title: 'User Modified', field: 'user', sortable: true },
 
         ];
 
@@ -379,7 +380,12 @@ export class AdvancePaymentComponent extends AppList {
             return;
         }
 
-        this.advanceSyncIds = advanceSyncList.map(x => x.id);
+        this.advanceSyncIds = advanceSyncList.map((x: AdvancePayment) => {
+            return <AccountingInterface.IRequestGuid>{
+                Id: x.id,
+                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'Update' : 'Add'
+            };
+        });
         if (!this.advanceSyncIds.length) {
             return;
         }
@@ -399,6 +405,8 @@ export class AdvancePaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
+
+                        this.getListAdvancePayment();
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }

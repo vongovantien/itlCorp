@@ -121,7 +121,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                              Description0 = ad.AdvanceNote,
                                                              CustomerName = employee.EmployeeNameVn,
                                                              CustomerCode = employee.StaffCode,
-                                                             Office = office.Code,
+                                                             OfficeCode = office.Code,
                                                              DocDate = ad.RequestDate,
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency)
                                                          };
@@ -171,7 +171,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                   CustomerMode = p.PartnerMode,
                                                                   LocalBranchCode = p.InternalCode,
                                                                   DocDate = voucher.Date,
-                                                                  Office = office.Code,
+                                                                  OfficeCode = office.Code,
                                                                   ReferenceNo = voucher.VoucherId,
                                                                   CurrencyCode = voucher.Currency,
                                                                   ExchangeRate = GetExchangeRate(voucher.Date, voucher.Currency),
