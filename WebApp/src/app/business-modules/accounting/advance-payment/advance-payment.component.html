@@ -256,6 +256,9 @@
     title="Confirm remove selected voucher">
 </confirm-popup>
 
+<confirm-popup #confirmSyncAdvance (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
+    body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
+
 
 <permission-403-popup></permission-403-popup>
 
