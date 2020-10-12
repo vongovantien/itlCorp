@@ -16,7 +16,7 @@ import { SeaLCLExportHBLComponent } from './sea-lcl-export-hbl.component';
 import { SeaLCLExportCreateHBLComponent } from './create/create-house-bill.component';
 import { SeaLCLExportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
-
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -28,8 +28,17 @@ const routing: Routes = [
         data: { name: 'New House Bill', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: SeaLCLExportDetailHBLComponent,
-        data: { name: 'House Bill Detail', path: ':id', level: 5 }
+        path: ':hblId',
+        data: { name: 'House Bill Detail', path: ':id', level: 5 },
+        children: [
+            {
+                path: '', component: SeaLCLExportDetailHBLComponent, data: { name: "" }
+            },
+            {
+                path: 'manifest', component: ShareBusinessReAlertComponent,
+                data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SLE_CODE },
+            }
+        ],
     }
 ];
 
