@@ -97,7 +97,7 @@
                                                             <span class="d-block" style="width:30px"></span>
                                                         </ng-template>
                                                         <ng-container
-                                                            *ngIf="advancePayment.statusApproval === 'Done';else dblock">
+                                                            *ngIf="advancePayment.statusApproval === 'Done' && advancePayment.syncStatus !== 'Synced' ;else dblock">
                                                             <label class="m-checkbox">
                                                                 <input type="checkbox" name=""
                                                                     [disabled]="advancePayment.statusApproval !== 'Done'"
@@ -179,6 +179,9 @@
                                                     <div *ngSwitchDefault class="text-danger">
                                                         {{advancePayment.syncStatus}}
                                                     </div>
+                                                </td>
+                                                <td>
+                                                    <span class="text-info">{{advancePayment.userModifiedName}}</span>
                                                 </td>
 
                                             </tr>
