@@ -57,5 +57,11 @@ namespace SystemInterface {
         TokenKey: string;
     }
 
+    export interface IBRavoResponse {
+        Stt: string;
+        Success: number;
+        Mgs: string;
+    }
+
 }
 
