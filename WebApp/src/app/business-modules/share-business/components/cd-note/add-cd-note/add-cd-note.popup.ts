@@ -195,7 +195,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.isCheckAllCharge = this.listChargePartner.every((item: any) => item.isSelected);
         for (const charge of charges.listCharges) {
             if (charge.voucherId === null && charge.invoiceNo === null) {
-            charge.isSelected = charges.isSelected;
+                charge.isSelected = charges.isSelected;
             }
         }
     }
@@ -210,7 +210,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
-                    charge.isDeleted = (charge.voucherId === null && charge.invoiceNo === null);
+                    charge.isDeleted = (charge.creditNo === null || charge.debitNo === null) ? true : (charge.voucherId === null && charge.invoiceNo === null);
                 }
             }
         }
