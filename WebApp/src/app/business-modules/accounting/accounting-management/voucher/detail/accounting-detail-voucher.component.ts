@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, PartnerAPIRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
@@ -17,6 +17,7 @@ import _merge from 'lodash/merge';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent } from '@common';
 import { BravoVoucher } from 'src/app/shared/models/partner-api/voucher-bravo';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-accounting-detail-voucher',
@@ -35,6 +36,8 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         protected _store: Store<IAccountingManagementState>,
         private _activedRoute: ActivatedRoute,
         private _ngProgressService: NgProgress,
+        private _partnerAPI: PartnerAPIRepo,
+        private _spinner: NgxSpinnerService
     ) {
         super(_toastService, _accountingRepo, _store, _router);
         this._progressRef = this._ngProgressService.ref();
@@ -217,53 +220,54 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
     }
 
     confirmSync() {
-        this._toastService.success("Tính năng đang phát triển");
+        // this._toastService.success("Tính năng đang phát triển");
         // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
         // this.confirmVoucherPopup.show();
     }
 
     onConfirmVoucher() {
-        this.getDataVoucherToSync();
-    }
-
-    getDataVoucherToSync() {
         this.confirmVoucherPopup.hide();
         const voucherIds: string[] = [];
         voucherIds.push(this.voucherId);
+        this._spinner.show();
         this._accountingRepo.getListVoucherToSync(voucherIds)
             .pipe(
-                catchError(this.catchError),
-            ).subscribe(
-                (res: BravoVoucher[]) => {
-                    const data: BravoVoucher[] = res;
-                    console.log(data);
-                    this.syncToAccountant(data, voucherIds);
-                },
-            );
-    }
-
-    syncToAccountant(data: BravoVoucher[], ids: string[]) {
-        // Gọi API Bravo
-
-        // Sync Bravo success
-        this.updateSyncStatusVoucher(ids);
-    }
-
-    updateSyncStatusVoucher(ids: string[]) {
-        this._accountingRepo.syncVoucherToAccountant(ids)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                concatMap((list: BravoVoucher[]) => {
+                    console.log(list);
+                    if (!list || !list.length) {
+                        return of(-1);
+                    }
+                    return this._partnerAPI.addSyncVoucherBravo(list);
+                }),
+                concatMap((bravoRes: SystemInterface.IBRavoResponse) => {
+                    if (bravoRes.Success === 1) {
+                        return this._accountingRepo.syncVoucherToAccountant(voucherIds);
+                    }
+                    return of(-2);
+                }),
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError)
             )
             .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this._toastService.success('Sync Data to Accountant System Successful!', '');
-                        this.getDetailVoucher(this.voucherId);
-                    } else {
-                        this._toastService.error(res.message);
+                (res: CommonInterface.IResult | number) => {
+                    console.log(res);
+                    if (res === -1) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (res === -2) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (((res as CommonInterface.IResult).status) || (res as number) === 1) {
+                        this._toastService.success("Sync data thành công");
+                        this.accountingManagement.syncStatus = "Synced";
                     }
                 },
+                (error) => {
+                    console.log(error);
+                }
             );
     }
+
 }

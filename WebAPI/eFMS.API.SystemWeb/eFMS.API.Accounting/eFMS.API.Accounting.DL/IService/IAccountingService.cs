@@ -15,8 +15,8 @@ namespace eFMS.API.Accounting.DL.IService
         List<BravoSettlementModel> GetListSettlementToSyncBravo(List<Guid> Ids);
         List<SyncModel> GetListCdNoteToSync(List<Guid> ids, string type);
         List<SyncModel> GetListSoaToSync(List<int> ids, string type);
-        List<object> GetListInvoicePaymentToSync(List<Guid> ids);
-        List<object> GetListObhPaymentToSync(List<int> ids);
+        List<PaymentModel> GetListInvoicePaymentToSync(List<Guid> ids);
+        List<PaymentModel> GetListObhPaymentToSync(List<int> ids);
         HandleState SyncListAdvanceToBravo(List<Guid> ids, out List<Guid> data);
         HandleState SyncListSettlementToBravo(List<Guid> ids, out List<Guid> data);
         HandleState SyncListVoucherToBravo(List<Guid> ids, out List<Guid> data);
