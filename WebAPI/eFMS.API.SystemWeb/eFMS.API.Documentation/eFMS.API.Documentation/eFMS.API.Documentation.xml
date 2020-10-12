@@ -277,6 +277,13 @@
             <param name="jobId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewSeaExportManifestByJobId(System.Guid)">
+            <summary>
+            preview sea export manifest by jobId
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsMawbcontainerController">
             <summary>
             

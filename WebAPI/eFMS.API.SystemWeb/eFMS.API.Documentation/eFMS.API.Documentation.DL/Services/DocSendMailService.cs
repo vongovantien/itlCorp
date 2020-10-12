@@ -250,9 +250,9 @@ namespace eFMS.API.Documentation.DL.Services
         #region Mail infor Pre Alert Sea Export
         public EmailContentModel GetInfoMailHBLPreAlerSeaExport(Guid hblId, string serviceId)
         {
-            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
-            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();           
             if (_housebill == null) return null;
+            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
             var _pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault(); // Departure Airport
             var _pod = catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault(); // Destination Airpor
             var _saleman = sysUserRepo.Get(x => x.Id == _housebill.SaleManId).FirstOrDefault();
@@ -268,8 +268,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (serviceId == "SFE")
             {
                 // Subject
+                var etdDate = _housebill.Etd?? _shipment.Etd;
+                string etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM").ToUpper();
                 _subject = string.Format(@"PRE ALERT –{0} – {1} // HBL: {2} // MBL: {3}// {4}// {5} // {6} // ETD: {7}",
-                _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageContainer, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+                _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageContainer, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, etd);
 
                 // Body
                 string containerDetail = string.Empty;
@@ -281,31 +283,29 @@ namespace eFMS.API.Documentation.DL.Services
                         con.Quantity, conType, con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType, con.Gw, con.Cbm);
                 }
 
-                var packageTotal = string.Empty;
-                foreach (var csMawbCon in csMawbcontainers.GroupBy(x => x.PackageTypeId))
-                {
-                    packageTotal += string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(csMawbCon.FirstOrDefault().PackageTypeId)));
-                }
-
+                string packageTotal = string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key)));
                 string packTypeTotal = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
+                etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
                 _body = string.Format(@"<div><b>Dear Sir/Madam,</b></div></br><div>Please find pre-alert docs in the attachment and confirm receipt.</div><br/>" +
-                                        "<div>POL :{0}</div><div>POD :{1}</div><br/>" +
-                                        "<div>VSL :{2}</div><div>ETD :{3}</div>" +
-                                        "<div>MBL :{4}({5}, {6})</div>" + containerDetail +
-                                        "<div>TOTAL: {7}, {8}, G.W: {9}, CBM: {10}</div>" +
-                                        "<div>HBL: {11} ({12}, {13})</div>" +
+                                        "<div>POL : {0}</div><div>POD : {1}</div><br/>" +
+                                        "<div>VSL : {2}</div><div>ETD : {3}</div><br/>" +
+                                        "<div>MBL : {4}({5}, {6})</div>" + containerDetail +
+                                        "<div>TOTAL : {7}, {8}, G.W: {9}, CBM: {10}</div><br/>" +
+                                        "<div>HBL : {11} ({12}, {13})</div>" +
                                         "<div>Shipper: {14}</div>" +
                                         "<div>Cnee: {15}</div>" +
                                         "<div>Notify: {16}</div>",
-                                        _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, _housebill.Etd.Value.ToString("dd MMM, yyyy"), _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
+                                        _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, etd, _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
                                         _housebill.PackageContainer, packageTotal, _housebill.GrossWeight, _housebill.Cbm,
-                                        _housebill.Hwbno, _housebill.Hbltype, _housebill.OceanVoyNo, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
+                                        _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
             }
             else
             {
                 // Subject
+                var etdDate = _housebill.Etd?? _shipment.Etd;
+                string etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM").ToUpper();
                 _subject = string.Format(@"PRE ALERT –{0} – {1} // HBL: {2} // MBL: {3}// {4} {5}// {6} // {7} // ETD: {8}",
-                _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageQty, packageType, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+                _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageQty, packageType, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, etd);
 
                 // Body
                 string packageDetail = string.Empty;
@@ -316,23 +316,20 @@ namespace eFMS.API.Documentation.DL.Services
                     packageDetail += string.Format("<div>{0} {1}, G.W: {2}, CBM: {3}</div>", con.PackageQuantity, packType, con.Gw, con.Cbm);
                 }
 
-                var packageTotal = string.Empty;
-                foreach (var csMawbCon in csMawbcontainers.GroupBy(x => x.PackageTypeId))
-                {
-                    packageTotal += string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(csMawbCon.FirstOrDefault().PackageTypeId)));
-                }
+                string packageTotal = string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key)));
+                etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
                 _body = string.Format(@"<div><b>Dear Sir/Madam,</b></div></br><div>Please find pre-alert docs in the attachment and confirm receipt.</div><br/>" +
-                                        "<div>POL :{0}</div><div>POD :{1}</div><br/>" +
-                                        "<div>VSL :{2}</div><div>ETD :{3}</div>" +
-                                        "<div>MBL :{4}({5}, {6})</div>" + packageDetail +
-                                        "<div>TOTAL: {7}, G.W: {8}, CBM: {9}</div>" +
-                                        "<div>HBL: {10} ({11}, {12})</div>" +
+                                        "<div>POL : {0}</div><div>POD : {1}</div><br/>" +
+                                        "<div>VSL : {2}</div><div>ETD : {3}</div><br/>" +
+                                        "<div>MBL : {4}({5}, {6})</div>" + packageDetail +
+                                        "<div>TOTAL : {7}, G.W: {8}, CBM: {9}</div><br/>" +
+                                        "<div>HBL : {10} ({11}, {12})</div>" +
                                         "<div>Shipper: {13}</div>" +
                                         "<div>Cnee: {14}</div>" +
                                         "<div>Notify: {15}</div>",
-                                        _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, _housebill.Etd.Value.ToString("dd MMM, yyyy"), _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
+                                        _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, etd, _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
                                         packageTotal, _housebill.GrossWeight, _housebill.Cbm,
-                                        _housebill.Hwbno, _housebill.Hbltype, _housebill.OceanVoyNo, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
+                                        _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
             }
 
 

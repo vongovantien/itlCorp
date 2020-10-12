@@ -856,6 +856,12 @@ export class DocumentationRepo {
         );
     }
 
+    previewSeaExportManifestByJobId(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaExportManifestByJobId`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     previewSIReportByJobId(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewFCLShippingInstructionByJobId`, { jobId: jobId }).pipe(
             map((data: any) => data)

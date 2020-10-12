@@ -64,6 +64,7 @@ export class ShareBusinessReAlertComponent extends AppList {
     pathGeneralSI: string = '';
     pathGeneralSISummary: string = '';
     pathGeneralSIDetailCont: string = '';
+    hblRptName: string = '';
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -93,6 +94,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                     this.serviceId = params.serviceId;
                     this.name = params.name;
                     this.isPreAlert = this.name === "Pre Alert";
+                    this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) ? "HBL" : "HAWB";
                     this.exportFileCrystalToPdf(params.serviceId);
                     this.getContentMail(params.serviceId, params.hblId, params.jobId);
 
@@ -149,22 +151,32 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.exportCrystalArrivalNoticeToPdf(serviceId);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                this.exportCrystalSISummaryToPdf();
-                setTimeout(() => {
-                    this.exportCrystalSIToPdf();
-                }, 3000);
-                setTimeout(() => {
-                    this.exportCrystalSIDetailContFCL();
-                }, 5000);
+                if ( this.isPreAlert ) {
+                    this.exportCrystalManifestToPdf();
+                    this.exportCrystalHawbFrameToPdf();
+                } else {
+                    this.exportCrystalSISummaryToPdf();
+                    setTimeout(() => {
+                        this.exportCrystalSIToPdf();
+                    }, 3000);
+                    setTimeout(() => {
+                        this.exportCrystalSIDetailContFCL();
+                    }, 5000);
+                }
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this.exportCrystalSISummaryToPdf();
-                setTimeout(() => {
-                    this.exportCrystalSIToPdf();
-                }, 3000);
-                setTimeout(() => {
-                    this.exportCrystalSIDetailContFCL();
-                }, 5000);
+                if ( this.isPreAlert ) {
+                    this.exportCrystalManifestToPdf();
+                    this.exportCrystalHawbFrameToPdf();
+                } else {
+                    this.exportCrystalSISummaryToPdf();
+                    setTimeout(() => {
+                        this.exportCrystalSIToPdf();
+                    }, 3000);
+                    setTimeout(() => {
+                        this.exportCrystalSIDetailContFCL();
+                    }, 5000);
+                }
                 break;
             default:
                 break;
@@ -302,7 +314,7 @@ export class ShareBusinessReAlertComponent extends AppList {
             case ChargeConstants.SFE_CODE: // Sea FCL Export
                 if (this.isPreAlert) {
                     this.sendMailButtonName = "Send Pre Alert";
-                    this.getInfoMailHBLPreAlertSeaExport(jobId, serviceId);
+                    this.getInfoMailHBLPreAlertSeaExport(hblId, serviceId);
                 } else {
                     this.sendMailButtonName = "Send S.I";
                     this.getInfoMailSISeaExport(jobId);
@@ -311,7 +323,7 @@ export class ShareBusinessReAlertComponent extends AppList {
             case ChargeConstants.SLE_CODE: // Sea LCL Export
                 if (this.isPreAlert) {
                     this.sendMailButtonName = "Send Pre Alert";
-                    this.getInfoMailHBLPreAlertSeaExport(jobId, serviceId);
+                    this.getInfoMailHBLPreAlertSeaExport(hblId, serviceId);
                 } else {
                     this.sendMailButtonName = "Send S.I";
                     this.getInfoMailSISeaExport(jobId);
@@ -472,30 +484,83 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     previewManifest() {
-        this._progressRef.start();
-        this._documentRepo.previewAirExportManifestByJobId(this.jobId)
+        if (this.isPreAlert) {
+            this._progressRef.start();
+            this._documentRepo.previewSeaExportManifestByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { })
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataReport = res;
-                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
+                            this.exportReportPopup.frm.nativeElement.submit();
                         }, 1000);
+
+                        this.pathGeneralManifest = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsManifest = true;
+                        this.isCheckedManifest = true;
                     } else {
-                        this._toastService.warning('There is no data charge to display preview');
+                        this.isExitsManifest = false;
+                        this.isCheckedManifest = false;
                     }
                 },
             );
+        } else {
+            this._progressRef.start();
+            this._documentRepo.previewAirExportManifestByJobId(this.jobId)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { this._progressRef.complete(); })
+                )
+                .subscribe(
+                    (res: Crystal) => {
+                        this.dataReport = res;
+                        if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.reportPopup.frm.nativeElement.submit();
+                                this.reportPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data charge to display preview');
+                        }
+                    },
+                );
+        }
     }
 
     previewHawb() {
+        if (this.isPreAlert) {
+            this.previewHBL();
+        } else {
+            this._progressRef.start();
+            this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { this._progressRef.complete(); })
+                )
+                .subscribe(
+                    (res: Crystal) => {
+                        this.dataReport = res;
+                        if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.reportPopup.frm.nativeElement.submit();
+                                this.reportPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data charge to display preview');
+                        }
+                    },
+                );
+        }
+    }
+
+    previewHBL() {
         this._progressRef.start();
-        this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
+        this._documentRepo.previewSeaHBLOfLanding(this.hblId, 'ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })
@@ -680,7 +745,8 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalManifestToPdf() {
-        this._documentRepo.previewAirExportManifestByJobId(this.jobId)
+        if (this.isPreAlert) {
+            this._documentRepo.previewSeaExportManifestByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -703,10 +769,36 @@ export class ShareBusinessReAlertComponent extends AppList {
                     }
                 },
             );
+        } else {
+            this._documentRepo.previewAirExportManifestByJobId(this.jobId)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { })
+                )
+                .subscribe(
+                    (res: Crystal) => {
+                        this.dataExportReport = res;
+                        if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.exportReportPopup.frm.nativeElement.submit();
+                            }, 1000);
+
+                            this.pathGeneralManifest = res.pathReportGenerate;
+                            this.attachedFile.push(res.pathReportGenerate);
+                            this.isExitsManifest = true;
+                            this.isCheckedManifest = true;
+                        } else {
+                            this.isExitsManifest = false;
+                            this.isCheckedManifest = false;
+                        }
+                    },
+                );
+        }
     }
 
     exportCrystalHawbFrameToPdf() {
-        this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
+        if (this.isPreAlert) {
+            this._documentRepo.previewSeaHBLOfLanding(this.hblId, 'ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -729,6 +821,31 @@ export class ShareBusinessReAlertComponent extends AppList {
                     }
                 },
             );
+        } else {
+            this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { })
+                )
+                .subscribe(
+                    (res: Crystal) => {
+                        this.dataExportReport = res;
+                        if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.exportReportPopup.frm.nativeElement.submit();
+                            }, 1000);
+
+                            this.pathGeneralMawb = res.pathReportGenerate;
+                            this.attachedFile.push(res.pathReportGenerate);
+                            this.isExitsHawb = true;
+                            this.isCheckedHawb = true;
+                        } else {
+                            this.isExitsHawb = false;
+                            this.isCheckedHawb = false;
+                        }
+                    },
+                );
+        }
     }
 
     exportCrystalSISummaryToPdf() {

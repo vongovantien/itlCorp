@@ -166,7 +166,7 @@
                                     <input type="checkbox" [(ngModel)]="isCheckedHawb" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
-                                <span><a class="pointer" (click)="previewHawb()">HAWB</a></span>
+                                <span><a class="pointer" (click)="previewHawb()">{{hblRptName}}</a></span>
                             </ng-container>
                             <ng-template #NotHawb>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
