@@ -17,5 +17,6 @@ namespace eFMS.API.ForPartner.DL.IService
         HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey);
         HandleState UpdateInvoice(InvoiceUpdateInfo model, string apiKey);
         HandleState DeleteInvoice(InvoiceInfo model, string apiKey);
+        HandleState RejectData(RejectData model, string apiKey);
     }
 }

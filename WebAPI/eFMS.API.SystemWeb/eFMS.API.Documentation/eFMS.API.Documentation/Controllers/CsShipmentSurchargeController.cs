@@ -160,7 +160,12 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var query = list.Where(x => !isSurchargeSpecialCase(x)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
+            string type = list.Select(t => t.Type).FirstOrDefault();
+            var query = type == "BUY" || type =="OBH" ? list.Where(x => !isSurchargeSpecialCase(x) && !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
+                                      .Where(g => g.Count() > 1)
+                                      .Select(y => y.Key):
+
+                                       list.Where(x => !isSurchargeSpecialCase(x)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
                                       .Where(g => g.Count() > 1)
                                       .Select(y => y.Key);
             if (query.Any())

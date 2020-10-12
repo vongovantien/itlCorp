@@ -368,6 +368,7 @@
                             <td>
                                 <div class="form-group ">
                                     <select class="form-control" [(ngModel)]="charge.chargeGroup"
+                                        (ngModelChange)="handleChangeFeeType($event, charge)"
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
                                         <option *ngFor="let group of (listChargeGroup | async)" [ngValue]="group.id">
                                             {{group.name}}

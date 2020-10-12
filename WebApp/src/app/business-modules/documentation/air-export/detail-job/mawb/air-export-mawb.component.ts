@@ -213,6 +213,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             firstCarrierBy: data.supplierName,
                             wtorValpayment: this.setDefaultWTVal(data),
                             otherPayment: this.setDefaultWTVal(data),
+                            kgIb: 'K',
                             handingInformation: this.setDefaultHandlingInformation(data)
                         });
                     }

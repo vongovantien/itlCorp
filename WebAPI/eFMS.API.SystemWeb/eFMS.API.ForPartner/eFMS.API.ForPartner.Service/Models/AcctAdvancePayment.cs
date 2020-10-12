@@ -28,5 +28,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public DateTime? VoucherDate { get; set; }
         public decimal? PaymentTerm { get; set; }
         public DateTime? LastSyncDate { get; set; }
+        public string SyncStatus { get; set; }
     }
 }

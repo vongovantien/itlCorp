@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { AccountingRepo } from '@repositories';
@@ -16,16 +16,19 @@ import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
 import { formatDate } from '@angular/common';
 import { RoutingConstants } from '@constants';
+import { ConfirmPopupComponent } from '@common';
+import { BravoVoucher } from 'src/app/shared/models/partner-api/voucher-bravo';
 
 @Component({
     selector: 'app-accounting-detail-voucher',
     templateUrl: './accounting-detail-voucher.component.html',
 })
 export class AccountingManagementDetailVoucherComponent extends AccountingManagementCreateVoucherComponent implements OnInit {
+    @ViewChild('confirmVoucherPopup', { static: false }) confirmVoucherPopup: ConfirmPopupComponent;
 
     voucherId: string;
     accountingManagement: AccAccountingManagementModel = new AccAccountingManagementModel();
-
+    confirmMessage: string = '';
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
@@ -212,5 +215,56 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
             }
         });
         return charges;
+    }
+
+    confirmSync() {
+        this._toastService.success("Tính năng đang phát triển");
+        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        // this.confirmVoucherPopup.show();
+    }
+
+    onConfirmVoucher() {
+        this.getDataVoucherToSync();
+    }
+
+    getDataVoucherToSync() {
+        this.confirmVoucherPopup.hide();
+        const voucherIds: string[] = [];
+        voucherIds.push(this.voucherId);
+        this._accountingRepo.getListVoucherToSync(voucherIds)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: BravoVoucher[]) => {
+                    const data: BravoVoucher[] = res;
+                    console.log(data);
+                    this.syncToAccountant(data, voucherIds);
+                },
+            );
+    }
+
+    syncToAccountant(data: BravoVoucher[], ids: string[]) {
+        // Gọi API Bravo
+
+        // Sync Bravo success
+        this.updateSyncStatusVoucher(ids);
+    }
+
+    updateSyncStatusVoucher(ids: string[]) {
+        this._accountingRepo.syncVoucherToAccountant(ids)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success('Sync Data to Accountant System Successful!', '');
+                        this.getDetailVoucher(this.voucherId);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                },
+            );
     }
 }

@@ -88,16 +88,15 @@
                             <ng-container *ngIf="type !== 'invoice'">
                                 <td>
                                     <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
-                                        (ngModelChange)="onChangeInvoiceNo(charge.invoiceNo)">
+                                        name="invoiceNo" (blur)="onBlurAnyCharge($event)" />
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" [(ngModel)]="charge.serie"
-                                        (ngModelChange)="onChangeSerieNo(charge.serie)">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.serie" name="serie"
+                                        (blur)="onBlurAnyCharge($event)" />
                                 </td>
                                 <td>
-                                    <input type="text" mask="d0/M0/0000" class="form-control"
-                                        [(ngModel)]="charge.invoiceDate"
-                                        (ngModelChange)="onChangeInvoiceDate(charge.invoiceDate)" />
+                                    <input type="text" mask="d0/M0/0000" class="form-control" name="invoiceDate"
+                                        (blur)="onBlurAnyCharge($event)" [(ngModel)]="charge.invoiceDate" />
                                     <!-- [value]="charge.invoiceDate | mask:'00/00/0000'" -->
                                 </td>
                                 <td>{{charge.obhPartner}}</td>

@@ -62,6 +62,8 @@ export class ApproveAdvancePaymentComponent extends AppPage {
 
     getDetail(idAdvance: string) {
         this._progressRef.start();
+        this.listRequestAdvancePaymentComponent.isLoading = true;
+
         this._accoutingRepo.getDetailAdvancePayment(idAdvance)
             .pipe(
                 catchError(this.catchError),

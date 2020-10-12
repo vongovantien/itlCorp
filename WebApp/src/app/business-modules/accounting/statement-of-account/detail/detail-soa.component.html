@@ -3,11 +3,20 @@
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
             [routerLink]="'/home/accounting/statement-of-account/edit'"
             [queryParams]="{ no: soa.soano, currency: 'VND' }"
-            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
+            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part' && soa.syncStatus !== 'Synced' ">
             <span>
                 <i class="la la-edit"></i>
                 <span>
                     Edit
+                </span>
+            </span>
+        </button>
+        <button class="btn btn-warning  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
+            *ngIf="soa.syncStatus !== 'Synced'">
+            <span>
+                <i class="la la-check"></i>
+                <span>
+                    Confirmed
                 </span>
             </span>
         </button>
@@ -115,6 +124,19 @@
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Type:</span>
                         <span class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 m--margin-bottom-10">
+                        <span class="m--font-bolder">Last Sync:</span>
+                        <span
+                            class="m--font-brand m--margin-left-5">{{soa.lastSyncDate | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                    </div>
+                    <div class="col-lg-4  m--margin-bottom-10" [ngSwitch]="soa.syncStatus">
+                        <span class="m--font-bolder">Sync Status:</span>
+                        <span *ngSwitchCase="'Synced'" class="text-success m--margin-left-5">{{soa.syncStatus}}</span>
+                        <span *ngSwitchCase="'Rejected'" class="text-danger m--margin-left-5">{{soa.syncStatus}}</span>
+                        <span *ngSwitchDefault class="m--margin-left-5">{{soa.syncStatus}}</span>
                     </div>
                 </div>
             </div>
@@ -318,3 +340,5 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<confirm-popup (onSubmit)="onConfirmSoa()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>

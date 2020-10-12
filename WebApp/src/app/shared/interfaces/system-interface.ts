@@ -51,5 +51,17 @@ namespace SystemInterface {
         isAllow: boolean;
     }
 
+    export interface IBravoToken {
+        Message: string;
+        Success: string;
+        TokenKey: string;
+    }
+
+    export interface IBRavoResponse {
+        Stt: string;
+        Success: number;
+        Mgs: string;
+    }
+
 }
 

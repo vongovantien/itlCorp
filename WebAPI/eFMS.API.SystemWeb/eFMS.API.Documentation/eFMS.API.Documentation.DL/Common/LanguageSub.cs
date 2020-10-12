@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND = "MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND";
         public static readonly string MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA = "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA";
         public static readonly string MSG_CDNOTE_NOT_NOT_FOUND = "MSG_CDNOTE_NOT_NOT_FOUND";
+        public static readonly string MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED = "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED";
 
         public static readonly string MSG_SURCHARGE_ARE_DUPLICATE_INVOICE = "MSG_SURCHARGE_ARE_DUPLICATE_INVOICE";
 

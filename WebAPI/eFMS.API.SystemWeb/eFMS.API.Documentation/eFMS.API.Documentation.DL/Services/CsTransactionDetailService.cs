@@ -88,6 +88,7 @@ namespace eFMS.API.Documentation.DL.Services
             permissionService = perService;
             sysOfficeRepo = sysOffice;
             stringLocalizer = localizer;
+            sysCompanyRepo = sysCompany;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -763,27 +764,36 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Owner:
                     houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID
+                                                || x.SaleManId == currentUser.UserID
+                                                );
                     break;
                 case PermissionRange.Group:
                     houseBills = houseBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID
+                                                || x.SaleManId == currentUser.UserID
+                                                );
                     break;
                 case PermissionRange.Department:
                     houseBills = houseBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID
+                                                || x.SaleManId == currentUser.UserID
+                                                );
                     break;
                 case PermissionRange.Office:
                     houseBills = houseBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID
+                                                || x.SaleManId == currentUser.UserID
+                                                );
                     break;
                 case PermissionRange.Company:
                     houseBills = houseBills.Where(x => x.CompanyId == currentUser.CompanyID
                                                 || authorizeUserIds.Contains(x.SaleManId)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID
+                                                || x.SaleManId == currentUser.UserID);
                     break;
             }
             if (houseBills == null)

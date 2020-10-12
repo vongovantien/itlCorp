@@ -393,6 +393,5 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSOAService.PreviewAccountStatementFull(soaNo);
             return Ok(result);
         }
-
     }
 }

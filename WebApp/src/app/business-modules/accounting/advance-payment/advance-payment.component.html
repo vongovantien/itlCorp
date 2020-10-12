@@ -13,7 +13,7 @@
                 <div class="m-form">
                     <div class="row">
                         <div class="col-lg-12 m--margin-bottom-10">
-                            <div class="dropdown m-dropdown m-dropdown--inline">
+                            <div class="dropdown m-dropdown m-dropdown--inline w-100">
                                 <div class="c-button-actions">
                                     <button type="button" class="btn btn-success dropdown-toggle"
                                         data-toggle="dropdown">
@@ -58,6 +58,15 @@
                                             </span>
                                         </span>
                                     </button>
+                                    <button class="btn btn-info m-btn--icon m-btn--uppercase float-right"
+                                        (click)="syncBravo()" title="Sync to accountant system">
+                                        <span>
+                                            <i class="la la-cloud-upload"></i>
+                                            <span>
+                                                Sync to Accountant
+                                            </span>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -70,135 +79,152 @@
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     <th class="m--w-50 first">
                                         <label class="m-checkbox">
-                                            <input type="checkbox" name="" [checked]="checkAll"
+                                            <input type="checkbox" name="" [checked]="isCheckAll"
                                                 [disabled]="!paymentHasStatusDone"
-                                                (change)="checkAll=!checkAll; checkAllChange()">
+                                                (change)="isCheckAll=!isCheckAll; checkAllChange()">
                                             <span></span>
                                         </label>
                                     </th>
                                 </thead>
                                 <tbody class="tbody-group">
-                                    <ng-container
-                                        *ngFor="let advancePayment of advancePayments; let i = index; trackBy: trackByFn">
-                                        <tr class="">
-                                            <td>
-                                                <div class="m-checkbox-list d-flex align-items-center">
-
-                                                    <label class="m-checkbox">
-                                                        <input type="checkbox" name=""
-                                                            [disabled]="advancePayment.statusApproval !== 'Done'"
-                                                            [checked]="advancePayment.isChecked"
-                                                            (change)="advancePayment.isChecked=!advancePayment.isChecked; removeAllChecked();">
-                                                        <span></span>
-                                                    </label>
-                                                    <button
-                                                        (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo, i)"
-                                                        class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
-                                                        [attr.data-target]="'#collapse' + i" data-toggle="collapse"
-                                                        title="Collapse" type="button">
-                                                        <i class="la la-angle-up"></i>
-                                                    </button>
-                                                    <ng-container
-                                                        *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
-                                                        <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
-                                                            title="Delete advance payment"
-                                                            (click)="prepareDeleteAdvance(advancePayment)">
-                                                            <i class="la la-trash text-danger"></i>
+                                    <ng-container *ngIf="!!advancePayments.length">
+                                        <ng-container
+                                            *ngFor="let advancePayment of advancePayments; let i = index; trackBy: trackByFn">
+                                            <tr>
+                                                <td>
+                                                    <div class="m-checkbox-list d-flex align-items-center">
+                                                        <ng-template #dblock>
+                                                            <span class="d-block" style="width:30px"></span>
+                                                        </ng-template>
+                                                        <ng-container
+                                                            *ngIf="advancePayment.statusApproval === 'Done';else dblock">
+                                                            <label class="m-checkbox">
+                                                                <input type="checkbox" name=""
+                                                                    [disabled]="advancePayment.statusApproval !== 'Done'"
+                                                                    [checked]="advancePayment.isChecked"
+                                                                    (change)="advancePayment.isChecked=!advancePayment.isChecked; removeAllChecked();">
+                                                                <span></span>
+                                                            </label>
+                                                        </ng-container>
+                                                        <button
+                                                            (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo, i)"
+                                                            class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
+                                                            [attr.data-target]="'#collapse' + i" data-toggle="collapse"
+                                                            title="Collapse" type="button">
+                                                            <i class="la la-angle-up"></i>
                                                         </button>
+                                                        <ng-container
+                                                            *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
+                                                            <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
+                                                                title="Delete advance payment"
+                                                                (click)="prepareDeleteAdvance(advancePayment)">
+                                                                <i class="la la-trash text-danger"></i>
+                                                            </button>
+                                                        </ng-container>
+                                                    </div>
+                                                </td>
+                                                <td class="text-underline text-primary pointer">
+                                                    <a (click)="viewDetail(advancePayment)">{{advancePayment.advanceNo}}
+                                                    </a>
+                                                </td>
+                                                <td>{{advancePayment.amount | number: '.0-3'}}</td>
+                                                <td>{{advancePayment.advanceCurrency}}</td>
+                                                <td><span class="text-info">{{advancePayment.requesterName}}</span></td>
+                                                <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
+                                                <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
+                                                <td [ngSwitch]="advancePayment.statusApprovalName">
+                                                    <div *ngSwitchCase="'New'" class="text-danger">
+                                                        {{advancePayment.statusApprovalName}}</div>
+                                                    <div *ngSwitchCase="'Done'" class="text-success">
+                                                        {{advancePayment.statusApprovalName}}</div>
+                                                    <div *ngSwitchCase="'Denied'" class="text-danger">
+                                                        {{advancePayment.statusApprovalName}}</div>
+                                                    <div *ngSwitchDefault class="text-primary">
+                                                        {{advancePayment.statusApprovalName}}
+                                                    </div>
+                                                </td>
+                                                <td [ngSwitch]="advancePayment.advanceStatusPayment">
+                                                    <ng-container
+                                                        *ngIf="advancePayment.statusApproval === 'Done' else empty">
+                                                        <div class="text-success" *ngSwitchCase="'Settled'">
+                                                            {{advancePayment.advanceStatusPayment}}
+                                                        </div>
+                                                        <div class="text-danger" *ngSwitchCase="'NotSettled'">
+                                                            Not Settled
+                                                        </div>
+                                                        <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
+                                                            Partial Settlement
+                                                        </div>
                                                     </ng-container>
-                                                </div>
-                                            </td>
-                                            <td class="text-underline text-primary pointer">
-                                                <a (click)="viewDetail(advancePayment)">{{advancePayment.advanceNo}}
-                                                </a>
-                                            </td>
-                                            <td>{{advancePayment.amount | number: '.0-3'}}</td>
-                                            <td>{{advancePayment.advanceCurrency}}</td>
-                                            <td><span class="text-info">{{advancePayment.requesterName}}</span></td>
-                                            <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
-                                            <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
-                                            <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
-                                            <td [ngSwitch]="advancePayment.statusApprovalName">
-                                                <div *ngSwitchCase="'New'" class="text-danger">
-                                                    {{advancePayment.statusApprovalName}}</div>
-                                                <div *ngSwitchCase="'Done'" class="text-success">
-                                                    {{advancePayment.statusApprovalName}}</div>
-                                                <div *ngSwitchCase="'Denied'" class="text-danger">
-                                                    {{advancePayment.statusApprovalName}}</div>
-                                                <div *ngSwitchDefault class="text-primary">
-                                                    {{advancePayment.statusApprovalName}}
-                                                </div>
-                                            </td>
-                                            <td [ngSwitch]="advancePayment.advanceStatusPayment">
-                                                <ng-container
-                                                    *ngIf="advancePayment.statusApproval === 'Done' else empty">
-                                                    <div class="text-success" *ngSwitchCase="'Settled'">
-                                                        {{advancePayment.advanceStatusPayment}}
+                                                    <ng-template #empty>-</ng-template>
+                                                </td>
+                                                <td [ngSwitch]="advancePayment.paymentMethod">
+                                                    <div *ngSwitchCase="'Cash'" class="text-primary">
+                                                        {{advancePayment.paymentMethodName}}
                                                     </div>
-                                                    <div class="text-danger" *ngSwitchCase="'NotSettled'">
-                                                        Not Settled
+                                                    <div *ngSwitchDefault class="text-info">
+                                                        {{advancePayment.paymentMethodName}}
                                                     </div>
-                                                    <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
-                                                        Partial Settlement
+                                                </td>
+                                                <td>{{advancePayment.advanceNote}}</td>
+                                                <td>{{advancePayment.voucherNo}}</td>
+                                                <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td class="text-info">
+                                                    {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td [ngSwitch]="advancePayment.syncStatus">
+                                                    <div *ngSwitchCase="'Synced'" class="text-success">
+                                                        {{advancePayment.syncStatus}}
                                                     </div>
-                                                </ng-container>
-                                                <ng-template #empty>-</ng-template>
-                                            </td>
-                                            <td [ngSwitch]="advancePayment.paymentMethod">
-                                                <div *ngSwitchCase="'Cash'" class="text-primary">
-                                                    {{advancePayment.paymentMethodName}}
-                                                </div>
-                                                <div *ngSwitchDefault class="text-info">
-                                                    {{advancePayment.paymentMethodName}}
-                                                </div>
-                                            </td>
-                                            <td>{{advancePayment.advanceNote}}</td>
-                                            <td>{{advancePayment.voucherNo}}</td>
-                                            <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
-                                            <td class="text-success">
-                                                {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy'}}</td>
+                                                    <div *ngSwitchDefault class="text-danger">
+                                                        {{advancePayment.syncStatus}}
+                                                    </div>
+                                                </td>
 
-                                        </tr>
-                                        <tr class="collapse-panel-row" app-table-collapse-row [id]="'collapse' + i"
-                                            [parentId]="'#adv-payment-list-table'">
-                                            <table class="table table-secondary dataTable">
-                                                <thead app-table-header [headers]="headerGroupRequest"
-                                                    (onClick)="sortByCollapse($event)">
-                                                </thead>
-                                                <tbody>
-                                                    <ng-container *ngIf="!isLoading && !!groupRequest.length">
-                                                        <tr class=""
-                                                            *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
-                                                            <td>{{request.jobId}}</td>
-                                                            <td>{{request.customNo}}</td>
-                                                            <td>{{request.hbl}}</td>
-                                                            <td>{{request.amount | number :'.0-2'}}</td>
-                                                            <td>{{request.requestCurrency}}</td>
-                                                            <td [ngSwitch]="request.statusPayment">
-                                                                <ng-container
-                                                                    *ngIf="advancePayment.statusApproval === 'Done' else empty">
-                                                                    <div class="text-success" *ngSwitchCase="'Settled'">
-                                                                        {{request.statusPayment}}
-                                                                    </div>
-                                                                    <div class="text-danger"
-                                                                        *ngSwitchCase="'NotSettled'">
-                                                                        Not Settled
-                                                                    </div>
-                                                                    <div class="text-danger"
-                                                                        *ngSwitchCase="'PartialSettlement'">
-                                                                        Partial Settlement
-                                                                    </div>
-                                                                </ng-container>
-                                                                <ng-template #empty>-</ng-template>
-                                                            </td>
+                                            </tr>
+                                            <tr class="collapse-panel-row" app-table-collapse-row [id]="'collapse' + i"
+                                                [parentId]="'#adv-payment-list-table'">
+                                                <table class="table table-secondary dataTable">
+                                                    <thead app-table-header [headers]="headerGroupRequest"
+                                                        (onClick)="sortByCollapse($event)">
+                                                    </thead>
+                                                    <tbody>
+                                                        <ng-container *ngIf="!isLoading && !!groupRequest.length">
+                                                            <tr class=""
+                                                                *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
+                                                                <td>{{request.jobId}}</td>
+                                                                <td>{{request.customNo}}</td>
+                                                                <td>{{request.hbl}}</td>
+                                                                <td>{{request.amount | number :'.0-2'}}</td>
+                                                                <td>{{request.requestCurrency}}</td>
+                                                                <td [ngSwitch]="request.statusPayment">
+                                                                    <ng-container
+                                                                        *ngIf="advancePayment.statusApproval === 'Done' else empty">
+                                                                        <div class="text-success"
+                                                                            *ngSwitchCase="'Settled'">
+                                                                            {{request.statusPayment}}
+                                                                        </div>
+                                                                        <div class="text-danger"
+                                                                            *ngSwitchCase="'NotSettled'">
+                                                                            Not Settled
+                                                                        </div>
+                                                                        <div class="text-danger"
+                                                                            *ngSwitchCase="'PartialSettlement'">
+                                                                            Partial Settlement
+                                                                        </div>
+                                                                    </ng-container>
+                                                                    <ng-template #empty>-</ng-template>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                        <tr *ngIf="!isLoading && !groupRequest.length"
+                                                            app-table-none-record>
                                                         </tr>
-                                                    </ng-container>
-                                                    <tr *ngIf="!isLoading && !groupRequest.length"
-                                                        app-table-none-record>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </tr>
+                                        </ng-container>
+
                                     </ng-container>
                                     <tr *ngIf="!isLoading && !advancePayments.length" app-table-none-record
                                         [colspan]="headers.length + 1">
@@ -220,9 +246,11 @@
 
 <confirm-popup #confirmDelete (onSubmit)="onDeleteAdvPayment()" [body]="'Do you want to delete ?'"
     [labelConfirm]="'Yes'" [labelCancel]="'No'"></confirm-popup>
+
 <confirm-popup #confirmExistedVoucher (onSubmit)="onSubmitUpdateVoucher()" [labelConfirm]="'Yes'"
     [body]="messageVoucherExisted" [labelCancel]="'No'" title="Voucher Existed">
 </confirm-popup>
+
 <confirm-popup #confirmRemoveSelectedVoucher (onSubmit)="onRemoveSelectedVoucher()" [labelConfirm]="'Yes'"
     [body]="'Are you sure you want to remove selected payment vouchers?'" [labelCancel]="'No'"
     title="Confirm remove selected voucher">
@@ -230,6 +258,9 @@
 
 
 <permission-403-popup></permission-403-popup>
+
 <update-payment-voucher-popup (onRequest)="applyVoucher($event)"></update-payment-voucher-popup>
+
 <info-popup body="Opps, Please check an advance to update voucher !!'" [title]="'Cannot Update Voucher'"></info-popup>
+
 <advance-payments-popup></advance-payments-popup>

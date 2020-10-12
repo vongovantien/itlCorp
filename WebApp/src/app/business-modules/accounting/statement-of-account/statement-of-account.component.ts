@@ -58,7 +58,9 @@ export class StatementOfAccountComponent extends AppList {
                 title: "Modified Date",
                 field: "datetimeModified",
                 sortable: true
-            }
+            },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
+            { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
         this.dataSearch = {
             CurrencyLocal: "VND"

@@ -26,7 +26,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     @ViewChild(AccountPaymentUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
-
+    @ViewChild('confirmInvoicePaymentPopup', { static: false }) confirmInvoicePaymentPopup: ConfirmPopupComponent;
     @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
 
 
@@ -35,7 +35,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     paymentHeaders: CommonInterface.IHeaderTable[];
 
     selectedPayment: PaymentModel;
-
+    confirmMessage: string = '';
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -197,6 +197,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
+                        this.getPagingData();
                         this.getPayments(this.selectedPayment.refNo);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
@@ -204,4 +205,34 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
                 },
             );
     }
+
+    confirmSync() {
+        this._toastService.success("Tính năng đang phát triển");
+        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        // this.confirmInvoicePaymentPopup.show();
+    }
+
+    onConfirmInvoicePayment() {
+        this.getDataInvoicePaymentToSync();
+    }
+
+    getDataInvoicePaymentToSync() {
+        this.confirmInvoicePaymentPopup.hide();
+        // const invoicePaymentIds: string[] = [];
+        // invoicePaymentIds.push();
+        // this._accountingRepo.getListInvoiceToSync(invoicePaymentIds)
+        //     .pipe(
+        //         catchError(this.catchError),
+        //     ).subscribe(
+        //         (res: BravoVoucher[]) => {
+        //             const data: BravoVoucher[] = res;
+        //             console.log(data);
+        //             this.syncToAccountant(data, invoicePaymentIds);
+        //         },
+        //     );
+    }
+
+    // syncToAccountant(data: BravoVoucher[], ids: string[]) {
+    //     // Gọi API Bravo
+    // }
 }

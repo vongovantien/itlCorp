@@ -138,6 +138,11 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         if (!this.arrivalNoteComponent.checkValidate() || !this.arrivalNoteComponent.hblArrivalNote.arrivalNo) {
             this.activeTab = 'arrival';
             this.infoPopup.show();
+
+            return;
+        }
+
+        if (!this.arrivalNoteComponent.checkValidateFirstNote() || !this.arrivalNoteComponent.checkValidateSecondtNote()) {
             return;
         }
         if (!this.deliveryComponent.deliveryOrder.deliveryOrderNo) {

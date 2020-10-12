@@ -108,6 +108,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
     }
 
     getListInvoice() {
+
         this._store.select(accountingManagementListState)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
@@ -174,14 +175,18 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
     }
 
     onDeleteInvoice() {
+
         if (!!this.selectedInvoice) {
             this._accountingRepo.deleteAcctMngt(this.selectedInvoice.id)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.message) {
+                            console.log("delete!");
                             this._toastService.success(res.message);
                             this.confirmPopupDelete.hide();
                             this.onSearchInvoice(this.dataSearch);
+                            this.requestSearchAcctMngt();
+
                         } else {
                             this._toastService.error(res.message);
                         }

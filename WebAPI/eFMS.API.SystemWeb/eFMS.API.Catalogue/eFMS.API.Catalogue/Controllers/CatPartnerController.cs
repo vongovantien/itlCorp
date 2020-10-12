@@ -139,6 +139,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
 
         [HttpGet("CheckPermission/{id}")]
+        [Authorize]
         public IActionResult CheckDetailPermission(string id)
         {
 

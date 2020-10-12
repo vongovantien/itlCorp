@@ -45,6 +45,7 @@
   "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA": "Cannot delete, this credit debit not is containing at least one charge have SOA no!",
   "MSG_CDNOTE_NOT_NOT_FOUND": "CD Note not found !",
   "MSG_SURCHARGE_ARE_DUPLICATE_INVOICE": "Surcharges have duplicated invoice charge",
+  "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED": "Not allow delete. Credit debit note is synced",
 
   "MSG_NOT_FOUND_TRANSACTION_TYPE": "Not found type transaction",
   "MSG_MBL_REQUIRED": "MBL is required!",

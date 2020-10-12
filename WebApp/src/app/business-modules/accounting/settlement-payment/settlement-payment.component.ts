@@ -1,21 +1,33 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
-import { ToastrService } from 'ngx-toastr';
-import { SortService } from 'src/app/shared/services';
-import { NgProgress } from '@ngx-progressbar/core';
-import { Router } from '@angular/router';
-import { catchError, finalize, map, } from 'rxjs/operators';
-import { User, SettlementPayment, PartnerOfAcctManagementResult } from 'src/app/shared/models';
-import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { ReportPreviewComponent } from 'src/app/shared/common';
-import { SystemConstants } from 'src/constants/system.const';
-import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
+
+import { NgxSpinnerService } from 'ngx-spinner';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { SelectRequester } from '../accounting-management/store';
 import { RoutingConstants } from '@constants';
+import { AppList } from '@app';
+import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { SortService } from '@services';
+import { User, SettlementPayment, PartnerOfAcctManagementResult } from '@models';
+import {
+    ConfirmPopupComponent,
+    Permission403PopupComponent,
+    InfoPopupComponent,
+    ReportPreviewComponent
+} from '@common';
+import { SystemConstants } from '@constants';
+import { AccountingConstants } from '@constants';
+
+import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
+
+import { catchError, concatMap, finalize, map, } from 'rxjs/operators';
+import { of } from 'rxjs';
+
 
 @Component({
     selector: 'app-settlement-payment',
@@ -30,7 +42,6 @@ export class SettlementPaymentComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(SettlementPaymentsPopupComponent, { static: false }) settlementPaymentsPopup: SettlementPaymentsPopupComponent;
 
-    headers: CommonInterface.IHeaderTable[];
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
 
@@ -38,7 +49,6 @@ export class SettlementPaymentComponent extends AppList {
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     userLogged: User;
-    dataReport: any = null;
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -47,7 +57,9 @@ export class SettlementPaymentComponent extends AppList {
         private _progressService: NgProgress,
         private _router: Router,
         private _exportRepo: ExportRepo,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _spinner: NgxSpinnerService,
+        private _partnerAPI: PartnerAPIRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -238,6 +250,8 @@ export class SettlementPaymentComponent extends AppList {
         const settlementCodes = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done');
         if (!!settlementCodes.length) {
             this.searchRef(settlementCodes.map(x => x.settlementNo));
+        } else {
+            this._toastService.warning("Please select settlement payment");
         }
     }
 
@@ -299,5 +313,64 @@ export class SettlementPaymentComponent extends AppList {
         this.settlementPaymentsPopup.pageSize = this.pageSize;
         this.settlementPaymentsPopup.getListSettlePayment();
         this.settlementPaymentsPopup.show();
+    }
+
+    syncBravo() {
+        const settlementSyncList = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done');
+        if (!settlementSyncList.length) {
+            this._toastService.warning("Please select settlement payments to sync");
+            return;
+        }
+
+        const hasSynced: boolean = settlementSyncList.some(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED);
+        if (hasSynced) {
+            const settlementHasSynced = settlementSyncList.filter(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED).map(a => a.settlementNo).toString();
+            this._toastService.warning(`${settlementHasSynced} had synced, Please recheck!`);
+            return;
+        }
+
+        const settleIds: string[] = settlementSyncList.map(x => x.id);
+        if (!settleIds.length) {
+            return;
+        }
+
+        this._spinner.show();
+        this._accoutingRepo.getListSettleSyncData(settleIds)
+            .pipe(
+                concatMap((list: any[]) => {
+                    console.log(list);
+                    if (!list || !list.length) {
+                        return of(-1);
+                    }
+                    return this._partnerAPI.addSyncInvoiceBravo(list);
+                }),
+                concatMap((bravoRes: SystemInterface.IBRavoResponse) => {
+                    if (bravoRes.Success === 1) {
+                        return this._accoutingRepo.syncSettleToAccountant(settleIds);
+                    }
+                    return of(-2);
+                }),
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult | number) => {
+                    if (res === -1) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (res === -2) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync data thành công");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+
     }
 }

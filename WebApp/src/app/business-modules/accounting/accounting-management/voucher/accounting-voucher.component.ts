@@ -63,6 +63,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
             { title: 'Voucher Date', field: 'date', sortable: true },
             { title: 'Issued Date', field: 'datetimeCreated', sortable: true },
             { title: 'Sync Date', field: 'lastSyncDate', sortable: true },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },
         ];
 
@@ -174,6 +175,8 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
                             this._toastService.success(res.message);
                             this.confirmPopupDelete.hide();
                             this.onSearchVoucher(this.dataSearch);
+
+                            this.requestSearchAcctMngt();
                         } else {
                             this._toastService.error(res.message);
                         }
