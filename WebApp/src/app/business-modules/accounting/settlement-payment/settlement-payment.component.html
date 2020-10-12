@@ -67,8 +67,9 @@
                                                     <ng-template #dblock>
                                                         <span class="d-block" style="width:30px"></span>
                                                     </ng-template>
-                                                    <label class="m-checkbox"
-                                                        *ngIf="settlePayment.statusApproval === 'Done' && !settlePayment.voucherNo;else dblock">
+                                                    <label class="m-checkbox" *ngIf="settlePayment.statusApproval === 'Done' 
+                                                        && !settlePayment.voucherNo 
+                                                        && settlePayment.syncStatus !== 'Synced';else dblock">
                                                         <input type="checkbox" [(ngModel)]="settlePayment.isSelected"
                                                             (change)="onChangeSelectedSettlement(settlePayment);">
                                                         <span></span>
@@ -121,6 +122,17 @@
                                             </td>
                                             <td>{{settlePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{settlePayment.note}}</td>
+                                            <td class="text-info">
+                                                {{settlePayment.lastSyncDate | date: 'dd/MM/yyyy'}}
+                                            </td>
+                                            <td [ngSwitch]="settlePayment.syncStatus">
+                                                <div *ngSwitchCase="'Synced'" class="text-success">
+                                                    {{settlePayment.syncStatus}}
+                                                </div>
+                                                <div *ngSwitchDefault class="text-danger">
+                                                    {{settlePayment.syncStatus}}
+                                                </div>
+                                            </td>
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row
                                             [id]="'ops-shipment-00' + settlePayment.id + 1"
@@ -164,31 +176,9 @@
                             </table>
                         </div>
                     </perfect-scrollbar>
-                    <div class="pagination-nav ">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="tatable__pager-size">
-                                    <div class="select-box">
-                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                            (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                            <ng-container
-                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                <option [ngValue]="item">{{item}} line / screen</option>
-                                            </ng-container>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                <div class="float-right">
-                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                        [(ngModel)]="page">
-                                    </pagination>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                        (onChange)="updatePagingData($event)"></app-pagination>
                 </div>
             </div>
         </div>
@@ -198,6 +188,9 @@
 
 <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteSettlemenPayment()">
 </confirm-popup>
+
+<confirm-popup #confirmSyncSettle (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
+    body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
 
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>

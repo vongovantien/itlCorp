@@ -96,8 +96,9 @@
                                                         <ng-template #dblock>
                                                             <span class="d-block" style="width:30px"></span>
                                                         </ng-template>
-                                                        <ng-container
-                                                            *ngIf="advancePayment.statusApproval === 'Done' && advancePayment.syncStatus !== 'Synced' ;else dblock">
+                                                        <ng-container *ngIf="advancePayment.statusApproval === 'Done' 
+                                                            && !advancePayment.voucherNo 
+                                                            && advancePayment.syncStatus !== 'Synced' ;else dblock">
                                                             <label class="m-checkbox">
                                                                 <input type="checkbox" name=""
                                                                     [disabled]="advancePayment.statusApproval !== 'Done'"

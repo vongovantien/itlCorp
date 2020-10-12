@@ -246,12 +246,13 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    select new BravoSettlementModel
                                                                    {
                                                                        Stt = settle.Id,
-                                                                       Office = office.Code,
+                                                                       OfficeCode = office.Code,
                                                                        DocDate = settle.RequestDate,
                                                                        ReferenceNo = settle.SettlementNo,
                                                                        ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
                                                                        Description0 = settle.Note,
                                                                        CustomerName = employee.EmployeeNameVn,
+                                                                       CustomerCode = employee.StaffCode
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -494,7 +495,7 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentModel sync = new PaymentModel();
                 sync.Stt = invoice.Id.ToString();
                 sync.BranchCode = string.Empty;
-                sync.Office = offices.Where(x => x.Id == invoice.OfficeId).FirstOrDefault()?.Code;
+                sync.OfficeCode = offices.Where(x => x.Id == invoice.OfficeId).FirstOrDefault()?.Code;
                 sync.DocDate = invoice.Date; //Invoice Date
                 sync.ReferenceNo = invoice.InvoiceNoReal; //Invoice No
                 var invoicePartner = partners.Where(x => x.Id == invoice.PartnerId).FirstOrDefault();
@@ -538,7 +539,7 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentModel sync = new PaymentModel();
                 sync.Stt = soa.Id.ToString();
                 sync.BranchCode = string.Empty;
-                sync.Office = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
+                sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
                 sync.DocDate = soa.DatetimeCreated; //Created Date SOA
                 sync.ReferenceNo = soa.Soano; //SOA No
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();

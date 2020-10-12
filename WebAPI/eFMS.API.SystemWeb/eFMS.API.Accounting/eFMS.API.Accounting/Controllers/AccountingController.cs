@@ -48,6 +48,13 @@ namespace eFMS.API.Accounting.Controllers
             };
         }
 
+        [HttpPost("GetListSettleToSync")]
+        public IActionResult GetListSettleToSync(List<Guid> ids)
+        {
+            var result = accountingService.GetListSettlementToSyncBravo(ids);
+            return Ok(result);
+        }
+
         [HttpPost("GetListCdNoteToSync")]
         public IActionResult GetListCdNoteToSync(List<Guid> ids, string type)
         {
@@ -168,14 +175,14 @@ namespace eFMS.API.Accounting.Controllers
                     // 3. Call Bravo to SYNC.
                     if (IdsAdd.Count > 0)
                     {
-                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncAdd", list, loginResponse.TokenKey);
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", list, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
                     }
 
                     if (IdsUpdate.Count > 0)
                     {
-                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncUpdate", list, loginResponse.TokenKey);
-                        responseUpdateModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", list, loginResponse.TokenKey);
+                        responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
                     }
 
                     // 4. Update STATUS
@@ -237,7 +244,7 @@ namespace eFMS.API.Accounting.Controllers
                     if (IdsUpdate.Count > 0)
                     {
                         resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", list, loginResponse.TokenKey);
-                        responseUpdateModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                        responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
                     }
 
                     // 4. Update STATUS
