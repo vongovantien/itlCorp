@@ -630,13 +630,6 @@ export class DocumentationRepo {
         );
     }
 
-    csConfirmed(cdNo: string) {
-        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/CsConfirmed`, {}, { cdNo: cdNo })
-            .pipe(
-                map((data: any) => data)
-            );
-    }
-
     getShipmentDemensionDetail(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetByMasterBill`, { mblId: jobId }).pipe(
             map((data: any) => data)
@@ -821,7 +814,7 @@ export class DocumentationRepo {
     }
 
     getInfoMailHBLSeaImport(hblId: string, serviceId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLSeaImport`, { hblId: hblId , serviceId: serviceId}).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLSeaImport`, { hblId: hblId, serviceId: serviceId }).pipe(
             map((data: any) => data)
         );
     }

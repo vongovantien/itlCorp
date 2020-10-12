@@ -1,6 +1,6 @@
 import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
-import { DocumentationRepo } from "src/app/shared/repositories";
+import { DocumentationRepo, AccountingRepo } from "src/app/shared/repositories";
 import { ShareBussinessCdNoteAddAirPopupComponent } from "../add-cd-note/add-cd-note.popup";
 import { catchError, finalize } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
@@ -11,13 +11,14 @@ import { ModalDirective } from "ngx-bootstrap/modal";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
 import { environment } from 'src/environments/environment';
+import { SyncModel } from "src/app/shared/models/partner-api/sync-model";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
     templateUrl: './detail-cd-note.popup.html'
 })
 export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteAddAirPopupComponent, { static: false }) cdNoteEditPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
     @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
@@ -26,7 +27,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     jobId: string = null;
     cdNote: string = null;
-    deleteMessage: string = '';
+    confirmMessage: string = '';
+    typeConfirm: string = '';
     isHouseBillID: boolean = false;
     transactionType: TransactionTypeEnum = 0;
 
@@ -46,6 +48,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
+        private _accountantRepo: AccountingRepo
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -71,7 +74,9 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             volume: 'Volume',
             packageQty: 'Package Quantity',
             soa: 'SOA',
-            locked: 'Locked'
+            locked: 'Locked',
+            syncStatus: 'Sync Status',
+            lastSync: 'Last Sync'
         };
 
         this.headers = [
@@ -156,8 +161,9 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.deleteMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
-                        this.confirmDeleteCdNotePopup.show();
+                        this.confirmMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
+                        this.typeConfirm = "DELETE";
+                        this.confirmCdNotePopup.show();
                     } else {
                         this.canNotDeleteCdNotePopup.show();
                     }
@@ -165,12 +171,12 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             );
     }
 
-    onDeleteCdNote() {
+    deleteCdNote() {
         this._documentationRepo.deleteCdNote(this.CdNoteDetail.cdNote.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
-                    this.confirmDeleteCdNotePopup.hide();
+                    this.confirmCdNotePopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -280,4 +286,60 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         this.popupReport.hide();
     }
 
+    showConfirmed() {
+        this._toastService.success("Tính năng đang phát triển");
+        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        // this.typeConfirm = "CONFIRMED";
+        // this.confirmCdNotePopup.show();
+    }
+
+    onConfirmCdNote() {
+        if (this.typeConfirm === "DELETE") {
+            this.deleteCdNote();
+        } else if (this.typeConfirm === "CONFIRMED") {
+            this.getDataCdNoteToSync();
+        }
+    }
+
+    getDataCdNoteToSync() {
+        this.confirmCdNotePopup.hide();
+        const cdNoteIds: string[] = [];
+        cdNoteIds.push(this.CdNoteDetail.cdNote.id);
+        this._accountantRepo.getListCdNoteToSync(cdNoteIds, this.CdNoteDetail.cdNote.type)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: SyncModel[]) => {
+                    const data: SyncModel[] = res;
+                    this.syncToAccountant(data, cdNoteIds);
+                },
+            );
+    }
+
+    syncToAccountant(data: SyncModel[], ids: string[]) {
+        // Gọi API Bravo (Nghiệp vụ hóa đơn hoặc nghiệp vụ chi phí dựa vào Type của CD Note)
+
+        // Sync Bravo success
+        this.updateSyncStatusCdNote(ids);
+    }
+
+    updateSyncStatusCdNote(ids: string[]) {
+        this._accountantRepo.syncCdNoteToAccountant(ids)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success('Sync Data to Accountant System Successful!', '');
+                        this.getDetailCdNote(this.jobId, this.cdNote);
+                        // Gọi onDelete để refresh lại list cd note
+                        this.onDeleted.emit();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                },
+            );
+    }
 }

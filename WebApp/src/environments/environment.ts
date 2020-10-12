@@ -3,8 +3,8 @@ export const environment = {
         local: false,
         HOST: {
                 WEB_URL: "test.api-efms.itlvn.com",
-                ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
-                // ACCOUNTING: "localhost:44368",
+                // ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
+                ACCOUNTING: "localhost:44368",
                 DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
                 // DOCUMENTATION: "localhost:44366",
                 CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
@@ -24,7 +24,7 @@ export const environment = {
                 // EXPORT_CRYSTAL: "http://localhost:53717/ExportCrystal.aspx",
                 EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
                 PARTNER_API: "test.api-efms.itlvn.com/partner",
-                ESB: "test-esb.itlvn.com:8280/bravo-itl"
+                ESB: "test-esb.itlvn.com:8280/itl-bravo"
         },
 
         AUTHORIZATION:

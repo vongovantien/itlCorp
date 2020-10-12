@@ -44,6 +44,11 @@
                                                         title="Collapse" (click)="getPayments(item.refId)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
+                                                    <button type="button"
+                                                        class="btn btn-sm m-btn--icon m-btn--icon-only"
+                                                        (click)="confirmSync()" title="Sync to accountant system">
+                                                        <i class="la la-cloud-upload text-warning"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                             <td>{{ item.soaNo }} </td>
@@ -141,3 +146,6 @@
 <info-popup [body]="'You can only delete the last payment. Please check again!'" [title]="'Notification'"
     [label]="'Ok'">
 </info-popup>
+
+<confirm-popup #confirmObhPaymentPopup (onSubmit)="onConfirmObhPayment()" [body]="confirmMessage" [labelConfirm]="'Ok'">
+</confirm-popup>

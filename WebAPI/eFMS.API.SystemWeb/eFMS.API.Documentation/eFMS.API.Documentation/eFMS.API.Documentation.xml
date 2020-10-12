@@ -71,13 +71,6 @@
             <param name="size"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CsConfirmed(System.String)">
-            <summary>
-            CS Confirmed by cdNo
-            </summary>
-            <param name="cdNo">Soa No</param>
-            <returns></returns>
-        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
             <summary>
             

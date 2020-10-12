@@ -48,5 +48,7 @@ namespace eFMS.API.Documentation.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public DateTime? LastSyncDate { get; set; }
+        public string SyncStatus { get; set; }
     }
 }

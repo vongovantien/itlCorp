@@ -3241,44 +3241,5 @@ namespace eFMS.API.Accounting.DL.Services
             return advanceRequests;
         }
 
-        public HandleState SyncListAdvance(List<Guid> ids, out List<Guid> data)
-        {
-            HandleState result = new HandleState();
-            List<Guid> invalidAdvances = new List<Guid>();
-            if (ids.Count > 0)
-            {
-                invalidAdvances = DataContext.Get(x => ids.Contains(x.Id) && (
-                x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
-                || !string.IsNullOrEmpty(x.VoucherNo)
-                || x.LastSyncDate.HasValue
-                ))
-                    .Select(x => x.Id)
-                    .ToList();
-
-                if (invalidAdvances.Count > 0)
-                {
-                    data = invalidAdvances;
-                    return new HandleState("Danh sách advance không hợp lệ");
-                }
-
-                foreach (Guid id in ids)
-                {
-                    AcctAdvancePayment adv = DataContext.Get(x => x.Id == id)?.FirstOrDefault();
-                    if (adv != null)
-                    {
-                        adv.UserModified = currentUser.UserID;
-                        adv.DatetimeModified = DateTime.Now;
-                        adv.LastSyncDate = DateTime.Now;
-
-                        DataContext.Update(adv, x => x.Id == id, false);
-                    }
-                }
-
-                result = DataContext.SubmitChanges();
-            }
-
-            data = invalidAdvances;
-            return result;
-        }
     }
 }

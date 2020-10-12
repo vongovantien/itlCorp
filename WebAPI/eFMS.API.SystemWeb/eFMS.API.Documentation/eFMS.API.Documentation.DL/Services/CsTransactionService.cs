@@ -675,9 +675,10 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
+            var SalemansIds = csTransactionDetailRepo.Get(x => x.JobId == id).Select(t => t.SaleManId).ToArray();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
+            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, SalemanIds = SalemansIds, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
             return code;
         }
 
@@ -814,27 +815,27 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Owner:
                     masterBills = masterBills.Where(x => x.PersonIncharge == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y=>y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
                     break;
                 case PermissionRange.Group:
                     masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
                     break;
                 case PermissionRange.Department:
                     masterBills = masterBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
                     break;
                 case PermissionRange.Office:
                     masterBills = masterBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
                     break;
                 case PermissionRange.Company:
                     masterBills = masterBills.Where(x => x.CompanyId == currentUser.CompanyID
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID);
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
                     break;
             }
             if (masterBills == null)

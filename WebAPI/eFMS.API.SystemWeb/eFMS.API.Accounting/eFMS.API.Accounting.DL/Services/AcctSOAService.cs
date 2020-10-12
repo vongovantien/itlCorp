@@ -1522,7 +1522,9 @@ namespace eFMS.API.Accounting.DL.Services
                                  UserCreated = ucreate.Username,
                                  DatetimeModified = s.DatetimeModified,
                                  UserModified = umodifies.Username,
-                                 PaymentStatus = s.PaymentStatus
+                                 PaymentStatus = s.PaymentStatus,
+                                 SyncStatus = s.SyncStatus,
+                                 LastSyncDate = s.LastSyncDate
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
@@ -1711,7 +1713,9 @@ namespace eFMS.API.Accounting.DL.Services
                                  DateType = s.DateType,
                                  CreatorShipment = s.CreatorShipment,
                                  PaymentStatus = s.PaymentStatus,
-                                 PaymentDueDate = s.PaymentDueDate
+                                 PaymentDueDate = s.PaymentDueDate,
+                                 SyncStatus = s.SyncStatus,
+                                 LastSyncDate = s.LastSyncDate
                              };
             var result = resultData.FirstOrDefault();
             if (result != null)
@@ -2066,6 +2070,26 @@ namespace eFMS.API.Accounting.DL.Services
                     if (air.HandlingFee.HasValue)
                     {
                         air.NetAmount += air.HandlingFee;
+                    }
+                    if (air.AMS.HasValue)
+                    {
+                        air.NetAmount += air.AMS;
+                    }
+                    if (air.AWB.HasValue)
+                    {
+                        air.NetAmount += air.AWB;
+                    }
+                    if (air.DAN.HasValue)
+                    {
+                        air.NetAmount += air.DAN;
+                    }
+                    if (air.OTH.HasValue)
+                    {
+                        air.NetAmount += air.OTH;
+                    }
+                    if (air.FuelSurcharge.HasValue)
+                    {
+                        air.NetAmount += air.FuelSurcharge;
                     }
                     var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
                     if (dataCharge.Any())
@@ -2605,35 +2629,6 @@ namespace eFMS.API.Accounting.DL.Services
             var surchargeIds = csShipmentSurchargeRepo.Get(x => x.PaySoano == soaNo || x.Soano == soaNo).Select(s => s.Id).ToList();
             return surchargeIds;
         }
-
-        public HandleState CsConfirmed(string soaNo)
-        {
-            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
-            if (soa == null) return null;
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    soa.UserModified = currentUser.UserID;
-                    soa.DatetimeModified = DateTime.Now;
-                    soa.Status = "Cs Confirmed";
-                    soa.SyncStatus = "SYNCED";
-                    soa.LastSyncDate = DateTime.Now;
-                    var hsUpdateSOA = DataContext.Update(soa, x => x.Id == soa.Id);
-                    trans.Commit();
-                    return hsUpdateSOA;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
-            }
-
-        }
+        
     }
 }
