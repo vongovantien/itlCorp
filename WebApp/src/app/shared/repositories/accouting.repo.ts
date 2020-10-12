@@ -658,7 +658,7 @@ export class AccountingRepo {
         );
     }
 
-    syncAdvanceToAccountant(list: string[]) {
+    syncAdvanceToAccountant(list: any[]) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncAdvanceToAccountantSystem`, list).pipe(
             map((data: any) => data)
         );

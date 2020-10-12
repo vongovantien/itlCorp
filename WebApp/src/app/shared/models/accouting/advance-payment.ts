@@ -23,8 +23,7 @@ export class AdvancePayment {
     advanceRequests: AdvancePaymentRequest[] = [];
     amount: number = 0;
     paymentMethodName: string = '';
-    userNameCreated: string = '';
-    userNameModified: string = '';
+
     isChecked: boolean = false;
     voucherNo: string = '';
     voucherDate: string = '';
@@ -37,6 +36,10 @@ export class AdvancePayment {
     isManager: boolean = false;
     isApproved: boolean = false;
     isShowBtnDeny: boolean = false;
+
+    userCreatedName: string = null;
+    userModifiedName: string = null;
+
 
 
     constructor(object?: any) {
