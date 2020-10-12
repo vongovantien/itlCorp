@@ -19,10 +19,6 @@
                                 </app-permission-button>
                             </ng-container>
 
-                            <app-default-button [buttonSetting]="cancelButtonSetting"
-                                (onClick)="accountingManagement.status !== 'New' ? gotoList() : confirmCancelPopup.show()">
-                            </app-default-button>
-
                             <button class="btn btn-warning m-btn--icon m-btn--uppercase" (click)="confirmSync()"
                                 title="Sync to accountant system" *ngIf="accountingManagement.syncStatus !== 'Synced'">
                                 <span>
@@ -32,6 +28,10 @@
                                     </span>
                                 </span>
                             </button>
+
+                            <app-default-button [buttonSetting]="cancelButtonSetting"
+                                (onClick)="accountingManagement.status !== 'New' ? gotoList() : confirmCancelPopup.show()">
+                            </app-default-button>
                         </div>
                     </div>
                 </div>
