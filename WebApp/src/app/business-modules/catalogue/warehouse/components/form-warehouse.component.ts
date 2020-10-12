@@ -165,9 +165,13 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
     onChange(event: any, type: string) {
         switch (type) {
             case 'country':
+                this.province.setValue(null);
+                this.district.setValue(null);
+                this.districts = [];
                 this.getProvinces(event.id);
                 break;
             case 'province':
+                this.district.setValue(null);
                 this.getDistricts(event.id);
                 break;
         }

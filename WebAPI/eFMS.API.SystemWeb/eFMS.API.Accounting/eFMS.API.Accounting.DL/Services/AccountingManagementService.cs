@@ -321,8 +321,8 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeModified = acc.DatetimeModified,
                            PaymentStatus = acc.PaymentStatus,
                            PaymentDueDate = acc.PaymentDueDate,
-                           LastSyncDate = acc.LastSyncDate
-
+                           LastSyncDate = acc.LastSyncDate,
+                           SyncStatus = acc.SyncStatus
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }

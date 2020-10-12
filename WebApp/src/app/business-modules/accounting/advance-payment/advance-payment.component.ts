@@ -4,12 +4,13 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 import { AppList } from '@app';
 import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
 import { SortService } from '@services';
 import { AdvancePayment, AdvancePaymentRequest, BravoAdvance, User } from '@models';
-import { SystemConstants } from '@constants';
+import { AccountingConstants, SystemConstants } from '@constants';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from '@common';
 
@@ -18,8 +19,8 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
-import { catchError, finalize, map } from 'rxjs/operators';
-
+import { catchError, concatMap, finalize, map } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-advance-payment',
@@ -61,7 +62,8 @@ export class AdvancePaymentComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _router: Router,
         private _store: Store<IAppState>,
-        private _partnerAPI: PartnerAPIRepo
+        private _partnerAPI: PartnerAPIRepo,
+        private _spinner: NgxSpinnerService
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
@@ -368,24 +370,54 @@ export class AdvancePaymentComponent extends AppList {
             return;
         }
 
-        const hasSynced: boolean = advanceSyncList.some(x => !!x.lastSyncDate);
+        const hasSynced: boolean = advanceSyncList.some(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED);
         if (hasSynced) {
-            const advanceHasSynced = advanceSyncList.filter(x => !!x.lastSyncDate).map(a => a.advanceNo).toString();
+            const advanceHasSynced = advanceSyncList.filter(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED).map(a => a.advanceNo).toString();
             this._toastService.warning(`${advanceHasSynced} had synced, Please recheck!`);
             return;
         }
 
         const advanceIds: string[] = advanceSyncList.map(x => x.id);
+        if (!advanceIds.length) {
+            return;
+        }
+        this._spinner.show();
         this._accoutingRepo.getListAdvanceSyncData(advanceIds)
-            .subscribe((res: BravoAdvance[]) => {
-                this.advanceSyncList = (res || []);
-
-                console.log(this.advanceSyncList);
-            });
-
-
-        // TODO API : lấy danh sách data map với bravo theo list advance
-
+            .pipe(
+                concatMap((list: BravoAdvance[]) => {
+                    console.log(list);
+                    if (!list || !list.length) {
+                        return of(-1);
+                    }
+                    return this._partnerAPI.addSyncAdvanceBravo(list);
+                }),
+                concatMap((bravoRes: SystemInterface.IBRavoResponse) => {
+                    if (bravoRes.Success === 1) {
+                        return this._accoutingRepo.syncAdvanceToAccountant(advanceIds);
+                    }
+                    return of(-2);
+                }),
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult | number) => {
+                    if (res === -1) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (res === -2) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync data thành công");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 }
 

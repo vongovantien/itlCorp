@@ -630,13 +630,6 @@ export class DocumentationRepo {
         );
     }
 
-    updateSyncStatusCdNote(cdNo: string) {
-        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/UpdateSyncStatus`, {}, { cdNo: cdNo })
-            .pipe(
-                map((data: any) => data)
-            );
-    }
-
     getShipmentDemensionDetail(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetByMasterBill`, { mblId: jobId }).pipe(
             map((data: any) => data)

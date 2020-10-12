@@ -37,4 +37,10 @@ export class AccountingConstants {
 
     public static DEFAULT_ACCOUNT_NO_CODE: string = '13111';
 
+    public static SYNC_STATUS = {
+        SYNCED: 'Synced',
+        REJECTED: 'Rejected'
+    };
+
+
 }
