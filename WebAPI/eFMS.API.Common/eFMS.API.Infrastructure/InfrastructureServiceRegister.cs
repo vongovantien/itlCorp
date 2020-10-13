@@ -60,6 +60,9 @@ namespace eFMS.API.Infrastructure
             services.Configure<ApiUrl>(option => {
                 option.Url = configuration.GetSection("ApiUrl").Value;
             });
+            services.Configure<ESBUrl>(option => {
+                option.Url = configuration.GetSection("ESB").Value;
+            });
             services.Configure<AuthenticationSetting>(authSetting => {
 
                 authSetting.PartnerShareKey

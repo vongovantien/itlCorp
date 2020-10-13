@@ -37,7 +37,7 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddTransient<IAccAccountingPaymentService, AccAccountingPaymentService>();
             services.AddTransient<IAccAccountReceivableService, AccAccountReceivableService>();
             services.AddTransient<IAccountingService, AccountingService>();
-
+            services.AddTransient<IActionFuncLogService, ActionFuncLogService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

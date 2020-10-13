@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using eFMS.API.Accounting.DL.Infrastructure.Http;
 using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
@@ -10,6 +15,7 @@ using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -21,34 +27,31 @@ namespace eFMS.API.Accounting.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccountingService accountingService;
+        private readonly IOptions<ESBUrl> webUrl;
+
+        private readonly BravoLoginModel loginInfo;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
-            IAccountingService service
+            IAccountingService service,
+            IOptions<ESBUrl> appSettings
             )
         {
             stringLocalizer = localizer;
             accountingService = service;
+            webUrl = appSettings;
+
+            loginInfo = new BravoLoginModel
+            {
+                UserName = "bravo",
+                Password = "br@vopro"
+            };
         }
 
-        [HttpPost("GetListAdvanceSyncData")]
-        public IActionResult GetListAdvanceSyncData(List<Guid> Ids)
+        [HttpPost("GetListSettleToSync")]
+        public IActionResult GetListSettleToSync(List<Guid> ids)
         {
-            List<BravoAdvanceModel> result = accountingService.GetListAdvanceToSyncBravo(Ids);
-            return Ok(result);
-        }
-
-        [HttpPost("GetListVoucherSyncData")]
-        public IActionResult GetListVoucherSyncData(List<Guid> Ids)
-        {
-            List<BravoVoucherModel> result = accountingService.GetListVoucherToSyncBravo(Ids);
-            return Ok(result);
-        }
-
-        [HttpPost("GetListSettlementSyncData")]
-        public IActionResult GetListSettlementSyncData(List<Guid> ids)
-        {
-            List<BravoSettlementModel> result = accountingService.GetListSettlementToSyncBravo(ids);
+            var result = accountingService.GetListSettlementToSyncBravo(ids);
             return Ok(result);
         }
 
@@ -82,50 +85,189 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPut("SyncAdvanceToAccountantSystem")]
         [Authorize]
-        public IActionResult SyncAdvanceToAccountantSystem(List<Guid> Ids)
+        public async Task<IActionResult> SyncAdvanceToAccountantSystem(List<RequestGuidListModel> request)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            HandleState hs = accountingService.SyncListAdvanceToBravo(Ids, out Ids);
-            string message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
-            if (!hs.Success)
+            try
             {
-                return BadRequest(result);
+                // 1. LOGIN
+                HttpResponseMessage responseFromApi = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+                BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+
+                if (loginResponse.Success == "1")
+                {
+                    // 2. Get Data To Sync.
+                    List<Guid> Ids = request.Select(x => x.Id).ToList();
+                    List<BravoAdvanceModel> list = accountingService.GetListAdvanceToSyncBravo(Ids);
+
+                    // 3. Call Bravo to SYNC.
+                    List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
+                    List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
+
+                    HttpResponseMessage resAdd = new HttpResponseMessage();
+                    HttpResponseMessage resUpdate = new HttpResponseMessage();
+                    BravoResponseModel responseAddModel = new BravoResponseModel();
+                    BravoResponseModel responseUpdateModel = new BravoResponseModel();
+
+                    if (IdsAdd.Count > 0)
+                    {
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncAdd", list, loginResponse.TokenKey);
+                        responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                    }
+
+                    if (IdsUpdate.Count > 0)
+                    {
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncUpdate", list, loginResponse.TokenKey);
+                        responseUpdateModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                    }
+
+                    // 4. Update STATUS
+                    if (responseAddModel.Success == "1" || responseUpdateModel.Success == "1")
+                    {
+                        HandleState hs = accountingService.SyncListAdvanceToBravo(Ids, out Ids);
+                        string message = HandleError.GetMessage(hs, Crud.Update);
+                        ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
+                        if (!hs.Success)
+                        {
+                            return BadRequest(result);
+                        }
+
+                        return Ok(result);
+                    }
+                    return BadRequest(responseAddModel.Msg + "\n" + responseUpdateModel.Msg );
+
+                }
+                return BadRequest("Sync fail");
             }
-            return Ok(result);
+            catch (Exception)
+            {
+                return BadRequest("Sync fail");
+            }
         }
 
         [HttpPut("SyncSettlementToAccountantSystem")]
         [Authorize]
-        public IActionResult SyncSettlementToAccountantSystem(List<Guid> Ids)
+        public async Task<IActionResult> SyncSettlementToAccountantSystem(List<RequestGuidListModel> request)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            HandleState hs = accountingService.SyncListSettlementToBravo(Ids, out Ids);
-            string message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
-            if (!hs.Success)
+            try
             {
-                return BadRequest(result);
+                // 1. Login
+                HttpResponseMessage responseFromApi = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+                BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+
+                if (loginResponse.Success == "1")
+                {
+                    // 2. Get Data To Sync.
+                    List<Guid> Ids = request.Select(x => x.Id).ToList();
+                    List<BravoSettlementModel> list = accountingService.GetListSettlementToSyncBravo(Ids);
+
+                    List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
+                    List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
+
+                    HttpResponseMessage resAdd = new HttpResponseMessage();
+                    HttpResponseMessage resUpdate = new HttpResponseMessage();
+                    BravoResponseModel responseAddModel = new BravoResponseModel();
+                    BravoResponseModel responseUpdateModel = new BravoResponseModel();
+
+                    // 3. Call Bravo to SYNC.
+                    if (IdsAdd.Count > 0)
+                    {
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", list, loginResponse.TokenKey);
+                        responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                    }
+
+                    if (IdsUpdate.Count > 0)
+                    {
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", list, loginResponse.TokenKey);
+                        responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
+                    }
+
+                    // 4. Update STATUS
+                    if (responseAddModel.Success == "1" || responseUpdateModel.Success == "1")
+                    {
+                        HandleState hs = accountingService.SyncListSettlementToBravo(Ids, out Ids);
+                        string message = HandleError.GetMessage(hs, Crud.Update);
+                        ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
+                        if (!hs.Success)
+                        {
+                            return BadRequest(result);
+                        }
+                        return Ok(result);
+                    }
+                    return BadRequest(responseAddModel.Msg + "\n" + responseUpdateModel.Msg);
+                }
+                return BadRequest("Sync fail");
             }
-            return Ok(result);
+            catch (Exception)
+            {
+                return BadRequest("Sync fail");
+            }
+           
         }
 
         [HttpPut("SyncVoucherToAccountantSystem")]
         [Authorize]
-        public IActionResult SyncVoucherToAccountantSystem(List<Guid> Ids)
+        public async Task<IActionResult> SyncVoucherToAccountantSystem(List<RequestGuidListModel> request)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            HandleState hs = accountingService.SyncListVoucherToBravo(Ids, out Ids);
-            string message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
-            if (!hs.Success)
+            try
             {
-                return BadRequest(result);
+                // 1. Login
+                HttpResponseMessage responseFromApi = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+                BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+
+                if (loginResponse.Success == "1")
+                {
+                    // 2. Get Data To Sync.
+                    List<Guid> Ids = request.Select(x => x.Id).ToList();
+                    List<BravoVoucherModel> list = accountingService.GetListVoucherToSyncBravo(Ids);
+
+                    List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
+                    List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
+
+                    HttpResponseMessage resAdd = new HttpResponseMessage();
+                    HttpResponseMessage resUpdate = new HttpResponseMessage();
+                    BravoResponseModel responseAddModel = new BravoResponseModel();
+                    BravoResponseModel responseUpdateModel = new BravoResponseModel();
+
+                    // 3. Call Bravo to SYNC.
+                    if (IdsAdd.Count > 0)
+                    {
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", list, loginResponse.TokenKey);
+                        responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                    }
+
+                    if (IdsUpdate.Count > 0)
+                    {
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", list, loginResponse.TokenKey);
+                        responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
+                    }
+
+                    // 4. Update STATUS
+                    if (responseAddModel.Success == "1" || responseUpdateModel.Success == "1")
+                    {
+                        HandleState hs = accountingService.SyncListVoucherToBravo(Ids, out Ids);
+                        string message = HandleError.GetMessage(hs, Crud.Update);
+                        ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
+                        if (!hs.Success)
+                        {
+                            return BadRequest(result);
+                        }
+                        return Ok(result);
+                    }
+                    return BadRequest(responseAddModel.Msg + "\n" + responseUpdateModel.Msg);
+                }
+                return BadRequest("Sync fail");
             }
-            return Ok(result);
+            catch (Exception)
+            {
+                return BadRequest("Sync fail");
+            }
+
         }
 
         [HttpPut("SyncListCdNoteToAccountant")]

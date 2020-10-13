@@ -121,7 +121,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                              Description0 = ad.AdvanceNote,
                                                              CustomerName = employee.EmployeeNameVn,
                                                              CustomerCode = employee.StaffCode,
-                                                             Office = office.Code,
+                                                             OfficeCode = office.Code,
                                                              DocDate = ad.RequestDate,
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency)
                                                          };
@@ -161,7 +161,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                 IQueryable<BravoVoucherModel> queryVouchers = from voucher in vouchers
                                                               join p in partners on voucher.PartnerId equals p.Id
-                                                              join office in offices on p.OfficeId equals office.Id
+                                                              join office in offices on voucher.OfficeId equals office.Id into officeGrp
+                                                              from office in officeGrp.DefaultIfEmpty()
                                                               select new BravoVoucherModel
                                                               {
                                                                   Stt = voucher.Id,
@@ -170,7 +171,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                   CustomerMode = p.PartnerMode,
                                                                   LocalBranchCode = p.InternalCode,
                                                                   DocDate = voucher.Date,
-                                                                  Office = office.Code,
+                                                                  OfficeCode = office.Code,
                                                                   ReferenceNo = voucher.VoucherId,
                                                                   CurrencyCode = voucher.Currency,
                                                                   ExchangeRate = GetExchangeRate(voucher.Date, voucher.Currency),
@@ -197,10 +198,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                   {
                                                                                       RowId = surcharge.Id,
                                                                                       ItemCode = charge.Code,
-                                                                                      Description = surcharge.Notes,
+                                                                                      Description = charge.ChargeNameVn,
                                                                                       Unit = unit.UnitNameVn,
                                                                                       CurrencyCode = surcharge.CurrencyId,
-                                                                                      ExchangeRate = surcharge.FinalExchangeRate,
+                                                                                      ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
                                                                                       BillEntryNo = surcharge.Hblno,
                                                                                       Ma_SpHt = surcharge.JobNo,
                                                                                       MasterBillNo = surcharge.Mblno,
@@ -210,14 +211,14 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       TaxRate = surcharge.Vatrate,
                                                                                       OriginalAmount = surcharge.Quantity * surcharge.UnitPrice,
                                                                                       OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice),
-                                                                                      OBHPartnerCode = surcharge.Type == "OBH" ? obhP.TaxCode : null,
+                                                                                      OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                       AtchDocNo = surcharge.InvoiceNo,
                                                                                       AtchDocDate = surcharge.InvoiceDate,
                                                                                       AtchDocSerieNo = surcharge.SeriesNo,
                                                                                       AccountNo = item.AccountNo, // AccountNo của voucher
                                                                                       ContracAccount = chgDef.CreditAccountNo,
                                                                                       VATAccount = chgDef.CreditVat,
-                                                                                      ChargeType = surcharge.Type,
+                                                                                      ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
                                                                                   };
                         if (queryChargesVoucher.Count() > 0)
                         {
@@ -245,12 +246,13 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    select new BravoSettlementModel
                                                                    {
                                                                        Stt = settle.Id,
-                                                                       Office = office.Code,
+                                                                       OfficeCode = office.Code,
                                                                        DocDate = settle.RequestDate,
                                                                        ReferenceNo = settle.SettlementNo,
                                                                        ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
                                                                        Description0 = settle.Note,
                                                                        CustomerName = employee.EmployeeNameVn,
+                                                                       CustomerCode = employee.StaffCode
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -267,7 +269,6 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                          join obhP in partners on surcharge.PaymentObjectId equals obhP.Id into obhPGrps
                                                                                          from obhP in obhPGrps.DefaultIfEmpty()
                                                                                          join unit in catUnits on surcharge.UnitId equals unit.Id
-
                                                                                          select new BravoSettlementRequestModel
                                                                                          {
                                                                                              RowId = surcharge.Id,
@@ -275,7 +276,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Description = charge.ChargeNameVn,
                                                                                              Unit = unit.UnitNameVn,
                                                                                              CurrencyCode = surcharge.CurrencyId,
-                                                                                             ExchangeRate = surcharge.FinalExchangeRate,
+                                                                                             ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
                                                                                              BillEntryNo = surcharge.Hblno,
                                                                                              Ma_SpHt = surcharge.JobNo,
                                                                                              MasterBillNo = surcharge.Mblno,
@@ -285,11 +286,11 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              TaxRate = surcharge.Vatrate,
                                                                                              OriginalAmount = surcharge.Quantity * surcharge.UnitPrice,
                                                                                              OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice),
-                                                                                             OBHPartnerCode = surcharge.Type == "OBH" ? obhP.TaxCode : null,
+                                                                                             OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
                                                                                              AtchDocDate = surcharge.InvoiceDate,
                                                                                              AtchDocSerieNo = surcharge.SeriesNo,
-                                                                                             ChargeType = surcharge.Type,
+                                                                                             ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -336,9 +337,9 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.ReferenceNo = cdNote.Code;
                 var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                 sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
-                sync.CustomerName = cdNotePartner.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = cdNotePartner.PartnerMode;
-                sync.LocalBranchCode = cdNotePartner.InternalCode; //Parnter Internal Code
+                sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
+                sync.CustomerMode = cdNotePartner?.PartnerMode;
+                sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
                 sync.CurrencyCode = "VND"; //để trống
                 sync.ExchangeRate = 1;
                 sync.Description0 = string.Empty;
@@ -426,9 +427,9 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.ReferenceNo = soa.Soano;
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
-                sync.CustomerName = soaPartner.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = soaPartner.PartnerMode;
-                sync.LocalBranchCode = soaPartner.InternalCode; //Parnter Internal Code
+                sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
+                sync.CustomerMode = soaPartner?.PartnerMode;
+                sync.LocalBranchCode = soaPartner?.InternalCode; //Parnter Internal Code
                 sync.CurrencyCode = soa.Currency;
                 sync.ExchangeRate = 1;
                 sync.Description0 = soa.Note;
@@ -483,14 +484,92 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
         
-        public List<object> GetListInvoicePaymentToSync(List<Guid> ids)
+        public List<PaymentModel> GetListInvoicePaymentToSync(List<Guid> ids)
         {
-            return null;
+            List<PaymentModel> data = new List<PaymentModel>();
+            if (ids == null || ids.Count() == 0) return data;
+
+            var invoices = DataContext.Get(x => ids.Contains(x.Id));
+            foreach (var invoice in invoices)
+            {
+                PaymentModel sync = new PaymentModel();
+                sync.Stt = invoice.Id.ToString();
+                sync.BranchCode = string.Empty;
+                sync.OfficeCode = offices.Where(x => x.Id == invoice.OfficeId).FirstOrDefault()?.Code;
+                sync.DocDate = invoice.Date; //Invoice Date
+                sync.ReferenceNo = invoice.InvoiceNoReal; //Invoice No
+                var invoicePartner = partners.Where(x => x.Id == invoice.PartnerId).FirstOrDefault();
+                sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
+                sync.CustomerName = invoicePartner?.PartnerNameVn; //Partner Local Name
+                sync.CurrencyCode = invoice.Currency;
+                sync.ExchangeRate = 1;
+                sync.Description0 = invoice.PaymentNote;
+                sync.DataType = "PAYMENT";
+
+                var payments = accountingPaymentRepository.Get(x => x.RefId == invoice.Id.ToString());
+                var details = new List<PaymentDetailModel>();
+                foreach(var payment in payments)
+                {
+                    var detail = new PaymentDetailModel();
+                    detail.RowId = payment.Id.ToString();
+                    detail.OriginalAmount = payment.PaymentAmount;
+                    detail.Description = string.Empty;
+                    detail.ObhPartnerCode = string.Empty; //Để trống
+                    detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
+                    detail.Stt_Cd_Htt = null;
+                    detail.ChargeType = "DEBIT";
+
+                    details.Add(detail);
+                }
+                sync.Details = details;
+
+                data.Add(sync);
+            }
+            return data;
         }
 
-        public List<object> GetListObhPaymentToSync(List<int> ids)
+        public List<PaymentModel> GetListObhPaymentToSync(List<int> ids)
         {
-            return null;
+            List<PaymentModel> data = new List<PaymentModel>();
+            if (ids == null || ids.Count() == 0) return data;
+
+            var soas = soaRepository.Get(x => ids.Contains(x.Id));
+            foreach(var soa in soas)
+            {
+                PaymentModel sync = new PaymentModel();
+                sync.Stt = soa.Id.ToString();
+                sync.BranchCode = string.Empty;
+                sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
+                sync.DocDate = soa.DatetimeCreated; //Created Date SOA
+                sync.ReferenceNo = soa.Soano; //SOA No
+                var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
+                sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
+                sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
+                sync.CurrencyCode = soa.Currency;
+                sync.ExchangeRate = 1;
+                sync.Description0 = soa.PaymentNote;
+                sync.DataType = "PAYMENT";
+
+                var payments = accountingPaymentRepository.Get(x => x.RefId == soa.Id.ToString());
+                var details = new List<PaymentDetailModel>();
+                foreach (var payment in payments)
+                {
+                    var detail = new PaymentDetailModel();
+                    detail.RowId = payment.Id.ToString();
+                    detail.OriginalAmount = payment.PaymentAmount;
+                    detail.Description = string.Empty;
+                    detail.ObhPartnerCode = string.Empty; //Để trống
+                    detail.BankAccountNo = soaPartner?.BankAccountNo; //Partner Bank Account no
+                    detail.Stt_Cd_Htt = null;
+                    detail.ChargeType = "OBH";
+
+                    details.Add(detail);
+                }
+                sync.Details = details;
+
+                data.Add(sync);
+            }
+            return data;
         }
 
         public HandleState SyncListAdvanceToBravo(List<Guid> ids, out List<Guid> data)

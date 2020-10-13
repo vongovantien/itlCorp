@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
 import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, concatMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -14,6 +14,8 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { PaymentModel, AccountingPaymentModel } from '@models';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { of } from 'rxjs';
 
 
 
@@ -35,6 +37,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
 
     selectedPayment: PaymentModel;
     confirmMessage: string = '';
+    refId: string;
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -42,7 +45,9 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
-        private _progressService: NgProgress) {
+        private _progressService: NgProgress,
+        private _partnerAPI: PartnerAPIRepo,
+        private _spinner: NgxSpinnerService) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
@@ -205,33 +210,55 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
             );
     }
 
-    confirmSync() {
+    confirmSync(refId: string) {
+        this.refId = refId;
         this._toastService.success("Tính năng đang phát triển");
         // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
         // this.confirmInvoicePaymentPopup.show();
     }
 
     onConfirmInvoicePayment() {
-        this.getDataInvoicePaymentToSync();
-    }
-
-    getDataInvoicePaymentToSync() {
         this.confirmInvoicePaymentPopup.hide();
-        // const invoicePaymentIds: string[] = [];
-        // invoicePaymentIds.push();
-        // this._accountingRepo.getListInvoiceToSync(invoicePaymentIds)
-        //     .pipe(
-        //         catchError(this.catchError),
-        //     ).subscribe(
-        //         (res: BravoVoucher[]) => {
-        //             const data: BravoVoucher[] = res;
-        //             console.log(data);
-        //             this.syncToAccountant(data, invoicePaymentIds);
-        //         },
-        //     );
+        const invoicePaymentIds: string[] = [];
+        invoicePaymentIds.push(this.refId);
+        this._spinner.show();
+        this._accountingRepo.getListInvoicePaymentToSync(invoicePaymentIds)
+            .pipe(
+                concatMap((list: PaymentModel[]) => {
+                    console.log(list);
+                    if (!list || !list.length) {
+                        return of(-1);
+                    }
+                    return this._partnerAPI.addSyncReceiptBravo(list);
+                }),
+                concatMap((bravoRes: SystemInterface.IBRavoResponse) => {
+                    if (bravoRes.Success === 1) {
+                        return of(1);
+                    }
+                    return of(-2);
+                }),
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult | number) => {
+                    console.log(res);
+                    if (res === -1) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (res === -2) {
+                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
+                        return;
+                    }
+                    if (((res as CommonInterface.IResult).status) || (res as number) === 1) {
+                        this._toastService.success("Sync data thành công");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
-    // syncToAccountant(data: BravoVoucher[], ids: string[]) {
-    //     // Gọi API Bravo
-    // }
 }
