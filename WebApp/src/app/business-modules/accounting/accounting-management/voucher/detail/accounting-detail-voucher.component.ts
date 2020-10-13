@@ -226,7 +226,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         if (this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
             return;
         }
-        this.voucherSync = [{ id: this.accountingManagement.id, type: this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'Update' : 'Add' }];
+        this.voucherSync = [{ id: this.accountingManagement.id, type: this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD' }];
         this.confirmVoucherPopup.show();
     }
 

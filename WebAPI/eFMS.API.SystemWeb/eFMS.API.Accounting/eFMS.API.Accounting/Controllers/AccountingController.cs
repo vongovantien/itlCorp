@@ -51,7 +51,7 @@ namespace eFMS.API.Accounting.Controllers
                 Password = "br@vopro"
             };
         }
-        
+
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]
         public async Task<IActionResult> GetListInvoicePaymentToSync(List<RequestGuidListModel> request)
@@ -65,7 +65,7 @@ namespace eFMS.API.Accounting.Controllers
                 if (loginResponse.Success == "1")
                 {
                     // 2. Get Data To Sync.
-                    List<Guid> ids = request.Select(x => x.Id).ToList();                    
+                    List<Guid> ids = request.Select(x => x.Id).ToList();
 
                     List<Guid> idsAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     List<Guid> idsUpdate = request.Where(x => x.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
@@ -77,7 +77,7 @@ namespace eFMS.API.Accounting.Controllers
                     HttpResponseMessage resUpdate = new HttpResponseMessage();
                     BravoResponseModel responseAddModel = new BravoResponseModel();
                     BravoResponseModel responseUpdateModel = new BravoResponseModel();
-                    
+
                     // 3. Call Bravo to SYNC.
                     if (listAdd.Count > 0)
                     {
@@ -150,7 +150,7 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.
                     List<int> ids = request.Select(x => x.Id).ToList();
-                    
+
                     List<int> idsAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     List<int> idsUpdate = request.Where(x => x.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
 
@@ -169,7 +169,8 @@ namespace eFMS.API.Accounting.Controllers
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
-                        var modelLog = new SysActionFuncLogModel {
+                        var modelLog = new SysActionFuncLogModel
+                        {
                             FuncLocal = "GetListObhPaymentToSync",
                             FuncPartner = "EFMSReceiptDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
@@ -209,7 +210,7 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         ResultHandle result = new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = ids };
                         return BadRequest(result);
-                    }                    
+                    }
                 }
                 return BadRequest("Sync fail");
             }
@@ -235,7 +236,7 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.
                     List<Guid> Ids = request.Select(x => x.Id).ToList();
-                    
+
                     // 3. Call Bravo to SYNC.
                     List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
@@ -297,14 +298,14 @@ namespace eFMS.API.Accounting.Controllers
 
                         return Ok(result);
                     }
-                    return BadRequest(responseAddModel.Msg + "\n" + responseUpdateModel.Msg );
+                    return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
 
                 }
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
             catch (Exception)
             {
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
 
@@ -324,7 +325,7 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.
                     List<Guid> Ids = request.Select(x => x.Id).ToList();
-                    
+
                     List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
 
@@ -385,15 +386,14 @@ namespace eFMS.API.Accounting.Controllers
                         }
                         return Ok(result);
                     }
-                    return BadRequest(responseAddModel.Msg + "\n" + responseUpdateModel.Msg);
+                    return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
                 }
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
             catch (Exception)
             {
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-           
         }
 
         [HttpPut("SyncVoucherToAccountantSystem")]
@@ -412,7 +412,6 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.
                     List<Guid> Ids = request.Select(x => x.Id).ToList();
-                    List<BravoVoucherModel> list = accountingService.GetListVoucherToSyncBravo(Ids);
 
                     List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
@@ -474,15 +473,14 @@ namespace eFMS.API.Accounting.Controllers
                         }
                         return Ok(result);
                     }
-                    return BadRequest(responseAddModel.Msg + "\n" + responseUpdateModel.Msg);
+                    return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
                 }
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
             catch (Exception)
             {
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-
         }
 
         [HttpPut("SyncListCdNoteToAccountant")]
@@ -501,7 +499,7 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.
                     List<Guid> ids = request.Select(x => x.Id).ToList();
-                    
+
                     List<Guid> IdsAdd_NVHD = request.Where(x => x.Action == ACTION.ADD && (x.Type == "DEBIT" || x.Type == "INVOICE")).Select(x => x.Id).ToList();
                     List<Guid> IdsUpdate_NVHD = request.Where(x => x.Action == ACTION.UPDATE && (x.Type == "DEBIT" || x.Type == "INVOICE")).Select(x => x.Id).ToList();
                     List<Guid> IdsAdd_NVCP = request.Where(x => x.Action == ACTION.ADD && x.Type == "CREDIT").Select(x => x.Id).ToList();
@@ -596,9 +594,9 @@ namespace eFMS.API.Accounting.Controllers
                     }
 
                     // 4. Update STATUS
-                    if (responseAddModel_NVHD.Success == "1" 
-                        || responseUpdateModel_NVHD.Success == "1" 
-                        || responseAddModel_NVCP.Success == "1" 
+                    if (responseAddModel_NVHD.Success == "1"
+                        || responseUpdateModel_NVHD.Success == "1"
+                        || responseAddModel_NVCP.Success == "1"
                         || responseUpdateModel_NVCP.Success == "1")
                     {
                         HandleState hs = accountingService.SyncListCdNoteToAccountant(ids);
@@ -615,7 +613,7 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         var result = new ResultHandle { Status = false, Message = responseAddModel_NVHD.Msg + "\n" + responseUpdateModel_NVHD.Msg + "\n" + responseAddModel_NVCP.Msg + "\n" + responseUpdateModel_NVCP.Msg, Data = ids };
                         return BadRequest(result);
-                    }                    
+                    }
                 }
                 return BadRequest("Sync fail");
             }
@@ -628,7 +626,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("SyncListSoaToAccountant")]
         [Authorize]
         public async Task<IActionResult> SyncListSoaToAccountant(List<RequestIntTypeListModel> request)
-        {            
+        {
             if (!ModelState.IsValid) return BadRequest();
 
             try
@@ -641,7 +639,7 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.
                     List<int> ids = request.Select(x => x.Id).ToList();
-                    
+
                     List<int> IdsAdd_NVHD = request.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == "DEBIT").Select(x => x.Id).ToList();
                     List<int> IdsUpdate_NVHD = request.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == "DEBIT").Select(x => x.Id).ToList();
                     List<int> IdsAdd_NVCP = request.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == "CREDIT").Select(x => x.Id).ToList();
@@ -755,14 +753,14 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         var result = new ResultHandle { Status = false, Message = responseAddModel_NVHD.Msg + "\n" + responseUpdateModel_NVHD.Msg + "\n" + responseAddModel_NVCP.Msg + "\n" + responseUpdateModel_NVCP.Msg, Data = ids };
                         return BadRequest(result);
-                    }                   
+                    }
                 }
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
             catch (Exception)
             {
-                return BadRequest("Sync fail");
-            }           
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
+            }
         }
     }
 }

@@ -20,7 +20,8 @@
                             </ng-container>
 
                             <button class="btn btn-info m-btn--icon m-btn--uppercase" (click)="confirmSync()"
-                                title="Sync to accountant system" *ngIf="accountingManagement.syncStatus !== 'Synced'">
+                                title="Sync to accountant system"
+                                *ngIf="!accountingManagement.syncStatus && accountingManagement.syncStatus !== 'Synced'">
                                 <span>
                                     <i class="la la-cloud-upload"></i>
                                     <span>

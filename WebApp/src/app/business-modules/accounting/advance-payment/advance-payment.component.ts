@@ -19,8 +19,7 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
-import { catchError, concatMap, finalize, map } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-advance-payment',
@@ -382,7 +381,7 @@ export class AdvancePaymentComponent extends AppList {
         this.advanceSyncIds = advanceSyncList.map((x: AdvancePayment) => {
             return <AccountingInterface.IRequestGuid>{
                 Id: x.id,
-                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'Update' : 'Add'
+                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
             };
         });
         if (!this.advanceSyncIds.length) {

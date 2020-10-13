@@ -335,7 +335,7 @@ export class SettlementPaymentComponent extends AppList {
         this.settleSyncIds = settlementSyncList.map((x: SettlementPayment) => {
             return <AccountingInterface.IRequestGuid>{
                 Id: x.id,
-                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'Update' : 'Add'
+                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
             };
         });
         if (!this.settleSyncIds.length) {
