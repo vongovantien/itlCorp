@@ -513,7 +513,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var advance = acctAdvanceRepository.Get(x => x.Id == _id).FirstOrDefault();
                     if (advance == null) return new HandleState((object)"Không tìm thấy advance");
-                    advance.SyncStatus = "REJECTED";
+                    advance.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     advance.UserModified = currentUser.UserID;
                     advance.DatetimeModified = DateTime.Now;
                     HandleState hs = acctAdvanceRepository.Update(advance, x => x.Id == advance.Id, false);
@@ -546,7 +546,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var settlement = acctSettlementRepo.Get(x => x.Id == _id).FirstOrDefault();
                     if (settlement == null) return new HandleState((object)"Không tìm thấy settlement");
-                    settlement.SyncStatus = "REJECTED";
+                    settlement.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     settlement.UserModified = currentUser.UserID;
                     settlement.DatetimeModified = DateTime.Now;
                     HandleState hs = acctSettlementRepo.Update(settlement, x => x.Id == settlement.Id, false);
@@ -579,7 +579,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     int.TryParse(id, out _id);
                     var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
                     if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
-                    soa.SyncStatus = "REJECTED";
+                    soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     soa.UserModified = currentUser.UserID;
                     soa.DatetimeModified = DateTime.Now;
                     HandleState hs = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
@@ -612,7 +612,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var cdNote = acctCdNoteRepo.Get(x => x.Id == _id).FirstOrDefault();
                     if (cdNote == null) return new HandleState((object)"Không tìm thấy CDNote");
-                    cdNote.SyncStatus = "REJECTED";
+                    cdNote.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     cdNote.UserModified = currentUser.UserID;
                     cdNote.DatetimeModified = DateTime.Now;
                     HandleState hs = acctCdNoteRepo.Update(cdNote, x => x.Id == cdNote.Id, false);
@@ -645,7 +645,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
                     if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
-                    voucher.SyncStatus = "REJECTED";
+                    voucher.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     voucher.UserModified = currentUser.UserID;
                     voucher.DatetimeModified = DateTime.Now;
                     HandleState hs = DataContext.Update(voucher, x => x.Id == voucher.Id, false);

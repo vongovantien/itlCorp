@@ -412,7 +412,6 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.
                     List<Guid> Ids = request.Select(x => x.Id).ToList();
-                    List<BravoVoucherModel> list = accountingService.GetListVoucherToSyncBravo(Ids);
 
                     List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();

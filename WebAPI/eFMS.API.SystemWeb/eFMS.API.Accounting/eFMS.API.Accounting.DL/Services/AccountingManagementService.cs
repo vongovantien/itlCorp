@@ -1282,7 +1282,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if(model.Currency == "VND")
                 {
-                    total = model.Charges.Sum(x => x.AmountVnd ?? 0);
+                    total = model.Charges.Sum(x => x.AmountVnd + x.VatAmountVnd ?? 0);
                 }
                 else
                 {
