@@ -55,7 +55,6 @@ namespace eFMS.API.ForPartner.Controllers
         public IActionResult Test(object model, [Required] [DefaultValue("b2dc38f39f6f202141f46afe66276075")]string apiKey)
         {
             return Ok(accountingManagementService.GenerateHashStringTest(model, apiKey));
-            //return new CustomBadRequestResult("eror");
         }
 
 
