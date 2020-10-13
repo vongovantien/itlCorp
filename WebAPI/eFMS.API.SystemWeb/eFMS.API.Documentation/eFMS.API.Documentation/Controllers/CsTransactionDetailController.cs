@@ -40,6 +40,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("CheckPermission/{id}")]
+        [Authorize]
         public IActionResult CheckDetailPermission(Guid id)
         {
 

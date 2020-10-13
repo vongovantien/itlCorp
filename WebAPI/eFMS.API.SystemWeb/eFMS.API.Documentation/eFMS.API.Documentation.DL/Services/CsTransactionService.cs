@@ -49,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsAirWayBill> airwaybillRepository;
         readonly IContextBase<SysGroup> groupRepository;
         readonly IContextBase<CatCommodity> commodityRepository;
+        readonly IContextBase<SysUserLevel> userlevelRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -78,6 +79,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<CsAirWayBill> airwaybillRepo,
             IContextBase<SysGroup> groupRepo,
+            IContextBase<SysUserLevel> userlevelRepo,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -106,6 +108,8 @@ namespace eFMS.API.Documentation.DL.Services
             airwaybillRepository = airwaybillRepo;
             groupRepository = groupRepo;
             commodityRepository = commodityRepo;
+            userlevelRepository = userlevelRepo;
+
         }
 
         #region -- INSERT & UPDATE --
@@ -675,10 +679,13 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
+            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
+            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+
             var SalemansIds = csTransactionDetailRepo.Get(x => x.JobId == id).Select(t => t.SaleManId).ToArray();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, SalemanIds = SalemansIds, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
+            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, SalemanIds = SalemansIds, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups , Departments = lstDepartments }, permissionRange, detail.TransactionType);
             return code;
         }
 
@@ -802,6 +809,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
 
+
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
             if (masterBills == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
@@ -815,17 +823,24 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Owner:
                     masterBills = masterBills.Where(x => x.PersonIncharge == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y=>y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
+
                     break;
                 case PermissionRange.Group:
+                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t=>t.UserId).ToList();
                     masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
+                                                || csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevel.Contains(t.SaleManId))
+                                                );
                     break;
                 case PermissionRange.Department:
+                    var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
                     masterBills = masterBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
+                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
+                                                || csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevelDepartment.Contains(t.SaleManId))
+                                                );
                     break;
                 case PermissionRange.Office:
                     masterBills = masterBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
