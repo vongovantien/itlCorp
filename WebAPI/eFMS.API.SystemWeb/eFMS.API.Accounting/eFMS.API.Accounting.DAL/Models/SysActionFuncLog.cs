@@ -10,6 +10,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string FuncPartner { get; set; }
         public string ObjectRequest { get; set; }
         public string ObjectResponse { get; set; }
+        public string Major { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

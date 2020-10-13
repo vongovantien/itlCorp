@@ -670,26 +670,14 @@ export class AccountingRepo {
         );
     }
 
-    getListCdNoteToSync(ids: string[], type: string) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListCdNoteToSync`, ids, { type: type }).pipe(
+    syncCdNoteToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListCdNoteToAccountant`, list).pipe(
             map((data: any) => data)
         );
     }
 
-    syncCdNoteToAccountant(ids: string[]) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListCdNoteToAccountant`, ids).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    getListSoaToSync(ids: number[], type: string) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListSoaToSync`, ids, { type: type }).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    syncSoaToAccountant(ids: number[]) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListSoaToAccountant`, ids).pipe(
+    syncSoaToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListSoaToAccountant`, list).pipe(
             map((data: any) => data)
         );
     }
@@ -700,20 +688,20 @@ export class AccountingRepo {
         );
     }
 
-    syncVoucherToAccountant(ids: string[]) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncVoucherToAccountantSystem`, ids).pipe(
+    syncVoucherToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncVoucherToAccountantSystem`, list).pipe(
             map((data: any) => data)
         );
     }
 
-    getListInvoicePaymentToSync(ids: string[]) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListInvoicePaymentToSync`, ids).pipe(
+    getListInvoicePaymentToSync(list: any[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListInvoicePaymentToSync`, list).pipe(
             map((data: any) => data)
         );
     }
 
-    getListObhPaymentToSync(ids: number[]) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListObhPaymentToSync`, ids).pipe(
+    getListObhPaymentToSync(list: any[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListObhPaymentToSync`, list).pipe(
             map((data: any) => data)
         );
     }
