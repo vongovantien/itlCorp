@@ -246,12 +246,13 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    select new BravoSettlementModel
                                                                    {
                                                                        Stt = settle.Id,
-                                                                       Office = office.Code,
+                                                                       OfficeCode = office.Code,
                                                                        DocDate = settle.RequestDate,
                                                                        ReferenceNo = settle.SettlementNo,
                                                                        ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
                                                                        Description0 = settle.Note,
                                                                        CustomerName = employee.EmployeeNameVn,
+                                                                       CustomerCode = employee.StaffCode
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -310,27 +311,19 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of cd note</param>
         /// <param name="type">Type: DEBIT/CREDIT/ALL</param>
         /// <returns></returns>
-        public List<SyncModel> GetListCdNoteToSync(List<Guid> ids, string type)
+        public List<SyncModel> GetListCdNoteToSync(List<Guid> ids)
         {
             List<SyncModel> data = new List<SyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
             var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
-            if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT)
-            {
-                cdNotes = cdNotes.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_INVOICE);
-            }
-            else if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
-            {
-                cdNotes = cdNotes.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT);
-            }
-           
+            
             foreach (var cdNote in cdNotes)
             {
                 SyncModel sync = new SyncModel();
                 sync.Stt = cdNote.Id.ToString();
                 sync.BranchCode = string.Empty;
-                sync.Office = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
+                sync.OfficeCode = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
                 sync.Transcode = string.Empty;
                 sync.DocDate = cdNote.DatetimeCreated;
                 sync.ReferenceNo = cdNote.Code;
@@ -366,8 +359,9 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.OriginalUnitPrice = surcharge.UnitPrice;
                     charge.TaxRate = surcharge.Vatrate;
                     var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                    charge.OriginalAmount = _totalNoVat;
+                    charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, 2);
                     charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                    charge.OriginalAmount3 = Math.Round(charge.OriginalAmount3 ?? 0, 2);
 
                     var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
@@ -400,27 +394,19 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of soa</param>
         /// <param name="type">Type: DEBIT/CREDIT/ALL</param>
         /// <returns></returns>
-        public List<SyncModel> GetListSoaToSync(List<int> ids, string type)
+        public List<SyncModel> GetListSoaToSync(List<int> ids)
         {
             List<SyncModel> data = new List<SyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
             var soas = soaRepository.Get(x => ids.Contains(x.Id));
-            if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT)
-            {
-                soas = soas.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT);
-            }
-            else if (type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
-            {
-                soas = soas.Where(x => x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT);
-            }
             
             foreach(var soa in soas)
             {
                 SyncModel sync = new SyncModel();
                 sync.Stt = soa.Id.ToString();
                 sync.BranchCode = string.Empty;
-                sync.Office = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
+                sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
                 sync.Transcode = string.Empty;
                 sync.DocDate = soa.DatetimeCreated;
                 sync.ReferenceNo = soa.Soano;
@@ -494,7 +480,7 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentModel sync = new PaymentModel();
                 sync.Stt = invoice.Id.ToString();
                 sync.BranchCode = string.Empty;
-                sync.Office = offices.Where(x => x.Id == invoice.OfficeId).FirstOrDefault()?.Code;
+                sync.OfficeCode = offices.Where(x => x.Id == invoice.OfficeId).FirstOrDefault()?.Code;
                 sync.DocDate = invoice.Date; //Invoice Date
                 sync.ReferenceNo = invoice.InvoiceNoReal; //Invoice No
                 var invoicePartner = partners.Where(x => x.Id == invoice.PartnerId).FirstOrDefault();
@@ -515,7 +501,7 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.Description = string.Empty;
                     detail.ObhPartnerCode = string.Empty; //Để trống
                     detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
-                    detail.Stt_Cd_Htt = null;
+                    detail.Stt_Cd_Htt = "TEST"; //Sẽ update sau
                     detail.ChargeType = "DEBIT";
 
                     details.Add(detail);
@@ -538,7 +524,7 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentModel sync = new PaymentModel();
                 sync.Stt = soa.Id.ToString();
                 sync.BranchCode = string.Empty;
-                sync.Office = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
+                sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
                 sync.DocDate = soa.DatetimeCreated; //Created Date SOA
                 sync.ReferenceNo = soa.Soano; //SOA No
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
@@ -559,7 +545,7 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.Description = string.Empty;
                     detail.ObhPartnerCode = string.Empty; //Để trống
                     detail.BankAccountNo = soaPartner?.BankAccountNo; //Partner Bank Account no
-                    detail.Stt_Cd_Htt = null;
+                    detail.Stt_Cd_Htt = "TEST"; //Sẽ update sau
                     detail.ChargeType = "OBH";
 
                     details.Add(detail);
