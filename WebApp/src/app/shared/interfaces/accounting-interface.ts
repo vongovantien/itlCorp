@@ -32,7 +32,7 @@ namespace AccountingInterface {
     }
 
     export interface IRequestInt {
-        Id: string;
+        Id: number;
         action: string;
     }
 }

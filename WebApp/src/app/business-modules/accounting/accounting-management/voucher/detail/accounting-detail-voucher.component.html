@@ -7,8 +7,8 @@
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3>{{accountingManagement.voucherId}}
                         <span
-                            class="m-badge m-badge--{{accountingManagement.status === 'New' ? 'danger' : 'success'}} m-badge--wide">
-                            {{accountingManagement.status}}
+                            class="m-badge m-badge--{{accountingManagement.status === 'New' && !accountingManagement.syncStatus ? 'danger' : 'success'}} m-badge--wide">
+                            {{!accountingManagement.syncStatus ? accountingManagement.status : accountingManagement.syncStatus}}
                         </span>
                     </h3>
                     <div>
@@ -19,7 +19,7 @@
                                 </app-permission-button>
                             </ng-container>
 
-                            <button class="btn btn-warning m-btn--icon m-btn--uppercase" (click)="confirmSync()"
+                            <button class="btn btn-info m-btn--icon m-btn--uppercase" (click)="confirmSync()"
                                 title="Sync to accountant system" *ngIf="accountingManagement.syncStatus !== 'Synced'">
                                 <span>
                                     <i class="la la-cloud-upload"></i>
@@ -30,7 +30,8 @@
                             </button>
 
                             <app-default-button [buttonSetting]="cancelButtonSetting"
-                                (onClick)="accountingManagement.status !== 'New' ? gotoList() : confirmCancelPopup.show()">
+                                (onClick)="accountingManagement.status !== 'New' ||
+                                 accountingManagement.syncStatus === 'Synced' ? gotoList() : confirmCancelPopup.show()">
                             </app-default-button>
                         </div>
                     </div>
@@ -55,5 +56,6 @@
 <info-popup [body]="invalidFormText"></info-popup>
 
 <confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
-<confirm-popup #confirmVoucherPopup (onSubmit)="onConfirmVoucher()" [body]="confirmMessage" [labelConfirm]="'Ok'">
-</confirm-popup>
+
+<confirm-popup #confirmSyncVoucher (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
+    body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>

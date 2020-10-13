@@ -8,7 +8,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
     {
         public string Stt { get; set; }
         public string BranchCode { get; set; }
-        public string Office { get; set; }
+        public string OfficeCode { get; set; }
         public string Transcode { get; set; }
         public DateTime? DocDate { get; set; }
         public string ReferenceNo { get; set; }

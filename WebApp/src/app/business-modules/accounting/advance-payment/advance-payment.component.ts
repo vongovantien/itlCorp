@@ -53,8 +53,7 @@ export class AdvancePaymentComponent extends AppList {
     paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
 
-
-    advanceSyncIds: AccountingInterface.IRequestGuid[] = [];
+    advanceSyncIds: any[] = [];
 
     constructor(
         private _accoutingRepo: AccountingRepo,

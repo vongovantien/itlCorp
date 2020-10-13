@@ -724,8 +724,8 @@ export class AccountingRepo {
         );
     }
 
-    syncSettleToAccountant(list: string[]) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/SyncSettlementToAccountantSystem`, list).pipe(
+    syncSettleToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncSettlementToAccountantSystem`, list).pipe(
             map((data: any) => data)
         );
     }
