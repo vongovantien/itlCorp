@@ -232,7 +232,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.selectedDateMode = this.dateModes[1];
 
         this.types = [
-            { title: 'All', value: 'All' },
+            // { title: 'All', value: 'All' }, Đã confirm không cần type All [13/10/2020]
             { title: 'Debit', value: 'Debit' },
             { title: 'Credit', value: 'Credit' },
         ];

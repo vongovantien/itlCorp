@@ -46,9 +46,15 @@
                                                     </button>
                                                     <button type="button"
                                                         class="btn btn-sm m-btn--icon m-btn--icon-only"
-                                                        title="Sync to accountant system"
-                                                        (click)="confirmSync(item.refId)">
+                                                        title="Sync to accountant system (Add)"
+                                                        (click)="confirmSync(item.refId, 'ADD')">
                                                         <i class="la la-cloud-upload text-warning"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-sm m-btn--icon m-btn--icon-only"
+                                                        title="Sync to accountant system (Update)"
+                                                        (click)="confirmSync(item.refId, 'UPDATE')">
+                                                        <i class="la la-cloud-upload text-info"></i>
                                                     </button>
                                                 </div>
                                             </td>

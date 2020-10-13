@@ -270,6 +270,10 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     showConfirmed() {
         // this._toastService.success("Tính năng đang phát triển");
+        if (this.soa.type === "All") {
+            this._toastService.warning("Not allow sync soa with type All");
+            return;
+        }
         this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
         this.confirmSoaPopup.show();
     }
@@ -290,6 +294,7 @@ export class StatementOfAccountDetailComponent extends AppList {
                 catchError(this.catchError),
             ).subscribe(
                 (res: CommonInterface.IResult) => {
+                    console.log(res);
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
                         this.getDetailSOA(this.soa.soano, this.soa.currency);

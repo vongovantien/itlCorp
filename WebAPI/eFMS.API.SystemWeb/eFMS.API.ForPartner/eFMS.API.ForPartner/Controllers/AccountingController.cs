@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using eFMS.API.Common;
@@ -10,11 +8,7 @@ using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
-using eFMS.API.ForPartner.Service.Models;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection.EF;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
@@ -55,7 +49,6 @@ namespace eFMS.API.ForPartner.Controllers
         public IActionResult Test(object model, [Required] [DefaultValue("b2dc38f39f6f202141f46afe66276075")]string apiKey)
         {
             return Ok(accountingManagementService.GenerateHashStringTest(model, apiKey));
-            //return new CustomBadRequestResult("eror");
         }
 
 
