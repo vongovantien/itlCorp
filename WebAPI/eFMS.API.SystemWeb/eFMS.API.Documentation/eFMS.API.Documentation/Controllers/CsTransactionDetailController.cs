@@ -115,7 +115,8 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Delete(Guid id)
         {
             var hs = csTransactionDetailService.DeleteTransactionDetail(id);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
+            var message = hs.Success == true ? HandleError.GetMessage(hs, Crud.Delete) : hs.Message.ToString();
+
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
