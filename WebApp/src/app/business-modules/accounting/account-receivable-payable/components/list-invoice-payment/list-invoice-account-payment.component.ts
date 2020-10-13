@@ -38,6 +38,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     selectedPayment: PaymentModel;
     confirmMessage: string = '';
     refId: string;
+    action: string;
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -210,8 +211,9 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
             );
     }
 
-    confirmSync(refId: string) {
+    confirmSync(refId: string, action: string) {
         this.refId = refId;
+        this.action = action;
         // this._toastService.success("Tính năng đang phát triển");
         this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
         this.confirmInvoicePaymentPopup.show();
@@ -222,7 +224,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
         const invoicePaymentIds: AccountingInterface.IRequestGuid[] = [];
         const invoicePaymentId: AccountingInterface.IRequestGuid = {
             Id: this.refId,
-            action: 'ADD'
+            action: this.action
         };
         invoicePaymentIds.push(invoicePaymentId);
         this._spinner.show();

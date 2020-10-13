@@ -118,8 +118,8 @@
                                                             </button>
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                                [disabled]="cdNote.syncStatus === 'Synced'"
-                                                                title="Remove" (click)="checkDeleteCdNote(cdNote.id)">
+                                                                *ngIf="cdNote.syncStatus !== 'Synced'" title="Remove"
+                                                                (click)="checkDeleteCdNote(cdNote.id)">
                                                                 <i class="la la-trash"></i>
                                                             </button>
                                                         </div>
@@ -189,4 +189,5 @@
 
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
-<info-popup [body]="'You can not delete this C/D Note, because it was issued SOA/Voucher/VAT Invoice. Please recheck!'"></info-popup>
+<info-popup [body]="'You can not delete this C/D Note, because it was issued SOA/Voucher/VAT Invoice. Please recheck!'">
+</info-popup>

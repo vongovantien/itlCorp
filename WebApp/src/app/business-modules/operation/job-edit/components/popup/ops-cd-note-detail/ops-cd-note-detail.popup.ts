@@ -8,6 +8,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { AccountingConstants } from '@constants';
 
 @Component({
     selector: 'ops-cd-note-detail',
@@ -240,7 +241,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
             type: this.CdNoteDetail.cdNote.type,
-            action: this.CdNoteDetail.cdNote.syncStatus
+            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
         };
         cdNoteIds.push(cdNoteId);
         this._spinner.show();

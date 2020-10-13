@@ -13,6 +13,7 @@ import { TransactionTypeEnum } from "src/app/shared/enums";
 import { environment } from 'src/environments/environment';
 import { NgProgress } from "@ngx-progressbar/core";
 import { NgxSpinnerService } from "ngx-spinner";
+import { AccountingConstants } from "@constants";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -310,7 +311,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
             type: this.CdNoteDetail.cdNote.type,
-            action: this.CdNoteDetail.cdNote.syncStatus
+            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
         };
         cdNoteIds.push(cdNoteId);
         this._spinner.show();

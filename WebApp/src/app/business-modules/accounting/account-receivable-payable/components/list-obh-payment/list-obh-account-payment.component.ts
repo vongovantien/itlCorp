@@ -36,6 +36,7 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
     selectedPayment: PaymentModel;
     confirmMessage: string = '';
     refId: string;
+    action: string;
     constructor(private _router: Router,
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
@@ -206,8 +207,9 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
             );
     }
 
-    confirmSync(refId: string) {
+    confirmSync(refId: string, action: string) {
         this.refId = refId;
+        this.action = action;
         // this._toastService.success("Tính năng đang phát triển");
         this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
         this.confirmObhPaymentPopup.show();
@@ -218,7 +220,7 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
         const obhPaymentIds: AccountingInterface.IRequestInt[] = [];
         const obhPaymentId: AccountingInterface.IRequestInt = {
             id: Number(this.refId),
-            action: 'ADD'
+            action: this.action
         };
         obhPaymentIds.push(obhPaymentId);
         this._spinner.show();
