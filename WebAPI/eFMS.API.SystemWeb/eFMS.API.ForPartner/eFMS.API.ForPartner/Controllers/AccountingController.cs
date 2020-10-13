@@ -52,7 +52,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <returns></returns>
         /// <response></response>
         [HttpPost("GenerateHash")]
-        public IActionResult Test(VoucherAdvance model, [Required] [DefaultValue("b2dc38f39f6f202141f46afe66276075")]string apiKey)
+        public IActionResult Test(object model, [Required] [DefaultValue("b2dc38f39f6f202141f46afe66276075")]string apiKey)
         {
             return Ok(accountingManagementService.GenerateHashStringTest(model, apiKey));
         }
