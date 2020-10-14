@@ -493,19 +493,14 @@ export class ShareBusinessReAlertComponent extends AppList {
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport = res;
-                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup.frm.nativeElement.submit();
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
                         }, 1000);
-
-                        this.pathGeneralManifest = res.pathReportGenerate;
-                        this.attachedFile.push(res.pathReportGenerate);
-                        this.isExitsManifest = true;
-                        this.isCheckedManifest = true;
                     } else {
-                        this.isExitsManifest = false;
-                        this.isCheckedManifest = false;
+                        this._toastService.warning('There is no data charge to display preview');
                     }
                 },
             );
