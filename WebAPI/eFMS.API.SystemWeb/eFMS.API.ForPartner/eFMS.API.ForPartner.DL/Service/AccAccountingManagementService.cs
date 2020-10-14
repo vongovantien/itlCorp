@@ -95,7 +95,7 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 string bodyString = JsonConvert.SerializeObject(body) + apiKey + configSetting.Value.PartnerShareKey;
 
-                string eFmsHash = Md5Helper.CreateMD5(bodyString);
+                string eFmsHash = Md5Helper.CreateMD5(bodyString.ToLower());
 
                 if (eFmsHash.ToLower() == hash.ToLower())
                 {
@@ -114,7 +114,7 @@ namespace eFMS.API.ForPartner.DL.Service
         {
             object data = body;
             string bodyString = JsonConvert.SerializeObject(data) + apiKey + configSetting.Value.PartnerShareKey;
-            return Md5Helper.CreateMD5(bodyString);
+            return Md5Helper.CreateMD5(bodyString.ToLower());
         }
 
         #region --- CRUD INVOICE ---
@@ -512,11 +512,11 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 if (adv.StatusApproval == ForPartnerConstants.STATUS_APPROVAL_DONE)
                 {
-                    adv.PaymentTerm = model.PaymnetTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
-                    if (model.PaymnetTerm != null)
+                    adv.PaymentTerm = model.PaymentTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
+                    if (model.PaymentTerm != null)
                     {
                         DateTime? deadlineDate = null;
-                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymnetTerm);
+                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymentTerm);
                         adv.DeadlinePayment = deadlineDate;
                     }
                     adv.VoucherNo = model.VoucherNo;

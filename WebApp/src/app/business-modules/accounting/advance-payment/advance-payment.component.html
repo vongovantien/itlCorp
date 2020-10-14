@@ -90,7 +90,7 @@
                                     <ng-container *ngIf="!!advancePayments.length">
                                         <ng-container
                                             *ngFor="let advancePayment of advancePayments; let i = index; trackBy: trackByFn">
-                                            <tr>
+                                            <tr [class.invalid-row]="advancePayment.syncStatus === 'Rejected'">
                                                 <td>
                                                     <div class="m-checkbox-list d-flex align-items-center">
                                                         <ng-template #dblock>
@@ -172,7 +172,7 @@
                                                 <td>{{advancePayment.voucherNo}}</td>
                                                 <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td class="text-info">
-                                                    {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy'}}</td>
+                                                    {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy HH:mm'}}</td>
                                                 <td [ngSwitch]="advancePayment.syncStatus">
                                                     <div *ngSwitchCase="'Synced'" class="text-success">
                                                         {{advancePayment.syncStatus}}

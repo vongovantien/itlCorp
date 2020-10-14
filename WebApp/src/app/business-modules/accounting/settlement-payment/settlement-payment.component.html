@@ -61,7 +61,7 @@
                                 <tbody class="tbody-group">
                                     <ng-container
                                         *ngFor="let settlePayment of settlements; let i = index; trackBy: trackByFn">
-                                        <tr class="">
+                                        <tr [class.invalid-row]="settlePayment.syncStatus === 'Rejected'">
                                             <td>
                                                 <div class="m-checkbox-list d-flex align-items-center">
                                                     <ng-template #dblock>
