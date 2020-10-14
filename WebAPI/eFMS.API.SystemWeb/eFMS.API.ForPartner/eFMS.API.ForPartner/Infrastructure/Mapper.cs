@@ -14,6 +14,8 @@ namespace eFMS.API.ForPartner.Infrastructure
 
             // Map to entity model
             CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
+
+            CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
         }
     }
 }
