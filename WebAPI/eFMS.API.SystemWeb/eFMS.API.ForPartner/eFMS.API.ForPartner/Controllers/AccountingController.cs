@@ -158,10 +158,10 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult("API Key invalid");
             }
-            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
-            {
-                return new CustomUnauthorizedResult("Hashed string invalid");
-            }
+            //if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            //{
+            //    return new CustomUnauthorizedResult("Hashed string invalid");
+            //}
 
             if (!ModelState.IsValid) return BadRequest();
 
