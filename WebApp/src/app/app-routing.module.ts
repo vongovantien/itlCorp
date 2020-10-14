@@ -8,6 +8,7 @@ import { ForbiddenPageComponent } from './403/403.component';
 import { MenuResolveGuard, AuthGuardService } from '@core';
 
 const routes: Routes = [
+
     {
         path: 'login',
         component: LoginComponent
@@ -106,6 +107,13 @@ const routes: Routes = [
                     name: "Commercial",
                 }
             },
+            {
+                path: 'profile',
+                loadChildren: () => import('./user-profile/user-profile.module').then(m => m.UserProfileModule),
+                data: {
+                    name: "Profile",
+                }
+            },
 
         ],
         runGuardsAndResolvers: "always"
@@ -121,11 +129,13 @@ const routes: Routes = [
         path: '403',
         component: ForbiddenPageComponent
     },
+
     {
         path: '**',
         redirectTo: '404',
         pathMatch: 'full'
-    }
+    },
+
 
 ];
 

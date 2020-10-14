@@ -1,0 +1,129 @@
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+
+    </div>
+</div>
+<div class="m-content mb-3">
+    <div class="container-lg form" [formGroup]="formUser">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="border p-3">
+                    <div class="row">
+                        <div class="col-lg-12 text-center py-3">
+
+                            <img src="assets/app/media/img/users/use433.jpg"
+                                onerror="src='assets/app/media/img/users/user4.jpg'" width="160px"
+                                class="rounded-circle" alt="Cinque Terre">
+
+                        </div>
+                        <h4 class="col-lg-12 text-center font-weight-bold" style="color: #5a7391; font-weight: 600;">
+                            {{employeeNameVn}}</h4>
+                        <h6 class="col-lg-12 text-center font-weight-bold py-2" style="color: #5b9bd1;">DEVELOPER</h6>
+                        <div class="col-lg-12 text-center">
+                            <!-- <button type="button" class="btn btn-info" style="border-radius: 15px; min-width: 100px; "> -->
+                            <input type="file" id="upload" #file (change)="handleFileInput($event)" hidden />
+                            <label class="custom-label" for="upload" type="button" class="btn btn-info mb-0"
+                                style="border-radius: 15px; min-width: 100px; ">
+                                UPLOAD
+                            </label>
+                            <!-- </button> -->
+                            <button type="button" class="btn btn-danger ml-3"
+                                style="border-radius: 15px; min-width: 100px; ">
+                                DOWNLOAD
+                            </button>
+                        </div>
+
+                        <div class="col-lg-12 text-success text-center mt-3">{{ fileName }}</div>
+
+                        <div class="col-lg-12 mt-3">
+                            <div class="row px-3 py-2 font-weight-bold">
+                                <div class="col-lg-5">Employee code:</div>
+                                <div class="col-lg-7">{{staffCode}}</div>
+                            </div>
+                            <div class="row px-3 py-2 font-weight-bold">
+                                <div class="col-lg-5">User Name:</div>
+                                <div class="col-lg-7">{{username}}</div>
+                            </div>
+                            <div class="row px-3 py-2 font-weight-bold">
+                                <div class="col-lg-5">Working status:</div>
+                                <div class="col-lg-7">{{workingStatus}}</div>
+                            </div>
+                            <div class="row px-3 py-2 font-weight-bold">
+                                <div class="col-lg-5">Credit Limit:</div>
+                                <div class="col-lg-7">{{creditLimit}}</div>
+                            </div>
+                            <div class="row px-3 py-2 font-weight-bold">
+                                <div class="col-lg-5">Credit Rate:</div>
+                                <div class="col-lg-7">{{creditRate}}</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-lg-8 border">
+                <div class="p-3">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Full name: </label>
+                                <input type="input" class="form-control" formControlName="employeeNameVn">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>English name: </label>
+                                <input type="input" class="form-control" formControlName="employeeNameEn">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Title: </label>
+                                <input type="input" class="form-control" formControlName="title">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Email: </label>
+                                <input type="input" class="form-control" formControlName="email">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Bank Account no: </label>
+                                <input type="input" class="form-control" formControlName="bankAccountNo">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Bank Name: </label>
+                                <input type="input" class="form-control" formControlName="bankName">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Phone Number: </label>
+                                <input type="input" class="form-control" formControlName="tel">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Description: </label>
+                                <textarea class="form-control" rows="5" formControlName="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 my-3 text-center">
+                            <button type="button" class="btn btn-success"
+                                style="border-radius: 15px; min-width: 100px;">UPDATE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

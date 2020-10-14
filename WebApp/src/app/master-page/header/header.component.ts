@@ -6,6 +6,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { Office } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-header',
@@ -63,6 +64,11 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 }
             }
         });
+    }
+
+    viewProfile() {
+        console.log(`home/profile/${"123"}`);
+        this.router.navigate([`home/profile/${"123"}`]);
     }
 
     getOfficeDepartGroupCurrentUser(currenUser: SystemInterface.IClaimUser) {
