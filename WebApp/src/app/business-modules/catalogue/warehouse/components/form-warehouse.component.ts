@@ -137,7 +137,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         this.warehouse.nameVn = this.warehouseNameVN.value;
         this.warehouse.countryId = this.country.value[0].id;
         this.warehouse.provinceId = this.province.value[0].id;
-        this.warehouse.districtId = this.district.value[0].id;
+        this.warehouse.districtId = !!this.district.value && this.district.value.length > 0 ? this.district.value[0].id : null;
         this.warehouse.address = this.address.value;
         this.warehouse.flightVesselNo = this.flightVesselNo.value;
         this.warehouse.active = !!this.isUpdate ? this.active.value : true;
