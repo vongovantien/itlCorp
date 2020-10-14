@@ -39,7 +39,8 @@ export class AdvancePayment {
 
     userCreatedName: string = null;
     userModifiedName: string = null;
-
+    userNameCreated: string = null;
+    userNameModified: string = null;
 
 
     constructor(object?: any) {

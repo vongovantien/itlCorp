@@ -95,7 +95,7 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 string bodyString = JsonConvert.SerializeObject(body) + apiKey + configSetting.Value.PartnerShareKey;
 
-                string eFmsHash = Md5Helper.CreateMD5(bodyString);
+                string eFmsHash = Md5Helper.CreateMD5(bodyString.ToLower());
 
                 if (eFmsHash.ToLower() == hash.ToLower())
                 {
@@ -114,7 +114,7 @@ namespace eFMS.API.ForPartner.DL.Service
         {
             object data = body;
             string bodyString = JsonConvert.SerializeObject(data) + apiKey + configSetting.Value.PartnerShareKey;
-            return Md5Helper.CreateMD5(bodyString);
+            return Md5Helper.CreateMD5(bodyString.ToLower());
         }
 
         #region --- CRUD INVOICE ---
@@ -512,11 +512,11 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 if (adv.StatusApproval == ForPartnerConstants.STATUS_APPROVAL_DONE)
                 {
-                    adv.PaymentTerm = model.PaymnetTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
-                    if (model.PaymnetTerm != null)
+                    adv.PaymentTerm = model.PaymentTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
+                    if (model.PaymentTerm != null)
                     {
                         DateTime? deadlineDate = null;
-                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymnetTerm);
+                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymentTerm);
                         adv.DeadlinePayment = deadlineDate;
                     }
                     adv.VoucherNo = model.VoucherNo;
@@ -555,19 +555,19 @@ namespace eFMS.API.ForPartner.DL.Service
             switch (model.Type?.ToUpper())
             {
                 case "ADVANCE":
-                    result = RejectAdvance(model.ReferenceID);
+                    result = RejectAdvance(model.ReferenceID, model.Reason);
                     break;
                 case "SETTLEMENT":
-                    result = RejectSettlement(model.ReferenceID);
+                    result = RejectSettlement(model.ReferenceID, model.Reason);
                     break;
                 case "SOA":
-                    result = RejectSoa(model.ReferenceID);
+                    result = RejectSoa(model.ReferenceID, model.Reason);
                     break;
                 case "CDNOTE":
-                    result = RejectCdNote(model.ReferenceID);
+                    result = RejectCdNote(model.ReferenceID, model.Reason);
                     break;
                 case "VOUCHER":
-                    result = RejectVoucher(model.ReferenceID);
+                    result = RejectVoucher(model.ReferenceID, model.Reason);
                     break;
                 default:
                     result = new HandleState((object)"Không tìm thấy loại reject");                    
@@ -588,7 +588,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return result;
         }
 
-        private HandleState RejectAdvance(string id)
+        private HandleState RejectAdvance(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -601,6 +601,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     advance.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     advance.UserModified = currentUser.UserID;
                     advance.DatetimeModified = DateTime.Now;
+                    advance.ReasonReject = reason;
                     HandleState hs = acctAdvanceRepository.Update(advance, x => x.Id == advance.Id, false);
                     if (hs.Success)
                     {
@@ -621,7 +622,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectSettlement(string id)
+        private HandleState RejectSettlement(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -634,6 +635,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     settlement.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     settlement.UserModified = currentUser.UserID;
                     settlement.DatetimeModified = DateTime.Now;
+                    settlement.ReasonReject = reason;
                     HandleState hs = acctSettlementRepo.Update(settlement, x => x.Id == settlement.Id, false);
                     if (hs.Success)
                     {
@@ -654,7 +656,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectSoa(string id)
+        private HandleState RejectSoa(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -667,6 +669,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     soa.UserModified = currentUser.UserID;
                     soa.DatetimeModified = DateTime.Now;
+                    soa.ReasonReject = reason;
                     HandleState hs = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
                     if (hs.Success)
                     {
@@ -687,7 +690,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectCdNote(string id)
+        private HandleState RejectCdNote(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -700,6 +703,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     cdNote.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     cdNote.UserModified = currentUser.UserID;
                     cdNote.DatetimeModified = DateTime.Now;
+                    cdNote.ReasonReject = reason;
                     HandleState hs = acctCdNoteRepo.Update(cdNote, x => x.Id == cdNote.Id, false);
                     if (hs.Success)
                     {
@@ -720,7 +724,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectVoucher(string id)
+        private HandleState RejectVoucher(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -733,6 +737,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     voucher.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     voucher.UserModified = currentUser.UserID;
                     voucher.DatetimeModified = DateTime.Now;
+                    voucher.ReasonReject = reason;
                     HandleState hs = DataContext.Update(voucher, x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {
