@@ -208,7 +208,9 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         for (const group of this.listChargePartner) {
             group.isSelected = this.isCheckAllCharge;
             for (const item of group.listCharges) {
-                if (item.voucherId === null && item.invoiceNo === null) {
+                if (item.creditNo === null && item.debitNo === null) {
+                    item.isSelected = this.isCheckAllCharge;
+                } else if (item.voucherId === null && item.invoiceNo === null) {
                     item.isSelected = this.isCheckAllCharge;
                 }
             }
@@ -218,7 +220,9 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     onChangeCheckBoxGrpCharge(charges: any) {
         this.isCheckAllCharge = this.listChargePartner.every((item: any) => item.isSelected);
         for (const charge of charges.listCharges) {
-            if (charge.voucherId === null && charge.invoiceNo === null) {
+            if (charge.creditNo === null && charge.debitNo === null) {
+                charge.isSelected = charges.isSelected;
+            } else if (charge.voucherId === null && charge.invoiceNo === null) {
                 charge.isSelected = charges.isSelected;
             }
         }
@@ -234,7 +238,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
-                    charge.isDeleted = (charge.voucherId === null && charge.invoiceNo === null);
+                    charge.isDeleted = (charge.creditNo === null || charge.debitNo === null) ? true : (charge.voucherId === null && charge.invoiceNo === null);
                 }
             }
         }

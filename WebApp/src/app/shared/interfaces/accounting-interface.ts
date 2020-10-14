@@ -25,4 +25,22 @@ namespace AccountingInterface {
         fromIssuedDate: string;
         toIssuedDate: string;
     }
+
+    export interface IRequestGuid {
+        Id: string;
+        action: string;
+    }
+
+    export interface IRequestInt {
+        id: number;
+        action: string;
+    }
+
+    export interface IRequestGuidType extends IRequestGuid {
+        type: string;
+    }
+
+    export interface IRequestIntType extends IRequestInt {
+        type: string;
+    }
 }

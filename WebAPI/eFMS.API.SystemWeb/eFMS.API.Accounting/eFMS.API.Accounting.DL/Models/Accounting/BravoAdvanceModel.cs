@@ -6,10 +6,10 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
     public class BravoAdvanceModel
     {
         public string DataType { get => "ADVANCE"; set => DataType = value; }
-        public string TransCode { get => "ADVANCE"; set => BranchCode = value; }
+        public string TransCode { get; set;}
         public string BranchCode { get; set; }
         public Guid Stt { get; set; }
-        public string Office { get; set; }
+        public string OfficeCode { get; set; }
         public DateTime? DocDate { get; set; }
         public string ReferenceNo { get; set; }
         public string CustomerCode { get; set; }

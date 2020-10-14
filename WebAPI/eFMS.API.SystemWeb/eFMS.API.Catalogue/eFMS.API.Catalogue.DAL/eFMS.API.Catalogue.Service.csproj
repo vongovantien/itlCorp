@@ -71,7 +71,6 @@
     <Compile Remove="Models\SysRolePermission.cs" />
     <Compile Remove="Models\SysSentEmailHistory.cs" />
     <Compile Remove="Models\SysUserGroup.cs" />
-    <Compile Remove="Models\SysUserLevel.cs" />
     <Compile Remove="Models\SysUserLog.cs" />
     <Compile Remove="Models\SysUserNotification.cs" />
     <Compile Remove="Models\SysUserOtherWorkPlace.cs" />

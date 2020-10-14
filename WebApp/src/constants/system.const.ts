@@ -18,6 +18,7 @@ export class SystemConstants {
     public static readonly ISCHANGE_OFFICE = 'ISCHANGE_OFFICE';
     public static readonly ISCHANGE_DEPT_GROUP = 'ISCHANGE_DEPT_GROUP';
     public static readonly BRAVO_TOKEN = 'bravo_token';
+    public static readonly EFMS_PARTNER_KEY = 'efms-partner-key';
 
     // RSA 512 = 64 bytes for plain text encode
     public static readonly ENCRYPT_SERVER_PUBLIC_KEY: string =

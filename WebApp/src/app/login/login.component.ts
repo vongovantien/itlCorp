@@ -123,15 +123,15 @@ export class LoginComponent {
 
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
 
-                            // * Get Bravo token.
-                            this._partnerAPI.loginBravo().subscribe(
-                                (res: SystemInterface.IBravoToken) => {
-                                    if (+res.Success === 1) {
-                                        console.log(res);
-                                        this._jwtService.saveBravoToken(res.TokenKey);
-                                    }
-                                }
-                            );
+                            // // * Get Bravo token.
+                            // this._partnerAPI.loginBravo().subscribe(
+                            //     (res: SystemInterface.IBravoToken) => {
+                            //         if (+res.Success === 1) {
+                            //             console.log(res);
+                            //             this._jwtService.saveBravoToken(res.TokenKey);
+                            //         }
+                            //     }
+                            // );
                         }
                     }).then(() => {
 

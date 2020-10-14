@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { AppList } from '@app';
-import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { User, SettlementPayment, PartnerOfAcctManagementResult } from '@models';
 import {
@@ -24,8 +24,7 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from '../compo
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 import { SelectRequester } from '../accounting-management/store';
 
-import { catchError, concatMap, finalize, map, } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize, map, } from 'rxjs/operators';
 
 
 @Component({
@@ -40,6 +39,8 @@ export class SettlementPaymentComponent extends AppList {
     @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent, { static: false }) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(SettlementPaymentsPopupComponent, { static: false }) settlementPaymentsPopup: SettlementPaymentsPopupComponent;
+    @ViewChild('confirmSyncSettle', { static: false }) confirmSyncPopup: ConfirmPopupComponent;
+
 
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
@@ -48,6 +49,8 @@ export class SettlementPaymentComponent extends AppList {
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     userLogged: User;
+
+    settleSyncIds: any[] = [];
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -58,7 +61,6 @@ export class SettlementPaymentComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _store: Store<IAppState>,
         private _spinner: NgxSpinnerService,
-        private _partnerAPI: PartnerAPIRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -79,6 +81,8 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'Voucher No', field: 'voucherNo', sortable: true },
             { title: 'Voucher Date', field: 'voucherDate', sortable: true },
             { title: 'Description', field: 'note', sortable: true },
+            { title: 'Sync Date', field: 'lastSyncDate', sortable: true },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
         ];
 
         this.headerCustomClearance = [
@@ -328,48 +332,40 @@ export class SettlementPaymentComponent extends AppList {
             return;
         }
 
-        const settleIds: string[] = settlementSyncList.map(x => x.id);
-        if (!settleIds.length) {
+        this.settleSyncIds = settlementSyncList.map((x: SettlementPayment) => {
+            return <AccountingInterface.IRequestGuid>{
+                Id: x.id,
+                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+            };
+        });
+        if (!this.settleSyncIds.length) {
             return;
         }
+        this.confirmSyncPopup.show();
 
+    }
+
+    onSyncBravo() {
+        this.confirmSyncPopup.hide();
         this._spinner.show();
-        this._accoutingRepo.getListSettleSyncData(settleIds)
+        this._accoutingRepo.syncSettleToAccountant(this.settleSyncIds)
             .pipe(
-                concatMap((list: any[]) => {
-                    console.log(list);
-                    if (!list || !list.length) {
-                        return of(-1);
-                    }
-                    return this._partnerAPI.addSyncInvoiceBravo(list);
-                }),
-                concatMap((bravoRes: SystemInterface.IBRavoResponse) => {
-                    if (bravoRes.Success === 1) {
-                        return this._accoutingRepo.syncSettleToAccountant(settleIds);
-                    }
-                    return of(-2);
-                }),
                 finalize(() => this._spinner.hide()),
                 catchError(this.catchError)
             )
             .subscribe(
-                (res: CommonInterface.IResult | number) => {
-                    if (res === -1) {
-                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
-                        return;
-                    }
-                    if (res === -2) {
-                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
-                        return;
-                    }
+                (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync data thành công");
+                        this._toastService.success("Sync Data to Accountant System Successful");
+
+                        this.getListSettlePayment();
+                    } else {
+                        this._toastService.error("Sync Data Fail");
                     }
                 },
                 (error) => {
                     console.log(error);
                 }
             );
-
     }
 }

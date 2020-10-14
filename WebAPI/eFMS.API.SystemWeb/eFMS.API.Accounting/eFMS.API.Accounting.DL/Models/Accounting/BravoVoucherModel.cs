@@ -11,7 +11,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string AccountNo { get; set; }
         public string BranchCode { get; set; }
         public string LocalBranchCode { get; set; }
-        public string Office { get; set; }
+        public string OfficeCode { get; set; }
         public string TransCode { get; set; }
         public string ReferenceNo { get; set; }
         public string CustomerCode { get; set; }  // Đối tượng voucher
