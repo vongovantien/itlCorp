@@ -184,9 +184,11 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         for (const group of this.listChargePartner) {
             group.isSelected = this.isCheckAllCharge;
             for (const item of group.listCharges) {
-                if (item.voucherId === null && item.invoiceNo === null) {
-                item.isSelected = this.isCheckAllCharge;
-                }
+                if (item.creditNo === null && item.debitNo === null) {
+                    item.isSelected = this.isCheckAllCharge;
+                } else if (item.voucherId === null && item.invoiceNo === null) {
+                    item.isSelected = this.isCheckAllCharge;
+                }               
             }
         }
     }
@@ -194,7 +196,9 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     onChangeCheckBoxGrpCharge(charges: any) {
         this.isCheckAllCharge = this.listChargePartner.every((item: any) => item.isSelected);
         for (const charge of charges.listCharges) {
-            if (charge.voucherId === null && charge.invoiceNo === null) {
+            if (charge.creditNo === null && charge.debitNo === null) {
+                charge.isSelected = charges.isSelected;
+            } else if (charge.voucherId === null && charge.invoiceNo === null) {
                 charge.isSelected = charges.isSelected;
             }
         }

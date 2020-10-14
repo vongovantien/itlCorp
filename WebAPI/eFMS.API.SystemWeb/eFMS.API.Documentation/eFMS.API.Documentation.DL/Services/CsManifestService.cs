@@ -592,6 +592,10 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);

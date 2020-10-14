@@ -599,6 +599,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FlexId).HasColumnName("FlexID");
@@ -2756,6 +2758,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.FuncPartner)
                     .HasMaxLength(255)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Major).HasMaxLength(100);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

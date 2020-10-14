@@ -38,6 +38,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     selectedPayment: PaymentModel;
     confirmMessage: string = '';
     refId: string;
+    action: string;
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -210,49 +211,34 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
             );
     }
 
-    confirmSync(refId: string) {
+    confirmSync(refId: string, action: string) {
         this.refId = refId;
-        this._toastService.success("Tính năng đang phát triển");
-        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        // this.confirmInvoicePaymentPopup.show();
+        this.action = action;
+        // this._toastService.success("Tính năng đang phát triển");
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmInvoicePaymentPopup.show();
     }
 
     onConfirmInvoicePayment() {
         this.confirmInvoicePaymentPopup.hide();
-        const invoicePaymentIds: string[] = [];
-        invoicePaymentIds.push(this.refId);
+        const invoicePaymentIds: AccountingInterface.IRequestGuid[] = [];
+        const invoicePaymentId: AccountingInterface.IRequestGuid = {
+            Id: this.refId,
+            action: this.action
+        };
+        invoicePaymentIds.push(invoicePaymentId);
         this._spinner.show();
         this._accountingRepo.getListInvoicePaymentToSync(invoicePaymentIds)
             .pipe(
-                concatMap((list: PaymentModel[]) => {
-                    console.log(list);
-                    if (!list || !list.length) {
-                        return of(-1);
-                    }
-                    return this._partnerAPI.addSyncReceiptBravo(list);
-                }),
-                concatMap((bravoRes: SystemInterface.IBRavoResponse) => {
-                    if (bravoRes.Success === 1) {
-                        return of(1);
-                    }
-                    return of(-2);
-                }),
                 finalize(() => this._spinner.hide()),
                 catchError(this.catchError)
             )
             .subscribe(
-                (res: CommonInterface.IResult | number) => {
-                    console.log(res);
-                    if (res === -1) {
-                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
-                        return;
-                    }
-                    if (res === -2) {
-                        this._toastService.warning("Data không hợp lệ, Vui lòng kiểm tra lại");
-                        return;
-                    }
-                    if (((res as CommonInterface.IResult).status) || (res as number) === 1) {
-                        this._toastService.success("Sync data thành công");
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+                    } else {
+                        this._toastService.error("Sync Data Fail");
                     }
                 },
                 (error) => {

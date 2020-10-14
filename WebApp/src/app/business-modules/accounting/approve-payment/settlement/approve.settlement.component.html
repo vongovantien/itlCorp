@@ -3,7 +3,13 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <settle-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></settle-payment-form-create>
+                <settle-payment-form-create (onChangeCurrency)="onChangeCurrency($event)">
+                    <ng-container
+                        *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
+                        <span
+                            class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">{{settlementPayment.settlement.syncStatus}}</span>
+                    </ng-container>
+                </settle-payment-form-create>
                 <div class="row" *ngIf="!!settlementPayment">
                     <div class="col-lg-6">
                         <div class="m--align-left">

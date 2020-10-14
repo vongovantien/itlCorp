@@ -40,5 +40,6 @@ namespace eFMS.API.Accounting.DL.Models
         public Guid? AcctManagementId { get; set; }
         public string RequesterId { get; set; }
         public string ChargeType { get; set; }
+        public bool? IsFromShipment { get; set; }
     }
 }

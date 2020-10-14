@@ -9,7 +9,8 @@ import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { listAnimation } from '@animations';
-import { SyncModel } from 'src/app/shared/models/partner-api/sync-model';
+import { AccountingConstants } from '@constants';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -38,7 +39,8 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _sortService: SortService,
         private _router: Router,
         private _progressService: NgProgress,
-        private _exportRepo: ExportRepo
+        private _exportRepo: ExportRepo,
+        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -267,54 +269,45 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     showConfirmed() {
-        this._toastService.success("Tính năng đang phát triển");
-        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        // this.confirmSoaPopup.show();
+        // this._toastService.success("Tính năng đang phát triển");
+        if (this.soa.type === "All") {
+            this._toastService.warning("Not allow sync soa with type All");
+            return;
+        }
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmSoaPopup.show();
     }
 
     onConfirmSoa() {
-        this.getDataSoaToSync();
-    }
-
-    getDataSoaToSync() {
         this.confirmSoaPopup.hide();
-        const soaIds: number[] = [];
-        soaIds.push(this.soa.id);
-        this._accoutingRepo.getListSoaToSync(soaIds, this.soa.type)
+        const soaSyncIds: AccountingInterface.IRequestIntType[] = [];
+        const soaId: AccountingInterface.IRequestIntType = {
+            id: this.soa.id,
+            type: this.soa.type,
+            action: this.soa.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+        };
+        soaSyncIds.push(soaId);
+        this._spinner.show();
+        this._accoutingRepo.syncSoaToAccountant(soaSyncIds)
             .pipe(
+                finalize(() => this._spinner.hide()),
                 catchError(this.catchError),
             ).subscribe(
-                (res: SyncModel[]) => {
-                    const data: SyncModel[] = res;
-                    this.syncToAccountant(data, soaIds);
-                },
-            );
-    }
-
-    syncToAccountant(data: SyncModel[], ids: number[]) {
-        // Gọi API Bravo (Nghiệp vụ hóa đơn hoặc nghiệp vụ chi phí dựa vào Type của SOA)
-
-        // Sync Bravo success
-        this.updateSyncStatusSoa(ids);
-    }
-
-    updateSyncStatusSoa(ids: number[]) {
-        this._accoutingRepo.syncSoaToAccountant(ids)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this._toastService.success('Sync Data to Accountant System Successful!', '');
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
                         this.getDetailSOA(this.soa.soano, this.soa.currency);
                     } else {
-                        this._toastService.error(res.message);
+                        this._toastService.error("Sync Data Fail");
                     }
                 },
+                (error) => {
+                    console.log(error);
+                }
             );
     }
+
 }
 
 interface ISOAExport {

@@ -23,6 +23,7 @@ namespace eFMS.API.ForPartner.Service.Models
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
+        public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
         public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
 
@@ -37,7 +38,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AccAccountingManagement>(entity =>
             {
@@ -229,6 +230,8 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
 
@@ -890,6 +893,37 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.VoucherIdredate)
                     .HasColumnName("VoucherIDREDate")
                     .HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<SysActionFuncLog>(entity =>
+            {
+                entity.ToTable("sysActionFuncLog");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.FuncLocal)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FuncPartner)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Major).HasMaxLength(100);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysPartnerApi>(entity =>

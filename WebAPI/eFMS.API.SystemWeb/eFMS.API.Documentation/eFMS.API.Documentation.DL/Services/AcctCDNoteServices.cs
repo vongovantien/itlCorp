@@ -222,6 +222,22 @@ namespace eFMS.API.Documentation.DL.Services
                 model.OfficeId = currentUser.OfficeID;
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
+
+                var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
+                model.CurrencyId = (_partner?.PartnerMode == "External") ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+
+                //Quy đổi tỉ giá CD Note so về currency Local
+                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                model.ExchangeRate = _exchangeRate;
+
+                decimal _total = 0;
+                foreach (var charge in model.listShipmentSurcharge)
+                {
+                    var _exchangeRateCharge = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, model.CurrencyId);
+                    _total += charge.Total * _exchangeRateCharge;
+                }
+                model.Total = _total;
+
                 var hs = DataContext.Add(model, false);
 
                 if (hs.Success)
@@ -274,6 +290,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
         }
+
         public HandleState UpdateCDNote(AcctCdnoteModel model)
         {
             try
@@ -288,6 +305,22 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.DepartmentId = model.DepartmentId;
                 entity.OfficeId = model.OfficeId;
                 entity.CompanyId = model.CompanyId;
+
+                var _partner = partnerRepositoty.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
+                entity.CurrencyId = (_partner?.PartnerMode == "External") ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+
+                //Quy đổi tỉ giá CD Note so về currency Local
+                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, entity.DatetimeCreated, entity.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                entity.ExchangeRate = _exchangeRate;
+
+                decimal _total = 0;
+                foreach (var charge in model.listShipmentSurcharge)
+                {
+                    var _exchangeRateCharge = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, entity.CurrencyId);
+                    _total += charge.Total * _exchangeRateCharge;
+                }
+                entity.Total = _total;
+
                 var stt = DataContext.Update(entity, x => x.Id == cdNote.Id, false);
                 if (stt.Success)
                 {

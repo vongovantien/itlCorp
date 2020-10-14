@@ -146,6 +146,7 @@ namespace eFMS.API.Documentation.DL.Common
                         && model.CompanyId == currentUser.CompanyID)
                         || authorizeUserIds.Contains(model.PersonInCharge)
                         || model.SalemanIds.Contains(currentUser.UserID)
+                        || model.Groups.Any(x => model.SalemanIds.Contains(x))
                         )
                     {
                         code = 200;
@@ -157,6 +158,7 @@ namespace eFMS.API.Documentation.DL.Common
                         && model.CompanyId == currentUser.CompanyID)
                         || authorizeUserIds.Contains(model.PersonInCharge)
                         || model.SalemanIds.Contains(currentUser.UserID)
+                        || model.Groups.Any(x => model.SalemanIds.Contains(x))
                         )
                     {
                         code = 200;
@@ -243,7 +245,7 @@ namespace eFMS.API.Documentation.DL.Common
                     code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.SaleManId == currentUser.UserID || model.UserCreated == currentUser.UserID) 
+                    if (model.UserCreated == currentUser.UserID) 
                     {
                         code = 200;
                     }
@@ -306,7 +308,9 @@ namespace eFMS.API.Documentation.DL.Common
                         && model.CompanyId == currentUser.CompanyID)
                         || authorizeUserIds.Contains(model.SaleManId)
                         || model.UserCreated == currentUser.UserID
-                        || model.SaleManId == currentUser.UserID)
+                        || model.SaleManId == currentUser.UserID
+                        || model.Groups.Contains(model.SaleManId)
+                        )
                     {
                         code = 200;
                     }
@@ -317,7 +321,9 @@ namespace eFMS.API.Documentation.DL.Common
                         && model.CompanyId == currentUser.CompanyID)
                         || authorizeUserIds.Contains(model.SaleManId)
                         || model.UserCreated == currentUser.UserID
-                        || model.SaleManId == currentUser.UserID)
+                        || model.SaleManId == currentUser.UserID
+                        || model.Departments.Contains(model.SaleManId)
+                        )
                     {
                         code = 200;
                     }
