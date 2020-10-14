@@ -14,7 +14,7 @@
             Accounting Contructor
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test(eFMS.API.ForPartner.DL.Models.VoucherAdvance,System.String)">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test(System.Object,System.String)">
             <summary>
             Test
             </summary>

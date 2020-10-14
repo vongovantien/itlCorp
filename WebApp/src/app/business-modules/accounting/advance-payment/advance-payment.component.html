@@ -90,14 +90,15 @@
                                     <ng-container *ngIf="!!advancePayments.length">
                                         <ng-container
                                             *ngFor="let advancePayment of advancePayments; let i = index; trackBy: trackByFn">
-                                            <tr>
+                                            <tr [class.invalid-row]="advancePayment.syncStatus === 'Rejected'">
                                                 <td>
                                                     <div class="m-checkbox-list d-flex align-items-center">
                                                         <ng-template #dblock>
                                                             <span class="d-block" style="width:30px"></span>
                                                         </ng-template>
-                                                        <ng-container
-                                                            *ngIf="advancePayment.statusApproval === 'Done';else dblock">
+                                                        <ng-container *ngIf="advancePayment.statusApproval === 'Done' 
+                                                            && !advancePayment.voucherNo 
+                                                            && advancePayment.syncStatus !== 'Synced' ;else dblock">
                                                             <label class="m-checkbox">
                                                                 <input type="checkbox" name=""
                                                                     [disabled]="advancePayment.statusApproval !== 'Done'"
@@ -171,7 +172,7 @@
                                                 <td>{{advancePayment.voucherNo}}</td>
                                                 <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td class="text-info">
-                                                    {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy'}}</td>
+                                                    {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy HH:mm'}}</td>
                                                 <td [ngSwitch]="advancePayment.syncStatus">
                                                     <div *ngSwitchCase="'Synced'" class="text-success">
                                                         {{advancePayment.syncStatus}}
@@ -179,6 +180,9 @@
                                                     <div *ngSwitchDefault class="text-danger">
                                                         {{advancePayment.syncStatus}}
                                                     </div>
+                                                </td>
+                                                <td>
+                                                    <span class="text-info">{{advancePayment.userModifiedName}}</span>
                                                 </td>
 
                                             </tr>
@@ -255,6 +259,9 @@
     [body]="'Are you sure you want to remove selected payment vouchers?'" [labelCancel]="'No'"
     title="Confirm remove selected voucher">
 </confirm-popup>
+
+<confirm-popup #confirmSyncAdvance (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
+    body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
 
 
 <permission-403-popup></permission-403-popup>

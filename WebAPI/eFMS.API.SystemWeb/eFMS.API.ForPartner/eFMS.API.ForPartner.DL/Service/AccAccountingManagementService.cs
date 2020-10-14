@@ -36,6 +36,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<AcctSettlementPayment> acctSettlementRepo;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepo;
+        private readonly IActionFuncLogService actionFuncLogService;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -52,7 +53,8 @@ namespace eFMS.API.ForPartner.DL.Service
             ICurrencyExchangeService exchangeService,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<AcctSettlementPayment> acctSettlementPayment,
-            IContextBase<AcctCdnote> acctCdnote
+            IContextBase<AcctCdnote> acctCdnote,
+            IActionFuncLogService actionFuncLog
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -67,6 +69,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currencyExchangeService = exchangeService;
             acctSettlementRepo = acctSettlementPayment;
             acctCdNoteRepo = acctCdnote;
+            actionFuncLogService = actionFuncLog;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -93,9 +96,9 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 string bodyString = JsonConvert.SerializeObject(body) + apiKey + configSetting.Value.PartnerShareKey;
 
-                string eFmsHash = Md5Helper.CreateMD5(bodyString);
+                string eFmsHash = Md5Helper.CreateMD5(bodyString.ToLower());
 
-                if (eFmsHash == hash)
+                if (eFmsHash.ToLower() == hash.ToLower())
                 {
                     valid = true;
                 }
@@ -112,7 +115,7 @@ namespace eFMS.API.ForPartner.DL.Service
         {
             object data = body;
             string bodyString = JsonConvert.SerializeObject(data) + apiKey + configSetting.Value.PartnerShareKey;
-            return Md5Helper.CreateMD5(bodyString);
+            return Md5Helper.CreateMD5(bodyString.ToLower());
         }
 
         #region --- CRUD INVOICE ---
@@ -125,6 +128,24 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsInsertInvoice = InsertInvoice(model, currentUser);
+
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "InsertInvoice",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(hsInsertInvoice),
+                Major = "Tạo Hóa Đơn"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsInsertInvoice;
+        }
+
+        private HandleState InsertInvoice(InvoiceCreateInfo model, ICurrentUser _currentUser)
+        {
             try
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
@@ -144,12 +165,12 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.ReferenceNo = debitCharges[0].ReferenceNo; //Cập nhật Reference No cho Invoice
                 invoice.Currency = model.Currency; //Currency of Invoice
                 invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(debitCharges, model.Currency); // Calculator Total Amount
-                invoice.UserCreated = invoice.UserModified = currentUser.UserID;
+                invoice.UserCreated = invoice.UserModified = _currentUser.UserID;
                 invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
-                invoice.GroupId = currentUser.GroupId;
-                invoice.DepartmentId = currentUser.DepartmentId;
-                invoice.OfficeId = currentUser.OfficeID;
-                invoice.CompanyId = currentUser.CompanyID;
+                invoice.GroupId = _currentUser.GroupId;
+                invoice.DepartmentId = _currentUser.DepartmentId;
+                invoice.OfficeId = _currentUser.OfficeID;
+                invoice.CompanyId = _currentUser.CompanyID;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -170,7 +191,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surcharge.FinalExchangeRate = charge.ExchangeRate;
                                 surcharge.ReferenceNo = charge.ReferenceNo;
                                 surcharge.DatetimeModified = DateTime.Now;
-                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.UserModified = _currentUser.UserID;
                                 var updateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
 
@@ -181,7 +202,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surcharge.FinalExchangeRate = charge.ExchangeRate;
                                 surcharge.ReferenceNo = charge.ReferenceNo;
                                 surcharge.DatetimeModified = DateTime.Now;
-                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.UserModified = _currentUser.UserID;
                                 var updateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
 
@@ -222,6 +243,24 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsDeleteInvoice = DeleteInvoice(model, currentUser);
+            
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "DeleteInvoice",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(hsDeleteInvoice),
+                Major = "Xóa Hóa Đơn"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsDeleteInvoice;
+        }
+
+        HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser)
+        {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -247,7 +286,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.FinalExchangeRate = null;
                             charge.AmountVnd = charge.VatAmountVnd = null;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = currentUser.UserID;
+                            charge.UserModified = _currentUser.UserID;
                             var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
 
@@ -375,7 +414,6 @@ namespace eFMS.API.ForPartner.DL.Service
         #region --- Advance ---
         public HandleState RemoveVoucherAdvance(string voucherNo, string apiKey)
         {
-            HandleState result = new HandleState();
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
@@ -383,6 +421,25 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsRemoveVoucherAdvance = RemoveVoucherAdvance(voucherNo, currentUser);
+            
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "RemoveVoucherAdvance",
+                ObjectRequest = JsonConvert.SerializeObject(voucherNo),
+                ObjectResponse = JsonConvert.SerializeObject(hsRemoveVoucherAdvance),
+                Major = "Hủy Phiếu Chi"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsRemoveVoucherAdvance;
+        }
+
+        private HandleState RemoveVoucherAdvance(string voucherNo, ICurrentUser _currentUser)
+        {
+            HandleState result = new HandleState();
             try
             {
                 if (string.IsNullOrEmpty(voucherNo))
@@ -419,9 +476,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         public HandleState UpdateVoucherAdvance(VoucherAdvance model, string apiKey)
-        {
-            HandleState result = new HandleState();
-
+        {            
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
@@ -429,6 +484,25 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsUpdateVoucherAdvance = UpdateVoucherAdvance(model, currentUser);
+
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "UpdateVoucherAdvance",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(hsUpdateVoucherAdvance),
+                Major = "Cập nhật thông tin Advance  (Phiếu chi)"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsUpdateVoucherAdvance;
+        }
+
+        private HandleState UpdateVoucherAdvance(VoucherAdvance model, ICurrentUser _currentUser)
+        {
+            HandleState result = new HandleState();
             try
             {
                 AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.Id == model.AdvanceID)?.FirstOrDefault();
@@ -439,11 +513,11 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 if (adv.StatusApproval == ForPartnerConstants.STATUS_APPROVAL_DONE)
                 {
-                    adv.PaymentTerm = model.PaymnetTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
-                    if (model.PaymnetTerm != null)
+                    adv.PaymentTerm = model.PaymentTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
+                    if (model.PaymentTerm != null)
                     {
                         DateTime? deadlineDate = null;
-                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymnetTerm);
+                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymentTerm);
                         adv.DeadlinePayment = deadlineDate;
                     }
                     adv.VoucherNo = model.VoucherNo;
@@ -465,9 +539,7 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 return new HandleState(ex.Message);
             }
-
         }
-
         #endregion ---Advance ---
 
         #region --- REJECT DATA ---
@@ -484,27 +556,40 @@ namespace eFMS.API.ForPartner.DL.Service
             switch (model.Type?.ToUpper())
             {
                 case "ADVANCE":
-                    result = RejectAdvance(model.ReferenceID);
+                    result = RejectAdvance(model.ReferenceID, model.Reason);
                     break;
                 case "SETTLEMENT":
-                    result = RejectSettlement(model.ReferenceID);
+                    result = RejectSettlement(model.ReferenceID, model.Reason);
                     break;
                 case "SOA":
-                    result = RejectSoa(model.ReferenceID);
+                    result = RejectSoa(model.ReferenceID, model.Reason);
                     break;
                 case "CDNOTE":
-                    result = RejectCdNote(model.ReferenceID);
+                    result = RejectCdNote(model.ReferenceID, model.Reason);
                     break;
                 case "VOUCHER":
-                    result = RejectVoucher(model.ReferenceID);
+                    result = RejectVoucher(model.ReferenceID, model.Reason);
                     break;
                 default:
-                    return new HandleState((object)"Không tìm thấy loại reject");
+                    result = new HandleState((object)"Không tìm thấy loại reject");                    
+                    break ;
             }
+
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "RejectData",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(result),
+                Major = "Reject Data " + model.Type?.ToUpper()
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
             return result;
         }
 
-        private HandleState RejectAdvance(string id)
+        private HandleState RejectAdvance(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -514,9 +599,10 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var advance = acctAdvanceRepository.Get(x => x.Id == _id).FirstOrDefault();
                     if (advance == null) return new HandleState((object)"Không tìm thấy advance");
-                    advance.SyncStatus = "REJECTED";
+                    advance.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     advance.UserModified = currentUser.UserID;
                     advance.DatetimeModified = DateTime.Now;
+                    advance.ReasonReject = reason;
                     HandleState hs = acctAdvanceRepository.Update(advance, x => x.Id == advance.Id, false);
                     if (hs.Success)
                     {
@@ -537,7 +623,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectSettlement(string id)
+        private HandleState RejectSettlement(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -547,9 +633,10 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var settlement = acctSettlementRepo.Get(x => x.Id == _id).FirstOrDefault();
                     if (settlement == null) return new HandleState((object)"Không tìm thấy settlement");
-                    settlement.SyncStatus = "REJECTED";
+                    settlement.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     settlement.UserModified = currentUser.UserID;
                     settlement.DatetimeModified = DateTime.Now;
+                    settlement.ReasonReject = reason;
                     HandleState hs = acctSettlementRepo.Update(settlement, x => x.Id == settlement.Id, false);
                     if (hs.Success)
                     {
@@ -570,7 +657,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectSoa(string id)
+        private HandleState RejectSoa(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -580,9 +667,10 @@ namespace eFMS.API.ForPartner.DL.Service
                     int.TryParse(id, out _id);
                     var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
                     if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
-                    soa.SyncStatus = "REJECTED";
+                    soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     soa.UserModified = currentUser.UserID;
                     soa.DatetimeModified = DateTime.Now;
+                    soa.ReasonReject = reason;
                     HandleState hs = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
                     if (hs.Success)
                     {
@@ -603,7 +691,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectCdNote(string id)
+        private HandleState RejectCdNote(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -613,9 +701,10 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var cdNote = acctCdNoteRepo.Get(x => x.Id == _id).FirstOrDefault();
                     if (cdNote == null) return new HandleState((object)"Không tìm thấy CDNote");
-                    cdNote.SyncStatus = "REJECTED";
+                    cdNote.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     cdNote.UserModified = currentUser.UserID;
                     cdNote.DatetimeModified = DateTime.Now;
+                    cdNote.ReasonReject = reason;
                     HandleState hs = acctCdNoteRepo.Update(cdNote, x => x.Id == cdNote.Id, false);
                     if (hs.Success)
                     {
@@ -636,7 +725,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState RejectVoucher(string id)
+        private HandleState RejectVoucher(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -646,9 +735,10 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
                     if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
-                    voucher.SyncStatus = "REJECTED";
+                    voucher.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     voucher.UserModified = currentUser.UserID;
                     voucher.DatetimeModified = DateTime.Now;
+                    voucher.ReasonReject = reason;
                     HandleState hs = DataContext.Update(voucher, x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {

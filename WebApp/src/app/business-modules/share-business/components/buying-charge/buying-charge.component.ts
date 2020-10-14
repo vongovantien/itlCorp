@@ -650,7 +650,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 || !charge.partnerShortName
                 || charge.unitPrice === null
                 || charge.quantity < 0
-                // || charge.unitPrice < 0
+                // || charge.unitPrice < 0   // ! Cho nhập âm để giảm trên hóa đơn
+                || +charge.unitPrice === 0   // ! Nhưng không cho nhập 0
                 || charge.currencyId === null
                 || charge.vatrate > 100
             ) {

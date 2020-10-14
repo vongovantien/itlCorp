@@ -37,7 +37,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.delete('Authorization'), url: req.url }));
             }
         } else {
-            const partnerAPIHeader = req.headers.get("partnerAPI");
+            const partnerAPIHeader = req.headers.get(SystemConstants.EFMS_PARTNER_KEY);
             if (partnerAPIHeader) {
                 token = `Bearer ${authHeaderBravo}`;
             }
