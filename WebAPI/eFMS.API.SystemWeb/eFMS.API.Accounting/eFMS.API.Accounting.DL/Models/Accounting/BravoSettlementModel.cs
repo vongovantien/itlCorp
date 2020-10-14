@@ -10,7 +10,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string DataType { get => "SETTLEMENT"; set => DataType = value; }
         public string TransCode { get; set; }
         public string BranchCode { get; set; }
-        public string Office { get; set; }
+        public string OfficeCode { get; set; }
         public DateTime? DocDate { get; set; }
         public string ReferenceNo { get; set; }
         public string CustomerModel { get => "External"; set => CustomerModel = value; }

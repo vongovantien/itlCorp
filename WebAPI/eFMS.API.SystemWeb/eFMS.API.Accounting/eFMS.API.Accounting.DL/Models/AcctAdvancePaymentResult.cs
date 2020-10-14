@@ -9,5 +9,7 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? Amount { get; set; }
         public string StatusApprovalName { get; set; }
         public string PaymentMethodName { get; set; }
+        public string UserCreatedName { get; set; }
+        public string UserModifiedName { get; set; }
     }
 }

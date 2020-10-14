@@ -345,7 +345,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                            // CR 14484
                            VoucherDate = settlePayment.VoucherDate,
-                           VoucherNo = settlePayment.VoucherNo
+                           VoucherNo = settlePayment.VoucherNo,
+                           LastSyncDate = settlePayment.LastSyncDate,
+                           SyncStatus = settlePayment.SyncStatus
                        };
 
             //Sort Array sẽ nhanh hơn

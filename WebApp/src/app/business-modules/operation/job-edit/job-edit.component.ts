@@ -320,7 +320,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                                 customerName: this.opsTransaction.customerName,
                                 agentName: this.opsTransaction.agentName,
                                 supplierName: this.opsTransaction.supplierName,
-                                coloaderId: this.opsTransaction.supplierId
+                                coloaderId: this.opsTransaction.supplierId,
+                                mawb: this.opsTransaction.mblno
                             }));
 
                             this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));
