@@ -32,6 +32,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public DateTime? StatementDate { get; set; }
         public string CurrencyId { get; set; }
+        public decimal? ExchangeRate { get; set; }
         public DateTime? CustomerConfirmDate { get; set; }
         public short? NumberDayOverDue { get; set; }
         public bool? AlertNumberDayOverDueEmail { get; set; }
@@ -50,5 +51,6 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? CompanyId { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public string SyncStatus { get; set; }
+        public string ReasonReject { get; set; }
     }
 }
