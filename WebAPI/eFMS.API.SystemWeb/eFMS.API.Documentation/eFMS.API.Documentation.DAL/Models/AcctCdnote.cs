@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public DateTime? StatementDate { get; set; }
         public string CurrencyId { get; set; }
+        public decimal? ExchangeRate { get; set; }
         public DateTime? CustomerConfirmDate { get; set; }
         public short? NumberDayOverDue { get; set; }
         public bool? AlertNumberDayOverDueEmail { get; set; }
