@@ -231,6 +231,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FlexId).HasColumnName("FlexID");
