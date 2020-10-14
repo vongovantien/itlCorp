@@ -94,7 +94,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 string eFmsHash = Md5Helper.CreateMD5(bodyString);
 
-                if (eFmsHash == hash)
+                if (eFmsHash.ToLower() == hash.ToLower())
                 {
                     valid = true;
                 }
