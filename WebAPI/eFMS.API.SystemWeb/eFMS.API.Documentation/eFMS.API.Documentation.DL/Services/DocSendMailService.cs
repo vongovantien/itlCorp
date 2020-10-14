@@ -268,7 +268,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (serviceId == "SFE")
             {
                 // Subject
-                var etdDate = _housebill.Etd?? _shipment.Etd;
+                var etdDate = _housebill.Etd ?? _shipment.Etd;
                 string etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM").ToUpper();
                 _subject = string.Format(@"PRE ALERT –{0} – {1} // HBL: {2} // MBL: {3}// {4}// {5} // {6} // ETD: {7}",
                 _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageContainer, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, etd);
@@ -280,7 +280,7 @@ namespace eFMS.API.Documentation.DL.Services
                     string conType = GetUnitNameById(con.ContainerTypeId);
                     string packType = GetUnitNameById(con.PackageTypeId);
                     containerDetail += string.Format("<div>{0}x{1}, CTNR/SEAL NO.: {2}/{3}/{4}, {5} {6}, G.W: {7}, CBM: {8}</div>",
-                        con.Quantity, conType, con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType, con.Gw, con.Cbm);
+                        con.Quantity, conType, con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType, String.Format("{0:#.###}", con.Gw), String.Format("{0:#.###}", con.Cbm));
                 }
 
                 string packageTotal = string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key)));
@@ -296,13 +296,13 @@ namespace eFMS.API.Documentation.DL.Services
                                         "<div>Cnee: {15}</div>" +
                                         "<div>Notify: {16}</div>",
                                         _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, etd, _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
-                                        _housebill.PackageContainer, packageTotal, _housebill.GrossWeight, _housebill.Cbm,
+                                        _housebill.PackageContainer, packageTotal, String.Format("{0:#.####}", _housebill.GrossWeight), String.Format("{0:#.####}", _housebill.Cbm),
                                         _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
             }
             else
             {
                 // Subject
-                var etdDate = _housebill.Etd?? _shipment.Etd;
+                var etdDate = _housebill.Etd ?? _shipment.Etd;
                 string etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM").ToUpper();
                 _subject = string.Format(@"PRE ALERT –{0} – {1} // HBL: {2} // MBL: {3}// {4} {5}// {6} // {7} // ETD: {8}",
                 _pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageQty, packageType, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, etd);
@@ -313,7 +313,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     string conType = GetUnitNameById(con.ContainerTypeId);
                     string packType = GetUnitNameById(con.PackageTypeId);
-                    packageDetail += string.Format("<div>{0} {1}, G.W: {2}, CBM: {3}</div>", con.PackageQuantity, packType, con.Gw, con.Cbm);
+                    packageDetail += string.Format("<div>{0} {1}, G.W: {2}, CBM: {3}</div>", con.PackageQuantity, packType, String.Format("{0:#.###}", con.Gw), String.Format("{0:#.###}", con.Cbm));
                 }
 
                 string packageTotal = string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key)));
@@ -328,7 +328,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         "<div>Cnee: {14}</div>" +
                                         "<div>Notify: {15}</div>",
                                         _pol?.NameEn, _pod?.NameEn, _housebill.OceanVoyNo, etd, _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb, _shipment?.Mbltype, _housebill.FreightPayment,
-                                        packageTotal, _housebill.GrossWeight, _housebill.Cbm,
+                                        packageTotal, String.Format("{0:#.####}", _housebill.GrossWeight), String.Format("{0:#.####}", _housebill.Cbm),
                                         _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
             }
 
