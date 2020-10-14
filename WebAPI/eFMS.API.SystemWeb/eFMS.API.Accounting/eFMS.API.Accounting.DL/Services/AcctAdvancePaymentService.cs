@@ -294,7 +294,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from user in user2.DefaultIfEmpty()
                        join uC in users on advancePayment.UserCreated equals uC.Id into UcGrps
                        from Ucgrp in UcGrps.DefaultIfEmpty()
-                       join uM in users on advancePayment.UserCreated equals uM.Id into UmGrps
+                       join uM in users on advancePayment.UserModified equals uM.Id into UmGrps
                        from Umgrp in UmGrps.DefaultIfEmpty()
                        join requestAdvance in requestAdvances on advancePayment.AdvanceNo equals requestAdvance.AdvanceNo into requestAdvances2
                        from requestAdvance in requestAdvances2.DefaultIfEmpty()
