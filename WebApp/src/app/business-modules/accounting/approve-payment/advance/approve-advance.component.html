@@ -3,7 +3,12 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
+                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)">
+                    <ng-container *ngIf="!!advancePayment && !!advancePayment.syncStatus">
+                        <span
+                            class="m-badge m-badge--{{advancePayment.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">{{advancePayment.syncStatus}}</span>
+                    </ng-container>
+                </adv-payment-form-create>
                 <div class="row" *ngIf="!!advancePayment">
                     <div class="col-lg-6">
                         <div class="m--align-left">

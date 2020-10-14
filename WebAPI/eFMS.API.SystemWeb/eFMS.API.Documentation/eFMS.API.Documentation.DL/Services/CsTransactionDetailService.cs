@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<SysCompany> sysCompanyRepo;
+        readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -67,7 +68,8 @@ namespace eFMS.API.Documentation.DL.Services
             IUserPermissionService perService,
             IContextBase<SysOffice> sysOffice,
             IStringLocalizer<LanguageSub> localizer,
-            IContextBase<SysCompany> sysCompany) : base(repository, mapper)
+            IContextBase<SysCompany> sysCompany,
+            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -89,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             stringLocalizer = localizer;
             sysCompanyRepo = sysCompany;
+            userlevelRepository = userlevelRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -420,9 +423,11 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
+            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
+            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange, detail.TransactionType);
+            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId,Groups = lstGroups, Departments = lstDepartments }, permissionRange, detail.TransactionType);
             return code;
         }
 
@@ -769,17 +774,21 @@ namespace eFMS.API.Documentation.DL.Services
                                                 );
                     break;
                 case PermissionRange.Group:
+                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
                     houseBills = houseBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
+                                                || dataUserLevel.Contains(x.SaleManId)
                                                 );
                     break;
                 case PermissionRange.Department:
+                    var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
                     houseBills = houseBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.SaleManId)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
+                                                || dataUserLevelDepartment.Contains(x.SaleManId)
                                                 );
                     break;
                 case PermissionRange.Office:
@@ -1523,6 +1532,9 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 result.SetParameter(parameter);
             }
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
 
             return result;
         }

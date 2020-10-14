@@ -292,6 +292,10 @@ namespace eFMS.API.Accounting.DL.Services
             var data = from advancePayment in advancePayments
                        join user in users on advancePayment.Requester equals user.Id into user2
                        from user in user2.DefaultIfEmpty()
+                       join uC in users on advancePayment.UserCreated equals uC.Id into UcGrps
+                       from Ucgrp in UcGrps.DefaultIfEmpty()
+                       join uM in users on advancePayment.UserModified equals uM.Id into UmGrps
+                       from Umgrp in UmGrps.DefaultIfEmpty()
                        join requestAdvance in requestAdvances on advancePayment.AdvanceNo equals requestAdvance.AdvanceNo into requestAdvances2
                        from requestAdvance in requestAdvances2.DefaultIfEmpty()
                        select new AcctAdvancePaymentResult
@@ -313,7 +317,10 @@ namespace eFMS.API.Accounting.DL.Services
                            Amount = requestAdvance.Amount,
                            VoucherNo = advancePayment.VoucherNo,
                            VoucherDate = advancePayment.VoucherDate,
-                           LastSyncDate = advancePayment.LastSyncDate
+                           LastSyncDate = advancePayment.LastSyncDate,
+                           SyncStatus = advancePayment.SyncStatus,
+                           UserCreatedName = Ucgrp.Username,
+                           UserModifiedName = Umgrp.Username,
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -335,7 +342,10 @@ namespace eFMS.API.Accounting.DL.Services
                 x.PaymentMethod,
                 x.VoucherNo,
                 x.VoucherDate,
-                x.LastSyncDate 
+                x.LastSyncDate,
+                x.SyncStatus,
+                x.UserCreatedName,
+                x.UserModifiedName
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -358,7 +368,10 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
                 StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
-                LastSyncDate = s.Key.LastSyncDate
+                LastSyncDate = s.Key.LastSyncDate,
+                SyncStatus = s.Key.SyncStatus,
+                UserCreatedName = s.Key.UserCreatedName,
+                UserModifiedName = s.Key.UserModifiedName
             });
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();

@@ -73,6 +73,19 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Get info mail housebill of Air Export
+        /// </summary>
+        /// <param name="hblId">Housebill ID</param>
+        /// <returns></returns>
+        [HttpGet("GetInfoMailHBLPreAlerSeaExport")]
+        [Authorize]
+        public IActionResult GetInfoMailHBLPreAlerSeaExport(Guid hblId, string serviceId)
+        {
+            var data = sendMailService.GetInfoMailHBLPreAlerSeaExport(hblId, serviceId);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// Get info mail shipping instruction of Sea Export
         /// </summary>
         /// <param name="jobId">Job ID</param>

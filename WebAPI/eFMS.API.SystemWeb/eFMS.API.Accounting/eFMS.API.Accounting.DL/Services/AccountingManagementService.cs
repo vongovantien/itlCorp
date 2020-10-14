@@ -823,32 +823,32 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
             {
-                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase));
+                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
             }
 
             if (criteria.SoaNos != null && criteria.SoaNos.Count > 0)
             {
-                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase));
+                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
             }
 
             if (criteria.JobNos != null && criteria.JobNos.Count > 0)
             {
-                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
+                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl, StringComparer.OrdinalIgnoreCase));
+                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl, StringComparer.OrdinalIgnoreCase));
+                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
             }
 
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
-                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase));
+                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase) || x.IsFromShipment == false);
             }
 
             var charges = GetChargeForVoucher(query);
@@ -1282,7 +1282,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if(model.Currency == "VND")
                 {
-                    total = model.Charges.Sum(x => x.AmountVnd ?? 0);
+                    total = model.Charges.Sum(x => x.AmountVnd + x.VatAmountVnd ?? 0);
                 }
                 else
                 {

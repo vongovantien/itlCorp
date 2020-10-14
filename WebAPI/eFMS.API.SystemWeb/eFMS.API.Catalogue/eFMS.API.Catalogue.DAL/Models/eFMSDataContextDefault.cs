@@ -52,6 +52,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
+        public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -1361,6 +1362,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ManifestIssuer).HasMaxLength(500);
 
+                entity.Property(e => e.ManifestShipper).HasMaxLength(500);
+
                 entity.Property(e => e.MasksOfRegistration).HasMaxLength(1000);
 
                 entity.Property(e => e.ModifiedDate)
@@ -1571,6 +1574,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ReferenceNo).HasMaxLength(100);
+
                 entity.Property(e => e.SeriesNo).HasMaxLength(50);
 
                 entity.Property(e => e.SettlementCode)
@@ -1658,6 +1663,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("AgentID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.AirlineInfo).HasMaxLength(800);
 
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 
@@ -2772,6 +2779,49 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.WorkingStatus)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysUserLevel>(entity =>
+            {
+                entity.ToTable("sysUserLevel");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Position)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasColumnName("UserID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
         }

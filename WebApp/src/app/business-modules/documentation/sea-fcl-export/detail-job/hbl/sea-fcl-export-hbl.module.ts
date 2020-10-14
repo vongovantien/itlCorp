@@ -19,7 +19,7 @@ import { SeaFCLExportCreateHBLComponent } from './create/create-house-bill.compo
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SeaFCLExportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
-
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -31,8 +31,17 @@ const routing: Routes = [
         data: { name: 'New House Bill', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: SeaFCLExportDetailHBLComponent,
-        data: { name: 'House Bill Detail', path: ':id', level: 5 }
+        path: ':hblId',
+        data: { name: 'House Bill Detail', path: ':id', level: 5 },
+        children: [
+            {
+                path: '', component: SeaFCLExportDetailHBLComponent, data: { name: "" }
+            },
+            {
+                path: 'manifest', component: ShareBusinessReAlertComponent,
+                data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SFE_CODE },
+            }
+        ],
     }
 ];
 

@@ -11,7 +11,8 @@ import { ModalDirective } from "ngx-bootstrap/modal";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
 import { environment } from 'src/environments/environment';
-import { SyncModel } from "src/app/shared/models/partner-api/sync-model";
+import { NgxSpinnerService } from "ngx-spinner";
+import { AccountingConstants } from "@constants";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
@@ -48,7 +49,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
-        private _accountantRepo: AccountingRepo
+        private _accountantRepo: AccountingRepo,
+        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -287,59 +289,48 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     showConfirmed() {
-        this._toastService.success("Tính năng đang phát triển");
-        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        // this.typeConfirm = "CONFIRMED";
-        // this.confirmCdNotePopup.show();
+        // this._toastService.success("Tính năng đang phát triển");
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.typeConfirm = "CONFIRMED";
+        this.confirmCdNotePopup.show();
     }
 
     onConfirmCdNote() {
         if (this.typeConfirm === "DELETE") {
             this.deleteCdNote();
         } else if (this.typeConfirm === "CONFIRMED") {
-            this.getDataCdNoteToSync();
+            this.syncCdNote();
         }
     }
 
-    getDataCdNoteToSync() {
+    syncCdNote() {
         this.confirmCdNotePopup.hide();
-        const cdNoteIds: string[] = [];
-        cdNoteIds.push(this.CdNoteDetail.cdNote.id);
-        this._accountantRepo.getListCdNoteToSync(cdNoteIds, this.CdNoteDetail.cdNote.type)
+        const cdNoteIds: AccountingInterface.IRequestGuidType[] = [];
+        const cdNoteId: AccountingInterface.IRequestGuidType = {
+            Id: this.CdNoteDetail.cdNote.id,
+            type: this.CdNoteDetail.cdNote.type,
+            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+        };
+        cdNoteIds.push(cdNoteId);
+        this._spinner.show();
+        this._accountantRepo.syncCdNoteToAccountant(cdNoteIds)
             .pipe(
+                finalize(() => this._spinner.hide()),
                 catchError(this.catchError),
             ).subscribe(
-                (res: SyncModel[]) => {
-                    const data: SyncModel[] = res;
-                    this.syncToAccountant(data, cdNoteIds);
-                },
-            );
-    }
-
-    syncToAccountant(data: SyncModel[], ids: string[]) {
-        // Gọi API Bravo (Nghiệp vụ hóa đơn hoặc nghiệp vụ chi phí dựa vào Type của CD Note)
-
-        // Sync Bravo success
-        this.updateSyncStatusCdNote(ids);
-    }
-
-    updateSyncStatusCdNote(ids: string[]) {
-        this._accountantRepo.syncCdNoteToAccountant(ids)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this._toastService.success('Sync Data to Accountant System Successful!', '');
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
                         this.getDetailCdNote(this.jobId, this.cdNote);
                         // Gọi onDelete để refresh lại list cd note
                         this.onDeleted.emit();
                     } else {
-                        this._toastService.error(res.message);
+                        this._toastService.error("Sync Data Fail");
                     }
                 },
+                (error) => {
+                    console.log(error);
+                }
             );
     }
 }
