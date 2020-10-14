@@ -34,6 +34,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<AcctSettlementPayment> acctSettlementRepo;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepo;
+        private readonly IActionFuncLogService actionFuncLogService;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -50,7 +51,8 @@ namespace eFMS.API.ForPartner.DL.Service
             ICurrencyExchangeService exchangeService,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<AcctSettlementPayment> acctSettlementPayment,
-            IContextBase<AcctCdnote> acctCdnote
+            IContextBase<AcctCdnote> acctCdnote,
+            IActionFuncLogService actionFuncLog
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -65,6 +67,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currencyExchangeService = exchangeService;
             acctSettlementRepo = acctSettlementPayment;
             acctCdNoteRepo = acctCdnote;
+            actionFuncLogService = actionFuncLog;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -94,7 +97,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 string eFmsHash = Md5Helper.CreateMD5(bodyString);
 
-                if (eFmsHash == hash)
+                if (eFmsHash.ToLower() == hash.ToLower())
                 {
                     valid = true;
                 }
@@ -124,6 +127,24 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsInsertInvoice = InsertInvoice(model, currentUser);
+
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "InsertInvoice",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(hsInsertInvoice),
+                Major = "Tạo Hóa Đơn"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsInsertInvoice;
+        }
+
+        private HandleState InsertInvoice(InvoiceCreateInfo model, ICurrentUser _currentUser)
+        {
             try
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
@@ -143,12 +164,12 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.ReferenceNo = debitCharges[0].ReferenceNo; //Cập nhật Reference No cho Invoice
                 invoice.Currency = model.Currency; //Currency of Invoice
                 invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(debitCharges, model.Currency); // Calculator Total Amount
-                invoice.UserCreated = invoice.UserModified = currentUser.UserID;
+                invoice.UserCreated = invoice.UserModified = _currentUser.UserID;
                 invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
-                invoice.GroupId = currentUser.GroupId;
-                invoice.DepartmentId = currentUser.DepartmentId;
-                invoice.OfficeId = currentUser.OfficeID;
-                invoice.CompanyId = currentUser.CompanyID;
+                invoice.GroupId = _currentUser.GroupId;
+                invoice.DepartmentId = _currentUser.DepartmentId;
+                invoice.OfficeId = _currentUser.OfficeID;
+                invoice.CompanyId = _currentUser.CompanyID;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -169,7 +190,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surcharge.FinalExchangeRate = charge.ExchangeRate;
                                 surcharge.ReferenceNo = charge.ReferenceNo;
                                 surcharge.DatetimeModified = DateTime.Now;
-                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.UserModified = _currentUser.UserID;
                                 var updateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
 
@@ -180,7 +201,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surcharge.FinalExchangeRate = charge.ExchangeRate;
                                 surcharge.ReferenceNo = charge.ReferenceNo;
                                 surcharge.DatetimeModified = DateTime.Now;
-                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.UserModified = _currentUser.UserID;
                                 var updateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
 
@@ -221,6 +242,24 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsDeleteInvoice = DeleteInvoice(model, currentUser);
+            
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "DeleteInvoice",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(hsDeleteInvoice),
+                Major = "Xóa Hóa Đơn"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsDeleteInvoice;
+        }
+
+        HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser)
+        {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -246,7 +285,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.FinalExchangeRate = null;
                             charge.AmountVnd = charge.VatAmountVnd = null;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = currentUser.UserID;
+                            charge.UserModified = _currentUser.UserID;
                             var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
 
@@ -374,7 +413,6 @@ namespace eFMS.API.ForPartner.DL.Service
         #region --- Advance ---
         public HandleState RemoveVoucherAdvance(string voucherNo, string apiKey)
         {
-            HandleState result = new HandleState();
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
@@ -382,6 +420,25 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsRemoveVoucherAdvance = RemoveVoucherAdvance(voucherNo, currentUser);
+            
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "RemoveVoucherAdvance",
+                ObjectRequest = JsonConvert.SerializeObject(voucherNo),
+                ObjectResponse = JsonConvert.SerializeObject(hsRemoveVoucherAdvance),
+                Major = "Hủy Phiếu Chi"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsRemoveVoucherAdvance;
+        }
+
+        private HandleState RemoveVoucherAdvance(string voucherNo, ICurrentUser _currentUser)
+        {
+            HandleState result = new HandleState();
             try
             {
                 if (string.IsNullOrEmpty(voucherNo))
@@ -418,9 +475,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         public HandleState UpdateVoucherAdvance(VoucherAdvance model, string apiKey)
-        {
-            HandleState result = new HandleState();
-
+        {            
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
@@ -428,6 +483,25 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
 
+            var hsUpdateVoucherAdvance = UpdateVoucherAdvance(model, currentUser);
+
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "UpdateVoucherAdvance",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(hsUpdateVoucherAdvance),
+                Major = "Cập nhật thông tin Advance  (Phiếu chi)"
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
+            return hsUpdateVoucherAdvance;
+        }
+
+        private HandleState UpdateVoucherAdvance(VoucherAdvance model, ICurrentUser _currentUser)
+        {
+            HandleState result = new HandleState();
             try
             {
                 AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.Id == model.AdvanceID)?.FirstOrDefault();
@@ -464,9 +538,7 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 return new HandleState(ex.Message);
             }
-
         }
-
         #endregion ---Advance ---
 
         #region --- REJECT DATA ---
@@ -498,8 +570,21 @@ namespace eFMS.API.ForPartner.DL.Service
                     result = RejectVoucher(model.ReferenceID);
                     break;
                 default:
-                    return new HandleState((object)"Không tìm thấy loại reject");
+                    result = new HandleState((object)"Không tìm thấy loại reject");                    
+                    break ;
             }
+
+            #region -- Ghi Log --
+            var modelLog = new SysActionFuncLogModel
+            {
+                FuncLocal = "RejectData",
+                ObjectRequest = JsonConvert.SerializeObject(model),
+                ObjectResponse = JsonConvert.SerializeObject(result),
+                Major = "Reject Data " + model.Type?.ToUpper()
+            };
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+            #endregion
+
             return result;
         }
 
