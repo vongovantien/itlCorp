@@ -42,6 +42,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
+        readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -57,7 +58,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<SysImage> sysImageRepo,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
-            IContextBase<CatDepartment> catDepartmentRepo) : base(repository, cacheService, mapper)
+            IContextBase<CatDepartment> catDepartmentRepo,
+            IContextBase<SysUserLevel> userlevelRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -72,6 +74,7 @@ namespace eFMS.API.Catalogue.DL.Services
             sysImageRepository = sysImageRepo;
             transactionDetailRepository = transactionDetailRepo;
             catDepartmentRepository = catDepartmentRepo;
+            userlevelRepository = userlevelRepo;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -671,9 +674,11 @@ namespace eFMS.API.Catalogue.DL.Services
                 case PermissionRange.Group:
                     if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
                     {
+                        var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
                         data = data.Where(x => (x.GroupId == currentUser.GroupId && (x.DepartmentId == currentUser.DepartmentId) && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                       || salemans.Any(y => dataUserLevel.Contains(y.SaleManId) && y.PartnerId.Equals(x.Id))
                        );
                     }
                     else
@@ -686,9 +691,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 case PermissionRange.Department:
                     if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
                     {
+                        var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+
                         data = data.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                       || salemans.Any(y => dataUserLevelDepartment.Contains(y.SaleManId) && y.PartnerId.Equals(x.Id))
                        );
                     }
                     else
