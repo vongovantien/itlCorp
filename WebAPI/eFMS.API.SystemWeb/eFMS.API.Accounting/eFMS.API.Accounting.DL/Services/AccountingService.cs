@@ -332,8 +332,8 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
                 sync.CustomerMode = cdNotePartner?.PartnerMode;
                 sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
-                sync.CurrencyCode = "VND"; //để trống
-                sync.ExchangeRate = 1;
+                sync.CurrencyCode = cdNote.CurrencyId;
+                sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = string.Empty;
                 sync.DataType = "CDNOTE";
 
@@ -392,7 +392,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// Get data list soa to sync accountant
         /// </summary>
         /// <param name="Ids">List Id of soa</param>
-        /// <param name="type">Type: DEBIT/CREDIT/ALL</param>
+        /// <param name="type">Type: DEBIT/CREDIT</param>
         /// <returns></returns>
         public List<SyncModel> GetListSoaToSync(List<int> ids)
         {
