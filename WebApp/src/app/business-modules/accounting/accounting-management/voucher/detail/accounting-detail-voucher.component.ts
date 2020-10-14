@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, PartnerAPIRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
@@ -15,15 +15,21 @@ import { of } from 'rxjs';
 import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
 import { formatDate } from '@angular/common';
+import { ConfirmPopupComponent } from '@common';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { AccountingConstants } from '@constants';
 
 @Component({
     selector: 'app-accounting-detail-voucher',
     templateUrl: './accounting-detail-voucher.component.html',
 })
 export class AccountingManagementDetailVoucherComponent extends AccountingManagementCreateVoucherComponent implements OnInit {
+    @ViewChild('confirmSyncVoucher', { static: false }) confirmVoucherPopup: ConfirmPopupComponent;
 
     voucherId: string;
     accountingManagement: AccAccountingManagementModel = new AccAccountingManagementModel();
+
+    voucherSync: any[] = [];
 
     constructor(
         protected _router: Router,
@@ -32,6 +38,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         protected _store: Store<IAccountingManagementState>,
         private _activedRoute: ActivatedRoute,
         private _ngProgressService: NgProgress,
+        private _spinner: NgxSpinnerService
     ) {
         super(_toastService, _accountingRepo, _store, _router);
         this._progressRef = this._ngProgressService.ref();
@@ -56,13 +63,15 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
             );
     }
 
-    getDetailVoucher(id: string) {
+    getDetailVoucher(id: string, isDispatchChargeList: boolean = true) {
         this._accountingRepo.getDetailAcctMngt(id)
             .subscribe(
                 (res: AccAccountingManagementModel) => {
                     this.accountingManagement = new AccAccountingManagementModel(res);
                     this.updateFormVoucher(res);
-                    this.updateChargeList(res);
+                    if (isDispatchChargeList) {
+                        this.updateChargeList(res);
+                    }
 
                     console.log(this.accountingManagement);
 
@@ -212,4 +221,37 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         });
         return charges;
     }
+
+    confirmSync() {
+        if (this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
+            return;
+        }
+        this.voucherSync = [{ id: this.accountingManagement.id, type: this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD' }];
+        this.confirmVoucherPopup.show();
+    }
+
+    onSyncBravo() {
+        this.confirmVoucherPopup.hide();
+        this._spinner.show();
+        this._accountingRepo.syncVoucherToAccountant(this.voucherSync)
+            .pipe(
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+
+                        this.getDetailVoucher(this.voucherId, false);
+                    } else {
+                        this._toastService.error("Sync Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
 }

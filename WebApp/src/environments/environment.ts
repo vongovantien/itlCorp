@@ -24,7 +24,7 @@ export const environment = {
                 // EXPORT_CRYSTAL: "http://localhost:53717/ExportCrystal.aspx",
                 EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
                 PARTNER_API: "test.api-efms.itlvn.com/partner",
-                ESB: "test-esb.itlvn.com:8280/bravo-itl"
+                ESB: "test-esb.itlvn.com:8280/itl-bravo"
         },
 
         AUTHORIZATION:

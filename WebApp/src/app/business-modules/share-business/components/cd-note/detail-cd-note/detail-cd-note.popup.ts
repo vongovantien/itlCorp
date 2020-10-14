@@ -1,6 +1,6 @@
 import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
-import { DocumentationRepo } from "src/app/shared/repositories";
+import { DocumentationRepo, AccountingRepo } from "src/app/shared/repositories";
 import { ShareBussinessCdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
 import { catchError, finalize } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
@@ -12,6 +12,8 @@ import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
 import { environment } from 'src/environments/environment';
 import { NgProgress } from "@ngx-progressbar/core";
+import { NgxSpinnerService } from "ngx-spinner";
+import { AccountingConstants } from "@constants";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -48,7 +50,9 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
-        private _progressService: NgProgress
+        private _progressService: NgProgress,
+        private _accountantRepo: AccountingRepo,
+        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -283,11 +287,10 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     showConfirmed() {
-        this._toastService.success("Tính năng đang phát triển");
-
-        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        // this.typeConfirm = "CONFIRMED";
-        // this.confirmCdNotePopup.show();
+        // this._toastService.success("Tính năng đang phát triển");
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.typeConfirm = "CONFIRMED";
+        this.confirmCdNotePopup.show();
     }
 
     hidePreview() {
@@ -298,34 +301,38 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         if (this.typeConfirm === "DELETE") {
             this.deleteCdNote();
         } else if (this.typeConfirm === "CONFIRMED") {
-            this._toastService.success("Tính năng đang phát triển");
+            this.syncCdNote();
         }
     }
 
-    getDataCdNoteToSync() {
-
-    }
-
-    syncToAccountant() {
-        // Gọi API Bravo
-    }
-
-    updateSyncStatusCdNote() {
-        this._progressRef.start();
-        this._documentationRepo.updateSyncStatusCdNote(this.cdNote)
+    syncCdNote() {
+        this.confirmCdNotePopup.hide();
+        const cdNoteIds: AccountingInterface.IRequestGuidType[] = [];
+        const cdNoteId: AccountingInterface.IRequestGuidType = {
+            Id: this.CdNoteDetail.cdNote.id,
+            type: this.CdNoteDetail.cdNote.type,
+            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+        };
+        cdNoteIds.push(cdNoteId);
+        this._spinner.show();
+        this._accountantRepo.syncCdNoteToAccountant(cdNoteIds)
             .pipe(
+                finalize(() => this._spinner.hide()),
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.success) {
-                        this._toastService.success('Sync Data to Accountant System Successful!', '');
-                        this.CdNoteDetail.syncStatus = 'Synced';
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this.getDetailCdNote(this.jobId, this.cdNote);
+                        // Gọi onDelete để refresh lại list cd note
+                        this.onDeleted.emit();
                     } else {
-                        this._toastService.error(res.message);
+                        this._toastService.error("Sync Data Fail");
                     }
                 },
+                (error) => {
+                    console.log(error);
+                }
             );
     }
 }

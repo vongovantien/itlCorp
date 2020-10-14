@@ -1,12 +1,14 @@
 import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo, AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { AccountingConstants } from '@constants';
 
 @Component({
     selector: 'ops-cd-note-detail',
@@ -38,6 +40,8 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
+        private _accountantRepo: AccountingRepo,
+        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -217,45 +221,48 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     }
 
     showConfirmed() {
-        this._toastService.success("Tính năng đang phát triển");
-
-        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        // this.typeConfirm = "CONFIRMED";
-        // this.confirmCdNotePopup.show();
+        // this._toastService.success("Tính năng đang phát triển");
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.typeConfirm = "CONFIRMED";
+        this.confirmCdNotePopup.show();
     }
 
     onConfirmCdNote() {
         if (this.typeConfirm === "DELETE") {
             this.deleteCdNote();
         } else if (this.typeConfirm === "CONFIRMED") {
-            this._toastService.success("Tính năng đang phát triển");
+            this.syncCdNote();
         }
     }
 
-    getDataCdNoteToSync() {
-
-    }
-
-    syncToAccountant() {
-        // Gọi API Bravo
-    }
-
-    updateSyncStatusCdNote() {
-        this._progressRef.start();
-        this._documentationRepo.updateSyncStatusCdNote(this.cdNote)
+    syncCdNote() {
+        this.confirmCdNotePopup.hide();
+        const cdNoteIds: AccountingInterface.IRequestGuidType[] = [];
+        const cdNoteId: AccountingInterface.IRequestGuidType = {
+            Id: this.CdNoteDetail.cdNote.id,
+            type: this.CdNoteDetail.cdNote.type,
+            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+        };
+        cdNoteIds.push(cdNoteId);
+        this._spinner.show();
+        this._accountantRepo.syncCdNoteToAccountant(cdNoteIds)
             .pipe(
+                finalize(() => this._spinner.hide()),
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.success) {
-                        this._toastService.success('Sync Data to Accountant System Successful!', '');
-                        this.CdNoteDetail.syncStatus = 'Synced';
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this.getDetailCdNote(this.jobId, this.cdNote);
+                        // Gọi onDelete để refresh lại list cd note
+                        this.onDeleted.emit();
                     } else {
-                        this._toastService.error(res.message);
+                        this._toastService.error("Sync Data Fail");
                     }
                 },
+                (error) => {
+                    console.log(error);
+                }
             );
     }
 }

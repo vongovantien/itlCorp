@@ -71,13 +71,6 @@
             <param name="size"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.UpdateSyncStatus(System.String)">
-            <summary>
-            Update Sync Status by cdNo
-            </summary>
-            <param name="cdNo">Soa No</param>
-            <returns></returns>
-        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
             <summary>
             
@@ -273,6 +266,13 @@
         <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewAirExportManifestByJobId(System.Guid)">
             <summary>
             preview air export manifest by jobId
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewSeaExportManifestByJobId(System.Guid)">
+            <summary>
+            preview sea export manifest by jobId
             </summary>
             <param name="jobId"></param>
             <returns></returns>
@@ -728,6 +728,13 @@
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirExport(System.Guid)">
+            <summary>
+            Get info mail housebill of Air Export
+            </summary>
+            <param name="hblId">Housebill ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLPreAlerSeaExport(System.Guid,System.String)">
             <summary>
             Get info mail housebill of Air Export
             </summary>

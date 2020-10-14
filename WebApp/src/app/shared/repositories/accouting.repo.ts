@@ -40,13 +40,6 @@ export class AccountingRepo {
             );
     }
 
-    updateSyncStatusSoa(soaNo: string) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/UpdateSyncStatus`, {}, { soaNo: soaNo })
-            .pipe(
-                map((data: any) => data)
-            );
-    }
-
     getDetaiLSOA(soaNO: string, currency: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetBySoaNo/${soaNO}&${currency}`)
             .pipe(
@@ -665,14 +658,62 @@ export class AccountingRepo {
         );
     }
 
-    syncAdvanceToAccountant(list: string[]) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/SyncAdvanceToAccountantSystem`, list).pipe(
+    syncAdvanceToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncAdvanceToAccountantSystem`, list).pipe(
             map((data: any) => data)
         );
     }
 
     getListAdvanceSyncData(list: string[]) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListAdvanceSyncData`, list).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncCdNoteToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListCdNoteToAccountant`, list).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncSoaToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListSoaToAccountant`, list).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListVoucherToSync(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListVoucherSyncData`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncVoucherToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncVoucherToAccountantSystem`, list).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListInvoicePaymentToSync(list: any[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListInvoicePaymentToSync`, list).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListObhPaymentToSync(list: any[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListObhPaymentToSync`, list).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListSettleSyncData(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/GetListSettlementSyncData`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncSettleToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncSettlementToAccountantSystem`, list).pipe(
             map((data: any) => data)
         );
     }

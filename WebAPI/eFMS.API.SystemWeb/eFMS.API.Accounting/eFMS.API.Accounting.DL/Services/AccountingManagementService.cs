@@ -321,8 +321,8 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeModified = acc.DatetimeModified,
                            PaymentStatus = acc.PaymentStatus,
                            PaymentDueDate = acc.PaymentDueDate,
-                           LastSyncDate = acc.LastSyncDate
-
+                           LastSyncDate = acc.LastSyncDate,
+                           SyncStatus = acc.SyncStatus
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
@@ -1282,7 +1282,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if(model.Currency == "VND")
                 {
-                    total = model.Charges.Sum(x => x.AmountVnd ?? 0);
+                    total = model.Charges.Sum(x => x.AmountVnd + x.VatAmountVnd ?? 0);
                 }
                 else
                 {

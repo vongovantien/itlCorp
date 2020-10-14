@@ -510,5 +510,93 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
         }
+
+        public Crystal PreviewSeaExportManifestByJobId(Guid jobId)
+        {
+            Crystal result = new Crystal();
+            var _manifest = GetById(jobId);
+            if (_manifest == null)
+            {
+                return null;
+            }
+            var transaction = csTransactionService.GetDetails(jobId);
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
+            var housebills = transactionDetailService.Query(criteria);
+            string noPieces = string.Empty;
+            string totalPackages = string.Empty;
+            var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
+            _manifest.PolName = _manifest.Pol != null ? ports.Where(x => x.Id == _manifest.Pol)?.FirstOrDefault()?.NameEn : null;
+            _manifest.PodName = _manifest.Pod != null ? ports.Where(x => x.Id == _manifest.Pod)?.FirstOrDefault()?.NameEn : null;
+            var parameter = new SeaCargoManifestParameter
+            {
+                ManifestNo = _manifest.RefNo?.ToUpper(),
+                Owner = _manifest.ManifestIssuer?.ToUpper() ?? string.Empty,
+                Marks = _manifest.MasksOfRegistration ?? string.Empty,
+                Flight = _manifest.VoyNo?.ToUpper() ?? string.Empty,
+                PortLading = _manifest.PolName?.ToUpper(),
+                PortUnlading = _manifest.PodName?.ToUpper(),
+                FlightDate = _manifest.InvoiceDate?.ToString("dd/MM/yyyy"),
+                Eta = "Eta test",
+                Consolidater = _manifest.Consolidator?.ToUpper() ?? string.Empty,
+                DeConsolidater = _manifest.DeConsolidator?.ToUpper() ?? string.Empty,
+                Forwarder = "Forwarder",
+                OMB = "OMB",
+                ContainerNo = "",
+                Agent = "Agent",
+                QtyPacks = string.Empty,
+                TotalShipments = "1",
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyDescription = "CompanyDescription",
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
+                Website = DocumentConstants.COMPANY_WEBSITE,
+                Contact = currentUser.UserName
+            };
+            var manifests = new List<SeaFCLExportCargoManifest>();
+            var freightManifests = new List<FreightManifest>();
+            if (housebills.Count > 0)
+            {
+
+                foreach (var item in housebills)
+                {
+                    var manifest = new SeaFCLExportCargoManifest
+                    {
+                        HBL = item.Hwbno,
+                        Marks = item.ShippingMark,
+                        Nofpiece = item.PackageContainer,
+                        GrossWeight = item.GW ?? 0,
+                        SeaCBM = item.CBM ?? 0,
+                        NoOfAWB = 0,
+                        Destination = item.FinalDestinationPlace?.ToUpper() ?? string.Empty,
+                        Shipper = item.ShipperDescription?.ToUpper() ?? string.Empty,
+                        Consignee = item.ConsigneeDescription?.ToUpper() ?? string.Empty,
+                        Descriptions = item.DesOfGoods ?? string.Empty,
+                        FreightCharge = item.FreightPayment != null ? "Frieght: " + item.FreightPayment : string.Empty,
+                        Notify = item.NotifyParty ?? string.Empty,
+                        OnboardNote = item.OnBoardStatus ?? string.Empty,
+                        MaskNos = string.Empty,
+                        TranShipmentTo = item.PlaceFreightPay ?? string.Empty,
+                        BillType = item.ServiceType ?? string.Empty
+                    };
+                    manifests.Add(manifest);
+                }
+            }
+            else
+            {
+                return result;
+            }
+            result = new Crystal
+            {
+                ReportName = "SeaCargoManifest.rpt",
+                AllowPrint = true,
+                AllowExport = true,
+                IsLandscape = true
+            };
+            result.AddDataSource(manifests);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+
     }
 }

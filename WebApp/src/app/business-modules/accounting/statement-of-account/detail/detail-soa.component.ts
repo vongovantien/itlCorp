@@ -9,6 +9,8 @@ import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { listAnimation } from '@animations';
+import { AccountingConstants } from '@constants';
+import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -37,7 +39,8 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _sortService: SortService,
         private _router: Router,
         private _progressService: NgProgress,
-        private _exportRepo: ExportRepo
+        private _exportRepo: ExportRepo,
+        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -222,25 +225,6 @@ export class StatementOfAccountDetailComponent extends AppList {
             );
     }
 
-    csConfirmed() {
-        this._progressRef.start();
-        this._accoutingRepo.updateSyncStatusSoa(this.soaNO)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.success) {
-                        this._toastService.success('Cs Confirmed successfully!', '');
-                        this.soa.status = 'Cs Confirmed';
-                    } else {
-                        this._toastService.error(res.message);
-                    }
-                },
-            );
-    }
-
     // Charge keyword search
     onChangeKeyWord(keyword: string) {
         if (this.TYPE === 'GROUP') {
@@ -285,37 +269,45 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     showConfirmed() {
-        this._toastService.success("Tính năng đang phát triển");
-
-        // this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        // this.confirmSoaPopup.show();
+        // this._toastService.success("Tính năng đang phát triển");
+        if (this.soa.type === "All") {
+            this._toastService.warning("Not allow sync soa with type All");
+            return;
+        }
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmSoaPopup.show();
     }
 
     onConfirmSoa() {
-        this._toastService.success("Tính năng đang phát triển");
         this.confirmSoaPopup.hide();
+        const soaSyncIds: AccountingInterface.IRequestIntType[] = [];
+        const soaId: AccountingInterface.IRequestIntType = {
+            id: this.soa.id,
+            type: this.soa.type,
+            action: this.soa.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+        };
+        soaSyncIds.push(soaId);
+        this._spinner.show();
+        this._accoutingRepo.syncSoaToAccountant(soaSyncIds)
+            .pipe(
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this.getDetailSOA(this.soa.soano, this.soa.currency);
+                    } else {
+                        this._toastService.error("Sync Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
-    getDataSoaToSync() {
-
-    }
-
-    syncToAccountant() {
-        // Gọi API Bravo
-    }
-
-    updateSyncStatusSoa() {
-        // Update Sync Status
-    }
-}
-
-interface IExcel {
-    title: string;
-    author: string;
-    headers: any[];
-    data: any;
-    fileName: string;
-    sheetName: string;
 }
 
 interface ISOAExport {

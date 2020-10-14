@@ -131,5 +131,14 @@
 
 
         public static readonly string API_KEY_HEADER = "efms-api-key";
+
+        public static readonly string STATUS_SYNCED = "Synced";
+        public static readonly string STATUS_REJECTED = "Rejected";
+
+        public static readonly string ACCOUNTANT_TYPE_DEBIT = "DEBIT";
+        public static readonly string ACCOUNTANT_TYPE_CREDIT = "CREDIT";
+        public static readonly string ACCOUNTANT_TYPE_INVOICE = "INVOICE";
+
+
     }
 }

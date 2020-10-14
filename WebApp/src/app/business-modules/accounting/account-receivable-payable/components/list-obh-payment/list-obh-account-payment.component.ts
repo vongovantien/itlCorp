@@ -5,16 +5,18 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
 import { SortService } from '@services';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { PaymentModel, AccountingPaymentModel } from '@models';
 import { SystemConstants } from '@constants';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, concatMap } from 'rxjs/operators';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'list-obh-account-payment',
@@ -25,21 +27,25 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
     @ViewChild(AccountPaymentUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
-
+    @ViewChild('confirmObhPaymentPopup', { static: false }) confirmObhPaymentPopup: ConfirmPopupComponent;
     @Output() onUpdateExtendDateOfOBH: EventEmitter<any> = new EventEmitter<any>();
 
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
     selectedPayment: PaymentModel;
-
+    confirmMessage: string = '';
+    refId: string;
+    action: string;
     constructor(private _router: Router,
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _store: Store<IAppState>,
         private _exportRepo: ExportRepo,
         private _sortService: SortService,
-        private _toastService: ToastrService) {
+        private _toastService: ToastrService,
+        private _partnerAPI: PartnerAPIRepo,
+        private _spinner: NgxSpinnerService) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.getPagingData;
@@ -200,5 +206,42 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
                 },
             );
     }
+
+    confirmSync(refId: string, action: string) {
+        this.refId = refId;
+        this.action = action;
+        // this._toastService.success("Tính năng đang phát triển");
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmObhPaymentPopup.show();
+    }
+
+    onConfirmObhPayment() {
+        this.confirmObhPaymentPopup.hide();
+        const obhPaymentIds: AccountingInterface.IRequestInt[] = [];
+        const obhPaymentId: AccountingInterface.IRequestInt = {
+            id: Number(this.refId),
+            action: this.action
+        };
+        obhPaymentIds.push(obhPaymentId);
+        this._spinner.show();
+        this._accountingRepo.getListObhPaymentToSync(obhPaymentIds)
+            .pipe(
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+                    } else {
+                        this._toastService.error("Sync Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
 }
 

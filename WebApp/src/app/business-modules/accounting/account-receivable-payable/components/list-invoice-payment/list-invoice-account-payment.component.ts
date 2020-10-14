@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
 import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, concatMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -14,6 +14,8 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { PaymentModel, AccountingPaymentModel } from '@models';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { of } from 'rxjs';
 
 
 
@@ -25,7 +27,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     @ViewChild(AccountPaymentUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
-
+    @ViewChild('confirmInvoicePaymentPopup', { static: false }) confirmInvoicePaymentPopup: ConfirmPopupComponent;
     @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
 
 
@@ -34,7 +36,9 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     paymentHeaders: CommonInterface.IHeaderTable[];
 
     selectedPayment: PaymentModel;
-
+    confirmMessage: string = '';
+    refId: string;
+    action: string;
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -42,7 +46,9 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
-        private _progressService: NgProgress) {
+        private _progressService: NgProgress,
+        private _partnerAPI: PartnerAPIRepo,
+        private _spinner: NgxSpinnerService) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
@@ -204,4 +210,41 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
                 },
             );
     }
+
+    confirmSync(refId: string, action: string) {
+        this.refId = refId;
+        this.action = action;
+        // this._toastService.success("Tính năng đang phát triển");
+        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmInvoicePaymentPopup.show();
+    }
+
+    onConfirmInvoicePayment() {
+        this.confirmInvoicePaymentPopup.hide();
+        const invoicePaymentIds: AccountingInterface.IRequestGuid[] = [];
+        const invoicePaymentId: AccountingInterface.IRequestGuid = {
+            Id: this.refId,
+            action: this.action
+        };
+        invoicePaymentIds.push(invoicePaymentId);
+        this._spinner.show();
+        this._accountingRepo.getListInvoicePaymentToSync(invoicePaymentIds)
+            .pipe(
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+                    } else {
+                        this._toastService.error("Sync Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
 }

@@ -16,6 +16,11 @@
         public string Url;
     }
 
+    public class ESBUrl
+    {
+        public string Url;
+    }
+
     public class AuthenticationSetting
     {
         public string Authority;
