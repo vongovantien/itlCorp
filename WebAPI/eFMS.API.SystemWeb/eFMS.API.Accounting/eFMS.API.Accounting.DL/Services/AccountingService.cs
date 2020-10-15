@@ -185,7 +185,7 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (BravoVoucherModel item in data)
                     {
                         // Ds surcharge của voucher
-                        IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.AcctManagementId == item.Stt);
+                        IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.AcctManagementId == item.Stt && (x.Type == "BUY" || x.Type == "OBH"));
 
                         IQueryable<BravoVoucherChargeModel> queryChargesVoucher = from surcharge in surcharges
                                                                                   join charge in charges on surcharge.ChargeId equals charge.Id
@@ -208,7 +208,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
                                                                                       Quantity9 = surcharge.Quantity,
                                                                                       OriginalUnitPrice = surcharge.UnitPrice,
-                                                                                      TaxRate = surcharge.Vatrate,
+                                                                                      TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0)/100, //Thuế suất /100
                                                                                       OriginalAmount = surcharge.Quantity * surcharge.UnitPrice,
                                                                                       OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice),
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
@@ -262,7 +262,7 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (BravoSettlementModel item in data)
                         {
                             // Ds Surcharge của settlement.
-                            IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
+                            IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo && (x.Type == "BUY" || x.Type == "OBH"));
 
                             IQueryable<BravoSettlementRequestModel> querySettlementReq = from surcharge in surcharges
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
@@ -283,7 +283,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
                                                                                              Quantity9 = surcharge.Quantity,
                                                                                              OriginalUnitPrice = surcharge.UnitPrice,
-                                                                                             TaxRate = surcharge.Vatrate,
+                                                                                             TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
                                                                                              OriginalAmount = surcharge.Quantity * surcharge.UnitPrice,
                                                                                              OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice),
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
@@ -357,7 +357,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
                     charge.OriginalUnitPrice = surcharge.UnitPrice;
-                    charge.TaxRate = surcharge.Vatrate;
+                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
                     var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
                     charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, 2);
                     charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
@@ -416,7 +416,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CustomerMode = soaPartner?.PartnerMode;
                 sync.LocalBranchCode = soaPartner?.InternalCode; //Parnter Internal Code
                 sync.CurrencyCode = soa.Currency;
-                sync.ExchangeRate = 1;
+                sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = soa.Note;
                 sync.DataType = "SOA";
 
@@ -440,7 +440,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
                     charge.OriginalUnitPrice = surcharge.UnitPrice;
-                    charge.TaxRate = surcharge.Vatrate;
+                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
                     var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
                     charge.OriginalAmount = _totalNoVat;
                     charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
@@ -487,7 +487,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
                 sync.CustomerName = invoicePartner?.PartnerNameVn; //Partner Local Name
                 sync.CurrencyCode = invoice.Currency;
-                sync.ExchangeRate = 1;
+                sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, invoice.DatetimeCreated, invoice.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = invoice.PaymentNote;
                 sync.DataType = "PAYMENT";
 
