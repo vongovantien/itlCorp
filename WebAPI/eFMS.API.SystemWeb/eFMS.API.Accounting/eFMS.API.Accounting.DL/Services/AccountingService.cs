@@ -306,7 +306,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Get data list cd note type debit to sync accountant
+        /// Get data list cd note debit to sync accountant
         /// </summary>
         /// <param name="Ids">List Id of cd note</param>
         /// <param name="type">Type: DEBIT/INVOICE</param>
@@ -379,7 +379,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Get data list cd note to sync accountant
+        /// Get data list cd note credit to sync accountant
         /// </summary>
         /// <param name="Ids">List Id of cd note</param>
         /// <param name="type">Type: CREDIT</param>
@@ -440,17 +440,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
                     charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
-
-                    if (cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
-                    {
-                        charge.AccountNo = string.Empty;
-                        charge.ContraAccount = string.Empty;
-                        charge.VATAccount = string.Empty;
-                        charge.AtchDocNo = surcharge.InvoiceNo;
-                        charge.AtchDocDate = surcharge.InvoiceDate;
-                        charge.AtchDocSerialNo = surcharge.SeriesNo;
-                    }
-
+                    
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -460,9 +450,9 @@ namespace eFMS.API.Accounting.DL.Services
 
             return data;
         }
-
+        
         /// <summary>
-        /// Get data list soa type debit to sync accountant
+        /// Get data list soa debit to sync accountant
         /// </summary>
         /// <param name="Ids">List Id of soa</param>
         /// <param name="type">Type: DEBIT</param>
@@ -531,7 +521,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return data;
         }
-
+        
         /// <summary>
         /// Get data list soa type credit to sync accountant
         /// </summary>
