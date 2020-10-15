@@ -340,14 +340,14 @@ namespace eFMS.API.Accounting.Controllers
                     // 3. Call Bravo to SYNC.
                     if (listAdd.Count > 0)
                     {
-                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSInvoiceDataSyncAdd", listAdd, loginResponse.TokenKey);
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
                         var modelLog = new SysActionFuncLogModel
                         {
                             FuncLocal = "SyncSettlementToAccountantSystem",
-                            FuncPartner = "EFMSInvoiceDataSyncAdd",
+                            FuncPartner = "EFMSVoucherDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
                             Major = "Nghiệp Vụ Chi Phí"
@@ -358,14 +358,14 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSInvoiceDataSyncUpdate", listUpdate, loginResponse.TokenKey);
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
                         var modelLog = new SysActionFuncLogModel
                         {
                             FuncLocal = "SyncSettlementToAccountantSystem",
-                            FuncPartner = "EFMSInvoiceDataSyncUpdate",
+                            FuncPartner = "EFMSVoucherDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
                             Major = "Nghiệp Vụ Chi Phí"

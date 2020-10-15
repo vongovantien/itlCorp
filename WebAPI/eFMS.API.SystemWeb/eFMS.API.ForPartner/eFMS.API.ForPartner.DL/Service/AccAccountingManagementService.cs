@@ -322,7 +322,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.GroupId = 0;
             currentUser.DepartmentId = 0;
             currentUser.OfficeID = Guid.Empty;
-            currentUser.CompanyID = Guid.Empty;
+            currentUser.CompanyID = partnerApi?.CompanyId ?? Guid.Empty;
 
             return currentUser;
         }
