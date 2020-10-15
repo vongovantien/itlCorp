@@ -123,7 +123,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || formCreate.errors)}">
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || formCreate.errors | equalError:'invalidPort')}">
                             <label required>Port of Destination (POD)</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: pod.value}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"

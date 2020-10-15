@@ -602,7 +602,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             SettlementCode = sett.SettlementNo,
                                             AcctManagementId = sur.AcctManagementId,
                                             RequesterId = sett.Requester,
-                                            ChargeType = sur.Type
+                                            ChargeType = sur.Type,
+                                            IsFromShipment = sur.IsFromShipment
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(query);
             var queryBuySellDocumentation = from sur in surcharges
@@ -655,7 +656,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 SettlementCode = sett.SettlementNo,
                                                 AcctManagementId = sur.AcctManagementId,
                                                 RequesterId = sett.Requester,
-                                                ChargeType = sur.Type
+                                                ChargeType = sur.Type,
+                                                IsFromShipment = sur.IsFromShipment
                                             };
             queryBuySellDocumentation = queryBuySellDocumentation.Where(query);
             var mergeBuySell = queryBuySellOperation.Union(queryBuySellDocumentation);
@@ -735,7 +737,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            SettlementCode = sett.SettlementNo,
                                            AcctManagementId = sur.AcctManagementId,
                                            RequesterId = sett.Requester,
-                                           ChargeType = sur.Type
+                                           ChargeType = sur.Type,
+                                           IsFromShipment = sur.IsFromShipment
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(query);
             var queryObhBuyDocumentation = from sur in surcharges
@@ -790,7 +793,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                SettlementCode = sett.SettlementNo,
                                                AcctManagementId = sur.AcctManagementId,
                                                RequesterId = sett.Requester,
-                                               ChargeType = sur.Type
+                                               ChargeType = sur.Type,
+                                               IsFromShipment = sur.IsFromShipment
                                            };
             queryObhBuyDocumentation = queryObhBuyDocumentation.Where(query);
             var mergeObhBuy = queryObhBuyOperation.Union(queryObhBuyDocumentation);

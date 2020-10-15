@@ -340,14 +340,14 @@ namespace eFMS.API.Accounting.Controllers
                     // 3. Call Bravo to SYNC.
                     if (listAdd.Count > 0)
                     {
-                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSInvoiceDataSyncAdd", listAdd, loginResponse.TokenKey);
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
                         var modelLog = new SysActionFuncLogModel
                         {
                             FuncLocal = "SyncSettlementToAccountantSystem",
-                            FuncPartner = "EFMSInvoiceDataSyncAdd",
+                            FuncPartner = "EFMSVoucherDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
                             Major = "Nghiệp Vụ Chi Phí"
@@ -358,14 +358,14 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSInvoiceDataSyncUpdate", listUpdate, loginResponse.TokenKey);
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
                         var modelLog = new SysActionFuncLogModel
                         {
                             FuncLocal = "SyncSettlementToAccountantSystem",
-                            FuncPartner = "EFMSInvoiceDataSyncUpdate",
+                            FuncPartner = "EFMSVoucherDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
                             Major = "Nghiệp Vụ Chi Phí"
@@ -507,8 +507,8 @@ namespace eFMS.API.Accounting.Controllers
 
                     List<SyncModel> listAdd_NVHD = (IdsAdd_NVHD.Count > 0) ? accountingService.GetListCdNoteToSync(IdsAdd_NVHD) : new List<SyncModel>();
                     List<SyncModel> listUpdate_NVHD = (IdsUpdate_NVHD.Count > 0) ? accountingService.GetListCdNoteToSync(IdsUpdate_NVHD) : new List<SyncModel>();
-                    List<SyncModel> listAdd_NVCP = (IdsAdd_NVCP.Count > 0) ? accountingService.GetListCdNoteToSync(IdsAdd_NVCP) : new List<SyncModel>();
-                    List<SyncModel> listUpdate_NVCP = (IdsUpdate_NVCP.Count > 0) ? accountingService.GetListCdNoteToSync(IdsUpdate_NVCP) : new List<SyncModel>();
+                    List<SyncCreditModel> listAdd_NVCP = (IdsAdd_NVCP.Count > 0) ? accountingService.GetListCdNoteCreditToSync(IdsAdd_NVCP) : new List<SyncCreditModel>();
+                    List<SyncCreditModel> listUpdate_NVCP = (IdsUpdate_NVCP.Count > 0) ? accountingService.GetListCdNoteCreditToSync(IdsUpdate_NVCP) : new List<SyncCreditModel>();
 
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
@@ -647,8 +647,8 @@ namespace eFMS.API.Accounting.Controllers
 
                     List<SyncModel> listAdd_NVHD = accountingService.GetListSoaToSync(IdsAdd_NVHD);
                     List<SyncModel> listUpdate_NVHD = accountingService.GetListSoaToSync(IdsUpdate_NVHD);
-                    List<SyncModel> listAdd_NVCP = accountingService.GetListSoaToSync(IdsAdd_NVCP);
-                    List<SyncModel> listUpdate_NVCP = accountingService.GetListSoaToSync(IdsUpdate_NVCP);
+                    List<SyncCreditModel> listAdd_NVCP = accountingService.GetListSoaCreditToSync(IdsAdd_NVCP);
+                    List<SyncCreditModel> listUpdate_NVCP = accountingService.GetListSoaCreditToSync(IdsUpdate_NVCP);
 
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
