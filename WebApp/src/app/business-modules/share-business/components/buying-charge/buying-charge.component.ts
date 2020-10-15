@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup } from '@models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup, CsTransactionDetail } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from '@services';
 import { SystemConstants } from '@constants';
@@ -326,7 +326,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIdredate = null;
         newSurCharge.isFromShipment = true;
         newSurCharge.hblno = this.hbl.hwbno || null;
-        newSurCharge.mblno = this.shipment.mawb || this.shipment.mblno || null;
+        newSurCharge.mblno = this.getMblNo(this.shipment, this.hbl);
         newSurCharge.jobNo = this.shipment.jobNo || null;
 
 
@@ -423,18 +423,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 break;
         }
     }
-
-    // onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
-    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+vat, +chargeItem.quantity, +chargeItem.unitPrice);
-    // }
-
-    // onChangeUnitPrice(unitPrice: number, chargeItem: CsShipmentSurcharge) {
-    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +unitPrice);
-    // }
-
-    // onChangeQuantity(quantity: number, chargeItem: CsShipmentSurcharge) {
-    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +quantity, +chargeItem.unitPrice);
-    // }
 
     onChangeDataUpdateTotal(chargeItem: CsShipmentSurcharge) {
         chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +chargeItem.unitPrice);
@@ -1018,7 +1006,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 id: SystemConstants.EMPTY_GUID,
                 exchangeDate: { startDate: new Date, endDate: new Date() },
                 hblno: this.hbl.hwbno || null,
-                mblno: this.shipment.mawb || this.shipment.mblno || null,
+                mblno: this.getMblNo(this.shipment, this.hbl),
                 jobNo: this.shipment.jobNo || null,
             })));
         return newCsShipmentSurcharge || [];
@@ -1054,7 +1042,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.type = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
                                 c.hblno = this.hbl.hwbno || null;
-                                c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                                c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
 
                                 this.onChangeDataUpdateTotal(c);
@@ -1096,7 +1084,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                         charges.forEach(c => {
                             c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
@@ -1105,7 +1093,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
                         charges.forEach(c => {
                             c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
@@ -1114,7 +1102,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.OBH) {
                         charges.forEach(c => {
                             c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
@@ -1240,6 +1228,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
         });
 
+    }
+
+    getMblNo(shipment: CsTransaction, hbl: CsTransactionDetail | HouseBill) {
+        let mblNo = null;
+        mblNo = shipment.mawb ? shipment.mawb : (hbl.mawb ? hbl.mawb : hbl.hwbno);
+        return mblNo;
     }
 }
 
