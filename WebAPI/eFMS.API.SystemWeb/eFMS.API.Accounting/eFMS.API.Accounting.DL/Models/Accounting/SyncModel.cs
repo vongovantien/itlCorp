@@ -44,7 +44,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string OBHPartnerCode { get; set; }
         public string ChargeType { get; set; }      
     }
-
+    
     public class SyncCreditModel
     {
         public string Stt { get; set; }

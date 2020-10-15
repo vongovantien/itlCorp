@@ -507,8 +507,8 @@ namespace eFMS.API.Accounting.Controllers
 
                     List<SyncModel> listAdd_NVHD = (IdsAdd_NVHD.Count > 0) ? accountingService.GetListCdNoteToSync(IdsAdd_NVHD) : new List<SyncModel>();
                     List<SyncModel> listUpdate_NVHD = (IdsUpdate_NVHD.Count > 0) ? accountingService.GetListCdNoteToSync(IdsUpdate_NVHD) : new List<SyncModel>();
-                    List<SyncModel> listAdd_NVCP = (IdsAdd_NVCP.Count > 0) ? accountingService.GetListCdNoteToSync(IdsAdd_NVCP) : new List<SyncModel>();
-                    List<SyncModel> listUpdate_NVCP = (IdsUpdate_NVCP.Count > 0) ? accountingService.GetListCdNoteToSync(IdsUpdate_NVCP) : new List<SyncModel>();
+                    List<SyncCreditModel> listAdd_NVCP = (IdsAdd_NVCP.Count > 0) ? accountingService.GetListCdNoteCreditToSync(IdsAdd_NVCP) : new List<SyncCreditModel>();
+                    List<SyncCreditModel> listUpdate_NVCP = (IdsUpdate_NVCP.Count > 0) ? accountingService.GetListCdNoteCreditToSync(IdsUpdate_NVCP) : new List<SyncCreditModel>();
 
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
