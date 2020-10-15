@@ -185,7 +185,7 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (BravoVoucherModel item in data)
                     {
                         // Ds surcharge của voucher
-                        IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.AcctManagementId == item.Stt && (x.Type == "BUY" || x.Type == "OBH"));
+                        IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.AcctManagementId == item.Stt);
 
                         IQueryable<BravoVoucherChargeModel> queryChargesVoucher = from surcharge in surcharges
                                                                                   join charge in charges on surcharge.ChargeId equals charge.Id
@@ -262,7 +262,7 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (BravoSettlementModel item in data)
                         {
                             // Ds Surcharge của settlement.
-                            IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo && (x.Type == "BUY" || x.Type == "OBH"));
+                            IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
 
                             IQueryable<BravoSettlementRequestModel> querySettlementReq = from surcharge in surcharges
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
@@ -309,7 +309,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// Get data list cd note to sync accountant
         /// </summary>
         /// <param name="Ids">List Id of cd note</param>
-        /// <param name="type">Type: DEBIT/CREDIT/ALL</param>
+        /// <param name="type">Type: DEBIT/CREDIT/INVOICE</param>
         /// <returns></returns>
         public List<SyncModel> GetListCdNoteToSync(List<Guid> ids)
         {
