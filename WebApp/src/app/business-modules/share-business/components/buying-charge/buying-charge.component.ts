@@ -290,6 +290,18 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 chargeItem.chargeNameEn = data.chargeNameEn;
                 chargeItem.chargeGroup = data.chargeGroup;
 
+                let charges = [];
+                this.listChargeGroup.subscribe((res: ChargeGroup[]) => {
+                    if (!!res) {
+                        charges = res;
+                    }
+                });
+
+                const chargeName = charges.find(x => x.id === chargeItem.chargeGroup).name;
+                if (chargeName === 'Com') {
+                    chargeItem.kickBack = true;
+                }
+
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
                     chargeItem.unitId = this.listUnits.find((u: Unit) => u.id === data.unitId).id;
