@@ -9,5 +9,7 @@ namespace eFMS.API.System.DL.Models
         public SysEmployeeModel SysEmployeeModel { get; set; }
         public string UserCreatedName { get; set; }
         public string UserModifiedName { get; set; }
+
+        public string Avatar { get; set; }
     }
 }

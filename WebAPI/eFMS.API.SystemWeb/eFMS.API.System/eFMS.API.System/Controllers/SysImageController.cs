@@ -35,7 +35,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult UploadImage(IFormFile file)
         {
             string folderName = Request.Headers["Module"];
-            var hs = imageService.UploadImage(file, folderName);
+            var hs = imageService.UploadImage(file, folderName, null);
 
             ResultHandle result = new ResultHandle { Status = hs.Result.Status, Message = hs.Result.Message, Data = hs.Result.Data };
             if (!hs.Result.Status)

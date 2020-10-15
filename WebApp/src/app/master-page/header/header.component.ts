@@ -67,8 +67,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 
     viewProfile() {
-        console.log(`home/profile/${"123"}`);
-        this.router.navigate([`home/profile/${"123"}`]);
+        this.router.navigate([`home/profile/${this.currenUser.id}`]);
     }
 
     getOfficeDepartGroupCurrentUser(currenUser: SystemInterface.IClaimUser) {

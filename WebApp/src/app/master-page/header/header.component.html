@@ -278,7 +278,11 @@
                                                     src="assets/app/media/img/users/user4.jpg" />
                                             </div>
                                             <div>
-                                                <h5 class="text-white mb-0" style="cursor: pointer;">Đoàn Văn Thương
+                                                <h5 class="text-white mb-0" style="cursor: pointer;">
+                                                    <span class="m-topbar__username"
+                                                        style="font-size: 14px; text-transform: capitalize;">
+                                                        {{!!currenUser ? currenUser.preferred_username : null}}
+                                                    </span>
                                                 </h5>
                                             </div>
                                             <div>
