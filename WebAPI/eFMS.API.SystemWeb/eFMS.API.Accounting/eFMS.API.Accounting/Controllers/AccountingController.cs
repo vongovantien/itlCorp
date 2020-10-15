@@ -647,8 +647,8 @@ namespace eFMS.API.Accounting.Controllers
 
                     List<SyncModel> listAdd_NVHD = accountingService.GetListSoaToSync(IdsAdd_NVHD);
                     List<SyncModel> listUpdate_NVHD = accountingService.GetListSoaToSync(IdsUpdate_NVHD);
-                    List<SyncModel> listAdd_NVCP = accountingService.GetListSoaToSync(IdsAdd_NVCP);
-                    List<SyncModel> listUpdate_NVCP = accountingService.GetListSoaToSync(IdsUpdate_NVCP);
+                    List<SyncCreditModel> listAdd_NVCP = accountingService.GetListSoaCreditToSync(IdsAdd_NVCP);
+                    List<SyncCreditModel> listUpdate_NVCP = accountingService.GetListSoaCreditToSync(IdsUpdate_NVCP);
 
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
