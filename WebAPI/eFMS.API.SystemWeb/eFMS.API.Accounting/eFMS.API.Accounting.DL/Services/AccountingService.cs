@@ -316,7 +316,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<SyncModel> data = new List<SyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
+            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id) && (x.Type == "DEBIT" || x.Type == "INVOICE"));
             
             foreach (var cdNote in cdNotes)
             {
@@ -366,8 +366,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
-                    charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
-                    
+                    charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);                    
+
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -389,7 +389,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<SyncCreditModel> data = new List<SyncCreditModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
+            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id) && x.Type == "CREDIT");
 
             foreach (var cdNote in cdNotes)
             {
@@ -440,17 +440,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
                     charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
-
-                    if (cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
-                    {
-                        charge.AccountNo = string.Empty;
-                        charge.ContraAccount = string.Empty;
-                        charge.VATAccount = string.Empty;
-                        charge.AtchDocNo = surcharge.InvoiceNo;
-                        charge.AtchDocDate = surcharge.InvoiceDate;
-                        charge.AtchDocSerialNo = surcharge.SeriesNo;
-                    }
-
+                    
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -460,7 +450,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return data;
         }
-
+        
         /// <summary>
         /// Get data list soa debit to sync accountant
         /// </summary>
@@ -472,7 +462,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<SyncModel> data = new List<SyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            var soas = soaRepository.Get(x => ids.Contains(x.Id));
+            var soas = soaRepository.Get(x => ids.Contains(x.Id) && x.Type.ToUpper() == "DEBIT");
             
             foreach(var soa in soas)
             {
@@ -531,9 +521,9 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return data;
         }
-
+        
         /// <summary>
-        /// Get data list soa credit to sync accountant
+        /// Get data list soa type credit to sync accountant
         /// </summary>
         /// <param name="Ids">List Id of soa</param>
         /// <param name="type">Type: CREDIT</param>
@@ -543,7 +533,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<SyncCreditModel> data = new List<SyncCreditModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            var soas = soaRepository.Get(x => ids.Contains(x.Id));
+            var soas = soaRepository.Get(x => ids.Contains(x.Id) && x.Type.ToUpper() == "CREDIT");
 
             foreach (var soa in soas)
             {
@@ -593,17 +583,13 @@ namespace eFMS.API.Accounting.DL.Services
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = soa.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
                     charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
-
-                    if (soa.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
-                    {
-                        charge.AccountNo = string.Empty;
-                        charge.ContraAccount = string.Empty;
-                        charge.VATAccount = string.Empty;
-                        charge.AtchDocNo = surcharge.InvoiceNo;
-                        charge.AtchDocDate = surcharge.InvoiceDate;
-                        charge.AtchDocSerialNo = surcharge.SeriesNo;
-                    }
-
+                    charge.AccountNo = string.Empty;
+                    charge.ContraAccount = string.Empty;
+                    charge.VATAccount = string.Empty;
+                    charge.AtchDocNo = surcharge.InvoiceNo;
+                    charge.AtchDocDate = surcharge.InvoiceDate;
+                    charge.AtchDocSerialNo = surcharge.SeriesNo;
+                    
                     charges.Add(charge);
                 }
                 sync.Details = charges;

@@ -42,9 +42,9 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public decimal? OriginalAmount { get; set; }
         public decimal? OriginalAmount3 { get; set; }
         public string OBHPartnerCode { get; set; }
-        public string ChargeType { get; set; }
+        public string ChargeType { get; set; }      
     }
-
+    
     public class SyncCreditModel
     {
         public string Stt { get; set; }
