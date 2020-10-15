@@ -93,7 +93,7 @@ namespace eFMS.API.ForPartner.DL.Service
             bool valid = false;
             if (body != null)
             {
-                string bodyString = JsonConvert.SerializeObject(body) + apiKey + configSetting.Value.PartnerShareKey;
+                string bodyString = apiKey + configSetting.Value.PartnerShareKey;
 
                 string eFmsHash = Md5Helper.CreateMD5(bodyString.ToLower());
 
@@ -113,7 +113,7 @@ namespace eFMS.API.ForPartner.DL.Service
         public string GenerateHashStringTest(object body, string apiKey)
         {
             object data = body;
-            string bodyString = JsonConvert.SerializeObject(data) + apiKey + configSetting.Value.PartnerShareKey;
+            string bodyString = apiKey + configSetting.Value.PartnerShareKey;
             return Md5Helper.CreateMD5(bodyString.ToLower());
         }
 
@@ -322,7 +322,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.GroupId = 0;
             currentUser.DepartmentId = 0;
             currentUser.OfficeID = Guid.Empty;
-            currentUser.CompanyID = Guid.Empty;
+            currentUser.CompanyID = partnerApi?.CompanyId ?? Guid.Empty;
 
             return currentUser;
         }
