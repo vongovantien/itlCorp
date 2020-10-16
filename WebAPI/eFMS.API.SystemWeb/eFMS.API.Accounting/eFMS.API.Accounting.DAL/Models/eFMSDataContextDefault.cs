@@ -298,6 +298,12 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(11)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BankAccountName).HasMaxLength(150);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(150);
+
+                entity.Property(e => e.BankName).HasMaxLength(150);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
