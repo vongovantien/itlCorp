@@ -168,8 +168,9 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
                 invoice.GroupId = _currentUser.GroupId;
                 invoice.DepartmentId = _currentUser.DepartmentId;
-                invoice.OfficeId = _currentUser.OfficeID;
-                invoice.CompanyId = _currentUser.CompanyID;
+                var firstCharge = surchargeRepo.Get(x => x.Id == debitCharges[0].ChargeId).Select(s => new { s.OfficeId, s.CompanyId }).FirstOrDefault();
+                invoice.OfficeId = firstCharge?.OfficeId ?? Guid.Empty; //Lấy OfficeId của first charge
+                invoice.CompanyId = firstCharge?.CompanyId ?? Guid.Empty; //Lấy CompanyId của first charge
                 invoice.PaymentTerm = model.PaymentTerm;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
