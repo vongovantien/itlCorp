@@ -170,6 +170,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.DepartmentId = _currentUser.DepartmentId;
                 invoice.OfficeId = _currentUser.OfficeID;
                 invoice.CompanyId = _currentUser.CompanyID;
+                invoice.PaymentTerm = model.PaymentTerm;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
