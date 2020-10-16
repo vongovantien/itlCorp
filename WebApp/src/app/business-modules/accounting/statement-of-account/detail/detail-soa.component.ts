@@ -296,10 +296,10 @@ export class StatementOfAccountDetailComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     console.log(res);
                     if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this._toastService.success("Send Data to Accountant System Successful");
                         this.getDetailSOA(this.soa.soano, this.soa.currency);
                     } else {
-                        this._toastService.error("Sync Data Fail");
+                        this._toastService.error("Send Data Fail");
                     }
                 },
                 (error) => {
