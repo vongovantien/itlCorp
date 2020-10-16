@@ -290,7 +290,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     showConfirmed() {
         // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
         this.confirmCdNotePopup.show();
     }

@@ -271,10 +271,10 @@ export class StatementOfAccountDetailComponent extends AppList {
     showConfirmed() {
         // this._toastService.success("Tính năng đang phát triển");
         if (this.soa.type === "All") {
-            this._toastService.warning("Not allow sync soa with type All");
+            this._toastService.warning("Not allow send soa with type All");
             return;
         }
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.confirmSoaPopup.show();
     }
 
