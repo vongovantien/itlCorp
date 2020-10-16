@@ -36,7 +36,7 @@ const routing: Routes = [
             },
             {
                 path: ':id/permission/:permissionId/:type', component: ShareSystemDetailPermissionComponent, data: { name: "UserPermission" }
-            }
+            },
         ]
     },
 ];
@@ -64,7 +64,7 @@ const routing: Routes = [
         UserDetailsComponent,
         UserManagementImportComponent,
         AddRoleUserComponent,
-        UserManagementAddGroupPopupComponent
+        UserManagementAddGroupPopupComponent,
     ],
     providers: [],
 })

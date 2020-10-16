@@ -20,6 +20,8 @@
             padding: 0;
         }
     }
+    
+    
 }
 
 @media only screen and (max-width: 1024px) {
@@ -29,4 +31,48 @@
     #m_header_topbar {
         top: 0 !important;
     }
+    
 }
+
+.info-account-wrapper{
+    width: 288px;
+    .popup-account__avatar {
+        width: 80px;
+        overflow: hidden;
+        
+    }
+}
+
+
+
+.flex-row-around {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px; 
+    align-items: center;
+}
+
+.flex-row-between {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px; 
+    align-items: center;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.icon-online {
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background-color: #7bc38d;
+}
+
+.icon-custom {
+    color: green;
+}
+
+
