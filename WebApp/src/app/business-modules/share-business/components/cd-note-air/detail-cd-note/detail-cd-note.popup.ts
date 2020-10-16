@@ -320,12 +320,12 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this._toastService.success("Send Data to Accountant System Successful");
                         this.getDetailCdNote(this.jobId, this.cdNote);
                         // Gọi onDelete để refresh lại list cd note
                         this.onDeleted.emit();
                     } else {
-                        this._toastService.error("Sync Data Fail");
+                        this._toastService.error("Send Data Fail");
                     }
                 },
                 (error) => {
