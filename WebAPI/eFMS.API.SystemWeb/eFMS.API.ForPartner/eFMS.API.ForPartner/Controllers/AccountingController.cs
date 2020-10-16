@@ -193,7 +193,8 @@ namespace eFMS.API.ForPartner.Controllers
                 InvoiceDate = model.InvoiceDate,
                 SerieNo = model.SerieNo,
                 Currency = model.Currency,
-                Charges = model.Charges
+                Charges = model.Charges,
+                PaymentTerm = model.PaymentTerm
             };            
             invoiceToCreate.Charges.ForEach(fe => {
                 fe.ReferenceNo = model.ReferenceNo;
