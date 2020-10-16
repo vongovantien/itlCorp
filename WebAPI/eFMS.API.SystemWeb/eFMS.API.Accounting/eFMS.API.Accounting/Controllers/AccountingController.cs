@@ -52,6 +52,16 @@ namespace eFMS.API.Accounting.Controllers
             };
         }
 
+        #region -- Test API --
+        [HttpPost("GetListAdvanceToSync")]
+        [Authorize]
+        public IActionResult GetListAdvanceToSync(List<Guid> Ids)
+        {
+            var data = accountingService.GetListAdvanceToSyncBravo(Ids);
+            return Ok(data);
+        }
+        #region -- Test API --
+
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]
         public async Task<IActionResult> GetListInvoicePaymentToSync(List<RequestGuidListModel> request)
