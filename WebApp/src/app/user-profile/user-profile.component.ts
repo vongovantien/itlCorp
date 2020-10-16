@@ -1,18 +1,14 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 
-import { Warehouse } from 'src/app/shared/models/catalogue/ware-house.model';
-import { PopupBase } from 'src/app/popup.base';
-import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
+
+import { SystemRepo } from 'src/app/shared/repositories';
+import { catchError, finalize, map, takeUntil, tap } from 'rxjs/operators';
+import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
-import { FormValidators } from 'src/app/shared/validators/form.validator';
-import { CommonEnum } from '@enums';
+
 import { AppList } from '@app';
 import { ActivatedRoute, Params } from '@angular/router';
 import UUID from 'validator/lib/isUUID';
-import { Identifiers } from '@angular/compiler/src/render3/r3_identifiers';
 
 @Component({
     selector: 'user-profile-page',
@@ -20,16 +16,11 @@ import { Identifiers } from '@angular/compiler/src/render3/r3_identifiers';
     styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfilePageComponent extends AppList {
-    //@Output() saveSuccess: EventEmitter<boolean> = new EventEmitter<boolean>();
-    //
-    currentUserId: string;
-    //
 
+    currentUserId: string;
     fileName: string = null;
     files: File[] = [];
-    //
     formUser: FormGroup;
-    // properties enable update
 
     employeeNameVn: AbstractControl;
     employeeNameEn: AbstractControl;
@@ -39,17 +30,14 @@ export class UserProfilePageComponent extends AppList {
     bankName: AbstractControl;
     tel: AbstractControl;
     description: AbstractControl;
-    // image
 
     avatar: AbstractControl;
-    // dump (viewonly) properties
 
     staffCode: AbstractControl;
     username: AbstractControl;
     workingStatus: AbstractControl;
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
-
 
     constructor(
         private _ngProgressService: NgProgress,
@@ -186,7 +174,6 @@ export class UserProfilePageComponent extends AppList {
             finalize(() => this._progressRef.complete()))
             .subscribe((body: any) => {
                 if (body.status) {
-                    //saved -> remove current url
                     this.fileName = null;
                     this.files = [];
                     this.getUserDetail(this.currentUserId);
