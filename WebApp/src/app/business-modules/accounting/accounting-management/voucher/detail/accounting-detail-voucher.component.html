@@ -7,7 +7,7 @@
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3>{{accountingManagement.voucherId}}
                         <span
-                            class="m-badge m-badge--{{accountingManagement.status === 'New' && !accountingManagement.syncStatus ? 'danger' : 'success'}} m-badge--wide">
+                            class="m-badge m-badge--{{accountingManagement.status === 'New' && (!accountingManagement.syncStatus || accountingManagement.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
                             {{!accountingManagement.syncStatus ? accountingManagement.status : accountingManagement.syncStatus}}
                         </span>
                     </h3>
@@ -21,7 +21,7 @@
 
                             <button class="btn btn-info m-btn--icon m-btn--uppercase" (click)="confirmSync()"
                                 title="Sync to accountant system"
-                                *ngIf="!accountingManagement.syncStatus && accountingManagement.syncStatus !== 'Synced'">
+                                *ngIf="!accountingManagement.syncStatus || accountingManagement.syncStatus !== 'Synced'">
                                 <span>
                                     <i class="la la-cloud-upload"></i>
                                     <span>
