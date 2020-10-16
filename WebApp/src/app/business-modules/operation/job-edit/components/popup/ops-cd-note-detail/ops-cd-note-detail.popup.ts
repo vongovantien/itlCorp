@@ -222,7 +222,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
 
     showConfirmed() {
         // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
         this.confirmCdNotePopup.show();
     }
@@ -252,12 +252,12 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this._toastService.success("Send Data to Accountant System Successful");
                         this.getDetailCdNote(this.jobId, this.cdNote);
                         // Gọi onDelete để refresh lại list cd note
                         this.onDeleted.emit();
                     } else {
-                        this._toastService.error("Sync Data Fail");
+                        this._toastService.error("Send Data Fail");
                     }
                 },
                 (error) => {

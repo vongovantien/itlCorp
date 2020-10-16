@@ -83,6 +83,20 @@ export class AddRoleUserComponent extends AppList {
             );
     }
 
+    getOffices() {
+        this._systemRepo.getListOfficesByUserId(this.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    this.officeData = res;
+                    this.listRoles.forEach(item => {
+                            item.offices = res;
+                    });
+                },
+            );
+    }
 
     cancelSave() {
         this.listRoles = this.listRoles.filter(x => !!x.id);
@@ -156,6 +170,8 @@ export class AddRoleUserComponent extends AppList {
         psm.offices = this.officeData;
         this.listRoles.push(psm);
         console.log(this.listRoles);
+        this.getCompanies();
+        this.getOffices();
     }
 
     deleteRole(index: number, id: string) {
