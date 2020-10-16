@@ -161,16 +161,16 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             string type = list.Select(t => t.Type).FirstOrDefault();
-            var query = type == "BUY" || type =="OBH" ? list.Where(x => !isSurchargeSpecialCase(x) && !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
-                                      .Where(g => g.Count() > 1)
-                                      .Select(y => y.Key):
-
-                                       list.Where(x => !isSurchargeSpecialCase(x)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
-                                      .Where(g => g.Count() > 1)
-                                      .Select(y => y.Key);
-            if (query.Any())
+            if(type == "BUY" || type == "OBH")
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
+                var query = list.Where(x => !isSurchargeSpecialCase(x) && !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
+                             .Where(g => g.Count() > 1)
+                             .Select(y => y.Key);
+
+                if (query.Any())
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
+                }
             }
             var hs = csShipmentSurchargeService.AddAndUpate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
