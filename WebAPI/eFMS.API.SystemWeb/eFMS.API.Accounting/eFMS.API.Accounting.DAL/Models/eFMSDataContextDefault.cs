@@ -3241,6 +3241,12 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false)
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.BankAccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankName).HasMaxLength(500);
+
                 entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.CreditRate).HasColumnType("decimal(18, 4)");
