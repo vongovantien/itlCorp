@@ -543,10 +543,10 @@ namespace eFMS.API.System.DL.Services
             result.EmployeeNameVn = currEmployee?.EmployeeNameVn;
             result.UserCreatedName = userCreate?.Username;
             result.UserModifiedName = userModified?.Username;
+
             // get avatar through last modified date.
             result.Avatar = currEmployee?.Photo;
 
-            result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
             if (result == null)
             {
                 return null;
@@ -564,6 +564,7 @@ namespace eFMS.API.System.DL.Services
                 return new HandleState();
             }
             // set change value -> currUser
+<<<<<<< HEAD
             var currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
             currUser.Description = criteria.Description?.Trim();
 
@@ -576,6 +577,20 @@ namespace eFMS.API.System.DL.Services
             currEmployee.Email = criteria.Email?.Trim();
             currEmployee.BankAccountNo = criteria.BankAccountNo?.Trim();
             currEmployee.BankName = criteria.BankName?.Trim();
+=======
+            SysUser currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            currUser.Description = criteria.Description;
+
+            // set change value -> currEmployee by employeeId of currUser
+            var currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
+            currEmployee.EmployeeNameEn = criteria.EmployeeNameEn;
+            currEmployee.EmployeeNameVn = criteria.EmployeeNameVn;
+            currEmployee.Title = criteria.Title;
+            currEmployee.Tel = criteria.Tel;
+            currEmployee.Email = criteria.Email;
+            currEmployee.BankName = criteria.BankName;
+            currEmployee.BankAccountNo = criteria.BankAccountNo;
+>>>>>>> feature/sprint20-26-08-2020
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
