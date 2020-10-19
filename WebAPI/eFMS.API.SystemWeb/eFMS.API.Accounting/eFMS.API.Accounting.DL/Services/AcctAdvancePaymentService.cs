@@ -227,8 +227,6 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.CompanyId == currentUser.CompanyID
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
                 && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
@@ -240,9 +238,6 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.CompanyId == currentUser.CompanyID
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Accountant) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED : true)
                 && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //BOD AND DEPUTY OF BOD                
             ).Select(s => s.advancePayment);
@@ -255,11 +250,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
                 advanceRequests = acctAdvanceRequestRepo.Get(x =>
-                                        criteria.ReferenceNos.Contains(x.AdvanceNo)
-                                     || criteria.ReferenceNos.Contains(x.Hbl)
-                                     || criteria.ReferenceNos.Contains(x.Mbl)
-                                     || criteria.ReferenceNos.Contains(x.CustomNo)
-                                     || criteria.ReferenceNos.Contains(x.JobId)
+                                        criteria.ReferenceNos.Contains(x.AdvanceNo, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.Hbl, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.Mbl, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.CustomNo, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.JobId, StringComparer.OrdinalIgnoreCase)
                                      );
 
             }
@@ -3263,7 +3258,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 DateTime? deadlineDate = null;
 
-                deadlineDate = adv.DeadlinePayment.Value.AddDays((double)days);
+                deadlineDate = adv.RequestDate.Value.AddDays((double)days);
                 adv.DeadlinePayment = deadlineDate;
                 adv.PaymentTerm = days;
 
