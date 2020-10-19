@@ -116,6 +116,7 @@ namespace eFMS.IdentityServer
                 list_Claim.Add(new Claim("nameVn", modelReturn.NameVn.ToString()));
                 list_Claim.Add(new Claim("bankAccountNo", modelReturn.BankAccountNo.ToString()));
                 list_Claim.Add(new Claim("bankName", modelReturn.BankName.ToString()));
+                list_Claim.Add(new Claim("photo", modelReturn.Photo.ToString()));
 
 
                 context.Result = new GrantValidationResult(

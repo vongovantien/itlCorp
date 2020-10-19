@@ -229,6 +229,7 @@ namespace eFMS.IdentityServer.DL.Services
             userInfo.NameVn = employee.EmployeeNameVn ?? "";
             userInfo.BankAccountNo = employee.BankAccountNo ?? "";
             userInfo.BankName = employee.BankName ?? "";
+            userInfo.Photo = employee.Photo ?? "";
 
             userInfo.message = "Login successfull !";
 
