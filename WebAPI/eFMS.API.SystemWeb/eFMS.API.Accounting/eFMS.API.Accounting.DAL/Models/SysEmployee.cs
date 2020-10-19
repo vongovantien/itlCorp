@@ -19,7 +19,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string HomeAddress { get; set; }
         public string Email { get; set; }
         public string AccessDescription { get; set; }
-        public byte[] Photo { get; set; }
         public string EmpPhotoSize { get; set; }
         public decimal? SaleTarget { get; set; }
         public decimal? Bonus { get; set; }
@@ -35,5 +34,6 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? InactiveOn { get; set; }
         public string BankName { get; set; }
         public string BankAccountNo { get; set; }
+        public string Photo { get; set; }
     }
 }
