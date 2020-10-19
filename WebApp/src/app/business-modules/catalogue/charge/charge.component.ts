@@ -48,7 +48,6 @@ export class ChargeComponent extends AppList implements OnInit {
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Status', field: 'active', sortable: true }
         ];
-        this.searchCharge();
     }
 
     sortCharge(sort: string): void {
