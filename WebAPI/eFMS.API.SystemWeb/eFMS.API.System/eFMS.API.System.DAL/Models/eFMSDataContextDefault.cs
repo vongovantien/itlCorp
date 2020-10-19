@@ -408,7 +408,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.Photo).HasColumnType("image");
+                entity.Property(e => e.Photo).HasMaxLength(500);
 
                 entity.Property(e => e.Position)
                     .HasMaxLength(50)

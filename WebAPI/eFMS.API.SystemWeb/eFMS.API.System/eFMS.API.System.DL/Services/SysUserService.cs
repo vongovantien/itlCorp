@@ -538,15 +538,13 @@ namespace eFMS.API.System.DL.Services
             }).FirstOrDefault();
             var userCreate = DataContext.Get(x => x.Id == result.UserCreated).FirstOrDefault();
             var userModified = DataContext.Get(x => x.Id == result.UserModified).FirstOrDefault();
-            //
-            result.EmployeeNameVn = employeeRepository.Get(x => x.Id == result.EmployeeId).FirstOrDefault().EmployeeNameVn;
+            // Get employee
+            var currEmployee = employeeRepository.Get(x => x.Id == result.EmployeeId).FirstOrDefault();
+            result.EmployeeNameVn = currEmployee?.EmployeeNameVn;
             result.UserCreatedName = userCreate?.Username;
             result.UserModifiedName = userModified?.Username;
             // get avatar through last modified date.
-            var image = imageRepository.Get(x => x.Folder == "User" && x.ObjectId == result.Id)
-                .OrderByDescending(y => y.DatetimeModified).FirstOrDefault();
-            
-            result.Avatar = image?.Url;
+            result.Avatar = currEmployee?.Photo;
 
             result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
             if (result == null)
@@ -584,22 +582,21 @@ namespace eFMS.API.System.DL.Services
                 try
                 {
                     var hs = DataContext.Update(currUser, x => x.Id == currUser.Id);
-                    
                     if (hs.Success)
                     {
-                        hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
-                        if(hs.Success)
+                        // upload Image
+                        if (criteria.Avatar != null)
                         {
-                            // upload
-                            if (criteria.Avatar != null)
-                            {
-                                sysImageService.UploadImage(criteria.Avatar, "User", currUser.Id);
-                            }
+                            sysImageService.UploadImage(criteria.Avatar, "User", currUser.Id);
+                            // get avatar through last modified date.
+                            var image = imageRepository.Get(x => x.Folder == "User" && x.ObjectId == currentUser.UserID)
+                                .OrderByDescending(y => y.DatetimeModified).FirstOrDefault();
+                            currEmployee.Photo = image?.Url;
                         }
-                        
+                        // update Employee
+                        hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
                     }
-                    
-                    
+
                     trans.Commit();
                     return hs;
                 }
