@@ -388,7 +388,8 @@ namespace eFMS.API.Accounting.DL.Services
                                          SettlementCode = null,
                                          AcctManagementId = sur.AcctManagementId,
                                          RequesterId = null,
-                                         ChargeType = sur.Type
+                                         ChargeType = sur.Type,
+                                         IsFromShipment = sur.IsFromShipment
                                      };
             querySellOperation = querySellOperation.Where(query);
             var querySellDocumentation = from sur in surcharges
@@ -439,7 +440,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              SettlementCode = null,
                                              AcctManagementId = sur.AcctManagementId,
                                              RequesterId = null,
-                                             ChargeType = sur.Type
+                                             ChargeType = sur.Type,
+                                             IsFromShipment = sur.IsFromShipment
                                          };
             querySellDocumentation = querySellDocumentation.Where(query);
             var mergeSell = querySellOperation.Union(querySellDocumentation);
@@ -827,32 +829,37 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
             {
-                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
+                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SoaNos != null && criteria.SoaNos.Count > 0)
             {
-                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
+                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.JobNos != null && criteria.JobNos.Count > 0)
             {
-                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
+                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
+                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Hbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl, StringComparer.OrdinalIgnoreCase) && x.IsFromShipment == true);
+                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
-                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase) || x.IsFromShipment == false);
+                query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase));
+            }
+            else
+            {
+                //Chỉ lấy Phí chứng từ khi không search theo Settlement
+                query = query.And(x => x.IsFromShipment == true);
             }
 
             var charges = GetChargeForVoucher(query);
