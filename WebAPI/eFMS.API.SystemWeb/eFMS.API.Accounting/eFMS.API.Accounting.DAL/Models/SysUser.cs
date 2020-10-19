@@ -25,7 +25,5 @@ namespace eFMS.API.Accounting.Service.Models
         public string Description { get; set; }
         public decimal? CreditLimit { get; set; }
         public decimal? CreditRate { get; set; }
-        public string BankAccountNo { get; set; }
-        public string BankName { get; set; }
     }
 }

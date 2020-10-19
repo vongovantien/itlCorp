@@ -3254,5 +3254,23 @@ namespace eFMS.API.Accounting.DL.Services
             return advanceRequests;
         }
 
+        public HandleState UpdatePaymentTerm(Guid Id, decimal days)
+        {
+            HandleState result = new HandleState();
+
+            AcctAdvancePayment adv = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+            if(adv != null)
+            {
+                DateTime? deadlineDate = null;
+
+                deadlineDate = adv.DeadlinePayment.Value.AddDays((double)days);
+                adv.DeadlinePayment = deadlineDate;
+                adv.PaymentTerm = days;
+
+                result = DataContext.Update(adv,x => x.Id == Id);
+            }
+
+            return result;
+        }
     }
 }

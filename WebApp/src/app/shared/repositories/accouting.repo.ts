@@ -717,6 +717,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    updatePaymentTerm(id: string, days: number) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/UpdatePaymentTerm`, null, { Id: id, days: days }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

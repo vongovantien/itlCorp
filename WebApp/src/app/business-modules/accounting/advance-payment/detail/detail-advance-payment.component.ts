@@ -1,21 +1,23 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { AdvancePayment, Currency } from 'src/app/shared/models';
+import { AdvancePayment } from '@models';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
 import { formatDate } from '@angular/common';
 import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
 import { ToastrService } from 'ngx-toastr';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { ReportPreviewComponent } from '@common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
+import { delayTime } from '@decorators';
 
 @Component({
     selector: 'app-advance-payment-detail',
     templateUrl: './detail-advance-payment.component.html',
 })
-export class AdvancePaymentDetailComponent extends AppPage {
+export class AdvancePaymentDetailComponent extends AppPage implements ICrystalReport {
 
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
@@ -47,6 +49,12 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 this.getDetail(this.advId);
             }
         });
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 
     onChangeCurrency(currency: string) {
@@ -97,7 +105,11 @@ export class AdvancePaymentDetailComponent extends AppPage {
                         statusApproval: this.advancePayment.statusApproval,
                         deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
                         note: this.advancePayment.advanceNote,
-                        currency: this.advancePayment.advanceCurrency
+                        currency: this.advancePayment.advanceCurrency,
+                        paymentTerm: this.advancePayment.paymentTerm || 9,
+                        bankAccountNo: this.advancePayment.bankAccountNo,
+                        bankAccountName: this.advancePayment.bankAccountName,
+                        bankName: this.advancePayment.bankName
                     });
 
                     this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
@@ -135,7 +147,11 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 advanceNo: this.advancePayment.advanceNo,
                 id: this.advancePayment.id,
                 UserCreated: this.advancePayment.userCreated,
-                DatetimeCreated: this.advancePayment.datetimeCreated
+                DatetimeCreated: this.advancePayment.datetimeCreated,
+                paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
+                bankAccountNo: this.formCreateComponent.bankAccountNo.value,
+                bankAccountName: this.formCreateComponent.bankAccountName.value,
+                bankName: this.formCreateComponent.bankName.value
             };
             this._progressRef.start();
             this._accoutingRepo.updateAdvPayment(body)
@@ -173,11 +189,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.previewPopup.frm.nativeElement.submit();
-                        this.previewPopup.show();
-                    }, 1000);
-
+                    this.showReport();
                 },
             );
     }
@@ -203,7 +215,11 @@ export class AdvancePaymentDetailComponent extends AppPage {
             advanceNo: this.advancePayment.advanceNo,
             id: this.advancePayment.id,
             UserCreated: this.advancePayment.userCreated,
-            DatetimeCreated: this.advancePayment.datetimeCreated
+            DatetimeCreated: this.advancePayment.datetimeCreated,
+            paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
+            bankAccountNo: this.formCreateComponent.bankAccountNo.value,
+            bankAccountName: this.formCreateComponent.bankAccountName.value,
+            bankName: this.formCreateComponent.bankName.value
         };
         this._progressRef.start();
         this._accoutingRepo.sendRequestAdvPayment(body)
@@ -225,6 +241,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 },
             );
     }
+
+
 
     exportAdvPayment(lang: string) {
         this._progressRef.start();
