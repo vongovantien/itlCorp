@@ -2531,7 +2531,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.CustomNo = _customNo;
                 soaCharge.JobNo = _jobNo;
                 soaCharge.CdCode = cdNote?.Code;
-                soaCharge.Docs = string.Join("\r\n", grpInvCdNoteByHbl.Where(w => w.Hblid == charge.Hblid).Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
+                soaCharge.Docs = string.Join("\r\n", grpInvCdNoteByHbl.ToList().Where(w => w.Hblid == charge.Hblid).Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
 
                 soaCharges.Add(soaCharge);
             }
