@@ -3,12 +3,13 @@ import { Component } from '@angular/core';
 
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map, takeUntil, tap } from 'rxjs/operators';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppList } from '@app';
 import { ActivatedRoute, Params } from '@angular/router';
 import UUID from 'validator/lib/isUUID';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'user-profile-page',
@@ -31,19 +32,22 @@ export class UserProfilePageComponent extends AppList {
     tel: AbstractControl;
     description: AbstractControl;
 
-    avatar: AbstractControl;
+    avatar: any = null;
 
     staffCode: AbstractControl;
     username: AbstractControl;
     workingStatus: AbstractControl;
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
+    isSubmited: boolean = false;
+    emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$";
 
     constructor(
         private _ngProgressService: NgProgress,
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
         private _activedRoute: ActivatedRoute,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -69,16 +73,23 @@ export class UserProfilePageComponent extends AppList {
     }
     initForm() {
         this.formUser = this._fb.group({
-            employeeNameVn: [],
-            employeeNameEn: [],
+            employeeNameVn: ['',
+                Validators.compose([
+                Validators.required
+            ])],
+            employeeNameEn: ['',
+            Validators.compose([
+            Validators.required
+            ])],
             title: [],
-            email: [],
+            email: ['',
+            Validators.compose([
+            Validators.required, Validators.pattern(this.emailPattern)
+            ])],
             bankAccountNo: [],
             bankName: [],
             tel: [],
             description: [],
-            //
-            avatar: [],
             // view only
             staffCode: [],
             username: [],
@@ -95,8 +106,6 @@ export class UserProfilePageComponent extends AppList {
         this.bankName = this.formUser.controls['bankName'];
         this.tel = this.formUser.controls['tel'];
         this.description = this.formUser.controls['description'];
-        //
-        this.avatar = this.formUser.controls['avatar'];
         // view only
         this.staffCode = this.formUser.controls['staffCode'];
         this.username = this.formUser.controls['username'];
@@ -123,28 +132,36 @@ export class UserProfilePageComponent extends AppList {
             employeeNameVn: body.employeeNameVn,
             employeeNameEn: !!body.sysEmployeeModel ? body.sysEmployeeModel.employeeNameEn : null,
             title: !!body.sysEmployeeModel ? body.sysEmployeeModel.title : null,
-            email: !!body.sysEmployeeModel ? body.sysEmployeeModel.title : null,
-            bankAccountNo: body.sysEmployeeModel.bankAccountNo,
-            bankName: body.bankName.bankName,
+            email: !!body.sysEmployeeModel ? body.sysEmployeeModel.email : null,
+            bankAccountNo: !!body.sysEmployeeModel ? body.sysEmployeeModel.bankAccountNo : null,
+            bankName: !!body.sysEmployeeModel ? body.sysEmployeeModel.bankName : null,
             tel: !!body.sysEmployeeModel ? body.sysEmployeeModel.tel : null,
             description: body.description,
-            //
-            avatar: body.avatar,
             // dump (viewonly) properties
-
             staffCode: !!body.sysEmployeeModel ? body.sysEmployeeModel.staffCode : null,
             username: body.username,
             workingStatus: body.workingStatus,
             creditLimit: body.creditLimit,
             creditRate: body.creditRate,
         });
+        this.avatar = body.avatar;
     }
 
 
     handleFileInput(event) {
         if (!!event.target['files']) {
-            this.fileName = event.target.value;
-            this.files = event.target['files'];
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+            if (!allowedExtensions.exec(event.target.value)) {
+                this._toastService.error("Invalid file type");
+            } else {
+                this.fileName = event.target.value;
+                this.files = event.target['files'];
+                let reader = new FileReader();      
+                reader.readAsDataURL(<File>event.target.files[0]); 
+                reader.onload = () => { 
+                    this.avatar = reader.result; 
+                }
+            }
         }
         console.log(this.files);
     }
@@ -158,12 +175,12 @@ export class UserProfilePageComponent extends AppList {
         const body = {
             employeeNameVn: form.employeeNameVn,
             employeeNameEn: form.employeeNameEn,
-            title: form.title,
+            title: !form.title ? '' : form.title,
             email: form.email,
-            bankAccountNo: form.bankAccountNo,
-            bankName: form.bankName,
-            tel: form.tel,
-            description: form.description,
+            bankAccountNo: !form.bankAccountNo ? '' : form.bankAccountNo,
+            bankName: !form.bankName ? '' : form.bankName,
+            tel: !form.tel ? '' : form.tel,
+            description: !form.description ? '' : form.description,
         };
         this.onUpdate(body, this.files);
     }

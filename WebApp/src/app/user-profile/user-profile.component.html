@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="col-lg-12 text-center py-3">
 
-                            <img src={{avatar.value}} onerror="src='assets/app/media/img/users/user4.jpg'" width="160px"
+                            <img src={{avatar}} onerror="src='assets/app/media/img/users/user4.jpg'" width="160px"
                                 class="rounded-circle" alt="Cinque Terre">
 
                         </div>
@@ -29,14 +29,7 @@
                                 style="min-width: 100px; ">
                                 UPLOAD
                             </label>
-                            <!-- </button> -->
-                            <button type="button" class="btn btn-danger ml-3 border-radius-15"
-                                style="min-width: 100px; ">
-                                DOWNLOAD
-                            </button>
                         </div>
-
-                        <div class="col-lg-12 text-success text-center mt-3">{{ fileName }} </div>
 
                         <div class="col-lg-12 mt-3">
                             <div class="row px-3 py-2 font-weight-bold">
@@ -69,45 +62,70 @@
                 <div class="p-3">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="form-group row">
+                            <div class="form-group row"
+                            [ngClass]="{'m-form__group has-danger': (employeeNameVn.dirty && !employeeNameVn.valid) || (isSubmited && !employeeNameVn.valid)}">
                                 <label required>Full name: </label>
-                                <input type="input" class="form-control" formControlName="employeeNameVn">
+                                <input type="input" class="form-control m-input m-input--square" formControlName="employeeNameVn"
+                                    placeholder="Please Enter Full Name">
+                                 <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (employeeNameVn.errors | equalError: 'required') || (employeeNameVn.errors | equalError: 'required') && employeeNameVn.dirty">
+                                    Full Name is required!
+                            </div>
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row">
-                                <label>English name: </label>
-                                <input type="input" class="form-control" formControlName="employeeNameEn">
+                            <div class="form-group row"
+                            [ngClass]="{'m-form__group has-danger': (employeeNameEn.dirty && !employeeNameEn.valid) || (isSubmited && !employeeNameEn.valid)}">
+                                <label required>English name: </label>
+                                <input type="input" class="form-control m-input m-input--square" formControlName="employeeNameEn"
+                                    placeholder="Please Enter Staff Code">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (employeeNameEn.errors | equalError: 'required') || (employeeNameEn.errors | equalError: 'required') && employeeNameEn.dirty">
+                                    English Name is required!
+                            </div>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group row">
                                 <label>Title: </label>
-                                <input type="input" class="form-control" formControlName="title">
+                                <input type="input" class="form-control m-input m-input--square" formControlName="title"
+                                    placeholder="Please Enter Title">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row"
+                                [ngClass]="{'m-form__group has-danger': (email.dirty && !email.valid) || (isSubmited && !email.valid)}">
+                                <label required>Email: </label>
+                                <input type="email" class="form-control m-input m-input--square" formControlName="email"
+                                    placeholder="Please Enter Email">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (email.errors | equalError: 'required') || (email.errors | equalError: 'required') && email.dirty">
+                                    Email is required!
+                                </div>
+                                <div class="form-control-feedback" *ngIf="email.errors?.pattern">
+                                    Email not valid.
+                               </div> 
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group row">
-                                <label>Email: </label>
-                                <input type="input" class="form-control" formControlName="email">
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group row">
-                                <label>Bank Account no: </label>
-                                <input type="input" class="form-control" formControlName="bankAccountNo">
+                                <label>Bank Account No: </label>
+                                <input type="input" class="form-control m-input m-input--square" formControlName="bankAccountNo"
+                                    placeholder="Please Enter Bank Account No">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group row">
                                 <label>Bank Name: </label>
-                                <input type="input" class="form-control" formControlName="bankName">
+                                <input type="input" class="form-control m-input m-input--square" formControlName="bankName"
+                                    placeholder="Please Enter Bank Name">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group row">
                                 <label>Phone Number: </label>
-                                <input type="input" class="form-control" formControlName="tel">
+                                <input type="input" class="form-control" formControlName="tel"
+                                    placeholder="Please Enter Phone Number">
                             </div>
                         </div>
                         <div class="col-lg-12">

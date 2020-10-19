@@ -534,22 +534,18 @@ namespace eFMS.API.System.DL.Services
                 Username = y.Username,
                 UserType = y.UserType,
                 WorkingStatus = y.WorkingStatus,
-                WorkPlaceId = y.WorkPlaceId,
+                WorkPlaceId = y.WorkPlaceId
             }).FirstOrDefault();
             var userCreate = DataContext.Get(x => x.Id == result.UserCreated).FirstOrDefault();
             var userModified = DataContext.Get(x => x.Id == result.UserModified).FirstOrDefault();
-
-
-            result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
-
+            // Get employee
+            var currEmployee = employeeRepository.Get(x => x.Id == result.EmployeeId).FirstOrDefault();
+            result.EmployeeNameVn = currEmployee?.EmployeeNameVn;
             result.UserCreatedName = userCreate?.Username;
             result.UserModifiedName = userModified?.Username;
 
             // get avatar through last modified date.
-            SysImage image = imageRepository.Get(x => x.Folder == "User" && x.ObjectId == result.Id)
-                .OrderByDescending(y => y.DatetimeModified).FirstOrDefault();
-            
-            result.Avatar = image?.Url;
+            result.Avatar = currEmployee?.Photo;
 
             if (result == null)
             {
@@ -568,6 +564,20 @@ namespace eFMS.API.System.DL.Services
                 return new HandleState();
             }
             // set change value -> currUser
+<<<<<<< HEAD
+            var currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            currUser.Description = criteria.Description?.Trim();
+
+            // set change value -> currEmployee by employeeId of currUser
+            var currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
+            currEmployee.EmployeeNameEn = criteria.EmployeeNameEn?.Trim();
+            currEmployee.EmployeeNameVn = criteria.EmployeeNameVn?.Trim();
+            currEmployee.Title = criteria.Title?.Trim();
+            currEmployee.Tel = criteria.Tel?.Trim();
+            currEmployee.Email = criteria.Email?.Trim();
+            currEmployee.BankAccountNo = criteria.BankAccountNo?.Trim();
+            currEmployee.BankName = criteria.BankName?.Trim();
+=======
             SysUser currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
             currUser.Description = criteria.Description;
 
@@ -580,28 +590,28 @@ namespace eFMS.API.System.DL.Services
             currEmployee.Email = criteria.Email;
             currEmployee.BankName = criteria.BankName;
             currEmployee.BankAccountNo = criteria.BankAccountNo;
+>>>>>>> feature/sprint20-26-08-2020
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     var hs = DataContext.Update(currUser, x => x.Id == currUser.Id);
-                    
                     if (hs.Success)
                     {
-                        hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
-                        if(hs.Success)
+                        // upload Image
+                        if (criteria.Avatar != null)
                         {
-                            // upload
-                            if (criteria.Avatar != null)
-                            {
-                                sysImageService.UploadImage(criteria.Avatar, "User", currUser.Id);
-                            }
+                            sysImageService.UploadImage(criteria.Avatar, "User", currUser.Id);
+                            // get avatar through last modified date.
+                            var image = imageRepository.Get(x => x.Folder == "User" && x.ObjectId == currentUser.UserID)
+                                .OrderByDescending(y => y.DatetimeModified).FirstOrDefault();
+                            currEmployee.Photo = image?.Url;
                         }
-                        
+                        // update Employee
+                        hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
                     }
-                    
-                    
+
                     trans.Commit();
                     return hs;
                 }
