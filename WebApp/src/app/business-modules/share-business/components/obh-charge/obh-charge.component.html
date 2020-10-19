@@ -270,7 +270,8 @@
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else unitPrice">
-                                        <input type="text" class="form-control" disabled [value]="charge.unitPrice">
+                                        <input type="text" class="form-control" disabled [value]="charge.unitPrice"
+                                            autoFormatCurrency>
                                     </ng-container>
                                     <ng-template #unitPrice>
                                         <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
