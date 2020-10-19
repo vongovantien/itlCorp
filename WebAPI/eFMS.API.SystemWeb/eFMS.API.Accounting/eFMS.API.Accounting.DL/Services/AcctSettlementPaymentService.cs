@@ -1136,23 +1136,23 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.jobIds != null)
             {
-                opsTrans = opsTrans.Where(x => criteria.jobIds.Contains(x.JobNo));
-                csTrans = csTrans.Where(x => criteria.jobIds.Contains(x.JobNo));
+                opsTrans = opsTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
+                csTrans = csTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
             }
             if (criteria.mbls != null)
             {
-                opsTrans = opsTrans.Where(x => criteria.mbls.Contains(x.Mblno));
-                csTrans = csTrans.Where(x => criteria.mbls.Contains(x.Mawb));
+                opsTrans = opsTrans.Where(x => criteria.mbls.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase));
+                csTrans = csTrans.Where(x => criteria.mbls.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase));
             }
             if (criteria.hbls != null)
             {
-                opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno));
-                csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno));
+                opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase));
+                csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase));
             }
             if (criteria.customNos != null)
             {
                 var join = from ops in opsTrans
-                           join cd in customsDeclarationRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo)) on ops.JobNo equals cd.JobNo
+                           join cd in customsDeclarationRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)) on ops.JobNo equals cd.JobNo
                            select ops;
                 opsTrans = join;
             }
