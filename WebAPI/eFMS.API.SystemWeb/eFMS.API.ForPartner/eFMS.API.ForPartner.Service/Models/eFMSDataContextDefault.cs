@@ -142,6 +142,12 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(11)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BankAccountName).HasMaxLength(150);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(150);
+
+                entity.Property(e => e.BankName).HasMaxLength(150);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
@@ -733,6 +739,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.ClearanceNo).HasMaxLength(100);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ContNo).HasMaxLength(200);
 
                 entity.Property(e => e.CreditNo)
@@ -962,12 +970,6 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .ValueGeneratedNever();
-
-                entity.Property(e => e.BankAccountNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.BankName).HasMaxLength(500);
 
                 entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
 
