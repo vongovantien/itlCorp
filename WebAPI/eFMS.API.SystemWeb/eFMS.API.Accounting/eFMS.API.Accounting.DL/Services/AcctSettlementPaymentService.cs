@@ -226,8 +226,6 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.settlementPayment.CompanyId == currentUser.CompanyID
                 && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Leader) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Manager) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
                 && (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
@@ -239,9 +237,6 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.settlementPayment.CompanyId == currentUser.CompanyID
                 && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Leader) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Manager) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
-                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Accountant) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED : true)
                 && (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //BOD AND DEPUTY OF BOD                
             ).Select(s => s.settlementPayment);
