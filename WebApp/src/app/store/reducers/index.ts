@@ -3,7 +3,6 @@ import { Params, RouterStateSnapshot, Data } from '@angular/router';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import { spinnerReducer, ISpinnerState } from './spinner.reducer';
 import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
-import { IClaimUserState, claimUserReducer } from './claim.reducer';
 import { IMenuState, menuReducer } from './menu.reducer';
 
 
@@ -15,18 +14,12 @@ export interface IRouterStateUrl {
 }
 
 export interface IAppState {
-    // routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
-    // spinnerReducer: ISpinnerState;
     catalogueReducer: ICatalogueState;
-    // claimReducer: IClaimUserState;
     menuReducer: IMenuState;
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
-    // routerReducer: fromRouter.routerReducer,
-    // spinnerReducer: spinnerReducer,
     catalogueReducer: catalogueReducer,
-    // claimReducer: claimUserReducer,
     menuReducer: menuReducer
 };
 
@@ -51,7 +44,6 @@ export class CustomSerializer implements fromRouter.RouterStateSerializer<IRoute
 // * Selector
 
 export const catalogueState = createFeatureSelector<any>('catalogueReducer');
-// export const claimUserState = createFeatureSelector<any>('claimReducer');
 export const menuState = createFeatureSelector<any>('menuReducer');
 
 
@@ -94,11 +86,6 @@ export const getCatalogueCurrencyLoadingState = createSelector(catalogueState, (
 
 // * SPINNER
 export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);
-
-// * CLAIM USER
-// export const getClaimUserState = createSelector(claimUserState, (state: IClaimUserState) => state);
-// export const getClaimUserOfficeState = createSelector(claimUserState, (state: IClaimUserState) => state && state.officeId);
-// export const getClaimUserDepartGrouptate = createSelector(claimUserState, (state: IClaimUserState) => state && { departmentId: state.departmentId, groupId: state.groupId });
 
 // * Menu
 export const getMenuPermissionState = createSelector(menuState, (state: IMenuState) => state);

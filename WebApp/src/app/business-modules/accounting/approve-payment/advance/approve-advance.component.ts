@@ -1,24 +1,30 @@
 import { Component, ViewChild, TemplateRef } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
-import { AdvancePaymentListRequestComponent } from '../../advance-payment/components/list-advance-payment-request/list-advance-payment-request.component';
-import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
-import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { AdvancePayment, Currency, AccountingApprove } from 'src/app/shared/models';
-import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+
+import { AppPage } from 'src/app/app.base';
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { AdvancePayment } from '@models';
+import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
+import { delayTime } from '@decorators';
+
+import { AdvancePaymentListRequestComponent } from '../../advance-payment/components/list-advance-payment-request/list-advance-payment-request.component';
+import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
+
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
+
+import { catchError, concatMap, finalize, takeUntil } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-approve-advance',
     templateUrl: './approve-advance.component.html',
 })
 
-export class ApproveAdvancePaymentComponent extends AppPage {
+export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalReport {
 
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
@@ -30,10 +36,10 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     idAdvPayment: string = '';
     advancePayment: AdvancePayment;
     approveInfo: any = null;
-    dataReport: any = null;
 
     modalRef: BsModalRef;
     comment: string = '';
+    paymentTerm: number;
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -59,6 +65,11 @@ export class ApproveAdvancePaymentComponent extends AppPage {
             });
     }
 
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
+    }
     getDetail(idAdvance: string) {
         this._progressRef.start();
         this.listRequestAdvancePaymentComponent.isLoading = true;
@@ -72,9 +83,10 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                 (res: any) => {
                     if (!!res) {
                         this.advancePayment = new AdvancePayment(res);
+                        console.log(this.advancePayment);
 
                         // * wait to currecy list api
-                        this.formCreateComponent.formCreate.setValue({
+                        this.formCreateComponent.formCreate.patchValue({
                             advanceNo: this.advancePayment.advanceNo,
                             requester: this.advancePayment.requester,
                             requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
@@ -82,7 +94,11 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                             statusApproval: this.advancePayment.statusApproval,
                             deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
                             note: this.advancePayment.advanceNote,
-                            currency: this.advancePayment.advanceCurrency
+                            currency: this.advancePayment.advanceCurrency,
+                            paymentTerm: this.advancePayment.paymentTerm,
+                            bankAccountNo: this.advancePayment.bankAccountNo,
+                            bankAccountName: this.advancePayment.bankAccountName,
+                            bankName: this.advancePayment.bankName
                         });
 
                         this.formCreateComponent.formCreate.disable();
@@ -92,6 +108,8 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                         this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);
 
                         this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
+
+                        this.paymentTerm = this.advancePayment.paymentTerm;
 
                         this.getInfoApprove(this.advancePayment.advanceNo);
                     } else {
@@ -173,11 +191,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.previewPopup.frm.nativeElement.submit();
-                        this.previewPopup.show();
-                    }, 1000);
-
+                    this.showReport();
                 },
             );
     }
@@ -244,5 +258,38 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     showInfoDenied() {
         this.historyDeniedPopup.getDeniedComment('Advance', this.advancePayment.advanceNo);
         this.historyDeniedPopup.show();
+    }
+
+    updatePaymentTerm(days: number) {
+        this._progressRef.start();
+        this._accoutingRepo.updatePaymentTerm(this.idAdvPayment, days)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                concatMap(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            return this._accoutingRepo.getDetailAdvancePayment(this.idAdvPayment);
+                        }
+                        return of(false);
+                    }
+                )
+            )
+            .subscribe(
+                (response: AdvancePayment | boolean) => {
+                    if (response === false) {
+                        this._toastService.error("Update payment term fail");
+                    } else {
+                        console.log(response);
+                        this._toastService.success("Update data success");
+
+                        this.advancePayment.datetimeModified = (response as AdvancePayment).datetimeModified;
+                        this.advancePayment.userNameModified = (response as AdvancePayment).userNameModified;
+                        this.formCreateComponent.formCreate.patchValue({
+                            deadLine: { startDate: new Date((response as AdvancePayment).deadlinePayment), endDate: new Date((response as AdvancePayment).deadlinePayment) },
+                        });
+                    }
+                },
+            );
     }
 }

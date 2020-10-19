@@ -60,7 +60,7 @@ namespace eFMS.API.Accounting.Controllers
             var data = accountingService.GetListAdvanceToSyncBravo(Ids);
             return Ok(data);
         }
-        #region -- Test API --
+        #endregion -- Test API --
 
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]

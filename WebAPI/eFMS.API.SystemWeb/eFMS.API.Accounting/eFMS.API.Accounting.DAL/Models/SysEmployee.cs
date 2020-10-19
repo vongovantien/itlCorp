@@ -33,5 +33,7 @@ namespace eFMS.API.Accounting.Service.Models
         public byte[] Signature { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+        public string BankName { get; set; }
+        public string BankAccountNo { get; set; }
     }
 }
