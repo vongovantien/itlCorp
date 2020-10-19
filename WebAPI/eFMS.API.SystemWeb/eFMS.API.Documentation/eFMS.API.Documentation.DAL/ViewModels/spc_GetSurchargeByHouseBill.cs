@@ -72,7 +72,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Guid? AcctManagementId { get; set; }
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
-
+        public Guid? CompanyId { get; set; }
 
 
     }
