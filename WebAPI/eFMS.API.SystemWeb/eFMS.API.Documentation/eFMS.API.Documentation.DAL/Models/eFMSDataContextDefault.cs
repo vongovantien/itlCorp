@@ -2970,6 +2970,14 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.AccessDescription).HasMaxLength(1600);
 
+                entity.Property(e => e.BankAccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Birthday).HasColumnType("datetime");
 
                 entity.Property(e => e.Bonus).HasColumnType("decimal(10, 4)");
@@ -3280,12 +3288,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .ValueGeneratedNever();
-
-                entity.Property(e => e.BankAccountNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.BankName).HasMaxLength(500);
 
                 entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
 
