@@ -57,23 +57,26 @@ export class ChargeComponent extends AppList implements OnInit {
 
     onSearchCharge(dataSearch: any) {
         this.dataSearch = {};
-        if (dataSearch.type === 'All') {
-            this.dataSearch.all = dataSearch.keyword;
-        } else {
-            this.dataSearch.all = null;
-            if (dataSearch.type === 'code') {
-                this.dataSearch.code = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'chargeNameEn') {
-                this.dataSearch.chargeNameEn = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'chargeNameVn') {
-                this.dataSearch.chargeNameVn = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'type') {
-                this.dataSearch.type = dataSearch.keyword;
+        if (!!dataSearch) {
+            if (dataSearch.type === 'All') {
+                this.dataSearch.all = dataSearch.keyword;
+            } else {
+                this.dataSearch.all = null;
+                if (dataSearch.type === 'code') {
+                    this.dataSearch.code = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'chargeNameEn') {
+                    this.dataSearch.chargeNameEn = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'chargeNameVn') {
+                    this.dataSearch.chargeNameVn = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'type') {
+                    this.dataSearch.type = dataSearch.keyword;
+                }
             }
         }
+
         this.searchCharge();
     }
 

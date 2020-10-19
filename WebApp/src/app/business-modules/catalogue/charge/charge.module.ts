@@ -18,7 +18,8 @@ import { DetailChargeComponent } from './detail-charge/detail-charge.component';
 import { FormAddChargeComponent } from './components/form-add-charge/form-add-charge.component';
 import { VoucherListComponent } from './components/voucher-list/voucher-list.component';
 import { GenerateSellingChargePopupComponent } from './components/popup/generate-selling-charge/generate-selling-charge.popup';
-
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store';
 const routing: Routes = [
     {
         path: '', data: { name: "", title: 'eFMS Charge' },
@@ -57,6 +58,7 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        StoreModule.forFeature('charge', reducers),
         ModalModule.forRoot(),
     ],
     exports: [],
