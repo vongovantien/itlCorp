@@ -18,5 +18,6 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public Guid? UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

@@ -88,7 +88,7 @@
                         <div class="col-lg-12">
                             <div class="form-group row">
                                 <label>Title: </label>
-                                <input type="input" class="form-control" formControlName="title"
+                                <input type="input" class="form-control m-input m-input--square" formControlName="title"
                                     placeholder="Please Enter Title">
                             </div>
                         </div>
@@ -96,7 +96,7 @@
                             <div class="form-group row"
                                 [ngClass]="{'m-form__group has-danger': (email.dirty && !email.valid) || (isSubmited && !email.valid)}">
                                 <label required>Email: </label>
-                                <input type="email" class="form-control  m-input m-input--square" formControlName="email"
+                                <input type="email" class="form-control m-input m-input--square" formControlName="email"
                                     placeholder="Please Enter Email">
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (email.errors | equalError: 'required') || (email.errors | equalError: 'required') && email.dirty">
@@ -110,14 +110,14 @@
                         <div class="col-lg-12">
                             <div class="form-group row">
                                 <label>Bank Account No: </label>
-                                <input type="input" class="form-control" formControlName="bankAccountNo"
+                                <input type="input" class="form-control m-input m-input--square" formControlName="bankAccountNo"
                                     placeholder="Please Enter Bank Account No">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group row">
                                 <label>Bank Name: </label>
-                                <input type="input" class="form-control" formControlName="bankName"
+                                <input type="input" class="form-control m-input m-input--square" formControlName="bankName"
                                     placeholder="Please Enter Bank Name">
                             </div>
                         </div>

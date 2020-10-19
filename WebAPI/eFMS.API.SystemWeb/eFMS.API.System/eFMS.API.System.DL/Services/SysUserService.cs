@@ -534,9 +534,7 @@ namespace eFMS.API.System.DL.Services
                 Username = y.Username,
                 UserType = y.UserType,
                 WorkingStatus = y.WorkingStatus,
-                WorkPlaceId = y.WorkPlaceId,
-                BankAccountNo = y.BankAccountNo,
-                BankName = y.BankName,
+                WorkPlaceId = y.WorkPlaceId
             }).FirstOrDefault();
             var userCreate = DataContext.Get(x => x.Id == result.UserCreated).FirstOrDefault();
             var userModified = DataContext.Get(x => x.Id == result.UserModified).FirstOrDefault();
@@ -569,19 +567,19 @@ namespace eFMS.API.System.DL.Services
             }
             // set change value -> currUser
             var currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
-            currUser.BankAccountNo = criteria.BankAccountNo == "null" ? null : criteria.BankAccountNo?.Trim();
-            currUser.BankName = criteria.BankName == "null" ? null : criteria.BankName?.Trim();
             currUser.Description = criteria.Description?.Trim();
 
             // set change value -> currEmployee by employeeId of currUser
             var currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
             currEmployee.EmployeeNameEn = criteria.EmployeeNameEn?.Trim();
             currEmployee.EmployeeNameVn = criteria.EmployeeNameVn?.Trim();
-            currEmployee.Title = criteria.Title == "null" ? null : criteria.Title?.Trim();
+            currEmployee.Title = criteria.Title?.Trim();
             currEmployee.Tel = criteria.Tel?.Trim();
             currEmployee.Email = criteria.Email?.Trim();
+            currEmployee.BankAccountNo = criteria.BankAccountNo?.Trim();
+            currEmployee.BankName = criteria.BankName?.Trim();
 
-            using(var trans = DataContext.DC.Database.BeginTransaction())
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {

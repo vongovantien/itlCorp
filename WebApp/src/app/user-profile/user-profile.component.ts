@@ -133,8 +133,8 @@ export class UserProfilePageComponent extends AppList {
             employeeNameEn: !!body.sysEmployeeModel ? body.sysEmployeeModel.employeeNameEn : null,
             title: !!body.sysEmployeeModel ? body.sysEmployeeModel.title : null,
             email: !!body.sysEmployeeModel ? body.sysEmployeeModel.email : null,
-            bankAccountNo: body.bankAccountNo,
-            bankName: body.bankName,
+            bankAccountNo: !!body.sysEmployeeModel ? body.sysEmployeeModel.bankAccountNo : null,
+            bankName: !!body.sysEmployeeModel ? body.sysEmployeeModel.bankName : null,
             tel: !!body.sysEmployeeModel ? body.sysEmployeeModel.tel : null,
             description: body.description,
             // dump (viewonly) properties
@@ -175,12 +175,12 @@ export class UserProfilePageComponent extends AppList {
         const body = {
             employeeNameVn: form.employeeNameVn,
             employeeNameEn: form.employeeNameEn,
-            title: form.title,
+            title: !form.title ? '' : form.title,
             email: form.email,
-            bankAccountNo: form.bankAccountNo,
-            bankName: form.bankName,
-            tel: form.tel,
-            description: form.description,
+            bankAccountNo: !form.bankAccountNo ? '' : form.bankAccountNo,
+            bankName: !form.bankName ? '' : form.bankName,
+            tel: !form.tel ? '' : form.tel,
+            description: !form.description ? '' : form.description,
         };
         this.onUpdate(body, this.files);
     }
