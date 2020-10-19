@@ -345,6 +345,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.ContractService = GetContractServicesName( objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
                     model.SalesmanId = objUpdate.SaleManId;
+                    model.UserCreatedContract = objUpdate.UserCreated;
                     SendMailActiveSuccess(model, "active");
                 }
             }
@@ -707,7 +708,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstTo = listEmailAR.Split(";").ToList();
             }
 
-            string emailCreator = objInfoCreator.Email;
+            string emailCreator = objInfoCreator?.Email;
 
             switch (partner.PartnerType)
             {
