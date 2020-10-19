@@ -124,8 +124,8 @@ export class UserProfilePageComponent extends AppList {
             employeeNameEn: !!body.sysEmployeeModel ? body.sysEmployeeModel.employeeNameEn : null,
             title: !!body.sysEmployeeModel ? body.sysEmployeeModel.title : null,
             email: !!body.sysEmployeeModel ? body.sysEmployeeModel.title : null,
-            bankAccountNo: body.bankAccountNo,
-            bankName: body.bankName,
+            bankAccountNo: body.sysEmployeeModel.bankAccountNo,
+            bankName: body.bankName.bankName,
             tel: !!body.sysEmployeeModel ? body.sysEmployeeModel.tel : null,
             description: body.description,
             //
