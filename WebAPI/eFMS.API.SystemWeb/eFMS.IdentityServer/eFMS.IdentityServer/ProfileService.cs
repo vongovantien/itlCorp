@@ -40,6 +40,8 @@ namespace eFMS.IdentityServer
             Claim groupClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("groupId")).FirstOrDefault();
             Claim nameEnClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("nameEn")).FirstOrDefault();
             Claim nameVnClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("nameVn")).FirstOrDefault();
+            Claim bankAccountNoClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("bankAccountNo")).FirstOrDefault();
+            Claim bankNameClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("bankName")).FirstOrDefault();
 
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
@@ -60,7 +62,9 @@ namespace eFMS.IdentityServer
                     departmentclaim,
                     groupClaim,
                     nameEnClaim,
-                    nameVnClaim
+                    nameVnClaim,
+                    bankAccountNoClaim,
+                    bankNameClaim
                 };
 
             context.IssuedClaims = claims;

@@ -13,6 +13,9 @@ namespace SystemInterface {
         groupId: number;
         nameEn: string;
         nameVn: string;
+        bankAccountNo: string;
+        bankAccountName: string;
+        bankName: string;
     }
 
     export interface IDepartmentGroup {

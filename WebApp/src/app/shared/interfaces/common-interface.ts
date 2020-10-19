@@ -104,6 +104,11 @@ namespace CommonInterface {
         data: any;
         totalValidRows: number;
     }
+
+    export interface IMoment {
+        startDate: any;
+        endDate: any;
+    }
 }
 
 

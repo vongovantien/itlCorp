@@ -36,7 +36,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctCdnote> cdNoteRepository;
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<AccAccountingPayment> accountingPaymentRepository;
-
+        private readonly IContextBase<CsTransactionDetail> csTransactionDetailRepository;
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -47,7 +47,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IQueryable<CatCharge> charges;
         readonly IQueryable<CatChargeDefaultAccount> chargesDefault;
         readonly IQueryable<CatUnit> catUnits;
-         
+
 
         public AccountingService(
             ICurrencyExchangeService exchangeService,
@@ -68,6 +68,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctCdnote> acctCdNote,
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AccAccountingPayment> accAccountingPayment,
+            IContextBase<CsTransactionDetail> csTransactionDetailRepo,
+
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
         {
@@ -89,6 +91,7 @@ namespace eFMS.API.Accounting.DL.Services
             soaRepository = acctSoa;
             currentUser = cUser;
             accountingPaymentRepository = accAccountingPayment;
+            csTransactionDetailRepository = csTransactionDetailRepo;
             // ---
 
             users = UserRepository.Get();
@@ -129,20 +132,23 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var item in data)
                 {
                     // Ds advance request
-                    List<BravoAdvanceRequestModel> advR = AdvanceRequestRepository.Get(x => x.AdvanceNo == item.ReferenceNo).Select(x => new BravoAdvanceRequestModel
-                    {
-                        RowId = x.Id,
-                        Ma_SpHt = x.JobId,
-                        BillEntryNo = x.Hbl,
-                        MasterBillNo = x.Mbl,
-                        OriginalAmount = x.Amount,
-                        Description = x.RequestNote,
-                        DeptCode = GetDeptCode(x.JobId),
-                    }).ToList();
+                    List<BravoAdvanceRequestModel> advRGrps = AdvanceRequestRepository
+                        .Get(x => x.AdvanceNo == item.ReferenceNo)
+                        .GroupBy(x => new { x.Hblid })
+                        .Select(x => new BravoAdvanceRequestModel
+                        {
+                            RowId = x.First().Id,
+                            Ma_SpHt = x.First().JobId,
+                            BillEntryNo = x.First().Hbl,
+                            MasterBillNo = x.First().Mbl,
+                            OriginalAmount = x.Sum(d => d.Amount),
+                            DeptCode = GetDeptCode(x.First().JobId),
+                            Description = GetCustomerHBL(x.Key.Hblid) + " " + x.First().JobId + " " + x.First().Hbl,
+                        }).ToList();
 
-                    if (advR.Count > 0)
+                    if (advRGrps.Count > 0)
                     {
-                        item.Details = advR;
+                        item.Details = advRGrps;
                     }
                 }
                 result = data;
@@ -208,7 +214,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
                                                                                       Quantity9 = surcharge.Quantity,
                                                                                       OriginalUnitPrice = surcharge.UnitPrice,
-                                                                                      TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0)/100, //Thuế suất /100
+                                                                                      TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
                                                                                       OriginalAmount = surcharge.Quantity * surcharge.UnitPrice,
                                                                                       OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice),
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
@@ -317,7 +323,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (ids == null || ids.Count() == 0) return data;
 
             var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id) && (x.Type == "DEBIT" || x.Type == "INVOICE"));
-            
+
             foreach (var cdNote in cdNotes)
             {
                 SyncModel sync = new SyncModel();
@@ -339,7 +345,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                foreach(var surcharge in surcharges)
+                foreach (var surcharge in surcharges)
                 {
                     var charge = new ChargeSyncModel();
                     charge.RowId = surcharge.Id.ToString();
@@ -366,7 +372,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
-                    charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);                    
+                    charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
 
                     charges.Add(charge);
                 }
@@ -440,7 +446,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
                     charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
-                    
+
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -450,7 +456,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return data;
         }
-        
+
         /// <summary>
         /// Get data list soa debit to sync accountant
         /// </summary>
@@ -463,8 +469,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (ids == null || ids.Count() == 0) return data;
 
             var soas = soaRepository.Get(x => ids.Contains(x.Id) && x.Type.ToUpper() == "DEBIT");
-            
-            foreach(var soa in soas)
+
+            foreach (var soa in soas)
             {
                 SyncModel sync = new SyncModel();
                 sync.Stt = soa.Id.ToString();
@@ -512,7 +518,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = soa.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
                     charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
-                    
+
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -521,7 +527,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return data;
         }
-        
+
         /// <summary>
         /// Get data list soa type credit to sync accountant
         /// </summary>
@@ -589,7 +595,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.AtchDocNo = surcharge.InvoiceNo;
                     charge.AtchDocDate = surcharge.InvoiceDate;
                     charge.AtchDocSerialNo = surcharge.SeriesNo;
-                    
+
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -623,7 +629,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var payments = accountingPaymentRepository.Get(x => x.RefId == invoice.Id.ToString());
                 var details = new List<PaymentDetailModel>();
-                foreach(var payment in payments)
+                foreach (var payment in payments)
                 {
                     var detail = new PaymentDetailModel();
                     detail.RowId = payment.Id.ToString();
@@ -649,7 +655,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (ids == null || ids.Count() == 0) return data;
 
             var soas = soaRepository.Get(x => ids.Contains(x.Id));
-            foreach(var soa in soas)
+            foreach (var soa in soas)
             {
                 PaymentModel sync = new PaymentModel();
                 sync.Stt = soa.Id.ToString();
@@ -804,7 +810,7 @@ namespace eFMS.API.Accounting.DL.Services
             data = invalidSVouchers;
             return result;
         }
-        
+
         public HandleState SyncListCdNoteToAccountant(List<Guid> ids)
         {
             var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
@@ -868,7 +874,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
-        
+
         #region -- Private Method --
 
         private decimal GetExchangeRate(DateTime? date, string currency)
@@ -910,14 +916,23 @@ namespace eFMS.API.Accounting.DL.Services
 
             return deptCode;
         }
-
         private decimal GetOrgVatAmount(decimal? vatrate, decimal? orgAmount)
         {
             decimal amount = 0;
             amount = (vatrate != null) ? (vatrate < 101 & vatrate >= 0) ? Math.Round(((orgAmount * vatrate) / 100 ?? 0), 3) : Math.Abs(vatrate ?? 0) : 0;
             return amount;
         }
-
+        private string GetCustomerHBL(Guid? Id)
+        {
+            string customerName = "";
+            CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == Id).FirstOrDefault();
+            if (hbl != null)
+            {
+                CatPartner partner = PartnerRepository.Get(x => x.Id == hbl.CustomerId).FirstOrDefault();
+                if (partner != null) customerName = partner.PartnerNameVn;
+            }
+            return customerName;
+        }
 
         #endregion -- Private Method --
 
