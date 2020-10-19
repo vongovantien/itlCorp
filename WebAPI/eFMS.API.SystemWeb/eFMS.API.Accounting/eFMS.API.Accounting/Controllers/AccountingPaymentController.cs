@@ -551,7 +551,7 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 }
 
-                data.PaymentMethod = workSheet.Cells[i, 7].Value.ToString();
+                data.PaymentMethod = workSheet.Cells[i, 7].Value != null ? workSheet.Cells[i, 7].Value.ToString() : "";
 
                 if(!string.IsNullOrEmpty(data.PaymentMethod) && (data.PaymentMethod.ToLower() != "cash" && data.PaymentMethod.ToLower() != "bank transfer" ))
                 {
