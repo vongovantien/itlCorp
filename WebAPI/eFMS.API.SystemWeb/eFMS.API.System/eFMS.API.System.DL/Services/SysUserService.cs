@@ -569,17 +569,17 @@ namespace eFMS.API.System.DL.Services
             }
             // set change value -> currUser
             var currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
-            currUser.BankAccountNo = criteria.BankAccountNo;
-            currUser.BankName = criteria.BankName;
-            currUser.Description = criteria.Description;
+            currUser.BankAccountNo = criteria.BankAccountNo == "null" ? null : criteria.BankAccountNo?.Trim();
+            currUser.BankName = criteria.BankName == "null" ? null : criteria.BankName?.Trim();
+            currUser.Description = criteria.Description?.Trim();
 
             // set change value -> currEmployee by employeeId of currUser
             var currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
-            currEmployee.EmployeeNameEn = criteria.EmployeeNameEn;
-            currEmployee.EmployeeNameVn = criteria.EmployeeNameVn;
-            currEmployee.Title = criteria.Title;
-            currEmployee.Tel = criteria.Tel;
-            currEmployee.Email = criteria.Email;
+            currEmployee.EmployeeNameEn = criteria.EmployeeNameEn?.Trim();
+            currEmployee.EmployeeNameVn = criteria.EmployeeNameVn?.Trim();
+            currEmployee.Title = criteria.Title == "null" ? null : criteria.Title?.Trim();
+            currEmployee.Tel = criteria.Tel?.Trim();
+            currEmployee.Email = criteria.Email?.Trim();
 
             using(var trans = DataContext.DC.Database.BeginTransaction())
             {
