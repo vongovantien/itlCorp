@@ -3263,7 +3263,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 DateTime? deadlineDate = null;
 
-                deadlineDate = adv.DeadlinePayment.Value.AddDays((double)days);
+                deadlineDate = adv.RequestDate.Value.AddDays((double)days);
                 adv.DeadlinePayment = deadlineDate;
                 adv.PaymentTerm = days;
 
