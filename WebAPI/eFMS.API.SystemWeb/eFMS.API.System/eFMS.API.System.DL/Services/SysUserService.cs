@@ -535,22 +535,22 @@ namespace eFMS.API.System.DL.Services
                 UserType = y.UserType,
                 WorkingStatus = y.WorkingStatus,
                 WorkPlaceId = y.WorkPlaceId,
-                BankAccountNo = y.BankAccountNo,
-                BankName = y.BankName,
             }).FirstOrDefault();
             var userCreate = DataContext.Get(x => x.Id == result.UserCreated).FirstOrDefault();
             var userModified = DataContext.Get(x => x.Id == result.UserModified).FirstOrDefault();
-            //
-            result.EmployeeNameVn = employeeRepository.Get(x => x.Id == result.EmployeeId).FirstOrDefault().EmployeeNameVn;
+
+
+            result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
+
             result.UserCreatedName = userCreate?.Username;
             result.UserModifiedName = userModified?.Username;
+
             // get avatar through last modified date.
-            var image = imageRepository.Get(x => x.Folder == "User" && x.ObjectId == result.Id)
+            SysImage image = imageRepository.Get(x => x.Folder == "User" && x.ObjectId == result.Id)
                 .OrderByDescending(y => y.DatetimeModified).FirstOrDefault();
             
             result.Avatar = image?.Url;
 
-            result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
             if (result == null)
             {
                 return null;
@@ -568,9 +568,7 @@ namespace eFMS.API.System.DL.Services
                 return new HandleState();
             }
             // set change value -> currUser
-            var currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
-            currUser.BankAccountNo = criteria.BankAccountNo;
-            currUser.BankName = criteria.BankName;
+            SysUser currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
             currUser.Description = criteria.Description;
 
             // set change value -> currEmployee by employeeId of currUser
@@ -580,8 +578,10 @@ namespace eFMS.API.System.DL.Services
             currEmployee.Title = criteria.Title;
             currEmployee.Tel = criteria.Tel;
             currEmployee.Email = criteria.Email;
+            currEmployee.BankName = criteria.BankName;
+            currEmployee.BankAccountNo = criteria.BankAccountNo;
 
-            using(var trans = DataContext.DC.Database.BeginTransaction())
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
