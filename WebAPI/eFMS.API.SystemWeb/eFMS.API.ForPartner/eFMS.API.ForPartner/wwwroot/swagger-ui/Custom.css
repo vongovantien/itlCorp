@@ -11,13 +11,13 @@
     padding: 15px;    
 }
 
-.swagger-ui .topbar .download-url-wrapper .select-label select {
+/*.swagger-ui .topbar .download-url-wrapper .select-label select {
     border-color: #EF1C25;
-}
+}*/
 
-.swagger-ui .info .title small:last-child {
+/*.swagger-ui .info .title small:last-child {
     background-color: #EF1C25 !important;
-}
+}*/
 
 .swagger-ui .topbar-wrapper .link img{
     width:100px;
