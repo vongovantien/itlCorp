@@ -105,7 +105,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Fee Type', field: 'chargeGroup', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
-            { title: 'Settle Payment', field: 'settlementCode', sortable: true },
+            // { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
@@ -219,6 +219,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.isFromShipment = true;
                         c.invoiceNo = null;
                         c.invoiceDate = null;
+                        c.finalExchangeRate = null;
                         // Mặc định lấy customer name của HBL
                         c.paymentObjectId = this.service === 'logistic' ? this.shipment.customerId : this.hbl.customerId;
                         c.partnerName = this.service === 'logistic' ? this.shipment.customerName : this.hbl.customerName;
@@ -231,10 +232,4 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 }
             );
     }
-
-    syncArrivalNote() {
-
-    }
-
-
 }
