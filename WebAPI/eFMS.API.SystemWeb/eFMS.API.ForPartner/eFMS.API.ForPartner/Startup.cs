@@ -98,7 +98,7 @@ namespace eFMS.API.ForPartner
                     options.RoutePrefix = "docs";
                     options.InjectStylesheet($"{swaggerJsonBasePath}/swagger-ui/custom.css");
                     options.InjectJavascript($"{swaggerJsonBasePath}/swagger-ui/custom.js", "text/javascript");
-                    options.DocumentTitle = "Accounting Public Api";                    
+                    options.DocumentTitle = "eFMS Partner API";                    
                 }
             });
 
