@@ -544,6 +544,7 @@ namespace eFMS.API.System.DL.Services
             result.UserCreatedName = userCreate?.Username;
             result.UserModifiedName = userModified?.Username;
             result.SysEmployeeModel.EmployeeNameEn = currEmployee.EmployeeNameEn;
+            result.SysEmployeeModel.EmployeeNameVn = currEmployee.EmployeeNameVn;
             result.SysEmployeeModel.Title = currEmployee.Title;
             result.SysEmployeeModel.Email = currEmployee.Email;
             result.SysEmployeeModel.BankAccountNo = currEmployee.BankAccountNo;
@@ -563,19 +564,19 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        public HandleState UpdateProfile(UserProfileCriteria criteria)
+        public HandleState UpdateProfile(UserProfileCriteria criteria, out object profile)
         {
             if(criteria == null)
             {
+                profile = null;
                 return new HandleState();
             }
-            // set change value -> currUser
 
-            var currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            SysUser currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
             currUser.Description = criteria.Description?.Trim();
 
-            // set change value -> currEmployee by employeeId of currUser
-            var currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
+            SysEmployee currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
+
             currEmployee.EmployeeNameEn = criteria.EmployeeNameEn?.Trim();
             currEmployee.EmployeeNameVn = criteria.EmployeeNameVn?.Trim();
             currEmployee.Title = criteria.Title?.Trim();
@@ -591,26 +592,19 @@ namespace eFMS.API.System.DL.Services
                     var hs = DataContext.Update(currUser, x => x.Id == currUser.Id);
                     if (hs.Success)
                     {
-                        // upload Image
-                        if (criteria.Avatar != null)
-                        {
-                            sysImageService.UploadImage(criteria.Avatar, "User", currUser.Id);
-                            // get avatar through last modified date.
-                            var image = imageRepository.Get(x => x.Folder == "User" && x.ObjectId == currentUser.UserID)
-                                .OrderByDescending(y => y.DatetimeModified).FirstOrDefault();
-                            currEmployee.Photo = image?.Url;
-                        }
-                        // update Employee
-                        hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
+                         currEmployee.Photo = criteria.Avatar;
+                         hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
                     }
 
                     trans.Commit();
+                    profile = currEmployee;
+
                     return hs;
                 }
                 catch(Exception ex)
                 {
                     trans.Rollback();
-                    
+                    profile = null;
                     return new HandleState(ex.Message);
                 }
                 finally

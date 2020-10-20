@@ -7,7 +7,7 @@ namespace eFMS.API.System.DL.Models.Criteria
 {
     public class UserProfileCriteria
     {
-        public IFormFile Avatar { get; set; }
+        public string Avatar { get; set; }
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }
         public string Title { get; set; }

@@ -113,7 +113,11 @@ namespace eFMS.API.System.DL.Services
 
         }
 
-        
+        public IQueryable<SysImageModel> GetImageUser(string userId)
+        {
+            var result = DataContext.Where(x => x.Folder == "User" && x.ObjectId == userId);
+            return result.ProjectTo<SysImageModel>(mapper.ConfigurationProvider);
+        }
     }
 
 }
