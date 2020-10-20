@@ -75,7 +75,7 @@ export class UserAddNewComponent extends AppPage {
 
 
 export interface IAddUser {
-    sysEmployeeModel: Employee;
+    sysEmployeeModel: Partial<Employee>;
     username: string;
     userType: string;
     workingStatus: string;

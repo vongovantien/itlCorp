@@ -35,7 +35,8 @@ namespace eFMS.API.System.Controllers
         public IActionResult UploadImage(IFormFile file)
         {
             string folderName = Request.Headers["Module"];
-            var hs = imageService.UploadImage(file, folderName, null);
+            string objectId = Request.Headers["ObjectId"];
+            var hs = imageService.UploadImage(file, folderName, objectId);
 
             ResultHandle result = new ResultHandle { Status = hs.Result.Status, Message = hs.Result.Message, Data = hs.Result.Data };
             if (!hs.Result.Status)
@@ -50,6 +51,15 @@ namespace eFMS.API.System.Controllers
         public IActionResult GetImageCompany()
         {
             var response = imageService.GetImageCompany();
+            return Ok(response);
+
+        }
+
+        [HttpGet]
+        [Route("User")]
+        public IActionResult GetImageUser(string userId)
+        {
+            var response = imageService.GetImageUser(userId);
             return Ok(response);
 
         }

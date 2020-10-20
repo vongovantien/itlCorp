@@ -281,14 +281,14 @@ namespace eFMS.API.System.Controllers
         [HttpPut]
         [Route("UpdateProfile")]
         [Authorize]
-        public IActionResult UpdateProfile([FromForm]UserProfileCriteria criteria)
+        public IActionResult UpdateProfile(UserProfileCriteria criteria)
         {
-            var hs = sysUserService.UpdateProfile(criteria);
+            HandleState hs = sysUserService.UpdateProfile(criteria, out object data);
             if (!hs.Success)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Error"});
             }
-            return Ok(new ResultHandle { Status = true, Message = "Success" });
+            return Ok(new ResultHandle { Status = true, Message = "Success", Data = data });
         }
 
         /// <summary>

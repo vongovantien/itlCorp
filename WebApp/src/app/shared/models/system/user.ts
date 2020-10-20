@@ -24,6 +24,9 @@ export class User {
     employeeNameEn: string = '';
     employeeNameVn: string = '';
 
+    userCreatedName: string = null;
+    userModifiedName: string = null;
+
 
     constructor(data?: any) {
         let self = this;

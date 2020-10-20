@@ -261,11 +261,12 @@
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-topbar__userpic">
                                     <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
-                                        src="assets/app/media/img/users/user4.jpg" />
+                                        [src]="currenUser.photo"
+                                        onerror="src = 'assets/app/media/img/users/user4.jpg'" />
                                 </span>
                                 <span class="m-topbar__username"
-                                    style="color: #3966b6; font-size: 14px; text-transform: capitalize; padding-left: 10px;">
-                                    {{!!currenUser ? currenUser.preferred_username : null}}
+                                    style="color: #3966b6; font-size: 16px; text-transform: capitalize; padding-left: 10px;">
+                                    {{!!currenUser ? currenUser.nameEn : null}}
                                 </span>
                             </a>
                             <!-- popup info account-->
@@ -275,15 +276,18 @@
                                         <div class="bg-info d-flex justify-content-around align-items-center p-2">
                                             <div class="popup-account__avatar">
                                                 <img alt="eFMS" class="img-fluid rounded-circle"
-                                                    src="assets/app/media/img/users/user4.jpg" />
+                                                    [src]="currenUser.photo"
+                                                    onerror="src = 'assets/app/media/img/users/user4.jpg'" />
                                             </div>
                                             <div>
                                                 <h5 class="text-white mb-0" style="cursor: pointer;">
                                                     <span class="m-topbar__username"
                                                         style="font-size: 14px; text-transform: capitalize;">
-                                                        {{!!currenUser ? currenUser.preferred_username : null}}
+                                                        {{!!currenUser ? currenUser.nameEn : null}}
                                                     </span>
                                                 </h5>
+                                                <div class="text-light font-italic text-capitalize">{{currenUser.title}}
+                                                </div>
                                             </div>
                                             <div>
                                                 <div class="icon-online">

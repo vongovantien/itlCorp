@@ -15,6 +15,8 @@ namespace eFMS.API.System.DL.IService
         HandleState Delete(Guid id);
         IQueryable<SysImageModel> GetAll();
         IQueryable<SysImageModel> GetImageCompany();
+        IQueryable<SysImageModel> GetImageUser(string userId);
+
 
     }
 }

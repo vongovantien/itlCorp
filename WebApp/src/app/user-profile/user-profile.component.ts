@@ -1,28 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 
-
-import { SystemRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, takeUntil, tap } from 'rxjs/operators';
+import { SystemRepo } from '@repositories';
+import { catchError, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { AppList } from '@app';
 import { ActivatedRoute, Params } from '@angular/router';
-import UUID from 'validator/lib/isUUID';
 import { ToastrService } from 'ngx-toastr';
+import { SystemConstants } from '@constants';
+import { AppForm } from '../app.form';
+import { environment } from 'src/environments/environment';
+import { GlobalState } from '../global-state';
+import { Employee } from '@models';
+
+import UUID from 'validator/lib/isUUID';
+
+
+declare var $: any;
 
 @Component({
     selector: 'user-profile-page',
     templateUrl: './user-profile.component.html',
     styleUrls: ['./user-profile.component.scss']
 })
-export class UserProfilePageComponent extends AppList {
+export class UserProfilePageComponent extends AppForm {
+    @ViewChild('image', { static: false }) el: ElementRef;
 
     currentUserId: string;
-    fileName: string = null;
-    files: File[] = [];
-    formUser: FormGroup;
 
+    formUser: FormGroup;
     employeeNameVn: AbstractControl;
     employeeNameEn: AbstractControl;
     title: AbstractControl;
@@ -31,23 +37,23 @@ export class UserProfilePageComponent extends AppList {
     bankName: AbstractControl;
     tel: AbstractControl;
     description: AbstractControl;
-
-    avatar: any = null;
-
     staffCode: AbstractControl;
     username: AbstractControl;
     workingStatus: AbstractControl;
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
-    isSubmited: boolean = false;
-    emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$";
+
+    photoUrl: string;
 
     constructor(
         private _ngProgressService: NgProgress,
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
         private _activedRoute: ActivatedRoute,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _zone: NgZone,
+        private _globalState: GlobalState
+
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -65,31 +71,75 @@ export class UserProfilePageComponent extends AppList {
                     return null;
                 }),
                 tap(id => this.currentUserId = id),
+                switchMap((id) => this._systemRepo.getDetailUser(id))
             ).subscribe(
-                (id: string) => {
-                    this.getUserDetail(id);
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.setUserForForm(res.data);
+                    }
                 }
             );
     }
+
+    ngAfterViewInit() {
+        this.initImageLibary();
+    }
+
+    initImageLibary() {
+        this._zone.run(() => {
+            $(this.el.nativeElement).froalaEditor({
+                requestWithCORS: true,
+                language: 'vi',
+                imageEditButtons: ['imageReplace'],
+                imageMaxSize: 5 * 1024 * 1024,
+                imageAllowedTypes: ['jpeg', 'jpg', 'png'],
+                requestHeaders: {
+                    Authorization: `Bearer ${localStorage.getItem(SystemConstants.ACCESS_TOKEN)}`,
+                    Module: 'User',
+                    ObjectId: `${this.currentUserId}`,
+                },
+                imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/User?userId=${this.currentUserId}`,
+
+            }).on('froalaEditor.contentChanged', (e: any) => {
+                this.photoUrl = e.target.src;
+            }).on('froalaEditor.image.error', (e, editor, error, response) => {
+                console.log(error);
+                switch (error.code) {
+                    case 5:
+                        this._toastService.error("Size image invalid");
+                        break;
+                    case 6:
+                        this._toastService.error("Image invalid");
+                        break;
+                    default:
+                        this._toastService.error(error.message);
+                        break;
+                }
+            });
+        });
+    }
+
     initForm() {
         this.formUser = this._fb.group({
             employeeNameVn: ['',
                 Validators.compose([
-                Validators.required
-            ])],
+                    Validators.required
+                ])],
             employeeNameEn: ['',
-            Validators.compose([
-            Validators.required
-            ])],
+                Validators.compose([
+                    Validators.required
+                ])],
             title: [],
             email: ['',
-            Validators.compose([
-            Validators.required, Validators.pattern(this.emailPattern)
-            ])],
+                Validators.compose([
+                    Validators.required, Validators.pattern(SystemConstants.CPATTERN.EMAIL)
+                ])],
             bankAccountNo: [],
             bankName: [],
             tel: [],
             description: [],
+
             // view only
             staffCode: [],
             username: [],
@@ -106,6 +156,7 @@ export class UserProfilePageComponent extends AppList {
         this.bankName = this.formUser.controls['bankName'];
         this.tel = this.formUser.controls['tel'];
         this.description = this.formUser.controls['description'];
+
         // view only
         this.staffCode = this.formUser.controls['staffCode'];
         this.username = this.formUser.controls['username'];
@@ -113,18 +164,6 @@ export class UserProfilePageComponent extends AppList {
         this.creditLimit = this.formUser.controls['creditLimit'];
         this.creditRate = this.formUser.controls['creditRate'];
 
-    }
-
-    getUserDetail(id: string) {
-        return this._systemRepo.getDetailUser(id)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe((body: any) => {
-                if (body.status) {
-                    this.setUserForForm(body.data);
-                }
-            });
     }
 
     setUserForForm(body: any) {
@@ -137,41 +176,19 @@ export class UserProfilePageComponent extends AppList {
             bankName: !!body.sysEmployeeModel ? body.sysEmployeeModel.bankName : null,
             tel: !!body.sysEmployeeModel ? body.sysEmployeeModel.tel : null,
             description: body.description,
-            // dump (viewonly) properties
             staffCode: !!body.sysEmployeeModel ? body.sysEmployeeModel.staffCode : null,
             username: body.username,
             workingStatus: body.workingStatus,
             creditLimit: body.creditLimit,
             creditRate: body.creditRate,
         });
-        this.avatar = body.avatar;
+        this.photoUrl = body.avatar;
     }
-
-
-    handleFileInput(event) {
-        if (!!event.target['files']) {
-            const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
-            if (!allowedExtensions.exec(event.target.value)) {
-                this._toastService.error("Invalid file type");
-            } else {
-                this.fileName = event.target.value;
-                this.files = event.target['files'];
-                let reader = new FileReader();      
-                reader.readAsDataURL(<File>event.target.files[0]); 
-                reader.onload = () => { 
-                    this.avatar = reader.result; 
-                }
-            }
-        }
-        console.log(this.files);
-    }
-
     handleUpdateUser() {
         const form = this.formUser.getRawValue();
         if (this.formUser.invalid) {
             return;
         }
-
         const body = {
             employeeNameVn: form.employeeNameVn,
             employeeNameEn: form.employeeNameEn,
@@ -181,19 +198,22 @@ export class UserProfilePageComponent extends AppList {
             bankName: !form.bankName ? '' : form.bankName,
             tel: !form.tel ? '' : form.tel,
             description: !form.description ? '' : form.description,
+            avatar: this.photoUrl
         };
-        this.onUpdate(body, this.files);
+        this.onUpdate(body);
     }
 
-    onUpdate(body: any, files: File[] = []) {
+    onUpdate(body: any) {
         this._progressRef.start();
-        this._systemRepo.updateProfile(body, files).pipe(catchError(this.catchError),
-            finalize(() => this._progressRef.complete()))
-            .subscribe((body: any) => {
+        this._systemRepo.updateProfile(body)
+            .pipe(catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe((body: CommonInterface.IResult) => {
                 if (body.status) {
-                    this.fileName = null;
-                    this.files = [];
-                    this.getUserDetail(this.currentUserId);
+                    this._toastService.success("Upload profile successful");
+                    this._globalState.notifyDataChanged('profile', body.data as Employee);
+                } else {
+                    this._toastService.error("Upload profile fail");
                 }
             });
     }
