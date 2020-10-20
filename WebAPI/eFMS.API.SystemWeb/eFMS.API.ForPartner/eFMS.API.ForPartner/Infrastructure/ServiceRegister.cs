@@ -63,7 +63,7 @@ namespace eFMS.API.ForPartner.Infrastructure
                                 Contact = new Contact()
                                 {
                                     Name = "LogTecHub",
-                                    Email = @"efms-support@itlvn.com",
+                                    Email = @"efms-team@logtechub.com",
                                     Url = @"https://logtechub.com"
                                 },
                                 License = new License()

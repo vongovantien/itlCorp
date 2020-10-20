@@ -16,7 +16,6 @@ import { catchError, finalize, concatMap } from 'rxjs/operators';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { of } from 'rxjs';
 
 @Component({
     selector: 'list-obh-account-payment',
@@ -210,9 +209,20 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
     confirmSync(refId: string, action: string) {
         this.refId = refId;
         this.action = action;
-        // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        this.confirmObhPaymentPopup.show();
+        this._accountingRepo.getPaymentByrefId(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe(
+                (res: []) => {
+                    if (res.length > 0) {
+                        // this._toastService.success("Tính năng đang phát triển");
+                        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+                        this.confirmObhPaymentPopup.show();
+                    } else {
+                        this._toastService.error("Not found payment to sync");
+                    }
+                },
+            );
     }
 
     onConfirmObhPayment() {

@@ -268,10 +268,14 @@ namespace eFMS.API.ForPartner.DL.Service
                 try
                 {
                     var data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo
+                                                 && x.InvoiceNoReal == model.InvoiceNo
+                                                 && x.Serie == model.SerieNo
                                                  && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault();
                     if (data == null) return new HandleState((object)"Không tìm thấy hóa đơn");
 
                     HandleState hs = DataContext.Delete(x => x.ReferenceNo == model.ReferenceNo
+                                                          && x.InvoiceNoReal == model.InvoiceNo
+                                                          && x.Serie == model.SerieNo
                                                           && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE, false);
                     if (hs.Success)
                     {
