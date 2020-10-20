@@ -15,9 +15,6 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { PaymentModel, AccountingPaymentModel } from '@models';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { of } from 'rxjs';
-
-
 
 @Component({
     selector: 'list-invoice-account-payment',
@@ -214,9 +211,20 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     confirmSync(refId: string, action: string) {
         this.refId = refId;
         this.action = action;
-        // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        this.confirmInvoicePaymentPopup.show();
+        this._accountingRepo.getPaymentByrefId(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe(
+                (res: []) => {
+                    if (res.length > 0) {
+                        // this._toastService.success("Tính năng đang phát triển");
+                        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+                        this.confirmInvoicePaymentPopup.show();
+                    } else {
+                        this._toastService.error("Not found payment to sync");
+                    }
+                },
+            );
     }
 
     onConfirmInvoicePayment() {
