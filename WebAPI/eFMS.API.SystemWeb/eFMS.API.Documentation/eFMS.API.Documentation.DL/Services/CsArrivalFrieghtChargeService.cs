@@ -421,7 +421,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyName = companyUser?.BunameEn; // Company Name En of user
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = officeUser.AddressEn; // Office Address En of user
-            parameter.CompanyAddress2 = "Tel: " + officeUser?.Tel + "\nFax: " + officeUser?.Fax; // Tel & Fax of Office user
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty); // Tel & Fax of Office user
             parameter.Website = companyUser?.Website; // Website Company of user
             parameter.MAWB = houserBill != null ? (houserBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             parameter.Contact = _currentUser;
@@ -564,7 +564,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyName = companyUser?.BunameEn; // Company Name En of user
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = officeUser?.AddressEn; // Office Address En of user 
-            parameter.CompanyAddress2 = "Tel: " + officeUser?.Tel + "\nFax: " + officeUser?.Fax; // Tel & Fax of Office user
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty); // Tel & Fax of Office user
             parameter.Website = companyUser?.Website; // Website Company of user
             parameter.AccountInfo = string.Empty;
             parameter.Contact = _currentUser;
@@ -710,7 +710,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyName = companyUser?.BunameEn, //Company Name En of user
                 CompanyDescription = "Company Description",
                 CompanyAddress1 = officeUser?.AddressEn, //Office Address En of user
-                CompanyAddress2 = "Tel: " + officeUser?.Tel + "\nFax: " + officeUser?.Fax, //Tel & Fax of Office user
+                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = companyUser?.Website, //Website Company of user
                 MAWB = detail.Mawb?.ToUpper(),
                 Contact = currentUser.UserName,
