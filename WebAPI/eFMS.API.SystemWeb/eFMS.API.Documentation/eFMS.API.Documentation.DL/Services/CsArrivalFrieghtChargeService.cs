@@ -411,15 +411,18 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            var companyUser = companyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+            // Company Information of Creator
+            var companyUser = companyRepo.Get(x => x.Id == houserBill.CompanyId).FirstOrDefault();
+            // Office Information of Creator
+            var officeUser = officeRepo.Get(x => x.Id == houserBill.OfficeId).FirstOrDefault();
             var parameter = new SeaArrivalNotesReportParams();
             parameter.No = string.Empty;
             parameter.ShipperName = string.Empty;
-            parameter.CompanyName = companyUser?.BunameEn; //Company Name En of user
+            parameter.CompanyName = companyUser?.BunameEn; // Company Name En of user
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1; //Office Address En of user
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT; //Tel & Fax of Office user
-            parameter.Website = companyUser?.Website; //Website Company of user
+            parameter.CompanyAddress1 = officeUser.AddressEn; // Office Address En of user
+            parameter.CompanyAddress2 = "Tel: " + officeUser?.Tel + "\nFax: " + officeUser?.Fax; // Tel & Fax of Office user
+            parameter.Website = companyUser?.Website; // Website Company of user
             parameter.MAWB = houserBill != null ? (houserBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 3;
@@ -550,16 +553,19 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            var companyUser = companyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
-            var officeUser = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();            
+            // Company Information
+            var companyUser = companyRepo.Get(x => x.Id == houseBill.CompanyId).FirstOrDefault();
+            // Office Information
+            var officeUser = officeRepo.Get(x => x.Id == houseBill.OfficeId).FirstOrDefault();            
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
-            parameter.CompanyName = companyUser?.BunameEn; //Company Name En of user
+            // Thông tin Company
+            parameter.CompanyName = companyUser?.BunameEn; // Company Name En of user
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = officeUser?.AddressEn; //Office Address En of user 
-            parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel, officeUser?.Fax); //Tel & Fax of Office user
-            parameter.Website = companyUser?.Website; //Website Company of user
+            parameter.CompanyAddress1 = officeUser?.AddressEn; // Office Address En of user 
+            parameter.CompanyAddress2 = "Tel: " + officeUser?.Tel + "\nFax: " + officeUser?.Fax; // Tel & Fax of Office user
+            parameter.Website = companyUser?.Website; // Website Company of user
             parameter.AccountInfo = string.Empty;
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 3;
@@ -693,8 +699,10 @@ namespace eFMS.API.Documentation.DL.Services
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
             if (detail.DeliveryOrderNo == null) return new Crystal();
 
-            var companyUser = companyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
-            var officeUser = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            // Company Information
+            var companyUser = companyRepo.Get(x => x.Id == detail.CompanyId).FirstOrDefault();
+            // Office Information
+            var officeUser = officeRepo.Get(x => x.Id == detail.OfficeId).FirstOrDefault();
             var parameter = new SeaDeliveryCommandParam
             {
                 Consignee = "s",
@@ -702,7 +710,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyName = companyUser?.BunameEn, //Company Name En of user
                 CompanyDescription = "Company Description",
                 CompanyAddress1 = officeUser?.AddressEn, //Office Address En of user
-                CompanyAddress2 = string.Format(@"Tel: {0}   Fax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                CompanyAddress2 = "Tel: " + officeUser?.Tel + "\nFax: " + officeUser?.Fax, //Tel & Fax of Office user
                 Website = companyUser?.Website, //Website Company of user
                 MAWB = detail.Mawb?.ToUpper(),
                 Contact = currentUser.UserName,
