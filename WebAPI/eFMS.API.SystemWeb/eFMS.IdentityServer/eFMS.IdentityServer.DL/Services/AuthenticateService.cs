@@ -225,11 +225,11 @@ namespace eFMS.IdentityServer.DL.Services
             userInfo.email = employee?.Email;
             userInfo.idUser = user.Id;
             userInfo.status = true;
-            userInfo.NameEn = employee.EmployeeNameEn ?? "";
-            userInfo.NameVn = employee.EmployeeNameVn ?? "";
-            userInfo.BankAccountNo = employee.BankAccountNo ?? "";
-            userInfo.BankName = employee.BankName ?? "";
-            userInfo.Photo = employee.Photo ?? "";
+            //userInfo.NameEn = employee.EmployeeNameEn ?? "";
+            //userInfo.NameVn = employee.EmployeeNameVn ?? "";
+            //userInfo.BankAccountNo = employee.BankAccountNo ?? "";
+            //userInfo.BankName = employee.BankName ?? "";
+            //userInfo.Photo = employee.Photo ?? "";
 
             userInfo.message = "Login successfull !";
 

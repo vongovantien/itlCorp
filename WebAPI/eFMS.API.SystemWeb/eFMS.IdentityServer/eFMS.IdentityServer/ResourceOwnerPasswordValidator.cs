@@ -112,11 +112,8 @@ namespace eFMS.IdentityServer
                 list_Claim.Add(new Claim("officeId", modelReturn.officeId.ToString()));
                 list_Claim.Add(new Claim("departmentId", (modelReturn.departmentId ?? null).ToString()));
                 list_Claim.Add(new Claim("groupId", modelReturn.groupId.ToString()));
-                list_Claim.Add(new Claim("nameEn", modelReturn.NameEn.ToString()));
-                list_Claim.Add(new Claim("nameVn", modelReturn.NameVn.ToString()));
-                list_Claim.Add(new Claim("bankAccountNo", modelReturn.BankAccountNo.ToString()));
-                list_Claim.Add(new Claim("bankName", modelReturn.BankName.ToString()));
-                list_Claim.Add(new Claim("photo", modelReturn.Photo.ToString()));
+                //list_Claim.Add(new Claim("nameEn", modelReturn.NameEn.ToString()));
+                //list_Claim.Add(new Claim("nameVn", modelReturn.NameVn.ToString()));
 
 
                 context.Result = new GrantValidationResult(
