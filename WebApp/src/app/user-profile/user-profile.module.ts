@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UserProfilePageComponent } from './user-profile.component';
+import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
 
 const routing: Routes = [
     {
@@ -26,6 +27,8 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         SharedModule,
         ReactiveFormsModule,
+        FroalaEditorModule.forRoot(),
+        FroalaViewModule.forRoot(),
     ],
     exports: [],
     providers: [],

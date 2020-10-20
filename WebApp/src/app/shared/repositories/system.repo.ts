@@ -645,10 +645,8 @@ export class SystemRepo {
         );
     }
 
-    updateProfile(body: any, files: File[] = []) {
-        return this._api.putFormData(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/UpdateProfile`, files, body, 'avatar').pipe(
-            map((data: any) => data)
-        );
+    updateProfile(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/UpdateProfile`, body);
     }
 
 }
