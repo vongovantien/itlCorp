@@ -14,6 +14,7 @@ import { AppForm } from 'src/app/app.form';
 import { catchError, finalize } from 'rxjs/operators';
 import { IShareSystemState, checkShareSystemUserLevel, SystemLoadUserLevelAction } from 'src/app/business-modules/share-system/store';
 import { PreviousRouteService } from 'src/app/shared/services/previous-route';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -94,7 +95,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
 
                         this.setValueFormGroup(res);
                     } else {
-                        this.router.navigate(['/home/system/group']);
+                        this.router.navigate([`${RoutingConstants.SYSTEM.GROUP}`]);
                         this.formGroup.reset();
                     }
                 });
@@ -171,7 +172,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     }
 
     cancel() {
-        this.router.navigate(['/home/system/group']);
+        this.router.navigate([`${RoutingConstants.SYSTEM.GROUP}`]);
 
     }
 

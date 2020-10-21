@@ -22,6 +22,7 @@ import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -172,14 +173,14 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: CommonInterface.IResult) => {
                     if (response.status) {
                         this.confirmDeleteJobPopup.hide();
-                        this.router.navigate(["/home/operation/job-management"]);
+                        this.router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
                     }
                 }
             );
     }
 
     onCancelUpdateJob() {
-        this._router.navigate(["home/operation/job-management"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
     }
 
     confirmCancelJob() {
@@ -384,7 +385,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     gotoList() {
-        this._router.navigate(["home/operation/job-management"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
     }
 
     handleCancelForm() {

@@ -7,6 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { Department } from 'src/app/shared/models/system/department';
 import { AppForm } from 'src/app/app.form';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-department-new',
@@ -132,7 +133,7 @@ export class DepartmentAddNewComponent extends AppForm {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            this._router.navigate([`home/system/department/${res.data.id}`]);
+                            this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}/${res.data.id}`]);
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -181,7 +182,7 @@ export class DepartmentAddNewComponent extends AppForm {
     }
 
     back() {
-        this._router.navigate(['home/system/department']);
+        this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}`]);
     }
 
 }

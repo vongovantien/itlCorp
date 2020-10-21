@@ -55,9 +55,14 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     personIncharge: AbstractControl;
 
     agentId: AbstractControl;
+    agentName: string = null;
+
     pol: AbstractControl;
     pod: AbstractControl;
+
     coloader: AbstractControl;
+    supplierName: string = null;
+
     deliveryPlace: AbstractControl;
 
     userLogged: User;
@@ -108,6 +113,8 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                             }
                         });
                         try {
+                            this.supplierName = res.supplierName;
+                            this.agentName = res.agentName;
                             this.formCreate.setValue({
                                 jobId: this.fclImportDetail.jobNo,
                                 mawb: this.fclImportDetail.mawb,

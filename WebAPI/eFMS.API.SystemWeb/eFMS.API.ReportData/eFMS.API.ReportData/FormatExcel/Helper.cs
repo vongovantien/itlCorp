@@ -83,6 +83,60 @@ namespace eFMS.API.ReportData
             }
         }
 
+        public Stream GeneratePotentialListExcel(List<CatPotentialModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+
+                "English Name",
+                "Local Name",
+                "Taxcode",
+                "Tel",
+                "Address",
+                "Email",
+                "Margin",
+                "Quotation",
+                "Creator",
+                "Status",
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Potential Customer List");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "POTENTIAL CUSTOMER INFORMATION");
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+
+                        worksheet.Cells[addressStartContent, 1].Value = item.NameEn;
+
+                        worksheet.Cells[addressStartContent, 2].Value = item.NameLocal;
+                        worksheet.Cells[addressStartContent, 3].Value = item.Taxcode;
+                        worksheet.Cells[addressStartContent, 4].Value = item.Tel;
+                        worksheet.Cells[addressStartContent, 5].Value = item.Address;
+                        worksheet.Cells[addressStartContent, 6].Value = item.Email;
+                        worksheet.Cells[addressStartContent, 7].Value = item.Margin;
+                        worksheet.Cells[addressStartContent, 8].Value = item.Quotation;
+                        worksheet.Cells[addressStartContent, 9].Value = item.UserCreatedName;
+                        worksheet.Cells[addressStartContent, 10].Value = item.Active.Value ? "Active" : "Inactive";
+                        
+
+                        addressStartContent++;
+                    }
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public void BindingFormatForCountryExcel(ExcelWorksheet worksheet, List<CatCountry> listItems)
         {
             // Tạo header

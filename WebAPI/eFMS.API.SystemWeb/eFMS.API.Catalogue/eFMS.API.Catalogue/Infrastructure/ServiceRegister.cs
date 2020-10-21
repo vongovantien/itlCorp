@@ -114,6 +114,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatChargeGroupService, CatChargeGroupService>();
             services.AddTransient<ICatChartOfAccountsService, CatChartOfAccountsService>();
             services.AddTransient<ICatIncotermService, CatIncotermService>();
+            services.AddTransient<ICatPotentialService, CatPotentialService>();
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

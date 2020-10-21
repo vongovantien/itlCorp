@@ -5,6 +5,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { Role } from 'src/app/shared/models';
 import { Router } from '@angular/router';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'form-create-permission',
@@ -80,7 +81,7 @@ export class PermissionFormCreateComponent extends PermissionFormSearchComponent
     }
 
     gotoList() {
-        this._router.navigate(["home/system/permission"]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.PERMISSION}`]);
     }
 }
 

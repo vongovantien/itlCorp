@@ -16,6 +16,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
 import { merge } from 'rxjs';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -236,7 +237,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     gotoSeparate() {
-        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}/separate`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}/separate`]);
     }
 
     openInputBookingNote(reportType: string) {

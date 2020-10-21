@@ -9,6 +9,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-settle-payment-new',
@@ -79,7 +80,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${res.data.settlement.id}`]);
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -114,7 +115,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                     if (res.status) {
                         this._toastService.success(`${res.data.settlement.settlementNo}`, ' Send request successfully');
 
-                        this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${res.data.settlement.id}/approve`]);
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -125,7 +126,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     }
 
     back() {
-        this._router.navigate(['home/accounting/settlement-payment']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
     }
 
 }

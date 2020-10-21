@@ -13,7 +13,7 @@ import { IShareBussinessState, getTransationLoading, getTransactionListShipment,
 
 import { AppList } from 'src/app/app.list';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 
 
 @Component({
@@ -212,7 +212,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
     }
 
     gotoCreateJob() {
-        this._router.navigate(['home/documentation/sea-consol-export/new']);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/new`]);
     }
 
     loadListHouseBillExpanding() {
@@ -226,7 +226,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["/home/documentation/sea-consol-export", id]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}`, id]);
                 } else {
                     this.permissionPopup.show();
                 }

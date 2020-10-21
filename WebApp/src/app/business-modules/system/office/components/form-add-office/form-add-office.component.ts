@@ -9,6 +9,7 @@ import { AppForm } from 'src/app/app.form';
 
 import { Store } from '@ngrx/store';
 import { checkShareSystemUserLevel, IShareSystemState } from 'src/app/business-modules/share-system/store';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'form-add-office',
@@ -120,7 +121,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     }
 
     gotoDetailDepartment(id: number) {
-        this._router.navigate([`home/system/department/${id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}/${id}`]);
     }
 
     getCompanyData(data: any) {

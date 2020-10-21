@@ -21,6 +21,7 @@ using OfficeOpenXml;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.Common.Infrastructure.Common;
 using ITL.NetCore.Common;
+using eFMS.API.System.Service.Models;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -241,36 +242,8 @@ namespace eFMS.API.System.Controllers
         [Route("{id}")]
         public IActionResult GetBy(string id)
         {
-            var result = sysUserService.Get(x => x.Id == id).Select(y => new SysUserModel
-            {
-                Active = y.Active,
-                CreditLimit = y.CreditLimit,
-                CreditRate = y.CreditRate,
-                DatetimeCreated = y.DatetimeCreated,
-                DatetimeModified = y.DatetimeModified,
-                Description = y.Description,
-                EmployeeId = y.EmployeeId,
-                EmployeeNameVn = y.EmployeeNameVn,
-                Id = y.Id,
-                InactiveOn = y.InactiveOn,
-                IsLdap = y.IsLdap,
-                LdapObjectGuid = y.LdapObjectGuid,
-                RefuseEmail = y.RefuseEmail,
-                SysEmployeeModel = y.SysEmployeeModel,
-                UserCreated = y.UserCreated,
-                UserCreatedName = y.UserCreatedName,
-                UserModified = y.UserModified,
-                UserModifiedName = y.UserModifiedName,
-                Username = y.Username,
-                UserType = y.UserType,
-                WorkingStatus = y.WorkingStatus,
-                WorkPlaceId = y.WorkPlaceId,
-            }).FirstOrDefault();
-            var userCreate = sysUserService.Get(x => x.Id == result.UserCreated).FirstOrDefault();
-            var userModified = sysUserService.Get(x => x.Id == result.UserModified).FirstOrDefault();
-            result.UserCreated = userCreate?.Username;
-            result.UserModified = userModified?.Username;
-            result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
+            var result = sysUserService.GetUserModelById(id);
+            
             if (result == null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = result });
@@ -303,6 +276,19 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpPut]
+        [Route("UpdateProfile")]
+        [Authorize]
+        public IActionResult UpdateProfile(UserProfileCriteria criteria)
+        {
+            HandleState hs = sysUserService.UpdateProfile(criteria, out object data);
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Error"});
+            }
+            return Ok(new ResultHandle { Status = true, Message = "Success", Data = data });
         }
 
         /// <summary>

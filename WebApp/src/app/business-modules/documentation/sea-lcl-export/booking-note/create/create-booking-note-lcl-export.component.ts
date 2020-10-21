@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-create',
@@ -84,7 +85,7 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/sea-lcl-export/booking-note/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/booking-note/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -93,7 +94,7 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-lcl-export/booking-note"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/booking-note`]);
     }
 
 }

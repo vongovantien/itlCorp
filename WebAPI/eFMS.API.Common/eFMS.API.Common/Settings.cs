@@ -28,5 +28,6 @@
         public string ApiName;
         public string ApiSecret;
         public string PartnerShareKey;
+        public string ApiKey;
     }
 }

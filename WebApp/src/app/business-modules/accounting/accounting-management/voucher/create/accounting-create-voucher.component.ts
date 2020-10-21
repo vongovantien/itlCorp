@@ -7,7 +7,7 @@ import { AccountingRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { IAccountingManagementState, InitPartner } from '../../store';
 import { AccAccountingManagementModel } from '@models';
-import { AccountingConstants } from '@constants';
+import { AccountingConstants, RoutingConstants } from '@constants';
 import { formatDate } from '@angular/common';
 
 import { AccountingManagementFormCreateVoucherComponent } from '../../components/form-create-voucher/form-create-voucher.component';
@@ -125,7 +125,7 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`home/accounting/management/voucher/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -139,7 +139,7 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
     }
 
     gotoList() {
-        this._router.navigate([`home/accounting/management/voucher`]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher`]);
     }
 
     ngOnDestroy() {

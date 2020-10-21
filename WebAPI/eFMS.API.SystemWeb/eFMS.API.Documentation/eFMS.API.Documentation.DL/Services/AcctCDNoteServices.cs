@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
         ICsShipmentSurchargeService surchargeService;
         ICsTransactionDetailService transactionDetailService;
         IContextBase<CustomsDeclaration> customsDeclarationRepository;
+        IContextBase<SysCompany> sysCompanyRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -66,7 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentSurchargeService surcharge,
             ICsTransactionDetailService transDetailService,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            ICurrencyExchangeService currencyExchange
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<SysCompany> sysCompanyRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -90,6 +92,7 @@ namespace eFMS.API.Documentation.DL.Services
             transactionDetailService = transDetailService;
             currencyExchangeService = currencyExchange;
             customsDeclarationRepository = customsDeclarationRepo;
+            sysCompanyRepository = sysCompanyRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -779,8 +782,10 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             Crystal result = null;
-            //Lấy thông tin Office của User Login
-            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            // Thông tin Company của Creator
+            var companyOfUser = sysCompanyRepository.Get(x => x.Id == model.CDNote.CompanyId).FirstOrDefault();
+            //Lấy thông tin Office của Creator
+            var officeOfUser = GetInfoOfficeOfUser(model.CDNote.OfficeId);
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
@@ -810,11 +815,11 @@ namespace eFMS.API.Documentation.DL.Services
                 DueTo = "N/A",
                 DueToCredit = "N/A",
                 SayWordAll = "N/A",
-                CompanyName = DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎",
+                CompanyName = companyOfUser?.BunameEn?.ToUpper(),
+                CompanyAddress1 = officeOfUser?.AddressEn,
+                CompanyAddress2 = "Tel: " + officeOfUser?.Tel + "\nFax: " + officeOfUser?.Fax,
                 CompanyDescription = "N/A",
-                Website = DocumentConstants.COMPANY_WEBSITE,//"efms.itlvn.com",
+                Website = companyOfUser?.Website,
                 IbanCode = "N/A",
                 AccountName = _accountName,
                 AccountNameEN = _accountNameEN,
@@ -1074,13 +1079,6 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             var parameter = new SeaDebitAgentsNewReportParams();
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user name login
-            parameter.CompanyDescription = string.Empty;
-
             parameter.DebitNo = criteria.CreditDebitNo;
             parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd MMM, yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
@@ -1166,8 +1164,19 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
 
-            //Lấy thông tin Office của User Login
-            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            // Lấy thông tin Office của Creator
+            var officeOfUser = GetInfoOfficeOfUser(data.CDNote.OfficeId);
+            // Thông tin Company của Creator
+            var companyOfUser = sysCompanyRepository.Get(x => x.Id == data.CDNote.CompanyId).FirstOrDefault();
+            // Thông tin công ty
+            parameter.CompanyName = companyOfUser?.BunameEn?.ToUpper();
+            parameter.CompanyAddress1 = officeOfUser?.AddressEn ?? string.Empty;
+            parameter.CompanyAddress2 = "Tel: " + officeOfUser?.Tel + "\nFax: " + officeOfUser?.Fax;
+            parameter.Website = companyOfUser?.Website;
+            parameter.Contact = _currentUser;//Get user name login
+            parameter.CompanyDescription = string.Empty;
+
+            // Thông tin Bank
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
@@ -1177,8 +1186,6 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
-
-            //Thông tin Bank
             parameter.AccountName = _accountName;
             parameter.AccountNameEN = _accountNameEN;
             parameter.BankName = _bankName;
@@ -1220,7 +1227,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
-                    decimal _exchangeRate = isOriginCurr ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);                    
+                    decimal _exchangeRate = isOriginCurr ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
                     var charge = new AirShipperDebitNewReport();
                     charge.IndexSort = i++;
 
@@ -1299,13 +1306,6 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             var parameter = new AirShipperDebitNewReportParams();
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user name login
-            parameter.CompanyDescription = string.Empty;
-
             parameter.DebitNo = criteria.CreditDebitNo;
             parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
@@ -1392,8 +1392,18 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
 
-            //Lấy thông tin Office của User Login
-            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            // Lấy thông tin Office của Creator
+            var officeOfUser = GetInfoOfficeOfUser(data.CDNote.OfficeId);
+            // Thông tin công ty
+            var companyOfUser = sysCompanyRepository.Get(x => x.Id == data.CDNote.CompanyId).FirstOrDefault();
+            parameter.CompanyName = companyOfUser?.BunameEn?.ToUpper();
+            parameter.CompanyAddress1 = officeOfUser?.AddressEn ?? string.Empty;
+            parameter.CompanyAddress2 = "Tel: " + officeOfUser?.Tel + "\nFax: " + officeOfUser?.Fax;
+            parameter.Website = companyOfUser?.Website ?? string.Empty;
+            parameter.Contact = _currentUser;//Get user name login
+            parameter.CompanyDescription = string.Empty;
+
+            // Thông tin Bank
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
@@ -1403,8 +1413,6 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
-
-            //Thông tin Bank
             parameter.AccountName = _accountName;
             parameter.AccountNameEN = _accountNameEN;
             parameter.BankName = _bankName;
@@ -1489,7 +1497,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private SysOffice GetInfoOfficeOfUser(Guid officeId)
+        private SysOffice GetInfoOfficeOfUser(Guid? officeId)
         {
             SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
             return result;

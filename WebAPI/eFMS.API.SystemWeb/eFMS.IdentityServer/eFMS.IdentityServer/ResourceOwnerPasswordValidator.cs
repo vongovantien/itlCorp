@@ -26,6 +26,9 @@ namespace eFMS.IdentityServer
 
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
+
+            var messageError = string.Empty;
+
             RSAHelper cryption = new RSAHelper();
             PermissionInfo userPermissionInfo;
             string password = cryption.Decrypt(context.Password);
@@ -35,7 +38,8 @@ namespace eFMS.IdentityServer
 
             if (!string.IsNullOrEmpty(officeId))
             {
-                if(string.IsNullOrEmpty(deptId)){
+                if (string.IsNullOrEmpty(deptId))
+                {
                     userPermissionInfo = new PermissionInfo
                     {
                         OfficeID = new Guid(officeId),
@@ -68,10 +72,8 @@ namespace eFMS.IdentityServer
             {
                 userPermissionInfo = null;
             }
-           
 
             Guid companyId = new Guid(_contextAccessor.HttpContext.Request.Headers["companyId"]);
-            var messageError = string.Empty;
             if (companyId == Guid.Empty)
             {
                 messageError = "Company invalid";
@@ -94,7 +96,7 @@ namespace eFMS.IdentityServer
                 default:
                     break;
             }
-           
+
             if (messageError != String.Empty)
             {
                 context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, messageError);
@@ -110,10 +112,9 @@ namespace eFMS.IdentityServer
                 list_Claim.Add(new Claim("officeId", modelReturn.officeId.ToString()));
                 list_Claim.Add(new Claim("departmentId", (modelReturn.departmentId ?? null).ToString()));
                 list_Claim.Add(new Claim("groupId", modelReturn.groupId.ToString()));
-                list_Claim.Add(new Claim("nameEn", modelReturn.NameEn.ToString()));
-                list_Claim.Add(new Claim("nameVn", modelReturn.NameVn.ToString()));
-                list_Claim.Add(new Claim("bankAccountNo", modelReturn.BankAccountNo.ToString()));
-                list_Claim.Add(new Claim("bankName", modelReturn.BankName.ToString()));
+                //list_Claim.Add(new Claim("nameEn", modelReturn.NameEn.ToString()));
+                //list_Claim.Add(new Claim("nameVn", modelReturn.NameVn.ToString()));
+
 
                 context.Result = new GrantValidationResult(
                     subject: modelReturn.idUser,
@@ -121,6 +122,7 @@ namespace eFMS.IdentityServer
                       claims: list_Claim
                     );
             }
+
             return Task.FromResult(context.Result);
         }
     }

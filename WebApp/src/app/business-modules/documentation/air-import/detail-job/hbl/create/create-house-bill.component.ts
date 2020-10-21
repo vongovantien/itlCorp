@@ -18,6 +18,7 @@ import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
 
 import { catchError, finalize, mergeMap } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -211,13 +212,13 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 ).subscribe((res: CommonInterface.IResult) => {
                     if (!!res) {
                         this._toastService.success(res[1].message, '');
-                        this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                     }
                 });
         }
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/air-import/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl`]);
     }
 }

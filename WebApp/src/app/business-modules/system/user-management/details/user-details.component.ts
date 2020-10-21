@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { IAddUser } from '../addnew/user.addnew.component';
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -46,6 +47,8 @@ export class UserDetailsComponent extends AppPage {
     userLevels: UserLevel[] = [];
     selectedUserLevel: UserLevel;
 
+    userDetail: any;
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _router: Router,
@@ -64,7 +67,7 @@ export class UserDetailsComponent extends AppPage {
                 this.getDetailUser(this.userId);
                 this.getListUserLevelByUserId();
             } else {
-                this._router.navigate(["home/system/user-management"]);
+                this._router.navigate([`${RoutingConstants.SYSTEM.USER_MANAGEMENT}`]);
             }
         });
     }
@@ -81,7 +84,11 @@ export class UserDetailsComponent extends AppPage {
                     employeeNameVn: this.formAdd.employeeNameVn.value,
                     title: this.formAdd.title.value,
                     email: this.formAdd.email.value,
-                    tel: this.formAdd.phone.value
+                    tel: this.formAdd.phone.value,
+                    bankAccountNo: this.userDetail.sysEmployeeModel.bankAccountNo,
+                    bankName: this.userDetail.sysEmployeeModel.bankName,
+                    photo: this.userDetail.avatar,
+
                 },
                 username: this.formAdd.username.value,
                 userType: this.formAdd.usertype.value.value,
@@ -118,8 +125,9 @@ export class UserDetailsComponent extends AppPage {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (res: any) => {
+                (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        this.userDetail = res.data;
                         this.formAdd.SelectedUser = new User(res.data);
                         this.formAdd.isDetail = true;
                         this.formData.isLdap = res.data.isLdap;

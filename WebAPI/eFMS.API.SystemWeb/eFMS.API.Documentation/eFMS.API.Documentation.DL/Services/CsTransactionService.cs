@@ -567,7 +567,7 @@ namespace eFMS.API.Documentation.DL.Services
                     CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
                     if (agent != null)
                     {
-                        result.AgentName = agent.PartnerNameEn;
+                        result.AgentName = agent.ShortName;
                         result.AgentData = GetAgent(agent);
                     }
                 }

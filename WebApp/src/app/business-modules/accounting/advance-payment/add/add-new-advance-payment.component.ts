@@ -8,6 +8,7 @@ import { AccountingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-advance-payment-new',
@@ -94,7 +95,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
-                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}/approve`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${res.data.id}/approve`]);
                     } else {
                         this.handleError(null, (data: any) => {
                             this._toastService.error(data.message, data.title);
@@ -131,7 +132,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
     }
 
     back() {
-        this._router.navigate(['home/accounting/advance-payment']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}`]);
     }
 
 }

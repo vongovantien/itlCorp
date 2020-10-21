@@ -7,6 +7,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { TrialOfficialOtherModel } from '@models';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'list-trial-official-account-receivable',
@@ -78,7 +79,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
 
     //
     viewDetail(agreementId: string) {
-        this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
             queryParams: {
                 agreementId: agreementId,
 

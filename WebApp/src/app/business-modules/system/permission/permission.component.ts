@@ -8,6 +8,7 @@ import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-permission',
@@ -65,7 +66,7 @@ export class PermissionComponent extends AppList {
     }
 
     gotoDetail(permission: Permission) {
-        this._router.navigate([`home/system/permission/${permission.id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.PERMISSION}/${permission.id}`]);
     }
 
     deletePermission(permission: Permission) {

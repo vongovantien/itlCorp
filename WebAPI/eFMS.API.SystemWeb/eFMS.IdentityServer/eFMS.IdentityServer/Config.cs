@@ -35,7 +35,31 @@ namespace eFMS.IdentityServer
                     {
                         "openid", "profile", "offline_access", "efms_api"
                     },
-                }
+                },
+                new Client
+                {
+                    ClientId = "Bravo",
+                    ClientName = "Bravo Client API",
+                    AccessTokenLifetime =  tokenLifetime,
+                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                    RequireClientSecret = false,
+                    RequireConsent = false,
+                    AlwaysSendClientClaims = true,
+                    AllowAccessTokensViaBrowser = true,
+                    AccessTokenType = AccessTokenType.Jwt,
+                    AllowOfflineAccess = true,
+                    UpdateAccessTokenClaimsOnRefresh = true,
+                    RefreshTokenExpiration = TokenExpiration.Sliding,
+                    SlidingRefreshTokenLifetime = slientRefreshToken,
+                    RedirectUris = redirectUris,
+                    AllowedCorsOrigins= originUris,
+                    AlwaysIncludeUserClaimsInIdToken = true,
+                    AllowedScopes =
+                    {
+                        "openid", "profile", "offline_access", "efms_api"
+                    },
+                },
+
             };
         }
 

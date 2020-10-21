@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { RoutingConstants } from '@constants';
 import { NgProgress } from '@ngx-progressbar/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -213,10 +214,10 @@ export class AdvancePaymentComponent extends AppList {
                     switch (adv.statusApproval) {
                         case 'New':
                         case 'Denied':
-                            this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}`]);
                             break;
                         default:
-                            this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`]);
                             break;
                     }
                 } else {

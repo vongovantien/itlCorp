@@ -18,6 +18,7 @@ import { CommonEnum } from '@enums';
 import { AppForm } from 'src/app/app.form';
 
 import { takeUntil, catchError } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -154,7 +155,7 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/sea-consol-export/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -191,7 +192,7 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`home/documentation/sea-consol-export/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -200,6 +201,6 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-consol-export"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}`]);
     }
 }

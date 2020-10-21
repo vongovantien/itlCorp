@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { AccAccountingManagementModel } from '@models';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 
 import { IAccountingManagementState, UpdateChargeList } from '../../store';
 import { AccountingManagementCreateVATInvoiceComponent } from '../create/accounting-create-vat-invoice.component';
@@ -174,6 +174,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
     }
 
     gotoList() {
-        this._router.navigate(["home/accounting/management/vat-invoice"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice`]);
     }
 }

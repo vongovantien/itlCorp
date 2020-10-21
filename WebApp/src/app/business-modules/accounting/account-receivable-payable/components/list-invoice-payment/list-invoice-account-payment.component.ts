@@ -14,7 +14,10 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { PaymentModel, AccountingPaymentModel } from '@models';
+import { RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
+
+
 
 @Component({
     selector: 'list-invoice-account-payment',
@@ -107,7 +110,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     }
 
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/payment-import`]);
     }
 
     exportExcel() {

@@ -15,6 +15,7 @@ import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import { SortService } from '@services';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-detail-company-info',
@@ -153,11 +154,11 @@ export class CompanyInformationDetailComponent extends AppList {
     }
 
     cancel() {
-        this._router.navigate(["home/system/company"]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.COMPANY}`]);
     }
 
     gotoDetailOffice(office: Office) {
-        this._router.navigate([`home/system/office/${office.id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.OFFICE}/${office.id}`]);
     }
 
     sortLocal(sort: string): void {

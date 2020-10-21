@@ -14,6 +14,7 @@ import { IFormAddOffice, OfficeFormAddComponent } from '../components/form-add-o
 
 
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -88,7 +89,7 @@ export class OfficeDetailsComponent extends AppList {
 
                 this.getDetailOffice(this.officeId);
             } else {
-                this._router.navigate(["home/system/office"]);
+                this._router.navigate([`${RoutingConstants.SYSTEM.OFFICE}`]);
             }
         });
         this.headers = [
@@ -201,10 +202,10 @@ export class OfficeDetailsComponent extends AppList {
             );
     }
     cancel() {
-        this._router.navigate(['/home/system/office']);
+        this._router.navigate([`${RoutingConstants.SYSTEM.OFFICE}`]);
     }
     gotoDetailDepartment(id: string) {
-        this._router.navigate([`home/system/department/${id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}/${id}`]);
     }
 
     sortLocal(sort: string): void {

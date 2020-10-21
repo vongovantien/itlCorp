@@ -11,6 +11,7 @@ import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 
 import { catchError, finalize, map } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -145,7 +146,7 @@ export class ChargeComponent extends AppList implements OnInit {
         this._catalogueRepo.checkAllowGetDetailCharge(charge.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["home/catalogue/charge", charge.id]);
+                    this._router.navigate([`${RoutingConstants.CATALOGUE.CHARGE}`, charge.id]);
                 } else {
                     this.permissionPopup.show();
                 }

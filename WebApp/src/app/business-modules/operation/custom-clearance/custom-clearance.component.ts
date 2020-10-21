@@ -14,6 +14,7 @@ import { IAppState, getMenuUserPermissionState } from '@store';
 import { Store } from '@ngrx/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { formatDate } from '@angular/common';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -137,7 +138,7 @@ export class CustomClearanceComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate(['/home/operation/custom-clearance/detail', id]);
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.CUSTOM_CLEARANCE}/detail`, id]);
                     } else {
                         this.canNotAllowActionPopup.show();
                     }
@@ -313,11 +314,11 @@ export class CustomClearanceComponent extends AppList {
     }
 
     gotoCreateCD() {
-        this._router.navigate(["home/operation/custom-clearance/new"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.CUSTOM_CLEARANCE}/new`]);
     }
 
     import() {
-        this._router.navigate(["home/operation/custom-clearance/import"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.CUSTOM_CLEARANCE}/import`]);
 
     }
 

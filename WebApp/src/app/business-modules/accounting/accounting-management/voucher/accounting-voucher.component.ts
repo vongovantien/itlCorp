@@ -9,7 +9,7 @@ import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { AccountingConstants } from '@constants';
+import { AccountingConstants, RoutingConstants } from '@constants';
 import { AccAccountingManagementCriteria, AccAccountingManagementResult } from '@models';
 
 import { AppList } from 'src/app/app.list';
@@ -93,11 +93,11 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'vat': {
-                this._router.navigate([`home/accounting/management/vat-invoice`]);
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice`]);
                 break;
             }
             case 'cdi': {
-                this._router.navigate([`home/accounting/management/cd-invoice`]);
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/cd-invoice`]);
                 break;
             }
         }
@@ -189,7 +189,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
         this._accountingRepo.checkDetailAcctMngtPermission(voucher.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate([`home/accounting/management/voucher/${voucher.id}`]);
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/${voucher.id}`]);
                 } else {
                     this.popup403.show();
                 }
