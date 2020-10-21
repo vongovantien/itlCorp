@@ -1751,14 +1751,14 @@ namespace eFMS.API.Documentation.DL.Services
                 authorizeLetters.Add(authorizeLetter);
             }
 
-            var companyUser = sysCompanyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
-            var officeUser = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var companyUser = sysCompanyRepo.Get(x => x.Id == data.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == data.OfficeId).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = companyUser?.BunameVn, //Company Name Vn of user
-                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
-                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                CompanyName = companyUser?.BunameVn, // Company Name Vn of user
+                CompanyAddress1 = officeUser?.AddressVn, // Office Address Vn of user
+                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,
@@ -1809,14 +1809,14 @@ namespace eFMS.API.Documentation.DL.Services
                 authorizeLetters.Add(authorizeLetter);
             }
 
-            var companyUser = sysCompanyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
-            var officeUser = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var companyUser = sysCompanyRepo.Get(x => x.Id == data.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == data.OfficeId).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = companyUser?.BunameVn, //Company Name Vn of user
-                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
-                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                CompanyName = companyUser?.BunameVn, // Company Name Vn of user
+                CompanyAddress1 = officeUser?.AddressVn, // Office Address Vn of user
+                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,
