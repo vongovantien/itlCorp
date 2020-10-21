@@ -11,6 +11,7 @@ import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent } from '@common';
 
 import { catchError } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-job-lcl-import',
@@ -39,7 +40,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-lcl-import"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}`]);
     }
 
     showImportPopup() {
@@ -149,7 +150,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/sea-lcl-import/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -167,7 +168,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/sea-lcl-import/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }

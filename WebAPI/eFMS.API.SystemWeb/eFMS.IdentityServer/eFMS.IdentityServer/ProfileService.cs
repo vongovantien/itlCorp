@@ -38,10 +38,6 @@ namespace eFMS.IdentityServer
             Claim officeClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("officeId")).FirstOrDefault();
             Claim departmentclaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("departmentId")).FirstOrDefault();
             Claim groupClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("groupId")).FirstOrDefault();
-            Claim nameEnClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("nameEn")).FirstOrDefault();
-            Claim nameVnClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("nameVn")).FirstOrDefault();
-            Claim bankAccountNoClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("bankAccountNo")).FirstOrDefault();
-            Claim bankNameClaim = context.Subject.Claims.Where<Claim>(claim => claim.Type.Equals("bankName")).FirstOrDefault();
 
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
@@ -54,17 +50,19 @@ namespace eFMS.IdentityServer
                     new Claim(JwtClaimTypes.Email, user.Email),
                     new Claim(JwtClaimTypes.PreferredUserName,user.Username),
                     new Claim(JwtClaimTypes.PhoneNumber,user.Tel??""),
-                    //new Claim("workplaceId",user.WorkPlaceId?.ToString()),
                     new Claim("userName", user.Username),
                     new Claim("employeeId", employee.Id),
+                    new Claim("photo", employee.Photo ?? ""),
+                    new Claim("nameEn", employee.EmployeeNameEn ?? ""),
+                    new Claim("nameVn", employee.EmployeeNameVn ?? ""),
+                    new Claim("title", employee.Title ?? ""),
+                    new Claim("Code", employee.StaffCode ?? ""),
+                    new Claim("BankAccountNo", employee.BankAccountNo ?? ""),
+                    new Claim("BankName", employee.BankName ?? ""),
                     companyClaim,
                     officeClaim,
                     departmentclaim,
                     groupClaim,
-                    nameEnClaim,
-                    nameVnClaim,
-                    bankAccountNoClaim,
-                    bankNameClaim
                 };
 
             context.IssuedClaims = claims;

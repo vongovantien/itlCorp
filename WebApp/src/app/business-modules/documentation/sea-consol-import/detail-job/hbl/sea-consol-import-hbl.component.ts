@@ -9,6 +9,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -32,13 +33,13 @@ export class SeaConsolImportHBLComponent extends AppShareHBLBase {
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-consol-import/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-consol-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-consol-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }
@@ -58,7 +59,7 @@ export class SeaConsolImportHBLComponent extends AppShareHBLBase {
     }
 
     gotoCreate() {
-        this._router.navigate([`/home/documentation/sea-consol-import/${this.jobId}/hbl/new`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/new`]);
     }
 
 
@@ -70,7 +71,7 @@ export class SeaConsolImportHBLComponent extends AppShareHBLBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate([`/home/documentation/sea-consol-import/${this.jobId}/hbl/${id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${id}`]);
                     } else {
                         this.info403Popup.show();
                     }
@@ -79,12 +80,12 @@ export class SeaConsolImportHBLComponent extends AppShareHBLBase {
     }
 
     duplicateConfirm() {
-        this._router.navigate([`home/documentation/sea-consol-import/${this.jobId}`], {
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
         });
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-consol-import"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}`]);
     }
 }

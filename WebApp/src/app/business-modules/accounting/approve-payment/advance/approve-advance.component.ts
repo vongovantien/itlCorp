@@ -15,6 +15,7 @@ import { AdvancePaymentListRequestComponent } from '../../advance-payment/compon
 import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
 
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
+import { RoutingConstants } from '@constants';
 
 import { catchError, concatMap, finalize, takeUntil } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -198,7 +199,7 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
 
     back() {
         if (!this.approveInfo.requesterAprDate) {
-            this._router.navigate([`home/accounting/advance-payment/${this.idAdvPayment}`]);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${this.idAdvPayment}`]);
         } else {
             window.history.back();
         }

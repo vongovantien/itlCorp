@@ -11,6 +11,7 @@ import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
 import { ExportRepo } from 'src/app/shared/repositories';
 import { User } from 'src/app/shared/models';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-user-management',
@@ -178,7 +179,7 @@ export class UserManagementComponent extends AppList {
     }
 
     gotoDetailUser(id: number) {
-        this._router.navigate([`home/system/user-management/${id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.USER_MANAGEMENT}/${id}`]);
     }
 
     export() {

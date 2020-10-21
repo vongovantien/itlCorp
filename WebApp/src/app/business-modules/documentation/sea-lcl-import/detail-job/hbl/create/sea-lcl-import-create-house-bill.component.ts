@@ -9,7 +9,7 @@ import { DocumentationRepo } from '@repositories';
 import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { Container, CsTransaction } from '@models';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { DataService } from '@services';
 
 import {
@@ -194,7 +194,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl`]);
     }
 
     createHbl(body: any) {
@@ -215,7 +215,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
-                        this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}/hbl/${res.data}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
 
                         return forkJoin([arrival, delivery]);
                     }),

@@ -46,9 +46,14 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     serviceDate: AbstractControl;
 
     coloader: AbstractControl; // Supplier/Vendor(Coloader).
+    supplierName: string = null;
+
     pol: AbstractControl;
     pod: AbstractControl;
+
     agent: AbstractControl;
+    agentName: string = null;
+
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
@@ -122,6 +127,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                     res.eta = null;
                                 }
                             });
+                            this.supplierName = res.supplierName;
+                            this.agentName = res.agentName;
                             this.formGroup.patchValue({
                                 jobID: res.jobNo,
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,

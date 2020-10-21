@@ -83,7 +83,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Shipping Line/Co-Loader</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: coloader.value}"
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field: 'id', value: coloader.value, hardValue: supplierName}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsPartner" [height]="200"
@@ -101,7 +102,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Agent</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: agentId.value}"
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field: 'id', value: agentId.value, hardValue: agentName}"
                                 (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsPartner" [height]="200"

@@ -8,6 +8,7 @@ import { AccountReceivableListTrialOfficialComponent } from '../components/list-
 import { AccountReceivableListGuaranteedComponent } from '../components/list-guaranteed/list-guaranteed-account-receivable.component';
 import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
 import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-account-receivable',
@@ -79,7 +80,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     //
     changeTabAccount(tab: string) {
         if (tab === 'payment') {
-            this._router.navigate([`/home/accounting/account-receivable-payable`]);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
         }
     }
     //
@@ -93,15 +94,15 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         this.selectedSubTab = tabname;
 
         if (tabname === 'TRIAL_OFFICIAL') {
-            this._router.navigate(['/home/accounting/account-receivable-payable/receivable']);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`]);
 
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
         } else if (tabname === 'GUARANTEED') {
-            this._router.navigate(['/home/accounting/account-receivable-payable/receivable'], { queryParams: { subTab: 'guaranteed' } });
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`], { queryParams: { subTab: 'guaranteed' } });
 
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Guarantee, this.guaranteedListComponent);
         } else {
-            this._router.navigate(['/home/accounting/account-receivable-payable/receivable'], { queryParams: { subTab: 'other' } });
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`], { queryParams: { subTab: 'other' } });
 
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Other, this.otherListComponent);
 

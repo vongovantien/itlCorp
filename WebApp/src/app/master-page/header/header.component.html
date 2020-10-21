@@ -31,8 +31,9 @@
             <div class="m-topbar m-stack m-stack--ver m-stack--general" id="m_header_topbar">
                 <div class="m-stack__item m-topbar__nav-wrapper">
                     <ul class="m-topbar__nav m-nav m-nav--inline">
+                        <!-------------------start search------------------------>
                         <!-- <li class="m-nav__item m-list-search m-list-search--skin-light">
-                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)"  data-toggle="dropdown">
+                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
                                     <i class="la la-search"></i>
                                 </span>
@@ -42,7 +43,8 @@
                                     <form class="m-list-search__form">
                                         <div class="m-list-search__form-wrapper">
                                             <span class="m-list-search__form-input-wrapper">
-                                                <input class="m-list-search__form-input" id="m_quicksearch_input" autocomplete="off"  placeholder="Search..." type="text" value="">
+                                                <input class="m-list-search__form-input" id="m_quicksearch_input"
+                                                    autocomplete="off" placeholder="Search..." type="text" value="">
                                             </span>
                                             <span class="m-list-search__form-icon-close" id="m_quicksearch_close">
                                                 <i class="la la-remove">
@@ -53,6 +55,8 @@
                                 </div>
                             </div>
                         </li> -->
+                        <!----------------end search--------------------->
+                        <!----------------start notification-------------->
                         <!-- <li class="m-nav__item m-topbar__notifications">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-nav__link-badge m-badge m-badge--danger">3</span>
@@ -159,6 +163,7 @@
                                 </div>
                             </div>
                         </li> -->
+                        <!----------------end notification-------------->
                         <li class="m-nav__item m-office">
                             <a class="m-nav__link m-dropdown__toggle pointer" data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
@@ -253,16 +258,69 @@
                             </div>
                         </li>
                         <li class="m-nav__item m-topbar__user-profile">
-                            <a class="m-nav__link" href="javascript:void(0)">
+                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-topbar__userpic">
                                     <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
-                                        src="assets/app/media/img/users/user4.jpg" />
+                                        [src]="currenUser.photo"
+                                        onerror="src = 'assets/app/media/img/users/user4.jpg'" />
                                 </span>
                                 <span class="m-topbar__username"
-                                    style="color: #3966b6; font-size: 14px; text-transform: capitalize; padding-left: 10px;">
-                                    {{!!currenUser ? currenUser.preferred_username : null}}
+                                    style="color: #3966b6; font-size: 16px; text-transform: capitalize; padding-left: 10px;">
+                                    {{!!currenUser ? currenUser.nameEn : null}}
                                 </span>
                             </a>
+                            <!-- popup info account-->
+                            <div class="dropdown-menu p-0   ">
+                                <div class="m-list-timeline m-list-timeline--skin-light info-account-wrapper">
+                                    <div class="m-list-timeline__item">
+                                        <div class="bg-info d-flex justify-content-around align-items-center p-2">
+                                            <div class="popup-account__avatar">
+                                                <img alt="eFMS" class="img-fluid rounded-circle"
+                                                    [src]="currenUser.photo"
+                                                    onerror="src = 'assets/app/media/img/users/user4.jpg'" />
+                                            </div>
+                                            <div>
+                                                <h5 class="text-white mb-0" style="cursor: pointer;">
+                                                    <span class="m-topbar__username"
+                                                        style="font-size: 14px; text-transform: capitalize;">
+                                                        {{!!currenUser ? currenUser.nameEn : null}}
+                                                    </span>
+                                                </h5>
+                                                <div class="text-light font-italic text-capitalize">{{currenUser.title}}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="icon-online">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-list-timeline__item pointer" (click)="viewProfile()">
+                                        <div class="flex-row-around bg-white">
+                                            <div class="flex-1 icon-custom">
+                                                <i class="la la-user"></i>
+                                            </div>
+                                            <div class="flex-6 flex-column">
+                                                <h6 style="font-weight: 600;">
+                                                    My Account
+                                                </h6>
+                                                <span class="text-muted">
+                                                    Account settings and more
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <i class="la la-angle-right" style="font-size:12px"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="m-list-timeline__item border-top">
+                                        <div class="p-4 bg-white">
+                                            <button type="button" class="btn btn-outline-info" data-toggle="modal"
+                                                data-target="#logout-modal">Sign Out</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </li>
                         <li class="m-nav__item m-topbar-logout">
                             <a class="m-nav__link" href="javascript:void(0)" data-toggle="modal"

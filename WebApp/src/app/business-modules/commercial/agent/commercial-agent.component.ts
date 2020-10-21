@@ -8,7 +8,7 @@ import { CatalogueRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 
 import { AppList } from 'src/app/app.list';
 
@@ -199,7 +199,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: boolean) => {
                     if (res) {
-                        this._router.navigate([`/home/commercial/agent/${this.selectedAgent.id}`]);
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${this.selectedAgent.id}`]);
                     } else {
                         this.info403Popup.show();
                     }

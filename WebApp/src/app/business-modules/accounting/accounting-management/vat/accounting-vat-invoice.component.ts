@@ -7,8 +7,8 @@ import { formatDate } from '@angular/common';
 
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
+import { AccountingConstants, RoutingConstants } from '@constants';
 import { AccAccountingManagementCriteria, AccAccountingManagementResult } from '@models';
-import { AccountingConstants } from '@constants';
 import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 
@@ -97,11 +97,11 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'cdi': {
-                this._router.navigate([`home/accounting/management/cd-invoice`]);
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/cd-invoice`]);
                 break;
             }
             case 'voucher': {
-                this._router.navigate([`home/accounting/management/voucher`]);
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher`]);
                 break;
             }
         }
@@ -199,7 +199,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
         this._accountingRepo.checkDetailAcctMngtPermission(invoice.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate([`home/accounting/management/vat-invoice/${invoice.id}`]);
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice/${invoice.id}`]);
                 } else {
                     this.popup403.show();
                 }

@@ -8,6 +8,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-department',
@@ -27,7 +28,7 @@ export class DepartmentComponent extends AppList {
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _exportRepo: ExportRepo, ) {
+        private _exportRepo: ExportRepo,) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.searchDepartment;
@@ -82,7 +83,7 @@ export class DepartmentComponent extends AppList {
     }
 
     gotoDetailDepartment(id: number) {
-        this._router.navigate([`home/system/department/${id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}/${id}`]);
     }
 
     sortDepartment(sort: string): void {

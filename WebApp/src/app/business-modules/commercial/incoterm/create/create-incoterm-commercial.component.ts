@@ -14,6 +14,7 @@ import { CommercialListChargeIncotermComponent } from '../components/list-charge
 import { catchError } from 'rxjs/operators';
 
 import _merge from 'lodash/merge';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'create-incoterm-commercial',
@@ -110,7 +111,7 @@ export class CommercialCreateIncotermComponent extends AppForm implements OnInit
     }
 
     gotoList() {
-        this._router.navigate(["home/commercial/incoterm"]);
+        this._router.navigate([`${RoutingConstants.COMMERCIAL.INCOTERM}`]);
     }
 
 }

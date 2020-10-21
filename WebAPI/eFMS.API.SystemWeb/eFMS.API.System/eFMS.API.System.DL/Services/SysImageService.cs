@@ -27,17 +27,17 @@ namespace eFMS.API.System.DL.Services
 
         }
 
-        public async Task<ResultHandle> UploadImage(IFormFile file, string folderName)
+        public async Task<ResultHandle> UploadImage(IFormFile file, string folderName, string ObjectId = null)
         {
             if (ImageHelper.CheckIfImageFile(file))
             {
-                return await WriteFile(file, folderName);
+                return await WriteFile(file, folderName, ObjectId);
             }
 
             return new ResultHandle { Data = 1, Message = "Có lỗi xảy ra", Status = false };
         }
 
-        public async Task<ResultHandle> WriteFile(IFormFile file, string folderName)
+        public async Task<ResultHandle> WriteFile(IFormFile file, string folderName, string ObjectId)
         {
             string fileName = "";
             //string folderName = "images";
@@ -58,7 +58,8 @@ namespace eFMS.API.System.DL.Services
                     Id = Guid.NewGuid(),
                     Url = urlImage,
                     Name = fileName,
-                    Folder = folderName ?? "Company"
+                    Folder = folderName ?? "Company",
+                    ObjectId = ObjectId,
                 };
                 HandleState x =  Add(sysImage); // lưu db
                 if(x.Success)
@@ -110,6 +111,12 @@ namespace eFMS.API.System.DL.Services
             var result =  DataContext.Where(x => x.Folder == "Company");
             return result.ProjectTo<SysImageModel>(mapper.ConfigurationProvider);
 
+        }
+
+        public IQueryable<SysImageModel> GetImageUser(string userId)
+        {
+            var result = DataContext.Where(x => x.Folder == "User" && x.ObjectId == userId);
+            return result.ProjectTo<SysImageModel>(mapper.ConfigurationProvider);
         }
     }
 

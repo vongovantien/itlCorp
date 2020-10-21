@@ -16,6 +16,7 @@ using eFMS.API.System.Service.Contexts;
 using Microsoft.Extensions.Localization;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -29,16 +30,20 @@ namespace eFMS.API.System.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ISysCompanyService sysCompanyRepository;
         private readonly ISysOfficeService sysOfficeRepository;
+        private readonly IContextBase<SysImage> imageRepository;
+        private readonly ISysImageService sysImageService;
 
 
 
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
+            IContextBase<SysImage> imageRepo,
             IContextBase<SysUserLevel> userlevelRepo, IDistributedCache distributedCache, IStringLocalizer<SystemLanguageSub> localizer,
             ISysEmployeeService employeeService,
             ICurrentUser currUser,
             ISysCompanyService sysCompanyRepo,
-            ISysOfficeService sysOfficeRepo) : base(repository, mapper)
+            ISysOfficeService sysOfficeRepo,
+            ISysImageService sysImageRepo) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
             userlevelRepository = userlevelRepo;
@@ -48,6 +53,8 @@ namespace eFMS.API.System.DL.Services
             currentUser = currUser;
             sysCompanyRepository = sysCompanyRepo;
             sysOfficeRepository = sysOfficeRepo;
+            imageRepository = imageRepo;
+            sysImageService = sysImageRepo;
         }
 
         public IQueryable<SysUserViewModel> GetAll()
@@ -502,5 +509,110 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
+        public SysUserModel GetUserModelById(string id)
+        {
+            var result = DataContext.Get(x => x.Id == id).Select(y => new SysUserModel
+            {
+                Active = y.Active,
+                CreditLimit = y.CreditLimit,
+                CreditRate = y.CreditRate,
+                DatetimeCreated = y.DatetimeCreated,
+                DatetimeModified = y.DatetimeModified,
+                Description = y.Description,
+                EmployeeId = y.EmployeeId,
+                //EmployeeNameVn = y.EmployeeNameVn,
+                Id = y.Id,
+                InactiveOn = y.InactiveOn,
+                IsLdap = y.IsLdap,
+                LdapObjectGuid = y.LdapObjectGuid,
+                RefuseEmail = y.RefuseEmail,
+                SysEmployeeModel = new SysEmployeeModel(),
+                UserCreated = y.UserCreated,
+                //UserCreatedName = y.UserCreatedName,
+                UserModified = y.UserModified,
+                //UserModifiedName = y.UserModifiedName,
+                Username = y.Username,
+                UserType = y.UserType,
+                WorkingStatus = y.WorkingStatus,
+                WorkPlaceId = y.WorkPlaceId
+            }).FirstOrDefault();
+            var userCreate = DataContext.Get(x => x.Id == result.UserCreated).FirstOrDefault();
+            var userModified = DataContext.Get(x => x.Id == result.UserModified).FirstOrDefault();
+            // Get employee
+            var currEmployee = employeeRepository.Get(x => x.Id == result.EmployeeId).FirstOrDefault();
+            result.EmployeeNameVn = currEmployee?.EmployeeNameVn;
+            result.UserCreatedName = userCreate?.Username;
+            result.UserModifiedName = userModified?.Username;
+            result.SysEmployeeModel.EmployeeNameEn = currEmployee.EmployeeNameEn;
+            result.SysEmployeeModel.EmployeeNameVn = currEmployee.EmployeeNameVn;
+            result.SysEmployeeModel.Title = currEmployee.Title;
+            result.SysEmployeeModel.Email = currEmployee.Email;
+            result.SysEmployeeModel.BankAccountNo = currEmployee.BankAccountNo;
+            result.SysEmployeeModel.BankName = currEmployee.BankName;
+            result.SysEmployeeModel.Tel = currEmployee.Tel;
+            result.SysEmployeeModel.StaffCode = currEmployee.StaffCode;
+            // get avatar through last modified date.
+            result.Avatar = currEmployee?.Photo;
+
+            if (result == null)
+            {
+                return null;
+            }
+            else
+            {
+                return result;
+            }
+        }
+
+        public HandleState UpdateProfile(UserProfileCriteria criteria, out object profile)
+        {
+            if(criteria == null)
+            {
+                profile = null;
+                return new HandleState();
+            }
+
+            SysUser currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            currUser.Description = criteria.Description?.Trim();
+
+            SysEmployee currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
+
+            currEmployee.EmployeeNameEn = criteria.EmployeeNameEn?.Trim();
+            currEmployee.EmployeeNameVn = criteria.EmployeeNameVn?.Trim();
+            currEmployee.Title = criteria.Title?.Trim();
+            currEmployee.Tel = criteria.Tel?.Trim();
+            currEmployee.Email = criteria.Email?.Trim();
+            currEmployee.BankAccountNo = criteria.BankAccountNo?.Trim();
+            currEmployee.BankName = criteria.BankName?.Trim();
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = DataContext.Update(currUser, x => x.Id == currUser.Id);
+                    if (hs.Success)
+                    {
+                         currEmployee.Photo = criteria.Avatar;
+                         hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
+                    }
+
+                    trans.Commit();
+                    profile = currEmployee;
+
+                    return hs;
+                }
+                catch(Exception ex)
+                {
+                    trans.Rollback();
+                    profile = null;
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+
+            }
+        }
     }
 }

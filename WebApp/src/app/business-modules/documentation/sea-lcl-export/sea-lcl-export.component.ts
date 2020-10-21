@@ -11,7 +11,7 @@ import * as fromShare from './../../share-business/store';
 import { AppList } from 'src/app/app.list';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { takeUntil, finalize, catchError } from 'rxjs/operators';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 @Component({
     selector: 'app-sea-lcl-export',
     templateUrl: './sea-lcl-export.component.html',
@@ -206,7 +206,7 @@ export class SeaLCLExportComponent extends AppList {
     }
 
     gotoCreateJob() {
-        this._router.navigate(['home/documentation/sea-lcl-export/new']);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/new`]);
     }
 
     loadListHouseBillExpanding() {
@@ -220,7 +220,7 @@ export class SeaLCLExportComponent extends AppList {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["/home/documentation/sea-lcl-export", id]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}`, id]);
                 } else {
                     this.permissionPopup.show();
                 }
@@ -228,7 +228,7 @@ export class SeaLCLExportComponent extends AppList {
     }
 
     gotoCreateBookingNote() {
-        this._router.navigate(['home/documentation/sea-lcl-export/booking-note']);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/booking-note`]);
 
     }
 }

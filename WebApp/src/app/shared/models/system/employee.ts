@@ -6,6 +6,9 @@ export class Employee {
     email: string = '';
     title: string = '';
     staffCode: string = '';
+    bankAccountNo: string = '';
+    bankName: string = '';
+    photo: string = '';
     constructor(data?: any) {
         let self = this;
         for (const key in data) {
