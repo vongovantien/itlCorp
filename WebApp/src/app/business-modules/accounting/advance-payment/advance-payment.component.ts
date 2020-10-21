@@ -63,7 +63,6 @@ export class AdvancePaymentComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _router: Router,
         private _store: Store<IAppState>,
-        private _partnerAPI: PartnerAPIRepo,
         private _spinner: NgxSpinnerService,
     ) {
         super();
@@ -238,7 +237,7 @@ export class AdvancePaymentComponent extends AppList {
     checkAllChange() {
         if (this.isCheckAll) {
             this.advancePayments.forEach(x => {
-                if (x.statusApproval === 'Done') {
+                if (x.statusApproval === 'Done' && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED && !x.voucherNo) {
                     x.isChecked = true;
                 }
             });

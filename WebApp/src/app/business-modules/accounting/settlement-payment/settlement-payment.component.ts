@@ -26,13 +26,15 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from '../compo
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 import { catchError, finalize, map, } from 'rxjs/operators';
+import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
+import { delayTime } from '@decorators';
 
 
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
 })
-export class SettlementPaymentComponent extends AppList {
+export class SettlementPaymentComponent extends AppList implements ICrystalReport {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
@@ -68,6 +70,12 @@ export class SettlementPaymentComponent extends AppList {
 
         this.requestList = this.getListSettlePayment;
         this.requestSort = this.sortSettlementPayment;
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 
     ngOnInit() {
@@ -229,10 +237,7 @@ export class SettlementPaymentComponent extends AppList {
                 (res: any) => {
                     if (res != null) {
                         this.dataReport = res;
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -248,7 +253,6 @@ export class SettlementPaymentComponent extends AppList {
                 }
             );
     }
-
 
     issueVoucher() {
         const settlementCodes = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done');
@@ -296,7 +300,7 @@ export class SettlementPaymentComponent extends AppList {
     checkAllSettlement() {
         if (this.isCheckAll) {
             this.settlements.forEach(x => {
-                if (x.statusApproval === 'Done') {
+                if (x.statusApproval === 'Done' && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED) {
                     x.isSelected = true;
                 }
             });
