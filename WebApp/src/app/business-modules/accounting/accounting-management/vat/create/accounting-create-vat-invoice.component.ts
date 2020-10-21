@@ -14,7 +14,7 @@ import { IAccountingManagementState, InitPartner } from '../../store';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-import { AccountingConstants, SystemConstants } from '@constants';
+import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
 import { Router } from '@angular/router';
 
 
@@ -112,7 +112,7 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`home/accounting/management/vat-invoice/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -130,7 +130,7 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
     }
 
     gotoList() {
-        this._router.navigate([`home/accounting/management/vat-invoice`]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice`]);
     }
 
     ngOnDestroy() {

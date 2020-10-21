@@ -16,6 +16,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import isUUID from 'validator/lib/isUUID';
+import { RoutingConstants } from '@constants';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
@@ -155,7 +156,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                         this.jobId = res.data.id;
 
                         // * get detail & container list.
-                        this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
                         this.isDuplicate = true;
                     } else {
@@ -191,16 +192,16 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'hbl':
-                this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }
@@ -225,7 +226,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-lcl-export"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}`]);
     }
 
     prepareDeleteJob() {
@@ -302,7 +303,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`], {
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();

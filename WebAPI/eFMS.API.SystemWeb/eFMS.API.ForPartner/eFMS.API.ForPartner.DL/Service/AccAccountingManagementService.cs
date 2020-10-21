@@ -24,6 +24,8 @@ namespace eFMS.API.ForPartner.DL.Service
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
+
+
         private readonly IHostingEnvironment environment;
         private readonly IOptions<AuthenticationSetting> configSetting;
         private readonly IContextBase<AcctAdvancePayment> acctAdvanceRepository;
@@ -76,7 +78,6 @@ namespace eFMS.API.ForPartner.DL.Service
             AccAccountingManagementModel result = mapper.Map<AccAccountingManagementModel>(accounting);
             return result;
         }
-
         public bool ValidateApiKey(string apiKey)
         {
             bool isValid = false;
@@ -789,3 +790,5 @@ namespace eFMS.API.ForPartner.DL.Service
 
     }
 }
+
+

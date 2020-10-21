@@ -7,6 +7,7 @@ import { NgProgress } from "@ngx-progressbar/core";
 import { SystemConstants } from "src/constants/system.const";
 
 import { catchError, finalize } from "rxjs/operators";
+import { RoutingConstants } from "@constants";
 
 
 type LOCATION_TAB = 'country' | 'city' | 'district' | 'town';
@@ -47,7 +48,7 @@ export class LocationComponent extends AppList implements OnInit, AfterViewInit 
     }
 
     import() {
-        this._router.navigate(["home/catalogue/location/location-import"], { queryParams: { type: this.selectedTab } });
+        this._router.navigate([`${RoutingConstants.CATALOGUE.LOCATION}/location-import`], { queryParams: { type: this.selectedTab } });
     }
 
     export() {

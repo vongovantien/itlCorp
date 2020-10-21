@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { finalize, catchError } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-add-company-info',
@@ -28,7 +29,7 @@ export class CompanyInformationAddComponent extends AppPage {
     ngOnInit(): void { }
 
     cancel() {
-        this._router.navigate(["home/system/company"]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.COMPANY}`]);
     }
 
     create() {
@@ -57,7 +58,7 @@ export class CompanyInformationAddComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this._router.navigate([`home/system/company/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.SYSTEM.COMPANY}/${res.data.id}`]);
 
                     } else {
                         this._toastService.error(res.message, '');

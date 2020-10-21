@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { DocumentationRepo } from '@repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ConfirmPopupComponent } from '@common';
+import { RoutingConstants } from '@constants';
 @Component({
     selector: 'app-sea-lcl-export-booking-note',
     templateUrl: './sea-lcl-export-booking-note.component.html'
@@ -130,7 +131,7 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
     }
 
     gotoDetail(id: string) {
-        this._router.navigate([`/home/documentation/sea-lcl-export/booking-note/${id}`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/booking-note/${id}`]);
     }
 
 }

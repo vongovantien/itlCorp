@@ -23,6 +23,7 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-hbl-fcl-export',
@@ -230,7 +231,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl/${res.data}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl/${res.data}`]);
                     } else {
                     }
                 }
@@ -281,7 +282,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl`]);
     }
 
 }

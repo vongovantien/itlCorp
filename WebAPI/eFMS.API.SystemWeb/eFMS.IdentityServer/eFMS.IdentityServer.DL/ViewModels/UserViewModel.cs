@@ -23,7 +23,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string HomePhone { get; set; }
         public string HomeAddress { get; set; }
         public string Email { get; set; }
-        public byte[] Photo { get; set; }
+        public string Photo { get; set; }
         public string EmpPhotoSize { get; set; }
         public bool Active { get; set; }
     }

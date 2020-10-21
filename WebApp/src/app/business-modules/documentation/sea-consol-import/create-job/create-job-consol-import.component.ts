@@ -18,6 +18,7 @@ import { ShareBussinessFormCreateSeaImportComponent } from 'src/app/business-mod
 import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -171,7 +172,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
                     if (res.status) {
                         this._toastService.success(res.message);
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/sea-consol-import/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -190,7 +191,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
                         this._toastService.success("New data added");
 
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/sea-consol-import/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -206,7 +207,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-consol-import"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}`]);
     }
 }
 

@@ -11,6 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
 import { ExportRepo } from 'src/app/shared/repositories';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-office',
@@ -189,7 +190,7 @@ export class OfficeComponent extends AppList {
     }
 
     gotoDetailOffice(id: number) {
-        this._router.navigate([`home/system/office/${id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.OFFICE}/${id}`]);
     }
 
 

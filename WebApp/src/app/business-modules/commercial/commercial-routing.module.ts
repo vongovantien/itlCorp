@@ -18,6 +18,11 @@ const routes: Routes = [
     {
         path: 'incoterm', loadChildren: () => import('./incoterm/commercial-incoterm.module').then(m => m.CommercialIncotermModule),
         data: { name: 'Incoterm' }
+    },
+    {
+        path: 'potential-customer',
+        loadChildren: () => import('./potential-customer/commercial-potential-customer.module').then(m => m.CommercialPotentialCustomerModule),
+        data: { name: 'Potential Customer' }
     }
 ];
 

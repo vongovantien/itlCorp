@@ -7,6 +7,7 @@ import { SOA } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
+import { RoutingConstants } from '@constants';
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { listAnimation } from '@animations';
 import { AccountingConstants } from '@constants';
@@ -170,7 +171,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     back() {
-        this._router.navigate(['home/accounting/statement-of-account']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
     }
 
     export() {

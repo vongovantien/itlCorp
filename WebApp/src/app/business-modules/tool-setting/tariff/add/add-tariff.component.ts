@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { Router } from '@angular/router';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-add-tariff',
@@ -95,7 +96,7 @@ export class TariffAddComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate(["home/tool/tariff"]);
+                        this._router.navigate([`${RoutingConstants.TOOL.TARIFF}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -132,6 +133,6 @@ export class TariffAddComponent extends AppList {
     }
 
     back() {
-        this._router.navigate(["home/tool/tariff"]);
+        this._router.navigate([`${RoutingConstants.TOOL.TARIFF}`]);
     }
 }

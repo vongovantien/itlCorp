@@ -13,6 +13,7 @@ import { GenerateSellingChargePopupComponent } from '../components/popup/generat
 import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
 import { CommonEnum } from '@enums';
 import { of } from 'rxjs';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'add-charge',
@@ -106,7 +107,7 @@ export class AddChargeComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
-                            this.router.navigate(["/home/catalogue/charge"]);
+                            this.router.navigate([`${RoutingConstants.CATALOGUE.CHARGE}`]);
                         } else {
                             this._toastService.error(res.message, '');
                         }

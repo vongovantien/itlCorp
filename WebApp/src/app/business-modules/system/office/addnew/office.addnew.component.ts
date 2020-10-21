@@ -6,6 +6,7 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { finalize, catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { RoutingConstants } from '@constants';
 
 
 
@@ -68,7 +69,7 @@ export class OfficeAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
-                            this._router.navigate([`home/system/office/${res.data.id}`]);
+                            this._router.navigate([`${RoutingConstants.SYSTEM.OFFICE}/${res.data.id}`]);
 
                         } else {
                             this._toastService.error(res.message, '');

@@ -14,7 +14,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-sea-lcl-import',
@@ -151,7 +151,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
     }
 
     gotoCreateJob() {
-        this._router.navigate(["home/documentation/sea-lcl-import/new"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/new`]);
     }
 
     onSearchMasterBills(data: any) {
@@ -240,7 +240,7 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
         this._documentationRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["/home/documentation/sea-lcl-import", id]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}`, id]);
                 } else {
                     this.permissionPopup.show();
                 }

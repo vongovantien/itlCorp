@@ -10,6 +10,7 @@ import { InfoPopupComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
+import { RoutingConstants } from '@constants';
 import {
     ShareBusinessImportJobDetailPopupComponent,
     ShareBusinessFormCreateAirComponent
@@ -124,7 +125,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/air-export/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -160,7 +161,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/air-export/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -169,7 +170,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/air-export"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}`]);
     }
 }
 

@@ -16,6 +16,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap }
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
+import { RoutingConstants } from '@constants';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
@@ -188,7 +189,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
 
-                        this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
                         this.isDuplicate = true;
 
@@ -223,19 +224,19 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'hbl':
-                this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
             case 'files':
-                this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
         }
     }
@@ -260,7 +261,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/air-export"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}`]);
     }
 
     prepareDeleteJob() {
@@ -320,7 +321,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/air-export/${this.jobId}`], {
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();

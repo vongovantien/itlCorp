@@ -9,6 +9,7 @@ import { SortService } from '@services';
 import { IShareBussinessState, AppShareHBLBase } from '@share-bussiness';
 
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-air-import-hbl',
@@ -41,7 +42,7 @@ export class AirImportHBLComponent extends AppShareHBLBase implements OnInit {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/${id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${id}`]);
                     } else {
                         this.info403Popup.show();
                     }
@@ -50,32 +51,32 @@ export class AirImportHBLComponent extends AppShareHBLBase implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/air-import"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}`]);
     }
 
     gotoCreate() {
-        this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/new`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/new`]);
     }
 
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'shipment':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
             case 'files':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
         }
     }
 
     duplicateConfirm() {
-        this._router.navigate([`home/documentation/air-import/${this.jobId}`], {
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
         });
     }

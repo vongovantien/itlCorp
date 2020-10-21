@@ -1,11 +1,12 @@
 import { Component, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, Event } from '@angular/router';
-import { SystemRepo } from '@repositories';
+import { IdentityRepo, SystemRepo } from '@repositories';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { Office } from 'src/app/shared/models';
-import { forkJoin } from 'rxjs';
+import { Employee, Office } from '@models';
+import { forkJoin, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { GlobalState } from 'src/app/global-state';
 
 @Component({
     selector: 'app-header',
@@ -31,38 +32,72 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     selectedDepartmentGroup: SystemInterface.IDepartmentGroup;
     pageTitle: string = 'Home';
 
+    subscriptions: Subscription[] = [];
+
     constructor(
         private router: Router,
         private _systemRepo: SystemRepo,
         private _activedRouter: ActivatedRoute,
+        private _identity: IdentityRepo,
+        private _globalState: GlobalState
     ) { }
 
     ngOnInit() {
         this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
         if (!!this.currenUser) {
             this.getOfficeDepartGroupCurrentUser(this.currenUser);
         }
 
-        this.router.events.subscribe((event: Event) => {
-            switch (true) {
-                case event instanceof NavigationEnd:
-                    const data = this.createBreadcrumbs(this._activedRouter.root);
-                    if (!!data.length && data.length > 2) {
-                        this.pageTitle = data[2].name;
-                    } else {
-                        this.pageTitle = "Home";
+
+        const indentitySub = this._identity.getUserProfile()
+            .subscribe(
+                (user: any) => {
+                    if (!!user) {
+                        this.currenUser.photo = user.photo;
+                        this.currenUser.nameEn = user.nameEn;
+                        this.currenUser.title = user.title;
+
                     }
-                    break;
-                case event instanceof NavigationStart:
-                case event instanceof NavigationCancel:
-                case event instanceof NavigationError: {
-                    break;
                 }
-                default: {
-                    break;
+            );
+
+        const routerSub = this.router.events
+            .subscribe((event: Event) => {
+                switch (true) {
+                    case event instanceof NavigationEnd:
+                        const data = this.createBreadcrumbs(this._activedRouter.root);
+                        if (!!data.length && data.length > 2) {
+                            this.pageTitle = data[2].name;
+                        } else {
+                            this.pageTitle = "Home";
+                        }
+                        break;
+                    case event instanceof NavigationStart:
+                    case event instanceof NavigationCancel:
+                    case event instanceof NavigationError: {
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
+            });
+
+        // * Subscribe data profile change.
+        this._globalState.subscribe('profile', (data: Employee) => {
+            if (!!data) {
+                this.currenUser.photo = data.photo;
+                this.currenUser.nameEn = data.employeeNameEn;
+                this.currenUser.title = data.title;
             }
         });
+
+        this.subscriptions.push(indentitySub, routerSub);
+    }
+
+    viewProfile() {
+        this.router.navigate([`home/profile/${this.currenUser.id}`]);
     }
 
     getOfficeDepartGroupCurrentUser(currenUser: SystemInterface.IClaimUser) {
@@ -199,6 +234,13 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         } else {
             leftMinimizeToggle.classList.add('m-aside-mobile--active');
 
+        }
+    }
+
+    ngOnDestroy(): void {
+        console.log(this.subscriptions);
+        if (this.subscriptions.length) {
+            this.subscriptions.forEach(c => c.unsubscribe());
         }
     }
 

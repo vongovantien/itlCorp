@@ -5,7 +5,7 @@ import { CatalogueRepo } from '@repositories';
 import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
 import { SortService } from '@services';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -103,7 +103,7 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
             .subscribe(
                 (res: boolean) => {
                     if (res) {
-                        this._router.navigate([`/home/commercial/incoterm/${incotermId}`]);
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.INCOTERM}/${incotermId}`]);
                     } else {
                         this.permissionPopup.show();
                     }
