@@ -33,6 +33,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
+        private readonly IContextBase<CsTransaction> transactionRepository;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IOptions<ApiUrl> ApiUrl;
 
@@ -49,6 +50,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysImage> sysImageRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<CatDepartment> catDepartmentRepo,
+            IContextBase<CsTransaction> transactionRepo,
             ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -61,6 +63,7 @@ namespace eFMS.API.Catalogue.DL.Services
             sysImageRepository = sysImageRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             catDepartmentRepository = catDepartmentRepo;
+            transactionRepository = transactionRepo;
             ApiUrl = apiurl;
 
         }
@@ -109,12 +112,25 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        public Guid? GetContractIdByPartnerId(string partnerId)
+        public object GetContractIdByPartnerId(string partnerId, string jobId)
         {
-            var data = DataContext.Get().Where(x => x.PartnerId == partnerId).OrderBy(x => x.DatetimeCreated).Select(x => x.SaleManId).FirstOrDefault();
-            if (data == null) return null;
+            var DataShipment = transactionRepository.Get(x => x.Id == new Guid(jobId)).FirstOrDefault();
+            var DataContract = DataContext.Get();
+            string OfficeNameAbbr = string.Empty;
+            string data = string.Empty;
+            data = DataContract.Where(x =>x.PartnerId == partnerId  && x.OfficeId.Contains( DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType) ).Select(x => x.SaleManId).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(data))
+            {
+                string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
+                data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType)).Select(x => x.SaleManId).FirstOrDefault();
+                OfficeNameAbbr = sysOfficeRepository.Get(x => x.Id == DataShipment.OfficeId).Select(t => t.ShortName).FirstOrDefault();
+
+            }
+
+            if (data == null) return new { OfficeNameAbbr };
             Guid? salemanId = new Guid(data);
-            return salemanId;
+            return new { salemanId };
         }
 
         #region CRUD
