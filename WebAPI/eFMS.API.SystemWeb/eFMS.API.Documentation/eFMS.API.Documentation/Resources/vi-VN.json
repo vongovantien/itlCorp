@@ -14,7 +14,7 @@
   "EF_ANNOTATIONS_STRING_LENGTH": "Trường [{0}] phải là chuỗi và có {2}-{1} ký tự",
   "FILE_NOT_FOUND": "Không tìm thấy file!",
   "MSG_MAWB_EXISTED": "MAWB đã tồn tại",
-  "MSG_HBNO_EXISTED": "MAWB đã tồn tại",
+  "MSG_HBNO_EXISTED": "HAWB đã tồn tại",
   "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted",
   "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?",
   "MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE": "Cargo type must have service type",

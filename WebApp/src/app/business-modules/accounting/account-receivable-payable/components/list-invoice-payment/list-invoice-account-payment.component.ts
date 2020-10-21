@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
@@ -47,7 +47,6 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
         private _progressService: NgProgress,
-        private _partnerAPI: PartnerAPIRepo,
         private _spinner: NgxSpinnerService) {
         super();
         this._progressRef = this._progressService.ref();

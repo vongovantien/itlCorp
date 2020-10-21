@@ -22,7 +22,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import _merge from 'lodash/merge';
 
 import isUUID from 'validator/lib/isUUID';
-import { forkJoin } from 'rxjs';
+import { forkJoin, merge } from 'rxjs';
 import { RoutingConstants } from '@constants';
 
 @Component({
@@ -32,7 +32,7 @@ import { RoutingConstants } from '@constants';
 export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     @ViewChild(AirExportHBLFormCreateComponent, { static: true }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild('confirmSave', { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
@@ -68,6 +68,19 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     this.gotoList();
                 }
             });
+
+        this.listenShortcutSaveHawb();
+    }
+
+    listenShortcutSaveHawb() {
+        merge(
+            this.createShortcut(['ControlLeft', 'ShiftLeft', 'KeyS']),
+        ).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                () => {
+                    this.confirmSaveHBL();
+                }
+            );
     }
 
     generateHblNo(transactionType: number) {
@@ -179,6 +192,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             c.jobId = this.jobId;
             c.hblId = SystemConstants.EMPTY_GUID;
         });
+    }
+
+    confirmSaveHBL() {
+        this.confirmPopup.show();
     }
 
     confirmSaveData() {

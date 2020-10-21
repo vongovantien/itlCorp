@@ -54,6 +54,8 @@ export class Surcharge {
     obhId: string = null;
     isDuplicate: boolean = false;
 
+    chargeGroup: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

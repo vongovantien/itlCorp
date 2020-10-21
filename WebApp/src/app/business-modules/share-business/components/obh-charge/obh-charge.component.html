@@ -128,7 +128,7 @@
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else partnerTemplate">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                        <input type="text" class="dropdown-toggle form-control" readonly disabled
                                             [(ngModel)]="charge.receiverName"
                                             [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
                                     </ng-container>
@@ -175,7 +175,7 @@
                                     || !charge.isFromShipment 
                                     || (isLocked | async) === true;else  chargeID">
                                     <div class="form-group">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                        <input type="text" class="dropdown-toggle form-control" readonly disabled
                                             [(ngModel)]="charge.chargeNameEn">
                                     </div>
                                 </ng-container>
@@ -407,7 +407,7 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled
+                                    <input type="text" class="form-control text-primary" disabled
                                         [value]="(!!charge.paySoano ? charge.paySoano + ' /' : '_/') + (!!charge.soano ? charge.soano : '_ ')">
                                 </div>
                             </td>
