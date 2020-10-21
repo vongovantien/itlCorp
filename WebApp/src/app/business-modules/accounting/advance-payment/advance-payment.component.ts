@@ -8,7 +8,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import { AppList } from '@app';
-import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
 import { AccountingConstants, SystemConstants } from '@constants';

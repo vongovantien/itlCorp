@@ -16,8 +16,6 @@ import { share } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
 
 import { NgxSpinnerService } from 'ngx-spinner';
-import { PartnerAPIRepo } from '../shared/repositories/partner-api.repo';
-import { JwtService } from '../shared/services/jwt.service';
 
 
 @Component({
@@ -57,8 +55,6 @@ export class LoginComponent {
         private _systemRepo: SystemRepo,
         private _cd: ChangeDetectorRef,
         private _spinner: NgxSpinnerService,
-        private _partnerAPI: PartnerAPIRepo,
-        private _jwtService: JwtService
     ) {
     }
 
@@ -122,16 +118,6 @@ export class LoginComponent {
                             this.cookieService.set("__p", userInfoEncrypted.password_encrypt, 1, "/", location.hostname);
 
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
-
-                            // // * Get Bravo token.
-                            // this._partnerAPI.loginBravo().subscribe(
-                            //     (res: SystemInterface.IBravoToken) => {
-                            //         if (+res.Success === 1) {
-                            //             console.log(res);
-                            //             this._jwtService.saveBravoToken(res.TokenKey);
-                            //         }
-                            //     }
-                            // );
                         }
                     }).then(() => {
 

@@ -5,14 +5,14 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { PaymentModel, AccountingPaymentModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
 
-import { catchError, finalize, concatMap } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -43,7 +43,6 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
         private _exportRepo: ExportRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
-        private _partnerAPI: PartnerAPIRepo,
         private _spinner: NgxSpinnerService) {
         super();
         this._progressRef = this._progressService.ref();

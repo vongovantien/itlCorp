@@ -24,7 +24,7 @@ export class AuthInterceptor implements HttpInterceptor {
         const timeoutValue = req.headers.get('timeout') || this.defaultTimeout;
         let token;
         const authHeader = localStorage.getItem(SystemConstants.ACCESS_TOKEN);
-        const authHeaderBravo = localStorage.getItem(SystemConstants.BRAVO_TOKEN);
+
         if (!!authHeader) {
             token = `Bearer ${authHeader}`;
         }
@@ -37,10 +37,6 @@ export class AuthInterceptor implements HttpInterceptor {
                 this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.delete('Authorization'), url: req.url }));
             }
         } else {
-            const partnerAPIHeader = req.headers.get(SystemConstants.EFMS_PARTNER_KEY);
-            if (partnerAPIHeader) {
-                token = `Bearer ${authHeaderBravo}`;
-            }
             this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', token || ''), url: req.url }));
             // this.authReq = req;
         }
