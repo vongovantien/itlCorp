@@ -7,5 +7,5 @@ export * from './remove-trim.pipe';
 export * from './highlight.pipe';
 export * from './service-name.pipe';
 export * from './special-permission.pipe';
-
+export * from './sum.pipe';
 
