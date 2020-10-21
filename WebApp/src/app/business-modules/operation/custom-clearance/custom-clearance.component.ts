@@ -189,8 +189,7 @@ export class CustomClearanceComponent extends AppList {
                     );
             }
         } else {
-
-            this.canNotAllowActionPopup.show();
+            this._toastrService.warning("Chưa chọn clearance để Convert", '', { enableHtml: true });
         }
     }
 
@@ -213,9 +212,7 @@ export class CustomClearanceComponent extends AppList {
                 );
             // this.confirmDeletePopup.show();
         } else {
-
-            this.canNotAllowActionPopup.show();
-            // this._toastrService.warning(`You haven't selected any custom clearance yet. Please select one or more custom no to delete!`);
+            this._toastrService.warning("Chưa chọn clearance để Delete", '', { enableHtml: true });
         }
     }
 
@@ -294,6 +291,16 @@ export class CustomClearanceComponent extends AppList {
             }
             if (clearance.type === null) {
                 this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có Type để tạo job mới <br />`;
+            }
+        }
+        if (this.messageConvertError.length === 0) {           
+            const customCheckedHBL = customCheckedArray.map(x => x.hblid);
+            if (customCheckedHBL.some((c, index) => customCheckedHBL.indexOf(c) !== index)){
+                this.messageConvertError = `Các clearance được chọn đang trùng số [HBL/HAWB] <br />`;
+            }
+            const customCheckedMBL = customCheckedArray.map(x => x.mblid);
+            if (customCheckedMBL.some((c, index) => customCheckedMBL.indexOf(c) !== index)){
+                this.messageConvertError += `Các clearance được chọn đang trùng số [MBL/MAWB] <br />`;
             }
         }
         return customCheckedArray;
