@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagingService, BaseService, SortService } from 'src/app/shared/services';
+import { PagingService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { NgProgressComponent, NgProgress } from '@ngx-progressbar/core';
