@@ -368,7 +368,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.addSurcharges(type, newSurCharge);
     }
-
     deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum) {
         this.isSubmitted = false;
         this.selectedIndexCharge = index;
