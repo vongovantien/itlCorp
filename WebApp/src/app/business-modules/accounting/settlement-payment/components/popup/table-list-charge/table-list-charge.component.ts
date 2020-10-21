@@ -347,6 +347,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 chargeItem.chargeName = data.chargeNameEn;
                 chargeItem.chargeId = data.id;
                 chargeItem.type = this.updateChargeType(data.type);
+                chargeItem.chargeGroup = data.chargeGroup;
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
                     this.listUnits.pipe(
