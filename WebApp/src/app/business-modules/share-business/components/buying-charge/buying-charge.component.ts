@@ -285,6 +285,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
         switch (type) {
             case 'charge':
+                chargeItem.duplicateCharge = false;
                 chargeItem.chargeId = data.id;
                 chargeItem.chargeCode = data.code;
                 chargeItem.chargeNameEn = data.chargeNameEn;
@@ -294,8 +295,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this.listChargeGroup.subscribe((res: ChargeGroup[]) => {
                     if (!!res) {
                         charges = res;
-                        const chargeName = charges.find(x => x.id === chargeItem.chargeGroup).name;
-                        if (chargeName === 'Com') {
+                        const chargeGrp = (charges || []).find(x => x.id === chargeItem.chargeGroup);
+                        if (chargeGrp && chargeGrp.name === 'Com') {
                             chargeItem.kickBack = true;
                         }
                     }
@@ -477,6 +478,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             return;
         }
         if (!this.checkDuplicate()) {
+            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         }
 
@@ -672,79 +674,34 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             || !!charge.voucherIddate;
     }
 
-    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): any {
-        const testObject = {};
-
-        return inputArray.map(function (item: { [x: string]: any; duplicate: boolean; }) {
-            const itemPropertyName = item[propertyName];
-            if (!!itemPropertyName && itemPropertyName in testObject) {
-                if (propertyName === 'chargeId') {
-                    // item.duplicateCharge = true;
-                    testObject[itemPropertyName].duplicateCharge = true;
-                    // return item;
-                }
-                if (propertyName === 'invoiceNo') {
-                    // item.duplicateInvoice = true;
-                    testObject[itemPropertyName].duplicateInvoice = true;
-                    // return item;
-                }
-            } else {
-                return testObject[itemPropertyName] = item;
-                // delete item.duplicate;
-            }
-        });
-    }
-
     checkDuplicate() {
         let valid: boolean = true;
-
-        const chargeToCheckDuplicate = [...this.charges].filter(x => !this.checkSpecialCaseCharge(x)) || [];
-        if (!chargeToCheckDuplicate.length) {
+        if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
             return true;
         }
-        if (this.utility.checkDuplicateInObject("chargeId", chargeToCheckDuplicate) && this.utility.checkDuplicateInObject("invoiceNo", chargeToCheckDuplicate)) {
+        const listChargeToDectect = this.charges.filter(c => !this.checkSpecialCaseCharge(c));
+        const chargeInvoiceGrps = listChargeToDectect.map(c => {
+            if (!!c.invoiceNo) return c.chargeId + c.invoiceNo;
+            return null;
+        }).filter(x => Boolean(x));
 
-            const testObjectCharge = {};
-            const testObjectInvoice = {};
-            const idsCharge: string[] = [];
-            const invoices: string[] = [];
+        const isDuplicate = new Set(chargeInvoiceGrps).size !== chargeInvoiceGrps.length;
 
-            chargeToCheckDuplicate.forEach(c => {
-                const itemPropertyNameCharge = c['chargeId'];
-                const itemPropertyNameInvoice = c['invoiceNo'];
-
-                if (!!itemPropertyNameCharge && itemPropertyNameCharge in testObjectCharge) {
-                    idsCharge.push(itemPropertyNameCharge);
+        if (isDuplicate) {
+            valid = false;
+            const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeInvoiceGrps))];
+            this.charges.filter(c => !this.checkSpecialCaseCharge(c)).forEach((c: CsShipmentSurcharge) => {
+                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo)) {
+                    c.duplicateCharge = true;
+                    c.duplicateInvoice = true;
                 } else {
-                    testObjectCharge[itemPropertyNameCharge] = c;
-                }
-                if (!!itemPropertyNameInvoice && itemPropertyNameInvoice in testObjectInvoice) {
-                    invoices.push(itemPropertyNameInvoice);
-                } else {
-                    testObjectInvoice[itemPropertyNameInvoice] = c;
+                    c.duplicateCharge = false;
+                    c.duplicateInvoice = false;
                 }
             });
+            console.log(arrayDuplicates);
+        } else valid = true;
 
-            if (!!idsCharge.length) {
-                chargeToCheckDuplicate.forEach(c => {
-                    if (idsCharge.includes(c.chargeId)) {
-                        c.duplicateCharge = true;
-                    }
-                });
-            }
-            if (!!invoices.length) {
-                chargeToCheckDuplicate.forEach(c => {
-                    if (invoices.includes(c.invoiceNo)) {
-                        c.duplicateInvoice = true;
-                    }
-                });
-            }
-            valid = false;
-            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
-            return;
-        } else {
-            valid = true;
-        }
         return valid;
     }
 
@@ -1211,11 +1168,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     componentRef.clear();
                 }
                 break;
-            // case 'charge':
-            //     const componentRefCharge = this.chargeContainerRef.toArray()[index];
-            //     if (!!componentRefCharge) {
-            //         componentRefCharge.clear();
-            //     }
         }
     }
 
