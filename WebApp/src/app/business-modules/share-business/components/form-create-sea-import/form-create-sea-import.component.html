@@ -16,16 +16,9 @@
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                     placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" formControlName="etd" [showClearButton]="true" />
-                                <span class="m-input-icon_clear" (click)="resetFormControl(etd)"
-                                    *ngIf="!!etd.value && !!etd.value.startDate">
-                                    <i class="la la-times"></i>
-                                </span>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+                                    [alwaysShowCalendars]="true" formControlName="etd" [showClearButton]="true"
+                                    [allowRemove]="!!etd.value && !!etd.value.startDate"
+                                    (remove)="resetFormControl(etd)" calendar />
                             </div>
                         </div>
                     </div>
@@ -39,16 +32,9 @@
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                     placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" formControlName="eta" />
-                                <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
-                                    *ngIf="!!eta.value && !!eta.value.startDate">
-                                    <i class="la la-times"></i>
-                                </span>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+                                    [alwaysShowCalendars]="true" formControlName="eta"
+                                    [allowRemove]="!!eta.value && !!eta.value.startDate"
+                                    (remove)="resetFormControl(eta)" calendar />
                             </div>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && formCreate.errors | equalError:'validateEta_Etd'">{{errorETA}}
@@ -65,7 +51,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>MBL Type</label>
-                            <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
+                            <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select" ng2ControlTrigger
                                 formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
                             </ng-select>
                         </div>
@@ -75,8 +61,8 @@
                             [ngClass]="{'m-form__group has-danger': (shipmentType.dirty && !shipmentType.valid) || (isSubmitted && !shipmentType.valid)}">
                             <label required>Shipment Type</label>
                             <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
-                                formControlName="shipmentType" (opened)="closeOtherSelects(selectShipmentType)"
-                                [allowClear]="true">
+                                ng2ControlTrigger formControlName="shipmentType"
+                                (opened)="closeOtherSelects(selectShipmentType)" [allowClear]="true">
                             </ng-select>
                         </div>
                     </div>
@@ -173,8 +159,8 @@
                             [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.valid)}">
                             <label required>Service Type</label>
                             <ng-select #selectServiceType [items]="serviceTypes" placeholder="Please Select"
-                                formControlName="typeOfService" (opened)="closeOtherSelects(selectServiceType)"
-                                [allowClear]="true">
+                                ng2ControlTrigger formControlName="typeOfService"
+                                (opened)="closeOtherSelects(selectServiceType)" [allowClear]="true">
                             </ng-select>
                         </div>
                     </div>
@@ -185,16 +171,9 @@
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                     placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" formControlName="serviceDate" />
-                                <span class="m-input-icon_clear" (click)="resetFormControl(serviceDate)"
-                                    *ngIf="!!serviceDate.value && !!serviceDate.value.startDate">
-                                    <i class="la la-times"></i>
-                                </span>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+                                    [alwaysShowCalendars]="true" formControlName="serviceDate"
+                                    [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate"
+                                    (remove)="resetFormControl(serviceDate)" calendar />
                             </div>
                         </div>
                     </div>

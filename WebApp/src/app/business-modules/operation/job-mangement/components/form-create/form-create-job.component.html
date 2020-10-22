@@ -35,16 +35,9 @@
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
-                                            readonly placeholder="DD/MM/YYYY" formControlName="serviceDate" />
-                                        <span class="m-input-icon_clear" (click)="resetFormControl(serviceDate)"
-                                            *ngIf="!!serviceDate.value && !!serviceDate.value.startDate">
-                                            <i class="la la-times"></i>
-                                        </span>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
+                                            readonly placeholder="DD/MM/YYYY" formControlName="serviceDate"
+                                            [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate"
+                                            (remove)="resetFormControl(serviceDate)" calendar />
                                     </div>
                                 </div>
                             </div>
@@ -55,7 +48,8 @@
                                         Product Service
                                     </label>
                                     <ng-select #ps [items]="productServices" placeholder="Please select"
-                                        (opened)="closeOtherSelects(ps)" formControlName="productService">
+                                        ng2ControlTrigger (opened)="closeOtherSelects(ps)"
+                                        formControlName="productService">
                                     </ng-select>
                                 </div>
                             </div>
@@ -65,7 +59,7 @@
                                     <label class="form-control-label" required>
                                         Service Mode
                                     </label>
-                                    <ng-select #sm [items]="serviceModes" placeholder="Please select"
+                                    <ng-select #sm [items]="serviceModes" placeholder="Please select" ng2ControlTrigger
                                         (opened)="closeOtherSelects(sm)" formControlName="serviceMode">
                                     </ng-select>
                                 </div>
@@ -77,7 +71,8 @@
                                         Shipment Mode
                                     </label>
                                     <ng-select #smo [items]="shipmentModes" placeholder="Please select"
-                                        (opened)="closeOtherSelects(smo)" formControlName="shipmentMode">
+                                        ng2ControlTrigger (opened)="closeOtherSelects(smo)"
+                                        formControlName="shipmentMode">
                                     </ng-select>
                                 </div>
                             </div>
@@ -88,7 +83,8 @@
                                         Shipment Type
                                     </label>
                                     <ng-select #smt [items]="shipmentTypes" placeholder="Please select"
-                                        (opened)="closeOtherSelects(smt)" formControlName="shipmentType">
+                                        ng2ControlTrigger (opened)="closeOtherSelects(smt)"
+                                        formControlName="shipmentType">
                                     </ng-select>
                                 </div>
                             </div>
@@ -209,7 +205,7 @@
                                         Commonity Group
                                     </label>
                                     <ng-select #commodity [items]="commodityGroups | async"
-                                        placeholder="Commodity group" [allowClear]="true"
+                                        placeholder="Commodity group" [allowClear]="true" ng2ControlTrigger
                                         (opened)="closeOtherSelects(commodity)" formControlName="commodityGroupId">
                                     </ng-select>
                                 </div>
