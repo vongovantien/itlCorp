@@ -106,6 +106,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="partnerId">partnerId that want to retrieve saleman</param>
         /// <param name="jobId">partnerId that want to retrieve saleman</param>
         /// <returns></returns>
+        [Authorize]
         [HttpGet("GetSalemanIdByPartnerId/{partnerId}/{jobId}")]
         public IActionResult GetSalemanIdByPartnerId(string partnerId, string jobId)
         {

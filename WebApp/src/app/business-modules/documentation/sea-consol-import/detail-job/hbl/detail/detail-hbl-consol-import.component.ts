@@ -190,7 +190,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                     this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
-
                         this.formHouseBill.getListSaleman();
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 

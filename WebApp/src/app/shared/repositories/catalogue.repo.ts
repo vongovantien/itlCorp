@@ -163,7 +163,7 @@ export class CatalogueRepo {
         );
     }
 
-    getSalemanIdByPartnerId(partnerId: string, jobId?: string) {
+    getSalemanIdByPartnerId(partnerId: string, jobId: string = null) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetSalemanIdByPartnerId/${partnerId}/${jobId}`).pipe(
             map((res: any) => {
                 return res;

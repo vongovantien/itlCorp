@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
@@ -9,19 +9,21 @@ import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, skip, takeUntil, tap } from 'rxjs/operators';
 
 import * as fromShare from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { User, CsTransactionDetail, PortIndex, CsTransaction } from 'src/app/shared/models';
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
-
+import { InfoPopupComponent } from '@common';
+import * as fromShareBussiness from './../../../share-business/store';
 @Component({
     selector: 'form-create-house-bill-import',
     templateUrl: './form-create-house-bill-import.component.html'
 })
 export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     formGroup: FormGroup;
     customer: AbstractControl;
     saleMan: AbstractControl;
@@ -85,6 +87,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     saleManInCustomerFilter: any = {};
     serviceTypesString: string[] = [];
     hbOfladingTypesString: string[] = [];
+    jobId: string = '';
 
     hbOfladingTypes: CommonInterface.IValueDisplay[];
     serviceTypes: CommonInterface.IValueDisplay[];
@@ -163,7 +166,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 .subscribe(
                     (res: CsTransaction) => {
                         this.shipmentDetail = res;
-
+                        this.jobId = this.shipmentDetail.id;
                         this.mtBill.setValue(this.shipmentDetail.mawb);
                         this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
                         this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
@@ -192,11 +195,22 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
                     }
                 );
+        } else {
+            this._store.select(fromShareBussiness.getDetailHBlState)
+                .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+                .subscribe(
+                    (res: CsTransactionDetail) => {
+                        if (!!res) {
+                            this.jobId = res.jobId;
+                        }
+                    }
+                );
         }
 
 
 
     }
+
 
     getPorts() {
         this.ports = this._store.select(getCataloguePortState).pipe(
@@ -440,20 +454,21 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     this.consignee.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.jobId).subscribe((res: any) => {
                     if (!!res) {
-                        this.saleMan.setValue(res);
-                    } else {
-                        this.saleMans = this.saleMans.pipe(
-                            tap((users: User[]) => {
-                                const user: User = users.find((u: User) => u.id === data.salePersonId);
-                                if (!!user) {
-                                    this.saleMan.setValue(user.id);
-                                }
-                            })
-                        );
+                        if (!!res.salemanId) {
+                            this.saleMan.setValue(res.salemanId);
+                        } else {
+                            this.saleMan.setValue(null);
+                        }
+                        if (!!res.officeNameAbbr) {
+                            console.log(res.officeNameAbbr);
+                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                            this.infoPopup.show();
+                        }
                     }
                 });
+
                 break;
             case 'Shipper':
                 this.shipper.setValue(data.id);

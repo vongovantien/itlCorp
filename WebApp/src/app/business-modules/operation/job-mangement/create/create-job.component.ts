@@ -55,7 +55,7 @@ export class JobManagementCreateJobComponent extends AppForm {
             customerId: form.customerId
         };
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
-        opsTransaction.salemanId = this.formCreateComponent.salemansId;
+        opsTransaction.salemanId = this.formCreateComponent.salemansId.value;
         return opsTransaction;
     }
 
