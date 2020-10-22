@@ -147,6 +147,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                     }
                 });
                 break;
+            case 'salesman':
+                this.salemansId.setValue(data.id);
+                break;
             default:
                 break;
         }
