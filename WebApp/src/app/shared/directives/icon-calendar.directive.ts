@@ -1,12 +1,21 @@
-import { Directive, Renderer2, ElementRef } from '@angular/core';
+import { Directive, Renderer2, ElementRef, HostListener } from '@angular/core';
+import { DaterangepickerDirective } from 'ngx-daterangepicker-material';
 
 @Directive({ selector: '[calendar]' })
 export class IconCalendarDirective {
 
+
     constructor(
         private renderer: Renderer2,
         private el: ElementRef,
+        private _d: DaterangepickerDirective
     ) { }
+
+    @HostListener('keydown.enter', ['$event'])
+    onKeydownEnterHandler(event: KeyboardEvent) {
+        this._d.picker.show();
+    }
+
 
     ngOnInit(): void {
         const parent: HTMLElement = this.el.nativeElement.parentElement;
