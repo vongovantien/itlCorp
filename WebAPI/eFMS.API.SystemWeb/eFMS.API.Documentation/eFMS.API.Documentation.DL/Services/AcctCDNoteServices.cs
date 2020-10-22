@@ -692,6 +692,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Status = cdNote.Status;
             soaDetails.SyncStatus = cdNote.SyncStatus;
             soaDetails.LastSyncDate = cdNote.LastSyncDate;
+            soaDetails.Note = cdNote.Note;
             return soaDetails;
         }
 

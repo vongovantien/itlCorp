@@ -199,6 +199,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
         this.cdNoteEditPopupComponent.currentMBLId = this.CdNoteDetail.jobId;
         this.cdNoteEditPopupComponent.flexId.setValue(this.CdNoteDetail.cdNote.flexId);
+        this.cdNoteEditPopupComponent.note.setValue(this.CdNoteDetail.cdNote.note);
         this.cdNoteEditPopupComponent.setHeader();
         this.cdNoteEditPopupComponent.getListCharges(this.CdNoteDetail.jobId, this.CdNoteDetail.partnerId, this.isHouseBillID, this.CdNoteDetail.cdNote.code);
         this.cdNoteEditPopupComponent.show();

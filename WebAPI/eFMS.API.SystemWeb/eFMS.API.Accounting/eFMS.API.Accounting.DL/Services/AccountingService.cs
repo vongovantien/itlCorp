@@ -340,7 +340,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
                 sync.CurrencyCode = cdNote.CurrencyId;
                 sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
-                sync.Description0 = string.Empty;
+                sync.Description0 = cdNote.Note;
                 sync.DataType = "CDNOTE";
 
                 var charges = new List<ChargeSyncModel>();
@@ -413,7 +413,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
                 sync.CurrencyCode = cdNote.CurrencyId;
                 sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
-                sync.Description0 = string.Empty;
+                sync.Description0 = cdNote.Note;
                 sync.DataType = "CDNOTE";
 
                 var charges = new List<ChargeCreditSyncModel>();

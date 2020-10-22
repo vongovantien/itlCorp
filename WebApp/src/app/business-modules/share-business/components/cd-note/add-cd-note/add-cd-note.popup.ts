@@ -9,6 +9,7 @@ import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model"
 import { ToastrService } from "ngx-toastr";
 import { AcctCDNote } from "src/app/shared/models/document/acctCDNote.model";
 import { TransactionTypeEnum } from "src/app/shared/enums/transaction-type.enum";
+import { AbstractControl, FormGroup, FormBuilder } from "@angular/forms";
 @Component({
     selector: 'cd-note-add-popup',
     templateUrl: './add-cd-note.popup.html'
@@ -20,7 +21,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargePopupComponent;
     @ViewChild('confirmCloseAddPopup', { static: false }) confirmCloseAddPopup: ConfirmPopupComponent;
-
+    @ViewChild('validateCDNotePopup', { static: false }) validateCDNotePopup: InfoPopupComponent;
+    formCreate: FormGroup;
     headers: CommonInterface.IHeaderTable[];
 
     noteTypes = [
@@ -46,6 +48,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     partnerCurrent: any = {};
     isHouseBillID: boolean = false;
 
+    note: AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -59,11 +62,13 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     balanceAmount: string = '';
 
     isChangeCharge: boolean = false;
+    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _fb: FormBuilder,
     ) {
         super();
         this.selectedNoteType = "DEBIT";
@@ -71,6 +76,10 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this.formCreate = this._fb.group({
+            note: []
+        });
+        this.note = this.formCreate.controls["note"];
     }
 
     setHeader() {
@@ -188,7 +197,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                     item.isSelected = this.isCheckAllCharge;
                 } else if (item.voucherId === null && item.invoiceNo === null) {
                     item.isSelected = this.isCheckAllCharge;
-                }               
+                }
             }
         }
     }
@@ -240,9 +249,32 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         return grpChargesNotDeleted;
     }
 
+    validateChargeOfCdNote(listChargePartner: ChargeCdNote[]) {
+        this.messageValidate = this.selectedNoteType + " Note existed Charge not match type, Please check again!";
+        for (const charges of listChargePartner) {
+            if (this.selectedNoteType === "DEBIT" || this.selectedNoteType === "INVOICE") {
+                const existsCredit = charges.listCharges.filter(group => group.credit !== null);
+                if (existsCredit.length > 0) {
+                    this.validateCDNotePopup.show();
+                    return true;
+                }
+            } else {
+                const existsDebit = charges.listCharges.filter(group => group.debit !== null);
+                if (existsDebit.length > 0) {
+                    this.validateCDNotePopup.show();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     saveCDNote() {
         // Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
+        if (this.validateChargeOfCdNote(this.listChargePartner)) {
+            return;
+        }
 
         // Không được phép create khi chưa có charge
         if (this.listChargePartner.length === 0) {
@@ -251,8 +283,9 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
-            this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
+            // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
             this.CDNote.transactionTypeEnum = this.transactionType;
+            this.CDNote.note = this.note.value;
             const arrayCharges = [];
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges) {

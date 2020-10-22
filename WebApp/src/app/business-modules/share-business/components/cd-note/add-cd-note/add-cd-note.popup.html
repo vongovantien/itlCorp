@@ -16,7 +16,7 @@
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state">
-                    <div class="div-inside bg-secondary m--margin-bottom-15">
+                    <form class="div-inside bg-secondary m--margin-bottom-15" [formGroup]="formCreate">
                         <div class="row">
                             <div class="col-lg-9">
                                 <div class="form-group">
@@ -63,7 +63,18 @@
                             </div>
 
                         </div>
-                    </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        Note
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        formControlName="note">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
 
                     <div class="m-form m-form--label-align-right">
                         <div class="row align-items-center">
@@ -250,3 +261,6 @@
 <confirm-popup #confirmCloseAddPopup (onSubmit)="onSubmitConfirmCloseAdd()" [title]="'Alert'"
     (onCancel)="onCancelConfirmCloseAdd()" [body]="'Do you want to exit without saving?'" [labelCancel]="'No'">
 </confirm-popup>
+
+<info-popup #validateCDNotePopup [body]="messageValidate" [title]="'Alert'">
+</info-popup>
