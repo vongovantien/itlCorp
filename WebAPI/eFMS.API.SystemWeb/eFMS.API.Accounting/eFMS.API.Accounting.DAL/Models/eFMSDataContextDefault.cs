@@ -621,6 +621,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Note).HasMaxLength(500);
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaidBehalfPrice).HasColumnType("decimal(18, 4)");

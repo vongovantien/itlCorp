@@ -164,6 +164,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.selectedNoteType = this.CdNoteDetail.cdNote.type;
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
         this.cdNoteEditPopupComponent.currentMBLId = this.CdNoteDetail.jobId;
+        this.cdNoteEditPopupComponent.note.setValue(this.CdNoteDetail.note);
         this.cdNoteEditPopupComponent.getListCharges(this.CdNoteDetail.jobId, this.CdNoteDetail.partnerId, this.isHouseBillID, this.CdNoteDetail.cdNote.code);
         this.cdNoteEditPopupComponent.show();
     }

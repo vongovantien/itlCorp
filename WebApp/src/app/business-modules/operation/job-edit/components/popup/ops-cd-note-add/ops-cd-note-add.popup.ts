@@ -9,6 +9,7 @@ import { ToastrService } from "ngx-toastr";
 import { AcctCDNote } from "src/app/shared/models/document/acctCDNote.model";
 import { TransactionTypeEnum } from "src/app/shared/enums/transaction-type.enum";
 import { OpsCdNoteAddRemainingChargePopupComponent } from "../ops-cd-note-add-remaining-charge/ops-cd-note-add-remaining-charge.popup";
+import { AbstractControl, FormGroup, FormBuilder } from "@angular/forms";
 @Component({
     selector: 'ops-cd-note-add-popup',
     templateUrl: './ops-cd-note-add.popup.html'
@@ -20,7 +21,8 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
     @ViewChild(OpsCdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: OpsCdNoteAddRemainingChargePopupComponent;
     @ViewChild('confirmCloseAddPopup', { static: false }) confirmCloseAddPopup: ConfirmPopupComponent;
-
+    @ViewChild('validateCDNotePopup', { static: false }) validateCDNotePopup: InfoPopupComponent;
+    formCreate: FormGroup;
     headers: CommonInterface.IHeaderTable[];
 
     noteTypes = [
@@ -45,6 +47,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     partnerCurrent: any = {};
     isHouseBillID: boolean = true;
 
+    note: AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -58,11 +61,13 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     balanceAmount: string = '';
 
     isChangeCharge: boolean = false;
+    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _fb: FormBuilder,
     ) {
         super();
         this.selectedNoteType = "DEBIT";
@@ -83,6 +88,10 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
             { title: "Debit Value", field: 'debit', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
+        this.formCreate = this._fb.group({
+            note: []
+        });
+        this.note = this.formCreate.controls["note"];
     }
 
     closePopup() {
@@ -229,9 +238,32 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
         return grpChargesNotDeleted;
     }
 
+    validateChargeOfCdNote(listChargePartner: ChargeCdNote[]) {
+        this.messageValidate = this.selectedNoteType + " Note existed Charge not match type, Please check again!";
+        for (const charges of listChargePartner) {
+            if (this.selectedNoteType === "DEBIT" || this.selectedNoteType === "INVOICE") {
+                const existsCredit = charges.listCharges.filter(group => group.credit !== null);
+                if (existsCredit.length > 0) {
+                    this.validateCDNotePopup.show();
+                    return true;
+                }
+            } else {
+                const existsDebit = charges.listCharges.filter(group => group.debit !== null);
+                if (existsDebit.length > 0) {
+                    this.validateCDNotePopup.show();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     saveCDNote() {
         // Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
+        if (this.validateChargeOfCdNote(this.listChargePartner)) {
+            return;
+        }
 
         // Không được phép create khi chưa có charge
         if (this.listChargePartner.length === 0) {
@@ -240,8 +272,9 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
-            this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
+            // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
             this.CDNote.transactionTypeEnum = TransactionTypeEnum.CustomLogistic;
+            this.CDNote.note = this.note.value;
             const arrayCharges = [];
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges) {
