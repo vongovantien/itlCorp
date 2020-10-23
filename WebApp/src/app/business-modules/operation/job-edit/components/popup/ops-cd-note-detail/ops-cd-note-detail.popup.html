@@ -15,8 +15,9 @@
                             <i class="la la-download"></i>Export<span class="caret"></span>
                         </button>
                         <div class="dropdown-menu" role="menu" aria-labelledby="button-nested">
-                            <a class="dropdown-item pointer" (click)="preview()">Debit Note Preview</a>
-                            <a class="dropdown-item pointer" (click)="exportCDNote()">Debit Note Excel</a>
+                            <a class="dropdown-item pointer" (click)="preview(false)">Preview with USD/VND</a>
+                            <a class="dropdown-item pointer" (click)="preview(true)">Preview with Original</a>
+                            <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a>
                         </div>
                     </div>
                 </div>
@@ -117,6 +118,18 @@
                                 <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> CBM: </span>
                                     {{ CdNoteDetail.cbm | number: '1.2-2' }}
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <span class="font-weight-bold"> Currency: </span>
+                                            {{ CdNoteDetail.currency }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <span class="font-weight-bold"> ExchangeRate: </span>
+                                            {{ CdNoteDetail.exchangeRate }}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="m--margin-top-5">
                                     <span class="font-weight-bold">SOA: </span>

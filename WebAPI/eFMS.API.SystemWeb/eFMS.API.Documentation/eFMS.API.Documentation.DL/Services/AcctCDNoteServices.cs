@@ -496,7 +496,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surcharges = surchargeService.GetByHB(hbId);
             return surcharges;
         }
-        
+
         public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo)
         {
             var places = placeRepository.Get();
@@ -692,6 +692,8 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Status = cdNote.Status;
             soaDetails.SyncStatus = cdNote.SyncStatus;
             soaDetails.LastSyncDate = cdNote.LastSyncDate;
+            soaDetails.Currency = cdNote.CurrencyId;
+            soaDetails.ExchangeRate = cdNote.ExchangeRate;
             return soaDetails;
         }
 
@@ -775,7 +777,7 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public Crystal Preview(AcctCDNoteDetailsModel model)
+        public Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin)
         {
             if (model == null)
             {
@@ -837,7 +839,8 @@ namespace eFMS.API.Documentation.DL.Services
                 InvoiceInfo = "N/A",
                 Contact = currentUser.UserName,
                 IssuedDate = model.CreatedDate,
-                OtherRef = "N/A"
+                OtherRef = "N/A",
+                IsOrigin = isOrigin
             };
             string trans = string.Empty;
             string port = string.Empty;
@@ -861,17 +864,35 @@ namespace eFMS.API.Documentation.DL.Services
                         subject = "ON BEHALF";
                     }
 
-                    decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                    decimal? _vatAmount = 0;                 
-                    if (item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && item.CurrencyId != DocumentConstants.CURRENCY_USD)
+                    decimal? _vatAmount = 0, _vatAmountUsd = 0, exchangeRateToUsd = 0, exchangeRateToVnd = 0;
+                    // Get exchange rate
+                    if (!isOrigin)
                     {
-                        //Quy đổi về USD đối với các currency khác
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : (((item.UnitPrice * item.Quantity) * item.Vatrate) / 100) * _exchangeRateToUsd;
+                        exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(null, model.CDNote.DatetimeCreated, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                        exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(null, model.CDNote.DatetimeCreated, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    }
+
+                    // Get Vat amount
+                    if (isOrigin)
+                    {
+                        if (item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && item.CurrencyId != DocumentConstants.CURRENCY_USD && isOrigin)
+                        {
+                            decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                            //Quy đổi về USD đối với các currency khác
+                            _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : (((item.UnitPrice * item.Quantity) * item.Vatrate) / 100) * _exchangeRateToUsd;
+                        }
+                        else
+                        {
+                            _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
+                        }
                     }
                     else
                     {
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
+                        decimal? _vatRate = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
+                        _vatAmount = _vatRate * exchangeRateToVnd; // To VND
+                        _vatAmountUsd = _vatRate * exchangeRateToUsd; // To USD
                     }
+
                     var acctCDNo = new AcctSOAReport
                     {
                         SortIndex = null,
@@ -928,7 +949,10 @@ namespace eFMS.API.Documentation.DL.Services
                         Unit = item.CurrencyId,
                         UnitPieaces = "N/A",
                         CustomDate = _clearance?.ClearanceDate,
-                        JobNo = model.JobNo
+                        JobNo = model.JobNo,
+                        ExchangeRateToUsd = exchangeRateToUsd,
+                        ExchangeRateToVnd = exchangeRateToVnd,
+                        ExchangeVATToUsd = (_vatAmountUsd ?? 0) + _decimalNumber
                     };
                     listSOA.Add(acctCDNo);
                 }
