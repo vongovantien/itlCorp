@@ -11,12 +11,14 @@ import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, Info
 import { DIM, CsTransaction } from '@models';
 import { ICanComponentDeactivate } from '@core';
 
-import { combineLatest, of, Observable } from 'rxjs';
+import { combineLatest, of, Observable, merge, race } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
@@ -25,7 +27,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
     templateUrl: './detail-job-air-export.component.html'
 })
 
-export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate {
+export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
@@ -69,7 +71,10 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this._progressRef = this._ngProgressService.ref();
     }
 
-    ngOnInit() { }
+
+    ngOnInit() {
+        this.listenShortcutKey();
+    }
 
     ngAfterViewInit() {
         combineLatest([
@@ -105,6 +110,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         );
     }
 
+    listenShortcutKey() {
+        merge(this.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit1'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('shipment'); });
+        merge(this.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit2'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('hbl'); });
+        merge(this.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit3'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('cdNote'); });
+        merge(this.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit4'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('assignment'); });
+        merge(this.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit5'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('files'); });
+        merge(this.createShortcut(['ControlLeft', 'KeyM'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}` + '/manifest']); });
+        merge(this.createShortcut(['ControlLeft', 'KeyB'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}` + '/mawb']); });
+    }
+
     getDetailShipment() {
         this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
             .pipe(
@@ -133,10 +148,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -249,10 +261,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -438,6 +447,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             return;
         }
         return of(!isEdited);
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 
 }
