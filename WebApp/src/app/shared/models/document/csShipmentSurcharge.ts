@@ -72,7 +72,6 @@ export class CsShipmentSurcharge {
     voucherIdre: string = null;
     voucherIdredate: string = null;
     finalExchangeRate: string = null;
-    acctManagementId: string = null;
 
     quantityType: any = null;
     creditNo: string = null;
