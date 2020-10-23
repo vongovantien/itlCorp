@@ -44,4 +44,5 @@ export class AcctCDNote {
   transactionTypeEnum: TransactionTypeEnum = 0;
   flexId: string = null;
   status: string = null;
+  note: string = null;
 }

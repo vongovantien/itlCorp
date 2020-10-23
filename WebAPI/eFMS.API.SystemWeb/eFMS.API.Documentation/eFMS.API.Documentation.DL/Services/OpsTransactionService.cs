@@ -1009,6 +1009,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
                 }
+                //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
+                var hsSurcharge = UpdateSurchargeOfHousebill(model);
             }
             return hs;
         }
@@ -1165,6 +1167,27 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     trans.Dispose();
                 }
+            }
+        }
+
+        private HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model)
+        {
+            try
+            {
+                var surcharges = surchargeRepository.Where(x => x.Hblid == model.Hblid);                
+                foreach (var surcharge in surcharges)
+                {
+                    surcharge.JobNo = model.JobNo;
+                    surcharge.Mblno = model.Mblno;
+                    surcharge.Hblno = model.Hwbno;
+                    var hsUpdateSurcharge = surchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);                    
+                }
+                var sm = surchargeRepository.SubmitChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
             }
         }
     }

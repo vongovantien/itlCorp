@@ -694,6 +694,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.LastSyncDate = cdNote.LastSyncDate;
             soaDetails.Currency = cdNote.CurrencyId;
             soaDetails.ExchangeRate = cdNote.ExchangeRate;
+            soaDetails.Note = cdNote.Note;
             return soaDetails;
         }
 

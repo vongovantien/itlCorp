@@ -1757,7 +1757,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperationAcctPLSheet(GeneralReportCriteria criteria)
         {
-            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
             Expression<Func<OpsTransaction, bool>> query = q => true;
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
@@ -2087,7 +2087,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();
@@ -2387,7 +2387,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();
@@ -2807,7 +2807,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();

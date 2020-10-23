@@ -245,6 +245,8 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges, model.Id);
                         }
+                        //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
+                        var hsSurcharge = UpdateSurchargeOfHousebill(model);
                     }
                     trans.Commit();
                     return isUpdateDone;
@@ -2091,6 +2093,28 @@ namespace eFMS.API.Documentation.DL.Services
                                   PicName = pic.Username
                               }).ToList();
             return housebillDaily;
+        }
+
+        private HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
+        {
+            try
+            {
+                var masterbill = csTransactionRepo.Get(x => x.Id == model.JobId).FirstOrDefault();
+                var surcharges = surchareRepository.Where(x => x.Hblid == model.Id);
+                foreach (var surcharge in surcharges)
+                {
+                    surcharge.JobNo = masterbill?.JobNo;
+                    surcharge.Mblno = !string.IsNullOrEmpty(masterbill?.Mawb) ? masterbill?.Mawb : model.Mawb;
+                    surcharge.Hblno = model.Hwbno;
+                    var hsUpdateSurcharge = surchareRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                }
+                var sm = surchareRepository.SubmitChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
     }
 }
