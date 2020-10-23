@@ -881,6 +881,29 @@ namespace eFMS.API.Catalogue.DL.Services
             return SendMail.Send(subject, body, lstTo, null, null, lstCc);
         }
 
+        public bool SendMailARConfirmed(string contractId)
+        {
+            var contract = DataContext.Get(x => x.Id == new Guid( contractId)).FirstOrDefault();
+            string employeeId = sysUserRepository.Get(x => x.Id == contract.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
+            string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
+            string url = string.Empty;
+
+
+            List<string> lstBCc = ListMailCC();
+            List<string> lstTo = new List<string>();
+
+            // info send to and cc
+            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+
+            if (listEmailAR != null && listEmailAR.Any())
+            {
+                lstTo = listEmailAR.Split(";").ToList();
+            }
+
+        }
+
         private List<string> ListMailCC()
         {
             List<string> lstCc = new List<string>

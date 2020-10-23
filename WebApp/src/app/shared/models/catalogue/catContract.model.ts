@@ -16,6 +16,7 @@ export class Contract {
     expiredDate: any = null;
     description: string = null;
     paymentMethod: string = null;
+    baseOn: string = null;
     contractNo: string = null;
     contractType: string = null;
     vas: string = null;

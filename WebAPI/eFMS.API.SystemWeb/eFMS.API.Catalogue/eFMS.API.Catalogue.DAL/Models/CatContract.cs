@@ -25,6 +25,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? TrialEffectDate { get; set; }
         public DateTime? TrialExpiredDate { get; set; }
         public int? PaymentTerm { get; set; }
+        public string BaseOn { get; set; }
         public decimal? CreditLimit { get; set; }
         public int? CreditLimitRate { get; set; }
         public decimal? CreditAmount { get; set; }
