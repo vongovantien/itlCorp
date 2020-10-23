@@ -21,7 +21,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteAddRemainingChargeAirPopupComponent, { static: false }) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargeAirPopupComponent;
     @ViewChild('confirmCloseAddPopup', { static: false }) confirmCloseAddPopup: ConfirmPopupComponent;
-
+    @ViewChild('validateCDNotePopup', { static: false }) validateCDNotePopup: InfoPopupComponent;
     formCreate: FormGroup;
 
     headers: CommonInterface.IHeaderTable[];
@@ -50,6 +50,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     isHouseBillID: boolean = false;
 
     flexId: AbstractControl;
+    note: AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -63,6 +64,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     balanceAmount: string = '';
 
     isChangeCharge: boolean = false;
+    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -77,9 +79,11 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
 
     ngOnInit() {
         this.formCreate = this._fb.group({
-            flexId: []
+            flexId: [],
+            note: []
         });
         this.flexId = this.formCreate.controls["flexId"];
+        this.note = this.formCreate.controls["note"];
     }
 
     setHeader() {
@@ -265,9 +269,33 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         return grpChargesNotDeleted;
     }
 
+    validateChargeOfCdNote(listChargePartner: ChargeCdNote[]) {
+        this.messageValidate = this.selectedNoteType + " Note existed Charge not match type, Please check again!";
+        for (const charges of listChargePartner) {
+            if (this.selectedNoteType === "DEBIT" || this.selectedNoteType === "INVOICE") {
+                const existsCredit = charges.listCharges.filter(group => group.credit !== null);
+                if (existsCredit.length > 0) {
+                    this.validateCDNotePopup.show();
+                    return true;
+                }
+            } else {
+                const existsDebit = charges.listCharges.filter(group => group.debit !== null);
+                if (existsDebit.length > 0) {
+                    this.validateCDNotePopup.show();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     saveCDNote() {
         // Lấy danh sách group charge chưa delete
-        this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner)
+        this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
+        if (this.validateChargeOfCdNote(this.listChargePartner)) {
+            return;
+        }
+
         // Không được phép create khi chưa có charge
         if (this.listChargePartner.length === 0) {
             this.notExistsChargePopup.show();
@@ -275,9 +303,10 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
-            this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
+            // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
             this.CDNote.flexId = this.flexId.value;
             this.CDNote.transactionTypeEnum = this.transactionType;
+            this.CDNote.note = this.note.value;
             const arrayCharges = [];
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges) {

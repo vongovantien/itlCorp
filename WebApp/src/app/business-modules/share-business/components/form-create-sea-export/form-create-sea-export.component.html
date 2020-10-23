@@ -38,16 +38,8 @@
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                     [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
-                                    formControlName="eta" />
-                                <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
-                                    *ngIf="!!eta.value && !!eta.value.startDate">
-                                    <i class="la la-times"></i>
-                                </span>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+                                    formControlName="eta" (remove)="resetFormControl(eta)" calendar
+                                    [allowRemove]="!!eta.value && !!eta.value.startDate" />
                             </div>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">{{errorETA}}
@@ -64,7 +56,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':   (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.valid)}">
                             <label required>MBL Type</label>
-                            <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
+                            <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select" ng2ControlTrigger
                                 formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
                             </ng-select>
                         </div>
@@ -74,7 +66,7 @@
                             [ngClass]="{'m-form__group has-danger':  isSubmitted && !coloader.value}">
                             <label required>Shipping Line/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                                [currentActiveItemId]="{ field: 'id', value: coloader.value}"
+                                [currentActiveItemId]="{ field: 'id', value: coloader.value, hardValue: supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(coloader)">
                             </app-combo-grid-virtual-scroll>
@@ -96,7 +88,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.valid)}">
                             <label required>Services Type</label>
-                            <ng-select #select2 [items]="serviceTypes" placeholder="Please Select"
+                            <ng-select #select2 [items]="serviceTypes" placeholder="Please Select" ng2ControlTrigger
                                 formControlName="typeOfService" (opened)="closeOtherSelects(select2)"
                                 [allowClear]="true">
                             </ng-select>
@@ -106,7 +98,7 @@
                         <div class="form-group">
                             <label>Agent</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [currentActiveItemId]="{ field: 'id', value: agent.value}"
+                                [currentActiveItemId]="{ field: 'id', value: agent.value, hardValue: agentName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(agent)">
                             </app-combo-grid-virtual-scroll>
@@ -142,7 +134,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':  (term.dirty && !term.valid) || (isSubmitted && !term.valid)}">
                             <label required>Term</label>
-                            <ng-select #selectTerm [items]="termTypes" placeholder="Please Select"
+                            <ng-select #selectTerm [items]="termTypes" placeholder="Please Select" ng2ControlTrigger
                                 formControlName="term" (opened)="closeOtherSelects(selectTerm)" [allowClear]="true">
                             </ng-select>
                         </div>
@@ -165,7 +157,7 @@
                             <label required>Shipment Type</label>
                             <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
                                 formControlName="shipmentType" (opened)="closeOtherSelects(selectShipmentType)"
-                                [allowClear]="true">
+                                [allowClear]="true" ng2ControlTrigger>
                             </ng-select>
                         </div>
                     </div>

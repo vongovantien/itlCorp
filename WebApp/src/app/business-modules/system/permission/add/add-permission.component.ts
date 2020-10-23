@@ -8,6 +8,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { PermissionFormCreateComponent } from '../components/form-create-permission/form-create-permission.component';
 import { Router } from '@angular/router';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-permission',
@@ -93,7 +94,7 @@ export class PermissionCreateComponent extends AppForm {
                         // * Update default control
                         this.formCreateComponent.formCreate.controls['type'].setValue(this.formCreateComponent.types[0]);
                         this.formCreateComponent.formCreate.controls['status'].setValue(this.formCreateComponent.statuss[0]);
-                        this._router.navigate([`home/system/permission/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.SYSTEM.PERMISSION}/${res.data.id}`]);
 
                     } else {
                         this._toastService.error(res.message);
@@ -117,7 +118,7 @@ export class PermissionCreateComponent extends AppForm {
     }
 
     gotoList() {
-        this._router.navigate(["home/system/permission"]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.PERMISSION}`]);
     }
 
 }

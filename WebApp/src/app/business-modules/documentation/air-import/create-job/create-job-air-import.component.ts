@@ -19,6 +19,7 @@ import * as fromShareBusiness from '../../../share-business/store';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import { RoutingConstants } from '@constants';
 @Component({
     selector: 'app-create-job-air-import',
     templateUrl: './create-job-air-import.component.html'
@@ -121,7 +122,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
                 (res: any) => {
                     if (res.result.success) {
                         this._toastService.success("New data added");
-                        this._router.navigate([`home/documentation/air-import/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -157,7 +158,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
                         // TODO goto detail.
-                        this._router.navigate([`home/documentation/air-import/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -166,6 +167,6 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/air-import"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}`]);
     }
 }

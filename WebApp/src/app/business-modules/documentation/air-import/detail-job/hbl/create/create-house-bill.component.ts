@@ -12,12 +12,13 @@ import { HouseBill } from '@models';
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
 import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction } from '@share-bussiness';
 
-import { forkJoin } from 'rxjs';
+import { forkJoin, merge } from 'rxjs';
 import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
 
-import { catchError, finalize, mergeMap } from 'rxjs/operators';
+import { catchError, finalize, mergeMap, takeUntil } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -66,6 +67,23 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     this.gotoList();
                 }
             });
+
+        this.listenShortcutSaveHawb();
+    }
+
+    listenShortcutSaveHawb() {
+        merge(
+            this.createShortcut(['ControlLeft', 'ShiftLeft', 'KeyS']),
+        ).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                () => {
+                    this.confirmSaveHBL();
+                }
+            );
+    }
+
+    confirmSaveHBL() {
+        this.confirmPopup.show();
     }
 
     onImport(selectedData: any) {
@@ -211,13 +229,13 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 ).subscribe((res: CommonInterface.IResult) => {
                     if (!!res) {
                         this._toastService.success(res[1].message, '');
-                        this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                     }
                 });
         }
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/air-import/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl`]);
     }
 }

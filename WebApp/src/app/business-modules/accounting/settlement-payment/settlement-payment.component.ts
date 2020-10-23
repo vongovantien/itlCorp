@@ -7,6 +7,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { SelectRequester } from '../accounting-management/store';
+import { RoutingConstants } from '@constants';
 import { AppList } from '@app';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
@@ -22,16 +24,17 @@ import { AccountingConstants } from '@constants';
 
 import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
-import { SelectRequester } from '../accounting-management/store';
 
 import { catchError, finalize, map, } from 'rxjs/operators';
+import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
+import { delayTime } from '@decorators';
 
 
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
 })
-export class SettlementPaymentComponent extends AppList {
+export class SettlementPaymentComponent extends AppList implements ICrystalReport {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
@@ -67,6 +70,12 @@ export class SettlementPaymentComponent extends AppList {
 
         this.requestList = this.getListSettlePayment;
         this.requestSort = this.sortSettlementPayment;
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 
     ngOnInit() {
@@ -206,10 +215,10 @@ export class SettlementPaymentComponent extends AppList {
                     switch (settlement.statusApproval) {
                         case 'New':
                         case 'Denied':
-                            this._router.navigate([`home/accounting/settlement-payment/${settlement.id}`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${settlement.id}`]);
                             break;
                         default:
-                            this._router.navigate([`home/accounting/settlement-payment/${settlement.id}/approve`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${settlement.id}/approve`]);
                             break;
                     }
                 } else {
@@ -228,10 +237,7 @@ export class SettlementPaymentComponent extends AppList {
                 (res: any) => {
                     if (res != null) {
                         this.dataReport = res;
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -247,7 +253,6 @@ export class SettlementPaymentComponent extends AppList {
                 }
             );
     }
-
 
     issueVoucher() {
         const settlementCodes = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done');
@@ -274,7 +279,7 @@ export class SettlementPaymentComponent extends AppList {
                     if (!!res && !!res.length) {
                         if (res.length === 1) {
                             this._store.dispatch(SelectRequester(res[0]));
-                            this._router.navigate(["home/accounting/management/voucher/new"]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/new`]);
                         } else {
                             this.selectRequesterPopup.listRequesters = res;
                             this.selectRequesterPopup.selectedRequester = null;
@@ -288,14 +293,14 @@ export class SettlementPaymentComponent extends AppList {
     }
 
     hidePopupRequester() {
-        this._router.navigate(["home/accounting/management/voucher/new"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/new`]);
         this.selectRequesterPopup.hide();
     }
 
     checkAllSettlement() {
         if (this.isCheckAll) {
             this.settlements.forEach(x => {
-                if (x.statusApproval === 'Done') {
+                if (x.statusApproval === 'Done' && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED) {
                     x.isSelected = true;
                 }
             });

@@ -11,6 +11,7 @@ import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
 import { StatementOfAccountFormCreateComponent } from '../components/form-create-soa/form-create-soa.component';
 import { NgProgress } from '@ngx-progressbar/core';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-statement-of-account-new',
@@ -135,7 +136,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                             this.calculatorReceivable(this.listCharges);
 
                             //  * go to detail page
-                            this._router.navigate(['home/accounting/statement-of-account/detail'], { queryParams: { no: res.data.soano, currency: 'VND' } });
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail`], { queryParams: { no: res.data.soano, currency: 'VND' } });
 
                         } else {
                             this._toastService.error(res, '', { positionClass: 'toast-bottom-right' });

@@ -388,7 +388,8 @@ namespace eFMS.API.Accounting.DL.Services
                                          SettlementCode = null,
                                          AcctManagementId = sur.AcctManagementId,
                                          RequesterId = null,
-                                         ChargeType = sur.Type
+                                         ChargeType = sur.Type,
+                                         IsFromShipment = sur.IsFromShipment
                                      };
             querySellOperation = querySellOperation.Where(query);
             var querySellDocumentation = from sur in surcharges
@@ -439,7 +440,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              SettlementCode = null,
                                              AcctManagementId = sur.AcctManagementId,
                                              RequesterId = null,
-                                             ChargeType = sur.Type
+                                             ChargeType = sur.Type,
+                                             IsFromShipment = sur.IsFromShipment
                                          };
             querySellDocumentation = querySellDocumentation.Where(query);
             var mergeSell = querySellOperation.Union(querySellDocumentation);
@@ -602,7 +604,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             SettlementCode = sett.SettlementNo,
                                             AcctManagementId = sur.AcctManagementId,
                                             RequesterId = sett.Requester,
-                                            ChargeType = sur.Type
+                                            ChargeType = sur.Type,
+                                            IsFromShipment = sur.IsFromShipment
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(query);
             var queryBuySellDocumentation = from sur in surcharges
@@ -655,7 +658,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 SettlementCode = sett.SettlementNo,
                                                 AcctManagementId = sur.AcctManagementId,
                                                 RequesterId = sett.Requester,
-                                                ChargeType = sur.Type
+                                                ChargeType = sur.Type,
+                                                IsFromShipment = sur.IsFromShipment
                                             };
             queryBuySellDocumentation = queryBuySellDocumentation.Where(query);
             var mergeBuySell = queryBuySellOperation.Union(queryBuySellDocumentation);
@@ -735,7 +739,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            SettlementCode = sett.SettlementNo,
                                            AcctManagementId = sur.AcctManagementId,
                                            RequesterId = sett.Requester,
-                                           ChargeType = sur.Type
+                                           ChargeType = sur.Type,
+                                           IsFromShipment = sur.IsFromShipment
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(query);
             var queryObhBuyDocumentation = from sur in surcharges
@@ -790,7 +795,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                SettlementCode = sett.SettlementNo,
                                                AcctManagementId = sur.AcctManagementId,
                                                RequesterId = sett.Requester,
-                                               ChargeType = sur.Type
+                                               ChargeType = sur.Type,
+                                               IsFromShipment = sur.IsFromShipment
                                            };
             queryObhBuyDocumentation = queryObhBuyDocumentation.Where(query);
             var mergeObhBuy = queryObhBuyOperation.Union(queryObhBuyDocumentation);
@@ -849,6 +855,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
                 query = query.And(x => criteria.SettlementCodes.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementCode, StringComparer.OrdinalIgnoreCase));
+            }
+            else
+            {
+                //Chỉ lấy Phí chứng từ khi không search theo Settlement
+                query = query.And(x => x.IsFromShipment == true);
             }
 
             var charges = GetChargeForVoucher(query);

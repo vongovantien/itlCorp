@@ -14,5 +14,7 @@ namespace eFMS.IdentityServer.DL.IService
         int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn, PermissionInfo permissionInfo = null);
 
         UserViewModel GetUserById(string id);
+
+        int ValidateAuthPartner(string username, string password, out LoginReturnModel modelReturn);
     }
 }

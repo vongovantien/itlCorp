@@ -227,8 +227,6 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.CompanyId == currentUser.CompanyID
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
                 && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
@@ -240,9 +238,6 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.CompanyId == currentUser.CompanyID
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
-                //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Accountant) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED : true)
                 && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //BOD AND DEPUTY OF BOD                
             ).Select(s => s.advancePayment);
@@ -255,11 +250,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
                 advanceRequests = acctAdvanceRequestRepo.Get(x =>
-                                        criteria.ReferenceNos.Contains(x.AdvanceNo)
-                                     || criteria.ReferenceNos.Contains(x.Hbl)
-                                     || criteria.ReferenceNos.Contains(x.Mbl)
-                                     || criteria.ReferenceNos.Contains(x.CustomNo)
-                                     || criteria.ReferenceNos.Contains(x.JobId)
+                                        criteria.ReferenceNos.Contains(x.AdvanceNo, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.Hbl, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.Mbl, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.CustomNo, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.JobId, StringComparer.OrdinalIgnoreCase)
                                      );
 
             }
@@ -294,7 +289,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from user in user2.DefaultIfEmpty()
                        join uC in users on advancePayment.UserCreated equals uC.Id into UcGrps
                        from Ucgrp in UcGrps.DefaultIfEmpty()
-                       join uM in users on advancePayment.UserCreated equals uM.Id into UmGrps
+                       join uM in users on advancePayment.UserModified equals uM.Id into UmGrps
                        from Umgrp in UmGrps.DefaultIfEmpty()
                        join requestAdvance in requestAdvances on advancePayment.AdvanceNo equals requestAdvance.AdvanceNo into requestAdvances2
                        from requestAdvance in requestAdvances2.DefaultIfEmpty()
@@ -3254,5 +3249,23 @@ namespace eFMS.API.Accounting.DL.Services
             return advanceRequests;
         }
 
+        public HandleState UpdatePaymentTerm(Guid Id, decimal days)
+        {
+            HandleState result = new HandleState();
+
+            AcctAdvancePayment adv = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+            if(adv != null)
+            {
+                DateTime? deadlineDate = null;
+
+                deadlineDate = adv.RequestDate.Value.AddDays((double)days);
+                adv.DeadlinePayment = deadlineDate;
+                adv.PaymentTerm = days;
+
+                result = DataContext.Update(adv,x => x.Id == Id);
+            }
+
+            return result;
+        }
     }
 }

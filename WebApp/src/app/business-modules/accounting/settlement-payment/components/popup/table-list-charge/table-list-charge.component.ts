@@ -66,7 +66,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     isUpdate: boolean = false;
 
     initShipments: OperationInteface.IShipment[];
-    initCDs: CustomDeclaration[];
+    initCDs: CustomDeclaration[] = [];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -347,6 +347,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 chargeItem.chargeName = data.chargeNameEn;
                 chargeItem.chargeId = data.id;
                 chargeItem.type = this.updateChargeType(data.type);
+                chargeItem.chargeGroup = data.chargeGroup;
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
                     this.listUnits.pipe(
@@ -356,6 +357,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                             chargeItem.unitId = unit.id;
                             chargeItem.unitPrice = data.unitPrice;
                             chargeItem.unitName = unit.unitNameEn;
+
+                            this.calculateTotal(chargeItem.vatrate, chargeItem.quantity, chargeItem.unitPrice, chargeItem);
                         }
                     );
                 }
@@ -451,7 +454,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             hblno: this.selectedShipment.hbl,
             quantity: 1
         }));
-        console.log(this.charges);
+
     }
 
     duplicateCharge(index: number) {

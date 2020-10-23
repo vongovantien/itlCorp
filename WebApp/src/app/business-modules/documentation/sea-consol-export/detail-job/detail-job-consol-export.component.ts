@@ -17,6 +17,7 @@ import isUUID from 'validator/lib/isUUID';
 import { CsTransaction } from '@models';
 import { SeaConsolExportCreateJobComponent } from '../create-job/create-job-consol-export.component';
 import { ICanComponentDeactivate } from '@core';
+import { RoutingConstants } from '@constants';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -160,7 +161,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                         this.jobId = res.data.id;
 
                         // * get detail & container list.
-                        this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
 
                         this.isDuplicate = true;
@@ -218,16 +219,16 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'hbl':
-                this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}/hbl`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }
@@ -270,7 +271,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-consol-export"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}`]);
     }
 
     prepareDeleteJob() {
@@ -330,7 +331,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}`], {
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();

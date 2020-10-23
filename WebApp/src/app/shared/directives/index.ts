@@ -14,6 +14,9 @@ export * from './inject-view-container-ref.directive';
 export * from './icon-calendar.directive';
 export * from './icon-clear-calendar.directive';
 export * from './load-module.directive';
+export * from './ng2-control-trigger.directive';
+
+
 
 
 

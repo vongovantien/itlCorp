@@ -39,7 +39,12 @@ export class AdvancePayment {
 
     userCreatedName: string = null;
     userModifiedName: string = null;
+    userNameCreated: string = null;
+    userNameModified: string = null;
 
+    bankAccountNo: string = null;
+    bankName: string = null;
+    bankAccountName: string = null;
 
 
     constructor(object?: any) {

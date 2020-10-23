@@ -104,6 +104,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FlexId).HasColumnName("FlexID");
@@ -117,6 +119,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Note).HasMaxLength(500);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
@@ -1668,6 +1672,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ClearanceNo).HasMaxLength(100);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.ContNo).HasMaxLength(200);
 
                 entity.Property(e => e.CreditNo)
@@ -2966,6 +2972,14 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.AccessDescription).HasMaxLength(1600);
 
+                entity.Property(e => e.BankAccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Birthday).HasColumnType("datetime");
 
                 entity.Property(e => e.Bonus).HasColumnType("decimal(10, 4)");
@@ -3009,7 +3023,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.Photo).HasColumnType("image");
+                entity.Property(e => e.Photo).HasMaxLength(500);
 
                 entity.Property(e => e.Position)
                     .HasMaxLength(50)

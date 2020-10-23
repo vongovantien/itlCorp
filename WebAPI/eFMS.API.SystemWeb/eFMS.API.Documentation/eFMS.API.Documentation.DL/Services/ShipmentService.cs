@@ -222,13 +222,13 @@ namespace eFMS.API.Documentation.DL.Services
                                     join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
                                     from cus in cus2.DefaultIfEmpty()
                                     where
-                                        searchOption.Equals("JobNo") ? keywords.Contains(ops.JobNo) : true
+                                        searchOption.Equals("JobNo") ? keywords.Contains(ops.JobNo, StringComparer.OrdinalIgnoreCase) : true
                                     &&
-                                        searchOption.Equals("Hwbno") ? keywords.Contains(ops.Hwbno) : true
+                                        searchOption.Equals("Hwbno") ? keywords.Contains(ops.Hwbno, StringComparer.OrdinalIgnoreCase) : true
                                     &&
-                                        searchOption.Equals("Mawb") ? keywords.Contains(ops.Mblno) : true
+                                        searchOption.Equals("Mawb") ? keywords.Contains(ops.Mblno, StringComparer.OrdinalIgnoreCase) : true
                                     &&
-                                        searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo) : true
+                                        searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true
                                     select new ShipmentsCopy
                                     {
                                         JobId = ops.JobNo,
@@ -262,13 +262,13 @@ namespace eFMS.API.Documentation.DL.Services
                               join cus in catPartnerRepo.Get() on cstd.CustomerId equals cus.Id into cus2
                               from cus in cus2.DefaultIfEmpty()
                               where
-                                    searchOption.Equals("JobNo") ? keywords.Contains(cst.JobNo) : true
+                                    searchOption.Equals("JobNo") ? keywords.Contains(cst.JobNo, StringComparer.OrdinalIgnoreCase) : true
                                 &&
-                                    searchOption.Equals("Hwbno") ? keywords.Contains(cstd.Hwbno) : true
+                                    searchOption.Equals("Hwbno") ? keywords.Contains(cstd.Hwbno, StringComparer.OrdinalIgnoreCase) : true
                                 &&
-                                    searchOption.Equals("Mawb") ? keywords.Contains(cstd.Mawb) : true
+                                    searchOption.Equals("Mawb") ? keywords.Contains(cstd.Mawb, StringComparer.OrdinalIgnoreCase) : true
                                 &&
-                                    searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo) : true
+                                    searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true
                               select new ShipmentsCopy
                               {
                                   JobId = cst.JobNo,
@@ -345,8 +345,8 @@ namespace eFMS.API.Documentation.DL.Services
             LockedLogResultModel result = null;
             IQueryable<LockedLogModel> opShipments = null;
             string transactionType = string.Empty;
-            opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
-                                                    && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno) : true)
+            opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
+                                                    && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase) : true)
                                                     || criteria.Keywords == null)
                                                     &&
                                                     (
@@ -371,15 +371,15 @@ namespace eFMS.API.Documentation.DL.Services
 
                 transactionType = DataTypeEx.GetType(criteria.TransactionType);
             }
-            var csTransactions = DataContext.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo) : true
-                                                 && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb) : true)
+            var csTransactions = DataContext.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
+                                                 && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase) : true)
                                                     || criteria.Keywords == null)
                                                  && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                                               );
             csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
             if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
             {
-                var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno));
+                var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase));
                 csTransactions = csTransactions.Join(shipmentDetails, x => x.Id, y => y.JobId, (x, y) => x);
             }
             var csShipments = csTransactions
@@ -1757,7 +1757,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperationAcctPLSheet(GeneralReportCriteria criteria)
         {
-            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
             Expression<Func<OpsTransaction, bool>> query = q => true;
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
@@ -2087,7 +2087,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();
@@ -2387,7 +2387,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();
@@ -2807,7 +2807,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();

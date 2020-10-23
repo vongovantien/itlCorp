@@ -407,8 +407,18 @@ namespace eFMS.API.Documentation.DL.Services
                             item.TransactionType = GetTransactionType(item.JobNo);
                             if(item.Hblid != Guid.Empty)
                             {
-                                CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
-                                item.OfficeId = hbl?.OfficeId ?? null;
+                                if (item.TransactionType != "CL")
+                                {
+                                    CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                    item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                                    item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                                }
+                                if (item.TransactionType == "CL")
+                                {
+                                    OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                                    item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                                    item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                                }
                             }
                             var t = DataContext.Add(item, true);
                         }

@@ -245,6 +245,8 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges, model.Id);
                         }
+                        //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
+                        var hsSurcharge = UpdateSurchargeOfHousebill(model);
                     }
                     trans.Commit();
                     return isUpdateDone;
@@ -1532,6 +1534,9 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 result.SetParameter(parameter);
             }
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
 
             return result;
         }
@@ -1748,14 +1753,14 @@ namespace eFMS.API.Documentation.DL.Services
                 authorizeLetters.Add(authorizeLetter);
             }
 
-            var companyUser = sysCompanyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
-            var officeUser = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var companyUser = sysCompanyRepo.Get(x => x.Id == data.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == data.OfficeId).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = companyUser?.BunameVn, //Company Name Vn of user
-                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
-                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                CompanyName = companyUser?.BunameVn, // Company Name Vn of user
+                CompanyAddress1 = officeUser?.AddressVn, // Office Address Vn of user
+                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,
@@ -1806,14 +1811,14 @@ namespace eFMS.API.Documentation.DL.Services
                 authorizeLetters.Add(authorizeLetter);
             }
 
-            var companyUser = sysCompanyRepo.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
-            var officeUser = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var companyUser = sysCompanyRepo.Get(x => x.Id == data.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == data.OfficeId).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = companyUser?.BunameVn, //Company Name Vn of user
-                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
-                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel, officeUser?.Fax), //Tel & Fax of Office user
+                CompanyName = companyUser?.BunameVn, // Company Name Vn of user
+                CompanyAddress1 = officeUser?.AddressVn, // Office Address Vn of user
+                CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
                 PrintDay = string.Empty,
@@ -2088,6 +2093,28 @@ namespace eFMS.API.Documentation.DL.Services
                                   PicName = pic.Username
                               }).ToList();
             return housebillDaily;
+        }
+
+        private HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
+        {
+            try
+            {
+                var masterbill = csTransactionRepo.Get(x => x.Id == model.JobId).FirstOrDefault();
+                var surcharges = surchareRepository.Where(x => x.Hblid == model.Id);
+                foreach (var surcharge in surcharges)
+                {
+                    surcharge.JobNo = masterbill?.JobNo;
+                    surcharge.Mblno = !string.IsNullOrEmpty(masterbill?.Mawb) ? masterbill?.Mawb : model.Mawb;
+                    surcharge.Hblno = model.Hwbno;
+                    var hsUpdateSurcharge = surchareRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                }
+                var sm = surchareRepository.SubmitChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
     }
 }

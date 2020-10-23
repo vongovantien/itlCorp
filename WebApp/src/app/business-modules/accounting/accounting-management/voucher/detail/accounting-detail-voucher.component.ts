@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
-import { AccountingRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
@@ -15,6 +15,7 @@ import { of } from 'rxjs';
 import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
 import { formatDate } from '@angular/common';
+import { RoutingConstants } from '@constants';
 import { ConfirmPopupComponent } from '@common';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AccountingConstants } from '@constants';
@@ -208,7 +209,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
     }
 
     gotoList() {
-        this._router.navigate(["home/accounting/management/voucher"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher`]);
     }
 
     formatInvoiceDate(charges: ChargeOfAccountingManagementModel[]) {

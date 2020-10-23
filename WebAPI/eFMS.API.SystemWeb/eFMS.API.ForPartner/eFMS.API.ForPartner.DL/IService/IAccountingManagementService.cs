@@ -1,4 +1,5 @@
 ﻿using eFMS.API.ForPartner.DL.Models;
+using eFMS.API.ForPartner.DL.Models.Criteria;
 using eFMS.API.ForPartner.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;

@@ -238,7 +238,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.unitPrice || charge.unitPrice ==='')}">
                                     <ng-container *ngIf="!!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
@@ -247,11 +247,13 @@
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else unitPrice">
-                                        <input type="text" class="form-control" disabled [value]="charge.unitPrice">
+                                        <input type="text" class="form-control" disabled [value]="charge.unitPrice"
+                                            autoFormatCurrency>
                                     </ng-container>
                                     <ng-template #unitPrice>
                                         <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
-                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price">
+                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price"
+                                            autoFormatCurrency>
                                     </ng-template>
                                 </div>
                             </td>
@@ -325,7 +327,7 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control  text-primary" [(ngModel)]="charge.soano"
+                                    <input type="text" class="form-control  text-primary" [ngModel]="charge.soano"
                                         disabled>
                                 </div>
                             </td>
@@ -335,12 +337,12 @@
                                         [value]="charge.debitNo">
                                 </div>
                             </td>
-                            <td class="disabled">
+                            <!-- <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control text-primary"
                                         [(ngModel)]="charge.settlementCode" disabled readonly>
                                 </div>
-                            </td>
+                            </td> -->
                             <td>
                                 <div class="form-group table-date">
                                     <ng-container *ngIf="!!charge.debitNo 
@@ -374,14 +376,14 @@
                             <td>
                                 <div class="form-group ">
                                     <input type="number" class="form-control" disabled
-                                        [(ngModel)]="charge.finalExchangeRate">
+                                        [ngModel]="charge.finalExchangeRate">
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.duplicateInvoice && charge.duplicateCharge}">
-                                    <input type="text" class="form-control text-primary" [(ngModel)]="charge.invoiceNo"
-                                        placeholder="Invoice No" (ngModelChange)="isDuplicateInvoice = false" disabled>
+                                    <input type="text" class="form-control text-primary" [ngModel]="charge.invoiceNo"
+                                        placeholder="Invoice No" disabled>
                                 </div>
                             </td>
                             <td>
@@ -422,7 +424,7 @@
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control  text-primary" disabled
-                                        [(ngModel)]="charge.voucherId">
+                                        [ngModel]="charge.voucherId">
                                 </div>
                             </td>
                             <td class="disabled">

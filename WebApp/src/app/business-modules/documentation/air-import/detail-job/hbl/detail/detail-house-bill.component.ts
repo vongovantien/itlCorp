@@ -1,22 +1,23 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { CsTransactionDetail, HouseBill } from '@models';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { ReportPreviewComponent } from '@common';
-import { ShareBusinessDeliveryOrderComponent, ShareBusinessArrivalNoteAirComponent } from '@share-bussiness';
 
-import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
+import { DocumentationRepo } from '@repositories';
+import { ReportPreviewComponent } from '@common';
+import { CsTransactionDetail, HouseBill } from '@models';
+import { ChargeConstants } from '@constants';
+import { DataService } from '@services';
+import { ICrystalReport } from '@interfaces';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
-import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
+import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 
+import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { DataService } from '@services';
+import { delayTime } from '@decorators';
+
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -28,18 +29,15 @@ enum HBL_TAB {
     selector: 'app-detail-hbl-air-import',
     templateUrl: './detail-house-bill.component.html',
 })
-export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit {
+export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit, ICrystalReport {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
 
     hblDetail: any;
 
-    dataReport: Crystal;
-
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
-    allowUpdate: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -64,6 +62,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         );
     }
 
+
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.hblId && isUUID(param.hblId)) {
@@ -84,6 +83,14 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
 
+        this.listenShortcutSaveHawb();
+
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 
     getDetailHbl() {
@@ -217,10 +224,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -244,10 +248,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data charge to display preview');
                     }
@@ -283,11 +284,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.frm.nativeElement.submit();
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    this.showReport();
                 },
             );
     }
@@ -300,11 +297,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.frm.nativeElement.submit();
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    this.showReport();
                 },
             );
     }
@@ -318,11 +311,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.frm.nativeElement.submit();
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    this.showReport();
                 },
             );
     }
@@ -336,13 +325,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.frm.nativeElement.submit();
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    this.showReport();
                 },
             );
     }
-
 }

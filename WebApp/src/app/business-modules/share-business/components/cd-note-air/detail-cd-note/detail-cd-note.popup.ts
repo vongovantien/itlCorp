@@ -199,6 +199,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
         this.cdNoteEditPopupComponent.currentMBLId = this.CdNoteDetail.jobId;
         this.cdNoteEditPopupComponent.flexId.setValue(this.CdNoteDetail.cdNote.flexId);
+        this.cdNoteEditPopupComponent.note.setValue(this.CdNoteDetail.cdNote.note);
         this.cdNoteEditPopupComponent.setHeader();
         this.cdNoteEditPopupComponent.getListCharges(this.CdNoteDetail.jobId, this.CdNoteDetail.partnerId, this.isHouseBillID, this.CdNoteDetail.cdNote.code);
         this.cdNoteEditPopupComponent.show();
@@ -290,7 +291,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     showConfirmed() {
         // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
         this.confirmCdNotePopup.show();
     }
@@ -320,12 +321,12 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this._toastService.success("Send Data to Accountant System Successful");
                         this.getDetailCdNote(this.jobId, this.cdNote);
                         // Gọi onDelete để refresh lại list cd note
                         this.onDeleted.emit();
                     } else {
-                        this._toastService.error("Sync Data Fail");
+                        this._toastService.error("Send Data Fail");
                     }
                 },
                 (error) => {

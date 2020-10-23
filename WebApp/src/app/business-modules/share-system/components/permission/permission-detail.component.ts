@@ -8,6 +8,7 @@ import { PermissionSample } from 'src/app/shared/models';
 import { AppPage } from 'src/app/app.base';
 import { ConfirmPopupComponent } from '@common';
 import { PermissionFormCreateComponent } from 'src/app/business-modules/system/permission/components/form-create-permission/form-create-permission.component';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'detail-permission',
@@ -228,17 +229,17 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
 
     backToDetail() {
         if (this.type === 'office') {
-            this._router.navigate([`home/system/office/${this.id}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.OFFICE}/${this.id}`]);
         } else if (this.type === 'user') {
-            this._router.navigate([`home/system/user-management/${this.userId}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.USER_MANAGEMENT}/${this.userId}`]);
         } else if (this.type === 'group') {
-            this._router.navigate([`home/system/group/${this.ids}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.GROUP}/${this.ids}`]);
         } else if (this.type === 'department') {
-            this._router.navigate([`home/system/department/${this.ids}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}/${this.ids}`]);
         } else if (this.type === 'company') {
-            this._router.navigate([`home/system/company/${this.ids}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.COMPANY}/${this.ids}`]);
         } else {
-            this._router.navigate([`home/system/permission`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.PERMISSION}`]);
         }
     }
 

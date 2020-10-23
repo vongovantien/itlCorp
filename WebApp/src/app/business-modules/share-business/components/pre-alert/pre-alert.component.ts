@@ -15,7 +15,7 @@ import { Crystal } from '@models';
 import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import * as fromShareBussiness from '@share-bussiness';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
@@ -151,7 +151,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.exportCrystalArrivalNoticeToPdf(serviceId);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                if ( this.isPreAlert ) {
+                if (this.isPreAlert) {
                     this.exportCrystalManifestToPdf();
                     this.exportCrystalHawbFrameToPdf();
                 } else {
@@ -165,7 +165,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                 }
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                if ( this.isPreAlert ) {
+                if (this.isPreAlert) {
                     this.exportCrystalManifestToPdf();
                     this.exportCrystalHawbFrameToPdf();
                 } else {
@@ -484,7 +484,7 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     previewManifest() {
-        if (this.isPreAlert) {
+        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
             this._progressRef.start();
             this._documentRepo.previewSeaExportManifestByJobId(this.jobId)
             .pipe(
@@ -493,19 +493,14 @@ export class ShareBusinessReAlertComponent extends AppList {
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport = res;
-                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup.frm.nativeElement.submit();
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
                         }, 1000);
-
-                        this.pathGeneralManifest = res.pathReportGenerate;
-                        this.attachedFile.push(res.pathReportGenerate);
-                        this.isExitsManifest = true;
-                        this.isCheckedManifest = true;
                     } else {
-                        this.isExitsManifest = false;
-                        this.isCheckedManifest = false;
+                        this._toastService.warning('There is no data charge to display preview');
                     }
                 },
             );
@@ -533,7 +528,7 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     previewHawb() {
-        if (this.isPreAlert) {
+        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
             this.previewHBL();
         } else {
             this._progressRef.start();
@@ -745,7 +740,7 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalManifestToPdf() {
-        if (this.isPreAlert) {
+        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
             this._documentRepo.previewSeaExportManifestByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
@@ -797,7 +792,7 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalHawbFrameToPdf() {
-        if (this.isPreAlert) {
+        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
             this._documentRepo.previewSeaHBLOfLanding(this.hblId, 'ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
@@ -959,14 +954,24 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
+                if (this.isPreAlert) {
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralManifest, this.isCheckedManifest);
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
+                } else {
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
+                }
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
+                if (this.isPreAlert) {
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralManifest, this.isCheckedManifest);
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
+                } else {
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
+                    this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
+                }
                 break;
             case ChargeConstants.SFI_CODE: // Air Import
             case ChargeConstants.SLI_CODE:              
@@ -993,16 +998,16 @@ export class ShareBusinessReAlertComponent extends AppList {
     cancelPreAlert() {
         switch (this.serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
-                this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/${this.hblId}`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 break;
             case ChargeConstants.AE_CODE: // Air Export
-                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}/si`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/si`]);
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}/si`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/si`]);
                 break;
             case ChargeConstants.SFI_CODE: // Sea FCL Import
                 this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/${this.hblId}`]);

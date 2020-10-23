@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup } from '@models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup, CsTransactionDetail } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from '@services';
 import { SystemConstants } from '@constants';
@@ -285,10 +285,23 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
         switch (type) {
             case 'charge':
+                chargeItem.duplicateCharge = false;
                 chargeItem.chargeId = data.id;
                 chargeItem.chargeCode = data.code;
                 chargeItem.chargeNameEn = data.chargeNameEn;
                 chargeItem.chargeGroup = data.chargeGroup;
+
+                let charges = [];
+                this.listChargeGroup.subscribe((res: ChargeGroup[]) => {
+                    if (!!res) {
+                        charges = res;
+                        const chargeGrp = (charges || []).find(x => x.id === chargeItem.chargeGroup);
+                        if (chargeGrp && chargeGrp.name === 'Com') {
+                            chargeItem.kickBack = true;
+                        }
+                    }
+                });
+
 
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
@@ -326,7 +339,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIdredate = null;
         newSurCharge.isFromShipment = true;
         newSurCharge.hblno = this.hbl.hwbno || null;
-        newSurCharge.mblno = this.shipment.mawb || this.shipment.mblno || null;
+        newSurCharge.mblno = this.getMblNo(this.shipment, this.hbl);
         newSurCharge.jobNo = this.shipment.jobNo || null;
 
 
@@ -352,10 +365,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.invoiceNo = null;
         newSurCharge.soano = null;
         newSurCharge.paySoano = null;
+        newSurCharge.finalExchangeRate = null;
 
         this.addSurcharges(type, newSurCharge);
     }
-
     deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum) {
         this.isSubmitted = false;
         this.selectedIndexCharge = index;
@@ -424,18 +437,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    // onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
-    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+vat, +chargeItem.quantity, +chargeItem.unitPrice);
-    // }
-
-    // onChangeUnitPrice(unitPrice: number, chargeItem: CsShipmentSurcharge) {
-    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +unitPrice);
-    // }
-
-    // onChangeQuantity(quantity: number, chargeItem: CsShipmentSurcharge) {
-    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +quantity, +chargeItem.unitPrice);
-    // }
-
     onChangeDataUpdateTotal(chargeItem: CsShipmentSurcharge) {
         chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +chargeItem.unitPrice);
     }
@@ -477,6 +478,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             return;
         }
         if (!this.checkDuplicate()) {
+            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         }
 
@@ -650,7 +652,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 || !charge.partnerShortName
                 || charge.unitPrice === null
                 || charge.quantity < 0
-                // || charge.unitPrice < 0
+                // || charge.unitPrice < 0   // ! Cho nhập âm để giảm trên hóa đơn
+                || +charge.unitPrice === 0   // ! Nhưng không cho nhập 0
                 || charge.currencyId === null
                 || charge.vatrate > 100
             ) {
@@ -671,79 +674,34 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             || !!charge.voucherIddate;
     }
 
-    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): any {
-        const testObject = {};
-
-        return inputArray.map(function (item: { [x: string]: any; duplicate: boolean; }) {
-            const itemPropertyName = item[propertyName];
-            if (!!itemPropertyName && itemPropertyName in testObject) {
-                if (propertyName === 'chargeId') {
-                    // item.duplicateCharge = true;
-                    testObject[itemPropertyName].duplicateCharge = true;
-                    // return item;
-                }
-                if (propertyName === 'invoiceNo') {
-                    // item.duplicateInvoice = true;
-                    testObject[itemPropertyName].duplicateInvoice = true;
-                    // return item;
-                }
-            } else {
-                return testObject[itemPropertyName] = item;
-                // delete item.duplicate;
-            }
-        });
-    }
-
     checkDuplicate() {
         let valid: boolean = true;
-
-        const chargeToCheckDuplicate = [...this.charges].filter(x => !this.checkSpecialCaseCharge(x)) || [];
-        if (!chargeToCheckDuplicate.length) {
+        if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
             return true;
         }
-        if (this.utility.checkDuplicateInObject("chargeId", chargeToCheckDuplicate) && this.utility.checkDuplicateInObject("invoiceNo", chargeToCheckDuplicate)) {
+        const listChargeToDectect = this.charges.filter(c => !this.checkSpecialCaseCharge(c));
+        const chargeInvoiceGrps = listChargeToDectect.map(c => {
+            if (!!c.invoiceNo) return c.chargeId + c.invoiceNo;
+            return null;
+        }).filter(x => Boolean(x));
 
-            const testObjectCharge = {};
-            const testObjectInvoice = {};
-            const idsCharge: string[] = [];
-            const invoices: string[] = [];
+        const isDuplicate = new Set(chargeInvoiceGrps).size !== chargeInvoiceGrps.length;
 
-            chargeToCheckDuplicate.forEach(c => {
-                const itemPropertyNameCharge = c['chargeId'];
-                const itemPropertyNameInvoice = c['invoiceNo'];
-
-                if (!!itemPropertyNameCharge && itemPropertyNameCharge in testObjectCharge) {
-                    idsCharge.push(itemPropertyNameCharge);
+        if (isDuplicate) {
+            valid = false;
+            const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeInvoiceGrps))];
+            this.charges.filter(c => !this.checkSpecialCaseCharge(c)).forEach((c: CsShipmentSurcharge) => {
+                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo)) {
+                    c.duplicateCharge = true;
+                    c.duplicateInvoice = true;
                 } else {
-                    testObjectCharge[itemPropertyNameCharge] = c;
-                }
-                if (!!itemPropertyNameInvoice && itemPropertyNameInvoice in testObjectInvoice) {
-                    invoices.push(itemPropertyNameInvoice);
-                } else {
-                    testObjectInvoice[itemPropertyNameInvoice] = c;
+                    c.duplicateCharge = false;
+                    c.duplicateInvoice = false;
                 }
             });
+            console.log(arrayDuplicates);
+        } else valid = true;
 
-            if (!!idsCharge.length) {
-                chargeToCheckDuplicate.forEach(c => {
-                    if (idsCharge.includes(c.chargeId)) {
-                        c.duplicateCharge = true;
-                    }
-                });
-            }
-            if (!!invoices.length) {
-                chargeToCheckDuplicate.forEach(c => {
-                    if (invoices.includes(c.invoiceNo)) {
-                        c.duplicateInvoice = true;
-                    }
-                });
-            }
-            valid = false;
-            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
-            return;
-        } else {
-            valid = true;
-        }
         return valid;
     }
 
@@ -1017,7 +975,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 id: SystemConstants.EMPTY_GUID,
                 exchangeDate: { startDate: new Date, endDate: new Date() },
                 hblno: this.hbl.hwbno || null,
-                mblno: this.shipment.mawb || this.shipment.mblno || null,
+                mblno: this.getMblNo(this.shipment, this.hbl),
                 jobNo: this.shipment.jobNo || null,
             })));
         return newCsShipmentSurcharge || [];
@@ -1053,7 +1011,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.type = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
                                 c.hblno = this.hbl.hwbno || null;
-                                c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                                c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
 
                                 this.onChangeDataUpdateTotal(c);
@@ -1095,7 +1053,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                         charges.forEach(c => {
                             c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
@@ -1104,7 +1062,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
                         charges.forEach(c => {
                             c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
@@ -1113,7 +1071,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.OBH) {
                         charges.forEach(c => {
                             c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
@@ -1210,11 +1168,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     componentRef.clear();
                 }
                 break;
-            // case 'charge':
-            //     const componentRefCharge = this.chargeContainerRef.toArray()[index];
-            //     if (!!componentRefCharge) {
-            //         componentRefCharge.clear();
-            //     }
         }
     }
 
@@ -1239,6 +1192,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
         });
 
+    }
+
+    getMblNo(shipment: CsTransaction, hbl: CsTransactionDetail | HouseBill) {
+        let mblNo = null;
+        mblNo = shipment.mawb ? shipment.mawb : (hbl.mawb ? hbl.mawb : hbl.hwbno);
+        return mblNo;
     }
 }
 

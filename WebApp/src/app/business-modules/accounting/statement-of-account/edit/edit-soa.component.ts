@@ -10,6 +10,7 @@ import { SortService, DataService } from '@services';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { NgProgress } from '@ngx-progressbar/core';
+import { RoutingConstants } from '@constants';
 import { listAnimation } from '@animations';
 @Component({
     selector: 'app-statement-of-account-edit',
@@ -198,7 +199,7 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     back() {
-        this._router.navigate(['home/accounting/statement-of-account']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
     }
 
     onUpdateMoreSOA(data: any) {
@@ -267,7 +268,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
                             // * init checkbox all
                             this.isCheckAllCharge = false;
-                            this._router.navigate([`/home/accounting/statement-of-account/detail/`], {
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
                                 queryParams: { no: this.soaNO, currency: this.currencyLocal }
                             });
 

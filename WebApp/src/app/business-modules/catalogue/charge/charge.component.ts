@@ -11,6 +11,7 @@ import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 
 import { catchError, finalize, map } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -48,7 +49,6 @@ export class ChargeComponent extends AppList implements OnInit {
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Status', field: 'active', sortable: true }
         ];
-        this.searchCharge();
     }
 
     sortCharge(sort: string): void {
@@ -57,23 +57,26 @@ export class ChargeComponent extends AppList implements OnInit {
 
     onSearchCharge(dataSearch: any) {
         this.dataSearch = {};
-        if (dataSearch.type === 'All') {
-            this.dataSearch.all = dataSearch.keyword;
-        } else {
-            this.dataSearch.all = null;
-            if (dataSearch.type === 'code') {
-                this.dataSearch.code = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'chargeNameEn') {
-                this.dataSearch.chargeNameEn = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'chargeNameVn') {
-                this.dataSearch.chargeNameVn = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'type') {
-                this.dataSearch.type = dataSearch.keyword;
+        if (!!dataSearch) {
+            if (dataSearch.type === 'All') {
+                this.dataSearch.all = dataSearch.keyword;
+            } else {
+                this.dataSearch.all = null;
+                if (dataSearch.type === 'code') {
+                    this.dataSearch.code = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'chargeNameEn') {
+                    this.dataSearch.chargeNameEn = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'chargeNameVn') {
+                    this.dataSearch.chargeNameVn = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'type') {
+                    this.dataSearch.type = dataSearch.keyword;
+                }
             }
         }
+
         this.searchCharge();
     }
 
@@ -143,7 +146,7 @@ export class ChargeComponent extends AppList implements OnInit {
         this._catalogueRepo.checkAllowGetDetailCharge(charge.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["home/catalogue/charge", charge.id]);
+                    this._router.navigate([`${RoutingConstants.CATALOGUE.CHARGE}`, charge.id]);
                 } else {
                     this.permissionPopup.show();
                 }

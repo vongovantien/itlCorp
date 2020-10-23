@@ -16,6 +16,7 @@ import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { RoutingConstants } from '@constants';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -121,7 +122,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-lcl-import/${this.hblDetail.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.hblDetail.jobId}/hbl`]);
 
     }
 

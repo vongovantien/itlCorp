@@ -31,7 +31,7 @@
                                 <div class="form-group">
                                     <label>MAWB Type </label>
                                     <ng-select #hawb [items]="billTypes" placeholder="Please select" [allowClear]="true"
-                                        (opened)="closeOtherSelects(hawb)" formControlName="mbltype">
+                                        (opened)="closeOtherSelects(hawb)" formControlName="mbltype" ng2ControlTrigger>
                                     </ng-select>
                                 </div>
                             </div>
@@ -40,7 +40,8 @@
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !shipmentType.valid}">
                                     <label required>Shipment Type</label>
                                     <ng-select #typeSipment [items]="shipmentTypes" placeholder="Please select"
-                                        (opened)="closeOtherSelects(typeSipment)" formControlName="shipmentType">
+                                        ng2ControlTrigger (opened)="closeOtherSelects(typeSipment)"
+                                        formControlName="shipmentType">
                                     </ng-select>
                                 </div>
                             </div>
@@ -54,7 +55,7 @@
                                 <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
+                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select airline"
                                 [loading]="isLoadingAirline | async" (remove)="resetColoaderControl()">
@@ -69,7 +70,7 @@
                                 <span class="text-danger" *ngIf="type === 'import'">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [currentActiveItemId]="{ field: 'id', value: agentId.value}"
+                                [currentActiveItemId]="{ field: 'id', value: agentId.value, hardValue: agentName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select agent"
                                 (remove)="resetFormControl(agentId)" [loading]="isLoadingAgent | async">
@@ -158,7 +159,8 @@
                         <div class="form-group">
                             <label>Payment Method</label>
                             <ng-select #pmethod [items]="termTypes" placeholder="Select payment method"
-                                [allowClear]="true" (opened)="closeOtherSelects(pmethod)" formControlName="paymentTerm">
+                                ng2ControlTrigger [allowClear]="true" (opened)="closeOtherSelects(pmethod)"
+                                formControlName="paymentTerm">
                             </ng-select>
                         </div>
                     </div>
@@ -221,7 +223,8 @@
                                 <div class="form-group">
                                     <label>Unit</label>
                                     <ng-select #unit [items]="units " (opened)="closeOtherSelects(unit)"
-                                        [allowClear]="true" formControlName="packageType" placeholder="Select unit">
+                                        ng2ControlTrigger [allowClear]="true" formControlName="packageType"
+                                        placeholder="Select unit">
                                     </ng-select>
                                 </div>
                             </div>

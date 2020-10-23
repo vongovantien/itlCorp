@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { finalize, catchError } from 'rxjs/operators';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { CatalogueRepo } from '@repositories';
 import { PagingService, SortService } from '@services';
@@ -168,10 +168,10 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
 
     close() {
         if (this.type === 'Customer') {
-            this._router.navigate([`/home/commercial/customer`]);
+            this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}`]);
 
         } else {
-            this._router.navigate([`/home/commercial/agent`]);
+            this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}`]);
         }
 
     }

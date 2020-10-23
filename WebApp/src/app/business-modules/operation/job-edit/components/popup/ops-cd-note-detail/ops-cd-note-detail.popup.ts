@@ -164,6 +164,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.selectedNoteType = this.CdNoteDetail.cdNote.type;
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
         this.cdNoteEditPopupComponent.currentMBLId = this.CdNoteDetail.jobId;
+        this.cdNoteEditPopupComponent.note.setValue(this.CdNoteDetail.note);
         this.cdNoteEditPopupComponent.getListCharges(this.CdNoteDetail.jobId, this.CdNoteDetail.partnerId, this.isHouseBillID, this.CdNoteDetail.cdNote.code);
         this.cdNoteEditPopupComponent.show();
     }
@@ -179,10 +180,10 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         }
     }
 
-    preview() {
+    preview(isOrigin: boolean) {
         this.CdNoteDetail.totalCredit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
         this.CdNoteDetail.totalDebit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
-        this._documentationRepo.previewCDNote(this.CdNoteDetail)
+        this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -222,7 +223,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
 
     showConfirmed() {
         // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
         this.confirmCdNotePopup.show();
     }
@@ -252,12 +253,12 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this._toastService.success("Send Data to Accountant System Successful");
                         this.getDetailCdNote(this.jobId, this.cdNote);
                         // Gọi onDelete để refresh lại list cd note
                         this.onDeleted.emit();
                     } else {
-                        this._toastService.error("Sync Data Fail");
+                        this._toastService.error("Send Data Fail");
                     }
                 },
                 (error) => {

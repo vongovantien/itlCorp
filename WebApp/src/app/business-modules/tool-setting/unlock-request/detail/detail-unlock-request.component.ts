@@ -14,6 +14,7 @@ import { SelectItem } from "ng2-select";
 import { formatDate } from "@angular/common";
 import { ConfirmPopupComponent } from "@common";
 import { UnlockRequestProcessApproveComponent } from "../components/process-approve-unlock-request/process-approve-unlock-request.component";
+import { RoutingConstants } from "@constants";
 declare var $: any;
 
 @Component({
@@ -342,7 +343,7 @@ export class UnlockRequestDetailComponent extends AppForm {
 
     onCancelUnlock() {
         this.confirmCancelPopup.hide();
-        this._router.navigate([`home/tool/unlock-request`]);
+        this._router.navigate([`${RoutingConstants.TOOL.UNLOCK_REQUEST}`]);
     }
 
     // RECALL REQUEST

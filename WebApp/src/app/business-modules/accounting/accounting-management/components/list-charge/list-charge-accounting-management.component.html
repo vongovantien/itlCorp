@@ -113,6 +113,47 @@
                             <td>{{charge.unitPrice | number: '.0-3'}}</td>
                             <td>{{charge.mbl}}</td>
                         </tr>
+                        <tr class="">
+                            <td>
+                                <span class="font-weight-bold m--margin-top-10">Total Amount:</span>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <span class="p-1 font-weight-bold">{{charges | sum:'orgAmount' | number: '.0-3'}}</span>
+                            </td>
+                            <td></td>
+                            <td>
+                                <span
+                                    class="p-1 font-weight-bold">{{charges | sum:'orgVatAmount' | number: '.0-3'}}</span>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="pl-3">
+                                <span class="p-1 font-weight-bold">{{charges | sum:'amountVnd' | number: '.0-3'}}</span>
+                            </td>
+                            <td class="pl-3">
+                                <span
+                                    class="p-1 font-weight-bold">{{charges | sum:'vatAmountVnd' | number: '.0-3'}}</span>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                     </ng-container>
                     <tr app-table-none-record *ngIf="!isLoading && !charges.length" [colspan]="headers.length + 1">
                     </tr>

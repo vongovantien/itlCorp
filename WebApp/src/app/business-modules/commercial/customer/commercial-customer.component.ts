@@ -10,7 +10,7 @@ import { Customer, Contract } from '@models';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { CommonEnum } from '@enums';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 
 import { catchError, finalize } from 'rxjs/operators';
@@ -190,7 +190,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: boolean) => {
                     if (res) {
-                        this._router.navigate([`/home/commercial/customer/${this.selectedCustomer.id}`]);
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.selectedCustomer.id}`]);
                     } else {
                         this.info403Popup.show();
                     }

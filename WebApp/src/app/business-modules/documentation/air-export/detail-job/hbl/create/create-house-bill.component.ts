@@ -22,7 +22,8 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import _merge from 'lodash/merge';
 
 import isUUID from 'validator/lib/isUUID';
-import { forkJoin } from 'rxjs';
+import { forkJoin, merge } from 'rxjs';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-hbl-air-export',
@@ -31,7 +32,7 @@ import { forkJoin } from 'rxjs';
 export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     @ViewChild(AirExportHBLFormCreateComponent, { static: true }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild('confirmSave', { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
@@ -67,6 +68,19 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     this.gotoList();
                 }
             });
+
+        this.listenShortcutSaveHawb();
+    }
+
+    listenShortcutSaveHawb() {
+        merge(
+            this.createShortcut(['ControlLeft', 'ShiftLeft', 'KeyS']),
+        ).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                () => {
+                    this.confirmSaveHBL();
+                }
+            );
     }
 
     generateHblNo(transactionType: number) {
@@ -180,6 +194,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         });
     }
 
+    confirmSaveHBL() {
+        this.confirmPopup.show();
+    }
+
     confirmSaveData() {
         this.confirmExistedHbl.hide();
         const houseBill: HouseBill = this.getDataForm();
@@ -221,10 +239,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.gotoList();
                         } else {
                             if (!!hbId) {
-                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${hbId}/separate`]);
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}${this.jobId}/hbl/${hbId}/separate`]);
                             }
                             else {
-                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${res.data}`]);
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${res.data}`]);
                             }
                         }
                     }
@@ -280,6 +298,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl`]);
     }
 }

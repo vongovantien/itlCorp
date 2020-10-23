@@ -350,7 +350,7 @@ namespace eFMS.API.Operation.DL.Services
 
         }
 
-        private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<Object> list)
+        private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<CustomsDeclaration> list)
         {
             List<CustomsDeclarationModel> results = new List<CustomsDeclarationModel>();
             var countryCache = countryApi.Getcountries().Result;

@@ -12,7 +12,7 @@
                             <ng-container *ngFor="let item of settingFields">
                                 <a class="dropdown-item"
                                     [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
-                                    href="javascript:void(0)" (click)="searchTypeChange(item,$event)"
+                                    href="javascript:void(0)" (click)="searchTypeChange(item)"
                                     attr.id="{{item.fieldName}}Field">
                                     {{ item.displayName }}
                                 </a>

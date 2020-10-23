@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { RoutingConstants } from '@constants';
 import { NgProgress } from '@ngx-progressbar/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import { AppList } from '@app';
-import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
 import { AccountingConstants, SystemConstants } from '@constants';
@@ -62,7 +63,6 @@ export class AdvancePaymentComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _router: Router,
         private _store: Store<IAppState>,
-        private _partnerAPI: PartnerAPIRepo,
         private _spinner: NgxSpinnerService,
     ) {
         super();
@@ -213,10 +213,10 @@ export class AdvancePaymentComponent extends AppList {
                     switch (adv.statusApproval) {
                         case 'New':
                         case 'Denied':
-                            this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}`]);
                             break;
                         default:
-                            this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
+                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`]);
                             break;
                     }
                 } else {
@@ -237,7 +237,7 @@ export class AdvancePaymentComponent extends AppList {
     checkAllChange() {
         if (this.isCheckAll) {
             this.advancePayments.forEach(x => {
-                if (x.statusApproval === 'Done') {
+                if (x.statusApproval === 'Done' && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED && !x.voucherNo) {
                     x.isChecked = true;
                 }
             });

@@ -7,6 +7,7 @@ import { SOA } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
+import { RoutingConstants } from '@constants';
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { listAnimation } from '@animations';
 import { AccountingConstants } from '@constants';
@@ -170,7 +171,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     back() {
-        this._router.navigate(['home/accounting/statement-of-account']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
     }
 
     export() {
@@ -271,10 +272,10 @@ export class StatementOfAccountDetailComponent extends AppList {
     showConfirmed() {
         // this._toastService.success("Tính năng đang phát triển");
         if (this.soa.type === "All") {
-            this._toastService.warning("Not allow sync soa with type All");
+            this._toastService.warning("Not allow send soa with type All");
             return;
         }
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.confirmSoaPopup.show();
     }
 
@@ -296,10 +297,10 @@ export class StatementOfAccountDetailComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     console.log(res);
                     if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync Data to Accountant System Successful");
+                        this._toastService.success("Send Data to Accountant System Successful");
                         this.getDetailSOA(this.soa.soano, this.soa.currency);
                     } else {
-                        this._toastService.error("Sync Data Fail");
+                        this._toastService.error("Send Data Fail");
                     }
                 },
                 (error) => {

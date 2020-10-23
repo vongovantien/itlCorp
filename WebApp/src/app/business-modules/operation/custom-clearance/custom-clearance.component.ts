@@ -14,6 +14,7 @@ import { IAppState, getMenuUserPermissionState } from '@store';
 import { Store } from '@ngrx/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { formatDate } from '@angular/common';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -137,7 +138,7 @@ export class CustomClearanceComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate(['/home/operation/custom-clearance/detail', id]);
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.CUSTOM_CLEARANCE}/detail`, id]);
                     } else {
                         this.canNotAllowActionPopup.show();
                     }
@@ -189,8 +190,7 @@ export class CustomClearanceComponent extends AppList {
                     );
             }
         } else {
-
-            this.canNotAllowActionPopup.show();
+            this._toastrService.warning("Chưa chọn clearance để Convert", '', { enableHtml: true });
         }
     }
 
@@ -213,9 +213,7 @@ export class CustomClearanceComponent extends AppList {
                 );
             // this.confirmDeletePopup.show();
         } else {
-
-            this.canNotAllowActionPopup.show();
-            // this._toastrService.warning(`You haven't selected any custom clearance yet. Please select one or more custom no to delete!`);
+            this._toastrService.warning("Chưa chọn clearance để Delete", '', { enableHtml: true });
         }
     }
 
@@ -296,6 +294,16 @@ export class CustomClearanceComponent extends AppList {
                 this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có Type để tạo job mới <br />`;
             }
         }
+        if (this.messageConvertError.length === 0) {           
+            const customCheckedHBL = customCheckedArray.map(x => x.hblid);
+            if (customCheckedHBL.some((c, index) => customCheckedHBL.indexOf(c) !== index)){
+                this.messageConvertError = `Các clearance được chọn đang trùng số [HBL/HAWB] <br />`;
+            }
+            const customCheckedMBL = customCheckedArray.map(x => x.mblid);
+            if (customCheckedMBL.some((c, index) => customCheckedMBL.indexOf(c) !== index)){
+                this.messageConvertError += `Các clearance được chọn đang trùng số [MBL/MAWB] <br />`;
+            }
+        }
         return customCheckedArray;
     }
 
@@ -313,11 +321,11 @@ export class CustomClearanceComponent extends AppList {
     }
 
     gotoCreateCD() {
-        this._router.navigate(["home/operation/custom-clearance/new"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.CUSTOM_CLEARANCE}/new`]);
     }
 
     import() {
-        this._router.navigate(["home/operation/custom-clearance/import"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.CUSTOM_CLEARANCE}/import`]);
 
     }
 

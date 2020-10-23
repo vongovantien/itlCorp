@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
-import { IdentityRepo } from './identity.repo';
 
 @Injectable({ providedIn: 'root' })
 export class SettingRepo {

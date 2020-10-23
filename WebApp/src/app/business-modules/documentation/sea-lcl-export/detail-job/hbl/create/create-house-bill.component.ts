@@ -25,6 +25,7 @@ import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { csBookingNote } from '@models';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-hbl-lcl-export',
@@ -263,7 +264,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                     if (res.status) {
                         this._toastService.success(res.message, '');
 
-                        this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl/${res.data}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${res.data}`]);
                     }
                 }
             );
@@ -271,7 +272,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
 
     gotoList() {
-        this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl`]);
     }
 
     updateInwordField(containers: Container[]) {

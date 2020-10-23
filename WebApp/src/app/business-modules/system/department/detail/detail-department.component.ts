@@ -12,6 +12,7 @@ import { AppList } from 'src/app/app.list';
 import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel } from 'src/app/business-modules/share-system/store';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-department-detail',
@@ -183,7 +184,7 @@ export class DepartmentDetailComponent extends AppList {
     }
 
     back() {
-        this._router.navigate(['home/system/department']);
+        this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}`]);
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -271,7 +272,7 @@ export class DepartmentDetailComponent extends AppList {
     }
 
     gotoDetailGroup(id: number) {
-        this._router.navigate([`home/system/group/${id}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.GROUP}/${id}`]);
     }
 
     getDeptTypes() {

@@ -17,6 +17,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap }
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { RoutingConstants } from '@constants';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -181,7 +182,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
 
-                        this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = "SHIPMENT";
 
                         this.isDuplicate = true;
@@ -217,19 +218,19 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'hbl':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}/hbl`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
             case 'files':
-                this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
         }
     }
@@ -310,7 +311,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/air-import/${this.jobId}`], {
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();

@@ -8,6 +8,7 @@ import { AccountingRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { GuaranteedModel } from '@models';
+import { RoutingConstants } from '@constants';
 
 
 
@@ -96,7 +97,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
     }
     //
     viewDetail(agreementId: string) {
-        this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
             queryParams: {
                 agreementId: agreementId,
                 subTab: 'guaranteed',

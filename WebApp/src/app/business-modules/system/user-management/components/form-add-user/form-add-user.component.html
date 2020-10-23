@@ -182,39 +182,15 @@
                             </div>
                         </div>
                     </div>
-                    <!--
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label">LDAP</label>
-                            <div class="m-checkbox-inline">
-                                <app-switch [toggle]="ldap.value" (toggleChange)="ldap.setValue($event)">
-                                </app-switch>
-
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="col-lg-4" *ngIf="isDetail">
-                        <div class="form-group">
-                            <label></label>
-                            <div class="c-btn-form-group">
-                                <button (click)="resetPassword(SelectedUser.id)"
-                                    class="btn btn-default  m-btn--icon m-btn--uppercase">Reset
-                                    Password</button>
-                            </div>
-                        </div>
-
-
-                    </div>-->
                 </div>
                 <div class="row m--margin-top-10" *ngIf="isDetail">
                     <div class="col-6">
                         Created: {{SelectedUser.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
-                            class="text-success">{{SelectedUser.userCreated}}</span>
+                            class="text-success">{{SelectedUser.userCreatedName}}</span>
                     </div>
                     <div class="col-6">
                         Modified: {{SelectedUser.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
-                            class="text-success">{{SelectedUser.userModified}}</span>
+                            class="text-success">{{SelectedUser.userModifiedName}}</span>
                     </div>
 
                 </div>
@@ -222,33 +198,4 @@
             </div>
         </div>
     </form>
-
-    <!-- <div class="m-portlet__body">
-        <tabset class="custom-class-tab">
-            <tab heading="Role">
-                <add-role-user></add-role-user>
-            </tab>
-            <tab heading="Group">
-                <div class="table-wrapper table-scrollabler" id="department-list-table">
-                    <table class="table table-striped table-brand table-hover dataTable">
-                        <thead app-table-header [headers]="headersuslv"> </thead>
-                        <tbody class="tbody-group">
-                            <ng-container *ngIf="!!this.userLevels.length">
-                                <tr *ngFor="let lv of this.userLevels; let i = index; trackBy: trackByFn">
-                                    <td>{{lv.groupName}}</td>
-                                    <td>{{lv.companyName}}</td>
-                                    <td>{{lv.officeName}}</td>
-                                    <td>{{lv.departmentName}}</td>
-                                    <td>{{lv.position}}</td>
-                                </tr>
-                            </ng-container>
-                            <tr *ngIf="!this.userLevels.length" app-table-none-record
-                                [colspan]="headersuslv.length + 1">
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </tab>
-        </tabset>
-    </div> -->
 </div>

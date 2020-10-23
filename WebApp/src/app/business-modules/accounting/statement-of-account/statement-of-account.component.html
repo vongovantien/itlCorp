@@ -98,7 +98,8 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <span>{{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                                <span
+                                                    class="text-info">{{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm'}}</span>
                                             </td>
                                         </tr>
                                         <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>

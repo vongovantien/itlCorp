@@ -7,6 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { TrialOfficialOtherModel } from '@models';
+import { RoutingConstants } from '@constants';
 
 
 
@@ -72,14 +73,14 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     viewDetail(agreementId: string, partnerId: string) {
 
         if (!!agreementId) {
-            this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
                 queryParams: {
                     agreementId: agreementId,
                     subTab: 'other',
                 }
             });
         } else {
-            this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
                 queryParams: {
                     partnerId: partnerId,
                     subTab: 'other',

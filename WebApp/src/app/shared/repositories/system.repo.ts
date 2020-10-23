@@ -645,5 +645,9 @@ export class SystemRepo {
         );
     }
 
+    updateProfile(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/UpdateProfile`, body);
+    }
+
 }
 

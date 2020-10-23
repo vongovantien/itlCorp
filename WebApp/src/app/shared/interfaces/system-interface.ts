@@ -13,6 +13,11 @@ namespace SystemInterface {
         groupId: number;
         nameEn: string;
         nameVn: string;
+        bankAccountNo: string;
+        bankAccountName: string;
+        bankName: string;
+        photo: string;
+        title: string;
     }
 
     export interface IDepartmentGroup {

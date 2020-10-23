@@ -24,6 +24,7 @@ import _merge from 'lodash/merge';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { PartnerRejectPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/partner-reject/partner-reject.popup';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -440,7 +441,6 @@ export class PartnerDetailComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // this.router.navigate(["/home/catalogue/partner-data"]);
                     } else {
                         this._toastService.warning(res.message);
                     }
@@ -467,7 +467,7 @@ export class PartnerDetailComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.confirmDeletePartnerPopup.hide();
-                        this.router.navigate(["/home/catalogue/partner-data"]);
+                        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}`]);
                     } else {
                         this._toastService.error(res.message);
                     }

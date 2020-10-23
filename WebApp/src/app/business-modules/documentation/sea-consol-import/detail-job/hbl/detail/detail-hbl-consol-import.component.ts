@@ -16,6 +16,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
 import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-import.component';
+import { RoutingConstants } from '@constants';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -122,7 +123,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-consol-import/${this.hblDetail.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.hblDetail.jobId}/hbl`]);
 
     }
 
@@ -190,7 +191,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                     this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
-
                         this.formHouseBill.getListSaleman();
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 

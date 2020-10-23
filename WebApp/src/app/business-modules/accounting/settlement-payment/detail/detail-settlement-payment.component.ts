@@ -11,6 +11,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { InjectViewContainerRefDirective } from '@directives';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-settlement-payment-detail',
@@ -185,7 +186,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     if (res.status) {
                         this._toastService.success(`${res.data.settlement.settlementNo}`, ' Send request successfully');
 
-                        this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${res.data.settlement.id}/approve`]);
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -223,7 +224,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
     }
 
     back() {
-        this._router.navigate(['home/accounting/settlement-payment']);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
     }
 
     exportSettlementPayment(language: string) {

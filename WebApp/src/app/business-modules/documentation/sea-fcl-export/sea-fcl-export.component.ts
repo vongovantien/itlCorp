@@ -15,7 +15,7 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
 import { formatDate } from '@angular/common';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 
 
 @Component({
@@ -215,7 +215,7 @@ export class SeaFCLExportComponent extends AppList {
     }
 
     gotoCreateJob() {
-        this._router.navigate(['home/documentation/sea-fcl-export/new']);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/new`]);
     }
 
     loadListHouseBillExpanding() {
@@ -229,7 +229,7 @@ export class SeaFCLExportComponent extends AppList {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["/home/documentation/sea-fcl-export", id]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}`, id]);
                 } else {
                     this.permissionPopup.show();
                 }

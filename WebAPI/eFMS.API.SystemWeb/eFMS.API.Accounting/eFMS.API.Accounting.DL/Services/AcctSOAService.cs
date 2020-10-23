@@ -1157,72 +1157,26 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.JobIds != null && criteria.JobIds.Count > 0)
             {
-                query = query.And(chg => criteria.JobIds.Contains(chg.JobId));
+                query = query.And(chg => criteria.JobIds.Contains(chg.JobId, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                query = query.And(chg => criteria.Hbls.Contains(chg.HBL));
+                query = query.And(chg => criteria.Hbls.Contains(chg.HBL, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                query = query.And(chg => criteria.Mbls.Contains(chg.MBL));
+                query = query.And(chg => criteria.Mbls.Contains(chg.MBL, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.CustomNo != null && criteria.CustomNo.Count > 0)
             {
-                query = query.And(chg => criteria.CustomNo.Contains(chg.CustomNo));
+                query = query.And(chg => criteria.CustomNo.Contains(chg.CustomNo, StringComparer.OrdinalIgnoreCase));
             }
 
             var charge = GetChargeShipmentDocAndOperation(query, criteria.IsOBH);
-
-            /*var data = charge.Select(chg => new ChargeShipmentModel
-            {
-                ID = chg.ID,
-                ChargeCode = chg.ChargeCode,
-                ChargeName = chg.ChargeName,
-                JobId = chg.JobId,
-                HBL = chg.HBL,
-                MBL = chg.MBL,
-                CustomNo = chg.CustomNo,
-                Type = chg.Type,
-                InvoiceNo = chg.InvoiceNo,
-                ServiceDate = chg.ServiceDate,
-                Note = chg.Note,
-                Debit = chg.Debit,
-                Credit = chg.Credit,
-                Currency = chg.Currency,
-                CurrencyToLocal = criteria.CurrencyLocal,
-                CurrencyToUSD = AccountingConstants.CURRENCY_USD,
-                AmountDebitLocal =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, criteria.CurrencyLocal)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                AmountCreditLocal =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, criteria.CurrencyLocal)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                AmountDebitUSD =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                AmountCreditUSD =
-                            (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                SOANo = chg.SOANo,
-                DatetimeModifiedSurcharge = chg.DatetimeModified,
-                CDNote = chg.CDNote
-            });*/
+            
             var data = new List<ChargeShipmentModel>();
             foreach (var item in charge)
             {
@@ -1583,7 +1537,10 @@ namespace eFMS.API.Accounting.DL.Services
                          join chg in csShipmentSurchargeRepo.Get() on s.Soano equals (chg.PaySoano ?? chg.Soano) into chg2
                          from chg in chg2.DefaultIfEmpty()
                          where
-                             listCode.Contains(s.Soano) || listCode.Contains(chg.JobNo) || listCode.Contains(chg.Mblno) || listCode.Contains(chg.Hblno)
+                                listCode.Contains(s.Soano, StringComparer.OrdinalIgnoreCase) 
+                             || listCode.Contains(chg.JobNo, StringComparer.OrdinalIgnoreCase) 
+                             || listCode.Contains(chg.Mblno, StringComparer.OrdinalIgnoreCase) 
+                             || listCode.Contains(chg.Hblno, StringComparer.OrdinalIgnoreCase)
                          select s.Soano).ToList();
                 soas = soas.Where(x => refNo.Contains(x.Soano));
             }
@@ -2574,7 +2531,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.CustomNo = _customNo;
                 soaCharge.JobNo = _jobNo;
                 soaCharge.CdCode = cdNote?.Code;
-                soaCharge.Docs = string.Join("\r\n", grpInvCdNoteByHbl.Where(w => w.Hblid == charge.Hblid).Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
+                soaCharge.Docs = string.Join("\r\n", grpInvCdNoteByHbl.ToList().Where(w => w.Hblid == charge.Hblid).Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
 
                 soaCharges.Add(soaCharge);
             }

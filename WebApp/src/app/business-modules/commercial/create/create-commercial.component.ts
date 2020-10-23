@@ -14,6 +14,7 @@ import { CommercialContractListComponent } from '../components/contract/commerci
 
 import { of } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -53,9 +54,9 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
 
     gotoList() {
         if (this.type === 'Customer') {
-            this._router.navigate(["home/commercial/customer"]);
+            this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}`]);
         } else {
-            this._router.navigate(["home/commercial/agent"]);
+            this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}`]);
         }
     }
 
@@ -166,15 +167,15 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                 }
                 if (res.status === true) {
                     if (this.type === 'Customer') {
-                        this._router.navigate([`home/commercial/customer/${res.id}`]);
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${res.id}`]);
                     } else {
-                        this._router.navigate([`home/commercial/agent/${res.id}`]);
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${res.id}`]);
                     }
                 } else if (!!res) {
                     if (this.type === 'Customer') {
-                        this._router.navigate([`home/commercial/customer/${res}`]);
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${res}`]);
                     } else {
-                        this._router.navigate([`home/commercial/agent/${res}`]);
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${res}`]);
                     }
                 }
             },

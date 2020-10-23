@@ -34,6 +34,7 @@ namespace eFMS.API.ForPartner.Infrastructure
             //services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
             services.AddTransient<IAccountingManagementService, AccAccountingManagementService>();
+            services.AddTransient<IActionFuncLogService, ActionFuncLogService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
@@ -62,7 +63,7 @@ namespace eFMS.API.ForPartner.Infrastructure
                                 Contact = new Contact()
                                 {
                                     Name = "LogTecHub",
-                                    Email = @"efms-support@itlvn.com",
+                                    Email = @"efms-team@logtechub.com",
                                     Url = @"https://logtechub.com"
                                 },
                                 License = new License()

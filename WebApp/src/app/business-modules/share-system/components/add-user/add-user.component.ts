@@ -12,6 +12,7 @@ import { AppList } from "src/app/app.list";
 import { catchError, finalize, takeUntil } from "rxjs/operators";
 import cloneDeep from "lodash/cloneDeep";
 import { IShareSystemState, getShareSystemUserLevelState, SystemLoadUserLevelAction } from "../../store";
+import { RoutingConstants } from "@constants";
 
 @Component({
     selector: 'form-user-level',
@@ -279,16 +280,16 @@ export class ShareSystemAddUserComponent extends AppList {
 
     gotoUserPermission(id: string, officeId: string) {
         if (this.type === "office") {
-            this._router.navigate([`home/system/office/${officeId}/${id}/${this.type}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.OFFICE}/${officeId}/${id}/${this.type}`]);
         }
         if (this.type === "company") {
-            this._router.navigate([`home/system/company/${this.object.id}/${officeId}/${id}/${this.type}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.COMPANY}/${this.object.id}/${officeId}/${id}/${this.type}`]);
         }
         if (this.type === "department") {
-            this._router.navigate([`home/system/department/${this.object.id}/${officeId}/${id}/${this.type}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}/${this.object.id}/${officeId}/${id}/${this.type}`]);
         }
         if (this.type === "group") {
-            this._router.navigate([`home/system/group/${this.object.id}/${officeId}/${id}/${this.type}`]);
+            this._router.navigate([`${RoutingConstants.SYSTEM.GROUP}/${this.object.id}/${officeId}/${id}/${this.type}`]);
         }
     }
 

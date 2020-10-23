@@ -867,5 +867,21 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+
+        [HttpPut("UpdatePaymentTerm")]
+        [Authorize]
+        public IActionResult UpdatePaymentTerm(Guid Id, decimal days)
+        {
+            HandleState hs = acctAdvancePaymentService.UpdatePaymentTerm(Id,days);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Id };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
     }
 }

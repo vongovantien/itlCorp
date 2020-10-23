@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { SystemRepo } from '@repositories';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
@@ -9,17 +9,22 @@ import { MenuUpdatePermissionAction } from '../../store/actions';
 
 @Injectable()
 export class MenuResolveGuard implements Resolve<any> {
+    specialUrls = ["profile"];
 
     constructor(
         private _systemRepo: SystemRepo,
         private _store: Store<IAppState>
     ) {
     }
+
     resolve(
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ): Observable<SystemInterface.IUserPermission> | Promise<any> | any {
         const pathArray = state.url.split("/").filter(i => Boolean(i));
+        if (this.specialUrls.includes(pathArray[1])) {
+            return of(true);
+        }
         if (!!pathArray[2]) {
             return this._systemRepo.getUserPermissionByMenu(pathArray[2])
                 .pipe()
@@ -56,4 +61,6 @@ export class MenuResolveGuard implements Resolve<any> {
                 );
         }
     }
+
+
 }

@@ -119,13 +119,14 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// Preview CD Note (OPS)
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="model">AcctCDNoteDetailsModel</param>
+        /// <param name="isOrigin">Is Preview with Original</param>
         /// <returns></returns>
         [HttpPost]
         [Route("PreviewOpsCdNote")]
-        public IActionResult PreviewOpsCdNote(AcctCDNoteDetailsModel model)
+        public IActionResult PreviewOpsCdNote(AcctCDNoteDetailsModel model, bool isOrigin)
         {
-            var result = cdNoteServices.Preview(model);
+            var result = cdNoteServices.Preview(model, isOrigin);
             return Ok(result);
         }
 

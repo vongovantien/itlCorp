@@ -3,7 +3,37 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
+                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" mode="approve">
+                    <span *ngIf="!!advancePayment && !!advancePayment.syncStatus"
+                        class="m-badge m-badge--{{advancePayment.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">{{advancePayment.syncStatus}}</span>
+
+                    <!-- ? Cho phép người có quyền approve chỉnh sửa -->
+                    <div class="update-payment-term pos-rel">
+                        <ng-container *ngIf="(!!advancePayment 
+                        && advancePayment.statusApproval !== 'New' 
+                        && advancePayment.statusApproval !== 'Denied' 
+                        && advancePayment.statusApproval !== 'Done' 
+                        && advancePayment.isManager 
+                        && !advancePayment.isApproved);else paymentTermReadonly">
+
+                            <input type="number" integer class="form-control m-input m-input--square "
+                                placeholder="days" [(ngModel)]="paymentTerm">
+
+                            <button title="Update payment term" style="position:absolute; top: 0; right: 0;"
+                                (click)="updatePaymentTerm(paymentTerm)"
+                                class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only  m--margin-left-10 btn-update-payment">
+                                <i class="la la-refresh"></i>
+                            </button>
+
+                        </ng-container>
+
+                        <ng-template #paymentTermReadonly>
+                            <input type="number" integer class="form-control m-input m-input--square "
+                                placeholder="days" [(ngModel)]="paymentTerm" disabled>
+                        </ng-template>
+                    </div>
+
+                </adv-payment-form-create>
                 <div class="row" *ngIf="!!advancePayment">
                     <div class="col-lg-6">
                         <div class="m--align-left">

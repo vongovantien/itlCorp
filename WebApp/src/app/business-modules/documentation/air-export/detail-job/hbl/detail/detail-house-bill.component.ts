@@ -5,17 +5,19 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
-import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
 import { Crystal, CsTransactionDetail, HouseBill } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
+import { RoutingConstants } from '@constants';
+import { SystemConstants, ChargeConstants } from '@constants';
 
+import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
+import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
+
+
+import { merge } from 'rxjs';
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { SystemConstants } from 'src/constants/system.const';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
-import { merge } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -76,15 +78,23 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
 
         // * Shortcut
+        //#region --- Shortcut ---
         merge(
             this.createShortcut(['ControlLeft', 'KeyI']),
             this.createShortcut(['ControlRight', 'KeyI'])
-        ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
-            () => {
-                this.preview('LASTEST_ITL_FRAME');
-            }
-        );
+        ).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                () => {
+                    this.preview('LASTEST_ITL_FRAME');
+                }
+            );
+
+        this.listenShortcutSaveHawb();
+
+        //#endregion --- Shortcut ---
     }
+
+
 
     getDetailHbl() {
         this._store.select(fromShareBussiness.getDetailHBlState)
@@ -236,7 +246,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     gotoSeparate() {
-        this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}/separate`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}/separate`]);
     }
 
     openInputBookingNote(reportType: string) {

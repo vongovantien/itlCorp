@@ -7,7 +7,7 @@ import { DocumentationRepo } from '@repositories';
 import { csBookingNote } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SubHeaderComponent, ReportPreviewComponent, ConfirmPopupComponent } from '@common';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 
 import { map, tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { of, combineLatest } from 'rxjs';
@@ -112,7 +112,7 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                         this._toastService.success("New data added");
                         this.headerComponent.resetBreadcrumb("View/Edit Booking Note");
 
-                        this._router.navigate([`home/documentation/sea-lcl-export/booking-note/`, res.model.id]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/booking-note/`, res.model.id]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
@@ -180,11 +180,11 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
     }
 
     gotoList() {
-        this._router.navigate(["home/documentation/sea-lcl-export/booking-note"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/booking-note`]);
     }
 
     gotoDuplicate() {
-        this._router.navigate(["home/documentation/sea-lcl-export/booking-note", this.bookingNoteId], { queryParams: { action: 'COPY' } });
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/booking-note`, this.bookingNoteId], { queryParams: { action: 'COPY' } });
     }
 
     previewBookingNote() {

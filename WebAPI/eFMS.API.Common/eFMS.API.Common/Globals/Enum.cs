@@ -177,7 +177,8 @@
         settingUnlockRequest,
         commercialCustomer,
         commercialAgent,
-        commercialIncoterm
+        commercialIncoterm,
+        commercialPotential,
     }
     public enum UnlockTypeEnum
     {

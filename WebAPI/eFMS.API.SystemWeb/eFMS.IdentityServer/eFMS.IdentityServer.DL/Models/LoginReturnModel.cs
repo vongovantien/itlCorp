@@ -19,6 +19,9 @@ namespace eFMS.API.System.DL.Models
         public string message { get; set; }
         public string NameEn { get; set; }
         public string NameVn { get; set; }
-
+        public string BankName { get; set; }
+        public string BankAccountNo { get; set; }
+        public string Photo { get; set; }
+        public string Title { get; set; }
     }
 }

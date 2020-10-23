@@ -22,6 +22,7 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-hbl-consol-export',
@@ -229,7 +230,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}/hbl/${res.data}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/hbl/${res.data}`]);
                     } else {
                     }
                 }
@@ -284,7 +285,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/hbl`]);
     }
 
 }

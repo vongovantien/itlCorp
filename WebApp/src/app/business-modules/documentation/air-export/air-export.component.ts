@@ -14,7 +14,7 @@ import { AppList } from 'src/app/app.list';
 import * as fromShare from './../../share-business/store';
 
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 import { ShareBussinessInputDailyExportPopupComponent } from '@share-bussiness';
 
 @Component({
@@ -43,8 +43,7 @@ export class AirExportComponent extends AppList {
         transactionType: this.transactionService,
         ...JobConstants.DEFAULT_RANGE_DATE_SEARCH
     };
-
-
+    routeConstants: Object = null;
 
     constructor(
         private _router: Router,
@@ -59,6 +58,7 @@ export class AirExportComponent extends AppList {
         this.requestSort = this.sortShipment;
 
         this.isLoading = this._store.select(fromShare.getTransationLoading);
+        //
     }
 
     ngOnInit() {
@@ -211,7 +211,8 @@ export class AirExportComponent extends AppList {
     }
 
     gotoCreateJob() {
-        this._router.navigate(['home/documentation/air-export/new']);
+
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/new`]);
     }
 
     loadListHouseBillExpanding() {
@@ -225,7 +226,7 @@ export class AirExportComponent extends AppList {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["/home/documentation/air-export", id]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}`, id]);
                 } else {
                     this.permissionPopup.show();
                 }

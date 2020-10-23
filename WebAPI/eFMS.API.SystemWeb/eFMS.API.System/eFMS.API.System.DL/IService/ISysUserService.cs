@@ -13,6 +13,11 @@ namespace eFMS.API.System.DL.IService
     {
         IQueryable<SysUserViewModel> GetAll();
         SysUserViewModel GetUserById(string Id);
+
+        SysUserModel GetUserModelById(string id);
+
+        HandleState UpdateProfile(UserProfileCriteria criteria, out object data);
+
         IQueryable<SysUserViewModel> QueryPermission(SysUserCriteria criteria);
         HandleState Insert(SysUserModel sysUserModel);
         HandleState Update(SysUserModel sysUserModel);

@@ -5,18 +5,17 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { PaymentModel, AccountingPaymentModel } from '@models';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 
-import { catchError, finalize, concatMap } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { of } from 'rxjs';
 
 @Component({
     selector: 'list-obh-account-payment',
@@ -44,7 +43,6 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
         private _exportRepo: ExportRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
-        private _partnerAPI: PartnerAPIRepo,
         private _spinner: NgxSpinnerService) {
         super();
         this._progressRef = this._progressService.ref();
@@ -103,7 +101,7 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
     }
 
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/import-obh"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/import-obh`]);
     }
 
     exportExcel() {
@@ -210,9 +208,20 @@ export class AccountPaymentListOBHPaymentComponent extends AppList implements On
     confirmSync(refId: string, action: string) {
         this.refId = refId;
         this.action = action;
-        // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        this.confirmObhPaymentPopup.show();
+        this._accountingRepo.getPaymentByrefId(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe(
+                (res: []) => {
+                    if (res.length > 0) {
+                        // this._toastService.success("Tính năng đang phát triển");
+                        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+                        this.confirmObhPaymentPopup.show();
+                    } else {
+                        this._toastService.error("Not found payment to sync");
+                    }
+                },
+            );
     }
 
     onConfirmObhPayment() {

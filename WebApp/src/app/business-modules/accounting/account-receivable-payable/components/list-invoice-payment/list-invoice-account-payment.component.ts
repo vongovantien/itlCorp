@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo, ExportRepo, PartnerAPIRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
@@ -14,8 +14,8 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { PaymentModel, AccountingPaymentModel } from '@models';
+import { RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { of } from 'rxjs';
 
 
 
@@ -47,7 +47,6 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
         private _progressService: NgProgress,
-        private _partnerAPI: PartnerAPIRepo,
         private _spinner: NgxSpinnerService) {
         super();
         this._progressRef = this._progressService.ref();
@@ -110,7 +109,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     }
 
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/payment-import`]);
     }
 
     exportExcel() {
@@ -214,9 +213,20 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     confirmSync(refId: string, action: string) {
         this.refId = refId;
         this.action = action;
-        // this._toastService.success("Tính năng đang phát triển");
-        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
-        this.confirmInvoicePaymentPopup.show();
+        this._accountingRepo.getPaymentByrefId(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe(
+                (res: []) => {
+                    if (res.length > 0) {
+                        // this._toastService.success("Tính năng đang phát triển");
+                        this.confirmMessage = `Are you sure you want to sync data to accountant system?`;
+                        this.confirmInvoicePaymentPopup.show();
+                    } else {
+                        this._toastService.error("Not found payment to sync");
+                    }
+                },
+            );
     }
 
     onConfirmInvoicePayment() {

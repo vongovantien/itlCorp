@@ -140,7 +140,6 @@
                                     || !!charge.settlementCode
                                     || !!charge.paySoano
                                     || !!charge.voucherId
-                                    || !!charge.invoiceNo
                                     || !!charge.voucherIddate
                                     || !charge.isFromShipment 
                                     || (isLocked | async) === true ;else chargeID">
@@ -235,7 +234,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null || (!!charge.unitPrice && charge.unitPrice < 0)}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.unitPrice || charge.unitPrice ==='')}">
                                     <ng-container *ngIf="!!charge.creditNo 
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
@@ -243,12 +242,13 @@
                                         || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else unitPrice">
-                                        <input type="text" class="form-control" disabled [value]="charge.unitPrice">
+                                        <input type="text" class="form-control" disabled [value]="charge.unitPrice"
+                                            autoFormatCurrency>
                                     </ng-container>
                                     <ng-template #unitPrice>
                                         <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
                                             (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price"
-                                            autoFormatCurrency numeric [decimals]="digitDecimal">
+                                            autoFormatCurrency>
                                     </ng-template>
                                 </div>
                             </td>
@@ -407,7 +407,7 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="number" class="form-control" [(ngModel)]="charge.finalExchangeRate"
+                                    <input type="number" class="form-control" [ngModel]="charge.finalExchangeRate"
                                         disabled>
                                 </div>
                             </td>
@@ -422,7 +422,7 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control text-primary" [(ngModel)]="charge.paySoano"
+                                    <input type="text" class="form-control text-primary" [ngModel]="charge.paySoano"
                                         disabled>
                                 </div>
                             </td>
@@ -435,13 +435,13 @@
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control text-primary"
-                                        [(ngModel)]="charge.settlementCode" disabled readonly>
+                                        [ngModel]="charge.settlementCode" disabled readonly>
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control  text-primary" disabled
-                                        [(ngModel)]="charge.voucherId">
+                                        [ngModel]="charge.voucherId">
                                 </div>
                             </td>
                             <td class="disabled">
@@ -452,7 +452,7 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIdre">
+                                    <input type="text" class="form-control" disabled [ngModel]="charge.voucherIdre">
                                 </div>
                             </td>
                             <td class="disabled">

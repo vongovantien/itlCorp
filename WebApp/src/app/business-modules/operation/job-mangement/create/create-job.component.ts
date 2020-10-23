@@ -14,6 +14,7 @@ import { AppForm } from "src/app/app.form";
 import _merge from 'lodash/merge';
 
 import { takeUntil, catchError, finalize } from "rxjs/operators";
+import { RoutingConstants } from "@constants";
 
 @Component({
     selector: "app-job-mangement-create",
@@ -55,7 +56,7 @@ export class JobManagementCreateJobComponent extends AppForm {
             customerId: form.customerId
         };
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
-        opsTransaction.salemanId = this.formCreateComponent.salemansId;
+        opsTransaction.salemanId = this.formCreateComponent.salemansId.value;
         return opsTransaction;
     }
 
@@ -102,6 +103,6 @@ export class JobManagementCreateJobComponent extends AppForm {
     }
 
     gotoList() {
-        this._router.navigate(["home/operation/job-management"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
     }
 }

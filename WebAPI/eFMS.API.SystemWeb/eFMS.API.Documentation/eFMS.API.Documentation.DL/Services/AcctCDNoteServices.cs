@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
         ICsShipmentSurchargeService surchargeService;
         ICsTransactionDetailService transactionDetailService;
         IContextBase<CustomsDeclaration> customsDeclarationRepository;
+        IContextBase<SysCompany> sysCompanyRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -66,7 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentSurchargeService surcharge,
             ICsTransactionDetailService transDetailService,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            ICurrencyExchangeService currencyExchange
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<SysCompany> sysCompanyRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -90,6 +92,7 @@ namespace eFMS.API.Documentation.DL.Services
             transactionDetailService = transDetailService;
             currencyExchangeService = currencyExchange;
             customsDeclarationRepository = customsDeclarationRepo;
+            sysCompanyRepository = sysCompanyRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -222,6 +225,22 @@ namespace eFMS.API.Documentation.DL.Services
                 model.OfficeId = currentUser.OfficeID;
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
+
+                var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
+                model.CurrencyId = (_partner?.PartnerMode == "External") ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+
+                //Quy đổi tỉ giá CD Note so về currency Local
+                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                model.ExchangeRate = _exchangeRate;
+
+                decimal _total = 0;
+                foreach (var charge in model.listShipmentSurcharge)
+                {
+                    var _exchangeRateCharge = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, model.CurrencyId);
+                    _total += charge.Total * _exchangeRateCharge;
+                }
+                model.Total = _total;
+
                 var hs = DataContext.Add(model, false);
 
                 if (hs.Success)
@@ -274,6 +293,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
         }
+
         public HandleState UpdateCDNote(AcctCdnoteModel model)
         {
             try
@@ -288,6 +308,22 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.DepartmentId = model.DepartmentId;
                 entity.OfficeId = model.OfficeId;
                 entity.CompanyId = model.CompanyId;
+
+                var _partner = partnerRepositoty.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
+                entity.CurrencyId = (_partner?.PartnerMode == "External") ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+
+                //Quy đổi tỉ giá CD Note so về currency Local
+                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, entity.DatetimeCreated, entity.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                entity.ExchangeRate = _exchangeRate;
+
+                decimal _total = 0;
+                foreach (var charge in model.listShipmentSurcharge)
+                {
+                    var _exchangeRateCharge = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, entity.CurrencyId);
+                    _total += charge.Total * _exchangeRateCharge;
+                }
+                entity.Total = _total;
+
                 var stt = DataContext.Update(entity, x => x.Id == cdNote.Id, false);
                 if (stt.Success)
                 {
@@ -460,7 +496,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surcharges = surchargeService.GetByHB(hbId);
             return surcharges;
         }
-        
+
         public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo)
         {
             var places = placeRepository.Get();
@@ -656,6 +692,9 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Status = cdNote.Status;
             soaDetails.SyncStatus = cdNote.SyncStatus;
             soaDetails.LastSyncDate = cdNote.LastSyncDate;
+            soaDetails.Currency = cdNote.CurrencyId;
+            soaDetails.ExchangeRate = cdNote.ExchangeRate;
+            soaDetails.Note = cdNote.Note;
             return soaDetails;
         }
 
@@ -739,15 +778,17 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public Crystal Preview(AcctCDNoteDetailsModel model)
+        public Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin)
         {
             if (model == null)
             {
                 return null;
             }
             Crystal result = null;
-            //Lấy thông tin Office của User Login
-            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            // Thông tin Company của Creator
+            var companyOfUser = sysCompanyRepository.Get(x => x.Id == model.CDNote.CompanyId).FirstOrDefault();
+            //Lấy thông tin Office của Creator
+            var officeOfUser = GetInfoOfficeOfUser(model.CDNote.OfficeId);
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
@@ -777,11 +818,11 @@ namespace eFMS.API.Documentation.DL.Services
                 DueTo = "N/A",
                 DueToCredit = "N/A",
                 SayWordAll = "N/A",
-                CompanyName = DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎",
+                CompanyName = companyOfUser?.BunameEn?.ToUpper(),
+                CompanyAddress1 = officeOfUser?.AddressEn,
+                CompanyAddress2 = "Tel: " + officeOfUser?.Tel + "\nFax: " + officeOfUser?.Fax,
                 CompanyDescription = "N/A",
-                Website = DocumentConstants.COMPANY_WEBSITE,//"efms.itlvn.com",
+                Website = companyOfUser?.Website,
                 IbanCode = "N/A",
                 AccountName = _accountName,
                 AccountNameEN = _accountNameEN,
@@ -799,7 +840,8 @@ namespace eFMS.API.Documentation.DL.Services
                 InvoiceInfo = "N/A",
                 Contact = currentUser.UserName,
                 IssuedDate = model.CreatedDate,
-                OtherRef = "N/A"
+                OtherRef = "N/A",
+                IsOrigin = isOrigin
             };
             string trans = string.Empty;
             string port = string.Empty;
@@ -823,17 +865,35 @@ namespace eFMS.API.Documentation.DL.Services
                         subject = "ON BEHALF";
                     }
 
-                    decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                    decimal? _vatAmount = 0;                 
-                    if (item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && item.CurrencyId != DocumentConstants.CURRENCY_USD)
+                    decimal? _vatAmount = 0, _vatAmountUsd = 0, exchangeRateToUsd = 0, exchangeRateToVnd = 0;
+                    // Get exchange rate
+                    if (!isOrigin)
                     {
-                        //Quy đổi về USD đối với các currency khác
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : (((item.UnitPrice * item.Quantity) * item.Vatrate) / 100) * _exchangeRateToUsd;
+                        exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(null, model.CDNote.DatetimeCreated, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                        exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(null, model.CDNote.DatetimeCreated, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    }
+
+                    // Get Vat amount
+                    if (isOrigin)
+                    {
+                        if (item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && item.CurrencyId != DocumentConstants.CURRENCY_USD && isOrigin)
+                        {
+                            decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                            //Quy đổi về USD đối với các currency khác
+                            _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : (((item.UnitPrice * item.Quantity) * item.Vatrate) / 100) * _exchangeRateToUsd;
+                        }
+                        else
+                        {
+                            _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
+                        }
                     }
                     else
                     {
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
+                        decimal? _vatRate = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
+                        _vatAmount = _vatRate * exchangeRateToVnd; // To VND
+                        _vatAmountUsd = _vatRate * exchangeRateToUsd; // To USD
                     }
+
                     var acctCDNo = new AcctSOAReport
                     {
                         SortIndex = null,
@@ -890,7 +950,10 @@ namespace eFMS.API.Documentation.DL.Services
                         Unit = item.CurrencyId,
                         UnitPieaces = "N/A",
                         CustomDate = _clearance?.ClearanceDate,
-                        JobNo = model.JobNo
+                        JobNo = model.JobNo,
+                        ExchangeRateToUsd = exchangeRateToUsd,
+                        ExchangeRateToVnd = exchangeRateToVnd,
+                        ExchangeVATToUsd = (_vatAmountUsd ?? 0) + _decimalNumber
                     };
                     listSOA.Add(acctCDNo);
                 }
@@ -1041,13 +1104,6 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             var parameter = new SeaDebitAgentsNewReportParams();
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user name login
-            parameter.CompanyDescription = string.Empty;
-
             parameter.DebitNo = criteria.CreditDebitNo;
             parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd MMM, yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
@@ -1133,8 +1189,19 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
 
-            //Lấy thông tin Office của User Login
-            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            // Lấy thông tin Office của Creator
+            var officeOfUser = GetInfoOfficeOfUser(data.CDNote.OfficeId);
+            // Thông tin Company của Creator
+            var companyOfUser = sysCompanyRepository.Get(x => x.Id == data.CDNote.CompanyId).FirstOrDefault();
+            // Thông tin công ty
+            parameter.CompanyName = companyOfUser?.BunameEn?.ToUpper();
+            parameter.CompanyAddress1 = officeOfUser?.AddressEn ?? string.Empty;
+            parameter.CompanyAddress2 = "Tel: " + officeOfUser?.Tel + "\nFax: " + officeOfUser?.Fax;
+            parameter.Website = companyOfUser?.Website;
+            parameter.Contact = _currentUser;//Get user name login
+            parameter.CompanyDescription = string.Empty;
+
+            // Thông tin Bank
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
@@ -1144,8 +1211,6 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
-
-            //Thông tin Bank
             parameter.AccountName = _accountName;
             parameter.AccountNameEN = _accountNameEN;
             parameter.BankName = _bankName;
@@ -1187,7 +1252,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
-                    decimal _exchangeRate = isOriginCurr ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);                    
+                    decimal _exchangeRate = isOriginCurr ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
                     var charge = new AirShipperDebitNewReport();
                     charge.IndexSort = i++;
 
@@ -1266,13 +1331,6 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             var parameter = new AirShipperDebitNewReportParams();
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.Contact = _currentUser;//Get user name login
-            parameter.CompanyDescription = string.Empty;
-
             parameter.DebitNo = criteria.CreditDebitNo;
             parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
@@ -1359,8 +1417,18 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
             parameter.OtherRef = string.Empty;//Tạm thời để trống
 
-            //Lấy thông tin Office của User Login
-            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            // Lấy thông tin Office của Creator
+            var officeOfUser = GetInfoOfficeOfUser(data.CDNote.OfficeId);
+            // Thông tin công ty
+            var companyOfUser = sysCompanyRepository.Get(x => x.Id == data.CDNote.CompanyId).FirstOrDefault();
+            parameter.CompanyName = companyOfUser?.BunameEn?.ToUpper();
+            parameter.CompanyAddress1 = officeOfUser?.AddressEn ?? string.Empty;
+            parameter.CompanyAddress2 = "Tel: " + officeOfUser?.Tel + "\nFax: " + officeOfUser?.Fax;
+            parameter.Website = companyOfUser?.Website ?? string.Empty;
+            parameter.Contact = _currentUser;//Get user name login
+            parameter.CompanyDescription = string.Empty;
+
+            // Thông tin Bank
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
@@ -1370,8 +1438,6 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
-
-            //Thông tin Bank
             parameter.AccountName = _accountName;
             parameter.AccountNameEN = _accountNameEN;
             parameter.BankName = _bankName;
@@ -1456,7 +1522,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private SysOffice GetInfoOfficeOfUser(Guid officeId)
+        private SysOffice GetInfoOfficeOfUser(Guid? officeId)
         {
             SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
             return result;

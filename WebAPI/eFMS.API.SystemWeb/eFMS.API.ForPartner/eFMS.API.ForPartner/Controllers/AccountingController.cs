@@ -51,6 +51,12 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(accountingManagementService.GenerateHashStringTest(model, apiKey));
         }
 
+        [HttpPost("CheckHash")]
+        public IActionResult CheckHash(object model, [Required] string apiKey,[Required] string hash)
+        {
+            return Ok(accountingManagementService.ValidateHashString(model, apiKey,hash));
+        }
+
 
         [HttpPut("UpdateVoucherAdvance")]
         public IActionResult UpdateVoucherAdvance(VoucherAdvance model, [Required] string apiKey, [Required] string hash)
@@ -187,7 +193,8 @@ namespace eFMS.API.ForPartner.Controllers
                 InvoiceDate = model.InvoiceDate,
                 SerieNo = model.SerieNo,
                 Currency = model.Currency,
-                Charges = model.Charges
+                Charges = model.Charges,
+                PaymentTerm = model.PaymentTerm
             };            
             invoiceToCreate.Charges.ForEach(fe => {
                 fe.ReferenceNo = model.ReferenceNo;
@@ -218,7 +225,6 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult("API Key invalid");
             }
-            //Tạm thời comment
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
                 return new CustomUnauthorizedResult("Hashed string invalid");
