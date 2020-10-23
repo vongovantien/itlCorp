@@ -33,6 +33,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
+        private readonly IContextBase<CsTransaction> transactionRepository;
+        private readonly IContextBase<OpsTransaction> opsRepository;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IOptions<ApiUrl> ApiUrl;
 
@@ -49,6 +51,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysImage> sysImageRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<CatDepartment> catDepartmentRepo,
+            IContextBase<CsTransaction> transactionRepo,
+            IContextBase<OpsTransaction> opsRepo,
             ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -61,6 +65,8 @@ namespace eFMS.API.Catalogue.DL.Services
             sysImageRepository = sysImageRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             catDepartmentRepository = catDepartmentRepo;
+            transactionRepository = transactionRepo;
+            opsRepository = opsRepo;
             ApiUrl = apiurl;
 
         }
@@ -91,7 +97,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.CompanyNameVn = company.BunameVn;
                 }
                 var officeIds = saleman.OfficeId.Split(";").ToList();
-                if(officeIds.Count() > 0)
+                if (officeIds.Count() > 0)
                 {
                     foreach (var officeId in officeIds)
                     {
@@ -109,12 +115,40 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        public Guid? GetContractIdByPartnerId(string partnerId)
+        public object GetContractIdByPartnerId(string partnerId, string jobId)
         {
-            var data = DataContext.Get().Where(x => x.PartnerId == partnerId).OrderBy(x => x.DatetimeCreated).Select(x => x.SaleManId).FirstOrDefault();
-            if (data == null) return null;
+            jobId = jobId == "null" || jobId == "undefined" ? null : jobId;
+            var DataShipment = !string.IsNullOrEmpty(jobId) ? transactionRepository.Get(x => x.Id == new Guid(jobId)).FirstOrDefault() : null;
+            var DataContract = DataContext.Get();
+            string OfficeNameAbbr = string.Empty;
+            string data = string.Empty;
+            // truong hop custom logistic
+            if (string.IsNullOrEmpty(jobId))
+            {
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL")).Select(x => x.SaleManId).FirstOrDefault();
+                if (string.IsNullOrEmpty(data))
+                {
+                    string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
+                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL")).Select(x => x.SaleManId).FirstOrDefault();
+                    OfficeNameAbbr = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID).Select(t => t.ShortName).FirstOrDefault();
+
+                }
+            }
+            else
+            {
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType)).Select(x => x.SaleManId).FirstOrDefault();
+                if (string.IsNullOrEmpty(data))
+                {
+                    string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
+                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType)).Select(x => x.SaleManId).FirstOrDefault();
+                    OfficeNameAbbr = sysOfficeRepository.Get(x => x.Id == DataShipment.OfficeId).Select(t => t.ShortName).FirstOrDefault();
+
+                }
+            }
+
+            if (data == null) return new { OfficeNameAbbr };
             Guid? salemanId = new Guid(data);
-            return salemanId;
+            return new { salemanId };
         }
 
         #region CRUD
@@ -342,7 +376,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     ObjPartner.Active = true;
                     catPartnerRepository.Update(ObjPartner, x => x.Id == partnerId);
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
-                    model.ContractService = GetContractServicesName( objUpdate.SaleService);
+                    model.ContractService = GetContractServicesName(objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
                     model.SalesmanId = objUpdate.SaleManId;
                     model.UserCreatedContract = objUpdate.UserCreated;
@@ -405,7 +439,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         {
                             contract.SaleService += "IT;";
                         }
-                        if(it.Trim() == "All")
+                        if (it.Trim() == "All")
                         {
                             contract.SaleService = "AE;SFE;SLE;SFI;SLI;CL;IT";
                         }
@@ -451,7 +485,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             contract.Vas = "AE;SFE;SLE;SFI;SLI;CL;IT";
                         }
                     }
-                    if(!string.IsNullOrEmpty(contract.Vas))
+                    if (!string.IsNullOrEmpty(contract.Vas))
                     {
                         if (contract.Vas.Length > 0)
                         {
@@ -466,7 +500,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             contract.SaleService = contract.SaleService.Remove(contract.SaleService.Length - 1);
                         }
                     }
-                  
+
                     var arrOffice = item.Office.Split(";").ToArray();
                     string officeStr = string.Empty;
                     if (arrOffice.Length > 1)
@@ -676,9 +710,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
 
-                if(item.EffectDate.HasValue && item.ExpireDate.HasValue)
+                if (item.EffectDate.HasValue && item.ExpireDate.HasValue)
                 {
-                    if(item.ExpireDate.Value < item.EffectDate.Value)
+                    if (item.ExpireDate.Value < item.EffectDate.Value)
                     {
                         item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_NOT_VALID]);
                         item.IsValid = false;
@@ -701,9 +735,9 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstTo = new List<string>();
 
             // info send to and cc
-            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID )?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
-            if (listEmailAR != null &&  listEmailAR.Any())
+            if (listEmailAR != null && listEmailAR.Any())
             {
                 lstTo = listEmailAR.Split(";").ToList();
             }
@@ -732,7 +766,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             if (type == "active")
             {
-                if(partner.PartnerType == "Customer")
+                if (partner.PartnerType == "Customer")
                 {
                     subject = "Actived Customer - " + partner.ShortName;
                     Title = "<i> Your Customer - " + partner.PartnerNameVn + " is active with info below </i> </br>";
@@ -746,7 +780,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-              
+
                 body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
                     Title +
                     "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
@@ -805,7 +839,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var contract = DataContext.Get(x => x.Id == new Guid(contractId)).FirstOrDefault();
             string employeeId = sysUserRepository.Get(x => x.Id == contract.SaleManId).Select(t => t.EmployeeId).FirstOrDefault();
             var salesmanObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
-            contract.SaleService  = GetContractServicesName(contract.SaleService);
+            contract.SaleService = GetContractServicesName(contract.SaleService);
 
             string subject = string.Empty;
             string linkVn = string.Empty;
@@ -813,7 +847,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string customerName = string.Empty;
             string url = string.Empty;
             string body = string.Empty;
-            if(partnerType == "Customer")
+            if (partnerType == "Customer")
             {
                 url = "home/commercial/customer/";
                 subject = "Reject Agreement Customer - " + partner.PartnerNameVn;
@@ -830,15 +864,15 @@ namespace eFMS.API.Catalogue.DL.Services
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
             body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
                         "Your Agreement of " + "<b>" + partner.PartnerNameVn + "</b>" + " is rejected by AR/Accountant as info bellow</br>" +
-                        "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName + 
+                        "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName +
                         "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
                         "\t  Số hợp đồng  / <i> Contract No: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br>" +
                         "\t  Service  / <i> Dịch vụ: </i> " + "<b>" + contract.SaleService + "</b>" + "</br>" +
                         "\t  Agreement type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
                         "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
-                         +linkEn + "</br>" + linkVn + "</br> </br>" +
+                         + linkEn + "</br>" + linkVn + "</br> </br>" +
                         "<i> Thanks and Regards </i>" + "</br> </br>" +
-                       "eFMS System </div>" );
+                       "eFMS System </div>");
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
 
@@ -918,7 +952,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.ApiUrl.Value.Url ;
+            string path = this.ApiUrl.Value.Url;
             try
             {
                 var list = new List<SysImage>();

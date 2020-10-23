@@ -25,11 +25,12 @@
             <param name="cdNoteId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOpsCdNote(eFMS.API.Documentation.DL.Models.AcctCDNoteDetailsModel)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOpsCdNote(eFMS.API.Documentation.DL.Models.AcctCDNoteDetailsModel,System.Boolean)">
             <summary>
             Preview CD Note (OPS)
             </summary>
-            <param name="model"></param>
+            <param name="model">AcctCDNoteDetailsModel</param>
+            <param name="isOrigin">Is Preview with Original</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.ExportOpsCdNote(System.Guid,System.String,System.Guid)">

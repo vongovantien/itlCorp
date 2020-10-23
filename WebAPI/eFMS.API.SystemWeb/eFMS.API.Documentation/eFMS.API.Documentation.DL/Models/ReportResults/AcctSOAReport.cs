@@ -27,13 +27,13 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string UnitPieaces { get; set; }
         public DateTime? Delivery { get; set; }
         public string HWBNO { get; set; }
-        public string Description { get; set;}
+        public string Description { get; set; }
         public decimal? Quantity { get; set; }
-        public string QUnit { get; set;}
+        public string QUnit { get; set; }
         public decimal? UnitPrice { get; set; }
         public string Unit { get; set; }
-        public decimal? VAT { get; set;}
-        public decimal? Debit { get; set;}
+        public decimal? VAT { get; set; }
+        public decimal? Debit { get; set; }
         public decimal? Credit { get; set; }
         public string Notes { get; set; }
         public string InputData { get; set; }
@@ -59,6 +59,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public DateTime? NgayDK { get; set; }
         public DateTime? CustomDate { get; set; }
         public string JobNo { get; set; }
+        public decimal? ExchangeRateToUsd { get; set; }
+        public decimal? ExchangeRateToVnd { get; set; }
+        public decimal? ExchangeVATToUsd { get; set; }
     }
 
 
@@ -95,6 +98,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Contact { get; set; }
         public string IssuedDate { get; set; }
         public string OtherRef { get; set; }
+        public bool IsOrigin { get; set; }
 
     }
 }

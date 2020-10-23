@@ -105,10 +105,10 @@ namespace eFMS.API.Documentation.DL.Services
             model.OfficeId = currentUser.OfficeID;
             model.CompanyId = currentUser.CompanyID;
             var customer = partnerRepository.Get(x => x.Id == model.CustomerId).FirstOrDefault();
-            if(customer != null)
-            {
-                model.SalemanId = customer.SalePersonId;
-            }
+            //if(customer != null)
+            //{
+            //    model.SalemanId = customer.SalePersonId;
+            //}
             var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
             if(dayStatus > 0)
             {

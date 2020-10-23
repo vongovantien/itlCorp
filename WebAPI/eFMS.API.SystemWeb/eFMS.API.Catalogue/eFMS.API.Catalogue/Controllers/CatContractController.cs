@@ -104,15 +104,15 @@ namespace eFMS.API.Catalogue.Controllers
         /// get the list of saleman by partner id
         /// </summary>
         /// <param name="partnerId">partnerId that want to retrieve saleman</param>
+        /// <param name="jobId">partnerId that want to retrieve saleman</param>
         /// <returns></returns>
-
-        [HttpGet("GetSalemanIdByPartnerId/{partnerId}")]
-        public IActionResult GetSalemanIdByPartnerId(string partnerId)
+        [Authorize]
+        [HttpGet("GetSalemanIdByPartnerId/{partnerId}/{jobId}")]
+        public IActionResult GetSalemanIdByPartnerId(string partnerId, string jobId)
         {
-            Guid? id = catContractService.GetContractIdByPartnerId(partnerId);
-            return Ok(id);
+            object data = catContractService.GetContractIdByPartnerId(partnerId, jobId);
+            return Ok(data);
         }
-
         /// <summary>
         /// add new saleman
         /// </summary>

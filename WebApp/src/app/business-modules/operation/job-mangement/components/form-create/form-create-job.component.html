@@ -210,6 +210,20 @@
                                     </ng-select>
                                 </div>
                             </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Salesman
+                                    </label>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value: salemansId.value}"
+                                        (itemSelected)="onSelectDataFormInfo($event, 'salesman')"
+                                        [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async"
+                                        size="15" [displayFields]="displayFieldSalesman"
+                                        (remove)="resetFormControl(salemansId)">
+                                    </app-combo-grid-virtual-scroll>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -217,3 +231,5 @@
         </div>
     </div>
 </form>
+<info-popup [body]="" [title]="'Notification'" [label]="'Ok'">
+</info-popup>

@@ -22,7 +22,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Update(CatContractModel model);
 
         List<CatContractModel> GetBy(string partnerId);
-        Guid? GetContractIdByPartnerId(string partnerId);
+        object GetContractIdByPartnerId(string partnerId, string jobId);
         Task<ResultHandle> UploadContractFile(ContractFileUploadModel model);
         //Task<ResultHandle> UploadMoreContractFile(UploadFileMoreContractModel model);
         Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model);

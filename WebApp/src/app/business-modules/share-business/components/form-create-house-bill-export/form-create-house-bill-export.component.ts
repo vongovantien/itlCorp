@@ -7,7 +7,7 @@ import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, csBookingNote } from '@models';
 import { JobConstants, ChargeConstants, SystemConstants } from '@constants';
-import { AppComboGridComponent } from '@common';
+import { AppComboGridComponent, InfoPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
 import { FormValidators } from '@validators';
@@ -27,6 +27,7 @@ import { DataService } from '@services';
 export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm implements OnInit {
 
     @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
     @Input() isUpdate: boolean = false;
     @Input() set type(t: string) { this._type = t; }
@@ -144,6 +145,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 .subscribe(
                     (res: CsTransactionDetail) => {
                         if (!!res) {
+                            this.shipmmentDetail.id = res.jobId;
                             this.updateFormValue(res);
                         }
                     }
@@ -439,18 +441,18 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         switch (type) {
             case 'customer':
                 this.customer.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.shipmmentDetail.id).subscribe((res: any) => {
                     if (!!res) {
-                        this.saleMan.setValue(res);
-                    } else {
-                        this.saleMans = this.saleMans.pipe(
-                            tap((users: User[]) => {
-                                const user: User = users.find((u: User) => u.id === data.salePersonId);
-                                if (!!user) {
-                                    this.saleMan.setValue(user.id);
-                                }
-                            })
-                        );
+                        if (!!res.salemanId) {
+                            this.saleMan.setValue(res.salemanId);
+                        } else {
+                            this.saleMan.setValue(null);
+                        }
+                        if (!!res.officeNameAbbr) {
+                            console.log(res.officeNameAbbr);
+                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                            this.infoPopup.show();
+                        }
                     }
                 });
 
