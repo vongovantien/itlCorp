@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { Customer, PortIndex, User } from '@models';
@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { FormValidators } from '@validators';
 import { JobConstants } from '@constants';
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -19,6 +20,7 @@ import { JobConstants } from '@constants';
 })
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     formCreate: FormGroup;
 
     hwbno: AbstractControl;
@@ -37,6 +39,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     billingOpsId: AbstractControl;
     commodityGroupId: AbstractControl;
     shipmentType: AbstractControl;
+    salemansId: AbstractControl;
 
     productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -49,17 +52,23 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     users: Observable<User[]>;
-    salemansId: string = null;
+    salesmans: Observable<User[]>;
 
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
         { field: 'nameEn', label: 'Port Name' },
         { field: 'countryNameEN', label: 'Country' },
     ];
+
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
         { field: 'partnerNameEn', label: 'Name EN' },
         { field: 'taxCode', label: 'Tax Code' },
+    ];
+
+    displayFieldSalesman: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'username', label: 'User Name' },
+        { field: 'employeeNameEn', label: 'Full Name' }
     ];
 
     commonData$: any;
@@ -92,7 +101,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             );
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-
+        this.salesmans = this._systemRepo.getSystemUsers();
         this.initForm();
     }
 
@@ -117,12 +126,29 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 break;
             case 'customer':
                 this.customerId.setValue(data.id);
-                const customerArray = this.customers.toPromise().then(res => {
-                    const customer: Customer = res.find(x => x.id === data.id);
-                    if (!!customer) {
-                        this.salemansId = customer.salePersonId;
+                // const customerArray = this.customers.toPromise().then(res => {
+                //     const customer: Customer = res.find(x => x.id === data.id);
+                //     if (!!customer) {
+                //         this.salemansId = customer.salePersonId;
+                //     }
+                // });
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id, null).subscribe((res: any) => {
+                    if (!!res) {
+                        if (!!res.salemanId) {
+                            this.salemansId.setValue(res.salemanId);
+                        } else {
+                            this.salemansId.setValue(null);
+                        }
+                        if (!!res.officeNameAbbr) {
+                            console.log(res.officeNameAbbr);
+                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                            this.infoPopup.show();
+                        }
                     }
                 });
+                break;
+            case 'salesman':
+                this.salemansId.setValue(data.id);
                 break;
             default:
                 break;
@@ -150,6 +176,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             supplierId: [],
             agentId: [],
             billingOpsId: [null, Validators.required],
+            salemansId: []
         }, { validator: FormValidators.comparePort });
 
         this.hwbno = this.formCreate.controls['hwbno'];
@@ -166,6 +193,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.agentId = this.formCreate.controls['agentId'];
         this.billingOpsId = this.formCreate.controls['billingOpsId'];
         this.shipmentType = this.formCreate.controls['shipmentType'];
+        this.salemansId = this.formCreate.controls['salemansId'];
 
         if (!!this.userLogged) {
             this.billingOpsId.setValue(this.userLogged.id);

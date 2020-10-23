@@ -54,6 +54,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string Status { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public string SyncStatus { get; set; }
+        public string Currency { get; set; }
+        public decimal? ExchangeRate { get; set; }
         public string Note { get; set; }
     }
 }

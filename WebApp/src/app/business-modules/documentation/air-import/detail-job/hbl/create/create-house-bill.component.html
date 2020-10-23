@@ -27,12 +27,15 @@
         </tabset>
     </div>
 </div>
+
 <import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="3">
 </import-house-bill-detail>
+
 <confirm-popup #confirmSave body="You are about to create a new HAWB. Are you sure all entered details are correct?"
     (onSubmit)="saveHBL()"></confirm-popup>
 
 <info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB'"></info-popup>
+
 <confirm-popup #confirmSaveExistedHbl body="HAWB No has existed, do you want to continue saving?"
     (onSubmit)="confirmSaveData()" title="HAWB Existed"></confirm-popup>

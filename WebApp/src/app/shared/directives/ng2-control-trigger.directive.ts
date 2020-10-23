@@ -13,11 +13,6 @@ export class Ng2ControlTriggerDirective {
         }
     }
 
-    @HostListener('focus', ['$event'])
-    onFocusHandle(e: any) {
-        console.log(123);
-    }
-
     constructor(private _ng2: SelectComponent) {
     }
 

@@ -23,6 +23,7 @@ import { JobConstants } from '@constants';
 import { SelectItem } from 'ng2-select';
 import { DataService } from '@services';
 import { formatDate } from '@angular/common';
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -32,6 +33,7 @@ import { formatDate } from '@angular/common';
 export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
     @ViewChild(ShareAirExportOtherChargePopupComponent, { static: false }) otherChargePopup: ShareAirExportOtherChargePopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
     formCreate: FormGroup;
     customerId: AbstractControl;
@@ -225,7 +227,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                     firstCarrierBy: shipment.flightVesselName,
                                     freightPayment: !!shipment.paymentTerm ? [(this.termTypes).find(type => type.id === shipment.paymentTerm)] : null,
                                     kgIb: 'K',
-                                    handingInformation: this.setDefaultHandlingInformation(shipment)                                   
+                                    handingInformation: this.setDefaultHandlingInformation(shipment)
                                 });
 
                                 // *  CR 14501
@@ -473,18 +475,18 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 this.customerId.setValue(data.id);
                 this.selectedCustomer = data;
 
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.jobId).subscribe((res: any) => {
                     if (!!res) {
-                        this.saleManId.setValue(res);
-                    } else {
-                        this.saleMans = this.saleMans.pipe(
-                            tap((users: User[]) => {
-                                const user: User = users.find((u: User) => u.id === data.salePersonId);
-                                if (!!user) {
-                                    this.saleManId.setValue(user.id);
-                                }
-                            })
-                        );
+                        if (!!res.salemanId) {
+                            this.saleManId.setValue(res.salemanId);
+                        } else {
+                            this.saleManId.setValue(null);
+                        }
+                        if (!!res.officeNameAbbr) {
+                            console.log(res.officeNameAbbr);
+                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                            this.infoPopup.show();
+                        }
                     }
                 });
                 if (!this.shipperId.value) {

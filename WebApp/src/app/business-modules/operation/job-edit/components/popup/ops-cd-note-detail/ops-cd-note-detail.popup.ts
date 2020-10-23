@@ -180,10 +180,10 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         }
     }
 
-    preview() {
+    preview(isOrigin: boolean) {
         this.CdNoteDetail.totalCredit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
         this.CdNoteDetail.totalDebit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
-        this._documentationRepo.previewCDNote(this.CdNoteDetail)
+        this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
