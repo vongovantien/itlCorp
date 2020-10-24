@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using eFMS.API.ForPartner.Infrastructure.Extensions;
+using System;
+
 namespace eFMS.API.ForPartner.Controllers
 {
     /// <summary>
@@ -68,6 +70,13 @@ namespace eFMS.API.ForPartner.Controllers
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
                 return new CustomUnauthorizedResult("Hashed string invalid");
+            }
+
+            var fieldRequireVoucherAdvance = GetFieldRequireForUpdateVoucherAdvance(model);
+            if (!string.IsNullOrEmpty(fieldRequireVoucherAdvance))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Trường {0} không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireVoucherAdvance), Data = model };
+                return BadRequest(_result);
             }
 
             HandleState hs = accountingManagementService.UpdateVoucherAdvance(model, apiKey);
@@ -126,19 +135,33 @@ namespace eFMS.API.ForPartner.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
-            if (debitCharges.Count == 0)
+            var fieldRequireInvoice = GetFieldRequireForCreateInvoice(model);
+            if (!string.IsNullOrEmpty(fieldRequireInvoice))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Trường {0} không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireInvoice), Data = model };
+                return BadRequest(_result);
+            }
+
+            var debit_Obh_Charges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT || x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
+            if (debit_Obh_Charges.Count == 0)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để tạo hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
 
-            var hs = accountingManagementService.InsertInvoice(model, apiKey);
+            var checkNotExistsPaymentTermOfCharge = model.Charges.Where(x => x.PaymentTerm == null || x.PaymentTerm < 1).Any();
+            if (checkNotExistsPaymentTermOfCharge)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "PaymentTerm (bắt buộc > 0) không có dữ liệu. Vui lòng kiểm tra lại!", Data = model };
+                return BadRequest(_result);
+            }
+
+            var hs = accountingManagementService.InsertInvoice(model, apiKey, "CreateInvoiceData");
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Tạo mới hóa đơn thành công", Data = model };
             if (!hs.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() + ". Tạo mới hóa đơn thất bại", Data = model };
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Tạo mới hóa đơn thất bại", hs.Message.ToString()), Data = model };
                 return BadRequest(_result);
             }
             return Ok(result);
@@ -165,10 +188,24 @@ namespace eFMS.API.ForPartner.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
-            if (debitCharges.Count == 0)
+            var fieldRequireInvoice = GetFieldRequireForUpdateInvoice(model);
+            if (!string.IsNullOrEmpty(fieldRequireInvoice))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Trường {0} không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireInvoice), Data = model };
+                return BadRequest(_result);
+            }
+
+            var debit_Obh_Charges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT || x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
+            if (debit_Obh_Charges.Count == 0)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để thay thế hóa đơn. Vui lòng kiểm tra lại!", Data = model };
+                return BadRequest(_result);
+            }
+
+            var checkNotExistsPaymentTermOfCharge = model.Charges.Where(x => x.PaymentTerm == null || x.PaymentTerm < 1).Any();
+            if (checkNotExistsPaymentTermOfCharge)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "PaymentTerm (bắt buộc > 0) không có dữ liệu. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
 
@@ -177,10 +214,10 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 ReferenceNo = model.PreReferenceNo
             };
-            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey);
+            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey, "ReplaceInvoiceData");
             if (!hsDeleteInvoice.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = hsDeleteInvoice.Message.ToString() + ". Xóa hóa đơn cũ thất bại", Data = model };
+                ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = string.Format(@"{0}. Xóa hóa đơn cũ thất bại", hsDeleteInvoice.Message.ToString()), Data = model };
                 return BadRequest(_result);
             }
             #endregion --- Delete Invoice Old by PreReferenceNo ---
@@ -194,18 +231,18 @@ namespace eFMS.API.ForPartner.Controllers
                 SerieNo = model.SerieNo,
                 Currency = model.Currency,
                 Charges = model.Charges,
-                PaymentTerm = model.PaymentTerm
+                Description = model.Description
             };            
             invoiceToCreate.Charges.ForEach(fe => {
                 fe.ReferenceNo = model.ReferenceNo;
             });
-            var hsInsertInvoice = accountingManagementService.InsertInvoice(invoiceToCreate, apiKey);
+            var hsInsertInvoice = accountingManagementService.InsertInvoice(invoiceToCreate, apiKey, "ReplaceInvoiceData");
             #endregion --- Create New Invoice by ReferenceNo ---
 
             ResultHandle result = new ResultHandle { Status = hsInsertInvoice.Success, Message = "Thay thế hóa đơn thành công", Data = model };
             if (!hsInsertInvoice.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hsInsertInvoice.Success, Message = hsInsertInvoice.Message.ToString() + ". Thay thế hóa đơn thất bại", Data = model };
+                ResultHandle _result = new ResultHandle { Status = hsInsertInvoice.Success, Message = string.Format(@"{0}. Thay thế hóa đơn thất bại", hsInsertInvoice.Message.ToString()), Data = model };
                 return BadRequest(_result);
             }
             return Ok(result);
@@ -231,11 +268,11 @@ namespace eFMS.API.ForPartner.Controllers
             }
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = accountingManagementService.DeleteInvoice(model, apiKey);            
+            var hs = accountingManagementService.DeleteInvoice(model, apiKey, "CancellingInvoice");            
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Hủy hóa đơn thành công", Data = model };
             if (!hs.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() + ". Hủy hóa đơn thất bại", Data = model };
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Hủy hóa đơn thất bại", hs.Message.ToString()), Data = model };
                 return BadRequest(_result);
             }
             return Ok(result);
@@ -264,10 +301,107 @@ namespace eFMS.API.ForPartner.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Reject data thành công", Data = model };
             if (!hs.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() + ". Reject data thất bại", Data = model };
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Reject data thất bại", hs.Message.ToString()), Data = model };
                 return BadRequest(_result);
             }
             return Ok(result);
         }
+
+        [HttpPut("RemoveVoucher")]
+        public IActionResult RemoveVoucher(RejectData model, [Required] string apiKey, [Required] string hash)
+        {
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult("API Key invalid");
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult("Hashed string invalid");
+            }
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = accountingManagementService.RemoveVoucher(model, apiKey);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Remove voucher thành công", Data = model };
+            if (!hs.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Remove voucher thất bại", hs.Message.ToString()), Data = model };
+                return BadRequest(_result);
+            }
+            return Ok(result);
+        }
+        #region --- PRIVATE ---
+        private string GetFieldRequireForCreateInvoice(InvoiceCreateInfo model)
+        {
+            string message = string.Empty;
+            if (string.IsNullOrEmpty(model.PartnerCode))
+            {
+                message += "PartnerCode";
+            }
+            if (string.IsNullOrEmpty(model.InvoiceNo))
+            {
+                message += !string.IsNullOrEmpty(message) ? ", InvoiceNo" : "InvoiceNo";
+            }
+            if (string.IsNullOrEmpty(model.SerieNo))
+            {
+                message += !string.IsNullOrEmpty(message) ? ", SerieNo" : "SerieNo";
+            }
+            if (model.InvoiceDate == null)
+            {
+                message += !string.IsNullOrEmpty(message) ? ", InvoiceDate" : "InvoiceDate";
+            }
+            if (string.IsNullOrEmpty(model.Currency))
+            {
+                message += !string.IsNullOrEmpty(message) ? ", Currency" : "Currency";
+            }
+            return message;
+        }
+
+        private string GetFieldRequireForUpdateInvoice(InvoiceUpdateInfo model)
+        {
+            string message = string.Empty;
+            if (string.IsNullOrEmpty(model.PartnerCode))
+            {
+                message += "PartnerCode";
+            }
+            if (string.IsNullOrEmpty(model.InvoiceNo))
+            {
+                message += !string.IsNullOrEmpty(message) ? ", InvoiceNo" : "InvoiceNo";
+            }
+            if (string.IsNullOrEmpty(model.SerieNo))
+            {
+                message += !string.IsNullOrEmpty(message) ? ", SerieNo" : "SerieNo";
+            }
+            if (model.InvoiceDate == null)
+            {
+                message += !string.IsNullOrEmpty(message) ? ", InvoiceDate" : "InvoiceDate";
+            }
+            if (string.IsNullOrEmpty(model.Currency))
+            {
+                message += !string.IsNullOrEmpty(message) ? ", Currency" : "Currency";
+            }
+            return message;
+        }
+
+        private string GetFieldRequireForUpdateVoucherAdvance(VoucherAdvance model)
+        {
+            string message = string.Empty;
+            if (string.IsNullOrEmpty(model.VoucherNo))
+            {
+                message += "VoucherNo";
+            }
+            if (model.VoucherDate == null)
+            {
+                message += !string.IsNullOrEmpty(message) ? ", VoucherDate" : "VoucherDate";
+            }
+            if (model.PaymentTerm == null || model.PaymentTerm < 1)
+            {
+                message += !string.IsNullOrEmpty(message) ? ", PaymentTerm (bắt buộc > 0)" : "PaymentTerm (bắt buộc > 0)";
+            }
+            if (string.IsNullOrEmpty(model.AdvanceNo))
+            {
+                message += !string.IsNullOrEmpty(message) ? ", AdvanceNo" : "AdvanceNo";
+            }
+            return message;
+        }
+        #endregion --- PRIVATE ---
     }
 }
