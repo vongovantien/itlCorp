@@ -88,7 +88,8 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
+                return BadRequest(_result);
             }
             return Ok(result);
         }

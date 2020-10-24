@@ -45,7 +45,7 @@
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
                                                         <ng-container
-                                                            *ngIf="!invoice.paymentStatus || invoice.paymentStatus == 'Unpaid'">
+                                                            *ngIf="(!invoice.paymentStatus || invoice.paymentStatus == 'Unpaid') && !invoice.referenceNo">
                                                             <app-permission-button
                                                                 (onClick)="prepareDeleteInvoice(invoice)" type="delete">
                                                             </app-permission-button>

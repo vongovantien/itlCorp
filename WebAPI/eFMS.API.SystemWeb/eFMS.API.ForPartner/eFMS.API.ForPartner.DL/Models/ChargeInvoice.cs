@@ -9,5 +9,6 @@ namespace eFMS.API.ForPartner.DL.Models
         public string ChargeType { get; set; }
         public decimal? ExchangeRate { get; set; }
         public string ReferenceNo { get; set; }
+        public decimal? PaymentTerm { get; set; }
     }
 }
