@@ -5,6 +5,11 @@ namespace eFMS.API.Setting.Service.Models
 {
     public partial class SysOffice
     {
+        public SysOffice()
+        {
+            CatDepartment = new HashSet<CatDepartment>();
+        }
+
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
@@ -39,5 +44,6 @@ namespace eFMS.API.Setting.Service.Models
         public DateTime? DatetimeModified { get; set; }
 
         public virtual SysCompany Bu { get; set; }
+        public virtual ICollection<CatDepartment> CatDepartment { get; set; }
     }
 }
