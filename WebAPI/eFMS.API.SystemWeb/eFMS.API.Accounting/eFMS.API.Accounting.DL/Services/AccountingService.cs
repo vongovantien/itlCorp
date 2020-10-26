@@ -637,7 +637,7 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.Description = string.Empty;
                     detail.ObhPartnerCode = string.Empty; //Để trống
                     detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
-                    detail.Stt_Cd_Htt = "TEST"; //Sẽ update sau
+                    detail.Stt_Cd_Htt = invoice.ReferenceNo; //ReferenceNo of Invoice (Bravo Updated)
                     detail.ChargeType = "DEBIT";
 
                     details.Add(detail);

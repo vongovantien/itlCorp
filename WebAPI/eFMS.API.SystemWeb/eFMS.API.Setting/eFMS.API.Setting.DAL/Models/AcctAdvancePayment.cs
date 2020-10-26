@@ -26,5 +26,12 @@ namespace eFMS.API.Setting.Service.Models
         public Guid? CompanyId { get; set; }
         public string VoucherNo { get; set; }
         public DateTime? VoucherDate { get; set; }
+        public decimal? PaymentTerm { get; set; }
+        public DateTime? LastSyncDate { get; set; }
+        public string SyncStatus { get; set; }
+        public string ReasonReject { get; set; }
+        public string BankAccountNo { get; set; }
+        public string BankAccountName { get; set; }
+        public string BankName { get; set; }
     }
 }

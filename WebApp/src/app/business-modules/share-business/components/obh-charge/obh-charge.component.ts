@@ -154,19 +154,21 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             case 'payer':
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
+                        console.log(this.hbl);
                         chargeItem.payerName = this.hbl.customerName;
-                        if (!chargeItem.payerName) {
-                            chargeItem.payerName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
-                        }
+                        chargeItem.payerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).shortName;
                         chargeItem.payerId = this.hbl.customerId;
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
                         chargeItem.payerName = this.shipment.supplierName;
                         chargeItem.payerId = this.shipment.coloaderId;
+                        chargeItem.payerShortName = this.listPartner.find(p => p.id === this.shipment.coloaderId).shortName;
                         break;
                     case CommonEnum.PartnerGroupEnum.AGENT:
-                        chargeItem.payerName = this.shipment.agentName;
+                        chargeItem.payerShortName = this.listPartner.find(p => p.id === this.shipment.agentId).shortName;
                         chargeItem.payerId = this.shipment.agentId;
+                        chargeItem.payerName = this.shipment.agentName;
+
                         break;
                     default:
                         break;
@@ -192,7 +194,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     chargeItem.payerName = partnerData.partnerNameEn;
                     chargeItem.payerId = partnerData.id;
                     chargeItem.payerShortName = partnerData.shortName;
-
                 }
                 break;
             default:

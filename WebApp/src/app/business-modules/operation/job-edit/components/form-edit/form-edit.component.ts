@@ -11,6 +11,7 @@ import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
 import { JobConstants } from '@constants';
 import { map } from 'rxjs/operators';
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'job-mangement-form-edit',
@@ -18,7 +19,7 @@ import { map } from 'rxjs/operators';
 })
 export class JobManagementFormEditComponent extends AppForm implements OnInit {
     @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
-
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     opsTransaction: OpsTransaction = null;
 
     formEdit: FormGroup;
@@ -282,10 +283,24 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 break;
             case 'customer':
                 this.customerId.setValue(data.id);
-                const customerArray = this.customers.toPromise().then(res => {
-                    const customer: Customer = res.find(x => x.id === data.id);
-                    if (!!customer) {
-                        this.salemansId.setValue(customer.salePersonId);
+                // const customerArray = this.customers.toPromise().then(res => {
+                //     const customer: Customer = res.find(x => x.id === data.id);
+                //     if (!!customer) {
+                //         this.salemansId.setValue(customer.salePersonId);
+                //     }
+                // });
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                    if (!!res) {
+                        if (!!res.salemanId) {
+                            this.salemansId.setValue(res.salemanId);
+                        } else {
+                            this.salemansId.setValue(null);
+                        }
+                        if (!!res.officeNameAbbr) {
+                            console.log(res.officeNameAbbr);
+                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                            this.infoPopup.show();
+                        }
                     }
                 });
                 break;
