@@ -81,7 +81,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isChangeAgrmentType: boolean = false;
     status: boolean = false;
     isAllowActiveContract: boolean = false;
-
+    isDisabledExpiredDateField: boolean = false;
 
     indexDetailContract: number = null;
 
@@ -587,6 +587,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             currencyId: !!this.selectedContract.currencyId ? [{ id: this.selectedContract.currencyId, text: this.selectedContract.currencyId }] : null
         });
         this.contractTypeDetail = this.selectedContract.contractType;
+        if (this.selectedContract.contractType === 'Trial') {
+            this.isDisabledExpiredDateField = true;
+        } else {
+            this.isDisabledExpiredDateField = false;
+        }
     }
 
 
@@ -757,6 +762,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
     }
 
+    selectedAgreementType($event: any) {
+        console.log($event);
+        if ($event.id === 'Trial') {
+            this.isDisabledExpiredDateField = true;
+            if (!!this.effectiveDate.value.startDate) {
+                this.expiredDate.setValue({
+                    startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
+                    endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
+                });
+            }
+        } else {
+            this.isDisabledExpiredDateField = false;
+        }
+    }
+
     mapOfficeId() {
         let officeId = '';
         const off = this.offices.filter(office => office.id !== 'All');
@@ -789,6 +809,25 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this._toastService.success('Sent Successfully!');
+                    } else {
+                        this._toastService.error('something went wrong!');
+                    }
+                }
+            );
+    }
+
+    onARConfirmed() {
+        this._progressRef.start();
+        this._catalogueRepo.arConfirmed(this.partnerId, this.selectedContract.id, this.type)
+            .pipe(
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (res === true) {
+                        this.selectedContract.arconfirmed = true;
+                        this.onRequest.emit(this.selectedContract);
+                        this._toastService.success('AR Confirm Successfully!');
                     } else {
                         this._toastService.error('something went wrong!');
                     }

@@ -417,6 +417,25 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+
+
+        /// <summary>
+        /// send email AR Confirmed
+        /// </summary>
+        /// <param name="partnerId">id of data that need to retrieve</param>
+        /// <param name="contractId">id of data that need to retrieve</param>
+        /// <param name="partnerType">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet("ARConfirmed")]
+        [Authorize]
+        public IActionResult ARConfirmed(string partnerId, string contractId, string partnerType)
+        {
+            bool result = catContractService.SendMailARConfirmed(partnerId, contractId , partnerType);
+            return Ok(result);
+        }
+
+
+
         /// <summary>
         /// reject partner comment
         /// </summary>

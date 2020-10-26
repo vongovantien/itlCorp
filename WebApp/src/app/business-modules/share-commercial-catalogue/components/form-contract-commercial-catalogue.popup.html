@@ -113,6 +113,7 @@
                                 <label>Expired Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="expiredDate" readonly
                                         [minDate]="minDateExpired" />
@@ -131,8 +132,8 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
                                 <label required>Agreement Type</label>
                                 <ng-select #ct [items]="contractTypes" [allowClear]="true"
-                                    (opened)="closeOtherSelects(ct)" formControlName="contractType"
-                                    placeholder="Please select">
+                                    (selected)="selectedAgreementType($event)" (opened)="closeOtherSelects(ct)"
+                                    formControlName="contractType" placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
@@ -422,8 +423,8 @@
                             <span> Request Approval </span>
                         </span>
                     </button>
-                    <button
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                    <button (click)="onARConfirmed()"
+                        *ngIf="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
                         class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-check"></i>

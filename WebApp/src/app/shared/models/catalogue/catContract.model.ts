@@ -47,6 +47,7 @@ export class Contract {
     isRequestApproval: boolean = false;
     partnerStatus: boolean = false;
     isChangeAgrmentType: boolean = false;
+    arconfirmed: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
