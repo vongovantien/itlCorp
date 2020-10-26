@@ -3,10 +3,12 @@ import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCance
 import { IdentityRepo, SystemRepo } from '@repositories';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { Employee, Office } from '@models';
+import { Employee, Office, SysNotification } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
+import { SignalRService } from '@services';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-header',
@@ -34,12 +36,16 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     subscriptions: Subscription[] = [];
 
+    notifications: SysNotification[] = [];
+
     constructor(
         private router: Router,
         private _systemRepo: SystemRepo,
         private _activedRouter: ActivatedRoute,
         private _identity: IdentityRepo,
-        private _globalState: GlobalState
+        private _globalState: GlobalState,
+        private _signalRService: SignalRService,
+        private _toast: ToastrService
     ) { }
 
     ngOnInit() {
@@ -94,6 +100,27 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         });
 
         this.subscriptions.push(indentitySub, routerSub);
+
+        this.getListNotification();
+
+        this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
+            if (data) {
+                this._toast.info(`You have a new message ${data.title}`, 'Infomation');
+                this.notifications.push(data);
+            }
+
+        });
+    }
+
+    getListNotification() {
+        this._systemRepo.getListNotifications()
+            .pipe()
+            .subscribe(
+                (res: SysNotification[]) => {
+                    this.notifications = res || [];
+                    console.log(this.notifications);
+                }
+            );
     }
 
     viewProfile() {
