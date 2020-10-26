@@ -13,6 +13,15 @@ using Microsoft.Extensions.Logging;
 using eFMS.API.Infrastructure;
 using eFMS.API.Common.Globals;
 using StackExchange.Redis;
+using eFMS.API.System.Infrastructure.Hubs;
+using eFMS.API.System.Infrastructure.EndPoints;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using EFCore.DbContextFactory.Extensions;
+using eFMS.API.System.Service.Contexts;
+using eFMS.API.System.Infrastructure.Extensions;
+using Microsoft.AspNetCore.SignalR;
+using eFMS.API.System.Service.Models;
 
 namespace eFMS.API.System
 {
@@ -39,6 +48,13 @@ namespace eFMS.API.System
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o => o.AddPolicy("AllowAny", builder => {
+                builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:4200");
+            }));
             services.AddAutoMapper();
             services.AddSession();
             services.AddInfrastructure<LanguageSub>(Configuration);
@@ -47,9 +63,10 @@ namespace eFMS.API.System
             services.AddMemoryCache();
 
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetConnectionString("Redis")));
+            services.AddSignalR();
+
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
-
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
@@ -95,12 +112,19 @@ namespace eFMS.API.System
                         description.GroupName.ToUpperInvariant());
                 }
             });
+            app.UseCors("AllowAny");
             app.UseStaticFiles();
             app.UseCors("AllowAllOrigins");
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<NotificationHub>("/notification");
+            });
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
+
+            app.UseSqlTableDependency<NotificationHubSubscription>(Configuration.GetConnectionString("eFMSConnection"));
             //app.UseRequestLocalization();
         }
     }

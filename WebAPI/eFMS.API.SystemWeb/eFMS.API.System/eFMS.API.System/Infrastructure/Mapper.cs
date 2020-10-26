@@ -34,6 +34,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysSettingFlow, SysSettingFlowModel>();
             CreateMap<SetLockingDateShipment, SetLockingDateShipmentModel>();
             CreateMap<SysPartnerApi, SysPartnerAPIModel>();
+            CreateMap<SysNotifications, SysNotificationsModel>();
 
 
             //map view model to entity model
@@ -57,6 +58,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysSettingFlowModel,SysSettingFlow >();
             CreateMap<SetLockingDateShipmentModel, SetLockingDateShipment>();
             CreateMap<SysPartnerAPIModel, SysPartnerApi>();
+            CreateMap<SysNotificationsModel, SysNotifications>();
+
 
 
         }
