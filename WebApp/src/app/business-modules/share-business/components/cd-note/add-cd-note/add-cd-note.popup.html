@@ -150,7 +150,7 @@
                                                     <div class="table-actions">
                                                         <label class="m-checkbox">
                                                             <input type="checkbox" [(ngModel)]="charge.isSelected"
-                                                                [disabled]="(charge.debitNo !== null || charge.creditNo !== null) && (charge.voucherId !== null || charge.soano !== null)"
+                                                                [disabled]="(charge.debitNo !== null || charge.creditNo !== null) && (charge.voucherId !== null || charge.soano !== null || charge.paySoano !== null)"
                                                                 (change)="onChangeCheckBoxItemCharge(charges)">
                                                             <span></span>
                                                         </label>

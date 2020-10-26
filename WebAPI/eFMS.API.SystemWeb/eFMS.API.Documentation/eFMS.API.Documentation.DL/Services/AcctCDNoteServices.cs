@@ -1074,7 +1074,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Thông tin list charge
                     charge.Subject = "LOCAL CHARGES";
-                    charge.Description = item.NameEn + (string.IsNullOrEmpty(item.Notes) ? "": " " + string.Format("( {0} )", item.Notes));//Charge name
+                    charge.Description = item.NameEn;//Charge name
+                    charge.Notes = string.IsNullOrEmpty(item.Notes) ? "" : "(" + item.Notes + ")";
                     charge.Quantity = item.Quantity;
                     charge.Unit = item.UnitCode; //Unit Code
                     charge.QUnit = isOriginCurr ? item.CurrencyId : criteria.Currency;
