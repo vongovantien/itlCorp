@@ -126,7 +126,9 @@ namespace eFMS.API.Accounting.DL.Services
                                                              CustomerCode = employee.StaffCode,
                                                              OfficeCode = office.Code,
                                                              DocDate = ad.RequestDate,
-                                                             ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency)
+                                                             ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
+                                                             DueDate = ad.PaymentTerm,
+                                                             PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod
                                                          };
                 List<BravoAdvanceModel> data = queryAdv.ToList();
                 foreach (var item in data)
@@ -183,6 +185,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                   ExchangeRate = GetExchangeRate(voucher.Date, voucher.Currency),
                                                                   Description0 = voucher.Description,
                                                                   AccountNo = voucher.AccountNo,
+                                                                  PaymentMethod = voucher.PaymentMethod
                                                               };
 
                 List<BravoVoucherModel> data = queryVouchers.ToList();
@@ -258,7 +261,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
                                                                        Description0 = settle.Note,
                                                                        CustomerName = employee.EmployeeNameVn,
-                                                                       CustomerCode = employee.StaffCode
+                                                                       CustomerCode = employee.StaffCode,
+                                                                       PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -415,6 +419,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = cdNote.Note;
                 sync.DataType = "CDNOTE";
+                sync.PaymentMethod = "Bank Transfer"; //Set default "Bank Transfer"
 
                 var charges = new List<ChargeCreditSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
@@ -559,6 +564,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = soa.Note;
                 sync.DataType = "SOA";
+                sync.PaymentMethod = "Bank Transfer"; //Set default "Bank Transfer"
 
                 var charges = new List<ChargeCreditSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
