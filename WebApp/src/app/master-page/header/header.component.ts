@@ -123,6 +123,12 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             );
     }
 
+    selectNotification(noti: SysNotification, e: any) {
+        e.stopPropagation();
+        noti.isRead = true;
+        console.log(noti);
+    }
+
     viewProfile() {
         this.router.navigate([`home/profile/${this.currenUser.id}`]);
     }
@@ -265,7 +271,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 
     ngOnDestroy(): void {
-        console.log(this.subscriptions);
         if (this.subscriptions.length) {
             this.subscriptions.forEach(c => c.unsubscribe());
         }
