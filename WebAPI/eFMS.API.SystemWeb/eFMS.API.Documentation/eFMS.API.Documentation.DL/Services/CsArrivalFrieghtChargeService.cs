@@ -33,6 +33,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatPartner> partnerRepositoty;
         private readonly IContextBase<SysOffice> officeRepo;
         private readonly IContextBase<SysCompany> companyRepo;
+        private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
+
 
         ICsTransactionDetailService houseBills;
 
@@ -100,21 +102,26 @@ namespace eFMS.API.Documentation.DL.Services
 
         private List<CsArrivalFrieghtChargeModel> GetFreightCharge(Guid hblid)
         {
-            var result = new List<CsArrivalFrieghtChargeModel>();
-            var freightCharges = DataContext.Get(x => x.Hblid == hblid).ProjectTo<CsArrivalFrieghtChargeModel>(mapper.ConfigurationProvider);
+            List<CsArrivalFrieghtChargeModel> result = new List<CsArrivalFrieghtChargeModel>();
+            IQueryable<CsArrivalFrieghtChargeModel> freightCharges = DataContext.Get(x => x.Hblid == hblid).ProjectTo<CsArrivalFrieghtChargeModel>(mapper.ConfigurationProvider);
+
             if (freightCharges.Count() > 0)
             {
-                var charges = chargeRepository.Get();
-                var units = unitRepository.Get();
-                var tempdata = freightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { ArrivalFrieghtCharge = x, ChargeCode = y.Code, ChargeName = y.ChargeNameEn })
+                IQueryable<CatCharge> charges = chargeRepository.Get();
+                IQueryable<CatUnit> units = unitRepository.Get();
+
+                var tempdata = freightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { ArrivalFrieghtCharge = x, ChargeCode = y.Code, ChargeName = y.ChargeNameEn, ChargeId = y.Id })
                     .Join(units, x => x.ArrivalFrieghtCharge.UnitId, y => y.Id, (x, y) => new { CsArrivalFrieghtCharge = x, UnitName = y.Code });
                 foreach (var item in tempdata)
                 {
-                    var charge = item.CsArrivalFrieghtCharge.ArrivalFrieghtCharge;
+                    CsArrivalFrieghtChargeModel charge = item.CsArrivalFrieghtCharge.ArrivalFrieghtCharge;
+
                     charge.CurrencyName = charge.CurrencyId;
                     charge.ChargeName = item.CsArrivalFrieghtCharge.ChargeName;
                     charge.UnitName = item.UnitName;
                     charge.ChargeCode = item.CsArrivalFrieghtCharge.ChargeCode;
+                    charge.ChargeGroup = charges.Where(x => x.Id == item.CsArrivalFrieghtCharge.ChargeId)?.FirstOrDefault()?.ChargeGroup ?? null;
+
                     result.Add(charge);
                 }
             }
@@ -123,8 +130,9 @@ namespace eFMS.API.Documentation.DL.Services
 
         private List<CsArrivalFrieghtChargeModel> GetFreightChargeDefault(Guid hblid, string transactionType)
         {
-            var results = new List<CsArrivalFrieghtChargeModel>();
-            var defaultFreightCharges = freightChargeDefaultRepository.Get(x => x.UserDefault == currentUser.UserID && x.TransactionType == transactionType)
+            List<CsArrivalFrieghtChargeModel> results = new List<CsArrivalFrieghtChargeModel>();
+
+            IQueryable<CsArrivalFrieghtChargeModel> defaultFreightCharges = freightChargeDefaultRepository.Get(x => x.UserDefault == currentUser.UserID && x.TransactionType == transactionType)
                 .Select(x => new CsArrivalFrieghtChargeModel
                 {
                     Id = Guid.Empty,
@@ -145,16 +153,20 @@ namespace eFMS.API.Documentation.DL.Services
                 });
             if (defaultFreightCharges.Count() > 0)
             {
-                var charges = chargeRepository.Get();
-                var units = unitRepository.Get();
-                var tempdata = defaultFreightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { FreightCharge = x, ChargeName = y.Code })
+                IQueryable<CatCharge> charges = chargeRepository.Get();
+                IQueryable<CatUnit> units = unitRepository.Get();
+
+                var tempdata = defaultFreightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { FreightCharge = x, ChargeName = y.Code, ChargeId = y.Id })
                     .Join(units, x => x.FreightCharge.UnitId, y => y.Id, (x, y) => new { x, y.Code });
-                results = new List<CsArrivalFrieghtChargeModel>();
+
                 foreach (var item in tempdata)
                 {
-                    var charge = item.x.FreightCharge;
+                    CsArrivalFrieghtChargeModel charge = item.x.FreightCharge;
+
                     charge.ChargeName = item.x.ChargeName;
                     charge.UnitName = item.Code;
+                    charge.ChargeGroup = charges.Where(x => x.Id == item.x.ChargeId)?.FirstOrDefault()?.ChargeGroup ?? null;
+
                     results.Add(charge);
                 }
             }

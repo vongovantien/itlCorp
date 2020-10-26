@@ -104,7 +104,11 @@ namespace eFMS.API.Accounting.DL.Services
                     AccAccountingManagement data = DataContext.Get(x => x.Id == id).FirstOrDefault();
                     if (data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID || data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
                     {
-                        return new HandleState(data.InvoiceNoReal + " Had payment");
+                        return new HandleState((object)data.InvoiceNoReal + " Had payment");
+                    }
+                    if (!string.IsNullOrEmpty(data.ReferenceNo))
+                    {
+                        return new HandleState((object)"Not allow delete. Invoice had updated from accountant system");
                     }
                     HandleState hs = DataContext.Delete(x => x.Id == id, false);
                     if (hs.Success)
@@ -166,7 +170,7 @@ namespace eFMS.API.Accounting.DL.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    return new HandleState(ex.Message);
+                    return new HandleState((object)ex.Message);
                 }
                 finally
                 {
@@ -322,7 +326,8 @@ namespace eFMS.API.Accounting.DL.Services
                            PaymentStatus = acc.PaymentStatus,
                            PaymentDueDate = acc.PaymentDueDate,
                            LastSyncDate = acc.LastSyncDate,
-                           SyncStatus = acc.SyncStatus
+                           SyncStatus = acc.SyncStatus,
+                           ReferenceNo = acc.ReferenceNo
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }

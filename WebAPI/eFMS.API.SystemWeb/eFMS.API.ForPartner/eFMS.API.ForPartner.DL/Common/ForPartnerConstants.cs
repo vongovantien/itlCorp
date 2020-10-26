@@ -57,6 +57,7 @@
         #region -- PAYMENT METHOD --
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
         public static readonly string PAYMENT_METHOD_BANK = "Bank";
+        public static readonly string PAYMENT_METHOD_BANK_OR_CASH = "Bank Transfer / Cash";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --
@@ -99,6 +100,7 @@
         #region ACOUNTING MANAGEMENT
         public static readonly string ACCOUNTING_VOUCHER_TYPE = "Voucher";
         public static readonly string ACCOUNTING_INVOICE_TYPE = "Invoice";
+        public static readonly string ACCOUNTING_INVOICE_TEMP_TYPE = "InvoiceTemp";
         public static readonly string ACCOUNTING_INVOICE_STATUS_NEW = "New";
         public static readonly string ACCOUNTING_INVOICE_STATUS_UPDATED = "Updated Invoice";
         public static readonly string ACCOUNTING_PAYMENT_STATUS_UNPAID = "Unpaid";
@@ -139,6 +141,7 @@
         public static readonly string ACCOUNTANT_TYPE_CREDIT = "CREDIT";
         public static readonly string ACCOUNTANT_TYPE_INVOICE = "INVOICE";
 
-
+        public static readonly string PARTNER_MODE_INTERNAL = "Internal";
+        public static readonly string PARTNER_MODE_EXTERNAL = "External";
     }
 }
