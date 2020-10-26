@@ -83,7 +83,8 @@
                                     && !charge.creditNo
                                     && !charge.settlementCode
                                     && !charge.voucherId
-                                    && !charge.voucherIddate}">
+                                    && !charge.voucherIddate}"
+                                    [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
                                     <ng-container *ngIf="!!charge.creditNo 
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
@@ -92,16 +93,13 @@
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true ;else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" disabled
-                                            [(ngModel)]="charge.partnerShortName"
-                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
+                                            [(ngModel)]="charge.partnerShortName">
                                     </ng-container>
                                     <ng-template #partnerTemplate>
                                         <input type="text" class="dropdown-toggle form-control" readonly
                                             [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
                                             (click)="loadDynamicComoGrid(charge,i)"
-                                            [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
-                                            [attr.readonly]="!!charge.creditNo 
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null" [attr.readonly]="!!charge.creditNo 
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
