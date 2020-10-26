@@ -21,6 +21,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string Description0 { get; set; }
         public string CurrencyCode { get; set; }
         public decimal? ExchangeRate { get; set; }  // Tỷ giá ngày tạo voucher
+        public string PaymentMethod { get; set; }
         public List<BravoVoucherChargeModel> Details { get; set; }
     }
 

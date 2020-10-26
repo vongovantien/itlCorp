@@ -12,7 +12,7 @@
             </span>
         </button>
         <button class="btn btn-info m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-            *ngIf="soa.syncStatus !== 'Synced'" title="Send to Accountant">
+            *ngIf="soa.syncStatus !== 'Synced' && soa.type === 'Debit'" title="Send to Accountant">
             <span>
                 <i class="la la-cloud-upload"></i>
                 <span>

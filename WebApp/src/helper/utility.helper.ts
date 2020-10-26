@@ -1,6 +1,8 @@
 import { SystemConstants } from "src/constants/system.const";
 import { ChargeConstants } from "@constants";
 import { CommonEnum } from "@enums";
+import { Observable, fromEvent, merge, combineLatest } from "rxjs";
+import { distinctUntilChanged, filter, share } from "rxjs/operators";
 
 export class UtilityHelper {
     prepareNg2SelectData(dataSource: any[], id: any, text: any): CommonInterface.INg2Select[] {
@@ -257,6 +259,27 @@ export class UtilityHelper {
             acc[val as number] = (acc[val as number] || 0) + 1;
             return acc;
         }, {});
+    }
+
+    createShortcut = (shortcuts: string[]): Observable<KeyboardEvent[]> => {
+        const keyDown$: Observable<KeyboardEvent> = fromEvent<KeyboardEvent>(document as Document, 'keydown');
+        const keyUp$: Observable<KeyboardEvent> = fromEvent<KeyboardEvent>(document as Document, 'keyup');
+
+        // * Create KeyboardEvent Observable for specified KeyCode
+        const createKeyPressStream = (charCode: string) =>
+            merge(keyDown$, keyUp$).pipe(
+                distinctUntilChanged((a: KeyboardEvent, b: KeyboardEvent) => a.code === b.code && a.type === b.type),
+                share()
+            ).pipe(filter((event: KeyboardEvent) => event.code === charCode));
+
+        // * Create Event Stream for every KeyCode in shortcut
+        const keyCodeEvents$: Observable<KeyboardEvent>[] = shortcuts.map((shortcut: string) => createKeyPressStream(shortcut));
+
+        // * Emit when specified keys are pressed (keydown).
+        // * Emit only when all specified keys are pressed at the same time.
+        return combineLatest(keyCodeEvents$).pipe(
+            filter<KeyboardEvent[]>((arr) => arr.every((a) => a.type === 'keydown'))
+        );
     }
 
 }

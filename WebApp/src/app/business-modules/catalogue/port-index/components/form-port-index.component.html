@@ -56,14 +56,14 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !country.value }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !country.valid }">
                                 <label class="form-control-label">
                                     Country <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select #cty [allowClear]="true" [items]="countries" placeholder="Select country"
                                     formControlName="country" (opened)="closeOtherSelects(cty)">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !country.value">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !country.valid">
                                     Country is required
                                 </div>
                             </div>
@@ -80,14 +80,14 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !mode.value }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !mode.valid }">
                                 <label class="form-control-label">
                                     Mode <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select #md [allowClear]="true" [items]="modes" placeholder="Select mode"
                                     formControlName="mode" (opened)="closeOtherSelects(md)">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !mode.value">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && !mode.valid">
                                     Mode is required
                                 </div>
                             </div>

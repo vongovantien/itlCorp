@@ -3,7 +3,6 @@ import { SortService } from "@services";
 import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
 import { getHBLSState, IShareBussinessState, GetDetailHBLSuccessAction, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction } from "../../store";
 import { Store } from "@ngrx/store";
-import { takeUntil, take, catchError, finalize } from "rxjs/operators";
 import { Params, ActivatedRoute } from "@angular/router";
 import { NgxSpinnerService } from "ngx-spinner";
 import { NgProgress } from "@ngx-progressbar/core";
@@ -11,9 +10,14 @@ import { ViewChild } from "@angular/core";
 import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { ToastrService } from "ngx-toastr";
 import { DocumentationRepo } from "@repositories";
-import isUUID from 'validator/lib/isUUID';
+import { ICrystalReport } from "@interfaces";
 
-export abstract class AppShareHBLBase extends AppList {
+import { takeUntil, take, catchError, finalize } from "rxjs/operators";
+import isUUID from 'validator/lib/isUUID';
+import { delayTime } from "@decorators";
+
+
+export abstract class AppShareHBLBase extends AppList implements ICrystalReport {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
@@ -54,6 +58,7 @@ export abstract class AppShareHBLBase extends AppList {
         this.requestSort = this.sortLocal;
     }
 
+
     ngOnInit() {
         this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
@@ -85,6 +90,15 @@ export abstract class AppShareHBLBase extends AppList {
                 }
             }
         );
+
+        this.listenShortcutMovingTab();
+    }
+
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 
     configHBL() {
@@ -286,10 +300,7 @@ export abstract class AppShareHBLBase extends AppList {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -306,6 +317,10 @@ export abstract class AppShareHBLBase extends AppList {
     onSelectTab(tabName: string) { }
 
     duplicateConfirm() { }
+
+    listenShortcutMovingTab() { }
+
+
 
 }
 
