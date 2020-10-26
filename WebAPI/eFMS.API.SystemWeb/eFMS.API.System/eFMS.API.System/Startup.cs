@@ -14,14 +14,8 @@ using eFMS.API.Infrastructure;
 using eFMS.API.Common.Globals;
 using StackExchange.Redis;
 using eFMS.API.System.Infrastructure.Hubs;
-using eFMS.API.System.Infrastructure.EndPoints;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using EFCore.DbContextFactory.Extensions;
-using eFMS.API.System.Service.Contexts;
 using eFMS.API.System.Infrastructure.Extensions;
-using Microsoft.AspNetCore.SignalR;
-using eFMS.API.System.Service.Models;
+
 
 namespace eFMS.API.System
 {
@@ -53,7 +47,11 @@ namespace eFMS.API.System
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
-                .WithOrigins("http://localhost:4200");
+                .WithOrigins("http://localhost:4200")
+                .WithOrigins("http://test.efms.itlvn.com")
+                .WithOrigins("http://staging.efms.itlvn.com")
+                .WithOrigins("http://efms.itlvn.com");
+
             }));
             services.AddAutoMapper();
             services.AddSession();
