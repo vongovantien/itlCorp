@@ -286,7 +286,8 @@
                     </span>
                 </button>
                 <button class="btn btn-info  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced'" title="Send to Accountant">
+                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && (CdNoteDetail.cdNote.type === 'DEBIT' || CdNoteDetail.cdNote.type === 'INVOICE')"
+                    title="Send to Accountant">
                     <span>
                         <i class="la la-cloud-upload"></i>
                         <span>

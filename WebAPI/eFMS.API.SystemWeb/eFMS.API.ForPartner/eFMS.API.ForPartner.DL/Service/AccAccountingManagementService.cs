@@ -35,6 +35,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctSettlementPayment> acctSettlementRepo;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepo;
         private readonly IActionFuncLogService actionFuncLogService;
+        private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -52,7 +53,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<AcctSettlementPayment> acctSettlementPayment,
             IContextBase<AcctCdnote> acctCdnote,
-            IActionFuncLogService actionFuncLog
+            IActionFuncLogService actionFuncLog,
+            IContextBase<AcctSettlementPayment> settlementPayment
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -68,6 +70,7 @@ namespace eFMS.API.ForPartner.DL.Service
             acctSettlementRepo = acctSettlementPayment;
             acctCdNoteRepo = acctCdnote;
             actionFuncLogService = actionFuncLog;
+            settlementPaymentRepo = settlementPayment;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -156,14 +159,18 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
 
                 var invoiceDebit = ModelInvoiceDebit(model, partner, debitCharges, _currentUser);
-                var invoiceObh = ModelInvoiceObh(model, partner, obhCharges, _currentUser);
+                var invoiceObh = obhCharges.Count > 0 ? ModelInvoiceObh(model, partner, obhCharges, _currentUser) : null;
                 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
                         HandleState hsDebit = DataContext.Add(invoiceDebit, false);
-                        HandleState hsObh = DataContext.Add(invoiceObh, false);
+                        HandleState hsObh = new HandleState();
+                        if (invoiceObh != null)
+                        {
+                            hsObh = DataContext.Add(invoiceObh, false);
+                        }
                         if (hsDebit.Success && hsObh.Success)
                         {
                             foreach (var debitCharge in debitCharges)
@@ -939,6 +946,46 @@ namespace eFMS.API.ForPartner.DL.Service
                     HandleState hs = DataContext.Delete(x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {
+                        var charges = surchargeRepo.Get(x => x.AcctManagementId == voucher.Id);
+                        foreach (CsShipmentSurcharge charge in charges)
+                        {
+                            charge.AcctManagementId = null;
+                            if (charge.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE)
+                            {
+                                charge.VoucherId = null;
+                                charge.VoucherIddate = null;
+                                charge.InvoiceNo = null;
+                                charge.InvoiceDate = null;
+                                charge.SeriesNo = null;
+                            }
+
+                            charge.DatetimeModified = DateTime.Now;
+                            charge.UserModified = currentUser.UserID;
+                            surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                        }
+
+                        // Cập nhật Settlement: VoucherNo, VoucherDate
+                        if (voucher.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE)
+                        {
+                            List<string> listSettlementCode = charges.Select(x => x.SettlementCode).Distinct().ToList();
+                            if (listSettlementCode.Count() > 0)
+                            {
+                                foreach (string code in listSettlementCode)
+                                {
+                                    AcctSettlementPayment settlement = settlementPaymentRepo.Get(x => x.SettlementNo == code).FirstOrDefault();
+                                    if (settlement != null)
+                                    {
+                                        settlement.VoucherDate = null;
+                                        settlement.VoucherNo = null;
+                                        settlement.UserModified = currentUser.UserID;
+                                        settlement.DatetimeModified = DateTime.Now;
+                                    }
+                                    settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id, false);
+                                }                                
+                            }
+                        }
+                        var smSurcharge = surchargeRepo.SubmitChanges();
+                        var smSettle = settlementPaymentRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
                         trans.Commit();
                     }
