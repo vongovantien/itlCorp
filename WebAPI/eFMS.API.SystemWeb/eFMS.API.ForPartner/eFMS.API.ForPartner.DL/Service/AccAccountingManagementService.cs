@@ -366,8 +366,13 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = _currentUser.UserID;
                             var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+
+                            UpdateStatusRemovedInvForSOA(charge.Soano);
+                            UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
                         }
 
+                        var smSoa = acctSOARepository.SubmitChanges();
+                        var smDebitNote = acctCdNoteRepo.SubmitChanges();
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
                         trans.Commit();
@@ -385,6 +390,35 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }
         }
+        
+        private HandleState UpdateStatusRemovedInvForSOA(string soaNo)
+        {
+            var hsUpdate = new HandleState();
+            var soa = acctSOARepository.Get(x => x.Soano == soaNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
+            if (soa != null)
+            {
+                soa.SyncStatus = ForPartnerConstants.STATUS_REMOVEED_INV;
+                soa.UserModified = currentUser.UserID;
+                soa.DatetimeModified = DateTime.Now;
+                hsUpdate = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
+            }
+            return hsUpdate;
+        }
+
+        private HandleState UpdateStatusRemovedInvForDebitNote(string debitNo)
+        {
+            var hsUpdate = new HandleState();
+            var debitNote = acctCdNoteRepo.Get(x => x.Code == debitNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
+            if (debitNote != null)
+            {
+                debitNote.SyncStatus = ForPartnerConstants.STATUS_REMOVEED_INV;
+                debitNote.UserModified = currentUser.UserID;
+                debitNote.DatetimeModified = DateTime.Now;
+                hsUpdate = acctCdNoteRepo.Update(debitNote, x => x.Id == debitNote.Id, false);
+            }
+            return hsUpdate;
+        }
+
         #endregion --- CRUD INVOICE ---
 
         #region --- PRIVATE METHOD ---
@@ -481,7 +515,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 charges.ForEach(fe =>
                 {
                     var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
-                    //Tỷ giá so với Local
+                    //Tỷ giá của Currency Charge so với Local
                     var _exchangeForLocal = CalculatorExchangeRate(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
                     decimal? exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(_exchangeForLocal, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
                     total += exchangeRate * surcharge.Total;
@@ -529,7 +563,7 @@ namespace eFMS.API.ForPartner.DL.Service
             var _exchangeRate = _rateFromCFToCT * exchangeRateNew;
             return _exchangeRate;
         }
-
+        
         #endregion --- PRIVATE METHOD ---
 
         #region --- Advance ---
