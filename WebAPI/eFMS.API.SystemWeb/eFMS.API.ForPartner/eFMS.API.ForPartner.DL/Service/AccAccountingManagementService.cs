@@ -397,7 +397,7 @@ namespace eFMS.API.ForPartner.DL.Service
             var soa = acctSOARepository.Get(x => x.Soano == soaNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
             if (soa != null)
             {
-                soa.SyncStatus = ForPartnerConstants.STATUS_REMOVEED_INV;
+                soa.SyncStatus = ForPartnerConstants.STATUS_REMOVED_INV;
                 soa.UserModified = currentUser.UserID;
                 soa.DatetimeModified = DateTime.Now;
                 hsUpdate = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
@@ -411,7 +411,7 @@ namespace eFMS.API.ForPartner.DL.Service
             var debitNote = acctCdNoteRepo.Get(x => x.Code == debitNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
             if (debitNote != null)
             {
-                debitNote.SyncStatus = ForPartnerConstants.STATUS_REMOVEED_INV;
+                debitNote.SyncStatus = ForPartnerConstants.STATUS_REMOVED_INV;
                 debitNote.UserModified = currentUser.UserID;
                 debitNote.DatetimeModified = DateTime.Now;
                 hsUpdate = acctCdNoteRepo.Update(debitNote, x => x.Id == debitNote.Id, false);
