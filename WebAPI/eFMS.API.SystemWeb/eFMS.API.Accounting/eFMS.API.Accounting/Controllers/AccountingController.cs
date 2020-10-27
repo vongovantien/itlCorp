@@ -772,5 +772,31 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
+
+        /// <summary>
+        /// Func Test (Get List Debit Note)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("GetListCdNoteDebit")]
+        public IActionResult GetListCdNoteDebit(List<RequestGuidTypeListModel> request)
+        {
+            List<Guid> Ids = request.Where(x => x.Type == "DEBIT" || x.Type == "INVOICE").Select(x => x.Id).ToList();
+            List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListCdNoteToSync(Ids) : new List<SyncModel>();
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// Func Test (Get List SOA Debit)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("GetListSOADebit")]
+        public IActionResult GetListSOADebit(List<RequestIntTypeListModel> request)
+        {
+            List<int> Ids = request.Where(x => x.Type == "DEBIT").Select(x => x.Id).ToList();
+            List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListSoaToSync(Ids) : new List<SyncModel>();
+            return Ok(list);
+        }
     }
 }
