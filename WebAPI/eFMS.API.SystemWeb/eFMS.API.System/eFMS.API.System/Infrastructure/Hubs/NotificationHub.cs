@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using eFMS.IdentityServer.DL.UserManager;
+using System;
+
 namespace eFMS.API.System.Infrastructure.Hubs
 {
     [Authorize]
@@ -11,13 +13,8 @@ namespace eFMS.API.System.Infrastructure.Hubs
         public NotificationHub(ICurrentUser currentUser)
         {
             this.currentUser = currentUser;
-            hubContext = _hubContext;
-    }
-
-        public string GetConnectionId()
-        {
-            return Context.ConnectionId ;
         }
+
         public object GetConnectionUser()
         {
             var user = new
@@ -36,6 +33,22 @@ namespace eFMS.API.System.Infrastructure.Hubs
         public async Task SendToConnection(string connectionId, string data)
         {
             await Clients.Client(connectionId).SendAsync("onChangeNotificationConnection", data);
+        }
+
+        public override async Task OnConnectedAsync()
+        {
+            Console.WriteLine("---------------------------------------------------------------------------------------");
+            Console.WriteLine(Context.ConnectionId + " Connected ");
+            Console.WriteLine("---------------------------------------------------------------------------------------");
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception ex)
+        {
+            Console.WriteLine("---------------------------------------------------------------------------------------");
+            Console.WriteLine(Context.ConnectionId + " Diconnected ");
+            Console.WriteLine("---------------------------------------------------------------------------------------");
+            await base.OnConnectedAsync();
         }
     }
 }
