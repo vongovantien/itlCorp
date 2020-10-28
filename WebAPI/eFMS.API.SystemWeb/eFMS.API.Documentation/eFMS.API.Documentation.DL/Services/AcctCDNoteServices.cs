@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
         ICsTransactionDetailService transactionDetailService;
         IContextBase<CustomsDeclaration> customsDeclarationRepository;
         IContextBase<SysCompany> sysCompanyRepository;
+        IContextBase<CatContract> catContractRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -68,7 +69,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
             ICurrencyExchangeService currencyExchange,
-            IContextBase<SysCompany> sysCompanyRepo
+            IContextBase<SysCompany> sysCompanyRepo,
+            IContextBase<CatContract> catContract
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -93,6 +95,7 @@ namespace eFMS.API.Documentation.DL.Services
             currencyExchangeService = currencyExchange;
             customsDeclarationRepository = customsDeclarationRepo;
             sysCompanyRepository = sysCompanyRepo;
+            catContractRepo = catContract;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -212,6 +215,47 @@ namespace eFMS.API.Documentation.DL.Services
             return prefixCode;
         }
 
+        private string GetTransactionType(TransactionTypeEnum typeEnum)
+        {
+            string _transactionType = string.Empty;
+            switch (typeEnum)
+            {
+                case TransactionTypeEnum.CustomLogistic:
+                    _transactionType = TermData.CustomLogistic;
+                    break;
+                case TransactionTypeEnum.InlandTrucking:
+                    _transactionType = TermData.InlandTrucking;
+                    break;
+                case TransactionTypeEnum.AirExport:
+                    _transactionType = TermData.AirExport;
+                    break;
+                case TransactionTypeEnum.AirImport:
+                    _transactionType = TermData.AirImport;
+                    break;
+                case TransactionTypeEnum.SeaConsolExport:
+                    _transactionType = TermData.SeaConsolExport;
+                    break;
+                case TransactionTypeEnum.SeaConsolImport:
+                    _transactionType = TermData.SeaConsolImport;
+                    break;
+                case TransactionTypeEnum.SeaFCLExport:
+                    _transactionType = TermData.SeaFCLExport;
+                    break;
+                case TransactionTypeEnum.SeaFCLImport:
+                    _transactionType = TermData.SeaFCLImport;
+                    break;
+                case TransactionTypeEnum.SeaLCLExport:
+                    _transactionType = TermData.SeaLCLExport;
+                    break;
+                case TransactionTypeEnum.SeaLCLImport:
+                    _transactionType = TermData.SeaLCLImport;
+                    break;
+                default:
+                    break;
+            }
+            return _transactionType;
+        }
+
         public HandleState AddNewCDNote(AcctCdnoteModel model)
         {
             try
@@ -226,8 +270,28 @@ namespace eFMS.API.Documentation.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
 
+                #region --- Set Currency For CD Note ---
+                CatPartner _partnerAcRef = new CatPartner();
                 var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
-                model.CurrencyId = (_partner?.PartnerMode == "External") ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                if (!string.IsNullOrEmpty(_partner?.ParentId) && _partner?.ParentId != _partner?.Id)
+                {
+                    _partnerAcRef = partnerRepositoty.Get(x => x.Id == _partner.ParentId).FirstOrDefault();
+                }
+                else
+                {
+                    _partnerAcRef = _partner;
+                }
+                var _transactionType = GetTransactionType(model.TransactionTypeEnum);
+                var _contractAcRef = catContractRepo.Get(x => x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
+                {
+                    model.CurrencyId = _contractAcRef.CurrencyId;
+                }
+                else
+                {
+                    model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_DOMESTIC) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                }
+                #endregion  --- Set Currency For CD Note ---
 
                 //Quy đổi tỉ giá CD Note so về currency Local
                 var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
@@ -309,8 +373,28 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.OfficeId = model.OfficeId;
                 entity.CompanyId = model.CompanyId;
 
-                var _partner = partnerRepositoty.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
-                entity.CurrencyId = (_partner?.PartnerMode == "External") ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                #region --- Set Currency For CD Note ---
+                CatPartner _partnerAcRef = new CatPartner();
+                var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
+                if (!string.IsNullOrEmpty(_partner?.ParentId) && _partner?.ParentId != _partner?.Id)
+                {
+                    _partnerAcRef = partnerRepositoty.Get(x => x.Id == _partner.ParentId).FirstOrDefault();
+                }
+                else
+                {
+                    _partnerAcRef = _partner;
+                }
+                var _transactionType = GetTransactionType(model.TransactionTypeEnum);
+                var _contractAcRef = catContractRepo.Get(x => x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
+                {
+                    entity.CurrencyId = _contractAcRef.CurrencyId;
+                }
+                else
+                {
+                    entity.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_DOMESTIC) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                }
+                #endregion  --- Set Currency For CD Note ---
 
                 //Quy đổi tỉ giá CD Note so về currency Local
                 var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, entity.DatetimeCreated, entity.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
@@ -340,10 +424,10 @@ namespace eFMS.API.Documentation.DL.Services
                         if (item.DebitNo == cdNote.Code)
                         {
                             item.DebitNo = null;
-                        }                        
+                        }
                         var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
                     }
-                    
+
                     foreach (var c in model.listShipmentSurcharge)
                     {
                         var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
@@ -459,7 +543,7 @@ namespace eFMS.API.Documentation.DL.Services
                     List<object> listCDNote = new List<object>();
                     foreach (var cdNote in cdNotesModel)
                     {
-                        var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);                       
+                        var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                         cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
@@ -999,7 +1083,7 @@ namespace eFMS.API.Documentation.DL.Services
             var cdNote = DataContext.Get(x => x.Id == cdNoteId).FirstOrDefault();
             var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && (!string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId)))
                                                   || (x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId))));
-                                                  
+
             if (query.Any())
             {
                 return false;
@@ -1042,7 +1126,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         charge.Address = (DocumentConstants.CURRENCY_LOCAL == criteria.Currency && data.CDNote.Type == "DEBIT") ? partner.AddressVn : partner.AddressEn;//Lấy địa chỉ Billing
-                    }                    
+                    }
                     charge.Workphone = data.PartnerTel?.ToUpper();
                     charge.Fax = data.PartnerFax?.ToUpper();
                     charge.Taxcode = data.PartnerTaxcode?.ToUpper();

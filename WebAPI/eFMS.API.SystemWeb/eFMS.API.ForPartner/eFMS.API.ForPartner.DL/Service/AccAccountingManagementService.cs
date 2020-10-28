@@ -36,6 +36,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctCdnote> acctCdNoteRepo;
         private readonly IActionFuncLogService actionFuncLogService;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
+        private readonly IContextBase<CatCurrencyExchange> currencyExchangeRepo;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -54,7 +55,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctSettlementPayment> acctSettlementPayment,
             IContextBase<AcctCdnote> acctCdnote,
             IActionFuncLogService actionFuncLog,
-            IContextBase<AcctSettlementPayment> settlementPayment
+            IContextBase<AcctSettlementPayment> settlementPayment,
+            IContextBase<CatCurrencyExchange> currencyExchange
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -71,6 +73,7 @@ namespace eFMS.API.ForPartner.DL.Service
             acctCdNoteRepo = acctCdnote;
             actionFuncLogService = actionFuncLog;
             settlementPaymentRepo = settlementPayment;
+            currencyExchangeRepo = currencyExchange;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -182,7 +185,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surchargeDebit.VoucherId = invoiceDebit.VoucherId;
                                 surchargeDebit.VoucherIddate = invoiceDebit.Date;
                                 surchargeDebit.SeriesNo = invoiceDebit.Serie;
-                                surchargeDebit.FinalExchangeRate = debitCharge.ExchangeRate;
+                                surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency); //debitCharge.ExchangeRate;
                                 surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
                                 surchargeDebit.DatetimeModified = DateTime.Now;
                                 surchargeDebit.UserModified = _currentUser.UserID;
@@ -199,7 +202,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surchargeObh.VoucherId = invoiceObh.VoucherId;
                                 surchargeObh.VoucherIddate = invoiceObh.Date;
                                 surchargeObh.SeriesNo = invoiceObh.Serie;
-                                surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate;
+                                surchargeObh.FinalExchangeRate = CalculatorExchangeRate(obhCharge.ExchangeRate, surchargeObh.ExchangeDate, surchargeObh.CurrencyId, invoiceObh.Currency); //obhCharge.ExchangeRate;
                                 surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
                                 surchargeObh.DatetimeModified = DateTime.Now;
                                 surchargeObh.UserModified = _currentUser.UserID;
@@ -363,8 +366,15 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = _currentUser.UserID;
                             var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+
+                            //Update Status Removed Inv For SOA (SOA synced)
+                            UpdateStatusRemovedInvForSOA(charge.Soano);
+                            //Update Status Removed Inv For Debit Note (Debit Note synced)
+                            UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
                         }
 
+                        var smSoa = acctSOARepository.SubmitChanges();
+                        var smDebitNote = acctCdNoteRepo.SubmitChanges();
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
                         trans.Commit();
@@ -382,6 +392,35 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }
         }
+        
+        private HandleState UpdateStatusRemovedInvForSOA(string soaNo)
+        {
+            var hsUpdate = new HandleState();
+            var soa = acctSOARepository.Get(x => x.Soano == soaNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
+            if (soa != null)
+            {
+                soa.SyncStatus = ForPartnerConstants.STATUS_REMOVED_INV;
+                soa.UserModified = currentUser.UserID;
+                soa.DatetimeModified = DateTime.Now;
+                hsUpdate = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
+            }
+            return hsUpdate;
+        }
+
+        private HandleState UpdateStatusRemovedInvForDebitNote(string debitNo)
+        {
+            var hsUpdate = new HandleState();
+            var debitNote = acctCdNoteRepo.Get(x => x.Code == debitNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
+            if (debitNote != null)
+            {
+                debitNote.SyncStatus = ForPartnerConstants.STATUS_REMOVED_INV;
+                debitNote.UserModified = currentUser.UserID;
+                debitNote.DatetimeModified = DateTime.Now;
+                hsUpdate = acctCdNoteRepo.Update(debitNote, x => x.Id == debitNote.Id, false);
+            }
+            return hsUpdate;
+        }
+
         #endregion --- CRUD INVOICE ---
 
         #region --- PRIVATE METHOD ---
@@ -470,15 +509,17 @@ namespace eFMS.API.ForPartner.DL.Service
             return _prefixVoucher;
         }
 
-        private decimal CalculatorTotalAmount(List<ChargeInvoice> charges, string currencyInvoice)
+        private decimal? CalculatorTotalAmount(List<ChargeInvoice> charges, string currencyInvoice)
         {
-            decimal total = 0;
+            decimal? total = 0;
             if (!string.IsNullOrEmpty(currencyInvoice))
             {
                 charges.ForEach(fe =>
                 {
                     var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
-                    decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
+                    //Tỷ giá của Currency Charge so với Local
+                    var _exchangeForLocal = CalculatorExchangeRate(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
+                    decimal? exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(_exchangeForLocal, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
                     total += exchangeRate * surcharge.Total;
                 });
             }
@@ -511,6 +552,20 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             return accountNo;
         }
+        
+        private decimal? CalculatorExchangeRate(decimal? exchangeRateNew, DateTime? exchangeDate, string currencyFrom, string currencyTo)
+        {
+            if (currencyFrom == currencyTo) return exchangeRateNew;
+
+            var currencyExchanges = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == exchangeDate.Value.Date).ToList();
+            var exchangeFrom = currencyFrom != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyFrom).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyFrom so với VND
+            var exchangeTo = currencyTo != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyTo).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyTo so với VND
+            var _rateFromCFToCT = exchangeFrom / exchangeTo; //Tỷ giá currencyFrom so với currencyTo
+
+            var _exchangeRate = _rateFromCFToCT * exchangeRateNew;
+            return _exchangeRate;
+        }
+        
         #endregion --- PRIVATE METHOD ---
 
         #region --- Advance ---

@@ -4,6 +4,20 @@
         <name>eFMS.API.Accounting</name>
     </assembly>
     <members>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListCdNoteDebit(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidTypeListModel})">
+            <summary>
+            Func Test (Get List Debit Note)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListSOADebit(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestIntTypeListModel})">
+            <summary>
+            Func Test (Get List SOA Debit)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingManagementController">
             <summary>
             A base class for an MVC controller without view support.
