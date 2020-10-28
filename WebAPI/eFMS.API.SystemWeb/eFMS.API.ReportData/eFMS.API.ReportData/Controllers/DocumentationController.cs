@@ -324,7 +324,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportJobProfitAnalysis(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataJobProfitAnalysisUrl, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, "http://localhost:44366" + Urls.Documentation.GetDataJobProfitAnalysisUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<JobProfitAnalysisExport>>();
             
             if (dataObjects.Result == null)

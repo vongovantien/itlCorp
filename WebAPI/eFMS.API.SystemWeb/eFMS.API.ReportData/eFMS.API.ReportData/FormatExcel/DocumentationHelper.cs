@@ -1835,6 +1835,14 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[rowStart, 19].Value = listData[i].JobProfit;
                     workSheet.Cells[rowStart, 19].Style.Numberformat.Format = numberFormat;
                 }
+                if(listData[i].JobNo == null)
+                {
+                    workSheet.Cells[rowStart, 17].Style.Font.Bold = true;
+                    workSheet.Cells[rowStart, 18].Style.Font.Bold = true;
+                    workSheet.Cells[rowStart, 19].Style.Font.Bold = true;
+                    workSheet.Cells[rowStart, 1, rowStart, 16].Merge = true;
+                    workSheet.Cells[rowStart, 1, rowStart, 19].Style.Border.Bottom.Style = ExcelBorderStyle.None;
+                }
 
                 rowStart += 1;
             }
@@ -1842,20 +1850,21 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 1, rowStart, 16].Value = "TOTAL";
             workSheet.Cells[rowStart, 1, rowStart, 16].Style.Font.Bold = true;
             workSheet.Cells[rowStart, 1, rowStart, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[rowStart, 17].Value = listData.Select(t => t.TotalRevenue).Sum();
+            workSheet.Cells[rowStart, 17].Value = listData.Where(x=>x.JobNo != null).Select(t => t.TotalRevenue).Sum() ;
             workSheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[rowStart, 17].Style.Font.Bold = true;
-            workSheet.Cells[rowStart, 18].Value = listData.Select(t => t.TotalCost).Sum();
+            workSheet.Cells[rowStart, 18].Value = listData.Where(x => x.JobNo != null).Select(t => t.TotalCost).Sum() ;
             workSheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[rowStart, 18].Style.Font.Bold = true;
-            workSheet.Cells[rowStart, 19].Value = listData.Select(t => t.JobProfit).Sum();
+            workSheet.Cells[rowStart, 19].Value = listData.Where(x => x.JobNo != null).Select(t => t.JobProfit).Sum();
             workSheet.Cells[rowStart, 19].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[rowStart, 19].Style.Font.Bold = true;
-
+   
 
             workSheet.Cells[6, 1, rowStart, 19].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[6, 1, rowStart, 19].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[6, 1, rowStart, 19].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+
         }
         private void BindingDataAccountingPLSheetExportExcel(ExcelWorksheet workSheet, List<AccountingPlSheetExport> listData, GeneralReportCriteria criteria)
         {

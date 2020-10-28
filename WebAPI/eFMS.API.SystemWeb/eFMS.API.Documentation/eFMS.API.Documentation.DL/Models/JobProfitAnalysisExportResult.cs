@@ -23,12 +23,13 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? CW { get; set; }
         public decimal? CBM { get; set; }
         public string ChargeCode { get; set; }
+        public string ChargeType { get; set; }
+        public bool? isGroup { get; set; }
         //public decimal? Revenue { get; set; }
         //public decimal? Cost { get; set; }
         public decimal? JobProfit { get; set; }
         public decimal? TotalRevenue { get; set; }
         public decimal? TotalCost { get; set; }
         public decimal? TotalJobProfit { get; set; }
-
     }
 }
