@@ -328,6 +328,7 @@ namespace eFMS.API.ForPartner.Controllers
             }
             return Ok(result);
         }
+
         #region --- PRIVATE ---
         private string GetFieldRequireForCreateInvoice(InvoiceCreateInfo model)
         {
@@ -403,5 +404,6 @@ namespace eFMS.API.ForPartner.Controllers
             return message;
         }
         #endregion --- PRIVATE ---
+
     }
 }

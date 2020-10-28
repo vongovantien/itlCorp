@@ -69,11 +69,8 @@
                                     <span [ngSwitch]="CdNoteDetail.syncStatus">
                                         <span *ngSwitchCase="'Synced'" class="text-success m--font-bolder">
                                             {{CdNoteDetail.syncStatus}}</span>
-                                        <span *ngSwitchCase="'Rejected'" class="text-danger m--font-bolder">
+                                        <span *ngSwitchDefault class="text-danger m--font-bolder">
                                             {{CdNoteDetail.syncStatus}}</span>
-                                        <span *ngSwitchDefault>
-                                            {{CdNoteDetail.syncStatus}}
-                                        </span>
                                     </span>
                                 </div>
                                 <div class="m--margin-bottom-10">
@@ -264,7 +261,8 @@
                     </span>
                 </button>
                 <button class="btn btn-success  m-btn--icon m-btn--uppercase"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced'" (click)="openPopupEdit()">
+                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv'"
+                    (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
                         <span>
@@ -273,7 +271,7 @@
                     </span>
                 </button>
                 <button class="btn btn-info  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && (CdNoteDetail.cdNote.type === 'DEBIT' || CdNoteDetail.cdNote.type === 'INVOICE')"
+                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv' && (CdNoteDetail.cdNote.type === 'DEBIT' || CdNoteDetail.cdNote.type === 'INVOICE')"
                     title="Send to Accountant">
                     <span>
                         <i class="la la-cloud-upload"></i>

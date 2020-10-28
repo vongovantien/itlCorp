@@ -71,5 +71,8 @@ namespace eFMS.API.Documentation.DL.Common
         public const string PERMISSION_RANGE_DEPARTMENT = "Department";
         public const string PERMISSION_RANGE_OFFICE = "Office";
         public const string PERMISSION_RANGE_COMPANY = "Company";
+
+        public static readonly string PARTNER_LOCATION_DOMESTIC = "Domestic";
+        public static readonly string PARTNER_LOCATION_OVERSEA = "Oversea";
     }
 }
