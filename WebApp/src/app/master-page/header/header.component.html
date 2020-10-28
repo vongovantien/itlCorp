@@ -135,8 +135,7 @@
                                                 <span
                                                     class="m-list-timeline__badge -m-list-timeline__badge--state-success">
                                                 </span>
-                                                <span class="m-list-timeline__text">
-                                                    {{item.description}}
+                                                <span class="m-list-timeline__text" [innerHTML]="item.description">
                                                 </span>
                                                 <span class="m-list-timeline__time">
                                                     {{item.datetimeCreated | date : 'HH:mm dd/MM'}}
