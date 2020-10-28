@@ -169,6 +169,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     (shipment: CsTransaction) => {
                         // * set default value for controls from shipment detail.
                         if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                            this.jobId = shipment.id;
                             this.formCreate.patchValue({
                                 mawb: shipment.mawb,
                                 pod: shipment.pod,

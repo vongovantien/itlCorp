@@ -66,6 +66,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string Warning = "Warning";
         public static readonly string Finish = "Finish";
 
+        public static readonly string CustomLogistic = "CL";
         public static readonly string InlandTrucking = "IT";//"InlandTrucking";
         public static readonly string AirExport = "AE";//"AirExport";
         public static readonly string AirImport = "AI";//"AirImport";

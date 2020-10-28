@@ -210,7 +210,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       Description = charge.ChargeNameVn,
                                                                                       Unit = unit.UnitNameVn,
                                                                                       CurrencyCode = surcharge.CurrencyId,
-                                                                                      ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
+                                                                                      ExchangeRate = surcharge.FinalExchangeRate, // currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
                                                                                       BillEntryNo = surcharge.Hblno,
                                                                                       Ma_SpHt = surcharge.JobNo,
                                                                                       MasterBillNo = surcharge.Mblno,
@@ -286,7 +286,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Description = charge.ChargeNameVn,
                                                                                              Unit = unit.UnitNameVn,
                                                                                              CurrencyCode = surcharge.CurrencyId,
-                                                                                             ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
+                                                                                             ExchangeRate = surcharge.FinalExchangeRate, //currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
                                                                                              BillEntryNo = surcharge.Hblno,
                                                                                              Ma_SpHt = surcharge.JobNo,
                                                                                              MasterBillNo = surcharge.Mblno,
@@ -359,24 +359,27 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Description = _charge?.ChargeNameVn;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                    charge.CurrencyCode = surcharge.CurrencyId;
-                    charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, "VND");
                     charge.BillEntryNo = surcharge.Hblno;
                     charge.MasterBillNo = surcharge.Mblno;
                     charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                     charge.NganhCode = "FWD";
-                    charge.Quantity9 = surcharge.Quantity;
-                    charge.OriginalUnitPrice = surcharge.UnitPrice;
-                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                    var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                    charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, 2);
-                    charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                    charge.OriginalAmount3 = Math.Round(charge.OriginalAmount3 ?? 0, 2);
-
+                    charge.Quantity9 = surcharge.Quantity;                    
                     var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
                     charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+
+                    charge.CurrencyCode = cdNote.CurrencyId; //Set Currency Charge = Currency Debit Note
+                    charge.ExchangeRate = cdNote.ExchangeRate; //Set Exchange Rate of Charge = Exchange Rate of Debit Note
+                    // Exchange Rate from currency original charge to currency debit note
+                    var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, cdNote.CurrencyId);
+                    var _unitPrice = surcharge.UnitPrice * _exchargeRate;
+                    charge.OriginalUnitPrice = _unitPrice;
+                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
+                    var _totalNoVat = surcharge.Quantity * _unitPrice;
+                    charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, 2);
+                    charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                    charge.OriginalAmount3 = Math.Round(charge.OriginalAmount3 ?? 0, 2);
 
                     charges.Add(charge);
                 }
@@ -506,23 +509,26 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Description = _charge?.ChargeNameVn;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                    charge.CurrencyCode = surcharge.CurrencyId;
-                    charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, soa.Currency);
                     charge.BillEntryNo = surcharge.Hblno;
                     charge.MasterBillNo = surcharge.Mblno;
                     charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                     charge.NganhCode = "FWD";
-                    charge.Quantity9 = surcharge.Quantity;
-                    charge.OriginalUnitPrice = surcharge.UnitPrice;
-                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                    var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                    charge.OriginalAmount = _totalNoVat;
-                    charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-
+                    charge.Quantity9 = surcharge.Quantity;                    
                     var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = soa.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
                     charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+
+                    charge.CurrencyCode = sync.CurrencyCode; //Set Currency Charge = Currency SOA
+                    charge.ExchangeRate = sync.ExchangeRate; //Set Exchange Rate of Charge = Exchange Rate of SOA
+                    // Exchange Rate from currency original charge to currency SOA
+                    var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, sync.CurrencyCode);
+                    var _unitPrice = surcharge.UnitPrice * _exchargeRate;
+                    charge.OriginalUnitPrice = _unitPrice;
+                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
+                    var _totalNoVat = surcharge.Quantity * _unitPrice;
+                    charge.OriginalAmount = _totalNoVat;
+                    charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
 
                     charges.Add(charge);
                 }

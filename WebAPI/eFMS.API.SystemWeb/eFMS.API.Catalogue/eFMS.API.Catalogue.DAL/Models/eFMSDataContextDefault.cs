@@ -35,7 +35,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatPartnerGroup> CatPartnerGroup { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
         public virtual DbSet<CatPlaceType> CatPlaceType { get; set; }
-        public virtual DbSet<CatPotential> CatPotential { get; set; }
         public virtual DbSet<CatServiceType> CatServiceType { get; set; }
         public virtual DbSet<CatStage> CatStage { get; set; }
         public virtual DbSet<CatTransportationMode> CatTransportationMode { get; set; }
@@ -51,6 +50,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
+        public virtual DbSet<SysSentEmailHistory> SysSentEmailHistory { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
 
@@ -65,7 +65,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -441,6 +441,12 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.Arconfirmed).HasColumnName("ARConfirmed");
+
+                entity.Property(e => e.BaseOn)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.BillingAmount).HasColumnType("decimal(18, 4)");
 
@@ -1125,55 +1131,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<CatPotential>(entity =>
-            {
-                entity.ToTable("catPotential");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Address).HasMaxLength(4000);
-
-                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
-
-                entity.Property(e => e.Email).HasMaxLength(4000);
-
-                entity.Property(e => e.GroupId).HasColumnName("GroupID");
-
-                entity.Property(e => e.Margin).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.NameEn).HasMaxLength(150);
-
-                entity.Property(e => e.NameLocal).HasMaxLength(150);
-
-                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
-
-                entity.Property(e => e.PotentialType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Taxcode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Tel).HasMaxLength(50);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
             modelBuilder.Entity<CatServiceType>(entity =>
             {
                 entity.ToTable("catServiceType");
@@ -1482,6 +1439,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
 
                 entity.Property(e => e.ClearanceNo).HasMaxLength(100);
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.ContNo).HasMaxLength(200);
 
@@ -2503,6 +2462,14 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.AccessDescription).HasMaxLength(1600);
 
+                entity.Property(e => e.BankAccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Birthday).HasColumnType("datetime");
 
                 entity.Property(e => e.Bonus).HasColumnType("decimal(10, 4)");
@@ -2546,7 +2513,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.Photo).HasColumnType("image");
+                entity.Property(e => e.Photo).HasMaxLength(500);
 
                 entity.Property(e => e.Position)
                     .HasMaxLength(50)
@@ -2720,6 +2687,41 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasForeignKey(d => d.Buid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_sysBranch_sysBU");
+            });
+
+            modelBuilder.Entity<SysSentEmailHistory>(entity =>
+            {
+                entity.ToTable("sysSentEmailHistory");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Bccs)
+                    .HasColumnName("BCCs")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Ccs)
+                    .HasColumnName("CCs")
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Description).HasMaxLength(4000);
+
+                entity.Property(e => e.Receivers)
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SentDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.SentUser)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Subject).HasMaxLength(4000);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysUser>(entity =>

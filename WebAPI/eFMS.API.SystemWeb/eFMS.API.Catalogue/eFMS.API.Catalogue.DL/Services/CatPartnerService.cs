@@ -43,6 +43,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -59,6 +60,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysImage> sysImageRepo,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
             IContextBase<CatDepartment> catDepartmentRepo,
+            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             IContextBase<SysUserLevel> userlevelRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -75,7 +77,7 @@ namespace eFMS.API.Catalogue.DL.Services
             transactionDetailRepository = transactionDetailRepo;
             catDepartmentRepository = catDepartmentRepo;
             userlevelRepository = userlevelRepo;
-
+            sendEmailHistoryRepository = sendEmailHistoryRepo;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -227,7 +229,21 @@ namespace eFMS.API.Catalogue.DL.Services
 
             lstTo.Add(creatorObj?.Email);
 
-            return SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
+
+            bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", lstTo),
+                Ccs = string.Join("; ", lstCc),
+                Subject = subject,
+                Sent = result,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+            var hsSm = sendEmailHistoryRepository.SubmitChanges();
+            return result;
         }
 
         private void SendMailRequestApproval(CatPartnerModel partner)
@@ -288,7 +304,21 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstCc = ListMailCC();
 
             lstCc.Add(objInfoSalesman?.Email);
-            SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            //SendMail.Send(subject, body, lstTo, null, null, lstCc);
+
+            bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
+
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", lstTo),
+                Ccs = string.Join("; ", lstCc),
+                Subject = subject,
+                Sent = result,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+            var hsSm = sendEmailHistoryRepository.SubmitChanges();
 
         }
 
@@ -345,6 +375,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "eFMS System </div>");
 
+            bool resultSenmail = false;
             if ( (partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
             {
                 if (lstToAccountant.Any() || lstCc.Any())
@@ -353,7 +384,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         lstToAccountant = lstCc;
                     }
-                    SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
+                    resultSenmail  = SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
                 }
             }
 
@@ -362,10 +393,22 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstToAccountant.AddRange(lstToAR);
                 if (lstToAccountant.Any())
                 {
-                    SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
+                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
                 }
             }
 
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", lstToAccountant),
+                Ccs = string.Join("; ", lstCc),
+                Subject = subject,
+                Sent = resultSenmail,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+
+            var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+            var hsSm = sendEmailHistoryRepository.SubmitChanges();
         }
 
         private List<string> ListMailCC()
