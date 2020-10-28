@@ -13,7 +13,8 @@ import { finalize, catchError, concatMap, map } from 'rxjs/operators';
 import { of, combineLatest } from 'rxjs';
 import { ConfirmPopupComponent } from '@common';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
-
+import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
+import { AppList } from 'src/app/app.list';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -22,8 +23,10 @@ import { CommercialFormCreateComponent } from '../components/form-create/form-cr
 export class CommercialDetailComponent extends CommercialCreateComponent implements OnInit {
     @ViewChild(CommercialFormCreateComponent, { static: false }) formCommercialComponent: CommercialFormCreateComponent;
     @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild(CommercialBranchSubListComponent, { static: false }) formBranchSubListComponent: CommercialBranchSubListComponent;
     partnerId: string;
     partner: Partner;
+    dataSearch: AppList;
 
     constructor(
         protected _router: Router,
@@ -53,9 +56,11 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 if (res.partnerId) {
                     this.partnerId = res.partnerId;
                     this.contractList.partnerId = this.partnerId;
+                    this.partnerList.partnerId = this.partnerId;
 
                     this.getDetailCustomer(this.partnerId);
                     this.contractList.getListContract(this.partnerId);
+                    this.partnerList.getSubListPartner(this.partnerId, this.type);
                 } else {
                     this.gotoList();
                 }
@@ -132,6 +137,18 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             );
     }
 
+    getSubListPartner(partnerId: string, partnerType: string) {
+        this._catalogueRepo.getSubListPartner(partnerId, partnerType)
+            .pipe(catchError(this.catchError), finalize(() => 
+                this.partnerList.isLoading = false
+            )).subscribe(
+                (res: any[]) => {
+                    this.partnerList.partners = res || [];
+                    console.log(this.partnerList);
+                }
+            );
+    }
+
     onSave() {
         this.formCreate.isSubmitted = true;
 
@@ -140,7 +157,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             return;
         }
 
-        if (!this.contractList.contracts.length) {
+        if (!this.formCreate.parentId.value && !this.contractList.contracts.length) {
             this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
             return;
         }

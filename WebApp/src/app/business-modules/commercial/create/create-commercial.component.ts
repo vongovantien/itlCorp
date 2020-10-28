@@ -11,10 +11,12 @@ import { Partner } from '@models';
 
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialContractListComponent } from '../components/contract/commercial-contract-list.component';
+import {CommercialBranchSubListComponent} from '../components/branch-sub/commercial-branch-sub-list.component';
 
 import { of } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
+import { isMoment } from 'moment';
 
 
 @Component({
@@ -25,6 +27,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
 
     @ViewChild(CommercialFormCreateComponent, { static: false }) formCreate: CommercialFormCreateComponent;
     @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
+    @ViewChild(CommercialBranchSubListComponent, { static: false }) partnerList: CommercialBranchSubListComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild('taxCodeInfo', { static: false }) infoPopupTaxCode: InfoPopupComponent;
     @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
@@ -68,7 +71,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
             return;
         }
 
-        if (!this.contractList.contracts.length) {
+        if (!this.formCreate.parentId.value && !this.contractList.contracts.length) {
             this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
             return;
         }

@@ -205,7 +205,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string body = string.Empty;
 
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
-            var creatorObj= sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            var creatorObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
 
             string address = webUrl.Value.Url + "/en/#/" + "home/catalogue/partner-data/detail/" + partner.Id;
             subject = "Reject Partner - " + partner.PartnerNameVn;
@@ -220,7 +220,7 @@ namespace eFMS.API.Catalogue.DL.Services
                    "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
                    + linkEn + "</br>" + linkVn + "</br> </br>" +
                   "<i> Thanks and Regards </i>" + "</br> </br>" +
-                  "eFMS System </div>" );
+                  "eFMS System </div>");
 
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
@@ -292,7 +292,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-   
+
         private void SendMailCreatedSuccess(CatPartner partner)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
@@ -345,11 +345,11 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "eFMS System </div>");
 
-            if ( (partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
+            if ((partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
             {
                 if (lstToAccountant.Any() || lstCc.Any())
                 {
-                    if(lstToAccountant.Count() == 0)
+                    if (lstToAccountant.Count() == 0)
                     {
                         lstToAccountant = lstCc;
                     }
@@ -1696,6 +1696,39 @@ namespace eFMS.API.Catalogue.DL.Services
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo
+            });
+            return results;
+        }
+
+        /// <summary>
+        /// Get partner list by parentId
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public IQueryable<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType)
+        {
+            if (id == null) return null;
+            var tet = Get();
+            var data = Get().Where(x => (x.ParentId ?? "").Contains(id ?? "", StringComparison.OrdinalIgnoreCase)
+                                && (x.PartnerType ?? "").Contains(partnerType ?? "", StringComparison.OrdinalIgnoreCase));
+            if (data == null) return null;
+            var results = data.Select(x => new CatPartnerViewModel
+            {
+                Id = x.Id,
+                PartnerGroup = x.PartnerGroup,
+                PartnerNameVn = x.PartnerNameVn,
+                PartnerNameEn = x.PartnerNameEn,
+                ShortName = x.ShortName,
+                TaxCode = x.TaxCode,
+                SalePersonId = x.SalePersonId,
+                Tel = x.Tel,
+                AddressEn = x.AddressEn,
+                Fax = x.Fax,
+                CoLoaderCode = x.CoLoaderCode,
+                RoundUpMethod = x.RoundUpMethod,
+                ApplyDim = x.ApplyDim,
+                AccountNo = x.AccountNo,
+                CountryShippingName = catCountryRepository.Get(k => k.Id == x.CountryShippingId).FirstOrDefault().NameEn
             });
             return results;
         }

@@ -16,6 +16,8 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 import { CustomerAgentImportComponent } from './components/customer-agent-import/customer-agent-import.component';
 import { ContractImportComponent } from './components/contract/import/contract-import.component';
+import {CommercialBranchSubListComponent} from './components/branch-sub/commercial-branch-sub-list.component';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 @NgModule({
     declarations: [
@@ -23,7 +25,8 @@ import { ContractImportComponent } from './components/contract/import/contract-i
         CommercialFormCreateComponent,
         CommercialDetailComponent,
         CustomerAgentImportComponent,
-        ContractImportComponent
+        ContractImportComponent,
+        
     ],
     imports: [
         CommonModule,
@@ -36,12 +39,11 @@ import { ContractImportComponent } from './components/contract/import/contract-i
         PaginationModule.forRoot(),
         SelectModule,
         FormsModule,
-
+        TabsModule.forRoot(),
     ],
     exports: [
         CommercialCreateComponent,
         CommercialFormCreateComponent,
-        CommercialContractListComponent,
         CommercialDetailComponent,
 
 

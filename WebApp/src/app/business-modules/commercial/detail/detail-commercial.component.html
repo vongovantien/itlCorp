@@ -33,7 +33,18 @@
                 <form-create-commercial [isUpdate]="true"></form-create-commercial>
             </div>
         </div>
-        <commercial-contract-list (onActiveContract)="updateStatusPartner($event)"></commercial-contract-list>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet__body">
+        <tabset class="custom-class-tab">
+            <tab heading="Group">
+                <commercial-contract-list (onActiveContract)="updateStatusPartner($event)"></commercial-contract-list>
+            </tab>
+            <tab heading="Branch">
+                <app-commercial-branch-sub-list></app-commercial-branch-sub-list>
+            </tab>
+        </tabset>
     </div>
 </div>
 
