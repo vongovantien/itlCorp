@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -798,5 +799,92 @@ namespace eFMS.API.Accounting.Controllers
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListSoaToSync(Ids) : new List<SyncModel>();
             return Ok(list);
         }
-    }
+
+        /// <summary>
+        /// Nghiệp vụ phiếu thu - Tạo Data Giải Lập Data Test Sync Qua Bravo
+        /// </summary>
+        /// <param name="paymentModels"></param>
+        /// <param name="action">ADD(0) or UPDATE(1)</param>
+        /// <returns></returns>
+        [HttpPost("GiaLapDataPhieuThu")]
+        [Authorize]
+        public async Task<IActionResult> GiaLapDataPhieuThu(List<PaymentModel> paymentModels, [Required] ACTION action)
+        {
+            if (paymentModels.Count == 0)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = "paymentModels bắt buộc phải có data!", Data = paymentModels };
+                return BadRequest(result);
+            }
+
+            try
+            {
+                // 1. Login
+                HttpResponseMessage responseFromApi = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+                BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+
+                if (loginResponse.Success == "1")
+                {                    
+                    HttpResponseMessage resAdd = new HttpResponseMessage();
+                    HttpResponseMessage resUpdate = new HttpResponseMessage();
+                    BravoResponseModel responseAddModel = new BravoResponseModel();
+                    BravoResponseModel responseUpdateModel = new BravoResponseModel();
+
+                    // 3. Call Bravo to SYNC.
+                    if (action == ACTION.ADD)
+                    {
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSReceiptDataSyncAdd", paymentModels, loginResponse.TokenKey);
+                        responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+
+                        #region -- Ghi Log --
+                        var modelLog = new SysActionFuncLogModel
+                        {
+                            FuncLocal = "GiaLapDataPhieuThu",
+                            FuncPartner = "EFMSReceiptDataSyncAdd",
+                            ObjectRequest = JsonConvert.SerializeObject(paymentModels),
+                            ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
+                            Major = "Nghiệp Vụ Phiếu Thu"
+                        };
+                        var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+                        #endregion
+                    }
+
+                    if (action == ACTION.UPDATE)
+                    {
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSReceiptDataSyncUpdate", paymentModels, loginResponse.TokenKey);
+                        responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
+
+                        #region -- Ghi Log --
+                        var modelLog = new SysActionFuncLogModel
+                        {
+                            FuncLocal = "GiaLapDataPhieuThu",
+                            FuncPartner = "EFMSReceiptDataSyncUpdate",
+                            ObjectRequest = JsonConvert.SerializeObject(paymentModels),
+                            ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
+                            Major = "Nghiệp Vụ Phiếu Thu"
+                        };
+                        var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+                        #endregion
+                    }
+
+                    // 4. Update STATUS
+                    if (responseAddModel.Success == "1"
+                        || responseUpdateModel.Success == "1")
+                    {
+                        ResultHandle result = new ResultHandle { Status = true, Message = "Sync phiếu thu thành công", Data = paymentModels };
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        ResultHandle result = new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = paymentModels };
+                        return BadRequest(result);
+                    }
+                }
+                return BadRequest("Sync fail");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Sync fail");
+            }
+        }
+    }     
 }
