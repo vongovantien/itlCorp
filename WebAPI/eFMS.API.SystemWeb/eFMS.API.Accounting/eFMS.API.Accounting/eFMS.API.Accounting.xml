@@ -18,6 +18,14 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GiaLapDataPhieuThu(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.PaymentModel},eFMS.API.Accounting.DL.Models.Accounting.ACTION)">
+            <summary>
+            Nghiệp vụ phiếu thu - Tạo Data Giải Lập Data Test Sync Qua Bravo
+            </summary>
+            <param name="paymentModels"></param>
+            <param name="action">ADD(0) or UPDATE(1)</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingManagementController">
             <summary>
             A base class for an MVC controller without view support.
