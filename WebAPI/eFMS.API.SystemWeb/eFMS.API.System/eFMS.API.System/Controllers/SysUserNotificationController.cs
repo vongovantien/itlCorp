@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -36,11 +39,26 @@ namespace eFMS.API.System.Controllers
 
         [HttpGet]
         [Route("Paging")]
+        [Authorize]
         public IActionResult Paging(int page, int size)
         {
             var data = sysUserNotificationService.Paging(page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("Read")]
+        public IActionResult ReadMessage(Guid Id)
+        {
+            HandleState result = sysUserNotificationService.Update(Id);
+            if(result.Success)
+            {
+                return Ok(new ResultHandle { Message = "Đọc tin nhắn thành công", Status = true});
+            }
+
+            return BadRequest(new ResultHandle { Message = "Đọc tin nhắn không thành công", Status = true });
         }
 
     }

@@ -15,12 +15,15 @@ namespace eFMS.API.System.DL.Services
     public class SysNotificationService : RepositoryBase<SysNotifications, SysNotificationsModel>, ISysNotificationService
     {
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysUserNotification> sysUserNotiRepository;
         public SysNotificationService(
             IContextBase<SysNotifications> repository, 
-            IMapper mapper, ICurrentUser ICurrentUser
+            IMapper mapper, ICurrentUser ICurrentUser,
+            IContextBase<SysUserNotification> sysUserNotiRepo
             ) : base(repository, mapper)
         {
             currentUser = ICurrentUser;
+            sysUserNotiRepository = sysUserNotiRepo;
         }
 
         public HandleState AddNew(SysNotifications model)
@@ -38,7 +41,36 @@ namespace eFMS.API.System.DL.Services
                 UserModified = currentUser.UserID
             };
 
-            result = DataContext.Add(data);
+            result = DataContext.Add(data, false);
+
+            if(result.Success)
+            {
+                SysUserNotification userNoti1 = new SysUserNotification
+                {
+                    Id = Guid.NewGuid(),
+                    NotitficationId = data.Id,
+                    Status = "New",
+                    DatetimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now,
+                    UserId = "c7f2245d-4102-46e3-8d38-6dd2af527e9c",
+                };
+                sysUserNotiRepository.Add(userNoti1, false);
+
+               SysUserNotification userNoti2 = new SysUserNotification
+                {
+                    Id = Guid.NewGuid(),
+                    NotitficationId = data.Id,
+                    Status = "New",
+                    DatetimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now,
+                    UserId = "925387dc-13cc-4c5e-accd-03e5fc109c3c",
+                };
+
+                sysUserNotiRepository.Add(userNoti2, false);
+
+            }
+            sysUserNotiRepository.SubmitChanges();
+            DataContext.SubmitChanges();
 
             return result;
         }

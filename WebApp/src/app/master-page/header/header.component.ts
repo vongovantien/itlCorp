@@ -3,7 +3,7 @@ import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCance
 import { IdentityRepo, SystemRepo } from '@repositories';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { Employee, Office, SysNotification } from '@models';
+import { Employee, Office, SysUserNotification } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
@@ -36,7 +36,9 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     subscriptions: Subscription[] = [];
 
-    notifications: SysNotification[] = [];
+    notifications: SysUserNotification[] = [];
+    newMssUnread: number;
+
 
     constructor(
         private router: Router,
@@ -100,15 +102,15 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         });
 
         this.subscriptions.push(indentitySub, routerSub);
-
+        // * Realtime
+        this._signalRService.startConnection();
         this.getListNotification();
 
-        this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
+        this._signalRService.listenEvent("NotificationWhenChange", (data: SysUserNotification) => {
             if (data) {
                 this._toast.info(`You have a new message ${data.title}`, 'Infomation');
-                this.notifications.push(data);
+                this.getListNotification();
             }
-
         });
     }
 
@@ -116,17 +118,28 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this._systemRepo.getListNotifications()
             .pipe()
             .subscribe(
-                (res: SysNotification[]) => {
-                    this.notifications = res || [];
-                    console.log(this.notifications);
+                (res: CommonInterface.IResponsePaging) => {
+                    this.notifications = res.data || [];
+                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
                 }
             );
     }
 
-    selectNotification(noti: SysNotification, e: any) {
+    selectNotification(noti: SysUserNotification, e: any) {
         e.stopPropagation();
-        noti.isRead = true;
         console.log(noti);
+
+        this._systemRepo.readMessage(noti.id)
+            .subscribe((res: CommonInterface.IResult) => {
+                if (!res.status) {
+                    this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
+
+                } else {
+                    noti.status = 'Read';
+                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
+                }
+
+            });
     }
 
     viewProfile() {

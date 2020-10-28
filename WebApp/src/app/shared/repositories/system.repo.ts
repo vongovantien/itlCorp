@@ -649,8 +649,12 @@ export class SystemRepo {
         return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/UpdateProfile`, body);
     }
 
-    getListNotifications() {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysNotification/GetNotifications`);
+    getListNotifications(page: number = 1, size: number = 15) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserNotification/Paging`, { page: page, size: size });
+    }
+
+    readMessage(Id: string) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserNotification/Read`, null, { Id: Id });
     }
 
 }

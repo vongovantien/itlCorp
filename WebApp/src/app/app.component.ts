@@ -89,7 +89,6 @@ export class AppComponent {
                 }
             });
 
-        // * Realtime
-        this._signalRService.startConnection();
+
     }
 }

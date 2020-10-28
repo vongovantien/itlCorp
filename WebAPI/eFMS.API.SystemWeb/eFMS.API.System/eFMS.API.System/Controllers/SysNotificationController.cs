@@ -9,6 +9,7 @@ using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.API.System.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -36,6 +37,7 @@ namespace eFMS.API.System.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ResultHandle> Post(SysNotifications model)
         {
             ResultHandle result = new ResultHandle();
@@ -58,13 +60,6 @@ namespace eFMS.API.System.Controllers
             return result;
         }
 
-        [HttpGet]
-        [Route("GetNotifications")]
-        public IActionResult GetNotifications(int page, int size)
-        {
-            List<SysNotificationsModel> data = sysNotificationService.GetListNotification();
-            return Ok(data);
-        }
-
+        
     }
 }

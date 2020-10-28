@@ -113,11 +113,11 @@ namespace eFMS.API.System
             app.UseCors("AllowAny");
             app.UseStaticFiles();
             app.UseCors("AllowAllOrigins");
+            app.UseAuthentication();
             app.UseSignalR(routes =>
             {
                 routes.MapHub<NotificationHub>("/notification");
             });
-            app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();

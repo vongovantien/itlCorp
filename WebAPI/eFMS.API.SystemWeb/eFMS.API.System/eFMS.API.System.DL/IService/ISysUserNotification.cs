@@ -14,7 +14,7 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserNotificationModel> Paging(int page, int size, out int rowsCount);
         IQueryable<SysUserNotificationModel> GetAll();
         HandleState Add(SysUserNotification sysBuModel);
-        HandleState Update(Guid id, SysUserNotification sysUserNotification);
-        HandleState Delete(Guid id);
+        HandleState Update(Guid Id);
+        HandleState Delete(Guid Id);
     }
 }

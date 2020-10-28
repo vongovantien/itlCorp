@@ -60,6 +60,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysPartnerAPIService, SysPartnerAPIService>();
             services.AddTransient<ISysNotificationService, SysNotificationService>();
             services.AddTransient<NotificationHubSubscription>();
+            services.AddTransient<ISysUserNotification, SysUserNotificationService>();
 
             services.AddSingleton<ICacheServiceBase<SysMenu>>(x =>
             new CacheServiceBase<SysMenu>(x.GetRequiredService<IConnectionMultiplexer>()

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.Service.Models;
@@ -23,9 +24,11 @@ namespace eFMS.API.System.DL.Services
         public SysUserNotificationService(
             IContextBase<SysUserNotification> repository,
             IContextBase<SysNotifications> sysNotificationRepo,
+            ICurrentUser currUser,
             IMapper mapper) : base(repository, mapper)
         {
             sysNotificationRepository = sysNotificationRepo;
+            currentUser = currUser;
         }
 
         public HandleState Add(SysUserNotification sysBuModel)
@@ -33,7 +36,7 @@ namespace eFMS.API.System.DL.Services
             throw new NotImplementedException();
         }
 
-        public HandleState Delete(Guid id)
+        public HandleState Delete(Guid Id)
         {
             throw new NotImplementedException();
         }
@@ -44,9 +47,29 @@ namespace eFMS.API.System.DL.Services
             return data.ProjectTo<SysUserNotificationModel>(mapper.ConfigurationProvider);
         }
 
-        public HandleState Update(Guid id, SysUserNotification sysUserNotification)
+        public HandleState Update(Guid Id)
         {
-            throw new NotImplementedException();
+            HandleState result = new HandleState();
+            try
+            {
+                SysUserNotification data = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+                if (data == null)
+                {
+                    return result;
+                }
+
+                data.Status = SystemConstants.NOTIFICATION_STATUS_READ;
+                data.DatetimeModified = DateTime.Now;
+                data.UserModified = currentUser.UserID;
+
+                result = DataContext.Update(data, x => x.Id == Id);
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return result;
+            }
         }
 
         IQueryable<SysUserNotificationModel> ISysUserNotification.Paging(int page, int size, out int rowsCount)
@@ -70,14 +93,30 @@ namespace eFMS.API.System.DL.Services
 
             IQueryable<SysUserNotificationModel> dataQuery = Get(query);
 
-            var queryNotiDetail = from u in dataQuery
-                                  join s in sysNotificationRepository.Get() on u.NotitficationId equals s.Id
-                            
-            dataQuery = dataQuery?.OrderByDescending(x => x.DatetimeModified);
+            if (dataQuery.Count() > 0)
+            {
+                IQueryable<SysUserNotificationModel> queryNotiDetail = from u in dataQuery
+                                                                       join s in sysNotificationRepository.Get() on u.NotitficationId equals s.Id into sGrps
+                                                                       from s in sGrps.DefaultIfEmpty()
+                                                                       select new SysUserNotificationModel
+                                                                       {
+                                                                           Title = s.Title,
+                                                                           Type = s.Type,
+                                                                           Action = s.Action,
+                                                                           ActionLink = s.ActionLink,
+                                                                           Description = s.Description,
+                                                                           Id = u.Id,
+                                                                           Status = u.Status,
+                                                                           UserId = u.UserId,
+                                                                           NotitficationId = s.Id,
+                                                                           DatetimeCreated = u.DatetimeCreated,
+                                                                           DatetimeModified = u.DatetimeModified,
+                                                                       };
 
+                queryNotiDetail = queryNotiDetail?.OrderByDescending(x => x.DatetimeModified);
+                return queryNotiDetail;
+            }
             return dataQuery;
-
-
         }
     }
 }
