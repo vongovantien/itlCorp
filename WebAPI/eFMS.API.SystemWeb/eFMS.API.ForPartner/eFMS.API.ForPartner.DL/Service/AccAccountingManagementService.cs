@@ -367,7 +367,9 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.UserModified = _currentUser.UserID;
                             var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
 
+                            //Update Status Removed Inv For SOA (SOA synced)
                             UpdateStatusRemovedInvForSOA(charge.Soano);
+                            //Update Status Removed Inv For Debit Note (Debit Note synced)
                             UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
                         }
 
