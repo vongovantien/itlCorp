@@ -528,6 +528,7 @@ namespace eFMS.API.Documentation.DL.Services
         private List<string> GetOfficeManager(Guid? companyId, Guid? officeId)
         {
             var officeManager = userLevelRepository.Get(x => x.GroupId == 11
+                                                    && x.DepartmentId == null
                                                     && x.OfficeId == officeId
                                                     && x.CompanyId == companyId
                                                     && x.Position == "Manager-Leader")
@@ -538,6 +539,8 @@ namespace eFMS.API.Documentation.DL.Services
         private List<string> GetCompanyManager(Guid? companyId)
         {
             var companyManager = userLevelRepository.Get(x => x.GroupId == 11
+                                                    && x.DepartmentId == null 
+                                                    && x.OfficeId == null
                                                     && x.CompanyId == companyId
                                                     && x.Position == "Manager-Leader")
                                                     .Select(s => s.UserId).ToList();

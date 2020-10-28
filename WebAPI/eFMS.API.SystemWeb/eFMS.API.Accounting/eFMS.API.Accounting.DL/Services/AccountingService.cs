@@ -286,7 +286,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Description = charge.ChargeNameVn,
                                                                                              Unit = unit.UnitNameVn,
                                                                                              CurrencyCode = surcharge.CurrencyId,
-                                                                                             ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
+                                                                                             ExchangeRate = surcharge.FinalExchangeRate, //currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, item.CurrencyCode),
                                                                                              BillEntryNo = surcharge.Hblno,
                                                                                              Ma_SpHt = surcharge.JobNo,
                                                                                              MasterBillNo = surcharge.Mblno,
