@@ -525,9 +525,22 @@ namespace eFMS.API.Documentation.DL.Services
             return accountants;
         }
 
+        private List<string> GetOfficeManager(Guid? companyId, Guid? officeId)
+        {
+            var officeManager = userLevelRepository.Get(x => x.GroupId == 11
+                                                    && x.DepartmentId == null
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId
+                                                    && x.Position == "Manager-Leader")
+                                                    .Select(s => s.UserId).ToList();
+            return officeManager;
+        }
+
         private List<string> GetCompanyManager(Guid? companyId)
         {
             var companyManager = userLevelRepository.Get(x => x.GroupId == 11
+                                                    && x.DepartmentId == null 
+                                                    && x.OfficeId == null
                                                     && x.CompanyId == companyId
                                                     && x.Position == "Manager-Leader")
                                                     .Select(s => s.UserId).ToList();
@@ -795,9 +808,16 @@ namespace eFMS.API.Documentation.DL.Services
                 var _employeeIdAcountant = userRepository.Get(x => x.Id == _userIdAccountant).FirstOrDefault()?.EmployeeId;
                 string _accountantName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
 
-                string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
-                var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
-                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdComManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                string _managerName = string.Empty;
+                string _userIdOfficeManager = GetOfficeManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault();
+                var _employeeIdOfficeManager = userRepository.Get(x => x.Id == _userIdOfficeManager).FirstOrDefault()?.EmployeeId;
+                _managerName = employeeRepository.Get(x => x.Id == _employeeIdOfficeManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                if (string.IsNullOrEmpty(_managerName))
+                {
+                    string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
+                    var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
+                    _managerName = employeeRepository.Get(x => x.Id == _employeeIdComManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                }
 
                 var parameter = new DepartSaleReportParameter
                 {
@@ -812,7 +832,7 @@ namespace eFMS.API.Documentation.DL.Services
                     CurrDecimalNo = 2, //
                     ReportBy = string.Empty,
                     SalesManager = string.Empty,
-                    Director = _comManagerName, // Company Manager
+                    Director = _managerName, // Office/Company Manager
                     ChiefAccountant = _accountantName // Accountant Manager của Current User
                 };
                 result = new Crystal
@@ -876,9 +896,16 @@ namespace eFMS.API.Documentation.DL.Services
                 var _employeeIdAcountant = userRepository.Get(x => x.Id == _userIdAccountant).FirstOrDefault()?.EmployeeId;
                 string _accountantName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
 
-                string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
-                var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
-                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdComManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                string _managerName = string.Empty;
+                string _userIdOfficeManager = GetOfficeManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault();
+                var _employeeIdOfficeManager = userRepository.Get(x => x.Id == _userIdOfficeManager).FirstOrDefault()?.EmployeeId;
+                _managerName = employeeRepository.Get(x => x.Id == _employeeIdOfficeManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                if (string.IsNullOrEmpty(_managerName))
+                {
+                    string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
+                    var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
+                    _managerName = employeeRepository.Get(x => x.Id == _employeeIdComManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                }
 
                 var parameter = new QuaterSaleReportParameter
                 {
@@ -893,7 +920,7 @@ namespace eFMS.API.Documentation.DL.Services
                     CurrDecimalNo = 2, //
                     ReportBy = string.Empty,
                     SalesManager = string.Empty,
-                    Director = _comManagerName, // Company Manager
+                    Director = _managerName, // Office/Company Manager
                     ChiefAccountant = _accountantName // Accountant Manager của Current User
                 };
                 result = new Crystal

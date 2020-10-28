@@ -8,8 +8,9 @@ import { SortService } from '@services';
 import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
+import { merge } from 'rxjs';
 
 @Component({
     selector: 'app-air-export-hbl',
@@ -78,5 +79,13 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
         });
+    }
+
+    listenShortcutMovingTab() {
+        merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit1'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('shipment'); });
+        merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit2'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('hbl'); });
+        merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit3'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('cdNote'); });
+        merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit4'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('assignment'); });
+        merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit5'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('files'); });
     }
 }

@@ -102,6 +102,10 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     AccAccountingManagement data = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                    if (data == null)
+                    {
+                        return new HandleState((object)"Data not found");
+                    }
                     if (data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID || data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
                     {
                         return new HandleState((object)data.InvoiceNoReal + " Had payment");
@@ -117,23 +121,12 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (CsShipmentSurcharge item in charges)
                         {
                             item.AcctManagementId = null;
-                            if (data.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
-                            {
-                                item.VoucherId = null;
-                                item.VoucherIddate = null;
-                                item.InvoiceNo = null;
-                                item.InvoiceDate = null;
-                                item.SeriesNo = null;
-                            }
-                            if (data.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
-                            {
-                                item.InvoiceNo = null;
-                                item.InvoiceDate = null;
-                                item.VoucherId = null;
-                                item.VoucherIddate = null;
-                                item.FinalExchangeRate = null;
-                            }
-
+                            item.InvoiceNo = null;
+                            item.InvoiceDate = null;
+                            item.VoucherId = null;
+                            item.VoucherIddate = null;
+                            item.SeriesNo = null;
+                            
                             item.AmountVnd = item.VatAmountVnd = null;
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;

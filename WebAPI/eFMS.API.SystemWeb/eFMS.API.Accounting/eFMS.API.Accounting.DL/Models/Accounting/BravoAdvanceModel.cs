@@ -17,6 +17,8 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string CurrencyCode { get; set; }
         public decimal ExchangeRate { get; set; }
         public string Description0 { get; set; }
+        public decimal? DueDate { get; set; }
+        public string PaymentMethod { get; set; }
         public List<BravoAdvanceRequestModel> Details { get; set; }
 
     }
