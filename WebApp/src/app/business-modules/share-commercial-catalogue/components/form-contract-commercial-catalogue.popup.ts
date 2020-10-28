@@ -47,6 +47,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     contractType: AbstractControl;
     saleService: AbstractControl;
     paymentMethod: AbstractControl;
+    baseOn: AbstractControl;
     vas: AbstractControl;
     trialEffectDate: AbstractControl;
     trialExpiredDate: AbstractControl;
@@ -80,7 +81,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isChangeAgrmentType: boolean = false;
     status: boolean = false;
     isAllowActiveContract: boolean = false;
-
+    isDisabledExpiredDateField: boolean = false;
 
     indexDetailContract: number = null;
 
@@ -117,6 +118,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         { id: "All", text: "All" },
         ...JobConstants.COMMON_DATA.FREIGHTTERMS
     ];
+
+    basesOn: CommonInterface.INg2Select[] = [
+        { id: "Invoice Date", text: "Invoice Date" },
+        { id: "Confirmed Billing", text: "Confirmed Billing" }
+    ];
+
     vaslst: CommonInterface.INg2Select[] = this.serviceTypes;
     isCollapsed: boolean = false;
 
@@ -203,6 +210,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             trialCreditLimit: [],
             trialCreditDays: [],
             paymentTerm: [],
+            baseOn: [[{ id: "Invoice Date", text: "Invoice Date" }]],
             creditLimit: [],
             creditLimitRate: [],
             creditAmount: [],
@@ -222,6 +230,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractType = this.formGroup.controls['contractType'];
         this.saleService = this.formGroup.controls['saleService'];
         this.paymentMethod = this.formGroup.controls['paymentMethod'];
+        this.baseOn = this.formGroup.controls['baseOn'];
         this.vas = this.formGroup.controls['vas'];
         this.trialEffectDate = this.formGroup.controls['trialEffectDate'];
         this.trialExpiredDate = this.formGroup.controls['trialExpiredDate'];
@@ -574,9 +583,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             saleService: !!this.selectedContract.saleService ? [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }] : null,
             vas: !!this.selectedContract.vas ? [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }] : null,
             paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null,
+            baseOn: !!this.selectedContract.baseOn ? [this.basesOn.find(type => type.id === this.selectedContract.baseOn)] : null,
             currencyId: !!this.selectedContract.currencyId ? [{ id: this.selectedContract.currencyId, text: this.selectedContract.currencyId }] : null
         });
         this.contractTypeDetail = this.selectedContract.contractType;
+        if (this.selectedContract.contractType === 'Trial') {
+            this.isDisabledExpiredDateField = true;
+        } else {
+            this.isDisabledExpiredDateField = false;
+        }
     }
 
 
@@ -601,6 +616,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const offices = this.officeId.value ? (this.officeId.value.length > 0 ? this.officeId.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.officeId = offices;
         this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value[0].id : null;
+        this.selectedContract.baseOn = !!this.baseOn.value ? this.baseOn.value[0].id : null;
         this.selectedContract.trialCreditLimited = this.formGroup.controls['trialCreditLimit'].value;
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
         if (this.officeId.value[0].id === 'All') {
@@ -746,6 +762,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
     }
 
+    selectedAgreementType($event: any) {
+        console.log($event);
+        if ($event.id === 'Trial') {
+            this.isDisabledExpiredDateField = true;
+            if (!!this.effectiveDate.value.startDate) {
+                this.expiredDate.setValue({
+                    startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
+                    endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
+                });
+            }
+        } else {
+            this.isDisabledExpiredDateField = false;
+        }
+    }
+
     mapOfficeId() {
         let officeId = '';
         const off = this.offices.filter(office => office.id !== 'All');
@@ -769,7 +800,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onSaveReject($event: string) {
         const comment = $event;
-        console.log(comment);
         this._progressRef.start();
         this._catalogueRepo.rejectCommentCommercial(this.partnerId, this.selectedContract.id, comment, this.type)
             .pipe(
@@ -779,6 +809,25 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this._toastService.success('Sent Successfully!');
+                    } else {
+                        this._toastService.error('something went wrong!');
+                    }
+                }
+            );
+    }
+
+    onARConfirmed() {
+        this._progressRef.start();
+        this._catalogueRepo.arConfirmed(this.partnerId, this.selectedContract.id, this.type)
+            .pipe(
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (res === true) {
+                        this.selectedContract.arconfirmed = true;
+                        this.onRequest.emit(this.selectedContract);
+                        this._toastService.success('AR Confirm Successfully!');
                     } else {
                         this._toastService.error('something went wrong!');
                     }

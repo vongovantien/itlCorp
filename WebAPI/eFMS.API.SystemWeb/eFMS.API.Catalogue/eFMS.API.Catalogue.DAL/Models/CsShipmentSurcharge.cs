@@ -60,5 +60,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
         public string ReferenceNo { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

@@ -198,7 +198,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Any(y => x.OfficeId.Contains(y)) && x.SaleManId == model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => x.SaleService == model.SaleService  && x.SaleManId == model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -416,6 +416,25 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+
+
+        /// <summary>
+        /// send email AR Confirmed
+        /// </summary>
+        /// <param name="partnerId">id of data that need to retrieve</param>
+        /// <param name="contractId">id of data that need to retrieve</param>
+        /// <param name="partnerType">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet("ARConfirmed")]
+        [Authorize]
+        public IActionResult ARConfirmed(string partnerId, string contractId, string partnerType)
+        {
+            bool result = catContractService.SendMailARConfirmed(partnerId, contractId , partnerType);
+            return Ok(result);
+        }
+
+
 
         /// <summary>
         /// reject partner comment
