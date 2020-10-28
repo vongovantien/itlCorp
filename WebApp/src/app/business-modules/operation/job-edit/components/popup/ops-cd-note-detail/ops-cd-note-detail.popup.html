@@ -46,10 +46,14 @@
                                 <div class="m--margin-top-5">
                                     <span class="font-weight-bold">Sync Status: </span>
                                     <span [ngSwitch]="CdNoteDetail.syncStatus">
-                                        <span *ngSwitchCase="'Synced'" class="text-success m--font-bolder">
-                                            {{CdNoteDetail.syncStatus}}</span>
-                                        <span *ngSwitchDefault class="text-danger m--font-bolder">
-                                            {{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchCase="'Synced'"
+                                            class="m--margin-left-5 m-badge m-badge--success m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchCase="'Rejected'"
+                                            class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchCase="'Removed Inv'"
+                                            class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchDefault
+                                            class="m--margin-left-5 m-badge m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
                                     </span>
                                 </div>
                                 <div class="m--margin-top-5">

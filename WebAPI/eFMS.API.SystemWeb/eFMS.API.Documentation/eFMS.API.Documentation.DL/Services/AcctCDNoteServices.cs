@@ -289,7 +289,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_DOMESTIC) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                    model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
                 #endregion  --- Set Currency For CD Note ---
 

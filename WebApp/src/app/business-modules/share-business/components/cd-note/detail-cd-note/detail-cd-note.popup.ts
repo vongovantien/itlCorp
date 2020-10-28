@@ -81,7 +81,9 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             soa: 'SOA',
             locked: 'Locked',
             syncStatus: 'Sync Status',
-            lastSync: 'Last Sync'
+            lastSync: 'Last Sync',
+            currency: 'Currency',
+            exchangeRate: 'ExchangeRate'
         };
 
         this.headers = [

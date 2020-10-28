@@ -558,6 +558,11 @@ namespace eFMS.API.ForPartner.DL.Service
             if (currencyFrom == currencyTo) return exchangeRateNew;
 
             var currencyExchanges = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == exchangeDate.Value.Date).ToList();
+            if (currencyExchanges.Count == 0)
+            {
+                DateTime? maxDateCreated = currencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchanges = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
             var exchangeFrom = currencyFrom != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyFrom).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyFrom so với VND
             var exchangeTo = currencyTo != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyTo).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyTo so với VND
             var _rateFromCFToCT = exchangeFrom / exchangeTo; //Tỷ giá currencyFrom so với currencyTo
@@ -1005,15 +1010,11 @@ namespace eFMS.API.ForPartner.DL.Service
                         foreach (CsShipmentSurcharge charge in charges)
                         {
                             charge.AcctManagementId = null;
-                            if (charge.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE)
-                            {
-                                charge.VoucherId = null;
-                                charge.VoucherIddate = null;
-                                charge.InvoiceNo = null;
-                                charge.InvoiceDate = null;
-                                charge.SeriesNo = null;
-                            }
-
+                            charge.VoucherId = null;
+                            charge.VoucherIddate = null;
+                            charge.InvoiceNo = null;
+                            charge.InvoiceDate = null;
+                            charge.SeriesNo = null;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
                             surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
