@@ -61,6 +61,10 @@
                                     <span>{{CdNoteDetail.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
                                 </div>
                                 <div class="m--margin-top-5">
+                                    <span class="font-weight-bold">Reason Reject: </span>
+                                    <span>{{CdNoteDetail.reasonReject}}</span>
+                                </div>
+                                <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Package Quantity: </span>
                                     {{ CdNoteDetail.sumPackages | number: '1.2-2' }}
                                 </div>
@@ -124,11 +128,11 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <span class="font-weight-bold"> Currency: </span>
-                                            {{ CdNoteDetail.currency }}
+                                            <span class="text-info">{{ CdNoteDetail.currency }}</span>
                                         </div>
                                         <div class="col-md-6">
                                             <span class="font-weight-bold"> ExchangeRate: </span>
-                                            {{ CdNoteDetail.exchangeRate }}
+                                            {{ CdNoteDetail.exchangeRate | number:'1.0-3'}}
                                         </div>
                                     </div>
                                 </div>
@@ -137,9 +141,8 @@
                                     {{CdNoteDetail.soaNo}}
                                 </div>
                                 <div class="m--margin-top-5">
-                                    <span class="font-weight-bold">Locked: </span>
-                                    <span
-                                        [ngClass]="CdNoteDetail.isLoocked ? 'm--font-danger' : ''">{{CdNoteDetail.isLoocked ? 'Yes' : 'No'}}</span>
+                                    <span class="font-weight-bold">Note: </span>
+                                    <span>{{CdNoteDetail.note}}</span>
                                 </div>
                             </div>
                         </div>

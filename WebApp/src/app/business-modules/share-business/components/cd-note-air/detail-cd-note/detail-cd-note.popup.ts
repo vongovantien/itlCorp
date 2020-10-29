@@ -76,11 +76,12 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             volume: 'Volume',
             packageQty: 'Package Quantity',
             soa: 'SOA',
-            locked: 'Locked',
+            note: 'Note',
             syncStatus: 'Sync Status',
             lastSync: 'Last Sync',
             currency: 'Currency',
-            exchangeRate: 'ExchangeRate'
+            exchangeRate: 'ExchangeRate',
+            reasonReject: 'Reason Reject'
         };
 
         this.headers = [
