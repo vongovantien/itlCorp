@@ -97,7 +97,8 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted &&  !effectiveDate.value.startDate }">
                                 <label required for="">Effective Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    <input (change)="onUpdateEffectiveDate()" type="text"
+                                        class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
