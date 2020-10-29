@@ -2209,12 +2209,15 @@ namespace eFMS.API.Documentation.DL.Services
             var GroupHbl = dataList.GroupBy(a => a.Hbl).Select(p => new { Hbl = p.Key, TotalCost = p.Sum(q => q.TotalCost), TotalRevenue = p.Sum(q => q.TotalRevenue), TotalJobProfit = p.Sum(q => q.JobProfit) }).ToList();
             foreach (var item in GroupHbl)
             {
-                int i = dataList.FindLastIndex(x => x.Hbl.StartsWith(item.Hbl));
-                JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
-                data.TotalCost = item.TotalCost;
-                data.TotalRevenue = item.TotalRevenue;
-                data.JobProfit = item.TotalJobProfit;
-                dataList.Insert(i + 1, data);
+                if(!string.IsNullOrEmpty(item.Hbl))
+                {
+                    int i = dataList.FindLastIndex(x => x.Hbl != null && x.Hbl.StartsWith(item.Hbl));
+                    JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
+                    data.TotalCost = item.TotalCost;
+                    data.TotalRevenue = item.TotalRevenue;
+                    data.JobProfit = item.TotalJobProfit;
+                    dataList.Insert(i + 1, data);
+                }
             }
             return dataList.AsQueryable();
 
@@ -2342,7 +2345,7 @@ namespace eFMS.API.Documentation.DL.Services
             var GroupHbl = dataList.GroupBy(a => a.Hbl).Select(p => new { Hbl = p.Key, TotalCost = p.Sum(q => q.TotalCost), TotalRevenue = p.Sum(q => q.TotalRevenue), TotalJobProfit = p.Sum(q => q.JobProfit) }).ToList();
             foreach (var item in GroupHbl)
             {
-                int i = dataList.FindLastIndex(x => x.Hbl.StartsWith(item.Hbl));
+                int i = dataList.FindLastIndex(x => x.Hbl != null && x.Hbl.StartsWith(item.Hbl));
                 JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
                 data.TotalCost = item.TotalCost;
                 data.TotalRevenue = item.TotalRevenue;
