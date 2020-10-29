@@ -41,12 +41,9 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
         { field: 'employeeNameVn', label: 'Full Name' }
     ];
 
-    invoiceStatusList: CommonInterface.INg2Select[] = [
-        { id: 'New', text: 'New' },
-        { id: 'Updated Invoice', text: 'Updated Invoice' }
-    ];
+    invoiceStatusList: string[] = ['New', 'Updated Invoice'];
 
-    voucherTypeList: CommonInterface.INg2Select[] = AccountingConstants.VOUCHER_TYPE;
+    voucherTypeList: string[] = AccountingConstants.VOUCHER_TYPE.map(i => i.id);
     dataSearch: AccAccountingManagementCriteria;
 
     constructor(
@@ -56,6 +53,7 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
         private _store: Store<IAccountingManagementState>
     ) {
         super();
+        this.requestReset = this.reset;
     }
 
     ngOnInit() {
@@ -70,7 +68,6 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
             )
             .subscribe(
                 (dataSearch: AccAccountingManagementCriteria) => {
-                    console.log(dataSearch);
                     if (!!dataSearch && dataSearch.typeOfAcctManagement && dataSearch.typeOfAcctManagement === this.accountType) {
                         this.dataSearch = dataSearch;
 
@@ -86,10 +83,10 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
                         }
 
                         if (this.dataSearch.typeOfAcctManagement === AccountingConstants.ISSUE_TYPE.VOUCHER && this.dataSearch.voucherType) {
-                            formData = { ...formData, voucherType: [AccountingConstants.VOUCHER_TYPE.find(x => x.id === this.dataSearch.voucherType)] };
+                            formData = { ...formData, voucherType: this.dataSearch.voucherType };
                         }
                         if (this.dataSearch.typeOfAcctManagement === AccountingConstants.ISSUE_TYPE.INVOICE && this.dataSearch.invoiceStatus) {
-                            formData = { ...formData, invoiceStatus: [this.invoiceStatusList.find(x => x.id === this.dataSearch.invoiceStatus)] };
+                            formData = { ...formData, invoiceStatus: this.dataSearch.invoiceStatus };
                         }
 
                         // * Update form search.
@@ -144,8 +141,8 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
             fromIssuedDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
             toIssuedDate: this.issueDate.value ? (this.issueDate.value.endDate !== null ? formatDate(this.issueDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
             creatorId: this.creator.value,
-            invoiceStatus: this.invoiceStatus.value ? (this.invoiceStatus.value.length > 0 ? this.invoiceStatus.value[0].id : null) : null,
-            voucherType: this.voucherType.value ? (this.voucherType.value.length > 0 ? this.voucherType.value[0].id : null) : null,
+            invoiceStatus: this.invoiceStatus.value,
+            voucherType: this.voucherType.value,
             typeOfAcctManagement: this.accountType,
         };
         this.onSearch.emit(criteria);
