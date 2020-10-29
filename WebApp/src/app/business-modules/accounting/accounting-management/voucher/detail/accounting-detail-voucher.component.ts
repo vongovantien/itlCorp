@@ -149,6 +149,9 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                             modelAdd.groupId = this.accountingManagement.groupId;
                             modelAdd.userCreated = this.accountingManagement.userCreated;
                             modelAdd.datetimeCreated = this.accountingManagement.datetimeCreated;
+                            modelAdd.syncStatus = this.accountingManagement.syncStatus;
+                            modelAdd.lastSyncDate = this.accountingManagement.lastSyncDate;
+                            modelAdd.reasonReject = this.accountingManagement.reasonReject;
 
                             this._progressRef.start();
                             return this._accountingRepo.updateAcctMngt(modelAdd)
