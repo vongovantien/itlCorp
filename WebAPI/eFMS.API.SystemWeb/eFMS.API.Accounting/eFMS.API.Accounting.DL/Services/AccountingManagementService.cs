@@ -989,7 +989,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             string _Type = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "Voucher" : "VAT Invoice");
                             string _Ref = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? accounting.VoucherId : accounting.InvoiceNoTempt);
-                            string description = string.Format(@"[Type] <b style='color:#3966b6'>[RefNo]</b> Has been created successfully");
+                            string description = string.Format(@"[Type] <b style='color:#3966b6'>[RefNo]</b> Has been created");
                             description = description.Replace("[Type]", _Type);
                             description = description.Replace("[RefNo]", _Ref);
                             // Add Notification

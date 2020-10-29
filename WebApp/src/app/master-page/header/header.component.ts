@@ -5,10 +5,11 @@ import { IdentityRepo, SystemRepo } from '@repositories';
 import { SystemConstants } from 'src/constants/system.const';
 import { Employee, Office, SysUserNotification } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
 import { SignalRService } from '@services';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-header',
@@ -39,6 +40,10 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     notifications: SysUserNotification[] = [];
     newMssUnread: number;
 
+    spinnerNotify: string = "spinnerNotify";
+    page: number = 1;
+    size: number = 10;
+    totalItem: number = 0;
 
     constructor(
         private router: Router,
@@ -47,7 +52,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         private _identity: IdentityRepo,
         private _globalState: GlobalState,
         private _signalRService: SignalRService,
-        private _toast: ToastrService
+        private _toast: ToastrService,
+        private _spinner: NgxSpinnerService
     ) { }
 
     ngOnInit() {
@@ -120,6 +126,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             .subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.notifications = res.data || [];
+                    this.totalItem = res.totalItems;
+
                     this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
                 }
             );
@@ -127,9 +135,16 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     selectNotification(noti: SysUserNotification, e: any) {
         e.stopPropagation();
-        console.log(noti);
-
+        if (noti.status === 'Read') {
+            return;
+        }
+        this._spinner.show(this.spinnerNotify);
         this._systemRepo.readMessage(noti.id)
+            .pipe(
+                finalize(() => {
+                    this._spinner.hide(this.spinnerNotify);
+                })
+            )
             .subscribe((res: CommonInterface.IResult) => {
                 if (!res.status) {
                     this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
@@ -144,6 +159,22 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     loadMoreNotification(e: any) {
         e.stopPropagation();
+        this._spinner.show(this.spinnerNotify);
+        this.page++;
+
+        this._systemRepo.getListNotifications(this.page, this.size)
+            .pipe(
+                finalize(() => {
+                    this._spinner.hide(this.spinnerNotify);
+                })
+            )
+            .subscribe((res: CommonInterface.IResponsePaging) => {
+                if (!!res.data) {
+                    this.notifications = [...this.notifications, ...res.data];
+                    this.totalItem = res.totalItems;
+                }
+            });
+
     }
 
     viewProfile() {
@@ -261,7 +292,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             }
         }
     }
-
 
     // minimize sidebar
     minimize_page_sidebar_desktop() {
