@@ -123,7 +123,7 @@
                                     <i class="la la-bell"></i>
                                 </span>
                             </a>
-                            <div class="dropdown-menu rounded-bottom" style="width: 340px; padding: 20px; border-radius: 2px; max-height:250px;
+                            <div class="dropdown-menu" style="width: 340px; padding: 10px; border-radius: 2px; max-height:250px;
                             overflow-y: scroll;" [ngStyle]="{'min-height.px': !!notifications.length ? 100 : 'auto'}">
                                 <ng-container *ngIf="notifications.length; else noneData">
                                     <div class="m-list-timeline m-list-timeline--skin-light">
@@ -135,11 +135,18 @@
                                                 <span
                                                     class="m-list-timeline__badge -m-list-timeline__badge--state-success">
                                                 </span>
-                                                <span class="m-list-timeline__text" [innerHTML]="item.description">
-                                                </span>
-                                                <span class="m-list-timeline__time">
-                                                    {{item.datetimeCreated | date : 'HH:mm dd/MM'}}
-                                                </span>
+                                                <div class="m-list-timeline__text">
+                                                    <div class="" [innerHTML]="item.description">
+                                                    </div>
+                                                    <div class="text-left m-list-timeline__time ">
+                                                        {{item.datetimeCreated | date : 'HH:mm dd/MM'}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="text-center text-primary pointer font-13 text-underline py-3 px-3">
+                                                <a (click)="loadMoreNotification($event)" title="Load more">Load
+                                                    More</a>
                                             </div>
                                         </div>
                                     </div>

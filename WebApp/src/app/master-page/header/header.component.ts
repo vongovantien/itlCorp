@@ -142,6 +142,10 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             });
     }
 
+    loadMoreNotification(e: any) {
+        e.stopPropagation();
+    }
+
     viewProfile() {
         this.router.navigate([`home/profile/${this.currenUser.id}`]);
     }
