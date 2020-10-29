@@ -779,6 +779,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Currency = cdNote.CurrencyId;
             soaDetails.ExchangeRate = cdNote.ExchangeRate;
             soaDetails.Note = cdNote.Note;
+            soaDetails.ReasonReject = cdNote.ReasonReject;
             return soaDetails;
         }
 
