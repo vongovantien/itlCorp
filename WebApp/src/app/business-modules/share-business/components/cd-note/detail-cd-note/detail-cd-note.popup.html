@@ -19,7 +19,6 @@
                             <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
                             <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
                             <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
-                            <!-- <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with Original</a> -->
                         </div>
                     </div>
                 </div>
@@ -82,6 +81,12 @@
                                         {{labelDetail.lastSync}}:
                                     </span>
                                     <span>{{CdNoteDetail.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        {{labelDetail.reasonReject}}:
+                                    </span>
+                                    <span>{{CdNoteDetail.reasonReject}}</span>
                                 </div>
                             </div>
                             <div class="col-xl-8">
@@ -168,16 +173,20 @@
                                             <span>{{CdNoteDetail.hbPackages}}</span>
                                         </div>
                                         <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                {{labelDetail.currency}}:
-                                            </span>
-                                            <span>{{CdNoteDetail.currency}}</span>
-                                        </div>
-                                        <div>
-                                            <span class="m--font-bolder">
-                                                {{labelDetail.exchangeRate}}:
-                                            </span>
-                                            <span>{{CdNoteDetail.exchangeRate}}</span>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <span class="m--font-bolder">
+                                                        {{labelDetail.currency}}:
+                                                    </span>
+                                                    <span class="text-info">{{ CdNoteDetail.currency }}</span>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <span class="m--font-bolder">
+                                                        {{labelDetail.exchangeRate}}:
+                                                    </span>
+                                                    <span>{{CdNoteDetail.exchangeRate | number:'1.0-3'}}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-xl-6">
@@ -189,10 +198,9 @@
                                         </div>
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
-                                                {{labelDetail.locked}}:
+                                                {{labelDetail.note}}:
                                             </span>
-                                            <span
-                                                [ngClass]="CdNoteDetail.isLoocked ? 'm--font-danger' : ''">{{CdNoteDetail.isLoocked ? 'Yes' : 'No'}}</span>
+                                            <span>{{CdNoteDetail.note}}</span>
                                         </div>
                                     </div>
                                 </div>
