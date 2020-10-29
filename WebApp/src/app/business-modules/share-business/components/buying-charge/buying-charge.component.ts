@@ -121,6 +121,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.configHeader();
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.headerPartner = [
+            { title: 'Name Abbr', field: 'shortName' },
             { title: 'Name', field: 'partnerNameEn' },
             { title: 'Partner Code', field: 'taxCode' },
         ];
