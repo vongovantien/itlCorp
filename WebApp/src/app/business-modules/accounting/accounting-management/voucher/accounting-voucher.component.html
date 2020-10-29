@@ -41,7 +41,8 @@
                                             <tr *ngFor="let voucher of vouchers; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
-                                                        <ng-container *ngIf="!voucher.lastSyncDate">
+                                                        <ng-container
+                                                            *ngIf="!voucher.syncStatus || voucher.syncStatus !== 'Synced'">
                                                             <app-permission-button
                                                                 (onClick)="prepareDeleteVoucher(voucher)" type="delete">
                                                             </app-permission-button>
@@ -52,7 +53,7 @@
                                                     <a (click)="viewDetail(voucher)">{{voucher.voucherId}}</a>
                                                 </td>
                                                 <td>{{voucher.partnerName}}</td>
-                                                <td>{{voucher.totalAmount | number: '.0-3'}}</td>
+                                                <td class="text-right">{{voucher.totalAmount | number: '.0-3'}}</td>
                                                 <td>{{voucher.currency}}</td>
                                                 <td>{{voucher.date | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{voucher.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
