@@ -120,7 +120,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                             return of({ data: null, message: 'Voucher ID has been existed', status: false });
                         } else {
                             const modelAdd: AccAccountingManagementModel = this.onSubmitData();
-                            console.log(modelAdd);
 
                             modelAdd.charges = [...this.listChargeComponent.charges];
 
