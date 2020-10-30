@@ -326,8 +326,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<SyncModel> data = new List<SyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id) && (x.Type == "DEBIT" || x.Type == "INVOICE"));
-
+            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id) && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE));
             foreach (var cdNote in cdNotes)
             {
                 SyncModel sync = new SyncModel();
@@ -397,71 +396,72 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of cd note</param>
         /// <param name="type">Type: CREDIT</param>
         /// <returns></returns>
-        public List<SyncCreditModel> GetListCdNoteCreditToSync(List<Guid> ids)
+        public List<SyncCreditModel> GetListCdNoteCreditToSync(List<RequestGuidTypeListModel> models)
         {
             List<SyncCreditModel> data = new List<SyncCreditModel>();
-            if (ids == null || ids.Count() == 0) return data;
+            if (models == null || models.Count() == 0) return data;
 
-            var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id) && x.Type == "CREDIT");
-
-            foreach (var cdNote in cdNotes)
+            foreach (var model in models)
             {
-                SyncCreditModel sync = new SyncCreditModel();
-                sync.Stt = cdNote.Id.ToString();
-                sync.BranchCode = string.Empty;
-                sync.OfficeCode = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
-                sync.Transcode = string.Empty;
-                sync.DocDate = cdNote.DatetimeCreated;
-                sync.ReferenceNo = cdNote.Code;
-                var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
-                sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
-                sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = cdNotePartner?.PartnerMode;
-                sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
-                sync.CurrencyCode = cdNote.CurrencyId;
-                sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
-                sync.Description0 = cdNote.Note;
-                sync.DataType = "CDNOTE";
-                sync.PaymentMethod = "Bank Transfer"; //Set default "Bank Transfer"
-
-                var charges = new List<ChargeCreditSyncModel>();
-                var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                foreach (var surcharge in surcharges)
+                var cdNote = cdNoteRepository.Get(x => model.Id == x.Id && x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).FirstOrDefault();
+                if (cdNote != null)
                 {
-                    var charge = new ChargeCreditSyncModel();
-                    charge.RowId = surcharge.Id.ToString();
-                    charge.Ma_SpHt = surcharge.JobNo;
-                    var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
-                    charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn;
-                    var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
-                    charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                    charge.CurrencyCode = surcharge.CurrencyId;
-                    charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, "VND");
-                    charge.BillEntryNo = surcharge.Hblno;
-                    charge.MasterBillNo = surcharge.Mblno;
-                    charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
-                    charge.NganhCode = "FWD";
-                    charge.Quantity9 = surcharge.Quantity;
-                    charge.OriginalUnitPrice = surcharge.UnitPrice;
-                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                    var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                    charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, 2);
-                    charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                    charge.OriginalAmount3 = Math.Round(charge.OriginalAmount3 ?? 0, 2);
+                    SyncCreditModel sync = new SyncCreditModel();
+                    sync.Stt = cdNote.Id.ToString();
+                    sync.BranchCode = string.Empty;
+                    sync.OfficeCode = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
+                    sync.Transcode = string.Empty;
+                    sync.DocDate = cdNote.DatetimeCreated;
+                    sync.ReferenceNo = cdNote.Code;
+                    var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
+                    sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
+                    sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
+                    sync.CustomerMode = cdNotePartner?.PartnerMode;
+                    sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
+                    sync.CurrencyCode = cdNote.CurrencyId;
+                    sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
+                    sync.Description0 = cdNote.Note;
+                    sync.DataType = "CDNOTE";
+                    sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
 
-                    var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
-                    var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
-                    charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
-                    charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+                    var charges = new List<ChargeCreditSyncModel>();
+                    var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                    foreach (var surcharge in surcharges)
+                    {
+                        var charge = new ChargeCreditSyncModel();
+                        charge.RowId = surcharge.Id.ToString();
+                        charge.Ma_SpHt = surcharge.JobNo;
+                        var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
+                        charge.ItemCode = _charge?.Code;
+                        charge.Description = _charge?.ChargeNameVn;
+                        var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
+                        charge.Unit = _unit?.UnitNameVn; //Unit Name En
+                        charge.CurrencyCode = surcharge.CurrencyId;
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, "VND");
+                        charge.BillEntryNo = surcharge.Hblno;
+                        charge.MasterBillNo = surcharge.Mblno;
+                        charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
+                        charge.NganhCode = "FWD";
+                        charge.Quantity9 = surcharge.Quantity;
+                        charge.OriginalUnitPrice = surcharge.UnitPrice;
+                        charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
+                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
+                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, 2);
+                        charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        charge.OriginalAmount3 = Math.Round(charge.OriginalAmount3 ?? 0, 2);
 
-                    charges.Add(charge);
+                        var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
+                        var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
+                        charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
+                        charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+
+                        charges.Add(charge);
+                    }
+                    sync.Details = charges;
+
+                    data.Add(sync);
                 }
-                sync.Details = charges;
-
-                data.Add(sync);
             }
-
             return data;
         }
 
@@ -476,8 +476,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<SyncModel> data = new List<SyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            var soas = soaRepository.Get(x => ids.Contains(x.Id) && x.Type.ToUpper() == "DEBIT");
-
+            var soas = soaRepository.Get(x => ids.Contains(x.Id) && x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT);
             foreach (var soa in soas)
             {
                 SyncModel sync = new SyncModel();
@@ -545,74 +544,76 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of soa</param>
         /// <param name="type">Type: CREDIT</param>
         /// <returns></returns>
-        public List<SyncCreditModel> GetListSoaCreditToSync(List<int> ids)
+        public List<SyncCreditModel> GetListSoaCreditToSync(List<RequestIntTypeListModel> models)
         {
             List<SyncCreditModel> data = new List<SyncCreditModel>();
-            if (ids == null || ids.Count() == 0) return data;
+            if (models == null || models.Count() == 0) return data;
 
-            var soas = soaRepository.Get(x => ids.Contains(x.Id) && x.Type.ToUpper() == "CREDIT");
-
-            foreach (var soa in soas)
-            {
-                SyncCreditModel sync = new SyncCreditModel();
-                sync.Stt = soa.Id.ToString();
-                sync.BranchCode = string.Empty;
-                sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
-                sync.Transcode = string.Empty;
-                sync.DocDate = soa.DatetimeCreated;
-                sync.ReferenceNo = soa.Soano;
-                var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
-                sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
-                sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = soaPartner?.PartnerMode;
-                sync.LocalBranchCode = soaPartner?.InternalCode; //Parnter Internal Code
-                sync.CurrencyCode = soa.Currency;
-                sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
-                sync.Description0 = soa.Note;
-                sync.DataType = "SOA";
-                sync.PaymentMethod = "Bank Transfer"; //Set default "Bank Transfer"
-
-                var charges = new List<ChargeCreditSyncModel>();
-                var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                foreach (var surcharge in surcharges)
+            foreach(var model in models)
+            {            
+                var soa = soaRepository.Get(x => model.Id == x.Id && x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).FirstOrDefault();
+                if (soa != null)
                 {
-                    var charge = new ChargeCreditSyncModel();
-                    charge.RowId = surcharge.Id.ToString();
-                    charge.Ma_SpHt = surcharge.JobNo;
-                    var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
-                    charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn;
-                    var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
-                    charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                    charge.CurrencyCode = surcharge.CurrencyId;
-                    charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, soa.Currency);
-                    charge.BillEntryNo = surcharge.Hblno;
-                    charge.MasterBillNo = surcharge.Mblno;
-                    charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
-                    charge.NganhCode = "FWD";
-                    charge.Quantity9 = surcharge.Quantity;
-                    charge.OriginalUnitPrice = surcharge.UnitPrice;
-                    charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                    var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                    charge.OriginalAmount = _totalNoVat;
-                    charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                    SyncCreditModel sync = new SyncCreditModel();
+                    sync.Stt = soa.Id.ToString();
+                    sync.BranchCode = string.Empty;
+                    sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
+                    sync.Transcode = string.Empty;
+                    sync.DocDate = soa.DatetimeCreated;
+                    sync.ReferenceNo = soa.Soano;
+                    var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
+                    sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
+                    sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
+                    sync.CustomerMode = soaPartner?.PartnerMode;
+                    sync.LocalBranchCode = soaPartner?.InternalCode; //Parnter Internal Code
+                    sync.CurrencyCode = soa.Currency;
+                    sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
+                    sync.Description0 = soa.Note;
+                    sync.DataType = "SOA";
+                    sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
 
-                    var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
-                    var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
-                    charge.OBHPartnerCode = soa.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
-                    charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
-                    charge.AccountNo = string.Empty;
-                    charge.ContraAccount = string.Empty;
-                    charge.VATAccount = string.Empty;
-                    charge.AtchDocNo = surcharge.InvoiceNo;
-                    charge.AtchDocDate = surcharge.InvoiceDate;
-                    charge.AtchDocSerialNo = surcharge.SeriesNo;
+                    var charges = new List<ChargeCreditSyncModel>();
+                    var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                    foreach (var surcharge in surcharges)
+                    {
+                        var charge = new ChargeCreditSyncModel();
+                        charge.RowId = surcharge.Id.ToString();
+                        charge.Ma_SpHt = surcharge.JobNo;
+                        var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
+                        charge.ItemCode = _charge?.Code;
+                        charge.Description = _charge?.ChargeNameVn;
+                        var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
+                        charge.Unit = _unit?.UnitNameVn; //Unit Name En
+                        charge.CurrencyCode = surcharge.CurrencyId;
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, soa.Currency);
+                        charge.BillEntryNo = surcharge.Hblno;
+                        charge.MasterBillNo = surcharge.Mblno;
+                        charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
+                        charge.NganhCode = "FWD";
+                        charge.Quantity9 = surcharge.Quantity;
+                        charge.OriginalUnitPrice = surcharge.UnitPrice;
+                        charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
+                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
+                        charge.OriginalAmount = _totalNoVat;
+                        charge.OriginalAmount3 = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
 
-                    charges.Add(charge);
+                        var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
+                        var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
+                        charge.OBHPartnerCode = soa.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
+                        charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+                        charge.AccountNo = string.Empty;
+                        charge.ContraAccount = string.Empty;
+                        charge.VATAccount = string.Empty;
+                        charge.AtchDocNo = surcharge.InvoiceNo;
+                        charge.AtchDocDate = surcharge.InvoiceDate;
+                        charge.AtchDocSerialNo = surcharge.SeriesNo;
+
+                        charges.Add(charge);
+                    }
+                    sync.Details = charges;
+
+                    data.Add(sync);
                 }
-                sync.Details = charges;
-
-                data.Add(sync);
             }
             return data;
         }

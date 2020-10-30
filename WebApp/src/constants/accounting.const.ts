@@ -6,10 +6,15 @@ export class AccountingConstants {
 
     ];
 
+    public static PAYMENT_METHOD_2: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
+        { id: 'Cash', text: 'Cash' },
+        { id: 'Bank Transfer', text: 'Bank Transfer' },
+    ];
+
     public static VOUCHER_TYPE: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
-        //{ id: 'Debt Voucher', text: 'Debt Voucher' },
-        //{ id: 'Bank', text: 'Bank' },
-        //{ id: 'Other', text: 'Other' },
+        // { id: 'Debt Voucher', text: 'Debt Voucher' },
+        // { id: 'Bank', text: 'Bank' },
+        // { id: 'Other', text: 'Other' },
         { id: 'Cash receipt', text: 'Cash receipt' },
         { id: 'Cash payment', text: 'Cash payment' },
         { id: 'Debit slip', text: 'Debit slip' },

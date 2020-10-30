@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.Infrastructure.Http;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
@@ -496,7 +497,7 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPut("SyncListCdNoteToAccountant")]
         [Authorize]
-        public async Task<IActionResult> SyncListCdNoteToAccountant(List<RequestGuidTypeListModel> request)
+        public async Task<IActionResult> SyncListCdNoteToAccountant(List<RequestGuidTypeListModel> requests)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -509,18 +510,18 @@ namespace eFMS.API.Accounting.Controllers
                 if (loginResponse.Success == "1")
                 {
                     // 2. Get Data To Sync.
-                    List<Guid> ids = request.Select(x => x.Id).ToList();
+                    List<Guid> ids = requests.Select(x => x.Id).ToList();
 
-                    List<Guid> IdsAdd_NVHD = request.Where(x => x.Action == ACTION.ADD && (x.Type == "DEBIT" || x.Type == "INVOICE")).Select(x => x.Id).ToList();
-                    List<Guid> IdsUpdate_NVHD = request.Where(x => x.Action == ACTION.UPDATE && (x.Type == "DEBIT" || x.Type == "INVOICE")).Select(x => x.Id).ToList();
-                    List<Guid> IdsAdd_NVCP = request.Where(x => x.Action == ACTION.ADD && x.Type == "CREDIT").Select(x => x.Id).ToList();
-                    List<Guid> IdsUpdate_NVCP = request.Where(x => x.Action == ACTION.UPDATE && x.Type == "CREDIT").Select(x => x.Id).ToList();
+                    List<Guid> IdsAdd_NVHD = requests.Where(x => x.Action == ACTION.ADD && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE)).Select(x => x.Id).ToList();
+                    List<Guid> IdsUpdate_NVHD = requests.Where(x => x.Action == ACTION.UPDATE && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE)).Select(x => x.Id).ToList();
+                    List<RequestGuidTypeListModel> IdsAdd_NVCP = requests.Where(x => x.Action == ACTION.ADD && x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+                    List<RequestGuidTypeListModel> IdsUpdate_NVCP = requests.Where(x => x.Action == ACTION.UPDATE && x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
 
                     List<SyncModel> listAdd_NVHD = (IdsAdd_NVHD.Count > 0) ? accountingService.GetListCdNoteToSync(IdsAdd_NVHD) : new List<SyncModel>();
                     List<SyncModel> listUpdate_NVHD = (IdsUpdate_NVHD.Count > 0) ? accountingService.GetListCdNoteToSync(IdsUpdate_NVHD) : new List<SyncModel>();
                     List<SyncCreditModel> listAdd_NVCP = (IdsAdd_NVCP.Count > 0) ? accountingService.GetListCdNoteCreditToSync(IdsAdd_NVCP) : new List<SyncCreditModel>();
                     List<SyncCreditModel> listUpdate_NVCP = (IdsUpdate_NVCP.Count > 0) ? accountingService.GetListCdNoteCreditToSync(IdsUpdate_NVCP) : new List<SyncCreditModel>();
-
+                    
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
                     BravoResponseModel responseAddModel_NVHD = new BravoResponseModel();
@@ -636,7 +637,7 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPut("SyncListSoaToAccountant")]
         [Authorize]
-        public async Task<IActionResult> SyncListSoaToAccountant(List<RequestIntTypeListModel> request)
+        public async Task<IActionResult> SyncListSoaToAccountant(List<RequestIntTypeListModel> requests)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -649,18 +650,18 @@ namespace eFMS.API.Accounting.Controllers
                 if (loginResponse.Success == "1")
                 {
                     // 2. Get Data To Sync.
-                    List<int> ids = request.Select(x => x.Id).ToList();
+                    List<int> ids = requests.Select(x => x.Id).ToList();
 
-                    List<int> IdsAdd_NVHD = request.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == "DEBIT").Select(x => x.Id).ToList();
-                    List<int> IdsUpdate_NVHD = request.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == "DEBIT").Select(x => x.Id).ToList();
-                    List<int> IdsAdd_NVCP = request.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == "CREDIT").Select(x => x.Id).ToList();
-                    List<int> IdsUpdate_NVCP = request.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == "CREDIT").Select(x => x.Id).ToList();
+                    List<int> IdsAdd_NVHD = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
+                    List<int> IdsUpdate_NVHD = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
+                    List<RequestIntTypeListModel> IdsAdd_NVCP = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+                    List<RequestIntTypeListModel> IdsUpdate_NVCP = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
 
                     List<SyncModel> listAdd_NVHD = accountingService.GetListSoaToSync(IdsAdd_NVHD);
                     List<SyncModel> listUpdate_NVHD = accountingService.GetListSoaToSync(IdsUpdate_NVHD);
                     List<SyncCreditModel> listAdd_NVCP = accountingService.GetListSoaCreditToSync(IdsAdd_NVCP);
                     List<SyncCreditModel> listUpdate_NVCP = accountingService.GetListSoaCreditToSync(IdsUpdate_NVCP);
-
+                    
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
                     BravoResponseModel responseAddModel_NVHD = new BravoResponseModel();
@@ -782,7 +783,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("GetListCdNoteDebit")]
         public IActionResult GetListCdNoteDebit(List<RequestGuidTypeListModel> request)
         {
-            List<Guid> Ids = request.Where(x => x.Type == "DEBIT" || x.Type == "INVOICE").Select(x => x.Id).ToList();
+            List<Guid> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE).Select(x => x.Id).ToList();
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListCdNoteToSync(Ids) : new List<SyncModel>();
             return Ok(list);
         }
@@ -795,7 +796,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("GetListSOADebit")]
         public IActionResult GetListSOADebit(List<RequestIntTypeListModel> request)
         {
-            List<int> Ids = request.Where(x => x.Type == "DEBIT").Select(x => x.Id).ToList();
+            List<int> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListSoaToSync(Ids) : new List<SyncModel>();
             return Ok(list);
         }

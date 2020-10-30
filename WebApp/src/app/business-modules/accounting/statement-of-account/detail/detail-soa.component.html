@@ -12,7 +12,7 @@
             </span>
         </button>
         <button class="btn btn-info m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-            *ngIf="soa.syncStatus !== 'Synced' && soa.syncStatus !== 'Removed Inv' && soa.type === 'Debit'"
+            *ngIf="soa.syncStatus !== 'Synced' && soa.syncStatus !== 'Removed Inv' && (soa.type === 'Debit' || (soa.type === 'Credit' && soa.currency === 'VND'))"
             title="Send to Accountant">
             <span>
                 <i class="la la-cloud-upload"></i>
@@ -351,3 +351,4 @@
 </ng-container>
 
 <confirm-popup (onSubmit)="onConfirmSoa()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<soa-payment-method-popup (onApply)="onApplyPaymentMethod($event)"></soa-payment-method-popup>

@@ -62,6 +62,8 @@ export * from './bill-instruction-sea-export/bill-instruction-sea-export.compone
 export * from './bill-instruction-housebills-sea-export/bill-instruction-housebills-sea-export.component';
 export * from './attach-list/attach-list-house-bill.component';
 export * from './input-daily-export/input-daily-export.popup';
+
+export * from './payment-method/payment-method.popup';
 // TODO export components from shareBussiness.
 
 
