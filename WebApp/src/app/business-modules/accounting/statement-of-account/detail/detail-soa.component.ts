@@ -12,6 +12,7 @@ import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { listAnimation } from '@animations';
 import { AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -20,6 +21,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmSoaPopup: ConfirmPopupComponent;
+    @ViewChild(StatementOfAccountPaymentMethodComponent, { static: false }) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
 
@@ -33,6 +35,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     initGroup: any[] = [];
     TYPE: string = 'LIST';
     confirmMessage: string = '';
+    paymentMethodSelected: string = '';
+
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -269,14 +273,27 @@ export class StatementOfAccountDetailComponent extends AppList {
         }
     }
 
+    confirmSendToAcc() {
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
+        this.confirmSoaPopup.show();
+    }
+
     showConfirmed() {
-        // this._toastService.success("Tính năng đang phát triển");
         if (this.soa.type === "All") {
             this._toastService.warning("Not allow send soa with type All");
             return;
         }
-        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
-        this.confirmSoaPopup.show();
+        if (this.soa.type === 'Credit' && this.soa.currency === 'VND') {
+            this.paymentMethodPopupComponent.show();
+        } else {
+            this.paymentMethodSelected = '';
+            this.confirmSendToAcc();
+        }
+    }
+
+    onApplyPaymentMethod($event) {
+        this.paymentMethodSelected = $event;
+        this.confirmSendToAcc();
     }
 
     onConfirmSoa() {
@@ -285,7 +302,8 @@ export class StatementOfAccountDetailComponent extends AppList {
         const soaId: AccountingInterface.IRequestIntType = {
             id: this.soa.id,
             type: this.soa.type,
-            action: this.soa.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+            action: this.soa.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+            paymentMethod: this.paymentMethodSelected
         };
         soaSyncIds.push(soaId);
         this._spinner.show();

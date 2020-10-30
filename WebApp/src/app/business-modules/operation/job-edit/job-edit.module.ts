@@ -17,7 +17,6 @@ import { OpsModuleBillingJobEditComponent } from './job-edit.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
-import { JobEditShareModule } from './job-edit-share.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
@@ -59,7 +58,6 @@ const customCurrencyMaskConfig = {
 @NgModule({
     imports: [
         CommonModule,
-        JobEditShareModule,  // ? Share Module with Credit/Debit Note
         RouterModule.forChild(routing),
         PaginationModule.forRoot(),
         SharedModule,

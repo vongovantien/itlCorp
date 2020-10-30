@@ -1,15 +1,18 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { AppForm } from 'src/app/app.form';
-import { User, Currency } from 'src/app/shared/models';
-
-import { formatDate } from '@angular/common';
-import { SystemConstants } from 'src/constants/system.const';
-import { CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { getAdvancePaymentSearchParamsState, IAdvancePaymentState, reducer } from '../../store/reducers';
+
+import { AppForm } from '@app';
+import { User, Currency } from '@models';
+import { formatDate } from '@angular/common';
+import { SystemConstants } from '@constants';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+
+import { map, takeUntil } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
+
+
+import { getAdvancePaymentSearchParamsState, IAdvancePaymentState } from '../../store/reducers';
 import { SearchList } from '../../store/actions';
 
 
@@ -38,8 +41,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     userLogged: User;
 
     currencies: Currency[] = [];
-    requesters: any[] = [];
-    requesterActive: any[] = [];
+    requesters: Currency[] = [];
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -74,7 +77,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             //     Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
             // ])],
             referenceNo: [],
-            requester: [this.requesterActive],
+            requester: [],
             requestDate: [],
             modifiedDate: [],
             statusApproval: [],
@@ -101,20 +104,17 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
         this.getUserLogged();
         this.getCurrencyAndUsers();
-        //this.getUsers();
     }
 
-    setDataSearchFromRedux(data: any) {
-
+    setDataSearchFromRedux(data: ISearchAdvancePayment) {
         this.formSearch.patchValue({
             referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
-
             requestDate: !!data.requestDateFrom && !!data.requestDateTo ? { startDate: new Date(data.requestDateFrom), endDate: new Date(data.requestDateTo) } : null,
             modifiedDate: !!data.advanceModifiedDateFrom && !!data.advanceModifiedDateTo ? { startDate: new Date(data.advanceModifiedDateFrom), endDate: new Date(data.advanceModifiedDateTo) } : null,
             statusApproval: !!data.statusApproval && data.statusApproval !== 'All' ? this.statusApprovals.filter(e => e.value === data.statusApproval)[0] : null,
             statusPayment: !!data.statusPayment && data.statusPayment !== 'All' ? this.statusPayments.filter(e => e.value === data.statusPayment)[0] : null,
             paymentMethod: !!data.paymentMethod && data.paymentMethod !== 'All' ? this.paymentMethods.filter(e => e.value === data.paymentMethod)[0] : null,
-
+            requester: !!data.requester ? data.requester : null
         });
     }
 
@@ -129,11 +129,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
             statusPayment: !!this.statusPayment.value ? this.statusPayment.value.value : 'All',
             currencyId: !!this.currencyId.value ? this.currencyId.value.id : 'All',
-            requester: this.requester.value.length > 0 ? this.requester.value[0].id : this.userLogged.id
+            requester: !!this.requester.value ? this.requester.value : this.userLogged.id
         };
-
-        //this.onSearch.emit(body);
-
         this._store.dispatch(SearchList({ payload: body }));
     }
 
@@ -178,17 +175,17 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         ).subscribe(
             (res) => {
                 this.currencies = res[0] || [];
-                this.requesters = res[1].map((item: any) => ({ text: item.username, id: item.id }));
+                this.requesters = res[1];
 
                 if (Object.keys(res[2]).length === 0 && res[2].constructor === Object) {
-                    this.requester.setValue([this.requesters.filter(stf => stf.id === this.userLogged.id)[0]]);
+                    this.requester.setValue(this.userLogged.id);
                     this.currencyId.setValue(null);
                 } else {
-                    const requesterTemp = [this.requesters.filter(e => e.id === res[2].requester)[0]];
-                    const currencyTemp = this.currencies.filter(e => e.id === res[2].currencyId).length <= 0 ? null
-                        : this.currencies.filter(e => e.id === res[2].currencyId)[0];
+                    const requesterTemp = this.requesters.find(e => e.id === res[2].requester);
+                    const currencyTemp = !this.currencies.find(e => e.id === res[2].currencyId) ? null
+                        : this.currencies.find(e => e.id === res[2].currencyId);
 
-                    this.requester.setValue(requesterTemp);
+                    this.requester.setValue(requesterTemp.id);
                     this.currencyId.setValue(currencyTemp);
 
                 }
@@ -210,32 +207,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.resetFormControl(this.statusPayment);
         this.resetFormControl(this.currencyId);
 
-        this._store.dispatch(SearchList({
-            payload: {}
-        }));
+        this._store.dispatch(SearchList({ payload: {} }));
         this.onSearch.emit(<any>{ requester: this.userLogged.id });
-    }
-
-    // getUsers() {
-    //     this._systemRepo.getSystemUsers({})
-    //         .pipe(
-    //             catchError(this.catchError),
-    //             finalize(() => { }),
-    //         ).subscribe(
-    //             (users: any) => {
-    //                 if (!!users) {
-    //                     this.requesters = users.map((item: any) => ({ text: item.username, id: item.id }));
-    //                     this.requesterActive = [this.requesters.filter(stf => stf.id === this.userLogged.id)[0]];
-    //                     this.requester.setValue(this.requesterActive);
-    //                 }
-    //             },
-    //         );
-    // }
-
-    onRemoveDataFormInfo(data: any, type: string) {
-        if (type === 'requester') {
-            this.requester.setValue([]);
-        }
     }
 }
 

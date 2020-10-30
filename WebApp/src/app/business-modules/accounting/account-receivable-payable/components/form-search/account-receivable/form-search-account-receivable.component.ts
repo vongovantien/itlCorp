@@ -1,19 +1,13 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
-import { formatDate } from '@angular/common';
 
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Partner, Office } from '@models';
-import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { User } from 'src/app/shared/models';
-
 import { AppForm } from 'src/app/app.form';
-
 import { Observable } from 'rxjs';
 
-
-//set value to binding input
 const OverDueDaysValues = [
     { from: null, to: null },
     { from: 1, to: 15 },
@@ -29,9 +23,6 @@ const DebitRatesValues = [
     { from: 120, to: null },
     { from: null, to: null },
 ];
-
-
-
 
 @Component({
     selector: 'form-search-account-receivable',
@@ -64,17 +55,11 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     salesManId: AbstractControl;
     officalId: AbstractControl;
-    ////seedData
-    // partner
+
     partners: Observable<Partner[]>;
-    //partners: any;
     salemans: Observable<User[]>;
-    //salemans: any;
     offices: Observable<Office[]>;
-    //offices: any;
 
-
-    //
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
         { field: 'shortName', label: 'ABBR Name' },
@@ -89,16 +74,16 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         { field: 'shortName', label: 'Abbr Name' },
         { field: 'branchNameEn', label: 'En Name' },
     ];
-    //model search
+
     overDueDays: CommonInterface.INg2Select[] = [
-        { id: '0', text: 'All' },
+        { id: 0, text: 'All' },
         { id: 1, text: '01-15 days' },
         { id: 2, text: '16-30 days' },
         { id: 3, text: 'Over 30 days' },
     ];
 
     debitRates: CommonInterface.INg2Select[] = [
-        { id: '0', text: 'All' },
+        { id: 0, text: 'All' },
         { id: 1, text: '0% - 50%' },
         { id: 2, text: '50% - 70%' },
         { id: 3, text: '70% - 100%' },
@@ -140,43 +125,31 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.formSearch = this._fb.group({
             partnerId: [],
 
-            overdueDays: [[this.overDueDays[0]]],
+            overdueDays: [this.overDueDays[0].id],
             fromOverdueDays: [],
             toOverdueDays: [],
-
-            debitRate: [[this.debitRates[0]]],
+            debitRate: [this.debitRates[0].id],
             fromDebitRate: [],
             toDebitRate: [],
-
-            agreementStatus: [[this.agreementStatusList[0]]],
-
-            agreementExpiredDays: [[this.agreementExpiredDayList[0]]],
-
-
+            agreementStatus: [this.agreementStatusList[0].id],
+            agreementExpiredDays: [this.agreementExpiredDayList[0].id],
             salesManId: [],
             officalId: [],
         });
 
         this.partnerId = this.formSearch.controls["partnerId"];
-
         this.overdueDays = this.formSearch.controls["overdueDays"];
         this.fromOverdueDays = this.formSearch.controls["fromOverdueDays"];
         this.toOverdueDays = this.formSearch.controls["toOverdueDays"];
-
         this.debitRate = this.formSearch.controls["debitRate"];
         this.fromDebitRate = this.formSearch.controls["fromDebitRate"];
         this.toDebitRate = this.formSearch.controls["toDebitRate"];
-
         this.agreementStatus = this.formSearch.controls["agreementStatus"];
-
         this.agreementExpiredDays = this.formSearch.controls["agreementExpiredDays"];
-
-
         this.salesManId = this.formSearch.controls["salesManId"];
         this.officalId = this.formSearch.controls["officalId"];
     }
 
-    //
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
@@ -192,28 +165,27 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                 break;
         }
     }
-    //
     onSelectBindingInput(item: any, fieldName: string) {
         switch (fieldName) {
             case 'OverDueDays':
-                this.fromOverdueDays.setValue(item.id === '0' ? OverDueDaysValues[0].from : OverDueDaysValues[item.id].from);
-                this.toOverdueDays.setValue(item.id === '0' ? OverDueDaysValues[0].to : OverDueDaysValues[item.id].to);
+                this.fromOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].from : OverDueDaysValues[item.id].from);
+                this.toOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].to : OverDueDaysValues[item.id].to);
                 break;
             case 'DebitRates':
-                this.fromDebitRate.setValue(item.id === '0' ? DebitRatesValues[0].from : DebitRatesValues[item.id].from);
-                this.toDebitRate.setValue(item.id === '0' ? DebitRatesValues[0].to : DebitRatesValues[item.id].to);
+                this.fromDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].from : DebitRatesValues[item.id].from);
+                this.toDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].to : DebitRatesValues[item.id].to);
                 break;
             default:
                 break;
         }
     }
-    //
+
     resetSearch() {
         this.formSearch.patchValue(Object.assign({}));
         this.initForm();
         this.submitSearch();
     }
-    //
+
     submitSearch() {
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         this.isSubmitted = true;
@@ -223,18 +195,15 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         const body: AccountingInterface.IAccReceivableSearch = {
             arType: this.arType,
             acRefId: dataForm.partnerId,
-            overDueDay: dataForm.overdueDays[0].id === '0' ? 0 : dataForm.overdueDays[0].id,
+            overDueDay: dataForm.overdueDays === 0 ? 0 : dataForm.overdueDays,
             debitRateFrom: dataForm.fromDebitRate,
             debitRateTo: dataForm.toDebitRate,
-            agreementStatus: dataForm.agreementStatus[0].id,
-            agreementExpiredDay: dataForm.agreementExpiredDays[0].id,
+            agreementStatus: dataForm.agreementStatus,
+            agreementExpiredDay: dataForm.agreementExpiredDays,
             salesmanId: dataForm.salesManId,
             officeId: dataForm.officalId,
         }
-        //format body 
         this.onSearch.emit(body);
-
     }
-
 }
 

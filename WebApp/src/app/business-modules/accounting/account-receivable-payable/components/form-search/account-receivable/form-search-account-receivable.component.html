@@ -15,8 +15,8 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <label>Over Due Days</label>
-                            <ng-select #s [items]="overDueDays" formControlName="overdueDays"
-                                (selected)="onSelectBindingInput($event, 'OverDueDays')">
+                            <ng-select [items]="overDueDays" formControlName="overdueDays" class="custom"
+                                (change)="onSelectBindingInput($event, 'OverDueDays')" bindLabel="text" bindValue="id">
                             </ng-select>
                         </div>
                         <div class="col-lg-3">
@@ -40,12 +40,11 @@
                         <div class="col-lg-7">
                             <div class="row">
                                 <div class="col-lg-6">
-
                                     <label>Debit Rate</label>
-                                    <ng-select #c [items]="debitRates" formControlName="debitRate"
-                                        (selected)="onSelectBindingInput($event, 'DebitRates')">
+                                    <ng-select [items]="debitRates" formControlName="debitRate" class="custom"
+                                        (change)="onSelectBindingInput($event, 'DebitRates')" bindLabel="text"
+                                        bindValue="id">
                                     </ng-select>
-
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="row">
@@ -64,9 +63,7 @@
                                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
                                                 <input type="number" min="0" class="form-control"
                                                     formControlName="toDebitRate">
-
                                             </div>
-
                                         </div>
                                     </div>
                                     <div class="form-control-feedback text-danger"
@@ -78,23 +75,17 @@
                         </div>
                         <div class="col-lg-5">
                             <label>Agreement Status</label>
-                            <ng-select #as [items]="agreementStatusList" formControlName="agreementStatus">
-
+                            <ng-select [items]="agreementStatusList" formControlName="agreementStatus" class="custom"
+                                bindLabel="text" bindValue="id">
                             </ng-select>
                         </div>
-
-
-
                     </div>
                 </div>
                 <div class="col-lg-4">
-
-
                     <label>Agreement Expired Days</label>
-                    <ng-select #s formControlName="agreementExpiredDays" [items]="agreementExpiredDayList">
+                    <ng-select [items]="agreementExpiredDayList" formControlName="agreementExpiredDays" class="custom"
+                        bindLabel="text" bindValue="id">
                     </ng-select>
-
-
                 </div>
             </div>
             <div class="row">
@@ -105,7 +96,6 @@
                         [currentActiveItemId]="{field:'id', value: salesManId.value}"
                         [selectedDisplayFields]="['username', 'employeeNameEn']" [dataSources]="salemans | async"
                         [displayFields]="displayFieldsSalesMan">
-
                     </app-combo-grid-virtual-scroll>
                 </div>
                 <div class="col-lg-6">
@@ -116,7 +106,6 @@
                         [selectedDisplayFields]="['shortName']" [dataSources]="offices | async"
                         [displayFields]="displayFieldsOffice">
                         >
-
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>

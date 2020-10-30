@@ -1331,6 +1331,9 @@ button {
         color: #fff !important;
     }
     &.ng-select-multiple {
+        .ng-select-container {
+            height: auto;
+        }
         .ng-value {
             font-size: 14px !important;
             color: #fff;

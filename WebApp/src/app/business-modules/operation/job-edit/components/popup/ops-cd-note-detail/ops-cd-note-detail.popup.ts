@@ -9,7 +9,7 @@ import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common
 import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AccountingConstants } from '@constants';
-
+import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
@@ -19,6 +19,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(OpsCdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent; @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(ShareBussinessPaymentMethodPopupComponent, { static: false }) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
 
     jobId: string = null;
     cdNote: string = null;
@@ -34,6 +35,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     balanceAmount: string = '';
 
     dataReport: any = null;
+    paymentMethodSelected: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -221,11 +223,24 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             );
     }
 
-    showConfirmed() {
-        // this._toastService.success("Tính năng đang phát triển");
+    confirmSendToAcc() {
         this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
         this.confirmCdNotePopup.show();
+    }
+
+    showConfirmed() {
+        if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.cdNote.currencyId === 'VND') {
+            this.paymentMethodPopupComponent.show();
+        } else {
+            this.paymentMethodSelected = '';
+            this.confirmSendToAcc();
+        }
+    }
+
+    onApplyPaymentMethod($event) {
+        this.paymentMethodSelected = $event;
+        this.confirmSendToAcc();
     }
 
     onConfirmCdNote() {
@@ -242,7 +257,8 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
             type: this.CdNoteDetail.cdNote.type,
-            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+            paymentMethod: this.paymentMethodSelected
         };
         cdNoteIds.push(cdNoteId);
         this._spinner.show();
