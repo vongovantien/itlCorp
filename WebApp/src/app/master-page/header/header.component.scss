@@ -69,6 +69,37 @@
     color: green;
 }
 
+.bg-profile {
+    background-image: url("./../../../assets/app/media/img/bg/bg-notification.jpg");
+    background-position: bottom;
+}
+
+.m-topbar__notifications-head {
+    background-image: url("./../../../assets/app/media/img/bg/bg-notification.jpg");
+    color: #fff;
+    background-position: bottom;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.m-list-timeline__item {
+    .m-list-timeline__text {
+        &:hover {
+            color: #2739c1 !important;
+        }
+    }
+    .m-list-timeline__badge {
+        &::before {
+            background-color: #26ae60 !important;
+        }
+    }
+    .m-list-timeline__items {
+        &::before {
+            height: 95% !important;
+        }
+    }
+}
+
 .m-list-timeline__item {
     &:hover {
         background-color: #f4f5f8;
