@@ -51,19 +51,15 @@
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label>Type</label>
-                                        <ng-select #type [items]="filterTypes" placeholder="Please select"
-                                            [allowClear]="true" (opened)="closeOtherSelects(type)"
-                                            formControlName="filterType">
-                                        </ng-select>
+                                        <ng-select [items]="filterTypes" formControlName="filterType"
+                                            placeholder="Please select" class="custom"></ng-select>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label>Status</label>
-                                        <ng-select #filterStatus [items]="status" placeholder="Please select"
-                                            [allowClear]="true" (opened)="closeOtherSelects(filterStatus)"
-                                            formControlName="filterStatus">
-                                        </ng-select>
+                                        <ng-select [items]="status" formControlName="filterStatus"
+                                            placeholder="Please select" class="custom"></ng-select>
                                     </div>
                                 </div>
                             </div>

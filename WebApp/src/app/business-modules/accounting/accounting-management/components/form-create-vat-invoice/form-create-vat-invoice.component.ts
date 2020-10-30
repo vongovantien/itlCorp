@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { AccountingConstants } from '@constants';
-import { ChartOfAccounts, Partner } from '@models';
+import { ChartOfAccounts, Currency, Partner } from '@models';
 import { CommonEnum } from '@enums';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 import { DataService } from '@services';
@@ -55,7 +55,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
-    paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD;
+    paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD.map(i => i.id);
 
     displayFieldsChartAccount: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountCode', label: 'Account Code' },
@@ -63,7 +63,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     ];
 
     partners: Observable<Partner[]>;
-    listCurrency: Observable<CommonInterface.INg2Select[]>;
+    listCurrency: Observable<Currency[]>;
     chartOfAccounts: Observable<ChartOfAccounts[]>;
 
     constructor(
@@ -80,7 +80,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this._store.dispatch(new GetCatalogueCurrencyAction());
 
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-        this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
+        this.listCurrency = this._store.select(getCatalogueCurrencyState);
         this.chartOfAccounts = this._catalogueRepo.getListChartOfAccounts();
 
         this.initForm();
@@ -142,10 +142,10 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             invoiceNoTempt: [null, Validators.required],
             invoiceNoReal: [{ value: null, disabled: true }],
             serie: [this.generateSerieNo(), Validators.required],
-            paymentMethod: [[this.paymentMethods[2]]],
+            paymentMethod: [this.paymentMethods[2]],
             accountNo: [],
             totalAmount: [{ value: null, disabled: true }],
-            currency: [[{ id: 'VND', text: 'VND' }]],
+            currency: ['VND'],
             status: ['New'],
             paymentTerm: [null, Validators.compose([
                 Validators.required,

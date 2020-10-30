@@ -1320,11 +1320,26 @@ button {
 }
 
 .ng-select.custom {
-    .ng-select-container{
+    .ng-select-container {
         border-color: #ebedf2;
         background-color: #fbfbfb;
-        
+        min-height: 32px;
+        height: 32px;
+    }
+    .ng-option-marked {
+        background-color: #3966b6 !important;
+        color: #fff !important;
+    }
+    &.ng-select-multiple {
+        .ng-value {
+            font-size: 14px !important;
+            color: #fff;
+            background-color: #3966b6 !important;
+            .icon {
+                &:hover {
+                    background: none !important;
+                }
+            }
+        }
     }
 }
-
-

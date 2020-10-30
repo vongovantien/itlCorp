@@ -162,7 +162,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .subscribe((res: SystemInterface.ISpecialAction) => {
                 if (!!res) {
                     this.isAllowActiveContract = res[0].isAllow;
-                    console.log(this.isAllowActiveContract);
                 }
 
             });
@@ -735,10 +734,20 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onUpdateTrialEffectiveDate(value: { startDate: any; endDate: any }) {
         const trialDays = !!this.formGroup.controls['trialCreditDays'].value ? this.formGroup.controls['trialCreditDays'].value : 0;
-        this.trialExpiredDate.setValue({
+        this.effectiveDate.setValue({
             startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
             endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
         });
+    }
+
+    onUpdateEffectiveDate() {
+        if (!!this.effectiveDate.value && !!this.effectiveDate.value.startDate && this.contractType.value[0].id === 'Trial') {
+            this.expiredDate.setValue({
+                startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
+                endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
+            });
+        }
+
     }
 
     selectedService($event: any) {

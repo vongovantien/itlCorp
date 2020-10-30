@@ -2,12 +2,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { StoreModule } from '@ngrx/store';
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxCurrencyModule } from 'ngx-currency';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
@@ -23,17 +25,13 @@ import { AccountingManagementSelectPartnerPopupComponent } from './components/po
 import { AccountingManagementListChargeComponent } from './components/list-charge/list-charge-accouting-management.component';
 import { AccountingManagementFormSearchVatVoucherComponent } from './components/form-search/vat-voucher/form-search-vat-voucher.component';
 
-import { reducers } from './store';
 import { AccountingManagementDetailVatInvoiceComponent } from './vat/detail/accounting-detail-vat-invoice.component';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { AccountingDetailCdNoteComponent } from './components/popup/detail-cd-note/detail-cd-note.component';
 import { AccountingManagementCreateVoucherComponent } from './voucher/create/accounting-create-voucher.component';
 import { AccountingManagementFormCreateVoucherComponent } from './components/form-create-voucher/form-create-voucher.component';
 import { AccountingManagementDetailVoucherComponent } from './voucher/detail/accounting-detail-voucher.component';
 import { AccountingManagementImportVatInvoiceComponent } from './vat/import/accounting-import-vat-invoice.component';
-import { NgxCurrencyModule } from 'ngx-currency';
 import { ShareAccountingModule } from '../share-accouting.module';
-import { NgxMaskModule, IConfig } from 'ngx-mask';
 
 const routing: Routes = [
     {
@@ -91,7 +89,7 @@ const maskConfig: Partial<IConfig> = {
         SharedModule,
         TabsModule.forRoot(),
         NgxDaterangepickerMd,
-        SelectModule,
+        NgSelectModule,
         ReactiveFormsModule,
         ModalModule,
         FormsModule,
