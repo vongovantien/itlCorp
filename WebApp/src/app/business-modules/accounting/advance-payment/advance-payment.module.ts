@@ -20,10 +20,10 @@ import { NgxCurrencyModule } from "ngx-currency";
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { ImportVoucherAdvancePaymentComponent } from './import/import-voucher-advance-payment.component';
-import { SelectModule } from 'ng2-select';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 const routing: Routes = [
     {
         path: "",
@@ -91,7 +91,8 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,
         StoreModule.forFeature('advance-payment', reducers),
-        SelectModule,
+        NgSelectModule
+
     ],
     declarations: [
         AdvancePaymentComponent,
