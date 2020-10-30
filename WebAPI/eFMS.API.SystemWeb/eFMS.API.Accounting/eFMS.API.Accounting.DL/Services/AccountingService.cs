@@ -637,6 +637,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode = invoice.Currency;
                 sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, invoice.DatetimeCreated, invoice.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = invoice.PaymentNote;
+                sync.PaymentMethod = invoice.PaymentMethod;
                 sync.DataType = "PAYMENT";
 
                 var payments = accountingPaymentRepository.Get(x => x.RefId == invoice.Id.ToString());
@@ -681,6 +682,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode = soa.Currency;
                 sync.ExchangeRate = 1;
                 sync.Description0 = soa.PaymentNote;
+                sync.PaymentMethod = "Bank Transfer"; //Tạm set Bank Transfer
                 sync.DataType = "PAYMENT";
 
                 var payments = accountingPaymentRepository.Get(x => x.RefId == soa.Id.ToString());
