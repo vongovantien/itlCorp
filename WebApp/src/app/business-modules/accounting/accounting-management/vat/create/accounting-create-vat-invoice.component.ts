@@ -98,8 +98,6 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
         const form: { [name: string]: any } = this.formCreateComponent.formGroup.getRawValue();
         const formData = {
             date: !!form.date && !!form.date.startDate ? formatDate(form.date.startDate, 'yyyy-MM-dd', 'en') : null,
-            paymentMethod: !!form.paymentMethod && !!form.paymentMethod.length ? form.paymentMethod[0].id : null,
-            currency: !!form.currency && !!form.currency.length ? form.currency[0].id : null,
         };
 
         return new AccAccountingManagementModel(Object.assign(_merge(form, formData)));

@@ -87,10 +87,6 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
     updateFormVoucher(res: AccAccountingManagementModel) {
         const formData: AccAccountingManagementModel | any = {
             date: !!res.date ? { startDate: new Date(res.date), endDate: new Date(res.date) } : null,
-            paymentMethod: !!res.paymentMethod ? [{ id: res.paymentMethod, text: res.paymentMethod }] : null,
-            currency: !!res.currency ? [{ id: res.currency, text: res.currency }] : null,
-            voucherType: !!res.voucherType ? [{ id: res.voucherType, text: res.voucherType }] : null,
-
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
     }
