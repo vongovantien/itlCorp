@@ -24,8 +24,10 @@ namespace eFMS.API.ForPartner.Service.Models
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
+        public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
+        public virtual DbSet<SysUserNotification> SysUserNotification { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,7 +40,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountingManagement>(entity =>
             {
@@ -252,6 +254,8 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Note).HasMaxLength(500);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
@@ -934,6 +938,39 @@ namespace eFMS.API.ForPartner.Service.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<SysNotifications>(entity =>
+            {
+                entity.ToTable("sysNotifications");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Action).HasMaxLength(200);
+
+                entity.Property(e => e.ActionLink).IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(200);
+
+                entity.Property(e => e.Title).HasMaxLength(150);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<SysPartnerApi>(entity =>
             {
                 entity.ToTable("sysPartnerAPI");
@@ -1019,6 +1056,32 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.WorkingStatus)
                     .HasMaxLength(20)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysUserNotification>(entity =>
+            {
+                entity.ToTable("sysUserNotification");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.NotitficationId).HasColumnName("NotitficationID");
+
+                entity.Property(e => e.Status).HasMaxLength(10);
+
+                entity.Property(e => e.UserCreated).HasMaxLength(50);
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName("UserID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified).HasMaxLength(50);
             });
         }
     }
