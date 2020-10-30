@@ -989,12 +989,13 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             string _Type = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "Voucher" : "VAT Invoice");
                             string _Ref = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? accounting.VoucherId : accounting.InvoiceNoTempt);
-                            string description = string.Format(@"[Type] <b style='color:#3966b6'>[RefNo]</b> Has been created");
+                            string description = string.Format(@"[Type] <b style='color:#3966b6'>[RefNo]</b> has been created");
                             description = description.Replace("[Type]", _Type);
                             description = description.Replace("[RefNo]", _Ref);
                             // Add Notification
                             SysNotifications sysNotification = new SysNotifications {
                                 Id = Guid.NewGuid(),
+                                Title = description,
                                 Description = description,
                                 Type = "User",
                                 UserCreated = currentUser.UserID,
@@ -1021,7 +1022,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     UserModified = currentUser.UserID,
                                 };
 
-                                sysUserNotifyRepository.Add(userNotify, false);
+                                sysUserNotifyRepository.Add(userNotify);
                             }
 
                             List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
