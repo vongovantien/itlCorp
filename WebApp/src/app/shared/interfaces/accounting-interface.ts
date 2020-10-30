@@ -38,9 +38,11 @@ namespace AccountingInterface {
 
     export interface IRequestGuidType extends IRequestGuid {
         type: string;
+        paymentMethod: string;
     }
 
     export interface IRequestIntType extends IRequestInt {
         type: string;
+        paymentMethod: string;
     }
 }
