@@ -116,13 +116,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             this.formContractPopup.vas.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
             this.formContractPopup.saleService.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
             this.formContractPopup.type = this.type;
-
         }
 
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
+        this.formContractPopup.effectiveDate.setValue(null);
 
         this.formContractPopup.show();
+
     }
 
     getDetailContract(id: string, index: number) {

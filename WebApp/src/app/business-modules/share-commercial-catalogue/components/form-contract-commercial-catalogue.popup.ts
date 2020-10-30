@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { Office, Company, User } from '@models';
@@ -557,6 +557,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.activeOffice = this.getCurrentActiveOffice(this.selectedContract.officeId);
         }
         this.setError(this.saleService);
+        this.effectiveDate.setValue(null);
+
         this.formGroup.patchValue({
             salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId : null,
             companyId: !!this.selectedContract.companyId ? this.selectedContract.companyId : null,
@@ -591,6 +593,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         } else {
             this.isDisabledExpiredDateField = false;
         }
+
     }
 
 
@@ -643,7 +646,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             }
 
             if (!!this.effectiveDate.value.startDate && !!this.expiredDate.value.startDate) {
-                this.trialCreditDays.setValue(this.expiredDate.value.startDate.diff(this.effectiveDate.value.startDate, 'days'));
+                const date2: any = new Date(this.selectedContract.expiredDate);
+                const date1: any = new Date(this.selectedContract.effectiveDate);
+                const diffTime = Math.abs(date1 - date2);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                this.trialCreditDays.setValue(diffDays);
             }
         }
 
@@ -740,11 +747,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         });
     }
 
-    onUpdateEffectiveDate() {
-        if (!!this.effectiveDate.value && !!this.effectiveDate.value.startDate && this.contractType.value[0].id === 'Trial') {
+    onUpdateEffectiveDate(value: { startDate: any; endDate: any }) {
+        if (!!value.startDate && this.contractType.value[0].id === 'Trial') {
+
             this.expiredDate.setValue({
-                startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
-                endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
+                startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 30)),
+                endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
         }
 
