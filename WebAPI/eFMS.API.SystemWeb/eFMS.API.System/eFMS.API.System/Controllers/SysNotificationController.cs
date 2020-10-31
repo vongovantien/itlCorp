@@ -21,12 +21,12 @@ namespace eFMS.API.System.Controllers
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class SysNotificationController : ControllerBase
     {
-        private IHubContext<NotificationHub> _signalrHub;
+        private IHubContext<NotificationHub, IHubClientNotification> _signalrHub;
         private readonly ISysNotificationService sysNotificationService;
         private ICurrentUser currentUser;
 
         public SysNotificationController(
-            IHubContext<NotificationHub> signalrHub,
+            IHubContext<NotificationHub, IHubClientNotification> signalrHub,
             ISysNotificationService sysNotiService,
              ICurrentUser currUser
             )
@@ -60,6 +60,21 @@ namespace eFMS.API.System.Controllers
             return result;
         }
 
-        
+        [HttpPost]
+        [Route("SendToAllClient")]
+        public async Task<IActionResult> SendToAllClient(string msg)
+        {
+            await _signalrHub.Clients.All.SendMessageToAllClient(msg);
+            return Ok("ok");
+        }
+
+        [HttpPost]
+        [Route("SendToClient")]
+        public async Task<IActionResult> SendToClient(string connectionId, string msg)
+        {
+            await _signalrHub.Clients.Client(connectionId).SendMessageToClient(connectionId,msg);
+            return Ok("ok");
+        }
+
     }
 }

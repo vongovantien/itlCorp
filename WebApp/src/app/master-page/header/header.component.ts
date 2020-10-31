@@ -118,8 +118,23 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 this.getListNotification();
             }
         });
+
+        this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
+            console.log(data);
+        });
+
+        this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
+            console.log(data);
+        });
+
+        this._signalRService.listenEvent("BroadCastMessage", (data: any) => {
+            console.log(data);
+        });
     }
 
+    testSendToClient() {
+        this._signalRService.invoke('BroadCastMessage', "hello world");
+    }
     getListNotification() {
         this._systemRepo.getListNotifications()
             .pipe()
