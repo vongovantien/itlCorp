@@ -24,6 +24,8 @@ namespace eFMS.API.System.DL.Services
         {
             currentUser = ICurrentUser;
             sysUserNotiRepository = sysUserNotiRepo;
+
+            SetChildren<SysUserNotification>("Id", "NotificationId");
         }
 
         public HandleState AddNew(SysNotifications model)
