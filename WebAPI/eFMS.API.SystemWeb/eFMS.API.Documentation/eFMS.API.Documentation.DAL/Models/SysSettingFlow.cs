@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.Documentation.Service.Models
 {
     public partial class SysSettingFlow
     {

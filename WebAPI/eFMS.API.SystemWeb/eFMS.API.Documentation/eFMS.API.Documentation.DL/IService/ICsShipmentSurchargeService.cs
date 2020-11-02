@@ -22,5 +22,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteMultiple(List<Guid> listId);
         HandleState AddAndUpate(List<CsShipmentSurchargeModel> list);
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
+        HandleState CheckCreditTerm(List<CsShipmentSurchargeModel> list);
+
     }
 }

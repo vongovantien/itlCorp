@@ -45,6 +45,7 @@ namespace eFMS.API.System.DL.Services
 
             resultData.Approvals = data.Where(x => x.Flow == "Approval").ToList();
             resultData.Unlocks = data.Where(x => x.Flow == "Unlock").ToList();
+            resultData.Account = data.FirstOrDefault(x => x.Type == "AccountReceivable");
 
             List<SetLockingDateShipment> dataLockingDateShipment = setLockingDateShipmentRepository.Where(x => x.OfficeId == officeId).ToList();
 
@@ -74,9 +75,14 @@ namespace eFMS.API.System.DL.Services
             {
                 list.Add(item);
             }
+          
 
             if (data.Count() == 0)
             {
+                if (model.AccountReceivable != null)
+                {
+                    hs = DataContext.Add(model.AccountReceivable, false);
+                }
                 foreach (SysSettingFlowModel item in list)
                 {
                     item.OfficeId = model.OfficeId;
@@ -96,6 +102,15 @@ namespace eFMS.API.System.DL.Services
                     item.DatetimeModified = DateTime.Now;
 
                     hs = DataContext.Update(item, x => x.Id == item.Id, false);
+                }
+
+                if (model.AccountReceivable != null && !data.Any(x => x.Type == "AccountReceivable"))
+                {
+                    model.AccountReceivable.OfficeId = model.OfficeId;
+                    model.AccountReceivable.UserCreated = model.AccountReceivable.UserModified = currentUser.UserID;
+                    model.AccountReceivable.DatetimeCreated = model.AccountReceivable.DatetimeModified = DateTime.Now;
+                    model.AccountReceivable.Id = Guid.NewGuid();
+                    hs = DataContext.Add(model.AccountReceivable, false);
                 }
             }
             DataContext.SubmitChanges();

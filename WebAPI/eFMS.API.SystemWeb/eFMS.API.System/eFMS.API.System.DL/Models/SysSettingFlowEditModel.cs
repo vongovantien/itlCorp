@@ -11,6 +11,7 @@ namespace eFMS.API.System.Models
         public List<SysSettingFlowModel> ApprovePayments { get; set; }
         public List<SysSettingFlowModel> UnlockShipments { get; set; }
         public List<SetLockingDateShipment> LockShipmentDate { get; set; }
+        public SysSettingFlowModel AccountReceivable { get; set; }
 
 
     }

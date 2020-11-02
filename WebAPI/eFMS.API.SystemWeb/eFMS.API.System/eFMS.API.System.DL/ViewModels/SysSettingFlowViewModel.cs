@@ -10,6 +10,7 @@ namespace eFMS.API.System.DL.ViewModels
         public List<SysSettingFlow> Approvals { get; set; }
         public List<SysSettingFlow> Unlocks { get; set; }
         public List<SetLockingDateShipment> LockingDateShipment { get; set; }
+        public SysSettingFlow Account { get; set; }
 
     }
 }
