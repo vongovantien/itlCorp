@@ -85,7 +85,6 @@ namespace eFMS.API.System.DL.Services
         {
             IQueryable<SysGroup> groups = null;
             IQueryable<CatDepartment> departments = null;
-            IQueryable<SysOffice> offices = null;
 
             if (criteria.All == null)
             {
