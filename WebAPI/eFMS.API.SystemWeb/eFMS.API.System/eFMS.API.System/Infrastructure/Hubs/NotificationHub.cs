@@ -7,15 +7,20 @@ using System.Collections.Generic;
 
 namespace eFMS.API.System.Infrastructure.Hubs
 {
-    [Authorize]
+    //[Authorize]
     public class NotificationHub : Hub<IHubClientNotification>
     {
-        readonly ICurrentUser currentUser;
+        //readonly ICurrentUser currentUser;
         public static HashSet<string> ConnectedIds = new HashSet<string>();
 
-        public NotificationHub(ICurrentUser currentUser)
+        //public NotificationHub(ICurrentUser currentUser)
+        //{
+        //    this.currentUser = currentUser;
+        //}
+
+        public NotificationHub()
         {
-            this.currentUser = currentUser;
+            
         }
 
         public HashSet<string> GetConnectionIds()
