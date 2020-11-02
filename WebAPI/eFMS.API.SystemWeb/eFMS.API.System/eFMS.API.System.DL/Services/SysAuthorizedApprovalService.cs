@@ -22,8 +22,6 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private IContextBase<SysUser> userRepository;
-        private readonly IContextBase<SysAuthorizedApproval> authorizedRepository;
-
 
         public SysAuthorizedApprovalService(IContextBase<SysAuthorizedApproval> repository, IMapper mapper, ICurrentUser user,
             IContextBase<SysUser> userRepo, ICacheServiceBase<SysAuthorizedApproval> cacheService) : base(repository, cacheService, mapper)

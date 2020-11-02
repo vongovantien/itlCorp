@@ -47,6 +47,8 @@ namespace eFMS.API.System
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
+                .SetIsOriginAllowed((host) => true)
+                .WithOrigins("https://localhost:4200")
                 .WithOrigins("http://localhost:4200")
                 .WithOrigins("http://test.efms.itlvn.com")
                 .WithOrigins("http://staging.efms.itlvn.com")
