@@ -19,6 +19,8 @@ using eFMS.API.System.Service.Models;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.System.Infrastructure.Common;
 using StackExchange.Redis;
+using eFMS.API.System.Infrastructure.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -56,7 +58,9 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysSettingFlowService, SysSettingFlowService>();
             services.AddTransient<ISetLockingDateShipment, SetLockingDateShipmentService>();
             services.AddTransient<ISysPartnerAPIService, SysPartnerAPIService>();
-
+            services.AddTransient<ISysNotificationService, SysNotificationService>();
+            services.AddTransient<NotificationHubSubscription>();
+            services.AddTransient<ISysUserNotification, SysUserNotificationService>();
 
             services.AddSingleton<ICacheServiceBase<SysMenu>>(x =>
             new CacheServiceBase<SysMenu>(x.GetRequiredService<IConnectionMultiplexer>()

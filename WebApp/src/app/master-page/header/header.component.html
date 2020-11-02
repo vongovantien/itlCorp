@@ -56,114 +56,7 @@
                             </div>
                         </li> -->
                         <!----------------end search--------------------->
-                        <!----------------start notification-------------->
-                        <!-- <li class="m-nav__item m-topbar__notifications">
-                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
-                                <span class="m-nav__link-badge m-badge m-badge--danger">3</span>
-                                <span class="m-nav__link-icon">
-                                    <i class="la la-bell"></i>
-                                </span>
-                            </a>
-                            <div class="dropdown-menu" style="width: 340px; padding: 20px; border-radius: 2px;">
-                                <div class="m-list-timeline m-list-timeline--skin-light">
-                                    <div class="m-list-timeline__items">
-                                        <div class="m-list-timeline__item">
-                                            <span class="m-list-timeline__badge -m-list-timeline__badge--state-success">
-                                            </span>
-                                            <span class="m-list-timeline__text">
-                                                12 new users registered
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                Just now
-                                            </span>
-                                        </div>
-                                        <div class="m-list-timeline__item">
-                                            <span class="m-list-timeline__badge">
-                                            </span>
-                                            <span class="m-list-timeline__text">
-                                                System shutdown
-                                                <span class="m-badge m-badge--success m-badge--wide">
-                                                    pending
-                                                </span>
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                14 mins
-                                            </span>
-                                        </div>
-                                        <div class="m-list-timeline__item">
-                                            <span class="m-list-timeline__badge">
-                                            </span>
-                                            <span class="m-list-timeline__text">
-                                                New invoice received
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                20 mins
-                                            </span>
-                                        </div>
-                                        <div class="m-list-timeline__item">
-                                            <span class="m-list-timeline__badge">
-                                            </span>
-                                            <span class="m-list-timeline__text">
-                                                DB overloaded 80%
-                                                <span class="m-badge m-badge--info m-badge--wide">
-                                                    settled
-                                                </span>
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                1 hr
-                                            </span>
-                                        </div>
-                                        <div class="m-list-timeline__item">
-                                            <span class="m-list-timeline__badge">
-                                            </span>
-                                            <span class="m-list-timeline__text">
-                                                System error -
-                                                <a class="m-link" href="#">
-                                                    Check
-                                                </a>
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                2 hrs
-                                            </span>
-                                        </div>
-                                        <div class="m-list-timeline__item m-list-timeline__item--read">
-                                            <span class="m-list-timeline__badge">
-                                            </span>
-                                            <span class="m-list-timeline__text" href="">
-                                                New order received
-                                                <span class="m-badge m-badge--danger m-badge--wide">
-                                                    urgent
-                                                </span>
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                7 hrs
-                                            </span>
-                                        </div>
-                                        <div class="m-list-timeline__item m-list-timeline__item--read">
-                                            <span class="m-list-timeline__badge">
-                                            </span>
-                                            <span class="m-list-timeline__text">
-                                                Production server down
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                3 hrs
-                                            </span>
-                                        </div>
-                                        <div class="m-list-timeline__item">
-                                            <span class="m-list-timeline__badge">
-                                            </span>
-                                            <span class="m-list-timeline__text">
-                                                Production server up
-                                            </span>
-                                            <span class="m-list-timeline__time">
-                                                5 hrs
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li> -->
-                        <!----------------end notification-------------->
+
                         <li class="m-nav__item m-office">
                             <a class="m-nav__link m-dropdown__toggle pointer" data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
@@ -173,7 +66,11 @@
                                     {{selectedOffice.shortName}}
                                 </span>
                             </a>
-                            <div class="dropdown-menu" style="min-width: 160px">
+                            <div class="dropdown-menu pt-0" style="min-width: 160px">
+                                <div
+                                    class="text-center font-14 font-weight-bold py-3 m-topbar__notifications-head mb-3">
+                                    <div>Offices</div>
+                                </div>
                                 <ul class="m-nav">
                                     <li class="m-nav__item pointer" *ngFor="let office of offices; let i = index"
                                         (click)="changeOffice(office)"
@@ -199,7 +96,11 @@
                                         {{selectedDepartmentGroup.groupName}} </ng-template>
                                 </span>
                             </a>
-                            <div class="dropdown-menu" style="min-width: 160px">
+                            <div class="dropdown-menu pt-0" style="min-width: 160px; ">
+                                <div
+                                    class="text-center font-14 font-weight-bold py-3 m-topbar__notifications-head mb-3">
+                                    <div>Department - Group </div>
+                                </div>
                                 <ul class="m-nav">
                                     <li class="m-nav__item pointer" *ngFor="let item of departmentGroups"
                                         (click)="changeDepartmentGroup(item)" [class.m-nav__item--active]="!!selectedDepartmentGroup 
@@ -220,6 +121,56 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </div>
+                        </li>
+                        <li class="m-nav__item m-topbar__notifications" title="Notification">
+                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
+                                <span class="m-nav__link-badge m-badge m-badge--danger"
+                                    *ngIf="!!newMssUnread">{{newMssUnread}}</span>
+                                <span class="m-nav__link-icon">
+                                    <i class="la la-bell"></i>
+                                </span>
+                            </a>
+                            <div class="dropdown-menu" style="width: 340px; padding: 10px; border-radius: 2px; max-height:250px;
+                            overflow-y: scroll;" [ngStyle]="{'min-height.px': !!notifications.length ? 100 : 'auto'}">
+                                <div
+                                    class="text-center font-19 font-weight-bold py-3 m-topbar__notifications-head mb-3 d-flex ">
+                                    <div> User Notification </div>
+                                    <div class="btn btn-success btn-sm btn-bold btn-font-md font-weight-bold"
+                                        *ngIf="!!newMssUnread"> {{newMssUnread}} new </div>
+                                </div>
+                                <ng-container *ngIf="notifications.length; else noneData">
+                                    <div class="m-list-timeline m-list-timeline--skin-light pos-rel">
+                                        <ngx-spinner bdColor="rgba(242,222,223,0.3)" [name]="spinnerNotify"
+                                            [fullScreen]="false" type="ball-spin-clockwise" size="medium">
+                                        </ngx-spinner>
+
+                                        <div class="m-list-timeline__items ">
+                                            <div class="m-list-timeline__item pointer"
+                                                [class.m-list-timeline__item--read]="item.status !== 'New'"
+                                                *ngFor="let item of notifications; let i = index"
+                                                (click)="selectNotification(item, $event)">
+                                                <span
+                                                    class="m-list-timeline__badge -m-list-timeline__badge--state-success">
+                                                </span>
+                                                <div class="m-list-timeline__text">
+                                                    <div class="" [innerHTML]="item.title">
+                                                    </div>
+                                                    <div class="text-left m-list-timeline__time ">
+                                                        {{item.datetimeCreated | date : 'HH:mm dd/MM'}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <ng-container *ngIf="totalItem > notifications.length">
+                                                <div
+                                                    class="text-center text-primary pointer font-13 text-underline py-3 px-3">
+                                                    <a (click)="loadMoreNotification($event)" title="Load more">Load
+                                                        More</a>
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </ng-container>
                             </div>
                         </li>
                         <li class="m-nav__item topbar__lang">
@@ -273,7 +224,7 @@
                             <div class="dropdown-menu p-0   ">
                                 <div class="m-list-timeline m-list-timeline--skin-light info-account-wrapper">
                                     <div class="m-list-timeline__item">
-                                        <div class="bg-info d-flex justify-content-around align-items-center p-2">
+                                        <div class="bg-profile d-flex justify-content-around align-items-center p-2">
                                             <div class="popup-account__avatar">
                                                 <img alt="eFMS" class="img-fluid rounded-circle"
                                                     [src]="currenUser.photo"
@@ -336,3 +287,10 @@
         </div>
     </div>
 </div>
+
+<ng-template #noneData>
+    <div class="no-data">
+        <i class="flaticon-coins"></i>
+        <span class="no-data-text">No notification found</span>
+    </div>
+</ng-template>
