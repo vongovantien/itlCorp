@@ -37,6 +37,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<AccAccountingPayment> accountingPaymentRepository;
         private readonly IContextBase<CsTransactionDetail> csTransactionDetailRepository;
+        private readonly IContextBase<SysNotifications> sysNotifyRepository;
+        private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -69,6 +71,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AccAccountingPayment> accAccountingPayment,
             IContextBase<CsTransactionDetail> csTransactionDetailRepo,
+            IContextBase<SysNotifications> sysNotifyRepo,
+            IContextBase<SysUserNotification> sysUserNotifyRepo,
 
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
@@ -92,6 +96,8 @@ namespace eFMS.API.Accounting.DL.Services
             currentUser = cUser;
             accountingPaymentRepository = accAccountingPayment;
             csTransactionDetailRepository = csTransactionDetailRepo;
+            sysNotifyRepository = sysNotifyRepo;
+            sysUserNotifyRepository = sysUserNotifyRepo;
             // ---
 
             users = UserRepository.Get();
@@ -875,6 +881,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
                     }
                     var sm = soaRepository.SubmitChanges();
+
                     trans.Commit();
                     return sm;
                 }
