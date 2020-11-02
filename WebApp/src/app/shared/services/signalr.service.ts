@@ -17,7 +17,7 @@ export class SignalRService {
         this.hubConnection = new HubConnectionBuilder()
             .configureLogging(LogLevel.Debug)
             .withAutomaticReconnect()
-            .withUrl(`http://${environment.HOST.SYSTEM}/notification`, { accessTokenFactory: () => this.getToken() }).build();
+            .withUrl(`http${environment.AUTHORIZATION.requireHttps ? 's' : ''}://${environment.HOST.SYSTEM}/notification`, { accessTokenFactory: () => this.getToken() }).build();
 
         this.hubConnection
             .start()

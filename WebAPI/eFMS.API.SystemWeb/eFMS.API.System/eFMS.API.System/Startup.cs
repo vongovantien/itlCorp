@@ -50,7 +50,7 @@ namespace eFMS.API.System
                 .WithOrigins("http://localhost:4200")
                 .WithOrigins("http://test.efms.itlvn.com")
                 .WithOrigins("http://staging.efms.itlvn.com")
-                .WithOrigins("http://efms.itlvn.com");
+                .WithOrigins("https://efms.itlvn.com");
 
             }));
             services.AddAutoMapper();
