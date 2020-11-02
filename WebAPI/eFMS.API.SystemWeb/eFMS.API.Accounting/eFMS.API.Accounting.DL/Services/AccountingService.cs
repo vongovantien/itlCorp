@@ -4,14 +4,14 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Common;
+using System.Linq;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -37,6 +37,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<AccAccountingPayment> accountingPaymentRepository;
         private readonly IContextBase<CsTransactionDetail> csTransactionDetailRepository;
+        private readonly IContextBase<SysNotifications> sysNotifyRepository;
+        private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -69,6 +71,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AccAccountingPayment> accAccountingPayment,
             IContextBase<CsTransactionDetail> csTransactionDetailRepo,
+            IContextBase<SysNotifications> sysNotifyRepo,
+            IContextBase<SysUserNotification> sysUserNotifyRepo,
 
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
@@ -92,6 +96,8 @@ namespace eFMS.API.Accounting.DL.Services
             currentUser = cUser;
             accountingPaymentRepository = accAccountingPayment;
             csTransactionDetailRepository = csTransactionDetailRepo;
+            sysNotifyRepository = sysNotifyRepo;
+            sysUserNotifyRepository = sysUserNotifyRepo;
             // ---
 
             users = UserRepository.Get();
@@ -362,7 +368,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.MasterBillNo = surcharge.Mblno;
                     charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                     charge.NganhCode = "FWD";
-                    charge.Quantity9 = surcharge.Quantity;                    
+                    charge.Quantity9 = surcharge.Quantity;
                     var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || cdNote.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
@@ -512,7 +518,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.MasterBillNo = surcharge.Mblno;
                     charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                     charge.NganhCode = "FWD";
-                    charge.Quantity9 = surcharge.Quantity;                    
+                    charge.Quantity9 = surcharge.Quantity;
                     var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                     charge.OBHPartnerCode = soa.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT ? _partnerPayer?.AccountNo : _partnerPaymentObject?.AccountNo;
@@ -549,8 +555,8 @@ namespace eFMS.API.Accounting.DL.Services
             List<SyncCreditModel> data = new List<SyncCreditModel>();
             if (models == null || models.Count() == 0) return data;
 
-            foreach(var model in models)
-            {            
+            foreach (var model in models)
+            {
                 var soa = soaRepository.Get(x => model.Id == x.Id && x.Type.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).FirstOrDefault();
                 if (soa != null)
                 {
@@ -728,21 +734,93 @@ namespace eFMS.API.Accounting.DL.Services
                     return new HandleState("Danh sách advance không hợp lệ");
                 }
 
-                foreach (Guid id in ids)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    AcctAdvancePayment adv = AdvanceRepository.Get(x => x.Id == id)?.FirstOrDefault();
-                    if (adv != null)
+                    try
                     {
-                        adv.UserModified = currentUser.UserID;
-                        adv.DatetimeModified = DateTime.Now;
-                        adv.LastSyncDate = DateTime.Now;
-                        adv.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                        foreach (Guid id in ids)
+                        {
+                            AcctAdvancePayment adv = AdvanceRepository.Get(x => x.Id == id)?.FirstOrDefault();
+                            if (adv != null)
+                            {
+                                adv.UserModified = currentUser.UserID;
+                                adv.DatetimeModified = DateTime.Now;
+                                adv.LastSyncDate = DateTime.Now;
+                                adv.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
-                        AdvanceRepository.Update(adv, x => x.Id == id, false);
+                                AdvanceRepository.Update(adv, x => x.Id == id, false);
+
+                                // Notify
+                                SysNotifications sysNotify = new SysNotifications
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Action = "Detail",
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    IsClosed = false,
+                                    IsRead = false,
+                                    Type = "User",
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                    Title = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", adv.AdvanceNo),
+                                    Description = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", adv.AdvanceNo),
+                                    ActionLink = string.Format(@"home/accounting/advance-payment/{0}", adv.Id),
+                                };
+
+                                sysNotifyRepository.Add(sysNotify, false);
+
+                                SysUserNotification sysUserNotify = new SysUserNotification
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Status = "New",
+                                    NotitficationId = sysNotify.Id,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    UserId = currentUser.UserID
+                                };
+
+                                sysUserNotifyRepository.Add(sysUserNotify, false);
+                                if (adv.UserCreated != currentUser.UserID)
+                                {
+                                    SysUserNotification sysUserNotifySync = new SysUserNotification
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Status = "New",
+                                        NotitficationId = sysNotify.Id,
+                                        UserCreated = currentUser.UserID,
+                                        UserModified = currentUser.UserID,
+                                        DatetimeCreated = DateTime.Now,
+                                        DatetimeModified = DateTime.Now,
+                                        UserId = adv.UserCreated,
+                                    };
+                                    sysUserNotifyRepository.Add(sysUserNotifySync, false);
+                                }
+                            }
+
+                        }
+                        HandleState hs = AdvanceRepository.SubmitChanges();
+                        if (hs.Success)
+                        {
+                            sysUserNotifyRepository.SubmitChanges();
+                            trans.Commit();
+
+                            data = new List<Guid>();
+                            return hs;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        data = new List<Guid>();
+                        return new HandleState((object)ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
                     }
                 }
-
-                result = AdvanceRepository.SubmitChanges();
             }
 
             data = invalidAdvances;
@@ -768,21 +846,93 @@ namespace eFMS.API.Accounting.DL.Services
                     return new HandleState("Danh sách settlement không hợp lệ");
                 }
 
-                foreach (Guid id in ids)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    AcctSettlementPayment settle = SettlementRepository.Get(x => x.Id == id)?.FirstOrDefault();
-                    if (settle != null)
+                    try
                     {
-                        settle.UserModified = currentUser.UserID;
-                        settle.DatetimeModified = DateTime.Now;
-                        settle.LastSyncDate = DateTime.Now;
-                        settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                        foreach (Guid id in ids)
+                        {
+                            AcctSettlementPayment settle = SettlementRepository.Get(x => x.Id == id)?.FirstOrDefault();
+                            if (settle != null)
+                            {
+                                settle.UserModified = currentUser.UserID;
+                                settle.DatetimeModified = DateTime.Now;
+                                settle.LastSyncDate = DateTime.Now;
+                                settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
-                        SettlementRepository.Update(settle, x => x.Id == id, false);
+                                SettlementRepository.Update(settle, x => x.Id == id, false);
+                                // Notify
+                                SysNotifications sysNotify = new SysNotifications
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Action = "Detail",
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    IsClosed = false,
+                                    IsRead = false,
+                                    Type = "User",
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                    Title = string.Format(@"Settlement <b style='color:#3966b6'>{0}</b> has been synced", settle.SettlementNo),
+                                    Description = string.Format(@"Settlement <b style='color:#3966b6'>{0}</b> has been synced", settle.SettlementNo),
+                                    ActionLink = string.Format(@"home/accounting/settlement-payment/{0}", settle.Id),
+                                };
+
+                                sysNotifyRepository.Add(sysNotify, false);
+
+                                SysUserNotification sysUserNotify = new SysUserNotification
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Status = "New",
+                                    NotitficationId = sysNotify.Id,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    UserId = currentUser.UserID
+                                };
+
+                                sysUserNotifyRepository.Add(sysUserNotify, false);
+                                if (settle.UserCreated != currentUser.UserID)
+                                {
+                                    SysUserNotification sysUserNotifySync = new SysUserNotification
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Status = "New",
+                                        NotitficationId = sysNotify.Id,
+                                        UserCreated = currentUser.UserID,
+                                        UserModified = currentUser.UserID,
+                                        DatetimeCreated = DateTime.Now,
+                                        DatetimeModified = DateTime.Now,
+                                        UserId = settle.UserCreated,
+                                    };
+                                    sysUserNotifyRepository.Add(sysUserNotifySync, false);
+                                }
+                            }
+                        }
+
+                        result = SettlementRepository.SubmitChanges();
+                        if (result.Success)
+                        {
+                            sysUserNotifyRepository.SubmitChanges();
+                        }
+
+                        trans.Commit();
+                        data = new List<Guid>();
+                        return result;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        data = new List<Guid>();
+                        return new HandleState((object)ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
                     }
                 }
 
-                result = SettlementRepository.SubmitChanges();
             }
 
             data = invalidSettlements;
@@ -804,22 +954,90 @@ namespace eFMS.API.Accounting.DL.Services
                     data = invalidSVouchers;
                     return new HandleState("Danh sách voucher không hợp lệ");
                 }
-
-                foreach (Guid id in ids)
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    AccAccountingManagement voucher = DataContext.Get(x => x.Id == id)?.FirstOrDefault();
-                    if (voucher != null)
+                    try
                     {
-                        voucher.UserModified = currentUser.UserID;
-                        voucher.DatetimeModified = DateTime.Now;
-                        voucher.LastSyncDate = DateTime.Now;
-                        voucher.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                        foreach (Guid id in ids)
+                        {
+                            AccAccountingManagement voucher = DataContext.Get(x => x.Id == id)?.FirstOrDefault();
+                            if (voucher != null)
+                            {
+                                voucher.UserModified = currentUser.UserID;
+                                voucher.DatetimeModified = DateTime.Now;
+                                voucher.LastSyncDate = DateTime.Now;
+                                voucher.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
-                        DataContext.Update(voucher, x => x.Id == id, false);
+                                DataContext.Update(voucher, x => x.Id == id, false);
+
+                                // Notify
+                                SysNotifications sysNotify = new SysNotifications
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Action = "Detail",
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    IsClosed = false,
+                                    IsRead = false,
+                                    Type = "User",
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                    Title = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
+                                    Description = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
+                                    ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
+                                };
+
+                                sysNotifyRepository.Add(sysNotify, false);
+
+                                SysUserNotification sysUserNotify = new SysUserNotification
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Status = "New",
+                                    NotitficationId = sysNotify.Id,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    UserId = currentUser.UserID,
+                                };
+
+                                sysUserNotifyRepository.Add(sysUserNotify, false);
+                                if (voucher.UserCreated != currentUser.UserID)
+                                {
+                                    SysUserNotification sysUserNotifySync = new SysUserNotification
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Status = "New",
+                                        NotitficationId = sysNotify.Id,
+                                        UserCreated = currentUser.UserID,
+                                        UserModified = currentUser.UserID,
+                                        DatetimeCreated = DateTime.Now,
+                                        DatetimeModified = DateTime.Now,
+                                        UserId = voucher.UserCreated
+                                    };
+                                    sysUserNotifyRepository.Add(sysUserNotifySync, false);
+                                }
+                            }
+                        }
+
+                        result = DataContext.SubmitChanges();
+                        if (result.Success)
+                        {
+                            sysUserNotifyRepository.SubmitChanges();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        data = new List<Guid>();
+                        return new HandleState((object)ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
                     }
                 }
 
-                result = DataContext.SubmitChanges();
             }
 
             data = invalidSVouchers;
@@ -841,7 +1059,58 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         cdNote.LastSyncDate = DateTime.Now;
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
+
+                        string description = string.Format(@"CD Note <b style='color:#3966b6'>{0}</b> has been synced", cdNote.Code);                       
+                        // Add Notification
+                        SysNotifications sysNotification = new SysNotifications
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = description,
+                            Description = description,
+                            Type = "User",
+                            UserCreated = currentUser.UserID,
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            UserModified = currentUser.UserID,
+                            Action = "Detail",
+                            ActionLink = GetLinkCdNote(cdNote.Code, cdNote.JobId),
+                            IsClosed = false,
+                            IsRead = false
+                        };
+                        HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
+                        if (hsSysNotification.Success)
+                        {
+                            SysUserNotification userNotifySync = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Status = "New",
+                                NotitficationId = sysNotification.Id,
+                                UserId = currentUser.UserID,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            var hsUserSync = sysUserNotifyRepository.Add(userNotifySync, false);
+                            if (cdNote.UserCreated != currentUser.UserID)
+                            {
+                                SysUserNotification userNotifyCreated = new SysUserNotification
+                                {
+                                    Id = Guid.NewGuid(),
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    Status = "New",
+                                    NotitficationId = sysNotification.Id,
+                                    UserId = cdNote.UserCreated,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                };
+                                var hsUserCreated = sysUserNotifyRepository.Add(userNotifyCreated, false);
+                            }
+                        }
                     }
+                    var smNotify = sysNotifyRepository.SubmitChanges();
+                    var smUserNotify = sysUserNotifyRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -873,7 +1142,58 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         soa.LastSyncDate = DateTime.Now;
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
+
+                        string description = string.Format(@"SOA No <b style='color:#3966b6'>{0}</b> has been synced", soa.Soano);
+                        // Add Notification
+                        SysNotifications sysNotification = new SysNotifications
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = description,
+                            Description = description,
+                            Type = "User",
+                            UserCreated = currentUser.UserID,
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            UserModified = currentUser.UserID,
+                            Action = "Detail",
+                            ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency={1}", soa.Soano, soa.Currency),
+                            IsClosed = false,
+                            IsRead = false
+                        };
+                        HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
+                        if (hsSysNotification.Success)
+                        {
+                            SysUserNotification userNotifySync = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Status = "New",
+                                NotitficationId = sysNotification.Id,
+                                UserId = currentUser.UserID,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            var hsUserSync = sysUserNotifyRepository.Add(userNotifySync, false);
+                            if (soa.UserCreated != currentUser.UserID)
+                            {
+                                SysUserNotification userNotifyCreated = new SysUserNotification
+                                {
+                                    Id = Guid.NewGuid(),
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    Status = "New",
+                                    NotitficationId = sysNotification.Id,
+                                    UserId = soa.UserCreated,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                };
+                                var hsUserCreated = sysUserNotifyRepository.Add(userNotifyCreated, false);
+                            }
+                        }
                     }
+                    var smNotify = sysNotifyRepository.SubmitChanges();
+                    var smUserNotify = sysUserNotifyRepository.SubmitChanges();
                     var sm = soaRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -947,6 +1267,57 @@ namespace eFMS.API.Accounting.DL.Services
                 if (partner != null) customerName = partner.PartnerNameVn;
             }
             return customerName;
+        }
+
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId)
+        {
+            string _link = string.Empty;
+            if (cdNoteNo.Contains("CL"))
+            {
+                _link = string.Format("home/operation/job-management/job-edit/{0}?tab=CDNOTE", jobId.ToString());
+            }
+            else
+            {
+                string prefixService = "home/documentation/";
+                if (cdNoteNo.Contains("IT"))
+                {
+                    prefixService += "inland-trucking";
+                }
+                else if (cdNoteNo.Contains("AE"))
+                {
+                    prefixService += "air-export";
+                }
+                else if (cdNoteNo.Contains("AI"))
+                {
+                    prefixService += "air-import";
+                }
+                else if (cdNoteNo.Contains("SEC"))
+                {
+                    prefixService += "sea-consol-export";
+                }
+                else if (cdNoteNo.Contains("SIC"))
+                {
+                    prefixService += "sea-consol-import";
+                }
+                else if (cdNoteNo.Contains("SEF"))
+                {
+                    prefixService += "sea-fcl-export";
+                }
+                else if (cdNoteNo.Contains("SIF"))
+                {
+                    prefixService += "sea-fcl-import";
+                }
+                else if (cdNoteNo.Contains("SEL"))
+                {
+                    prefixService += "sea-lcl-export";
+                }
+                else if (cdNoteNo.Contains("SIL"))
+                {
+                    prefixService += "sea-lcl-import";
+                }
+                _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
+            }
+            return _link;
         }
 
         #endregion -- Private Method --
