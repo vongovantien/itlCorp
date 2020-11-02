@@ -24,6 +24,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysMenu> SysMenu { get; set; }
+        public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
         public virtual DbSet<SysPermissionSample> SysPermissionSample { get; set; }
@@ -34,6 +35,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
+        public virtual DbSet<SysUserNotification> SysUserNotification { get; set; }
         public virtual DbSet<SysUserPermission> SysUserPermission { get; set; }
         public virtual DbSet<SysUserPermissionGeneral> SysUserPermissionGeneral { get; set; }
         public virtual DbSet<SysUserPermissionSpecial> SysUserPermissionSpecial { get; set; }
@@ -49,7 +51,7 @@ namespace eFMS.API.System.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatDepartment>(entity =>
             {
@@ -567,6 +569,39 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<SysNotifications>(entity =>
+            {
+                entity.ToTable("sysNotifications");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Action).HasMaxLength(200);
+
+                entity.Property(e => e.ActionLink).IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(200);
+
+                entity.Property(e => e.Title).HasMaxLength(150);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<SysOffice>(entity =>
             {
                 entity.ToTable("sysOffice");
@@ -1030,6 +1065,32 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysUserNotification>(entity =>
+            {
+                entity.ToTable("sysUserNotification");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.NotitficationId).HasColumnName("NotitficationID");
+
+                entity.Property(e => e.Status).HasMaxLength(10);
+
+                entity.Property(e => e.UserCreated).HasMaxLength(50);
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName("UserID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified).HasMaxLength(50);
             });
 
             modelBuilder.Entity<SysUserPermission>(entity =>

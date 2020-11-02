@@ -20,8 +20,6 @@
             padding: 0;
         }
     }
-    
-    
 }
 
 @media only screen and (max-width: 1024px) {
@@ -31,31 +29,27 @@
     #m_header_topbar {
         top: 0 !important;
     }
-    
 }
 
-.info-account-wrapper{
+.info-account-wrapper {
     width: 288px;
     .popup-account__avatar {
         width: 80px;
         overflow: hidden;
-        
     }
 }
-
-
 
 .flex-row-around {
     display: flex;
     justify-content: space-around;
-    padding: 20px; 
+    padding: 20px;
     align-items: center;
 }
 
 .flex-row-between {
     display: flex;
     justify-content: space-between;
-    padding: 20px; 
+    padding: 20px;
     align-items: center;
 }
 
@@ -65,9 +59,9 @@
 }
 
 .icon-online {
-    width: 10px; 
-    height: 10px; 
-    border-radius: 50%; 
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
     background-color: #7bc38d;
 }
 
@@ -75,4 +69,39 @@
     color: green;
 }
 
+.bg-profile {
+    background-image: url("./../../../assets/app/media/img/bg/bg-notification.jpg");
+    background-position: bottom;
+}
 
+.m-topbar__notifications-head {
+    background-image: url("./../../../assets/app/media/img/bg/bg-notification.jpg");
+    color: #fff;
+    background-position: bottom;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.m-list-timeline__item {
+    .m-list-timeline__text {
+        &:hover {
+            color: #2739c1 !important;
+        }
+    }
+    .m-list-timeline__badge {
+        &::before {
+            background-color: #26ae60 !important;
+        }
+    }
+    .m-list-timeline__items {
+        &::before {
+            height: 95% !important;
+        }
+    }
+}
+
+.m-list-timeline__item {
+    &:hover {
+        background-color: #f4f5f8;
+    }
+}
