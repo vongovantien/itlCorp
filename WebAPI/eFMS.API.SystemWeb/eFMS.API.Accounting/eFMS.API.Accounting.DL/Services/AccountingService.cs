@@ -847,7 +847,58 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         cdNote.LastSyncDate = DateTime.Now;
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
+
+                        string description = string.Format(@"CD Note <b style='color:#3966b6'>{0}</b> has been synced", cdNote.Code);                       
+                        // Add Notification
+                        SysNotifications sysNotification = new SysNotifications
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = description,
+                            Description = description,
+                            Type = "User",
+                            UserCreated = currentUser.UserID,
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            UserModified = currentUser.UserID,
+                            Action = "Detail",
+                            ActionLink = GetLinkCdNote(cdNote.Code, cdNote.JobId),
+                            IsClosed = false,
+                            IsRead = false
+                        };
+                        HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
+                        if (hsSysNotification.Success)
+                        {
+                            SysUserNotification userNotifySync = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Status = "New",
+                                NotitficationId = sysNotification.Id,
+                                UserId = currentUser.UserID,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            var hsUserSync = sysUserNotifyRepository.Add(userNotifySync, false);
+                            if (cdNote.UserCreated != currentUser.UserID)
+                            {
+                                SysUserNotification userNotifyCreated = new SysUserNotification
+                                {
+                                    Id = Guid.NewGuid(),
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    Status = "New",
+                                    NotitficationId = sysNotification.Id,
+                                    UserId = cdNote.UserCreated,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                };
+                                var hsUserCreated = sysUserNotifyRepository.Add(userNotifyCreated, false);
+                            }
+                        }
                     }
+                    var smNotify = sysNotifyRepository.SubmitChanges();
+                    var smUserNotify = sysUserNotifyRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -879,9 +930,59 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         soa.LastSyncDate = DateTime.Now;
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
-                    }
-                    var sm = soaRepository.SubmitChanges();
 
+                        string description = string.Format(@"SOA No <b style='color:#3966b6'>{0}</b> has been synced", soa.Soano);
+                        // Add Notification
+                        SysNotifications sysNotification = new SysNotifications
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = description,
+                            Description = description,
+                            Type = "User",
+                            UserCreated = currentUser.UserID,
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            UserModified = currentUser.UserID,
+                            Action = "Detail",
+                            ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency={1}", soa.Soano, soa.Currency),
+                            IsClosed = false,
+                            IsRead = false
+                        };
+                        HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
+                        if (hsSysNotification.Success)
+                        {
+                            SysUserNotification userNotifySync = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Status = "New",
+                                NotitficationId = sysNotification.Id,
+                                UserId = currentUser.UserID,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            var hsUserSync = sysUserNotifyRepository.Add(userNotifySync, false);
+                            if (soa.UserCreated != currentUser.UserID)
+                            {
+                                SysUserNotification userNotifyCreated = new SysUserNotification
+                                {
+                                    Id = Guid.NewGuid(),
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    Status = "New",
+                                    NotitficationId = sysNotification.Id,
+                                    UserId = soa.UserCreated,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                };
+                                var hsUserCreated = sysUserNotifyRepository.Add(userNotifyCreated, false);
+                            }
+                        }
+                    }
+                    var smNotify = sysNotifyRepository.SubmitChanges();
+                    var smUserNotify = sysUserNotifyRepository.SubmitChanges();
+                    var sm = soaRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
                 }
@@ -954,6 +1055,57 @@ namespace eFMS.API.Accounting.DL.Services
                 if (partner != null) customerName = partner.PartnerNameVn;
             }
             return customerName;
+        }
+
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId)
+        {
+            string _link = string.Empty;
+            if (cdNoteNo.Contains("CL"))
+            {
+                _link = "home/operation/job-management/job-edit/" + jobId.ToString();
+            }
+            else
+            {
+                string prefixService = "home/documentation/";
+                if (cdNoteNo.Contains("IT"))
+                {
+                    prefixService += "inland-trucking";
+                }
+                else if (cdNoteNo.Contains("AE"))
+                {
+                    prefixService += "air-export";
+                }
+                else if (cdNoteNo.Contains("AI"))
+                {
+                    prefixService += "air-import";
+                }
+                else if (cdNoteNo.Contains("SEC"))
+                {
+                    prefixService += "sea-consol-export";
+                }
+                else if (cdNoteNo.Contains("SEI"))
+                {
+                    prefixService += "sea-consol-import";
+                }
+                else if (cdNoteNo.Contains("SEF"))
+                {
+                    prefixService += "sea-fcl-export";
+                }
+                else if (cdNoteNo.Contains("SIF"))
+                {
+                    prefixService += "sea-fcl-import";
+                }
+                else if (cdNoteNo.Contains("SEL"))
+                {
+                    prefixService += "sea-lcl-export";
+                }
+                else if (cdNoteNo.Contains("SIL"))
+                {
+                    prefixService += "sea-lcl-import";
+                }
+                _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
+            }
+            return _link;
         }
 
         #endregion -- Private Method --
