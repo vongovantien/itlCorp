@@ -1062,7 +1062,7 @@ namespace eFMS.API.Accounting.DL.Services
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
             {
-                _link = "home/operation/job-management/job-edit/" + jobId.ToString();
+                _link = string.Format("home/operation/job-management/job-edit/{0}?tab=CDNOTE", jobId.ToString());
             }
             else
             {
@@ -1083,7 +1083,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     prefixService += "sea-consol-export";
                 }
-                else if (cdNoteNo.Contains("SEI"))
+                else if (cdNoteNo.Contains("SIC"))
                 {
                     prefixService += "sea-consol-import";
                 }
