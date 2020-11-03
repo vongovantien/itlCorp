@@ -577,6 +577,57 @@ namespace eFMS.API.ForPartner.DL.Service
             return _exchangeRate;
         }
 
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId)
+        {
+            string _link = string.Empty;
+            if (cdNoteNo.Contains("CL"))
+            {
+                _link = string.Format(@"home/operation/job-management/job-edit/{0}?tab=CDNOTE", jobId.ToString());
+            }
+            else
+            {
+                string prefixService = "home/documentation/";
+                if (cdNoteNo.Contains("IT"))
+                {
+                    prefixService += "inland-trucking";
+                }
+                else if (cdNoteNo.Contains("AE"))
+                {
+                    prefixService += "air-export";
+                }
+                else if (cdNoteNo.Contains("AI"))
+                {
+                    prefixService += "air-import";
+                }
+                else if (cdNoteNo.Contains("SEC"))
+                {
+                    prefixService += "sea-consol-export";
+                }
+                else if (cdNoteNo.Contains("SIC"))
+                {
+                    prefixService += "sea-consol-import";
+                }
+                else if (cdNoteNo.Contains("SEF"))
+                {
+                    prefixService += "sea-fcl-export";
+                }
+                else if (cdNoteNo.Contains("SIF"))
+                {
+                    prefixService += "sea-fcl-import";
+                }
+                else if (cdNoteNo.Contains("SEL"))
+                {
+                    prefixService += "sea-lcl-export";
+                }
+                else if (cdNoteNo.Contains("SIL"))
+                {
+                    prefixService += "sea-lcl-import";
+                }
+                _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
+            }
+            return _link;
+        }
+
         #endregion --- PRIVATE METHOD ---
 
         #region --- Advance ---
@@ -782,9 +833,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState smAdvance = acctAdvanceRepository.SubmitChanges();
                         if (smAdvance.Success)
                         {
-                            string title = string.Format(@"Accountant Rejected Data Advance <b style='color:#3966b6'>[AdvanceNo]</b>");
-                            title = title.Replace("[AdvanceNo]", advance.AdvanceNo);
-
+                            string title = string.Format(@"Accountant Rejected Data Advance <b style='color:#3966b6'>{0}</b>", advance.AdvanceNo);
                             SysNotifications sysNotify = new SysNotifications
                             {
                                 Id = Guid.NewGuid(),
@@ -798,9 +847,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = "home/accounting/advance-payment/" + advance.Id,
+                                ActionLink = string.Format(@"home/accounting/advance-payment/{0}", advance.Id),
                             };
-
                             sysNotificationRepository.Add(sysNotify);
 
                             SysUserNotification sysUserNotify = new SysUserNotification
@@ -852,11 +900,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     if (hs.Success)
                     {
                         HandleState smSettlement = acctSettlementRepo.SubmitChanges();
-                        if(smSettlement.Success)
+                        if (smSettlement.Success)
                         {
-                            string title = string.Format(@"Accountant Rejected Data Settlement <b style='color:#3966b6'>[SettlementNo]</b>");
-                            title = title.Replace("[SettlementNo]", settlement.SettlementNo);
-
+                            string title = string.Format(@"Accountant Rejected Data Settlement <b style='color:#3966b6'>{0}</b>", settlement.SettlementNo);
                             SysNotifications sysNotify = new SysNotifications
                             {
                                 Id = Guid.NewGuid(),
@@ -870,9 +916,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = "home/accounting/settlement-payment/" + settlement.Id,
+                                ActionLink = string.Format(@"home/accounting/settlement-payment/", settlement.Id),
                             };
-
                             sysNotificationRepository.Add(sysNotify);
 
                             SysUserNotification sysUserNotify = new SysUserNotification
@@ -926,9 +971,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState smSoa = acctSOARepository.SubmitChanges();
                         if (smSoa.Success)
                         {
-                            string title = string.Format(@"Accountant Rejected Data SOA <b style='color:#3966b6'>[soa]</b>");
-                            title = title.Replace("[soa]", soa.Soano);
-
+                            string title = string.Format(@"Accountant Rejected Data SOA <b style='color:#3966b6'>{0}</b>", soa.Soano);
                             SysNotifications sysNotify = new SysNotifications
                             {
                                 Id = Guid.NewGuid(),
@@ -942,9 +985,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = "home/accounting/statement-of-account/detail?no=" + soa.Soano + "&currency=VND"
+                                ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency={1}", soa.Soano, soa.Currency)
                             };
-
                             sysNotificationRepository.Add(sysNotify);
 
                             SysUserNotification sysUserNotify = new SysUserNotification
@@ -998,9 +1040,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState smCdNote = acctCdNoteRepo.SubmitChanges();
                         if (smCdNote.Success)
                         {
-                            string title = string.Format(@"Accountant Rejected Data CDNote <b style='color:#3966b6'>[code]</b>");
-                            title = title.Replace("[code]", cdNote.Code);
-
+                            string title = string.Format(@"Accountant Rejected Data CDNote <b style='color:#3966b6'>{0}</b>", cdNote.Code);
                             SysNotifications sysNotify = new SysNotifications
                             {
                                 Id = Guid.NewGuid(),
@@ -1014,10 +1054,9 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = null, // TODO: url của CDNOTE
+                                ActionLink = GetLinkCdNote(cdNote.Code, cdNote.JobId),
                             };
-
-                            sysNotificationRepository.Add(sysNotify);
+                            var hsNotifi = sysNotificationRepository.Add(sysNotify);
 
                             SysUserNotification sysUserNotify = new SysUserNotification
                             {
@@ -1030,7 +1069,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                             };
-                            sysUserNotificationRepository.Add(sysUserNotify);
+                            var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify);
                         }
                         trans.Commit();
                     }
@@ -1070,9 +1109,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         var sm = DataContext.SubmitChanges();
                         if (sm.Success)
                         {
-                            string title = string.Format(@"Accountant Rejected Data Voucher <b style='color:#3966b6'>[VoucherID]</b>");
-                            title = title.Replace("[VoucherID]", voucher.VoucherId);
-
+                            string title = string.Format(@"Accountant Rejected Data Voucher <b style='color:#3966b6'>{0}</b>", voucher.VoucherId);
                             SysNotifications sysNotify = new SysNotifications
                             {
                                 Id = Guid.NewGuid(),
@@ -1086,9 +1123,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = "home/accounting/management/voucher/" + voucher.Id,
+                                ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
                             };
-
                             sysNotificationRepository.Add(sysNotify);
 
                             SysUserNotification sysUserNotify = new SysUserNotification
@@ -1168,7 +1204,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     result = RejectCdNote(model.ReferenceID, model.Reason);
                     break;
                 case "VOUCHER":
-                    result = DeleteVoucher(model.ReferenceID);
+                    result = DeleteVoucher(model.ReferenceID, model.Reason);
                     break;
                 default:
                     result = new HandleState((object)"Không tìm thấy loại remove voucher");
@@ -1189,7 +1225,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return result;
         }
 
-        private HandleState DeleteVoucher(string id)
+        private HandleState DeleteVoucher(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -1236,6 +1272,40 @@ namespace eFMS.API.ForPartner.DL.Service
                                 }
                             }
                         }
+
+                        string title = string.Format(@"Accountant Removed Data Voucher <b style='color:#3966b6'>{0}</b>", voucher.VoucherId);
+                        SysNotifications sysNotify = new SysNotifications
+                        {
+                            Id = Guid.NewGuid(),
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            Type = "User",
+                            Title = title,
+                            IsClosed = false,
+                            IsRead = false,
+                            Description = reason,
+                            UserCreated = currentUser.UserID,
+                            UserModified = currentUser.UserID,
+                            Action = "Detail",
+                            ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
+                        };
+                        var hsNotifi = sysNotificationRepository.Add(sysNotify, false);
+
+                        SysUserNotification sysUserNotify = new SysUserNotification
+                        {
+                            Id = Guid.NewGuid(),
+                            UserId = voucher.UserCreated,
+                            Status = "New",
+                            NotitficationId = sysNotify.Id,
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            UserCreated = currentUser.UserID,
+                            UserModified = currentUser.UserID,
+                        };
+                        var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify, false);
+
+                        var smNotifi = sysNotificationRepository.SubmitChanges();
+                        var smUserNotifi = sysUserNotificationRepository.SubmitChanges();
                         var smSurcharge = surchargeRepo.SubmitChanges();
                         var smSettle = settlementPaymentRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
