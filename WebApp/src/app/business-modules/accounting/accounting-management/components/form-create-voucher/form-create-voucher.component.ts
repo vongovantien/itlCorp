@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AccountingConstants } from '@constants';
-import { Partner, ChartOfAccounts } from '@models';
+import { Partner, ChartOfAccounts, Currency } from '@models';
 
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { Store } from '@ngrx/store';
@@ -12,9 +12,8 @@ import { DataService } from '@services';
 
 import { getAccoutingManagementPartnerState } from '../../store';
 
-import { Observable, merge } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
-import { SelectItem } from 'ng2-select';
+import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -45,8 +44,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
-    paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD;
-    voucherTypes: CommonInterface.INg2Select[] = AccountingConstants.VOUCHER_TYPE;
+    paymentMethods: string[] = AccountingConstants.PAYMENT_METHOD.map(i => i.id);
+    voucherTypes: string[] = AccountingConstants.VOUCHER_TYPE.map(i => i.id);
 
     displayFieldsChartAccount: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountCode', label: 'Account Code' },
@@ -54,7 +53,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
     ];
 
     partners: Observable<Partner[]>;
-    listCurrency: Observable<CommonInterface.INg2Select[]>;
+    listCurrency: Observable<Currency[]>;
     chartOfAccounts: Observable<ChartOfAccounts[]>;
 
     constructor(
@@ -71,7 +70,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this._store.dispatch(new GetCatalogueCurrencyAction());
 
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-        this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
+        this.listCurrency = this._store.select(getCatalogueCurrencyState);
         this.chartOfAccounts = this._catalogueRepo.getListChartOfAccounts();
 
         this.initForm();
@@ -135,10 +134,10 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             invoiceNoReal: [],
 
             voucherType: [],
-            paymentMethod: [[this.paymentMethods[2]]],
+            paymentMethod: [this.paymentMethods[2]],
             accountNo: [],
             totalAmount: [{ value: null, disabled: true }],
-            currency: [[{ id: 'VND', text: 'VND' }]],
+            currency: ['VND'],
             status: [],
             paymentTerm: [null, Validators.compose([
                 Validators.required,
@@ -159,13 +158,6 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this.description = this.formGroup.controls['description'];
         this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
         this.paymentTerm = this.formGroup.controls['paymentTerm'];
-
-        // this.chartOfAccounts.subscribe(
-        //     (accounts: ChartOfAccounts[]) => {
-        //         const defaultAccountNo: ChartOfAccounts = (accounts || []).find((a: ChartOfAccounts) => a.accountCode === AccountingConstants.DEFAULT_ACCOUNT_NO_CODE);
-        //         this.accountNo.setValue(!!defaultAccountNo ? defaultAccountNo.accountCode : null);
-        //     }
-        // );
     }
 
 
@@ -207,7 +199,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         }
     }
 
-    selectedVoucherType(e: SelectItem) {
-        this.generateVoucherId(e.id);
+    selectedVoucherType(e) {
+        this.generateVoucherId(e);
     }
 }

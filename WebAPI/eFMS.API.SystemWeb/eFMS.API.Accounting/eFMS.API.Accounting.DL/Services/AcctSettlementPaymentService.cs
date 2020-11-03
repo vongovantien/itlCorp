@@ -43,6 +43,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCharge> catChargeRepo;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
@@ -69,6 +70,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatCharge> catCharge,
             IContextBase<CatUnit> catUnit,
             IContextBase<CatPartner> catPartner,
+            IContextBase<SysSentEmailHistory> sentEmailHistory,
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
             IUserBaseService userBase) : base(repository, mapper)
@@ -94,6 +96,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvancePaymentService = advance;
             currencyExchangeService = currencyExchange;
             userBaseService = userBase;
+            sentEmailHistoryRepo = sentEmailHistory;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -342,7 +345,8 @@ namespace eFMS.API.Accounting.DL.Services
                            VoucherDate = settlePayment.VoucherDate,
                            VoucherNo = settlePayment.VoucherNo,
                            LastSyncDate = settlePayment.LastSyncDate,
-                           SyncStatus = settlePayment.SyncStatus
+                           SyncStatus = settlePayment.SyncStatus,
+                           ReasonReject = settlePayment.ReasonReject
                        };
 
             //Sort Array sẽ nhanh hơn
@@ -3801,6 +3805,21 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -3885,6 +3904,21 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -3970,6 +4004,21 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 

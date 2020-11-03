@@ -97,7 +97,8 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted &&  !effectiveDate.value.startDate }">
                                 <label required for="">Effective Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
+                                        class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -113,6 +114,7 @@
                                 <label>Expired Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="expiredDate" readonly
                                         [minDate]="minDateExpired" />
@@ -130,7 +132,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
                                 <label required>Agreement Type</label>
-                                <ng-select #ct [items]="contractTypes" [allowClear]="true"
+                                <ng-select #ct [items]="contractTypes" (selected)="selectedAgreementType($event)"
                                     (opened)="closeOtherSelects(ct)" formControlName="contractType"
                                     placeholder="Please select">
                                 </ng-select>
@@ -209,7 +211,7 @@
                                         </label>
                                         <input type="number" min="0" numeric [decimals]="digitDecimal"
                                             autoFormatCurrency
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditLimit">
                                     </div>
                                 </div>
@@ -218,7 +220,7 @@
                                         <label>Trial Credit Days
                                         </label>
                                         <input type="number" min="0" (change)="onChageTrialCreditDays()"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditDays">
                                     </div>
                                 </div>
@@ -228,7 +230,7 @@
                                         </label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input
-                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
                                                 type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
@@ -249,7 +251,7 @@
                                         </label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input
-                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
                                                 type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
@@ -266,24 +268,36 @@
                                 </div>
                             </ng-container>
                             <ng-container *ngIf=" isUpdate ||  (!isUpdate  && contractType.value[0].id ==='Official')">
-                                <div class="col-lg-4">
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label>Payment Term</label>
                                         <input type="number" min="0" numeric [decimals]="digitDecimal"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
                                             autoFormatCurrency class="form-control" formControlName="paymentTerm">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>Base On</label>
+                                        <ng-select #bo [items]="basesOn" [allowClear]="true"
+                                            (opened)="closeOtherSelects(bo)" formControlName="baseOn"
+                                            placeholder="Please select">
+                                        </ng-select>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Credit Limit</label>
-                                        <input type="number" class="form-control" formControlName="creditLimit">
+                                        <input
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
+                                            type="number" class="form-control" formControlName="creditLimit">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Credit Limited Rate</label>
                                         <input min="0"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
                                             type="number" class="form-control" formControlName="creditLimitRate">
                                     </div>
                                 </div>
@@ -320,16 +334,16 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Customer Advance Amount</label>
-                                        <input min="0"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
-                                            type="number" class="form-control" formControlName="customerAmount">
+                                        <input min="0" disabled type="number" class="form-control"
+                                            formControlName="customerAmount">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Credit Rate</label>
-                                        <input min="0" type="number" class="form-control" formControlName="creditRate"
-                                            numeric [decimals]="digitDecimal" autoFormatCurrency>
+                                        <input min="0" disabled type="number" class="form-control"
+                                            formControlName="creditRate" numeric [decimals]="digitDecimal"
+                                            autoFormatCurrency>
                                     </div>
                                 </div>
                             </ng-container>
@@ -394,7 +408,9 @@
             </div>
             <div class="modal-footer m--align-center">
                 <ng-container *ngIf="openOnPartner === false">
-                    <button (click)="onSubmit()" class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
+                    <button
+                        *ngIf="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true &&  (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true) || !isUpdate"
+                        (click)="onSubmit()" class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-save"></i>
                             <span> Save </span>
@@ -406,6 +422,14 @@
                         <span>
                             <i class="la la-send"></i>
                             <span> Request Approval </span>
+                        </span>
+                    </button>
+                    <button (click)="onARConfirmed()"
+                        *ngIf="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
+                        class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-check"></i>
+                            <span> AR Confirmed </span>
                         </span>
                     </button>
                     <button (click)="activeInactiveContract(selectedContract.id)"

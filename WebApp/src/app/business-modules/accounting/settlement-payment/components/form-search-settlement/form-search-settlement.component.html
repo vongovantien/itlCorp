@@ -16,8 +16,8 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="">Requester</label>
-                                <ng-select formControlName="requester" [allowClear]="true"
-                                    (removed)="onRemoveDataFormInfo($event, 'requester')" [items]="requesters">
+                                <ng-select formControlName="requester" [items]="requesters" class="custom"
+                                    bindLabel="username" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>

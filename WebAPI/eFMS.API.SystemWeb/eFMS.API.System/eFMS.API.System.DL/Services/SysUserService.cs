@@ -574,6 +574,8 @@ namespace eFMS.API.System.DL.Services
 
             SysUser currUser = DataContext.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
             currUser.Description = criteria.Description?.Trim();
+            currUser.UserModified = currentUser.UserID;
+            currUser.DatetimeModified = DateTime.Now;
 
             SysEmployee currEmployee = employeeRepository.Get(y => y.Id == currUser.EmployeeId).FirstOrDefault();
 

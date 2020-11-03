@@ -59,7 +59,8 @@
                                         </span>
                                     </button>
                                     <button class="btn btn-info m-btn--icon m-btn--uppercase float-right"
-                                        (click)="syncBravo()" title="Sync to accountant system">
+                                        (click)="syncBravo()" title="Sync to accountant system"
+                                        *ngIf="menuSpecialPermission | async | specialPermission:'SyncAcctSystem'">
                                         <span>
                                             <i class="la la-cloud-upload"></i>
                                             <span>
@@ -128,7 +129,7 @@
                                                     <a (click)="viewDetail(advancePayment)">{{advancePayment.advanceNo}}
                                                     </a>
                                                 </td>
-                                                <td>{{advancePayment.amount | number: '.0-3'}}</td>
+                                                <td class="text-right">{{advancePayment.amount | number: '.0-3'}}</td>
                                                 <td>{{advancePayment.advanceCurrency}}</td>
                                                 <td><span class="text-info">{{advancePayment.requesterName}}</span></td>
                                                 <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
@@ -178,7 +179,7 @@
                                                         {{advancePayment.syncStatus}}
                                                     </div>
                                                     <div *ngSwitchDefault class="text-danger">
-                                                        {{advancePayment.syncStatus}}
+                                                        {{advancePayment.syncStatus}}{{advancePayment.reasonReject ? ' - ' +advancePayment.reasonReject : ''}}
                                                     </div>
                                                 </td>
                                                 <td>

@@ -3,10 +3,13 @@ import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCance
 import { IdentityRepo, SystemRepo } from '@repositories';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { Employee, Office } from '@models';
+import { Employee, Office, SysUserNotification } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
+import { SignalRService } from '@services';
+import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-header',
@@ -34,12 +37,23 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     subscriptions: Subscription[] = [];
 
+    notifications: SysUserNotification[] = [];
+    newMssUnread: number;
+
+    spinnerNotify: string = "spinnerNotify";
+    page: number = 1;
+    size: number = 10;
+    totalItem: number = 0;
+
     constructor(
         private router: Router,
         private _systemRepo: SystemRepo,
         private _activedRouter: ActivatedRoute,
         private _identity: IdentityRepo,
-        private _globalState: GlobalState
+        private _globalState: GlobalState,
+        private _signalRService: SignalRService,
+        private _toast: ToastrService,
+        private _spinner: NgxSpinnerService
     ) { }
 
     ngOnInit() {
@@ -94,6 +108,88 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         });
 
         this.subscriptions.push(indentitySub, routerSub);
+        // * Realtime
+        this._signalRService.startConnection();
+        this.getListNotification();
+
+        this._signalRService.listenEvent("NotificationWhenChange", (data: SysUserNotification) => {
+            if (data) {
+                // this._toast.info(`You have a new message ${data.title}`, 'Infomation');
+                this.getListNotification();
+            }
+        });
+
+        this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
+            console.log(data);
+        });
+
+        this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
+            console.log(data);
+        });
+
+        this._signalRService.listenEvent("BroadCastMessage", (data: any) => {
+            console.log(data);
+        });
+    }
+
+    testSendToClient() {
+        this._signalRService.invoke('BroadCastMessage', "hello world");
+    }
+    getListNotification() {
+        this._systemRepo.getListNotifications()
+            .pipe()
+            .subscribe(
+                (res: CommonInterface.IResponsePaging) => {
+                    this.notifications = res.data || [];
+                    this.totalItem = res.totalItems;
+                    this.newMssUnread = res.totalNoRead;
+                }
+            );
+    }
+
+    selectNotification(noti: SysUserNotification, e: any) {
+        e.stopPropagation();
+        if (noti.status === 'Read') {
+            return;
+        }
+        this._spinner.show(this.spinnerNotify);
+        this._systemRepo.readMessage(noti.id)
+            .pipe(
+                finalize(() => {
+                    this._spinner.hide(this.spinnerNotify);
+                })
+            )
+            .subscribe((res: CommonInterface.IResult) => {
+                if (!res.status) {
+                    this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
+
+                } else {
+                    noti.status = 'Read';
+                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
+                }
+
+            });
+    }
+
+    loadMoreNotification(e: any) {
+        e.stopPropagation();
+        this._spinner.show(this.spinnerNotify);
+        this.page++;
+
+        this._systemRepo.getListNotifications(this.page, this.size)
+            .pipe(
+                finalize(() => {
+                    this._spinner.hide(this.spinnerNotify);
+                })
+            )
+            .subscribe((res: CommonInterface.IResponsePaging) => {
+                if (!!res.data) {
+                    this.notifications = [...this.notifications, ...res.data];
+                    this.totalItem = res.totalItems;
+                    this.newMssUnread = res.totalNoRead;
+                }
+            });
+
     }
 
     viewProfile() {
@@ -212,7 +308,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         }
     }
 
-
     // minimize sidebar
     minimize_page_sidebar_desktop() {
         const bodyElement = document.getElementById('bodyElement');
@@ -238,7 +333,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 
     ngOnDestroy(): void {
-        console.log(this.subscriptions);
         if (this.subscriptions.length) {
             this.subscriptions.forEach(c => c.unsubscribe());
         }

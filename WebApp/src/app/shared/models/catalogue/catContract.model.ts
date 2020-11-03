@@ -16,6 +16,7 @@ export class Contract {
     expiredDate: any = null;
     description: string = null;
     paymentMethod: string = null;
+    baseOn: string = null;
     contractNo: string = null;
     contractType: string = null;
     vas: string = null;
@@ -46,6 +47,7 @@ export class Contract {
     isRequestApproval: boolean = false;
     partnerStatus: boolean = false;
     isChangeAgrmentType: boolean = false;
+    arconfirmed: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

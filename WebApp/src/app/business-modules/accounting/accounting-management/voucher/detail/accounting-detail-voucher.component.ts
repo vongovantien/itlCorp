@@ -87,10 +87,6 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
     updateFormVoucher(res: AccAccountingManagementModel) {
         const formData: AccAccountingManagementModel | any = {
             date: !!res.date ? { startDate: new Date(res.date), endDate: new Date(res.date) } : null,
-            paymentMethod: !!res.paymentMethod ? [{ id: res.paymentMethod, text: res.paymentMethod }] : null,
-            currency: !!res.currency ? [{ id: res.currency, text: res.currency }] : null,
-            voucherType: !!res.voucherType ? [{ id: res.voucherType, text: res.voucherType }] : null,
-
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
     }
@@ -149,6 +145,9 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                             modelAdd.groupId = this.accountingManagement.groupId;
                             modelAdd.userCreated = this.accountingManagement.userCreated;
                             modelAdd.datetimeCreated = this.accountingManagement.datetimeCreated;
+                            modelAdd.syncStatus = this.accountingManagement.syncStatus;
+                            modelAdd.lastSyncDate = this.accountingManagement.lastSyncDate;
+                            modelAdd.reasonReject = this.accountingManagement.reasonReject;
 
                             this._progressRef.start();
                             return this._accountingRepo.updateAcctMngt(modelAdd)
@@ -227,7 +226,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         if (this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
             return;
         }
-        this.voucherSync = [{ id: this.accountingManagement.id, type: this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD' }];
+        this.voucherSync = [{ id: this.accountingManagement.id, action: this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD' }];
         this.confirmVoucherPopup.show();
     }
 

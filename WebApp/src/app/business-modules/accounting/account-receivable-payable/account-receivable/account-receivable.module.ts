@@ -5,13 +5,13 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SelectModule } from 'ng2-select';
 import { Routes, RouterModule } from '@angular/router';
 import { AccountReceivableListTrialOfficialComponent } from '../components/list-trial-official/list-trial-official-account-receivable.component';
 import { AccountReceivableListGuaranteedComponent } from '../components/list-guaranteed/list-guaranteed-account-receivable.component';
 import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
 import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
 import { AccountReceivableDetailComponent } from './detail/detail-account-receivable.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 const routing: Routes = [
@@ -40,7 +40,8 @@ const routing: Routes = [
         SharedModule,
         CommonModule,
         ReactiveFormsModule,
-        SelectModule,
+        // SelectModule,
+        NgSelectModule
     ],
     exports: [
 

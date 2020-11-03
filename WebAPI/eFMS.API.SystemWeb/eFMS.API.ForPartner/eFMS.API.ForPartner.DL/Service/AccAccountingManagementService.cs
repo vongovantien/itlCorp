@@ -35,6 +35,10 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctSettlementPayment> acctSettlementRepo;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepo;
         private readonly IActionFuncLogService actionFuncLogService;
+        private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
+        private readonly IContextBase<CatCurrencyExchange> currencyExchangeRepo;
+        private readonly IContextBase<SysNotifications> sysNotificationRepository;
+        private readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -52,7 +56,11 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<AcctSettlementPayment> acctSettlementPayment,
             IContextBase<AcctCdnote> acctCdnote,
-            IActionFuncLogService actionFuncLog
+            IActionFuncLogService actionFuncLog,
+            IContextBase<AcctSettlementPayment> settlementPayment,
+            IContextBase<CatCurrencyExchange> currencyExchange,
+            IContextBase<SysNotifications> sysNotifyRepo,
+            IContextBase<SysUserNotification> sysUsernotifyRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -68,6 +76,10 @@ namespace eFMS.API.ForPartner.DL.Service
             acctSettlementRepo = acctSettlementPayment;
             acctCdNoteRepo = acctCdnote;
             actionFuncLogService = actionFuncLog;
+            settlementPaymentRepo = settlementPayment;
+            currencyExchangeRepo = currencyExchange;
+            sysNotificationRepository = sysNotifyRepo;
+            sysUserNotificationRepository = sysUsernotifyRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -156,14 +168,18 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
 
                 var invoiceDebit = ModelInvoiceDebit(model, partner, debitCharges, _currentUser);
-                var invoiceObh = ModelInvoiceObh(model, partner, obhCharges, _currentUser);
-                
+                var invoiceObh = obhCharges.Count > 0 ? ModelInvoiceObh(model, partner, obhCharges, _currentUser) : null;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
                         HandleState hsDebit = DataContext.Add(invoiceDebit, false);
-                        HandleState hsObh = DataContext.Add(invoiceObh, false);
+                        HandleState hsObh = new HandleState();
+                        if (invoiceObh != null)
+                        {
+                            hsObh = DataContext.Add(invoiceObh, false);
+                        }
                         if (hsDebit.Success && hsObh.Success)
                         {
                             foreach (var debitCharge in debitCharges)
@@ -175,7 +191,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surchargeDebit.VoucherId = invoiceDebit.VoucherId;
                                 surchargeDebit.VoucherIddate = invoiceDebit.Date;
                                 surchargeDebit.SeriesNo = invoiceDebit.Serie;
-                                surchargeDebit.FinalExchangeRate = debitCharge.ExchangeRate;
+                                surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency); //debitCharge.ExchangeRate;
                                 surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
                                 surchargeDebit.DatetimeModified = DateTime.Now;
                                 surchargeDebit.UserModified = _currentUser.UserID;
@@ -192,7 +208,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surchargeObh.VoucherId = invoiceObh.VoucherId;
                                 surchargeObh.VoucherIddate = invoiceObh.Date;
                                 surchargeObh.SeriesNo = invoiceObh.Serie;
-                                surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate;
+                                surchargeObh.FinalExchangeRate = CalculatorExchangeRate(obhCharge.ExchangeRate, surchargeObh.ExchangeDate, surchargeObh.CurrencyId, invoiceObh.Currency); //obhCharge.ExchangeRate;
                                 surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
                                 surchargeObh.DatetimeModified = DateTime.Now;
                                 surchargeObh.UserModified = _currentUser.UserID;
@@ -308,7 +324,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
 
             var hsDeleteInvoice = DeleteInvoice(model, currentUser);
-            
+
             #region -- Ghi Log --
             var modelLog = new SysActionFuncLogModel
             {
@@ -356,8 +372,15 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = _currentUser.UserID;
                             var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+
+                            //Update Status Removed Inv For SOA (SOA synced)
+                            UpdateStatusRemovedInvForSOA(charge.Soano);
+                            //Update Status Removed Inv For Debit Note (Debit Note synced)
+                            UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
                         }
 
+                        var smSoa = acctSOARepository.SubmitChanges();
+                        var smDebitNote = acctCdNoteRepo.SubmitChanges();
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
                         trans.Commit();
@@ -375,6 +398,35 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }
         }
+
+        private HandleState UpdateStatusRemovedInvForSOA(string soaNo)
+        {
+            var hsUpdate = new HandleState();
+            var soa = acctSOARepository.Get(x => x.Soano == soaNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
+            if (soa != null)
+            {
+                soa.SyncStatus = ForPartnerConstants.STATUS_REMOVED_INV;
+                soa.UserModified = currentUser.UserID;
+                soa.DatetimeModified = DateTime.Now;
+                hsUpdate = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
+            }
+            return hsUpdate;
+        }
+
+        private HandleState UpdateStatusRemovedInvForDebitNote(string debitNo)
+        {
+            var hsUpdate = new HandleState();
+            var debitNote = acctCdNoteRepo.Get(x => x.Code == debitNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
+            if (debitNote != null)
+            {
+                debitNote.SyncStatus = ForPartnerConstants.STATUS_REMOVED_INV;
+                debitNote.UserModified = currentUser.UserID;
+                debitNote.DatetimeModified = DateTime.Now;
+                hsUpdate = acctCdNoteRepo.Update(debitNote, x => x.Id == debitNote.Id, false);
+            }
+            return hsUpdate;
+        }
+
         #endregion --- CRUD INVOICE ---
 
         #region --- PRIVATE METHOD ---
@@ -463,21 +515,23 @@ namespace eFMS.API.ForPartner.DL.Service
             return _prefixVoucher;
         }
 
-        private decimal CalculatorTotalAmount(List<ChargeInvoice> charges, string currencyInvoice)
+        private decimal? CalculatorTotalAmount(List<ChargeInvoice> charges, string currencyInvoice)
         {
-            decimal total = 0;
+            decimal? total = 0;
             if (!string.IsNullOrEmpty(currencyInvoice))
             {
                 charges.ForEach(fe =>
                 {
                     var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
-                    decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
+                    //Tỷ giá của Currency Charge so với Local
+                    var _exchangeForLocal = CalculatorExchangeRate(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
+                    decimal? exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(_exchangeForLocal, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
                     total += exchangeRate * surcharge.Total;
                 });
             }
             return total;
         }
-        
+
         private string SetAccountNoForInvoice(string partnerMode, string currencyInvoice)
         {
             if (string.IsNullOrEmpty(partnerMode))
@@ -504,6 +558,76 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             return accountNo;
         }
+
+        private decimal? CalculatorExchangeRate(decimal? exchangeRateNew, DateTime? exchangeDate, string currencyFrom, string currencyTo)
+        {
+            if (currencyFrom == currencyTo) return exchangeRateNew;
+
+            var currencyExchanges = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == exchangeDate.Value.Date).ToList();
+            if (currencyExchanges.Count == 0)
+            {
+                DateTime? maxDateCreated = currencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchanges = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
+            var exchangeFrom = currencyFrom != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyFrom).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyFrom so với VND
+            var exchangeTo = currencyTo != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyTo).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyTo so với VND
+            var _rateFromCFToCT = exchangeFrom / exchangeTo; //Tỷ giá currencyFrom so với currencyTo
+
+            var _exchangeRate = _rateFromCFToCT * exchangeRateNew;
+            return _exchangeRate;
+        }
+
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId)
+        {
+            string _link = string.Empty;
+            if (cdNoteNo.Contains("CL"))
+            {
+                _link = string.Format(@"home/operation/job-management/job-edit/{0}?tab=CDNOTE", jobId.ToString());
+            }
+            else
+            {
+                string prefixService = "home/documentation/";
+                if (cdNoteNo.Contains("IT"))
+                {
+                    prefixService += "inland-trucking";
+                }
+                else if (cdNoteNo.Contains("AE"))
+                {
+                    prefixService += "air-export";
+                }
+                else if (cdNoteNo.Contains("AI"))
+                {
+                    prefixService += "air-import";
+                }
+                else if (cdNoteNo.Contains("SEC"))
+                {
+                    prefixService += "sea-consol-export";
+                }
+                else if (cdNoteNo.Contains("SIC"))
+                {
+                    prefixService += "sea-consol-import";
+                }
+                else if (cdNoteNo.Contains("SEF"))
+                {
+                    prefixService += "sea-fcl-export";
+                }
+                else if (cdNoteNo.Contains("SIF"))
+                {
+                    prefixService += "sea-fcl-import";
+                }
+                else if (cdNoteNo.Contains("SEL"))
+                {
+                    prefixService += "sea-lcl-export";
+                }
+                else if (cdNoteNo.Contains("SIL"))
+                {
+                    prefixService += "sea-lcl-import";
+                }
+                _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
+            }
+            return _link;
+        }
+
         #endregion --- PRIVATE METHOD ---
 
         #region --- Advance ---
@@ -517,7 +641,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
 
             var hsRemoveVoucherAdvance = RemoveVoucherAdvance(voucherNo, currentUser);
-            
+
             #region -- Ghi Log --
             var modelLog = new SysActionFuncLogModel
             {
@@ -571,7 +695,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         public HandleState UpdateVoucherAdvance(VoucherAdvance model, string apiKey)
-        {            
+        {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
@@ -669,8 +793,8 @@ namespace eFMS.API.ForPartner.DL.Service
                     result = RejectPayment(model.ReferenceID, model.Reason);
                     break;
                 default:
-                    result = new HandleState((object)"Không tìm thấy loại reject");                    
-                    break ;
+                    result = new HandleState((object)"Không tìm thấy loại reject");
+                    break;
             }
 
             #region -- Ghi Log --
@@ -695,16 +819,51 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     var _id = Guid.Empty;
                     Guid.TryParse(id, out _id);
-                    var advance = acctAdvanceRepository.Get(x => x.Id == _id).FirstOrDefault();
+                    AcctAdvancePayment advance = acctAdvanceRepository.Get(x => x.Id == _id).FirstOrDefault();
                     if (advance == null) return new HandleState((object)"Không tìm thấy advance");
+
                     advance.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     advance.UserModified = currentUser.UserID;
                     advance.DatetimeModified = DateTime.Now;
                     advance.ReasonReject = reason;
+
                     HandleState hs = acctAdvanceRepository.Update(advance, x => x.Id == advance.Id, false);
                     if (hs.Success)
                     {
-                        var smAdvance = acctAdvanceRepository.SubmitChanges();
+                        HandleState smAdvance = acctAdvanceRepository.SubmitChanges();
+                        if (smAdvance.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data Advance <b style='color:#3966b6'>{0}</b>", advance.AdvanceNo);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = string.Format(@"home/accounting/advance-payment/{0}", advance.Id),
+                            };
+                            sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = advance.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            sysUserNotificationRepository.Add(sysUserNotify);
+                        }
                         trans.Commit();
                     }
                     return hs;
@@ -729,16 +888,51 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     var _id = Guid.Empty;
                     Guid.TryParse(id, out _id);
-                    var settlement = acctSettlementRepo.Get(x => x.Id == _id).FirstOrDefault();
+                    AcctSettlementPayment settlement = acctSettlementRepo.Get(x => x.Id == _id).FirstOrDefault();
                     if (settlement == null) return new HandleState((object)"Không tìm thấy settlement");
+
                     settlement.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     settlement.UserModified = currentUser.UserID;
                     settlement.DatetimeModified = DateTime.Now;
                     settlement.ReasonReject = reason;
+
                     HandleState hs = acctSettlementRepo.Update(settlement, x => x.Id == settlement.Id, false);
                     if (hs.Success)
                     {
-                        var smSettlement = acctSettlementRepo.SubmitChanges();
+                        HandleState smSettlement = acctSettlementRepo.SubmitChanges();
+                        if (smSettlement.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data Settlement <b style='color:#3966b6'>{0}</b>", settlement.SettlementNo);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = string.Format(@"home/accounting/settlement-payment/", settlement.Id),
+                            };
+                            sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = settlement.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            sysUserNotificationRepository.Add(sysUserNotify);
+                        }
                         trans.Commit();
                     }
                     return hs;
@@ -765,14 +959,49 @@ namespace eFMS.API.ForPartner.DL.Service
                     int.TryParse(id, out _id);
                     var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
                     if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
+
                     soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     soa.UserModified = currentUser.UserID;
                     soa.DatetimeModified = DateTime.Now;
                     soa.ReasonReject = reason;
+
                     HandleState hs = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
                     if (hs.Success)
                     {
-                        var smSoa = acctSOARepository.SubmitChanges();
+                        HandleState smSoa = acctSOARepository.SubmitChanges();
+                        if (smSoa.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data SOA <b style='color:#3966b6'>{0}</b>", soa.Soano);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency={1}", soa.Soano, soa.Currency)
+                            };
+                            sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = soa.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            sysUserNotificationRepository.Add(sysUserNotify);
+                        }
                         trans.Commit();
                     }
                     return hs;
@@ -799,14 +1028,49 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var cdNote = acctCdNoteRepo.Get(x => x.Id == _id).FirstOrDefault();
                     if (cdNote == null) return new HandleState((object)"Không tìm thấy CDNote");
+
                     cdNote.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     cdNote.UserModified = currentUser.UserID;
                     cdNote.DatetimeModified = DateTime.Now;
                     cdNote.ReasonReject = reason;
+
                     HandleState hs = acctCdNoteRepo.Update(cdNote, x => x.Id == cdNote.Id, false);
                     if (hs.Success)
                     {
-                        var smCdNote = acctCdNoteRepo.SubmitChanges();
+                        HandleState smCdNote = acctCdNoteRepo.SubmitChanges();
+                        if (smCdNote.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data CDNote <b style='color:#3966b6'>{0}</b>", cdNote.Code);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = GetLinkCdNote(cdNote.Code, cdNote.JobId),
+                            };
+                            var hsNotifi = sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = cdNote.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify);
+                        }
                         trans.Commit();
                     }
                     return hs;
@@ -833,14 +1097,49 @@ namespace eFMS.API.ForPartner.DL.Service
                     Guid.TryParse(id, out _id);
                     var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
                     if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
+
                     voucher.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     voucher.UserModified = currentUser.UserID;
                     voucher.DatetimeModified = DateTime.Now;
                     voucher.ReasonReject = reason;
+
                     HandleState hs = DataContext.Update(voucher, x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {
                         var sm = DataContext.SubmitChanges();
+                        if (sm.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data Voucher <b style='color:#3966b6'>{0}</b>", voucher.VoucherId);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
+                            };
+                            sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = voucher.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            sysUserNotificationRepository.Add(sysUserNotify);
+                        }
                         trans.Commit();
                     }
                     return hs;
@@ -856,7 +1155,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }
         }
-        
+
         private HandleState RejectPayment(string id, string reason)
         {
             var _idSoa = 0;
@@ -905,7 +1204,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     result = RejectCdNote(model.ReferenceID, model.Reason);
                     break;
                 case "VOUCHER":
-                    result = DeleteVoucher(model.ReferenceID);
+                    result = DeleteVoucher(model.ReferenceID, model.Reason);
                     break;
                 default:
                     result = new HandleState((object)"Không tìm thấy loại remove voucher");
@@ -926,7 +1225,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return result;
         }
 
-        private HandleState DeleteVoucher(string id)
+        private HandleState DeleteVoucher(string id, string reason)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -939,6 +1238,76 @@ namespace eFMS.API.ForPartner.DL.Service
                     HandleState hs = DataContext.Delete(x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {
+                        var charges = surchargeRepo.Get(x => x.AcctManagementId == voucher.Id);
+                        foreach (CsShipmentSurcharge charge in charges)
+                        {
+                            charge.AcctManagementId = null;
+                            charge.VoucherId = null;
+                            charge.VoucherIddate = null;
+                            charge.InvoiceNo = null;
+                            charge.InvoiceDate = null;
+                            charge.SeriesNo = null;
+                            charge.DatetimeModified = DateTime.Now;
+                            charge.UserModified = currentUser.UserID;
+                            surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                        }
+
+                        // Cập nhật Settlement: VoucherNo, VoucherDate
+                        if (voucher.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE)
+                        {
+                            List<string> listSettlementCode = charges.Select(x => x.SettlementCode).Distinct().ToList();
+                            if (listSettlementCode.Count() > 0)
+                            {
+                                foreach (string code in listSettlementCode)
+                                {
+                                    AcctSettlementPayment settlement = settlementPaymentRepo.Get(x => x.SettlementNo == code).FirstOrDefault();
+                                    if (settlement != null)
+                                    {
+                                        settlement.VoucherDate = null;
+                                        settlement.VoucherNo = null;
+                                        settlement.UserModified = currentUser.UserID;
+                                        settlement.DatetimeModified = DateTime.Now;
+                                    }
+                                    settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id, false);
+                                }
+                            }
+                        }
+
+                        string title = string.Format(@"Accountant Removed Data Voucher <b style='color:#3966b6'>{0}</b>", voucher.VoucherId);
+                        SysNotifications sysNotify = new SysNotifications
+                        {
+                            Id = Guid.NewGuid(),
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            Type = "User",
+                            Title = title,
+                            IsClosed = false,
+                            IsRead = false,
+                            Description = reason,
+                            UserCreated = currentUser.UserID,
+                            UserModified = currentUser.UserID,
+                            Action = "Detail",
+                            ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
+                        };
+                        var hsNotifi = sysNotificationRepository.Add(sysNotify, false);
+
+                        SysUserNotification sysUserNotify = new SysUserNotification
+                        {
+                            Id = Guid.NewGuid(),
+                            UserId = voucher.UserCreated,
+                            Status = "New",
+                            NotitficationId = sysNotify.Id,
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            UserCreated = currentUser.UserID,
+                            UserModified = currentUser.UserID,
+                        };
+                        var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify, false);
+
+                        var smNotifi = sysNotificationRepository.SubmitChanges();
+                        var smUserNotifi = sysUserNotificationRepository.SubmitChanges();
+                        var smSurcharge = surchargeRepo.SubmitChanges();
+                        var smSettle = settlementPaymentRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
                         trans.Commit();
                     }

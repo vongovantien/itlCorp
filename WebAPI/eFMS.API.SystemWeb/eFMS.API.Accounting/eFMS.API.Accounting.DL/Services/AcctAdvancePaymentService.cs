@@ -43,6 +43,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         readonly IUserBaseService userBaseService;
+        readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
 
@@ -64,7 +65,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartner> catPartner,
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
-            ICurrencyExchangeService currencyExchange, IStringLocalizer<LanguageSub> localizer,
+            IContextBase<SysSentEmailHistory> sentEmailHistory,
+            ICurrencyExchangeService currencyExchange, 
+            IStringLocalizer<LanguageSub> localizer,
             IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
@@ -86,6 +89,7 @@ namespace eFMS.API.Accounting.DL.Services
             currencyExchangeService = currencyExchange;
             userBaseService = userBase;
             stringLocalizer = localizer;
+            sentEmailHistoryRepo = sentEmailHistory;
         }
 
         #region --- LIST & PAGING ---
@@ -316,6 +320,7 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = advancePayment.SyncStatus,
                            UserCreatedName = Ucgrp.Username,
                            UserModifiedName = Umgrp.Username,
+                           ReasonReject = advancePayment.ReasonReject
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -340,7 +345,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.LastSyncDate,
                 x.SyncStatus,
                 x.UserCreatedName,
-                x.UserModifiedName
+                x.UserModifiedName,
+                x.ReasonReject
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -366,7 +372,8 @@ namespace eFMS.API.Accounting.DL.Services
                 LastSyncDate = s.Key.LastSyncDate,
                 SyncStatus = s.Key.SyncStatus,
                 UserCreatedName = s.Key.UserCreatedName,
-                UserModifiedName = s.Key.UserModifiedName
+                UserModifiedName = s.Key.UserModifiedName,
+                ReasonReject = s.Key.ReasonReject
             });
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
@@ -2191,6 +2198,21 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -2244,6 +2266,21 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -2298,6 +2335,21 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 

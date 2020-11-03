@@ -1,6 +1,7 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 
 import { PreviousRouteService, JwtService, SortService, ApiService, PagingService, DataService, SEOService } from '@services';
+import { SignalRService } from './signalr.service';
 @NgModule({
     declarations: [],
     imports: [
@@ -13,7 +14,8 @@ import { PreviousRouteService, JwtService, SortService, ApiService, PagingServic
         DataService,
         PreviousRouteService,
         JwtService,
-        SEOService
+        SEOService,
+        SignalRService
     ],
 })
 export class ServiceModule {

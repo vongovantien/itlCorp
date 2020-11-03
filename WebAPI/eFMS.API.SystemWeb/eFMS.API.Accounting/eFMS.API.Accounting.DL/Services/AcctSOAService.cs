@@ -1478,7 +1478,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  UserModified = umodifies.Username,
                                  PaymentStatus = s.PaymentStatus,
                                  SyncStatus = s.SyncStatus,
-                                 LastSyncDate = s.LastSyncDate
+                                 LastSyncDate = s.LastSyncDate,
+                                 ReasonReject = s.ReasonReject
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
@@ -1672,7 +1673,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  PaymentStatus = s.PaymentStatus,
                                  PaymentDueDate = s.PaymentDueDate,
                                  SyncStatus = s.SyncStatus,
-                                 LastSyncDate = s.LastSyncDate
+                                 LastSyncDate = s.LastSyncDate,
+                                 ReasonReject = s.ReasonReject
                              };
             var result = resultData.FirstOrDefault();
             if (result != null)

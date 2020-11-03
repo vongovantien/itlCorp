@@ -51,15 +51,15 @@
                                             <td>
                                                 <span>{{soa.shipment}}</span>
                                             </td>
-                                            <td>
+                                            <td class="text-right">
                                                 <span>{{soa.creditAmount | number :'.0-2'}}
                                                     {{soa.currency}}</span>
                                             </td>
-                                            <td>
+                                            <td class="text-right">
                                                 <span>{{soa.debitAmount | number: '.0-2'}}
                                                     {{soa.currency}}</span>
                                             </td>
-                                            <td>
+                                            <td class="text-right">
                                                 <span *ngIf="soa.totalAmount >= 0">{{soa.totalAmount | number: '.0-2' }}
                                                     {{soa.currency}}</span>
                                                 <span
@@ -92,7 +92,8 @@
                                                 <span *ngSwitchCase="'Synced'" class="text-success">
                                                     {{soa.syncStatus}}</span>
                                                 <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                    {{soa.syncStatus}}</span>
+                                                    {{soa.syncStatus}}{{soa.reasonReject ? ' - ' + soa.reasonReject : ''}}
+                                                </span>
                                                 <span *ngSwitchDefault>
                                                     {{soa.syncStatus}}
                                                 </span>

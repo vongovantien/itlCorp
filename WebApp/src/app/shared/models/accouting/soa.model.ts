@@ -38,6 +38,7 @@ export class SOA {
     paymentStatus: string = '';
     lastSyncDate: string = '';
     syncStatus: string = '';
+    reasonReject: string = '';
 
     constructor(data?: any) {
         const self = this;

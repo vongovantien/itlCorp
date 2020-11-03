@@ -57,5 +57,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string Currency { get; set; }
         public decimal? ExchangeRate { get; set; }
         public string Note { get; set; }
+        public string ReasonReject { get; set; }
     }
 }

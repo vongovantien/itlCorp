@@ -32,7 +32,8 @@
                                             </span>
                                         </button>
                                         <button class="btn btn-info m-btn--icon m-btn--uppercase float-right"
-                                            (click)="syncBravo()" title="Sync to accountant system">
+                                            (click)="syncBravo()" title="Sync to accountant system"
+                                            *ngIf="menuSpecialPermission | async | specialPermission:'SyncAcctSystem'">
                                             <span>
                                                 <i class="la la-cloud-upload"></i>
                                                 <span>
@@ -101,7 +102,7 @@
                                                 <a (click)="viewDetail(settlePayment)">{{settlePayment.settlementNo}}
                                                 </a>
                                             </td>
-                                            <td>{{settlePayment.amount | number: '.0-3'}}</td>
+                                            <td class="text-right">{{settlePayment.amount | number: '.0-3'}}</td>
                                             <td>{{settlePayment.settlementCurrency}}</td>
                                             <td class="text-info">{{settlePayment.requesterName}}</td>
                                             <td>{{settlePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
@@ -130,7 +131,7 @@
                                                     {{settlePayment.syncStatus}}
                                                 </div>
                                                 <div *ngSwitchDefault class="text-danger">
-                                                    {{settlePayment.syncStatus}}
+                                                    {{settlePayment.syncStatus}}{{settlePayment.reasonReject ? ' - ' +settlePayment.reasonReject : ''}}
                                                 </div>
                                             </td>
                                         </tr>

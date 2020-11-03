@@ -63,17 +63,16 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Payment Method</label>
-                                <ng-select #pm [items]="paymentMethods" [allowClear]="true"
-                                    (opened)="closeOtherSelects(pm)" formControlName="paymentMethod" placeholder="Cash">
+                                <ng-select [items]="paymentMethods" formControlName="paymentMethod" placeholder="Cash"
+                                    class="custom">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Voucher Type</label>
-                                <ng-select #v [items]="voucherTypes" [allowClear]="true" (opened)="closeOtherSelects(v)"
-                                    formControlName="voucherType" placeholder="Select Type"
-                                    (selected)="selectedVoucherType($event)">
+                                <ng-select [items]="voucherTypes" formControlName="voucherType"
+                                    placeholder="Select Type" class="custom" (change)="selectedVoucherType($event)">
                                 </ng-select>
                             </div>
                         </div>
@@ -98,8 +97,8 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Currency</label>
-                                <ng-select #c [items]="listCurrency | async" [allowClear]="true"
-                                    (opened)="closeOtherSelects(c)" formControlName="currency" placeholder="VND">
+                                <ng-select [items]="listCurrency | async" formControlName="currency" placeholder="VND"
+                                    class="custom" bindLabel="id" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>

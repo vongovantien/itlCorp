@@ -60,6 +60,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Status', field: 'active', sortable: true },
             { title: 'Office', field: 'officeNameEn', sortable: true },
             { title: 'Company', field: 'companyNameAbbr', sortable: true },
+            { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
         ];
     }
 
@@ -109,18 +110,20 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
         this.formContractPopup.contractType.setValue([<CommonInterface.INg2Select>{ id: 'Trial', text: 'Trial' }]);
         this.formContractPopup.currencyId.setValue([<CommonInterface.INg2Select>{ id: 'VND', text: 'VND' }]);
+        this.formContractPopup.baseOn.setValue([<CommonInterface.INg2Select>{ id: "Invoice Date", text: "Invoice Date" }]);
 
         if (this.type === 'Agent') {
             this.formContractPopup.vas.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
             this.formContractPopup.saleService.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
             this.formContractPopup.type = this.type;
-
         }
 
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
+        this.formContractPopup.effectiveDate.setValue(null);
 
         this.formContractPopup.show();
+
     }
 
     getDetailContract(id: string, index: number) {
@@ -135,6 +138,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 .subscribe(
                     (res: Contract) => {
                         if (!!res) {
+
                             this.selectedContract = res;
                             this.formContractPopup.idContract = this.selectedContract.id;
                             this.formContractPopup.selectedContract = res;

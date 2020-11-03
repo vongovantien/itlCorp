@@ -46,18 +46,23 @@
                                 <div class="m--margin-top-5">
                                     <span class="font-weight-bold">Sync Status: </span>
                                     <span [ngSwitch]="CdNoteDetail.syncStatus">
-                                        <span *ngSwitchCase="'Synced'" class="text-success m--font-bolder">
-                                            {{CdNoteDetail.syncStatus}}</span>
-                                        <span *ngSwitchCase="'Rejected'" class="text-danger m--font-bolder">
-                                            {{CdNoteDetail.syncStatus}}</span>
-                                        <span *ngSwitchDefault>
-                                            {{CdNoteDetail.syncStatus}}
-                                        </span>
+                                        <span *ngSwitchCase="'Synced'"
+                                            class="m--margin-left-5 m-badge m-badge--success m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchCase="'Rejected'"
+                                            class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchCase="'Removed Inv'"
+                                            class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
+                                        <span *ngSwitchDefault
+                                            class="m--margin-left-5 m-badge m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
                                     </span>
                                 </div>
                                 <div class="m--margin-top-5">
                                     <span class="font-weight-bold">Last Sync: </span>
                                     <span>{{CdNoteDetail.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                </div>
+                                <div class="m--margin-top-5">
+                                    <span class="font-weight-bold">Reason Reject: </span>
+                                    <span>{{CdNoteDetail.reasonReject}}</span>
                                 </div>
                                 <div class="m--margin-top-5">
                                     <span class="font-weight-bold"> Package Quantity: </span>
@@ -123,11 +128,11 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <span class="font-weight-bold"> Currency: </span>
-                                            {{ CdNoteDetail.currency }}
+                                            <span class="text-info">{{ CdNoteDetail.currency }}</span>
                                         </div>
                                         <div class="col-md-6">
                                             <span class="font-weight-bold"> ExchangeRate: </span>
-                                            {{ CdNoteDetail.exchangeRate }}
+                                            {{ CdNoteDetail.exchangeRate | number:'1.0-3'}}
                                         </div>
                                     </div>
                                 </div>
@@ -136,9 +141,8 @@
                                     {{CdNoteDetail.soaNo}}
                                 </div>
                                 <div class="m--margin-top-5">
-                                    <span class="font-weight-bold">Locked: </span>
-                                    <span
-                                        [ngClass]="CdNoteDetail.isLoocked ? 'm--font-danger' : ''">{{CdNoteDetail.isLoocked ? 'Yes' : 'No'}}</span>
+                                    <span class="font-weight-bold">Note: </span>
+                                    <span>{{CdNoteDetail.note}}</span>
                                 </div>
                             </div>
                         </div>
@@ -277,7 +281,8 @@
                     </span>
                 </button>
                 <button class="btn btn-success  m-btn--icon m-btn--uppercase"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced'" (click)="openPopupEdit()">
+                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv'"
+                    (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
                         <span>
@@ -286,7 +291,8 @@
                     </span>
                 </button>
                 <button class="btn btn-info  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced'" title="Send to Accountant">
+                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv' && (CdNoteDetail.cdNote.type === 'DEBIT' || CdNoteDetail.cdNote.type === 'INVOICE' || (CdNoteDetail.cdNote.currencyId == 'VND' && CdNoteDetail.cdNote.type == 'CREDIT'))"
+                    title="Send to Accountant">
                     <span>
                         <i class="la la-cloud-upload"></i>
                         <span>
@@ -316,3 +322,5 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<payment-method-popup (onApply)="onApplyPaymentMethod($event)"></payment-method-popup>

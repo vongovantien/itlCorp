@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { NgProgress } from "@ngx-progressbar/core";
 import { NgxSpinnerService } from "ngx-spinner";
 import { AccountingConstants } from "@constants";
+import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -26,6 +27,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
     @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(ShareBussinessPaymentMethodPopupComponent, { static: false }) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
 
     jobId: string = null;
     cdNote: string = null;
@@ -44,6 +46,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     dataReport: any = null;
 
     labelDetail: any = {};
+    paymentMethodSelected: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -79,9 +82,12 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             volume: 'Volume',
             packageQty: 'Package Quantity',
             soa: 'SOA',
-            locked: 'Locked',
+            note: 'Note',
             syncStatus: 'Sync Status',
-            lastSync: 'Last Sync'
+            lastSync: 'Last Sync',
+            currency: 'Currency',
+            exchangeRate: 'ExchangeRate',
+            reasonReject: 'Reason Reject'
         };
 
         this.headers = [
@@ -269,7 +275,6 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     get scr() {
-        // return this.sanitizer.bypassSecurityTrustResourceUrl("http://localhost:53717");
         return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
     }
 
@@ -287,15 +292,28 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         return true;
     }
 
-    showConfirmed() {
-        // this._toastService.success("Tính năng đang phát triển");
+    hidePreview() {
+        this.popupReport.hide();
+    }
+
+    confirmSendToAcc() {
         this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
         this.confirmCdNotePopup.show();
     }
 
-    hidePreview() {
-        this.popupReport.hide();
+    showConfirmed() {
+        if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.cdNote.currencyId === 'VND') {
+            this.paymentMethodPopupComponent.show();
+        } else {
+            this.paymentMethodSelected = '';
+            this.confirmSendToAcc();
+        }
+    }
+
+    onApplyPaymentMethod($event) {
+        this.paymentMethodSelected = $event;
+        this.confirmSendToAcc();
     }
 
     onConfirmCdNote() {
@@ -312,7 +330,8 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
             type: this.CdNoteDetail.cdNote.type,
-            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
+            action: this.CdNoteDetail.cdNote.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+            paymentMethod: this.paymentMethodSelected
         };
         cdNoteIds.push(cdNoteId);
         this._spinner.show();

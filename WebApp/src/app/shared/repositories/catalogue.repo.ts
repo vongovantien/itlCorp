@@ -330,6 +330,14 @@ export class CatalogueRepo {
             );
     }
 
+    arConfirmed(partnerId: string, contractId: string, partnerType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/ARConfirmed`, { partnerId: partnerId, contractId: contractId, partnerType: partnerType })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+
 
     uploadFileContract(partnerId: string, contractId: string, body: any) {
         return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(

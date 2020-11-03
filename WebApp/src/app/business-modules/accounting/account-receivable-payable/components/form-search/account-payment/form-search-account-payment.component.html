@@ -61,17 +61,16 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="">Overdue Days</label>
-                                <ng-select #days (opened)="closeOtherSelects(days)" [items]="overDueDays"
-                                    [allowClear]="false" formControlName="overdueDate">
+                                <ng-select [items]="overDueDays" formControlName="overdueDate" class="custom"
+                                    bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="">Payment Status</label>
-                                <ng-select #status (opened)="closeOtherSelects(status)" [items]="payments"
-                                    (selected)="selelectedStatus($event)" [allowClear]="false"
-                                    formControlName="paymentStatus" [multiple]="true">
+                                <ng-select [items]="payments" formControlName="paymentStatus" class="custom"
+                                    (add)="selelectedStatus($event)" [multiple]="true">
                                 </ng-select>
                             </div>
                         </div>

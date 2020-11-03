@@ -118,7 +118,8 @@
                             </td>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }"
+                                    [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
                                     <ng-container *ngIf="!!charge.creditNo 
                                         || !!charge.debitNo 
                                         || !!charge.settlementCode
@@ -129,8 +130,7 @@
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" readonly disabled
-                                            [(ngModel)]="charge.receiverName"
-                                            [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
+                                            [(ngModel)]="charge.receiverName">
                                     </ng-container>
                                     <ng-template #partnerTemplate>
                                         <input type="text" class="dropdown-toggle form-control" readonly

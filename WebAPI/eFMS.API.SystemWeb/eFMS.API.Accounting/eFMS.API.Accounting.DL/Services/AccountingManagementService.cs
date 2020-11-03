@@ -44,6 +44,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctSoa> soaRepo;
         private readonly IContextBase<AccAccountingPayment> accountingPaymentRepository;
         private readonly IContextBase<CatContract> catContractRepository;
+        private readonly IContextBase<SysNotifications> sysNotifyRepository;
+        private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
 
 
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
@@ -68,6 +70,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysEmployee> employee,
             IContextBase<AccAccountingPayment> accountingPaymentRepo,
             IContextBase<CatContract> catContractRepo,
+            IContextBase<SysNotifications> sysNotifyRepo,
+            IContextBase<SysUserNotification> sysUserNotifyRepo,
 
             IContextBase<AcctSoa> soa) : base(repository, mapper)
         {
@@ -92,6 +96,9 @@ namespace eFMS.API.Accounting.DL.Services
             soaRepo = soa;
             accountingPaymentRepository = accountingPaymentRepo;
             catContractRepository = catContractRepo;
+            sysUserNotifyRepository = sysUserNotifyRepo;
+            sysNotifyRepository = sysNotifyRepo;
+
         }
 
         #region --- DELETE ---
@@ -102,6 +109,10 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     AccAccountingManagement data = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                    if (data == null)
+                    {
+                        return new HandleState((object)"Data not found");
+                    }
                     if (data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID || data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
                     {
                         return new HandleState((object)data.InvoiceNoReal + " Had payment");
@@ -117,23 +128,12 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (CsShipmentSurcharge item in charges)
                         {
                             item.AcctManagementId = null;
-                            if (data.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
-                            {
-                                item.VoucherId = null;
-                                item.VoucherIddate = null;
-                                item.InvoiceNo = null;
-                                item.InvoiceDate = null;
-                                item.SeriesNo = null;
-                            }
-                            if (data.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
-                            {
-                                item.InvoiceNo = null;
-                                item.InvoiceDate = null;
-                                item.VoucherId = null;
-                                item.VoucherIddate = null;
-                                item.FinalExchangeRate = null;
-                            }
-
+                            item.InvoiceNo = null;
+                            item.InvoiceDate = null;
+                            item.VoucherId = null;
+                            item.VoucherIddate = null;
+                            item.SeriesNo = null;
+                            
                             item.AmountVnd = item.VatAmountVnd = null;
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
@@ -327,7 +327,8 @@ namespace eFMS.API.Accounting.DL.Services
                            PaymentDueDate = acc.PaymentDueDate,
                            LastSyncDate = acc.LastSyncDate,
                            SyncStatus = acc.SyncStatus,
-                           ReferenceNo = acc.ReferenceNo
+                           ReferenceNo = acc.ReferenceNo,
+                           ReasonReject = acc.ReasonReject
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
@@ -987,6 +988,44 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = DataContext.Add(accounting, false);
                         if (hs.Success)
                         {
+                            string _Type = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "Voucher" : "VAT Invoice");
+                            string _Ref = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? accounting.VoucherId : accounting.InvoiceNoTempt);
+                            string description = string.Format(@"[Type] <b style='color:#3966b6'>[RefNo]</b> has been created");
+                            description = description.Replace("[Type]", _Type);
+                            description = description.Replace("[RefNo]", _Ref);
+                            // Add Notification
+                            SysNotifications sysNotification = new SysNotifications {
+                                Id = Guid.NewGuid(),
+                                Title = description,
+                                Description = description,
+                                Type = "User",
+                                UserCreated = currentUser.UserID,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = "home/accounting/management/" + (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "voucher" : "vat-invoice/") + accounting.Id,
+                                IsClosed = false,
+                                IsRead = false
+                            };
+
+                            HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification);
+                            if(hsSysNotification.Success)
+                            {
+                                SysUserNotification userNotify = new SysUserNotification {
+                                    Id = Guid.NewGuid(),
+                                    DatetimeCreated = DateTime.Now,
+                                    DatetimeModified = DateTime.Now,
+                                    Status = "New",
+                                    NotitficationId = sysNotification.Id,
+                                    UserId = currentUser.UserID,
+                                    UserCreated = currentUser.UserID,
+                                    UserModified = currentUser.UserID,
+                                };
+
+                                sysUserNotifyRepository.Add(userNotify);
+                            }
+
                             List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
 
                             foreach (ChargeOfAccountingManagementModel chargeOfAcct in chargesOfAcct)
@@ -1053,6 +1092,7 @@ namespace eFMS.API.Accounting.DL.Services
                             surchargeRepo.SubmitChanges();
                             soaRepo.SubmitChanges();
                             DataContext.SubmitChanges();
+                            sysUserNotifyRepository.SubmitChanges();
                             trans.Commit();
                         }
                         return hs;

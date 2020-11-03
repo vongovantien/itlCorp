@@ -34,6 +34,7 @@ namespace CommonInterface {
         page: number;
         size: number;
         totalItems: number;
+        [key: string]: any;
     }
 
     export interface IParamPaging {

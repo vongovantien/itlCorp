@@ -3,7 +3,7 @@
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
             [routerLink]="'/home/accounting/statement-of-account/edit'"
             [queryParams]="{ no: soa.soano, currency: 'VND' }"
-            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part' && soa.syncStatus !== 'Synced' ">
+            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part' && soa.syncStatus !== 'Synced' && soa.syncStatus !== 'Removed Inv'">
             <span>
                 <i class="la la-edit"></i>
                 <span>
@@ -12,7 +12,8 @@
             </span>
         </button>
         <button class="btn btn-info m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-            *ngIf="soa.syncStatus !== 'Synced'" title="Send to Accountant">
+            *ngIf="soa.syncStatus !== 'Synced' && soa.syncStatus !== 'Removed Inv' && (soa.type === 'Debit' || (soa.type === 'Credit' && soa.currency === 'VND'))"
+            title="Send to Accountant">
             <span>
                 <i class="la la-cloud-upload"></i>
                 <span>
@@ -138,7 +139,13 @@
                             class="m--margin-left-5 m-badge m-badge--success m-badge--wide">{{soa.syncStatus}}</span>
                         <span *ngSwitchCase="'Rejected'"
                             class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{soa.syncStatus}}</span>
+                        <span *ngSwitchCase="'Removed Inv'"
+                            class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{soa.syncStatus}}</span>
                         <span *ngSwitchDefault class="m--margin-left-5">{{soa.syncStatus}}</span>
+                    </div>
+                    <div class="col-lg-4 m--margin-bottom-10">
+                        <span class="m--font-bolder">Reason Reject:</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.reasonReject}}</span>
                     </div>
                 </div>
             </div>
@@ -344,3 +351,4 @@
 </ng-container>
 
 <confirm-popup (onSubmit)="onConfirmSoa()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<soa-payment-method-popup (onApply)="onApplyPaymentMethod($event)"></soa-payment-method-popup>

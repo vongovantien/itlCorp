@@ -61,6 +61,9 @@
                                     {{item.active ? 'Active' : 'Inactive'}}</td>
                                 <td>{{item.officeNameAbbr}}</td>
                                 <td>{{item.companyNameEn}}</td>
+                                <td>
+                                    <app-switch disabled [(toggle)]="item.arconfirmed" size="sm"></app-switch>
+                                </td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(isLoading) && !contracts.length"></tr>

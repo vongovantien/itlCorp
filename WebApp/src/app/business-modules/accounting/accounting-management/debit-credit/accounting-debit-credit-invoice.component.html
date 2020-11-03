@@ -59,7 +59,7 @@
                                                 <td>
                                                     {{cdNote.partnerName}}
                                                 </td>
-                                                <td>{{ cdNote.total | number: '.0-3'}}</td>
+                                                <td class="text-right">{{ cdNote.total | number: '.0-3'}}</td>
                                                 <td>{{ cdNote.currency}}</td>
                                                 <td>{{ cdNote.issuedDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td class="text-success">{{ cdNote.creator}}</td>
@@ -73,6 +73,18 @@
                                                         </ng-container>
                                                     </ng-container>
                                                 </td>
+                                                <td [ngSwitch]="cdNote.syncStatus">
+                                                    <span *ngSwitchCase="'Synced'" class="text-success">
+                                                        {{cdNote.syncStatus}}</span>
+                                                    <span *ngSwitchCase="'Rejected'" class="text-danger">
+                                                        {{cdNote.syncStatus}}</span>
+                                                    <span *ngSwitchDefault>
+                                                        {{cdNote.syncStatus}}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{cdNote.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                                </td>
                                             </tr>
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!isLoading && !cdNotes.length"
@@ -82,31 +94,8 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="pagination-nav">
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="tatable__pager-size">
-                                            <div class="select-box">
-                                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                                    (change)="selectPageSize(pageSize)" name="pagesize">
-                                                    <ng-container
-                                                        *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                        <option [ngValue]="item">{{item}} line / screen</option>
-                                                    </ng-container>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                        <div class="float-right">
-                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                                [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                                [(ngModel)]="page" [maxSize]="10">
-                                            </pagination>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                                (onChange)="updatePagingData($event)"></app-pagination>
                         </div>
                     </div>
                 </tab>

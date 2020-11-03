@@ -75,9 +75,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
     updateFormInvoice(res: AccAccountingManagementModel) {
         const formData: AccAccountingManagementModel | any = {
             date: !!res.date ? { startDate: new Date(res.date), endDate: new Date(res.date) } : null,
-            paymentMethod: !!res.paymentMethod ? [{ id: res.paymentMethod, text: res.paymentMethod }] : null,
-            currency: !!res.currency ? [{ id: res.currency, text: res.currency }] : null,
-
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
 
@@ -120,7 +117,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                             return of({ data: null, message: 'Voucher ID has been existed', status: false });
                         } else {
                             const modelAdd: AccAccountingManagementModel = this.onSubmitData();
-                            console.log(modelAdd);
 
                             modelAdd.charges = [...this.listChargeComponent.charges];
 

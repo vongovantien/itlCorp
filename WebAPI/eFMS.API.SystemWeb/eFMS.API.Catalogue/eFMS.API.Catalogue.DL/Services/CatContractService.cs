@@ -16,7 +16,6 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,6 +34,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         private readonly IContextBase<CsTransaction> transactionRepository;
         private readonly IContextBase<OpsTransaction> opsRepository;
+        private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IOptions<ApiUrl> ApiUrl;
 
@@ -53,6 +53,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatDepartment> catDepartmentRepo,
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<OpsTransaction> opsRepo,
+            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -68,6 +69,7 @@ namespace eFMS.API.Catalogue.DL.Services
             transactionRepository = transactionRepo;
             opsRepository = opsRepo;
             ApiUrl = apiurl;
+            sendEmailHistoryRepository = sendEmailHistoryRepo;
 
         }
 
@@ -162,20 +164,20 @@ namespace eFMS.API.Catalogue.DL.Services
             DataContext.SubmitChanges();
             if (hs.Success)
             {
-                if (entity.IsRequestApproval == true)
-                {
-                    var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
-                    CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
-                    model.ContractService = entity.SaleService;
+                //if (entity.IsRequestApproval == true)
+                //{
+                var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
+                CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
+                model.ContractService = entity.SaleService;
 
-                    model.ContractService = GetContractServicesName(model.ContractService);
+                model.ContractService = GetContractServicesName(model.ContractService);
 
-                    model.ContractType = entity.ContractType;
-                    model.ContractNo = entity.ContractNo;
-                    model.SalesmanId = entity.SaleManId;
-                    model.UserCreatedContract = contract.UserCreated;
-                    SendMailActiveSuccess(model, string.Empty);
-                }
+                model.ContractType = entity.ContractType;
+                model.ContractNo = entity.ContractNo;
+                model.SalesmanId = entity.SaleManId;
+                model.UserCreatedContract = contract.UserCreated;
+                SendMailActiveSuccess(model, string.Empty);
+                //}
                 ClearCache();
                 Get();
             }
@@ -213,8 +215,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         case "IT":
                             ContractServicesName += "Trucking; ";
                             break;
+                        case "SFI":
+                            ContractServicesName += "Sea FCL Import; ";
+                            break;
                         default:
-                            ContractServicesName = "Air Export; Air Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking ";
+                            ContractServicesName = "Air Export; Air Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
                             break;
                     }
                 }
@@ -365,6 +370,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     objUpdate.CreditLimitRate = credit.CreditRate;
                 }
                 isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
+                objUpdate.DatetimeModified = DateTime.Now;
             }
             if (isUpdateDone.Success)
             {
@@ -764,6 +770,10 @@ namespace eFMS.API.Catalogue.DL.Services
             string Title = string.Empty;
             string Name = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
+            List<string> lstCc = new List<string>
+            {
+            };
+            bool resultSendEmail = false;
             if (type == "active")
             {
                 if (partner.PartnerType == "Customer")
@@ -791,15 +801,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     + linkEn + "</br>" + linkVn + "</br> </br>" +
                     "<i> Thanks and Regards </i>" + "</br> </br>" +
                     "eFMS System </div>");
-                List<string> lstCc = new List<string>
-                {
-                };
+           
                 if (lstTo.Any())
                 {
                     lstCc = lstTo;
                 }
                 lstCc.Add(objInfoSalesman?.Email);
-                SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
+                resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
             }
             else
             {
@@ -825,12 +833,25 @@ namespace eFMS.API.Catalogue.DL.Services
                   "<i> Thanks and Regards </i>" + "</br> </br>" +
                   "eFMS System </div>");
 
-                List<string> lstCc = new List<string>
-                {
-                };
                 lstCc.Add(objInfoSalesman?.Email);
-                SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
+                //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
+                resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
+               
             }
+
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", lstTo),
+                Ccs = string.Join("; ", lstCc),
+                Subject = subject,
+                Sent = resultSendEmail,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+
+            var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+            var hsSm = sendEmailHistoryRepository.SubmitChanges();
+
         }
 
         public bool SendMailRejectComment(string partnerId, string contractId, string comment, string partnerType)
@@ -878,7 +899,106 @@ namespace eFMS.API.Catalogue.DL.Services
 
             lstTo.Add(salesmanObj?.Email);
 
-            return SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", lstTo),
+                Ccs = string.Join("; ", lstCc),
+                Subject = subject,
+                Sent = result,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+            var hsSm = sendEmailHistoryRepository.SubmitChanges();
+            return result;
+
+        }
+
+        public bool SendMailARConfirmed(string partnerId, string contractId, string partnerType)
+        {
+            string saleService = string.Empty;
+            var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
+            var contract = DataContext.Get(x => x.Id == new Guid(contractId)).FirstOrDefault();
+            string employeeId = sysUserRepository.Get(x => x.Id == contract.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
+            string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
+            saleService = GetContractServicesName(contract.SaleService);
+            contract.Arconfirmed = true;
+            contract.DatetimeModified = DateTime.Now;
+            var hs  = DataContext.Update(contract, x => x.Id == new Guid( contractId),false);
+            DataContext.SubmitChanges();
+            string url = string.Empty;
+
+            List<string> lstBCc = ListMailCC();
+            List<string> lstTo = new List<string>();
+
+            // info send to and cc
+            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+
+            if (listEmailAR != null && listEmailAR.Any())
+            {
+                lstTo = listEmailAR.Split(";").ToList();
+            }
+
+            string linkVn = string.Empty;
+            string linkEn = string.Empty;
+            string subject = string.Empty;
+            string body = string.Empty;
+            string Title = string.Empty;
+            string Name = string.Empty;
+
+            if (partnerType == "Customer")
+            {
+                url = "home/commercial/customer/";
+            }
+            else
+            {
+                url = "home/commercial/agent/";
+            }
+
+            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
+
+
+            linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+            linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            subject = "eFMS - Partner Confirm Credit Term Request From " + FullNameCreatetor;
+
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+
+              "<i> You have a Partner Confirm Credit Term request From " + FullNameCreatetor + " as info below </i> </br>" +
+              "<i> Bạn có một yêu cầu xác duyệt đối tượng từ " + FullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+
+              "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+              "\t  Partner Name  / <i> Tên đối tượng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+              "\t  Partner Type  / <i> Loại Partner:</i> " + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
+              "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+              "\t  Address / <i> Địa chỉ: </i>" + "<b>" + partner.AddressVn + "</b>" + "</br>" +
+              "\t  Requestor / <i> Người yêu cầu: </i>" + "<b>" + partner.AddressVn + "</b>" + "</br>" +
+
+              "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + saleService + "</b>" + "</br>" +
+              "\t  Agreement  type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
+              "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br></br>" +
+
+              linkEn + "</br>" + linkVn + "</br> </br>" +
+              "<i> Thanks and Regards </i>" + "</br> </br>" +
+              "eFMS System </div>");
+            bool result =  SendMail.Send(subject, body, lstTo, null, null, lstBCc);
+
+            var logSendMail = new SysSentEmailHistory
+            {
+                Receivers = string.Join("; ", lstTo),
+                Ccs = string.Join("; ", lstBCc),
+                Subject = subject,
+                Sent = result,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+            var hsSm = sendEmailHistoryRepository.SubmitChanges();
+            return result;
         }
 
         private List<string> ListMailCC()
@@ -890,7 +1010,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 "andy.hoa@itlvn.com",
                 "cara.oanh@itlvn.com",
                 "lynne.loc@itlvn.com",
-                "samuel.an@logtechub.com"
+                "samuel.an@logtechub.com",
+                "kenny.thuong@itlvn.com",
             };
             return lstCc;
         }

@@ -13,13 +13,14 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string OfficeCode { get; set; }
         public DateTime? DocDate { get; set; }
         public string ReferenceNo { get; set; }
-        public string CustomerModel { get => "External"; set => CustomerModel = value; }
+        public string CustomerMode { get => "Internal"; set => CustomerMode = value; }
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
         public string CurrencyCode { get => "VND"; set => CurrencyCode = value; }
         public decimal ExchangeRate { get; set; }
         public string Description0 { get; set; }
         public string LocalBranchCode { get; set; }
+        public string PaymentMethod { get; set; }
         public List<BravoSettlementRequestModel> Details { get; set; }
     }
 

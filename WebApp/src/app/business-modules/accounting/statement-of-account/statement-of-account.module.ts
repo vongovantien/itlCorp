@@ -5,7 +5,7 @@ import { StatementOfAccountDetailComponent } from './detail/detail-soa.component
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
 import { Routes, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -23,6 +23,7 @@ import { StatementOfAccountSummaryComponent } from './components/summary/summary
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { ShareAccountingModule } from '../share-accouting.module';
+import { StatementOfAccountPaymentMethodComponent } from './components/poup/payment-method/soa-payment-method.popup';
 
 const routing: Routes = [
     {
@@ -60,7 +61,7 @@ const COMPONENTS = [
     StatementOfAccountAddChargeComponent,
     StatementOfAccountSummaryComponent,
     StatementOfAccountFormCreateComponent,
-
+    StatementOfAccountPaymentMethodComponent,
 ];
 
 @NgModule({
@@ -85,8 +86,8 @@ const COMPONENTS = [
         PerfectScrollbarModule,
         NgProgressModule,
         ShareAccountingModule,
-        BsDropdownModule.forRoot()
-
+        BsDropdownModule.forRoot(),
+        ReactiveFormsModule
 
     ],
     exports: [],

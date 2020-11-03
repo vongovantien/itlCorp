@@ -209,7 +209,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.public = this.partner.public;
         modelAdd.workPlaceId = this.partner.workPlaceId;
         modelAdd.partnerMode = this.partner.partnerMode;
-        modelAdd.partnerLocation = this.formCreate.partnerLocation.value[0].id;
+        modelAdd.partnerLocation = !!this.formCreate.partnerLocation.value[0].id ? this.formCreate.partnerLocation.value[0].id : this.formCreate.partnerLocation.value;
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);

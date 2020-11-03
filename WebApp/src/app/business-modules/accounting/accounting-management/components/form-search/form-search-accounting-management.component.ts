@@ -20,14 +20,9 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
     partners: Observable<Customer[]>;
     creators: Observable<User[]>;
 
-    filterTypes: CommonInterface.INg2Select[] =
-        [
-            { id: '', text: 'All' },
-            { id: 'Debit', text: 'Debit Note' },
-            { id: 'Credit', text: 'Credit Note' },
-            { id: 'Invoice', text: 'Invoice' }
-        ];
-    status: CommonInterface.INg2Select[] = AccountingConstants.STATUS_CD;
+    filterTypes: string[] = ['All', 'Debit', 'Credit', 'Invoice'];
+    status: string[] = AccountingConstants.STATUS_CD.map(i => i.id);
+
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
     displayFieldsCreator: CommonInterface.IComboGridDisplayField[] = [
@@ -50,6 +45,8 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         private _fb: FormBuilder
     ) {
         super();
+
+        this.requestReset = this.resetSearch;
     }
 
     ngOnInit() {
@@ -65,7 +62,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
             partner: [],
             issuedDate: [],
             creator: [],
-            filterType: [[this.filterTypes[0]]],
+            filterType: [this.filterTypes[0]],
             filterStatus: []
         });
 
@@ -98,8 +95,8 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
             partnerId: this.partner.value,
             issuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             creatorId: this.creator.value,
-            type: !!this.filterType.value && this.filterType.value.length > 0 ? this.filterType.value[0].id : null,
-            status: !!this.filterStatus.value && this.filterStatus.value.length > 0 ? this.filterStatus.value[0].id : null
+            type: this.filterType.value === 'All' ? null : this.filterType.value,
+            status: this.filterStatus.value
         };
         this.onSearch.emit(body);
     }
