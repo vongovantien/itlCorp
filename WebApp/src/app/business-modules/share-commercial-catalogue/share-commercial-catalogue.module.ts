@@ -16,7 +16,6 @@ import { CommercialContractListComponent } from "../commercial/components/contra
 import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
 import { PartnerRejectPopupComponent } from "./components/partner-reject/partner-reject.popup";
 import { CommercialBranchSubListComponent } from "../commercial/components/branch-sub/commercial-branch-sub-list.component";
-import { FormPartnerCommercialCatalogueComponent } from './components/partner-detail-popup/form-partner-commercial-catalogue/form-partner-commercial-catalogue.component';
 
 const COMPONENTS = [
     FormContractCommercialPopupComponent,
@@ -27,8 +26,7 @@ const COMPONENTS = [
 ]
 @NgModule({
     declarations: [
-        ...COMPONENTS,
-        FormPartnerCommercialCatalogueComponent
+        ...COMPONENTS
     ],
     imports: [
         NgxDaterangepickerMd,

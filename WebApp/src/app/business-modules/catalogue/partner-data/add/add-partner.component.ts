@@ -20,6 +20,7 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import _merge from 'lodash/merge';
+import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -33,6 +34,7 @@ export class AddPartnerDataComponent extends AppList {
     @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
     @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
     @ViewChild('duplicatePartnerPopup', { static: false }) confirmDuplicatePartner: InfoPopupComponent;
+    @ViewChild(CommercialBranchSubListComponent, { static: false }) commercialBranchSubList: CommercialBranchSubListComponent;
 
 
     contracts: Contract[] = [];
@@ -68,6 +70,8 @@ export class AddPartnerDataComponent extends AppList {
     list: any[] = [];
 
     isDup: boolean = false;
+    name: string;
+    isAddSubPartner: boolean;
 
     constructor(private route: ActivatedRoute,
         private _catalogueRepo: CatalogueRepo,

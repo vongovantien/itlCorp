@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -11,12 +11,11 @@ import { Partner } from '@models';
 
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialContractListComponent } from '../components/contract/commercial-contract-list.component';
-import {CommercialBranchSubListComponent} from '../components/branch-sub/commercial-branch-sub-list.component';
+import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 
 import { of } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
-import { isMoment } from 'moment';
 
 
 @Component({
@@ -36,6 +35,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
 
     fileList: File[] = [];
     type: string;
+    name: string;
+    isAddSubPartner: boolean;
 
     constructor(
         protected _router: Router,
@@ -52,6 +53,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     ngOnInit(): void {
         this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
             this.type = result.type;
+            this.name = result.name;
+            this.isAddSubPartner = name === 'New Branch/Sub';
         });
     }
 

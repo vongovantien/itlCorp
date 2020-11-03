@@ -20,6 +20,7 @@ import { Company } from '@models';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
+import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import _merge from 'lodash/merge';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
@@ -45,7 +46,9 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(PartnerRejectPopupComponent, { static: false }) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(CommercialContractListComponent, { static: false }) listContract: CommercialContractListComponent;
+    @ViewChild(CommercialBranchSubListComponent, { static: false }) listSubPartner: CommercialBranchSubListComponent;
 
+    public originRoute: string = null;
     contracts: Contract[] = [];
     selectedContract: Contract = new Contract();
     contract: Contract = new Contract();
@@ -104,11 +107,19 @@ export class PartnerDetailComponent extends AppList {
     }
 
     ngOnInit() {
+        if (!localStorage.getItem('id_token_url_obj') && this.router.url.search('BranchSub') === -1) {
+            localStorage.setItem('id_token_url_obj', this.router.url);
+        }
         this.initHeaderSalemanTable();
         this.route.params.subscribe((prams: any) => {
             if (!!prams.id) {
                 this.partner.id = prams.id;
                 this.getListContract(this.partner.id);
+            }
+        });
+        this.route.data.subscribe((prams: any) => {
+            if (prams.name === "Detail BranchSub") {
+                this.getParnerDetails();
             }
         });
         this.getDataCombobox();
@@ -141,7 +152,9 @@ export class PartnerDetailComponent extends AppList {
                         if (this.partner.partnerMode === 'External') {
                             this.formPartnerComponent.isDisabledInternalCode = true;
                         }
-
+                        if (!!this.partner.partnerType) {
+                            this.getSubListPartner(this.partner.id, this.partner.partnerType);
+                        }
                         this.formPartnerComponent.activePartner = this.partner.active;
                     }
                 }
@@ -214,7 +227,7 @@ export class PartnerDetailComponent extends AppList {
         forkJoin([
             this._catalogueRepo.getCountryByLanguage(),
             this._catalogueRepo.getProvinces(),
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.ALL),
+            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.ALL, true, this.partner.id),
             this._catalogueRepo.getPartnerGroup(),
             this._systemRepo.getAllOffice(),
             this._catalogueRepo.getPartnerCharge(this.partner.id)
@@ -440,6 +453,7 @@ export class PartnerDetailComponent extends AppList {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        this.formPartnerComponent.activePartner = this.partner.active;
                         this._toastService.success(res.message);
                     } else {
                         this._toastService.warning(res.message);
@@ -485,50 +499,63 @@ export class PartnerDetailComponent extends AppList {
                 (res: any[]) => {
                     this.listContract.contracts = res || [];
                     this.listContract.isActiveNewContract = false;
-                    console.log(this.listContract.contracts);
-                    this.listContract.contracts.forEach(element => {
+                    // console.log(this.listContract.contracts);
+                    // this.listContract.contracts.forEach(element => {
 
-                        if (element.saleService.includes(';')) {
-                            const arr = element.saleService.split(';');
-                            element.saleService = '';
-                            arr.forEach(item => {
-                                element.saleService += item + '; ';
-                            });
-                            element.saleServiceName = '';
-                            arr.forEach(item => {
-                                element.saleServiceName += this.formContractPopup.serviceTypes.find(x => x.id === item).text + "; ";
-                            });
-                            if (element.saleService.charAt(element.saleService.length - 2) === ';') {
-                                element.saleService = element.saleService.substr(0, element.saleService.length - 2);
-                            }
-                            if (element.saleServiceName.charAt(element.saleServiceName.length - 2) === ';') {
-                                element.saleServiceName = element.saleServiceName.substr(0, element.saleServiceName.length - 2);
-                            }
-                        }
-                        else {
-                            element.saleServiceName = element.saleService.toLowerCase();
-                            const obj = this.formContractPopup.serviceTypes.find(x => x.id === element.saleService);
+                    //     if (element.saleService.includes(';')) {
+                    //         const arr = element.saleService.split(';');
+                    //         element.saleService = '';
+                    //         arr.forEach(item => {
+                    //             element.saleService += item + '; ';
+                    //         });
+                    //         element.saleServiceName = '';
+                    //         arr.forEach(item => {
+                    //             element.saleServiceName += this.formContractPopup.serviceTypes.find(x => x.id === item).text + "; ";
+                    //         });
+                    //         if (element.saleService.charAt(element.saleService.length - 2) === ';') {
+                    //             element.saleService = element.saleService.substr(0, element.saleService.length - 2);
+                    //         }
+                    //         if (element.saleServiceName.charAt(element.saleServiceName.length - 2) === ';') {
+                    //             element.saleServiceName = element.saleServiceName.substr(0, element.saleServiceName.length - 2);
+                    //         }
+                    //     }
+                    //     else {
+                    //         element.saleServiceName = element.saleService.toLowerCase();
+                    //         const obj = this.formContractPopup.serviceTypes.find(x => x.id === element.saleService);
 
-                            element.saleServiceName = !!obj ? obj.text : null;
-                        }
-                        if (!!element.officeId) {
-                            if (element.officeId.includes(';')) {
-                                const arrayOffice = element.officeId.split(';');
-                                element.officeNameEn = '';
-                                arrayOffice.forEach(itemOffice => {
-                                    element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
-                                });
-                                if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
-                                    element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
-                                }
-                            } else {
-                                element.officeId = element.officeId.toLowerCase();
-                                const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
+                    //         element.saleServiceName = !!obj ? obj.text : null;
+                    //     }
+                    //     if (!!element.officeId) {
+                    //         if (element.officeId.includes(';')) {
+                    //             const arrayOffice = element.officeId.split(';');
+                    //             element.officeNameEn = '';
+                    //             arrayOffice.forEach(itemOffice => {
+                    //                 element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                    //             });
+                    //             if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
+                    //                 element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                    //             }
+                    //         } else {
+                    //             element.officeId = element.officeId.toLowerCase();
+                    //             const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
 
-                                element.officeNameEn = !!obj ? obj.text : null;
-                            }
-                        }
-                    });
+                    //             element.officeNameEn = !!obj ? obj.text : null;
+                    //         }
+                    //     }
+                    // });
+                }
+            );
+    }
+
+    getSubListPartner(partnerId: string, partnerType: string) {
+        this.isLoading = true;
+        this._catalogueRepo.getSubListPartner(partnerId, partnerType)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+            })).subscribe(
+                (res: Partner[]) => {
+                    this.listSubPartner.partners = res || [];
+                    this.listSubPartner.parentId = partnerId;
                 }
             );
     }
@@ -583,5 +610,13 @@ export class PartnerDetailComponent extends AppList {
 
     }
 
-
+    gotoList() {
+        this.originRoute = localStorage.getItem('id_token_url_obj');
+        if (this.originRoute === this.router.url) {
+            localStorage.removeItem('id_token_url_obj');
+            this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}`]);
+        } else {
+            this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/${this.partner.parentId}`]);
+        }
+    }
 }

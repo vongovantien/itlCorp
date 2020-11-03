@@ -576,7 +576,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("GetSubListPartnerByID/{id}/{partnerType}")]
         public IActionResult GetSubListPartnerByID(string id, string partnerType)
         {
-            var results = catPartnerService.GetSubListPartnerByID(id, partnerType);
+            var results = catPartnerService.GetSubListPartnerByID(id.Trim(), partnerType.Trim());
             return Ok(results);
         }
     }

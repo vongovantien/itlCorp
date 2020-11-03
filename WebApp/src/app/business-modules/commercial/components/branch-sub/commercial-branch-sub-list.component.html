@@ -6,8 +6,7 @@
 
                     <div class="form-group col-lg-4 p-1">
                         <div class="m-input-icon m-input-icon--right">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search"
-                                [(ngModel)]="keyword" name=keyword>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search" [(ngModel)]="keyword" name=keyword>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-search"></i>
@@ -17,8 +16,9 @@
                     </div>
 
                     <div class="form-group">
-                        <app-permission-button title="add new" [routerLink]="['/home/commercial/agent/new']">
-                        </app-permission-button>
+                        <app-default-button *ngIf="!isAddSubPartner && !!parentId" [buttonSetting]="addButtonSetting" (onClick)="gotoCreatePartner()"
+                            [dataTarget]="addButtonSetting.dataTarget">
+                        </app-default-button>
                     </div>
                 </div>
             </div>
@@ -35,12 +35,12 @@
                      'partnerNameEn', 'partnerNameVn', 'taxCode', 'countryShippingName'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
-                                        <button (click)="getSubListPartner(item.id)"
+                                        <button (click)="showDetail(item)"
                                             class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <ng-container *ngIf="!item.active">
-                                            <button (click)="showConfirmDelete(item,i)"
+                                        <ng-container *ngIf="!item.active && !openOnPartner">
+                                            <button (click)="showConfirmDelete(item)"
                                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                 <i class="la la-trash"></i>
                                             </button>
@@ -63,3 +63,7 @@
         </div>
     </div>
 </div>
+
+<confirm-popup body="You want to delete this agent ?" (onSubmit)="onDelete()"></confirm-popup>
+
+<permission-403-popup></permission-403-popup>

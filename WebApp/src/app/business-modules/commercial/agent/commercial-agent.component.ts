@@ -71,6 +71,9 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             settingFields: this.headers.filter(h => h.field !== 'datetimeModified').map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
+        if (!!localStorage.getItem('id_token_url_obj')) {
+            localStorage.removeItem('id_token_url_obj');
+        }
         this.dataSearch = { All: '' };
         this.dataSearch.partnerType = 'Agent';
         this.getPartners();

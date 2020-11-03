@@ -59,6 +59,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerNameVn: AbstractControl;
     shortName: AbstractControl;
     partnerAccountRef: AbstractControl;
+    parentName: string = '';
 
     taxCode: AbstractControl;
     partnerGroup: AbstractControl;
@@ -118,6 +119,7 @@ export class FormAddPartnerComponent extends AppForm {
         { id: 'Oversea', text: 'Oversea' }
     ];
 
+    displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
 
     constructor(
@@ -387,6 +389,7 @@ export class FormAddPartnerComponent extends AppForm {
 
         switch (type) {
             case 'acRef':
+                this.parentName = null;
                 this.partnerAccountRef.setValue(data.id);
                 break;
             case 'shippping-country':
@@ -434,7 +437,11 @@ export class FormAddPartnerComponent extends AppForm {
         let billingProvinceActive = [];
         let shippingProvinceActive = [];
         index = this.parentCustomers.findIndex(x => x.id === partner.parentId);
-        if (index > -1) { parentCustomerActive = [this.parentCustomers[index]]; }
+        if (index > -1) {
+            parentCustomerActive = [this.parentCustomers[index]];
+        } else {
+            this.getACRefName(partner.parentId);
+        }
 
         index = this.countries.findIndex(x => x.id === partner.countryId);
         if (index > - 1) {
@@ -504,12 +511,10 @@ export class FormAddPartnerComponent extends AppForm {
 
     getPartnerGroupActives(arg0: string[]): any {
         const partnerGroupActives = [];
+        console.log('partnerGroupActives ' + arg0)
         if (arg0.length > 0) {
             for (let i = 0; i < arg0.length; i++) {
-                const group = this.partnerGroups.find(x => x.id === arg0[i]);
-                if (group) {
-                    partnerGroupActives.push(group);
-                }
+                partnerGroupActives.push(arg0[i]);
             }
         }
         return partnerGroupActives;
@@ -546,5 +551,17 @@ export class FormAddPartnerComponent extends AppForm {
         } else {
             this.isDisabledInternalCode = true;
         }
+    }
+
+    getACRefName(parentId: string) {
+        this._catalogueRepo.getDetailPartner(parentId)
+            .pipe(catchError(this.catchError), finalize(() => { }))
+            .subscribe(
+                (res: Partner) => {
+                    if (!!res) {
+                        this.parentName = res.shortName;
+                    }
+                }
+            );
     }
 }

@@ -42,11 +42,11 @@ namespace eFMS.API.Catalogue.DL.Common
 
         public static List<CatPartnerGroupModel> CatPartnerGroups = new List<CatPartnerGroupModel>
         {
-            new CatPartnerGroupModel { Id = AgenPartner, GroupNameVn = "Agent", GroupNameEn ="Agent" },
+            // new CatPartnerGroupModel { Id = AgenPartner, GroupNameVn = "Agent", GroupNameEn ="Agent" },
             //new CatPartnerGroupModel { Id = "AIRSHIPSUP", GroupNameVn = "AIRSHIPSUP", GroupNameEn = "Air Ship Sub" },
             new CatPartnerGroupModel { Id = CarrierPartner, GroupNameVn = "Người vận chuyển", GroupNameEn = "Carrier"},
             new CatPartnerGroupModel { Id = ConsigneePartner, GroupNameVn = "Người nhận hàng", GroupNameEn = "Consignee" },
-            new CatPartnerGroupModel { Id = CustomerPartner, GroupNameVn = "Khách hàng", GroupNameEn = "Customer" },
+            // new CatPartnerGroupModel { Id = CustomerPartner, GroupNameVn = "Khách hàng", GroupNameEn = "Customer" },
             new CatPartnerGroupModel { Id = ShipperPartner, GroupNameVn = "Người gửi", GroupNameEn = "Shipper" },
             new CatPartnerGroupModel { Id = StaffPartner, GroupNameVn = "Nhân viên", GroupNameEn = "Staff" },
             new CatPartnerGroupModel { Id = PersonalPartner, GroupNameVn = "Cá nhân", GroupNameEn = "Personal" },

@@ -941,6 +941,16 @@ namespace eFMS.API.Catalogue.DL.Services
                 CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
                 queryDetail.ProvinceShippingName = province.NameEn;
             }
+            // Get usercreate name
+            if (queryDetail.UserCreated != null)
+            {
+                queryDetail.UserCreatedName = sysUserRepository.Get(x => x.Id == queryDetail.UserCreated)?.FirstOrDefault()?.Username;
+            }
+            // Get usermodified name
+            if (queryDetail.UserCreated != null)
+            {
+                queryDetail.UserModifiedName = sysUserRepository.Get(x => x.Id == queryDetail.UserModified)?.FirstOrDefault()?.Username;
+            }
             return queryDetail;
         }
 
@@ -1679,6 +1689,10 @@ namespace eFMS.API.Catalogue.DL.Services
             var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(criteria.Id))
+            {
+                data = data.Where(x => x.ParentId != criteria.Id);
+            }
             if (data == null) return null;
             var results = data.Select(x => new CatPartnerViewModel
             {
@@ -1705,31 +1719,37 @@ namespace eFMS.API.Catalogue.DL.Services
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public IQueryable<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType)
+        public List<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType)
         {
             if (id == null) return null;
-            var tet = Get();
-            var data = Get().Where(x => (x.ParentId ?? "").Contains(id ?? "", StringComparison.OrdinalIgnoreCase)
-                                && (x.PartnerType ?? "").Contains(partnerType ?? "", StringComparison.OrdinalIgnoreCase));
+            var currPartnerId = Get(x => x.Id == id).FirstOrDefault()?.AccountNo;
+            var data = Get(x => x.ParentId == id && x.AccountNo != currPartnerId && x.PartnerType == partnerType);
             if (data == null) return null;
-            var results = data.Select(x => new CatPartnerViewModel
+            var results = new List<CatPartnerViewModel>();
+            foreach (var partner in data)
             {
-                Id = x.Id,
-                PartnerGroup = x.PartnerGroup,
-                PartnerNameVn = x.PartnerNameVn,
-                PartnerNameEn = x.PartnerNameEn,
-                ShortName = x.ShortName,
-                TaxCode = x.TaxCode,
-                SalePersonId = x.SalePersonId,
-                Tel = x.Tel,
-                AddressEn = x.AddressEn,
-                Fax = x.Fax,
-                CoLoaderCode = x.CoLoaderCode,
-                RoundUpMethod = x.RoundUpMethod,
-                ApplyDim = x.ApplyDim,
-                AccountNo = x.AccountNo,
-                CountryShippingName = catCountryRepository.Get(k => k.Id == x.CountryShippingId).FirstOrDefault().NameEn
-            });
+                var item = new CatPartnerViewModel()
+                {
+                    Id = partner.Id,
+                    PartnerGroup = partner.PartnerGroup,
+                    PartnerNameVn = partner.PartnerNameVn,
+                    PartnerNameEn = partner.PartnerNameEn,
+                    ShortName = partner.ShortName,
+                    TaxCode = partner.TaxCode,
+                    SalePersonId = partner.SalePersonId,
+                    Tel = partner.Tel,
+                    AddressEn = partner.AddressEn,
+                    Fax = partner.Fax,
+                    CoLoaderCode = partner.CoLoaderCode,
+                    RoundUpMethod = partner.RoundUpMethod,
+                    ApplyDim = partner.ApplyDim,
+                    AccountNo = partner.AccountNo,
+                    Active = partner.Active,
+                    PartnerType = partner.PartnerType,
+                    CountryShippingName = catCountryRepository.Where(k => k.Id == partner.CountryShippingId)?.FirstOrDefault().NameEn
+                };
+                results.Add(item);
+            }
             return results;
         }
     }

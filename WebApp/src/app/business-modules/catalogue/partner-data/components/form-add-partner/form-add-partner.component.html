@@ -153,9 +153,9 @@
                             A/C Ref
                         </label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acRef')"
-                            [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value}"
+                            [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value, hardValue: parentName}"
                             [selectedDisplayFields]="['partnerNameVn']" [dataSources]="parentCustomers"
-                            [displayFields]="[{field: 'partnerNameVn', label: 'Name'}]"
+                            [displayFields]="displayFieldCustomer"
                             (remove)="resetFormControl(partnerAccountRef)" placeholder="Select A/C Ref">
                         </app-combo-grid-virtual-scroll>
                     </div>

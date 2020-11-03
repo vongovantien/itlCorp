@@ -85,6 +85,9 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
+        if (!!localStorage.getItem('id_token_url_obj')) {
+            localStorage.removeItem('id_token_url_obj');
+        }
         this.tabSelect(this.activeTab);
     }
     resetSearch(event) {

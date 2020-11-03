@@ -10,11 +10,12 @@ import { Partner } from '@models';
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 
 import { finalize, catchError, concatMap, map } from 'rxjs/operators';
-import { of, combineLatest } from 'rxjs';
+import { of, combineLatest, Observable } from 'rxjs';
 import { ConfirmPopupComponent } from '@common';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
-import { AppList } from 'src/app/app.list';
+import { CommonEnum } from '@enums';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -23,11 +24,12 @@ import { AppList } from 'src/app/app.list';
 export class CommercialDetailComponent extends CommercialCreateComponent implements OnInit {
     @ViewChild(CommercialFormCreateComponent, { static: false }) formCommercialComponent: CommercialFormCreateComponent;
     @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
-    @ViewChild(CommercialBranchSubListComponent, { static: false }) formBranchSubListComponent: CommercialBranchSubListComponent;
+    @ViewChild(CommercialBranchSubListComponent, { static: false }) formBranchSubList: CommercialBranchSubListComponent;
     partnerId: string;
     partner: Partner;
-    dataSearch: AppList;
+    isAddSub: boolean;
 
+    public originRoute: string = '';
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
@@ -39,7 +41,11 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute);
     }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        if (!localStorage.getItem('id_token_url_obj') && this._router.url.search('BranchSub') === -1) {
+            localStorage.setItem('id_token_url_obj', this._router.url);
+        }
+    }
 
     ngAfterViewInit() {
 
@@ -52,15 +58,22 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             (res: any) => {
                 if (res.type) {
                     this.type = res.type;
+                    this.partnerList.partnerType = this.type;
+                }
+                if (res.name) {
+                    this.isAddSub = res.name === 'New Branch/Sub';
                 }
                 if (res.partnerId) {
                     this.partnerId = res.partnerId;
-                    this.contractList.partnerId = this.partnerId;
-                    this.partnerList.partnerId = this.partnerId;
+                    this.partnerList.parentId = this.partnerId;
+                    this.partnerList.isAddSubPartner = this.isAddSub;
 
                     this.getDetailCustomer(this.partnerId);
-                    this.contractList.getListContract(this.partnerId);
-                    this.partnerList.getSubListPartner(this.partnerId, this.type);
+                    if (!this.isAddSub) {
+                        this.contractList.partnerId = this.partnerId;
+                        this.contractList.getListContract(this.partnerId);
+                        this.partnerList.getSubListPartner(this.partnerId, this.type);
+                    }
                 } else {
                     this.gotoList();
                 }
@@ -83,6 +96,14 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     console.log("detail partner:", this.partner);
                     // this.formCreate.formGroup.patchValue(res);
                     this.setDataForm(this.partner);
+                    if (this.isAddSub) {
+                        this.formCreate.isBranchSub = true;
+                        this.formCreate.isUpdate = false;
+                        this.formCreate.getACRefName(this.partner.id);
+                    } else {
+                        this.formCreate.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, true, this.partner.id);
+                        this.formCreate.getACRefName(this.partner.parentId);
+                    }
                     // this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
 
                     this.formCreate.getShippingProvinces(res.countryShippingId);
@@ -93,11 +114,11 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
     setDataForm(partner: Partner) {
         this.formCreate.formGroup.patchValue({
-            accountNo: partner.accountNo,
+            accountNo: this.isAddSub ? null : partner.accountNo,
             partnerNameEn: partner.partnerNameEn,
             partnerNameVn: partner.partnerNameVn,
             shortName: partner.shortName,
-            taxCode: partner.taxCode,
+            taxCode: this.isAddSub ? null : partner.taxCode,
             internalReferenceNo: partner.internalReferenceNo,
             addressShippingEn: partner.addressShippingEn,
             addressShippingVn: partner.addressShippingVn,
@@ -117,7 +138,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             provinceId: partner.provinceId,
             provinceShippingId: partner.provinceShippingId,
             partnerLocation: !!partner.partnerLocation ? [<CommonInterface.INg2Select>{ id: partner.partnerLocation, text: partner.partnerLocation }] : null,
-            parentId: partner.parentId
+            parentId: this.isAddSub ? partner.id : partner.parentId
         });
     }
 
@@ -139,7 +160,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
     getSubListPartner(partnerId: string, partnerType: string) {
         this._catalogueRepo.getSubListPartner(partnerId, partnerType)
-            .pipe(catchError(this.catchError), finalize(() => 
+            .pipe(catchError(this.catchError), finalize(() =>
                 this.partnerList.isLoading = false
             )).subscribe(
                 (res: any[]) => {
@@ -149,7 +170,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             );
     }
 
-    onSave() {
+    onSaveDetail() {
         this.formCreate.isSubmitted = true;
 
         if (!this.formCreate.formGroup.valid) {
@@ -165,7 +186,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
         modelAdd.contracts = this.contractList.contracts;
 
-        modelAdd.id = this.partnerId;
+        modelAdd.id = this.isAddSub ? null : this.partnerId;
         modelAdd.userCreated = this.partner.userCreated;
         modelAdd.datetimeCreated = this.partner.datetimeCreated;
         modelAdd.partnerType = this.partner.partnerType;
@@ -252,6 +273,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     if (res || res.status) {
                         this.partner = res;
                         console.log("detail partner:", this.partner);
+                        this.isAddSub = false;
                         this.formCreate.formGroup.patchValue(res);
                     } else {
                         this._toastService.error(res.message);
@@ -262,5 +284,33 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 }
             );
     }
+
+    gotoList() {
+        this.originRoute = localStorage.getItem('id_token_url_obj');
+        if (this.originRoute === this._router.url) {
+            localStorage.removeItem('id_token_url_obj');
+            if (this.type === 'Customer') {
+                this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}`]);
+            } else {
+                this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}`]);
+            }
+        } else
+            if (this.isAddSub) {
+                this.partnerId = this.partner.id;
+                if (this.type === 'Customer') {
+                    this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}`]);
+                } else {
+                    this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${this.partnerId}`]);
+                }
+            } else {
+                this.partnerId = this.partner.parentId;
+                if (this.type === 'Customer') {
+                    this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}`]);
+                } else {
+                    this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${this.partnerId}`]);
+                }
+            }
+    }
+
 }
 

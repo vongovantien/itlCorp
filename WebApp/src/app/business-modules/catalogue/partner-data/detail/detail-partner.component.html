@@ -35,8 +35,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn  m-btn--icon m-btn--uppercase"
-                    routerLink="/home/catalogue/partner-data">
+                <button type="button" class="btn  m-btn--icon m-btn--uppercase" (click)="gotoList()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -53,8 +52,16 @@
         <!--begin::Form-->
         <form-add-partner (requireSaleman)="isShowSaleMan=$event" [isUpdate]="true"></form-add-partner>
         <!--end::Form-->
-        <commercial-contract-list [openOnPartner]="true"></commercial-contract-list>
-
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Agreement">
+                    <commercial-contract-list [openOnPartner]="true"></commercial-contract-list>
+                </tab>
+                <tab heading="Branch/Sub">
+                    <app-commercial-branch-sub-list [openOnPartner]="true"></app-commercial-branch-sub-list>
+                </tab>
+            </tabset>
+        </div>
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>
