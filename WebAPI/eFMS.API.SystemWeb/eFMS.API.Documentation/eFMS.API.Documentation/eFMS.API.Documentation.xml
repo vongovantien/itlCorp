@@ -424,6 +424,20 @@
             <param name="list"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckAccountReceivableCreditTerm(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check account receivable
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckAccountReceivableExpiredAgreement(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check account receivable
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Update(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
             <summary>
             update an existed surcharge

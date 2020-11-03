@@ -37,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<SysNotifications> notificationRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
+        private readonly IContextBase<AccAccountReceivable> accAccountReceivableRepository;
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
         private readonly ICurrencyExchangeService currencyExchangeService;
@@ -54,6 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUserLevel> userLevelRepo,
             IContextBase<SysNotifications> notificationRepo,
             IContextBase<SysUserNotification> sysUserNotifyRepo,
+            IContextBase<AccAccountReceivable> accAccountRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange
@@ -74,6 +76,8 @@ namespace eFMS.API.Documentation.DL.Services
             catDepartmentRepository = catDepartmentRepo;
             userlevelRepository = userLevelRepo;
             notificationRepository = notificationRepo;
+            sysUserNotifyRepository = sysUserNotifyRepo;
+            accAccountReceivableRepository = accAccountRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -420,9 +424,9 @@ namespace eFMS.API.Documentation.DL.Services
                             item.UserCreated = currentUser.UserID;
                             item.Id = Guid.NewGuid();
                             item.ExchangeDate = DateTime.Now;
-                            
+
                             item.TransactionType = GetTransactionType(item.JobNo);
-                            if(item.Hblid != Guid.Empty)
+                            if (item.Hblid != Guid.Empty)
                             {
                                 if (item.TransactionType != "CL")
                                 {
@@ -570,7 +574,7 @@ namespace eFMS.API.Documentation.DL.Services
                 string transactionType = GetTransactionType(jobno);
                 CsTransaction csTransaction = new CsTransaction();
                 OpsTransaction opsTransaction = new OpsTransaction();
-                var hs = new HandleState();
+                var hs = new HandleState(false);
                 bool isCheckedCreditRate = false;
 
                 if (transactionType == "CL")
@@ -583,81 +587,258 @@ namespace eFMS.API.Documentation.DL.Services
                     csTransaction = csTransactionRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
                     isCheckedCreditRate = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.CreditLimit == true);
                 }
-              
+                /// Check credit term office
                 if (isCheckedCreditRate)
                 {
                     List<string> listPartner = list.Select(t => t.PaymentObjectId).ToList();
                     List<string> listPartnerByAc = partnerRepository.Get(x => listPartner.Contains(x.Id)).Select(t => t.ParentId).ToList();
 
                     var dataAgreements = transactionType == "CL" ? catContractRepository.Get(x => x.OfficeId.Contains(opsTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId))
-                        : catContractRepository.Get(x => x.OfficeId.Contains(csTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType));
-                    if(dataAgreements != null)
+                        : catContractRepository.Get(x => x.OfficeId.Contains(csTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId));
+                    if (dataAgreements != null && dataAgreements.Any())
                     {
                         foreach (var item in dataAgreements)
                         {
-                            if(item.CreditRate >= 120)
+                            if (item.CreditRate >= 120)
                             {
                                 item.Active = false;
                                 item.DatetimeModified = DateTime.Now;
                                 item.UserModified = currentUser.UserID;
-                                hs = catContractRepository.Update(item, x => x.Id == item.Id,false);
-
+                                hs = catContractRepository.Update(item, x => x.Id == item.Id, false);
                             }
                         }
+                        catContractRepository.SubmitChanges();
                         if (hs.Success)
                         {
                             string description = string.Format(@"<b style='color:#3966b6'>Contract</b> has been inactive");
                             // Add Notification
-                            SysNotifications sysNotification = new SysNotifications
+                            HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
+                            if (resultAddNotification.Success)
                             {
-                                Id = Guid.NewGuid(),
-                                Title = description,
-                                Description = description,
-                                Type = "User",
-                                UserCreated = currentUser.UserID,
-                                DatetimeCreated = DateTime.Now,
-                                DatetimeModified = DateTime.Now,
-                                UserModified = currentUser.UserID,
-                                Action = "Detail",
-                                ActionLink = string.Empty,
-                                IsClosed = false,
-                                IsRead = false
-                            };
-                            HandleState hsSysNotification = notificationRepository.Add(sysNotification,false);
-                            if (hsSysNotification.Success)
-                            {
-                                List<string> users = GetUserSaleAndDepartmentAR(dataAgreements.ToList());
-                                List<SysUserNotification> userNotifications = new List<SysUserNotification>();
-                                foreach(var item in users)
-                                {
-                                    SysUserNotification userNotify = new SysUserNotification
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        DatetimeCreated = DateTime.Now,
-                                        DatetimeModified = DateTime.Now,
-                                        Status = "New",
-                                        NotitficationId = sysNotification.Id,
-                                        UserId = item,
-                                        UserCreated = currentUser.UserID,
-                                        UserModified = currentUser.UserID,
-                                    };
-                                    userNotifications.Add(userNotify);
-                                }
-                                sysUserNotifyRepository.Add(userNotifications,false);
+                                return resultAddNotification;
                             }
                         }
-                        catContractRepository.SubmitChanges();
-                        notificationRepository.SubmitChanges();
-                        sysUserNotifyRepository.SubmitChanges();
+                        else
+                        {
+                            return new HandleState(false, "Credit rate not greater than 120!");
+                        }
+                    }
+                    else
+                    {
+                        return new HandleState(false, "Agrements Data Not Found!");
                     }
                 }
+                else
+                {
+                    return new HandleState(false, "Credit limit not checked or offcie not found!");
+                }
+                // end check credit term
 
                 return hs;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                return new HandleState(false, ex.Message);
             }
+        }
+
+        public HandleState CheckExpiredAgreement(List<CsShipmentSurchargeModel> list)
+        {
+            try
+            {
+                string jobno = list.Select(t => t.JobNo).FirstOrDefault();
+                string transactionType = GetTransactionType(jobno);
+                CsTransaction csTransaction = new CsTransaction();
+                OpsTransaction opsTransaction = new OpsTransaction();
+                var hs = new HandleState(false);
+                bool isCheckedExpiredAgreement = false;
+
+                if (transactionType == "CL")
+                {
+                    opsTransaction = opsTransRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
+                    isCheckedExpiredAgreement = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.ExpiredAgreement == true);
+                }
+                else
+                {
+                    csTransaction = csTransactionRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
+                    isCheckedExpiredAgreement = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.ExpiredAgreement == true);
+                }
+                /// Check credit term office
+                if (isCheckedExpiredAgreement)
+                {
+                    List<string> listPartner = list.Select(t => t.PaymentObjectId).ToList();
+                    List<string> listPartnerByAc = partnerRepository.Get(x => listPartner.Contains(x.Id)).Select(t => t.ParentId).ToList();
+
+                    var dataAgreements = transactionType == "CL" ? catContractRepository.Get(x => x.OfficeId.Contains(opsTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId))
+                        : catContractRepository.Get(x => x.OfficeId.Contains(csTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId));
+                    if (dataAgreements != null && dataAgreements.Any())
+                    {
+                        foreach (var item in dataAgreements)
+                        {
+                            if ((item.ContractType == "Official" && item.ExpiredDate > DateTime.Now) || (item.ContractType == "Trial" && item.TrialExpiredDate > DateTime.Now))
+                            {
+                                item.Active = false;
+                                item.DatetimeModified = DateTime.Now;
+                                item.UserModified = currentUser.UserID;
+                                hs = catContractRepository.Update(item, x => x.Id == item.Id, false);
+                            }
+                        }
+                        catContractRepository.SubmitChanges();
+                        if (hs.Success)
+                        {
+                            string description = string.Format(@"<b style='color:#3966b6'>Contract</b> has been inactive");
+                            // Add Notification
+                            HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
+                            if (resultAddNotification.Success)
+                            {
+                                return resultAddNotification;
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState(false, "Agrements Data Not Found!");
+                        }
+                    }
+                    else
+                    {
+                        return new HandleState(false, "Agrements Data Not Found!");
+                    }
+                }
+                else
+                {
+                    return new HandleState(false, "Expired Agreement not checked or offcie not found!");
+                }
+                // end check credit term
+
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(false, ex.Message);
+            }
+        }
+
+        public HandleState CheckPaymenterm(List<CsShipmentSurchargeModel> list)
+        {
+            try
+            {
+                string jobno = list.Select(t => t.JobNo).FirstOrDefault();
+                string transactionType = GetTransactionType(jobno);
+                CsTransaction csTransaction = new CsTransaction();
+                OpsTransaction opsTransaction = new OpsTransaction();
+                var hs = new HandleState(false);
+                bool isCheckedPaymenterm = false;
+
+                if (transactionType == "CL")
+                {
+                    opsTransaction = opsTransRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
+                    isCheckedPaymenterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.OverPaymentTerm == true);
+                }
+                else
+                {
+                    csTransaction = csTransactionRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
+                    isCheckedPaymenterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.OverPaymentTerm == true);
+                }
+                /// Check credit term office
+                if (isCheckedPaymenterm)
+                {
+                    List<string> listPartner = list.Select(t => t.PaymentObjectId).ToList();
+                    List<string> listPartnerByAc = partnerRepository.Get(x => listPartner.Contains(x.Id)).Select(t => t.ParentId).ToList();
+
+                    var dataAgreements = transactionType == "CL" ? catContractRepository.Get(x => x.OfficeId.Contains(opsTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId))
+                        : catContractRepository.Get(x => x.OfficeId.Contains(csTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId));
+                    if (dataAgreements != null && dataAgreements.Any())
+                    {
+                        foreach (var item in dataAgreements)
+                        {
+                            bool dataAccountReceivable = accAccountReceivableRepository.Any(x => item.OfficeId.Contains(x.OfficeId.ToString()) && item.SaleService.Contains(x.Service) && item.PartnerId == x.PartnerId && x.Over30Day >= 0 );
+                            if (dataAccountReceivable)
+                            {
+                                item.Active = false;
+                                item.DatetimeModified = DateTime.Now;
+                                item.UserModified = currentUser.UserID;
+                                hs = catContractRepository.Update(item, x => x.Id == item.Id, false);
+
+                            }
+                        }
+                        catContractRepository.SubmitChanges();
+                        if (hs.Success)
+                        {
+                            string description = string.Format(@"<b style='color:#3966b6'>Contract</b> has been inactive");
+                            // Add Notification
+                            HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
+                            if (resultAddNotification.Success)
+                            {
+                                return resultAddNotification;
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState(false, "Agrements Data Not Found!");
+                        }
+                    }
+                    else
+                    {
+                        return new HandleState(false, "Agrements Data Not Found!");
+                    }
+                }
+                else
+                {
+                    return new HandleState(false, "Expired Agreement not checked or offcie not found!");
+                }
+                // end check credit term
+
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(false, ex.Message);
+            }
+        }
+
+        private HandleState AddNotifications(string description, List<CatContract> dataAgreements)
+        {
+            SysNotifications sysNotification = new SysNotifications
+            {
+                Id = Guid.NewGuid(),
+                Title = description,
+                Description = description,
+                Type = "User",
+                UserCreated = currentUser.UserID,
+                DatetimeCreated = DateTime.Now,
+                DatetimeModified = DateTime.Now,
+                UserModified = currentUser.UserID,
+                Action = "Detail",
+                ActionLink = string.Empty,
+                IsClosed = false,
+                IsRead = false
+            };
+            HandleState hsSysNotification = notificationRepository.Add(sysNotification, false);
+            if (hsSysNotification.Success)
+            {
+                List<string> users = GetUserSaleAndDepartmentAR(dataAgreements);
+                List<SysUserNotification> userNotifications = new List<SysUserNotification>();
+                foreach (var item in users)
+                {
+                    SysUserNotification userNotify = new SysUserNotification
+                    {
+                        Id = Guid.NewGuid(),
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        Status = "New",
+                        NotitficationId = sysNotification.Id,
+                        UserId = item,
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
+                    };
+                    userNotifications.Add(userNotify);
+                }
+                HandleState hsSysUserNotification = sysUserNotifyRepository.Add(userNotifications, false);
+                notificationRepository.SubmitChanges();
+                sysUserNotifyRepository.SubmitChanges();
+                if (hsSysUserNotification.Success) return hsSysUserNotification;
+            }
+            return new HandleState(false);
         }
 
         private List<string> GetUserSaleAndDepartmentAR(List<CatContract> contracts)
@@ -666,8 +847,8 @@ namespace eFMS.API.Documentation.DL.Services
             List<string> usersDepartmentAR = new List<string>();
             int DepartmentId = catDepartmentRepository.Get(x => x.DeptType == "AR").Select(t => t.Id).FirstOrDefault();
             usersDepartmentAR = userlevelRepository.Get(x => x.DepartmentId == DepartmentId).Select(t => t.UserId).ToList();
-            users.AddRange(contracts.Select(t => t.SaleManId).ToList()); 
-            if(usersDepartmentAR != null)
+            users.AddRange(contracts.Select(t => t.SaleManId).ToList());
+            if (usersDepartmentAR != null)
             {
                 users.AddRange(usersDepartmentAR);
             }
@@ -677,7 +858,7 @@ namespace eFMS.API.Documentation.DL.Services
         private string GetTransactionType(string jobNo)
         {
             string transactionType = null;
-            if(!string.IsNullOrEmpty(jobNo))
+            if (!string.IsNullOrEmpty(jobNo))
             {
                 IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get(x => x.JobNo == jobNo);
                 if (docTransaction != null && docTransaction.Count() > 0)

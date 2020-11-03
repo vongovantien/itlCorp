@@ -23,6 +23,9 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState AddAndUpate(List<CsShipmentSurchargeModel> list);
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
         HandleState CheckCreditTerm(List<CsShipmentSurchargeModel> list);
+        HandleState CheckExpiredAgreement(List<CsShipmentSurchargeModel> list);
+        HandleState CheckPaymenterm(List<CsShipmentSurchargeModel> list);
+
 
     }
 }

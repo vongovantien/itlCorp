@@ -112,6 +112,13 @@ namespace eFMS.API.System.DL.Services
                     model.AccountReceivable.Id = Guid.NewGuid();
                     hs = DataContext.Add(model.AccountReceivable, false);
                 }
+                else if(data.Any(x => x.Type == "AccountReceivable"))
+                {
+                    model.AccountReceivable.OfficeId = model.OfficeId;
+                    model.AccountReceivable.UserModified = currentUser.UserID;
+                    model.AccountReceivable.DatetimeModified = DateTime.Now;
+                    hs = DataContext.Update(model.AccountReceivable, x=>x.Id == model.AccountReceivable.Id);
+                }
             }
             DataContext.SubmitChanges();
 

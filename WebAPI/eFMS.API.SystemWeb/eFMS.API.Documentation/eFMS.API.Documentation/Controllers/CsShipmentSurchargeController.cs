@@ -182,6 +182,48 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// check account receivable
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("CheckAccountReceivableCreditTerm")]
+        [Authorize]
+        public IActionResult CheckAccountReceivableCreditTerm([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csShipmentSurchargeService.CheckCreditTerm(list);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// check account receivable
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("CheckAccountReceivableExpiredAgreement")]
+        [Authorize]
+        public IActionResult CheckAccountReceivableExpiredAgreement([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csShipmentSurchargeService.CheckExpiredAgreement(list);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         /// <summary>
         /// update an existed surcharge
         /// </summary>
