@@ -223,6 +223,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.invoiceNo = null;
                         c.invoiceDate = null;
                         c.finalExchangeRate = null;
+                        c.acctManagementId = null;
+
                         // Mặc định lấy customer name của HBL
                         c.paymentObjectId = this.service === 'logistic' ? this.shipment.customerId : this.hbl.customerId;
                         c.partnerName = this.service === 'logistic' ? this.shipment.customerName : this.hbl.customerName;
