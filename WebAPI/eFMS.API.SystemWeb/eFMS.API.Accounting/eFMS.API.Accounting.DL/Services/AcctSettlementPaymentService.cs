@@ -345,7 +345,8 @@ namespace eFMS.API.Accounting.DL.Services
                            VoucherDate = settlePayment.VoucherDate,
                            VoucherNo = settlePayment.VoucherNo,
                            LastSyncDate = settlePayment.LastSyncDate,
-                           SyncStatus = settlePayment.SyncStatus
+                           SyncStatus = settlePayment.SyncStatus,
+                           ReasonReject = settlePayment.ReasonReject
                        };
 
             //Sort Array sẽ nhanh hơn

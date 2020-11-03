@@ -179,7 +179,7 @@
                                                         {{advancePayment.syncStatus}}
                                                     </div>
                                                     <div *ngSwitchDefault class="text-danger">
-                                                        {{advancePayment.syncStatus}}
+                                                        {{advancePayment.syncStatus}}{{advancePayment.reasonReject ? ' - ' +advancePayment.reasonReject : ''}}
                                                     </div>
                                                 </td>
                                                 <td>

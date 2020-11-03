@@ -984,8 +984,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Type = "User",
                                     UserCreated = currentUser.UserID,
                                     UserModified = currentUser.UserID,
-                                    Title = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
-                                    Description = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
+                                    Title = string.Format(@"Voucher <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
+                                    Description = string.Format(@"Voucher <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
                                     ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
                                 };
 
