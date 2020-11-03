@@ -11,7 +11,7 @@ namespace eFMS.API.System.DL.IService
 {
     public interface ISysUserNotification : IRepositoryBase<SysUserNotification, SysUserNotificationModel>
     {
-        IQueryable<SysUserNotificationModel> Paging(int page, int size, out int rowsCount);
+        IQueryable<SysUserNotificationModel> Paging(int page, int size, out int rowsCount, out int totalNoRead);
         IQueryable<SysUserNotificationModel> GetAll();
         HandleState Add(SysUserNotification sysBuModel);
         HandleState Update(Guid Id);

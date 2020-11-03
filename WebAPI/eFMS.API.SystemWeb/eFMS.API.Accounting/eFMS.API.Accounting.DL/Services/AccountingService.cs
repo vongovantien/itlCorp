@@ -803,6 +803,7 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = AdvanceRepository.SubmitChanges();
                         if (hs.Success)
                         {
+                            sysNotifyRepository.SubmitChanges();
                             sysUserNotifyRepository.SubmitChanges();
                             trans.Commit();
 
@@ -914,6 +915,7 @@ namespace eFMS.API.Accounting.DL.Services
                         result = SettlementRepository.SubmitChanges();
                         if (result.Success)
                         {
+                            sysNotifyRepository.SubmitChanges();
                             sysUserNotifyRepository.SubmitChanges();
                         }
 
@@ -1023,6 +1025,7 @@ namespace eFMS.API.Accounting.DL.Services
                         result = DataContext.SubmitChanges();
                         if (result.Success)
                         {
+                            sysNotifyRepository.SubmitChanges();
                             sysUserNotifyRepository.SubmitChanges();
                         }
                     }
