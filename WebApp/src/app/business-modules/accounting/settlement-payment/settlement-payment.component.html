@@ -131,7 +131,7 @@
                                                     {{settlePayment.syncStatus}}
                                                 </div>
                                                 <div *ngSwitchDefault class="text-danger">
-                                                    {{settlePayment.syncStatus}}
+                                                    {{settlePayment.syncStatus}}{{settlePayment.reasonReject ? ' - ' +settlePayment.reasonReject : ''}}
                                                 </div>
                                             </td>
                                         </tr>

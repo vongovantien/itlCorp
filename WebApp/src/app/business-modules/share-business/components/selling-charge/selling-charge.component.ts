@@ -178,6 +178,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                                 newSurCharge.id = SystemConstants.EMPTY_GUID;
                                 newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
                                 newSurCharge.invoiceDate = null;
+                                newSurCharge.hblno = this.hbl.hwbno || null;
+                                newSurCharge.mblno = this.getMblNo(this.shipment, this.hbl);
+                                newSurCharge.jobNo = this.shipment.jobNo || null;
 
                                 // * Default get partner = customer name's hbl.
                                 newSurCharge.partnerShortName = this.hbl.customerName;
@@ -220,6 +223,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.invoiceNo = null;
                         c.invoiceDate = null;
                         c.finalExchangeRate = null;
+                        c.acctManagementId = null;
+
                         // Mặc định lấy customer name của HBL
                         c.paymentObjectId = this.service === 'logistic' ? this.shipment.customerId : this.hbl.customerId;
                         c.partnerName = this.service === 'logistic' ? this.shipment.customerName : this.hbl.customerName;

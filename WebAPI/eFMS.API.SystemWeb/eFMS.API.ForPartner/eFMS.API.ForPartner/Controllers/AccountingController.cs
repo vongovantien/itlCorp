@@ -54,12 +54,18 @@ namespace eFMS.API.ForPartner.Controllers
         }
 
         [HttpPost("CheckHash")]
-        public IActionResult CheckHash(object model, [Required] string apiKey,[Required] string hash)
+        public IActionResult CheckHash(object model, [Required] string apiKey, [Required] string hash)
         {
-            return Ok(accountingManagementService.ValidateHashString(model, apiKey,hash));
+            return Ok(accountingManagementService.ValidateHashString(model, apiKey, hash));
         }
 
-
+        /// <summary>
+        /// Update Voucher Advance
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         [HttpPut("UpdateVoucherAdvance")]
         public IActionResult UpdateVoucherAdvance(VoucherAdvance model, [Required] string apiKey, [Required] string hash)
         {
@@ -90,7 +96,13 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(new ResultHandle { Status = true, Message = stringLocalizer[message].Value, Data = model });
         }
 
-
+        /// <summary>
+        /// Remove Voucher Advance
+        /// </summary>
+        /// <param name="voucherNo"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         [HttpPut("RemoveVoucherAdvance")]
         public IActionResult RemoveVoucherAdvance(string voucherNo, [Required] string apiKey, [Required] string hash)
         {
@@ -232,8 +244,9 @@ namespace eFMS.API.ForPartner.Controllers
                 Currency = model.Currency,
                 Charges = model.Charges,
                 Description = model.Description
-            };            
-            invoiceToCreate.Charges.ForEach(fe => {
+            };
+            invoiceToCreate.Charges.ForEach(fe =>
+            {
                 fe.ReferenceNo = model.ReferenceNo;
             });
             var hsInsertInvoice = accountingManagementService.InsertInvoice(invoiceToCreate, apiKey, "ReplaceInvoiceData");
@@ -268,7 +281,7 @@ namespace eFMS.API.ForPartner.Controllers
             }
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = accountingManagementService.DeleteInvoice(model, apiKey, "CancellingInvoice");            
+            var hs = accountingManagementService.DeleteInvoice(model, apiKey, "CancellingInvoice");
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Hủy hóa đơn thành công", Data = model };
             if (!hs.Success)
             {
@@ -307,6 +320,13 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Remove Voucher
+        /// </summary>
+        /// <param name="model">model to remove data</param>
+        /// <param name="apiKey">API Key</param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         [HttpPut("RemoveVoucher")]
         public IActionResult RemoveVoucher(RejectData model, [Required] string apiKey, [Required] string hash)
         {
@@ -333,25 +353,26 @@ namespace eFMS.API.ForPartner.Controllers
         private string GetFieldRequireForCreateInvoice(InvoiceCreateInfo model)
         {
             string message = string.Empty;
+            const string comma = ", ";
             if (string.IsNullOrEmpty(model.PartnerCode))
             {
                 message += "PartnerCode";
             }
             if (string.IsNullOrEmpty(model.InvoiceNo))
             {
-                message += !string.IsNullOrEmpty(message) ? ", InvoiceNo" : "InvoiceNo";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "InvoiceNo";
             }
             if (string.IsNullOrEmpty(model.SerieNo))
             {
-                message += !string.IsNullOrEmpty(message) ? ", SerieNo" : "SerieNo";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "SerieNo";
             }
             if (model.InvoiceDate == null)
             {
-                message += !string.IsNullOrEmpty(message) ? ", InvoiceDate" : "InvoiceDate";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "InvoiceDate";
             }
             if (string.IsNullOrEmpty(model.Currency))
             {
-                message += !string.IsNullOrEmpty(message) ? ", Currency" : "Currency";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "Currency";
             }
             return message;
         }
@@ -359,25 +380,26 @@ namespace eFMS.API.ForPartner.Controllers
         private string GetFieldRequireForUpdateInvoice(InvoiceUpdateInfo model)
         {
             string message = string.Empty;
+            const string comma = ", ";
             if (string.IsNullOrEmpty(model.PartnerCode))
             {
                 message += "PartnerCode";
             }
             if (string.IsNullOrEmpty(model.InvoiceNo))
             {
-                message += !string.IsNullOrEmpty(message) ? ", InvoiceNo" : "InvoiceNo";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "InvoiceNo";
             }
             if (string.IsNullOrEmpty(model.SerieNo))
             {
-                message += !string.IsNullOrEmpty(message) ? ", SerieNo" : "SerieNo";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "SerieNo";
             }
             if (model.InvoiceDate == null)
             {
-                message += !string.IsNullOrEmpty(message) ? ", InvoiceDate" : "InvoiceDate";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "InvoiceDate";
             }
             if (string.IsNullOrEmpty(model.Currency))
             {
-                message += !string.IsNullOrEmpty(message) ? ", Currency" : "Currency";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "Currency";
             }
             return message;
         }
@@ -385,21 +407,22 @@ namespace eFMS.API.ForPartner.Controllers
         private string GetFieldRequireForUpdateVoucherAdvance(VoucherAdvance model)
         {
             string message = string.Empty;
+            const string comma = ", ";
             if (string.IsNullOrEmpty(model.VoucherNo))
             {
                 message += "VoucherNo";
             }
             if (model.VoucherDate == null)
             {
-                message += !string.IsNullOrEmpty(message) ? ", VoucherDate" : "VoucherDate";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "VoucherDate";
             }
             if (model.PaymentTerm == null || model.PaymentTerm < 1)
             {
-                message += !string.IsNullOrEmpty(message) ? ", PaymentTerm (bắt buộc > 0)" : "PaymentTerm (bắt buộc > 0)";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "PaymentTerm (bắt buộc > 0)";
             }
             if (string.IsNullOrEmpty(model.AdvanceNo))
             {
-                message += !string.IsNullOrEmpty(message) ? ", AdvanceNo" : "AdvanceNo";
+                message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "AdvanceNo";
             }
             return message;
         }

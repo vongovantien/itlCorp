@@ -1478,7 +1478,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  UserModified = umodifies.Username,
                                  PaymentStatus = s.PaymentStatus,
                                  SyncStatus = s.SyncStatus,
-                                 LastSyncDate = s.LastSyncDate
+                                 LastSyncDate = s.LastSyncDate,
+                                 ReasonReject = s.ReasonReject
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();

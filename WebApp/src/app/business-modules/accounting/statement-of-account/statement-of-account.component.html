@@ -92,7 +92,8 @@
                                                 <span *ngSwitchCase="'Synced'" class="text-success">
                                                     {{soa.syncStatus}}</span>
                                                 <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                    {{soa.syncStatus}}</span>
+                                                    {{soa.syncStatus}}{{soa.reasonReject ? ' - ' + soa.reasonReject : ''}}
+                                                </span>
                                                 <span *ngSwitchDefault>
                                                     {{soa.syncStatus}}
                                                 </span>

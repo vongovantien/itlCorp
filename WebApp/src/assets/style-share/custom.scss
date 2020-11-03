@@ -1320,6 +1320,9 @@ button {
 }
 
 .ng-select.custom {
+    .ng-input {
+        left: -4px !important;
+    }
     .ng-select-container {
         border-color: #ebedf2;
         background-color: #fbfbfb;

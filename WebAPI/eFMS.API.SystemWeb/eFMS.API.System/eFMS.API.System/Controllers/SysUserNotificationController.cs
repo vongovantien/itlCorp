@@ -42,8 +42,8 @@ namespace eFMS.API.System.Controllers
         [Authorize]
         public IActionResult Paging(int page, int size)
         {
-            var data = sysUserNotificationService.Paging(page, size, out int rowCount);
-            var result = new { data, totalItems = rowCount, page, size };
+            var data = sysUserNotificationService.Paging(page, size, out int rowCount, out int totalNoRead);
+            var result = new { data, totalItems = rowCount, page, size, totalNoRead };
             return Ok(result);
         }
 

@@ -142,8 +142,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 (res: CommonInterface.IResponsePaging) => {
                     this.notifications = res.data || [];
                     this.totalItem = res.totalItems;
-
-                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
+                    this.newMssUnread = res.totalNoRead;
                 }
             );
     }
@@ -187,6 +186,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 if (!!res.data) {
                     this.notifications = [...this.notifications, ...res.data];
                     this.totalItem = res.totalItems;
+                    this.newMssUnread = res.totalNoRead;
                 }
             });
 

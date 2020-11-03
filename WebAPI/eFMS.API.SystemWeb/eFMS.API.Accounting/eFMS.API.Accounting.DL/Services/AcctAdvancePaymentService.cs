@@ -320,6 +320,7 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = advancePayment.SyncStatus,
                            UserCreatedName = Ucgrp.Username,
                            UserModifiedName = Umgrp.Username,
+                           ReasonReject = advancePayment.ReasonReject
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -344,7 +345,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.LastSyncDate,
                 x.SyncStatus,
                 x.UserCreatedName,
-                x.UserModifiedName
+                x.UserModifiedName,
+                x.ReasonReject
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -370,7 +372,8 @@ namespace eFMS.API.Accounting.DL.Services
                 LastSyncDate = s.Key.LastSyncDate,
                 SyncStatus = s.Key.SyncStatus,
                 UserCreatedName = s.Key.UserCreatedName,
-                UserModifiedName = s.Key.UserModifiedName
+                UserModifiedName = s.Key.UserModifiedName,
+                ReasonReject = s.Key.ReasonReject
             });
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();

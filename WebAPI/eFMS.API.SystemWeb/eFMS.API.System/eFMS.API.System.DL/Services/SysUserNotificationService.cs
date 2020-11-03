@@ -72,11 +72,12 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        IQueryable<SysUserNotificationModel> ISysUserNotification.Paging(int page, int size, out int rowsCount)
+        IQueryable<SysUserNotificationModel> ISysUserNotification.Paging(int page, int size, out int rowsCount, out int totalNoRead)
         {
             IQueryable<SysUserNotificationModel> data = GetQuery();
 
             rowsCount = data.Count();
+            totalNoRead = data.Count(x => x.Status == SystemConstants.NOTIFICATION_STATUS_NEW);
             if (page == 0)
             {
                 page = 1;
