@@ -1028,6 +1028,10 @@ namespace eFMS.API.Accounting.DL.Services
                             sysNotifyRepository.SubmitChanges();
                             sysUserNotifyRepository.SubmitChanges();
                         }
+                        trans.Commit();
+
+                        data = new List<Guid>();
+                        return result;
                     }
                     catch (Exception ex)
                     {
