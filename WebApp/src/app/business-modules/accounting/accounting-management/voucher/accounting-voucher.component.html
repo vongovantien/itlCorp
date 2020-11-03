@@ -64,7 +64,9 @@
                                                     <span *ngSwitchCase="'Synced'" class="text-success">
                                                         {{voucher.syncStatus}}</span>
                                                     <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                        {{voucher.syncStatus}}</span>
+                                                        {{voucher.syncStatus}}
+                                                        {{voucher.reasonReject ? ' - ' + voucher.reasonReject : ''}}
+                                                    </span>
                                                     <span *ngSwitchDefault>
                                                         {{voucher.syncStatus}}
                                                     </span>
