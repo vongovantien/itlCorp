@@ -24,6 +24,24 @@
             <returns></returns>
             <response></response>
         </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.UpdateVoucherAdvance(eFMS.API.ForPartner.DL.Models.VoucherAdvance,System.String,System.String)">
+            <summary>
+            Update Voucher Advance
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.RemoveVoucherAdvance(System.String,System.String,System.String)">
+            <summary>
+            Remove Voucher Advance
+            </summary>
+            <param name="voucherNo"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CreateInvoiceData(eFMS.API.ForPartner.DL.Models.InvoiceCreateInfo,System.String,System.String)">
             <summary>
             Create Invoice
@@ -56,6 +74,15 @@
             Reject Data
             </summary>
             <param name="model">model to reject data</param>
+            <param name="apiKey">API Key</param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.RemoveVoucher(eFMS.API.ForPartner.DL.Models.RejectData,System.String,System.String)">
+            <summary>
+            Remove Voucher
+            </summary>
+            <param name="model">model to remove data</param>
             <param name="apiKey">API Key</param>
             <param name="hash"></param>
             <returns></returns>
