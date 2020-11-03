@@ -12,6 +12,8 @@ export class CDNoteViewModel {
     creator: string = '';
     status: string = '';
     isSelected: boolean = false;
+    syncStatus: string = '';
+    lastSyncDate: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

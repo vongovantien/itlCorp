@@ -62,7 +62,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
             partner: [],
             issuedDate: [],
             creator: [],
-            filterType: [[this.filterTypes[0]]],
+            filterType: [this.filterTypes[0]],
             filterStatus: []
         });
 
