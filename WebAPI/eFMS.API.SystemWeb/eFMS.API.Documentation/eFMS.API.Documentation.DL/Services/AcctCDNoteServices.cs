@@ -1677,7 +1677,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CDNoteModel> results = null;
             var data = Query(criteria);
             if (data == null) { rowsCount = 0; return results; }
-            var cdNotes = Query(criteria)?.OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
+            var cdNotes = Query(criteria)?.ToArray().OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
             {
                 ReferenceNo = x.Code,
                 PartnerId = x.PartnerId,
@@ -1685,6 +1685,8 @@ namespace eFMS.API.Documentation.DL.Services
                 IssuedDate = x.DatetimeCreated,
                 Creator = x.UserCreated,
                 JobId = x.JobId,
+                SyncStatus = x.SyncStatus,
+                LastSyncDate = x.LastSyncDate
             })?.ToList();
 
             rowsCount = cdNotes.Count;
@@ -1720,8 +1722,9 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     page = 1;
                 }
-                cdNotesGroupByCurrency = cdNotesGroupByCurrency.Skip((page - 1) * size).Take(size);
+                // cdNotesGroupByCurrency = cdNotesGroupByCurrency.Skip((page - 1) * size).Take(size);
                 results = GetCDNotes(cdNotes, cdNotesGroupByCurrency);
+                results = results.Skip((page - 1) * size).Take(size).ToList();
             }
             return results;
         }
@@ -1761,7 +1764,9 @@ namespace eFMS.API.Documentation.DL.Services
                             IssuedDate = cd.IssuedDate,
                             Creator = creator.Username,
                             HBLNo = charge.HBLNo,
-                            Status = charge.Status
+                            Status = charge.Status,
+                            SyncStatus = cd.SyncStatus,
+                            LastSyncDate = cd.LastSyncDate
                         })?.AsQueryable();
             var results = new List<CDNoteModel>();
             foreach (var item in data)

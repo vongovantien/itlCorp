@@ -21,5 +21,8 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string InvoiceNo { get; set; }
         public string VoucherId { get; set; }
         public string IssuedStatus { get; set; }
+        public string SyncStatus { get; set; }
+        public DateTime? LastSyncDate { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }
