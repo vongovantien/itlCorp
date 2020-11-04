@@ -1004,7 +1004,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 DatetimeModified = DateTime.Now,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = "home/accounting/management/" + (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "voucher" : "vat-invoice/") + accounting.Id,
+                                ActionLink = "home/accounting/management/" + (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "voucher/" : "vat-invoice/") + accounting.Id,
                                 IsClosed = false,
                                 IsRead = false
                             };
