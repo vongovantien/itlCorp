@@ -985,7 +985,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency={1}", soa.Soano, soa.Currency)
+                                ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency=VND", soa.Soano)
                             };
                             sysNotificationRepository.Add(sysNotify);
 
