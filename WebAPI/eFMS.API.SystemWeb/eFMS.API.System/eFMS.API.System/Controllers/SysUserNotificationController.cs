@@ -61,5 +61,18 @@ namespace eFMS.API.System.Controllers
             return BadRequest(new ResultHandle { Message = "Đọc tin nhắn không thành công", Status = true });
         }
 
+        [HttpDelete]
+        [Route("Delete")]
+        [Authorize]
+        public IActionResult DeleteMessage(Guid Id)
+        {
+            HandleState result = sysUserNotificationService.Delete(x => x.Id == Id);
+            if (result.Success)
+            {
+                return Ok(new ResultHandle { Message = "Notify was deleted successfully", Status = true });
+            }
+
+            return BadRequest(new ResultHandle { Message = "Delete notify fail", Status = true });
+        }
     }
 }

@@ -15,6 +15,5 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserNotificationModel> GetAll();
         HandleState Add(SysUserNotification sysBuModel);
         HandleState Update(Guid Id);
-        HandleState Delete(Guid Id);
     }
 }

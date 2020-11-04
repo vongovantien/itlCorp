@@ -178,6 +178,27 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             });
     }
 
+    deleteNotify(notify: SysUserNotification, index: number, e: any) {
+        e.stopPropagation();
+        this._spinner.show(this.spinnerNotify);
+        this._systemRepo.deleteMessage(notify.id)
+            .pipe(
+                finalize(() => {
+                    this._spinner.hide(this.spinnerNotify);
+                })
+            )
+            .subscribe((res: CommonInterface.IResult) => {
+                if (!res.status) {
+                    this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
+                } else {
+                    this.notifications.splice(index, 1);
+                    if (notify.status === 'New') {
+                        this.newMssUnread--;
+                    }
+                }
+            });
+    }
+
     loadMoreNotification(e: any) {
         e.stopPropagation();
         this._spinner.show(this.spinnerNotify);
