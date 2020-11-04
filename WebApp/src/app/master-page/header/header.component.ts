@@ -149,6 +149,15 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     selectNotification(noti: SysUserNotification, e: any) {
         e.stopPropagation();
+        if (noti.actionLink) {
+            if (noti.actionLink.includes("?")) {
+                // TODO handle query param
+                // console.log(window.location.host + "/#" + window.location.pathname + noti.actionLink);
+                // this.router.navigateByUrl(window.location.host + "/#" + window.location.pathname + noti.actionLink, { skipLocationChange: true });
+            } else {
+                this.router.navigate([noti.actionLink]);
+            }
+        }
         if (noti.status === 'Read') {
             return;
         }
@@ -162,12 +171,10 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             .subscribe((res: CommonInterface.IResult) => {
                 if (!res.status) {
                     this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
-
                 } else {
                     noti.status = 'Read';
-                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
+                    this.newMssUnread--;
                 }
-
             });
     }
 
