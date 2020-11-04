@@ -152,6 +152,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         // Tính công nợ
                         this.calculatorReceivable(this.charges);
 
+                        //
+
                         this.getProfit();
 
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);

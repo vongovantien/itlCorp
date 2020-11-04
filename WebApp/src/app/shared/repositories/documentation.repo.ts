@@ -214,7 +214,7 @@ export class DocumentationRepo {
     }
 
     previewCDNote(data, isOrigin) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data, {isOrigin: isOrigin}).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data, { isOrigin: isOrigin }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -369,6 +369,33 @@ export class DocumentationRepo {
 
     addShipmentSurcharges(data: any[]) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/AddAndUpdate`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    checkAccountReceivableCreditTerm(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivableCreditTerm`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    checkAccountReceivableExpiredAgreement(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivableExpiredAgreement`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    checkAccountReceivablePaymentTerm(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivablePaymentTerm`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;

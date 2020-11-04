@@ -13,7 +13,6 @@ import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
-import { formatDate } from '@angular/common';
 import { Company } from '@models';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';

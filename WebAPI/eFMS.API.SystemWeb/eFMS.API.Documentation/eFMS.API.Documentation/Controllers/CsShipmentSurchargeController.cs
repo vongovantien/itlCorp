@@ -184,17 +184,17 @@ namespace eFMS.API.Documentation.Controllers
 
 
         /// <summary>
-        /// check account receivable
+        /// check account receivable credit term
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        [HttpPost("CheckAccountReceivableCreditTerm")]
+        [HttpPost("NotificationCreditTerm")]
         [Authorize]
         public IActionResult CheckAccountReceivableCreditTerm([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var hs = csShipmentSurchargeService.CheckCreditTerm(list);
-            var message = HandleError.GetMessage(hs, Crud.Update);
+            var hs = csShipmentSurchargeService.NotificationCreditTerm(list);
+            var message = hs.Message == null ? hs.Exception.Message : HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
@@ -205,17 +205,17 @@ namespace eFMS.API.Documentation.Controllers
 
 
         /// <summary>
-        /// check account receivable
+        /// check account receivable expired agreement
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        [HttpPost("CheckAccountReceivableExpiredAgreement")]
+        [HttpPost("NotificationExpiredAgreement")]
         [Authorize]
         public IActionResult CheckAccountReceivableExpiredAgreement([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var hs = csShipmentSurchargeService.CheckExpiredAgreement(list);
-            var message = HandleError.GetMessage(hs, Crud.Update);
+            var hs = csShipmentSurchargeService.NotificationExpiredAgreement(list);
+            var message = hs.Message == null ? hs.Exception.Message : HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
@@ -224,6 +224,39 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// check account receivable payment terrm
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("NotificationPaymentTerm")]
+        [Authorize]
+        public IActionResult CheckAccountReceivablePaymentTerm([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csShipmentSurchargeService.NotificationPaymenTerm(list);
+            var message = hs.Message == null ? hs.Exception.Message :  HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// check valid account receivable
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("CheckAccountReceivable")]
+        public IActionResult CheckValidAccountReceivable([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            object rs = csShipmentSurchargeService.CheckAccountReceivable(list);
+            return Ok(rs);
+        }
         /// <summary>
         /// update an existed surcharge
         /// </summary>

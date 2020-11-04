@@ -426,14 +426,28 @@
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckAccountReceivableCreditTerm(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
             <summary>
-            check account receivable
+            check account receivable credit term
             </summary>
             <param name="list"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckAccountReceivableExpiredAgreement(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
             <summary>
-            check account receivable
+            check account receivable expired agreement
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckAccountReceivablePaymentTerm(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check account receivable payment terrm
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckValidAccountReceivable(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check valid account receivable
             </summary>
             <param name="list"></param>
             <returns></returns>

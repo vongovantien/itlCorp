@@ -566,7 +566,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public HandleState CheckCreditTerm(List<CsShipmentSurchargeModel> list)
+        public HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list)
         {
             try
             {
@@ -630,7 +630,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    return new HandleState(false, "Credit limit not checked or offcie not found!");
+                    return new HandleState(false, "Credit limit not checked or office not found!");
                 }
                 // end check credit term
 
@@ -642,7 +642,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState CheckExpiredAgreement(List<CsShipmentSurchargeModel> list)
+        public HandleState NotificationExpiredAgreement(List<CsShipmentSurchargeModel> list)
         {
             try
             {
@@ -706,7 +706,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    return new HandleState(false, "Expired Agreement not checked or offcie not found!");
+                    return new HandleState(false, "Expired Agreement not checked or office not found!");
                 }
                 // end check credit term
 
@@ -718,7 +718,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState CheckPaymenterm(List<CsShipmentSurchargeModel> list)
+        public HandleState NotificationPaymenTerm(List<CsShipmentSurchargeModel> list)
         {
             try
             {
@@ -751,7 +751,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         foreach (var item in dataAgreements)
                         {
-                            bool dataAccountReceivable = accAccountReceivableRepository.Any(x => item.OfficeId.Contains(x.OfficeId.ToString()) && item.SaleService.Contains(x.Service) && item.PartnerId == x.PartnerId && x.Over30Day >= 0 );
+                            bool dataAccountReceivable = accAccountReceivableRepository.Any(x => item.OfficeId.Contains(x.Office.ToString()) && item.SaleService.Contains(x.Service) && item.PartnerId == x.PartnerId && x.Over30Day >= 0);
                             if (dataAccountReceivable)
                             {
                                 item.Active = false;
@@ -784,7 +784,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    return new HandleState(false, "Expired Agreement not checked or offcie not found!");
+                    return new HandleState(false, "Expired Agreement not checked or office not found!");
                 }
                 // end check credit term
 
@@ -794,6 +794,74 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState(false, ex.Message);
             }
+        }
+
+        public object CheckAccountReceivable(List<CsShipmentSurchargeModel> list)
+        {
+            bool valid = true;
+            try
+            {
+                string jobno = list.Select(t => t.JobNo).FirstOrDefault();
+                string transactionType = GetTransactionType(jobno);
+                CsTransaction csTransaction = new CsTransaction();
+                OpsTransaction opsTransaction = new OpsTransaction();
+                var hs = new HandleState(false);
+                bool isCheckedPaymenterm = false;
+                bool isCheckedCreditterm = false;
+                bool isCheckedExpiredAgreement = false;
+
+                List<string> listPartner = list.Select(t => t.PaymentObjectId).ToList();
+                List<string> listPartnerByAc = partnerRepository.Get(x => listPartner.Contains(x.Id)).Select(t => t.ParentId).ToList();
+
+                var dataAgreements = transactionType == "CL" ? catContractRepository.Get(x => x.OfficeId.Contains(opsTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId))
+                : catContractRepository.Get(x => x.OfficeId.Contains(csTransaction.OfficeId.ToString()) && x.SaleService.Contains(transactionType) && listPartnerByAc.Contains(x.PartnerId));
+
+                if (transactionType == "CL")
+                {
+                    opsTransaction = opsTransRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
+                    isCheckedCreditterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.CreditLimit == true);
+                    isCheckedPaymenterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.OverPaymentTerm == true);
+                    isCheckedExpiredAgreement = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.ExpiredAgreement == true);
+                }   
+                else
+                {
+                    csTransaction = csTransactionRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
+                    isCheckedCreditterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.CreditLimit == true);
+                    isCheckedPaymenterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.OverPaymentTerm == true);
+                    isCheckedExpiredAgreement = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.ExpiredAgreement == true);
+                }
+                if (dataAgreements != null && dataAgreements.Any())
+                {
+                    if (isCheckedCreditterm)
+                    {
+                        if (dataAgreements.Any(x => x.CreditRate >= 120)) valid = false;
+                        if (!valid) return new { valid, transactionType, listPartner };
+                    }
+                    if (isCheckedExpiredAgreement)
+                    {
+                        if (dataAgreements.Any(x => (x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now))) valid = false;
+                        if (!valid) return new { valid, transactionType , listPartner };
+                    }
+                    if (isCheckedPaymenterm)
+                    {
+                        foreach (var item in dataAgreements)
+                        {
+                            bool dataAccountReceivable = accAccountReceivableRepository.Any(x => item.OfficeId.Contains(x.Office.ToString()) && item.SaleService.Contains(x.Service) && item.PartnerId == x.PartnerId && x.Over30Day >= 0);
+                            if (dataAccountReceivable)
+                            {
+                                valid = false;
+                                break;
+                            }
+                        }
+                        if (!valid) return new { valid, transactionType, listPartner };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return valid;
         }
 
         private HandleState AddNotifications(string description, List<CatContract> dataAgreements)
