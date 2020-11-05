@@ -224,8 +224,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       Quantity9 = surcharge.Quantity,
                                                                                       OriginalUnitPrice = surcharge.UnitPrice,
                                                                                       TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
-                                                                                      OriginalAmount = surcharge.Quantity * surcharge.UnitPrice,
-                                                                                      OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice),
+                                                                                      OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0 , 0) : Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
+                                                                                      OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                       AtchDocNo = surcharge.InvoiceNo,
                                                                                       AtchDocDate = surcharge.InvoiceDate,
@@ -300,8 +300,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Quantity9 = surcharge.Quantity,
                                                                                              OriginalUnitPrice = surcharge.UnitPrice,
                                                                                              TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
-                                                                                             OriginalAmount = surcharge.Quantity * surcharge.UnitPrice,
-                                                                                             OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice),
+                                                                                             OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0,0) : Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
+                                                                                             OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
                                                                                              AtchDocDate = surcharge.InvoiceDate,
@@ -1282,10 +1282,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             return deptCode;
         }
-        private decimal GetOrgVatAmount(decimal? vatrate, decimal? orgAmount)
+        private decimal GetOrgVatAmount(decimal? vatrate, decimal? orgAmount, string currency)
         {
             decimal amount = 0;
             amount = (vatrate != null) ? (vatrate < 101 & vatrate >= 0) ? Math.Round(((orgAmount * vatrate) / 100 ?? 0), 3) : Math.Abs(vatrate ?? 0) : 0;
+            if(currency == AccountingConstants.CURRENCY_LOCAL)
+            {
+                amount = Math.Round(amount, 0);
+            }
             return amount;
         }
         private string GetCustomerHBL(Guid? Id)
