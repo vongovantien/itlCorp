@@ -36,10 +36,6 @@ namespace eFMS.API.System.DL.Services
             throw new NotImplementedException();
         }
 
-        public HandleState Delete(Guid Id)
-        {
-            throw new NotImplementedException();
-        }
 
         public IQueryable<SysUserNotificationModel> GetAll()
         {

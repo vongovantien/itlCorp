@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { ReportPreviewComponent } from '@common';
 import { Crystal } from '@models';
 import { ToastrService } from 'ngx-toastr';
+import { SortService } from '@services';
 
 @Component({
     selector: 'accounting-detail-cd-note',
@@ -31,7 +32,13 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         volume: 'Volume',
         packageQty: 'Package Quantity',
         soa: 'SOA',
-        locked: 'Locked'
+        locked: 'Locked',
+        note: 'Note',
+        syncStatus: 'Sync Status',
+        lastSync: 'Last Sync',
+        currency: 'Currency',
+        exchangeRate: 'ExchangeRate',
+        reasonReject: 'Reason Reject'
     };
     airLabelDetail: any = {
         hbl: 'HAWB/ HBL',
@@ -62,16 +69,20 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         { title: 'VAT', field: 'vatrate', sortable: true },
         { title: "Credit Value", field: 'credit', sortable: true },
         { title: "Debit Value", field: 'debit', sortable: true },
-        { title: 'Note', field: 'notes', sortable: true }
+        { title: 'Note', field: 'notes', sortable: true },
+        { title: 'Exc Rate', field: 'exchangeRate', sortable: true }
     ];
     balanceAmount: string = '';
     totalCredit: string = '';
     totalDebit: string = '';
     cdNote: string = '';
 
-    constructor(private _documentationRepo: DocumentationRepo,
-        private _toastService: ToastrService) {
+    constructor(
+        private _documentationRepo: DocumentationRepo,
+        private _toastService: ToastrService,
+        private _sortService: SortService) {
         super();
+        this.requestSort = this.sortChargeCdNote;
     }
 
     ngOnInit() {
@@ -203,4 +214,9 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
             );
     }
 
+    sortChargeCdNote(sort: string): void {
+        if (this.cdnoteDetail) {
+            this.cdnoteDetail.listSurcharges = this._sortService.sort(this.cdnoteDetail.listSurcharges, sort, this.order);
+        }
+    }
 }
