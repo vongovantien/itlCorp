@@ -657,5 +657,9 @@ export class SystemRepo {
         return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserNotification/Read`, null, { Id: Id });
     }
 
+    deleteMessage(Id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserNotification/Delete`, { Id: Id });
+    }
+
 }
 
