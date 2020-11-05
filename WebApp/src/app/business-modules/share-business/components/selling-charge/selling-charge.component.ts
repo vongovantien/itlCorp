@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -17,6 +17,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
+import { InfoPopupComponent } from '@common';
 
 
 @Component({
@@ -26,12 +27,16 @@ import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 })
 
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
+    @ViewChild('accountReceivablePopup', { static: false }) accountReceivablePopup: InfoPopupComponent;
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
     @Input() showSyncStandard: boolean = true;
 
+
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+
+    messageCreditRate: string = '';
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -140,28 +145,56 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         }
 
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
-        this._progressRef.start();
-
-        this._documentRepo.addShipmentSurcharges(this.charges)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+        this._documentRepo.checkAccountReceivable(this.charges)
+            .pipe(catchError(this.catchError))
             .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-
-                        // Tính công nợ
-                        this.calculatorReceivable(this.charges);
-
-                        //
-
-                        this.getProfit();
-
-                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+                        if (res.validCreditTerm === false) {
+                            this.messageCreditRate = 'The bellow partners are over Credit limit of ' + res.transactionTypes + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
+                            this.messageCreditRate += 'Những đối tượng bên dưới đã vượt quá hạn công nợ của Dịch Vụ ' + res.transactionTypes + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
+                            if (res.partnerAccountReceivables.length > 0) {
+                                res.partnerAccountReceivables.forEach(item => {
+                                    this.messageCreditRate += item.shortName + ' - ' + item.creditRate;
+                                });
+                            }
+                            this.accountReceivablePopup.show();
+                        } else if (res.validPaymentTerm === false) {
+                            this.messageCreditRate = 'The bellow partners have debit overdue [ Payment Term ]' + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
+                            this.messageCreditRate += 'Những đối tượng bên dưới có công nợ quá hạn [ Payment Term ] ' + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
+                            if (res.partnerAccountReceivables.length > 0) {
+                                res.partnerAccountReceivables.forEach(item => {
+                                    this.messageCreditRate += item.shortName + ' - ' + item.creditRate;
+                                });
+                            }
+                        }
                     } else {
-                        this._toastService.error(res.message);
+                        // this.onSave(body);
                     }
-                }
+                },
             );
+
+        // this._documentRepo.addShipmentSurcharges(this.charges)
+        //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+        //     .subscribe(
+        //         (res: CommonInterface.IResult) => {
+        //             if (res.status) {
+        //                 this._toastService.success(res.message);
+
+        //                 // Tính công nợ
+        //                 this.calculatorReceivable(this.charges);
+
+        //                 //
+
+        //                 this.getProfit();
+
+        //                 this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        //             } else {
+        //                 this._toastService.error(res.message);
+        //             }
+        //         }
+        //     );
     }
 
     syncFreightCharge() {

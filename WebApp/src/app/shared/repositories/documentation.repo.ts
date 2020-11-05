@@ -394,6 +394,16 @@ export class DocumentationRepo {
         );
     }
 
+    checkAccountReceivable(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivable`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+
     checkAccountReceivablePaymentTerm(data: any[]) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivablePaymentTerm`, data).pipe(
             catchError((error) => throwError(error)),
