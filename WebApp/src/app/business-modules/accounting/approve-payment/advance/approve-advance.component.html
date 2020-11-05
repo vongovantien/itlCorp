@@ -5,7 +5,9 @@
             <div class="m-portlet__body">
                 <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" mode="approve">
                     <span *ngIf="!!advancePayment && !!advancePayment.syncStatus"
-                        class="m-badge m-badge--{{advancePayment.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">{{advancePayment.syncStatus}}</span>
+                        class="m-badge m-badge--{{advancePayment.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
+                        {{advancePayment.syncStatus}}{{advancePayment.syncStatus === 'Rejected' && advancePayment.reasonReject ? ' - ' + advancePayment.reasonReject : ''}}
+                    </span>
 
                     <!-- ? Cho phép người có quyền approve chỉnh sửa -->
                     <div class="update-payment-term pos-rel">
