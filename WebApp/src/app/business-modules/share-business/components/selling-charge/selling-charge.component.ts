@@ -156,18 +156,44 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                             this.messageCreditRate += 'Những đối tượng bên dưới đã vượt quá hạn công nợ của Dịch Vụ ' + res.transactionTypes + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
                             if (res.partnerAccountReceivables.length > 0) {
                                 res.partnerAccountReceivables.forEach(item => {
-                                    this.messageCreditRate += item.shortName + ' - ' + item.creditRate;
+                                    if (!!item.creditRate) {
+                                        this.messageCreditRate += item.shortName + ' - ' + item.creditRate + '<br>';
+                                    }
                                 });
                             }
                             this.accountReceivablePopup.show();
                         } else if (res.validPaymentTerm === false) {
-                            this.messageCreditRate = 'The bellow partners have debit overdue [ Payment Term ]' + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
-                            this.messageCreditRate += 'Những đối tượng bên dưới có công nợ quá hạn [ Payment Term ] ' + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
+
+                            this.messageCreditRate = 'The bellow partners have debit overdue ' + res.partnerAccountReceivables[0].paymentTerm + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
+                            this.messageCreditRate += 'Những đối tượng bên dưới có công nợ quá hạn ' + res.partnerAccountReceivables[0].paymentTerm + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
                             if (res.partnerAccountReceivables.length > 0) {
                                 res.partnerAccountReceivables.forEach(item => {
-                                    this.messageCreditRate += item.shortName + ' - ' + item.creditRate;
+                                    this.messageCreditRate += item.shortName + ' - ' + item.paymentTerm;
                                 });
                             }
+                            this.accountReceivablePopup.show();
+                        } else {
+                            this._documentRepo.addShipmentSurcharges(this.charges)
+                                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                                .subscribe(
+                                    (result: CommonInterface.IResult) => {
+                                        if (result.status) {
+                                            this._toastService.success(result.message);
+
+                                            // Tính công nợ
+                                            this.calculatorReceivable(this.charges);
+
+                                            //
+
+                                            this.getProfit();
+
+                                            this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                                            console.log(this.charges);
+                                        } else {
+                                            this._toastService.error(result.message);
+                                        }
+                                    }
+                                );
                         }
                     } else {
                         // this.onSave(body);
@@ -175,26 +201,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 },
             );
 
-        // this._documentRepo.addShipmentSurcharges(this.charges)
-        //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-        //     .subscribe(
-        //         (res: CommonInterface.IResult) => {
-        //             if (res.status) {
-        //                 this._toastService.success(res.message);
 
-        //                 // Tính công nợ
-        //                 this.calculatorReceivable(this.charges);
-
-        //                 //
-
-        //                 this.getProfit();
-
-        //                 this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
-        //             } else {
-        //                 this._toastService.error(res.message);
-        //             }
-        //         }
-        //     );
     }
 
     syncFreightCharge() {

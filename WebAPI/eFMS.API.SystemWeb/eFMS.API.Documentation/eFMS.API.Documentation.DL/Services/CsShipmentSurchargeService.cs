@@ -610,7 +610,28 @@ namespace eFMS.API.Documentation.DL.Services
                         catContractRepository.SubmitChanges();
                         if (hs.Success)
                         {
-                            string description = string.Format(@"<b style='color:#3966b6'>Contract</b> has been inactive");
+                            //string title = "Over Credit Term";
+                            var dataPartner = partnerRepository.Get(x => listPartner.Contains(x.Id)).ToList();
+                            string description = string.Empty;
+                            foreach (var item in dataPartner)
+                            {
+                                string type = string.Empty;
+                                if(item.PartnerType == "Customer")
+                                {
+                                    type = "Customer"; 
+                                }
+                                else if(item.PartnerType == "Agent")
+                                {
+                                    type = "Agent";
+                                }
+                                else
+                                {
+                                    type = "Partner Data";
+                                }
+                                description +=  type + " " +  string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over credit limit with" + dataAgreements.Where(x => x.CreditRate >= 120 && x.PartnerId == item.Id).Select(t => t.CreditRate).FirstOrDefault() + "</br>");
+                            }
+                            description += " Please check it soon ";
+
                             // Add Notification
                             HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
                             if (resultAddNotification.Success)
@@ -837,26 +858,27 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     string transactionTypes = API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == transactionType)?.DisplayName;
                     var dataPartner = partnerRepository.Get(x => listPartner.Contains(x.Id)).ToList();
-                    foreach(var item in dataPartner)
+                    foreach (var item in dataPartner)
                     {
-                        PartnerAccountReceivable partnerAccountReceivable = new PartnerAccountReceivable();
-                        partnerAccountReceivable.ShortName = item.ShortName;
-                        foreach(var agreement in dataAgreements)
+
+                        foreach (var agreement in dataAgreements)
                         {
-                            if(item.ParentId == agreement.PartnerId)
+                            PartnerAccountReceivable partnerAccountReceivable = new PartnerAccountReceivable();
+                            partnerAccountReceivable.ShortName = item.ShortName;
+                            if (item.ParentId == agreement.PartnerId && ( ( agreement.CreditRate >= 120) || (accAccountReceivableRepository.Any(x => x.PartnerId == agreement.PartnerId && (agreement.OfficeId.Contains(x.Office.ToString()) && agreement.SaleService.Contains(x.Service) && x.Over30Day > 0)))))
                             {
+                                partnerAccountReceivable.PaymentTerm = agreement.PaymentTerm;
                                 partnerAccountReceivable.CreditRate = agreement.CreditRate;
-                                var dataAccountReceivable = accAccountReceivableRepository.Get(x => agreement.OfficeId.Contains(x.Office.ToString()) && agreement.SaleService.Contains(x.Service) && agreement.PartnerId == x.PartnerId && x.Over30Day > 0).Select(x=>x.Over30Day).FirstOrDefault();
-                                partnerAccountReceivable.PaymentTerm = dataAccountReceivable;
+                                partnerAccountReceivables.Add(partnerAccountReceivable);
+
                             }
-                            partnerAccountReceivables.Add(partnerAccountReceivable);
                         }
                     }
-                    partnerAccountReceivables = partnerAccountReceivables.Distinct().ToList();
                     if (isCheckedCreditterm)
                     {
+                      
                         if (dataAgreements.Any(x => x.CreditRate >= 120)) validCreditTerm = false;
-                        var data = partnerAccountReceivables.Find(x => x.CreditRate == null || x.CreditRate == 0 || x.CreditRate < 120);
+                        var data = partnerAccountReceivables.Find(x => x.CreditRate != null && x.CreditRate < 120);
                         partnerAccountReceivables.Remove(data);
                     }
                     if (isCheckedExpiredAgreement)
@@ -874,8 +896,9 @@ namespace eFMS.API.Documentation.DL.Services
                                 break;
                             }
                         }
-                    }
 
+                    }
+                    
                     return new { validCreditTerm, validPaymentTerm, validExpiredDate, transactionTypes, partnerAccountReceivables };
                 }
             }

@@ -194,13 +194,13 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var hs = csShipmentSurchargeService.NotificationCreditTerm(list);
-            var message = hs.Message == null ? hs.Exception.Message : HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            //var message = hs.Message == null ? hs.Exception.Message : HandleError.GetMessage(hs, Crud.Update);
+            //ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            //if (!hs.Success)
+            //{
+            //    return BadRequest(result);
+            //}
+            return Ok(hs.Success);
         }
 
 
