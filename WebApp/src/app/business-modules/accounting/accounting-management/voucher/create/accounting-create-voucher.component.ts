@@ -79,10 +79,6 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
     }
 
     checkValidateForm() {
-        this.setError(this.formCreateComponent.currency);
-        this.setError(this.formCreateComponent.paymentMethod);
-        this.setError(this.formCreateComponent.voucherType);
-
         let valid: boolean = true;
         if (!this.formCreateComponent.formGroup.valid) {
             valid = false;
