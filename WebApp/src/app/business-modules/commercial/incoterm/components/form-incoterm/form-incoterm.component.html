@@ -23,8 +23,8 @@
                 <div class="col-lg-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !service.valid}">
                         <label required>Service</label>
-                        <ng-select #s [items]="services" (opened)="closeOtherSelects(s)" formControlName="service"
-                            (selected)="onSelectService($event)">
+                        <ng-select class="custom" [items]="services" formControlName="service"
+                            (add)="onSelectService($event)" bindLabel="text" bindValue="id">
                         </ng-select>
                     </div>
                 </div>

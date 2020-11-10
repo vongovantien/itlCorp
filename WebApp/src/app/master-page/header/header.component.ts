@@ -114,17 +114,16 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysUserNotification) => {
             if (data) {
-                // this._toast.info(`You have a new message ${data.title}`, 'Infomation');
                 this.getListNotification();
             }
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation');
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation');
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {

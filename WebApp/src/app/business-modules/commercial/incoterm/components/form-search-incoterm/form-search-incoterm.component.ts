@@ -2,7 +2,6 @@ import { Component, OnInit, Output, EventEmitter, } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { ChargeConstants } from '@constants';
-import { Incoterm } from '@models';
 
 @Component({
     selector: 'form-search-incoterm',
@@ -36,8 +35,8 @@ export class CommercialFormSearchIncotermComponent extends AppForm implements On
 
     statusSelects: CommonInterface.INg2Select[] = [
         { text: 'All', id: 'All' },
-        { text: 'Inactive', id: "0" },
-        { text: 'Active', id: "1" },
+        { text: 'Inactive', id: false },
+        { text: 'Active', id: true },
     ];
 
     constructor(
@@ -56,8 +55,8 @@ export class CommercialFormSearchIncotermComponent extends AppForm implements On
     initForm() {
         this.formSearch = this._fb.group({
             incoterm: [],
-            service: [[this.services[0]]],
-            status: [[this.statusSelects[0]]],
+            service: [[this.services[0].id]],
+            status: [this.statusSelects[0].id],
         });
         this.incoterm = this.formSearch.controls["incoterm"];
         this.service = this.formSearch.controls["service"];
@@ -69,48 +68,43 @@ export class CommercialFormSearchIncotermComponent extends AppForm implements On
         const body = this.formatSearchParams(dataForm);
         this.onSearch.emit(body);
     }
-    //
+
     onResetIncoterm() {
         const body = {};
         this.onReset.emit(body);
     }
-    //
+
     formatSearchParams(body: any): ISearchIncoterm {
-        const checkAllItem = [...body.service].filter(e => e.id === 'All');
+        const checkAllItem = [...body.service].filter(e => e === 'All');
         if (checkAllItem.length > 0) {
             return {
                 code: body.incoterm,
                 service: null,
-                active: body.status[0].id === 'All' ? null : body.status[0].id === "1" ? true : false,
+                active: body.status === 'All' ? null : body.status,
             };
         } else {
-            const serviceQuery = [...body.service].map(ele => {
-                return ele.id;
-            });
             return {
                 code: body.incoterm,
-                service: serviceQuery,
-                active: body.status[0].id === 'All' ? null : body.status[0].id === "1" ? true : false,
+                service: body.service,
+                active: body.status === 'All' ? null : body.status,
             };
         }
     }
-    //select service
-    selelectedService(event) {
+
+    selelectedService(event: CommonInterface.INg2Select) {
         const currService = this.service.value;
-        if ([...currService].filter(ele => ele.id === 'All').length > 0 && event.id !== "All") {
+        if (currService.filter(ele => ele === 'All').length > 0 && event.id !== "All") {
             currService.splice(0);
-            currService.push(event);
+            currService.push(event.id);
             this.service.setValue(currService);
         }
         if (event.id === 'All') {
-            const onlyAllObj = currService.filter(ele => ele.id === 'All');
+            const onlyAllObj = currService.filter(ele => ele === 'All');
             this.service.setValue(onlyAllObj);
         }
-
     }
-
-
 }
+
 interface ISearchIncoterm {
     code: string;
     service: string[];

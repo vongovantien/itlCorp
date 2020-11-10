@@ -9,6 +9,7 @@
                         <span
                             class="m-badge m-badge--{{accountingManagement.status === 'New' && (!accountingManagement.syncStatus || accountingManagement.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
                             {{!accountingManagement.syncStatus ? accountingManagement.status : accountingManagement.syncStatus}}
+                            {{accountingManagement.syncStatus === 'Rejected' && accountingManagement.reasonReject ? ' - ' + accountingManagement.reasonReject : ''}}
                         </span>
                     </h3>
                     <div>
