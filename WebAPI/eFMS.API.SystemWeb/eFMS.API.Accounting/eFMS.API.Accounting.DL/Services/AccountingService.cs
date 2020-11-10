@@ -1392,7 +1392,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _originAmount;
         }
-
         private decimal GetOrgVatAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _orgVatAmout = 0;
@@ -1408,6 +1407,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _orgVatAmout;
         }
+        
         #endregion -- Private Method --
 
     }
