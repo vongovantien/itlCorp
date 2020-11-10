@@ -215,17 +215,23 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       ItemCode = charge.Code,
                                                                                       Description = charge.ChargeNameVn,
                                                                                       Unit = unit.UnitNameVn,
-                                                                                      CurrencyCode = surcharge.CurrencyId,
+                                                                                      // CR 14952
+                                                                                      CurrencyCode = (item.AccountNo == "3311" || item.AccountNo == "3313") ? item.CurrencyCode : surcharge.CurrencyId,
                                                                                       ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL),
                                                                                       BillEntryNo = surcharge.Hblno,
                                                                                       Ma_SpHt = surcharge.JobNo,
                                                                                       MasterBillNo = surcharge.Mblno,
                                                                                       DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
                                                                                       Quantity9 = surcharge.Quantity,
-                                                                                      OriginalUnitPrice = surcharge.UnitPrice,
                                                                                       TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
-                                                                                      OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0 , 0) : Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
-                                                                                      OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
+
+                                                                                      // CR 14952
+                                                                                      OriginalUnitPrice = GetOriginalUnitPriceWithAccountNo(surcharge.UnitPrice ?? 0, item.AccountNo, surcharge.FinalExchangeRate ?? 1),
+                                                                                      OriginalAmount = GetOriginAmountWithAccountNo(item.AccountNo, surcharge),
+                                                                                      OriginalAmount3 = GetOrgVatAmountWithAccountNo(item.AccountNo, surcharge),
+                                                                                      Amount = surcharge.AmountVnd,
+                                                                                      Amount3 = surcharge.VatAmountVnd,
+
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                       AtchDocNo = surcharge.InvoiceNo,
                                                                                       AtchDocDate = surcharge.InvoiceDate,
@@ -300,7 +306,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Quantity9 = surcharge.Quantity,
                                                                                              OriginalUnitPrice = surcharge.UnitPrice,
                                                                                              TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
-                                                                                             OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0,0) : Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
+                                                                                             OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 0) : Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
                                                                                              OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
@@ -522,7 +528,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
                 foreach (var surcharge in surcharges)
-                {                    
+                {
                     var charge = new ChargeSyncModel();
                     charge.RowId = surcharge.Id.ToString();
                     charge.Ma_SpHt = surcharge.JobNo;
@@ -549,7 +555,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.OriginalUnitPrice = Math.Round(_unitPrice ?? 0, decimalRound); //Đơn giá
                     charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
                     var _totalNoVat = surcharge.Quantity * _unitPrice;
-                    charge.OriginalAmount =  Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
+                    charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
                     var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
                     charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế
 
@@ -1091,7 +1097,7 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.LastSyncDate = DateTime.Now;
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
 
-                        string description = string.Format(@"CD Note <b style='color:#3966b6'>{0}</b> has been synced", cdNote.Code);                       
+                        string description = string.Format(@"CD Note <b style='color:#3966b6'>{0}</b> has been synced", cdNote.Code);
                         // Add Notification
                         SysNotifications sysNotification = new SysNotifications
                         {
@@ -1286,7 +1292,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             decimal amount = 0;
             amount = (vatrate != null) ? (vatrate < 101 & vatrate >= 0) ? Math.Round(((orgAmount * vatrate) / 100 ?? 0), 3) : Math.Abs(vatrate ?? 0) : 0;
-            if(currency == AccountingConstants.CURRENCY_LOCAL)
+            if (currency == AccountingConstants.CURRENCY_LOCAL)
             {
                 amount = Math.Round(amount, 0);
             }
@@ -1303,7 +1309,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return customerName;
         }
-
         private string GetLinkCdNote(string cdNoteNo, Guid jobId)
         {
             string _link = string.Empty;
@@ -1354,7 +1359,55 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return _link;
         }
+        private decimal GetOriginalUnitPriceWithAccountNo(decimal unitPrice, string accountNo, decimal finalExchange = 1)
+        {
+            decimal _unitPrice = 0;
+            if (!string.IsNullOrEmpty(accountNo) && (accountNo == "3311" || accountNo == "3313"))
+            {
+                _unitPrice = Math.Round(unitPrice * finalExchange);
+            }
+            else
+            {
+                _unitPrice = unitPrice;
+            }
 
+            return _unitPrice;
+        }
+        private decimal GetOriginAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
+        {
+            decimal _originAmount = 0;
+            if (!string.IsNullOrEmpty(accountNo) && (accountNo == "3311" || accountNo == "3313"))
+            {
+                _originAmount = surcharge.AmountVnd ?? 0;
+            }
+            else
+            {
+                // Tính toán như cũ
+                _originAmount = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
+                if(surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    _originAmount = Math.Round(_originAmount, 0);
+                }
+            }
+
+            return _originAmount;
+        }
+
+        private decimal GetOrgVatAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
+        {
+            decimal _orgVatAmout = 0;
+            if (!string.IsNullOrEmpty(accountNo) && (accountNo == "3311" || accountNo == "3313"))
+            {
+                _orgVatAmout = surcharge.VatAmountVnd ?? 0;
+            }
+            else
+            {
+                // Tính toán như cũ
+                _orgVatAmout = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId);
+            }
+
+            return _orgVatAmout;
+        }
         #endregion -- Private Method --
 
     }

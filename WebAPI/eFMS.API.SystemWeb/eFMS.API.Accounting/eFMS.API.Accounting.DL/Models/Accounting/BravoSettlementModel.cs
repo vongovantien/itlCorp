@@ -50,5 +50,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public DateTime? AtchDocDate { get; set; } // Invoice Date
         public string AtchDocSerieNo { get; set; } // Serie
         public string ChargeType { get; set; } // CREDIT / OBH
+        public decimal? Amount { get; set; }
+        public decimal? Amount3 { get; set; }
     }
 }
