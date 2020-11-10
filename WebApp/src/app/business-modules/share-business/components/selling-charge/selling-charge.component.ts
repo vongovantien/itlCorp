@@ -188,6 +188,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                                             this.getProfit();
 
                                             this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+
                                             console.log(this.charges);
                                         } else {
                                             this._toastService.error(result.message);
@@ -195,8 +196,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                                     }
                                 );
                         }
-                    } else {
-                        // this.onSave(body);
                     }
                 },
             );

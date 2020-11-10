@@ -190,16 +190,10 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("NotificationCreditTerm")]
         [Authorize]
-        public IActionResult CheckAccountReceivableCreditTerm([FromBody]List<CsShipmentSurchargeModel> list)
+        public IActionResult NotificationCreditTerm([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
             var hs = csShipmentSurchargeService.NotificationCreditTerm(list);
-            //var message = hs.Message == null ? hs.Exception.Message : HandleError.GetMessage(hs, Crud.Update);
-            //ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            //if (!hs.Success)
-            //{
-            //    return BadRequest(result);
-            //}
             return Ok(hs.Success);
         }
 
@@ -211,17 +205,11 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("NotificationExpiredAgreement")]
         [Authorize]
-        public IActionResult CheckAccountReceivableExpiredAgreement([FromBody]List<CsShipmentSurchargeModel> list)
+        public IActionResult NotificationExpiredAgreement([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
             var hs = csShipmentSurchargeService.NotificationExpiredAgreement(list);
-            var message = hs.Message == null ? hs.Exception.Message : HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return Ok(hs.Success);
         }
 
 
@@ -236,13 +224,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var hs = csShipmentSurchargeService.NotificationPaymenTerm(list);
-            var message = hs.Message == null ? hs.Exception.Message :  HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return Ok(hs.Success);
         }
 
         /// <summary>

@@ -44,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        private readonly IContextBase<CatContract> catContractRepository;
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
 
@@ -66,7 +67,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
-            ICurrencyExchangeService currencyExchange, 
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<CatContract> catContractRepo,
             IStringLocalizer<LanguageSub> localizer,
             IUserBaseService userBase) : base(repository, mapper)
         {
@@ -90,6 +92,7 @@ namespace eFMS.API.Accounting.DL.Services
             userBaseService = userBase;
             stringLocalizer = localizer;
             sentEmailHistoryRepo = sentEmailHistory;
+            catContractRepository = catContractRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -1502,6 +1505,9 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
+                            // to do send notification
+
+
                         }
                         else
                         {
@@ -2212,6 +2218,106 @@ namespace eFMS.API.Accounting.DL.Services
 
             return sendMailResult;
         }
+
+        private string GetTransactionType(string jobNo)
+        {
+            string transactionType = null;
+            if (!string.IsNullOrEmpty(jobNo))
+            {
+                IQueryable<CsTransaction> docTransaction = csTransactionRepo.Get(x => x.JobNo == jobNo);
+                if (docTransaction != null && docTransaction.Count() > 0)
+                {
+                    transactionType = docTransaction?.FirstOrDefault()?.TransactionType;
+                }
+                else
+                {
+                    IQueryable<OpsTransaction> opsTransaction = opsTransactionRepo.Get(x => x.JobNo == jobNo);
+                    if (opsTransaction != null && opsTransaction.Count() > 0)
+                    {
+                        transactionType = "CL";
+                    }
+                    else
+                    {
+                        return string.Empty;
+                    }
+                }
+                return transactionType;
+            }
+            return string.Empty;
+
+        }
+
+        //Check Agreements Data 
+        private List<CatContract> GetAgreementDatasByAdvanceNo(string advanceNo)
+        {
+            try
+            {
+                var list = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo)
+                   .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo })
+                   .Select(se => new AcctAdvanceRequest
+                   {
+                       JobId = se.First().JobId,
+                       Hbl = se.First().Hbl,
+                   }).ToList().OrderByDescending(o => o.DatetimeModified);
+
+                var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
+                var lstHouseBill = datamap.Select(t => t.Hblid).Distinct().ToList();
+                List<string> lstJobNo = datamap.Select(t => t.JobId).Distinct().ToList();
+                List<ShipmentTypeModel> lstJob = new List<ShipmentTypeModel>();
+                var listCustomer = csTransactionDetailRepo.Get(x => lstHouseBill.Contains(x.Id)).Select(t => t.CustomerId).ToList();
+                List<string> listPartnerByAc = catPartnerRepo.Get(x => listCustomer.Contains(x.Id)).Select(t => t.ParentId).ToList();
+                List<string> transactionTypes = new List<string>();
+                List<CatContract> agreements = new List<CatContract>();
+
+
+                if (lstJobNo.Count() > 0)
+                {
+                    foreach (var item in lstJobNo)
+                    {
+                        string type = GetTransactionType(item);
+                        ShipmentTypeModel shipmentTypeModel = new ShipmentTypeModel();
+                        shipmentTypeModel.JobNo = item;
+                        shipmentTypeModel.TransactionType = type;
+                        lstJob.Add(shipmentTypeModel);
+                    }
+                }
+
+
+                if (lstJob.Count() > 0)
+                {
+                    foreach (var item in lstJob)
+                    {
+
+                        CatContract agreement = new CatContract();
+                        if (item.TransactionType == "CL")
+                        {
+                            OpsTransaction opsTransaction = new OpsTransaction();
+                            opsTransaction = opsTransactionRepo.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                            var data = catContractRepository.Get(x => x.OfficeId.Contains(opsTransaction.OfficeId.ToString()) && x.SaleService.Contains(item.TransactionType) && listPartnerByAc.Contains(x.PartnerId));
+                            agreements.AddRange(data);
+                        }
+                        else
+                        {
+                            CsTransaction csTransaction = new CsTransaction();
+                            csTransaction = csTransactionRepo.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                            var data = catContractRepository.Get(x => x.OfficeId.Contains(csTransaction.OfficeId.ToString()) && x.SaleService.Contains(item.TransactionType) && listPartnerByAc.Contains(x.PartnerId));
+                            agreements.AddRange(data);
+                        }
+                    }
+                }
+                return agreements;
+            }
+            catch(Exception ex)
+            {
+                throw ex; 
+            }
+        }
+
+
+        //Send notification credit term
+        
+
+
 
         //Send Mail Approved
         private bool SendMailApproved(string advanceNo, DateTime approvedDate)

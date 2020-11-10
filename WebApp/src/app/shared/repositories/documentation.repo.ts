@@ -376,8 +376,8 @@ export class DocumentationRepo {
         );
     }
 
-    checkAccountReceivableCreditTerm(data: any[]) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivableCreditTerm`, data).pipe(
+    notificationAccountReceivableCreditTerm(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/NotificationCreditTerm`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -385,14 +385,25 @@ export class DocumentationRepo {
         );
     }
 
-    checkAccountReceivableExpiredAgreement(data: any[]) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivableExpiredAgreement`, data).pipe(
+    notificationReceivableExpiredAgreement(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/NotificationExpiredAgreement`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
             })
         );
     }
+
+
+    notificationReceivablePaymentTerm(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/NotificationPaymentTerm`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
 
     checkAccountReceivable(data: any[]) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivable`, data).pipe(
@@ -403,15 +414,6 @@ export class DocumentationRepo {
         );
     }
 
-
-    checkAccountReceivablePaymentTerm(data: any[]) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CheckAccountReceivablePaymentTerm`, data).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
-        );
-    }
 
     upLoadContainerFile(files: any, id: string, isHouseBill: boolean) {
         return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/UploadFile`, files, "uploadedFile", { id: id, isHouseBill: isHouseBill });

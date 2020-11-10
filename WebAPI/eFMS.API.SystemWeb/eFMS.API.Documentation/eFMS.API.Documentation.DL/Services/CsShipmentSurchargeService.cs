@@ -580,7 +580,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (transactionType == "CL")
                 {
                     opsTransaction = opsTransRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
-                    isCheckedCreditRate = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.CreditLimit == true);
+                    isCheckedCreditRate = settingFlowRepository.Any(x => x.OfficeId == opsTransaction.OfficeId && x.CreditLimit == true);
                 }
                 else
                 {
@@ -615,20 +615,7 @@ namespace eFMS.API.Documentation.DL.Services
                             string description = string.Empty;
                             foreach (var item in dataPartner)
                             {
-                                string type = string.Empty;
-                                if(item.PartnerType == "Customer")
-                                {
-                                    type = "Customer"; 
-                                }
-                                else if(item.PartnerType == "Agent")
-                                {
-                                    type = "Agent";
-                                }
-                                else
-                                {
-                                    type = "Partner Data";
-                                }
-                                description +=  type + " " +  string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over credit limit with" + dataAgreements.Where(x => x.CreditRate >= 120 && x.PartnerId == item.Id).Select(t => t.CreditRate).FirstOrDefault() + "</br>");
+                                description =  string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over credit limit with " + dataAgreements.Where(x => x.CreditRate >= 120 && x.PartnerId == item.Id).Select(t => t.CreditRate).FirstOrDefault() + "</br>");
                             }
                             description += " Please check it soon ";
 
@@ -677,7 +664,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (transactionType == "CL")
                 {
                     opsTransaction = opsTransRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
-                    isCheckedExpiredAgreement = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.ExpiredAgreement == true);
+                    isCheckedExpiredAgreement = settingFlowRepository.Any(x => x.OfficeId == opsTransaction.OfficeId && x.ExpiredAgreement == true);
                 }
                 else
                 {
@@ -707,7 +694,13 @@ namespace eFMS.API.Documentation.DL.Services
                         catContractRepository.SubmitChanges();
                         if (hs.Success)
                         {
-                            string description = string.Format(@"<b style='color:#3966b6'>Contract</b> has been inactive");
+                            var dataPartner = partnerRepository.Get(x => listPartner.Contains(x.Id)).ToList();
+                            string description = string.Empty;
+                            foreach (var item in dataPartner)
+                            {
+                                description = string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over Expired Date with" + dataAgreements.Where(x => ((x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now)) && x.PartnerId == item.Id).Select(t => t.ExpiredDate).FirstOrDefault() + "</br>");
+                            }
+                            description += " Please check it soon ";
                             // Add Notification
                             HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
                             if (resultAddNotification.Success)
@@ -753,7 +746,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (transactionType == "CL")
                 {
                     opsTransaction = opsTransRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
-                    isCheckedPaymenterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.OverPaymentTerm == true);
+                    isCheckedPaymenterm = settingFlowRepository.Any(x => x.OfficeId == opsTransaction.OfficeId && x.OverPaymentTerm == true);
                 }
                 else
                 {
@@ -785,7 +778,26 @@ namespace eFMS.API.Documentation.DL.Services
                         catContractRepository.SubmitChanges();
                         if (hs.Success)
                         {
-                            string description = string.Format(@"<b style='color:#3966b6'>Contract</b> has been inactive");
+                            string description = string.Empty;
+                            var dataPartner = partnerRepository.Get(x => listPartner.Contains(x.Id)).ToList();
+                            foreach (var item in dataPartner)
+                            {
+                                string type = string.Empty;
+                                if (item.PartnerType == "Customer")
+                                {
+                                    type = "Customer";
+                                }
+                                else if (item.PartnerType == "Agent")
+                                {
+                                    type = "Agent";
+                                }
+                                else
+                                {
+                                    type = "Partner Data";
+                                }
+                                description += type + " " + string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> has debit overdue" + dataAgreements.Where(x=> x.PartnerId == item.Id).Select(t => t.PaymentTerm).FirstOrDefault() + "</br>");
+                            }
+                            description += " Please check it soon ";
                             // Add Notification
                             HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
                             if (resultAddNotification.Success)
