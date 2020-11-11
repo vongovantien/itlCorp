@@ -988,44 +988,6 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = DataContext.Add(accounting, false);
                         if (hs.Success)
                         {
-                            string _Type = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "Voucher" : "VAT Invoice");
-                            string _Ref = (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? accounting.VoucherId : accounting.InvoiceNoTempt);
-                            string description = string.Format(@"[Type] <b style='color:#3966b6'>[RefNo]</b> has been created");
-                            description = description.Replace("[Type]", _Type);
-                            description = description.Replace("[RefNo]", _Ref);
-                            // Add Notification
-                            SysNotifications sysNotification = new SysNotifications {
-                                Id = Guid.NewGuid(),
-                                Title = description,
-                                Description = description,
-                                Type = "User",
-                                UserCreated = currentUser.UserID,
-                                DatetimeCreated = DateTime.Now,
-                                DatetimeModified = DateTime.Now,
-                                UserModified = currentUser.UserID,
-                                Action = "Detail",
-                                ActionLink = "home/accounting/management/" + (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE ? "voucher/" : "vat-invoice/") + accounting.Id,
-                                IsClosed = false,
-                                IsRead = false
-                            };
-
-                            HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification);
-                            if(hsSysNotification.Success)
-                            {
-                                SysUserNotification userNotify = new SysUserNotification {
-                                    Id = Guid.NewGuid(),
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    Status = "New",
-                                    NotitficationId = sysNotification.Id,
-                                    UserId = currentUser.UserID,
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                };
-
-                                sysUserNotifyRepository.Add(userNotify);
-                            }
-
                             List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
 
                             foreach (ChargeOfAccountingManagementModel chargeOfAcct in chargesOfAcct)
@@ -1092,7 +1054,6 @@ namespace eFMS.API.Accounting.DL.Services
                             surchargeRepo.SubmitChanges();
                             soaRepo.SubmitChanges();
                             DataContext.SubmitChanges();
-                            sysUserNotifyRepository.SubmitChanges();
                             trans.Commit();
                         }
                         return hs;
