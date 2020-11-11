@@ -9,7 +9,6 @@ import { Partner } from '@models';
 import { CatalogueRepo } from '@repositories';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { SortService } from '@services';
 
 @Component({
   selector: 'app-commercial-branch-sub-list',
@@ -24,7 +23,8 @@ export class CommercialBranchSubListComponent extends AppList {
   @Input() parentId: string;
   @Input() partnerType: string;
   @Input() openOnPartner: boolean = false;
-
+  isAddSubPartner: boolean;
+  
   constructor(private _router: Router,
     private _catalogueRepo: CatalogueRepo,
     private _toastService: ToastrService,
@@ -38,7 +38,6 @@ export class CommercialBranchSubListComponent extends AppList {
 
   partners: Partner[] = [];
   selectedPartner: Partner;
-  isAddSubPartner: boolean;
 
   ngOnInit() {
     this.headers = [
@@ -65,10 +64,13 @@ export class CommercialBranchSubListComponent extends AppList {
   }
 
   gotoCreatePartner() {
-    if (this.partnerType === 'Customer') {
-      this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.parentId}/newBranchSub`]);
+    this.isAddSubPartner = true;
+    if (this.openOnPartner) {
+      this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/add/${this.parentId}/${this.isAddSubPartner}`]);
+    } else if (this.partnerType === 'Customer') {
+      this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/new/${this.parentId}/${this.isAddSubPartner}`]);
     } else {
-      this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${this.parentId}/newBranchSub`]);
+      this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/new/${this.parentId}/${this.isAddSubPartner}`]);
     }
   }
 
@@ -80,14 +82,13 @@ export class CommercialBranchSubListComponent extends AppList {
       ).subscribe(
         (res: boolean) => {
           if (res) {
-            console.log('toute' + this.openOnPartner)
             if (this.openOnPartner) {
-              this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detailBranchSub/${partner.id}`]);
+              this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${partner.id}`]);
             } else {
               if (partner.partnerType === 'Customer') {
-                this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${partner.id}/BranchSub`]);
+                this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${partner.id}`]);
               } else {
-                this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${partner.id}/BranchSub`]);
+                this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${partner.id}`]);
               }
             }
           } else {
@@ -99,7 +100,19 @@ export class CommercialBranchSubListComponent extends AppList {
 
   showConfirmDelete(partner: Partner) {
     this.selectedPartner = partner;
-    this._catalogueRepo.checkDeletePartnerPermission(partner.id)
+    this._catalogueRepo.getDetailPartner(this.selectedPartner.id)
+      .subscribe(
+        (res: any) => {
+          if (!res) {
+            this._toastService.warning("This Partner '" + this.selectedPartner.shortName + "' has been deleted, Please check again!");
+          } else {
+            this.checkDeletePartnerPermission(partner.id);
+          }
+        });
+  }
+
+  checkDeletePartnerPermission(partnerId: string) {
+    this._catalogueRepo.checkDeletePartnerPermission(partnerId)
       .pipe(
         catchError(this.catchError),
         finalize(() => this._progressRef.complete())

@@ -28,10 +28,7 @@ const routing: Routes = [
                 path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Agent' }
             },
             {
-                path: ':partnerId/newBranchSub', component: CommercialDetailComponent, data: { name: 'New Branch/Sub', path: "partnerId" }
-            },
-            {
-                path: ':partnerId/BranchSub', component: CommercialDetailComponent, data: { name: 'View/Edit Agent' }
+                path: 'new/:partnerId/:isAddSub', component: CommercialDetailComponent, data: { name: 'New Branch/Sub', path: ':partnerId' }
             },
         ]
     }

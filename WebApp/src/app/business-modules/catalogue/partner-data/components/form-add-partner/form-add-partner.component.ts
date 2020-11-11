@@ -97,6 +97,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerMode: AbstractControl;
     partnerLocation: AbstractControl;
     internalCode: AbstractControl;
+    isAddBranchSub: boolean;
 
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
@@ -439,10 +440,7 @@ export class FormAddPartnerComponent extends AppForm {
         index = this.parentCustomers.findIndex(x => x.id === partner.parentId);
         if (index > -1) {
             parentCustomerActive = [this.parentCustomers[index]];
-        } else {
-            this.getACRefName(partner.parentId);
         }
-
         index = this.countries.findIndex(x => x.id === partner.countryId);
         if (index > - 1) {
             countryIdActive = [this.countries[index]];
@@ -462,14 +460,14 @@ export class FormAddPartnerComponent extends AppForm {
         this.public = partner.public;
 
         this.partnerForm.setValue({
-            partnerAccountNo: partner.accountNo,
+            partnerAccountNo: this.isAddBranchSub ? null : partner.accountNo,
             internalReferenceNo: partner.internalReferenceNo,
             partnerNameEn: partner.partnerNameEn,
             partnerNameVn: partner.partnerNameVn,
             shortName: partner.shortName,
             //
-            partnerAccountRef: partner.parentId,
-            taxCode: partner.taxCode,
+            partnerAccountRef: this.isAddBranchSub ? partner.id : partner.parentId,
+            taxCode: this.isAddBranchSub ? null : partner.taxCode,
             partnerGroup: partnerGroupActives,
             countryShippingId: partner.countryShippingId,
             provinceShippingId: partner.provinceShippingId,
@@ -497,7 +495,7 @@ export class FormAddPartnerComponent extends AppForm {
             bankAccountAddress: partner.bankAccountAddress,
             swiftCode: partner.swiftCode,
 
-            active: partner.active === null ? false : partner.active,
+            active: this.isAddBranchSub ? false : (partner.active === null ? false : partner.active),
             note: partner.note,
             coLoaderCode: partner.coLoaderCode,
             roundUpMethod: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
@@ -511,7 +509,6 @@ export class FormAddPartnerComponent extends AppForm {
 
     getPartnerGroupActives(arg0: string[]): any {
         const partnerGroupActives = [];
-        console.log('partnerGroupActives ' + arg0)
         if (arg0.length > 0) {
             for (let i = 0; i < arg0.length; i++) {
                 partnerGroupActives.push(arg0[i]);

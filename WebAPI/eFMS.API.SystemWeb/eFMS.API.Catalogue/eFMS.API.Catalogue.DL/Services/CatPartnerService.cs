@@ -85,6 +85,7 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<OpsTransaction>("Id", "SupplierId");
             SetChildren<OpsTransaction>("Id", "AgentId");
             SetChildren<CatPartnerCharge>("Id", "PartnerId");
+            SetChildren<CatContract>("Id", "PartnerId");
             SetChildren<CsManifest>("Id", "Supplier");
             SetChildren<CsShipmentSurcharge>("Id", "PayerID");
             SetChildren<CsShipmentSurcharge>("Id", "PaymentObjectID");
@@ -557,6 +558,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var s = contractRepository.Delete(x => x.PartnerId == id);
                 contractRepository.SubmitChanges();
+                var partnerUpdate = DataContext.Get(x => x.ParentId == id);
+                foreach (var partner in partnerUpdate)
+                {
+                    partner.ParentId = partner.Id;
+                    DataContext.Update(partner, x => x.Id == partner.Id);
+                }
                 ClearCache();
                 Get();
             }

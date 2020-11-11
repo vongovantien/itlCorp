@@ -6,8 +6,8 @@
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3 class="w-75">
-                        {{isAddSub ? (type == 'Customer'? 'Customer': 'Agent') : partner?.partnerNameEn}}
-                        <ng-container *ngIf="!!partner && !isAddSub">
+                        {{isAddSubPartner ? (type == 'Customer'? 'Customer': 'Agent') : partner?.partnerNameEn}}
+                        <ng-container *ngIf="!!partner && !isAddSubPartner">
                             <ng-container *ngIf="partner.active else inactive">
                                 <span class="m-badge m-badge--success m-badge--wide">
                                     Active
@@ -22,9 +22,9 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button *ngIf="!isAddSub" [buttonSetting]="saveButtonSetting" (onClick)="onSaveDetail()">
+                            <app-default-button *ngIf="!isAddSubPartner" [buttonSetting]="saveButtonSetting" (onClick)="onSaveDetail()">
                             </app-default-button>
-                            <app-default-button *ngIf="isAddSub" [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
+                            <app-default-button *ngIf="isAddSubPartner" [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
                             </app-default-button>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
                             </app-default-button>
@@ -33,7 +33,7 @@
                 </div>
                 <hr />
                 <form-create-commercial [isUpdate]="true"></form-create-commercial>
-                <div class="row" *ngIf="!!partner && !isAddSub">
+                <div class="row" *ngIf="!!partner && !isAddSubPartner">
                     <div class="col-6">
                         <div class="m--align-left">
                             Created: {{partner.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}

@@ -85,9 +85,6 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
-        if (!!localStorage.getItem('id_token_url_obj')) {
-            localStorage.removeItem('id_token_url_obj');
-        }
         this.tabSelect(this.activeTab);
     }
     resetSearch(event) {
@@ -155,7 +152,20 @@ export class PartnerComponent extends AppList implements OnInit {
 
     showConfirmDelete(event) {
         this.partner = event;
-        this._catalogueRepo.checkDeletePartnerPermission(this.partner.id)
+        this._catalogueRepo.getDetailPartner(this.partner.id)
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.warning("This Partner '" + this.partner.shortName + "' has been deleted, Please check again!");
+                        this.allPartnerComponent.getPartners();
+                    } else {
+                        this.checkDeletePartnerPermission(this.partner.id);
+                    }
+                });
+    }
+
+    checkDeletePartnerPermission(partnerId: string) {
+        this._catalogueRepo.checkDeletePartnerPermission(partnerId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -168,7 +178,6 @@ export class PartnerComponent extends AppList implements OnInit {
                     }
                 }
             );
-
     }
 
     showDetail(event) {
@@ -224,7 +233,8 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     addPartner() {
-        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/add`], { queryParams: { partnerType: this.criteria.partnerGroup } });
+        const type = this.activeTab === this.tabName.allTab ? -1 : this.criteria.partnerGroup;
+        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/add`], { queryParams: { partnerType: type } });
     }
 
     export() {

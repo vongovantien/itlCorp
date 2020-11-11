@@ -232,7 +232,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             List<string> idsContract = null;
-            if (model.Contracts.Count() > 0)
+            if (model.Contracts?.Count() > 0)
             {
 
                 model.Contracts.ForEach(x => x.Id = Guid.NewGuid());

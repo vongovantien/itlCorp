@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
+import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -15,21 +15,19 @@ import { ConfirmPopupComponent } from '@common';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommonEnum } from '@enums';
-import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-detail-commercial',
     templateUrl: './detail-commercial.component.html',
 })
+
 export class CommercialDetailComponent extends CommercialCreateComponent implements OnInit {
     @ViewChild(CommercialFormCreateComponent, { static: false }) formCommercialComponent: CommercialFormCreateComponent;
     @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
     @ViewChild(CommercialBranchSubListComponent, { static: false }) formBranchSubList: CommercialBranchSubListComponent;
     partnerId: string;
     partner: Partner;
-    isAddSub: boolean;
 
-    public originRoute: string = '';
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
@@ -42,13 +40,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     ngOnInit(): void {
-        if (!localStorage.getItem('id_token_url_obj') && this._router.url.search('BranchSub') === -1) {
-            localStorage.setItem('id_token_url_obj', this._router.url);
-        }
     }
 
     ngAfterViewInit() {
-
         combineLatest([
             this._activedRoute.params,
             this._activedRoute.data,
@@ -56,20 +50,24 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             map(([p, d]) => ({ ...p, ...d }))
         ).subscribe(
             (res: any) => {
+                if (res.isAddSub) {
+                    if (localStorage.getItem('success_add_sub') === "true") {
+                        localStorage.removeItem('success_add_sub');
+                        this.back();
+                    }
+                    this.isAddSubPartner = res.isAddSub;
+                    this.partnerList.isAddSubPartner = this.isAddSubPartner;
+                }
                 if (res.type) {
                     this.type = res.type;
                     this.partnerList.partnerType = this.type;
                 }
-                if (res.name) {
-                    this.isAddSub = res.name === 'New Branch/Sub';
-                }
                 if (res.partnerId) {
                     this.partnerId = res.partnerId;
                     this.partnerList.parentId = this.partnerId;
-                    this.partnerList.isAddSubPartner = this.isAddSub;
 
                     this.getDetailCustomer(this.partnerId);
-                    if (!this.isAddSub) {
+                    if (!this.isAddSubPartner) {
                         this.contractList.partnerId = this.partnerId;
                         this.contractList.getListContract(this.partnerId);
                         this.partnerList.getSubListPartner(this.partnerId, this.type);
@@ -82,10 +80,19 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
     }
 
+
     onFocusInternalReference() {
         this.confirmTaxcode.hide();
         //
         this.formCommercialComponent.handleFocusInternalReference();
+    }
+
+    getDetailPartner(partnerId: string) {
+        this._catalogueRepo.getDetailPartner(partnerId)
+            .subscribe(
+                (res: Partner) => {
+                    this.partner = res;
+                });
     }
 
     getDetailCustomer(partnerId: string) {
@@ -94,10 +101,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 (res: Partner) => {
                     this.partner = res;
                     console.log("detail partner:", this.partner);
-                    // this.formCreate.formGroup.patchValue(res);
+                    this.formCreate.isBranchSub = this.isAddSubPartner;
                     this.setDataForm(this.partner);
-                    if (this.isAddSub) {
-                        this.formCreate.isBranchSub = true;
+                    if (this.isAddSubPartner) {
                         this.formCreate.isUpdate = false;
                         this.formCreate.getACRefName(this.partner.id);
                     } else {
@@ -114,11 +120,11 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
     setDataForm(partner: Partner) {
         this.formCreate.formGroup.patchValue({
-            accountNo: this.isAddSub ? null : partner.accountNo,
+            accountNo: this.isAddSubPartner ? null : partner.accountNo,
             partnerNameEn: partner.partnerNameEn,
             partnerNameVn: partner.partnerNameVn,
             shortName: partner.shortName,
-            taxCode: this.isAddSub ? null : partner.taxCode,
+            taxCode: this.isAddSubPartner ? null : partner.taxCode,
             internalReferenceNo: partner.internalReferenceNo,
             addressShippingEn: partner.addressShippingEn,
             addressShippingVn: partner.addressShippingVn,
@@ -138,7 +144,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             provinceId: partner.provinceId,
             provinceShippingId: partner.provinceShippingId,
             partnerLocation: !!partner.partnerLocation ? [<CommonInterface.INg2Select>{ id: partner.partnerLocation, text: partner.partnerLocation }] : null,
-            parentId: this.isAddSub ? partner.id : partner.parentId
+            parentId: this.isAddSubPartner ? partner.id : partner.parentId
         });
     }
 
@@ -186,7 +192,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
         modelAdd.contracts = this.contractList.contracts;
 
-        modelAdd.id = this.isAddSub ? null : this.partnerId;
+        modelAdd.id = this.isAddSubPartner ? null : this.partnerId;
         modelAdd.userCreated = this.partner.userCreated;
         modelAdd.datetimeCreated = this.partner.datetimeCreated;
         modelAdd.partnerType = this.partner.partnerType;
@@ -273,7 +279,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     if (res || res.status) {
                         this.partner = res;
                         console.log("detail partner:", this.partner);
-                        this.isAddSub = false;
+                        this.isAddSubPartner = false;
                         this.formCreate.formGroup.patchValue(res);
                     } else {
                         this._toastService.error(res.message);
@@ -286,31 +292,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     gotoList() {
-        this.originRoute = localStorage.getItem('id_token_url_obj');
-        if (this.originRoute === this._router.url) {
-            localStorage.removeItem('id_token_url_obj');
-            if (this.type === 'Customer') {
-                this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}`]);
-            } else {
-                this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}`]);
-            }
-        } else
-            if (this.isAddSub) {
-                this.partnerId = this.partner.id;
-                if (this.type === 'Customer') {
-                    this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}`]);
-                } else {
-                    this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${this.partnerId}`]);
-                }
-            } else {
-                this.partnerId = this.partner.parentId;
-                if (this.type === 'Customer') {
-                    this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}`]);
-                } else {
-                    this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${this.partnerId}`]);
-                }
-            }
+        this.back();
     }
-
 }
 

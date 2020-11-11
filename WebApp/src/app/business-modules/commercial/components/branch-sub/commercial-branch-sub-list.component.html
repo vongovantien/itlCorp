@@ -39,7 +39,7 @@
                                             class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <ng-container *ngIf="!item.active && !openOnPartner">
+                                        <ng-container *ngIf="!item.active">
                                             <button (click)="showConfirmDelete(item)"
                                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                 <i class="la la-trash"></i>
@@ -64,6 +64,6 @@
     </div>
 </div>
 
-<confirm-popup body="You want to delete this agent ?" (onSubmit)="onDelete()"></confirm-popup>
+<confirm-popup body="You want to delete this {{openOnPartner ? 'Partner' : partnerType}}?" (onSubmit)="onDelete()"></confirm-popup>
 
 <permission-403-popup></permission-403-popup>

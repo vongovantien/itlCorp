@@ -8,11 +8,11 @@ import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { SalemanAdd } from 'src/app/shared/models/catalogue/salemanadd.model';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, finalize, map } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, combineLatest } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
@@ -78,10 +78,13 @@ export class PartnerDetailComponent extends AppList {
     currenctUser: any = '';
     company: Company[] = [];
     salemansId: string = null;
+    allowDelete: boolean = true;
+    allowUpdate: boolean = true;
 
     list: any[] = [];
 
     isDup: boolean = false;
+    isAddSubPartner: boolean = false;
 
     menuSpecialPermission: Observable<any[]>;
 
@@ -107,29 +110,39 @@ export class PartnerDetailComponent extends AppList {
     }
 
     ngOnInit() {
-        if (!localStorage.getItem('id_token_url_obj') && this.router.url.search('BranchSub') === -1) {
-            localStorage.setItem('id_token_url_obj', this.router.url);
-        }
         this.initHeaderSalemanTable();
-        this.route.params.subscribe((prams: any) => {
-            if (!!prams.id) {
-                this.partner.id = prams.id;
-                this.getListContract(this.partner.id);
-            }
-        });
-        this.route.data.subscribe((prams: any) => {
-            if (prams.name === "Detail BranchSub") {
-                this.getParnerDetails();
-            }
-        });
-        this.getDataCombobox();
+        combineLatest([
+            this.route.params,
+            this.route.data,
+        ]).pipe(
+            map(([p, d]) => ({ ...p, ...d }))
+        ).subscribe(
+            (res: any) => {
+                if (!!res.id) {
+                    this.partner.id = res.id;
+                }
+                if (res.isAddSubPartner) {
+                    if (localStorage.getItem('success_add_sub') === "true") {
+                        localStorage.removeItem('success_add_sub');
+                        this.back();
+                    }
+                    this.isAddSubPartner = res.isAddSubPartner;
+                }
+                this.getDataCombobox();
+                if (this.isAddSubPartner) {
+                    this.getListContract(null);
+                } else {
+                    this.getListContract(this.partner.id);
+                }
+            });
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
     }
 
     ngAfterViewInit() {
-        this.formPartnerComponent.isUpdate = true;
+        this.formPartnerComponent.isUpdate = !this.isAddSubPartner;
 
         this._cd.detectChanges();
     }
@@ -145,14 +158,23 @@ export class PartnerDetailComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.partner = res;
+                        this.allowDelete = this.partner.permission.allowDelete;
+                        this.allowUpdate = this.partner.permission.allowUpdate;
+                        this.formPartnerComponent.isAddBranchSub = this.isAddSubPartner;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
                         console.log("res: ", res);
                         this.formPartnerComponent.setFormData(this.partner);
+                        if (this.isAddSubPartner) {
+                            this.formPartnerComponent.getACRefName(this.partner.id);
+                        } else {
+                            this.getParentCustomers();
+                            this.formPartnerComponent.getACRefName(this.partner.parentId);
+                        }
                         console.log(this.partner.partnerMode);
                         if (this.partner.partnerMode === 'External') {
                             this.formPartnerComponent.isDisabledInternalCode = true;
                         }
-                        if (!!this.partner.partnerType) {
+                        if (!!this.partner.partnerType && !this.isAddSubPartner) {
                             this.getSubListPartner(this.partner.id, this.partner.partnerType);
                         }
                         this.formPartnerComponent.activePartner = this.partner.active;
@@ -161,6 +183,19 @@ export class PartnerDetailComponent extends AppList {
             );
 
     }
+
+    getParentCustomers() {
+        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.ALL, true, this.partner.id)
+            .pipe(catchError(this.catchError), finalize(() => { }))
+            .subscribe(
+                (res) => {
+                    if (res) {
+                        this.formPartnerComponent.parentCustomers = res;
+                    } else { this.formPartnerComponent.parentCustomers = []; }
+                }
+            );
+    }
+
     checkRequireSaleman(partnerGroup: string): boolean {
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
@@ -341,6 +376,11 @@ export class PartnerDetailComponent extends AppList {
 
     onSubmit() {
         this.formPartnerComponent.isSubmitted = true;
+        if (this.isAddSubPartner) {
+            this.formPartnerComponent.applyDim.setErrors(null);
+            this.formPartnerComponent.roundUpMethod.setErrors(null);
+            this.formPartnerComponent.partnerMode.setErrors(null);
+        }
         if (!this.formPartnerComponent.partnerForm.valid) {
             return;
         }
@@ -357,7 +397,7 @@ export class PartnerDetailComponent extends AppList {
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
-                    s = s + item['id'] + ';';
+                    s = s + item + ';';
                 }
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }
@@ -374,12 +414,12 @@ export class PartnerDetailComponent extends AppList {
             partnerGroup: this.partner.partnerGroup,
             partnerMode: formBody.partnerMode != null && formBody.partnerMode.length > 0 ? formBody.partnerMode[0].id : null,
             partnerLocation: formBody.partnerLocation != null && formBody.partnerLocation.length > 0 ? formBody.partnerLocation[0].id : null,
-            id: this.partner.id,
+            id: this.isAddSubPartner ? null : this.partner.id,
         };
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
-        //merge clone & this.partner.
+        // merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
 
         console.log("merge2: ", mergeObjPartner);
@@ -448,18 +488,35 @@ export class PartnerDetailComponent extends AppList {
     onSave(body: any) {
 
         this._progressRef.start();
-        this._catalogueRepo.updatePartner(body.id, body)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this.formPartnerComponent.activePartner = this.partner.active;
-                        this._toastService.success(res.message);
-                    } else {
-                        this._toastService.warning(res.message);
+        if (!this.isAddSubPartner) {
+            this._catalogueRepo.updatePartner(body.id, body)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this.formPartnerComponent.activePartner = this.partner.active;
+                            this._toastService.success(res.message);
+                        } else {
+                            this._toastService.warning(res.message);
+                        }
                     }
-                }
-            );
+                );
+        } else {
+            this._catalogueRepo.createPartner(body)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res.result.success) {
+                            localStorage.setItem('success_add_sub', "true");
+                            this._toastService.success("New data added");
+                            this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${res.model.id}`]);
+                        } else {
+                            this._toastService.error("Opps", "Something getting error!");
+                        }
+
+                    }, err => {
+                    });
+        }
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {
@@ -556,6 +613,7 @@ export class PartnerDetailComponent extends AppList {
                 (res: Partner[]) => {
                     this.listSubPartner.partners = res || [];
                     this.listSubPartner.parentId = partnerId;
+                    this.listSubPartner.partnerType = partnerType;
                 }
             );
     }
@@ -611,12 +669,6 @@ export class PartnerDetailComponent extends AppList {
     }
 
     gotoList() {
-        this.originRoute = localStorage.getItem('id_token_url_obj');
-        if (this.originRoute === this.router.url) {
-            localStorage.removeItem('id_token_url_obj');
-            this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}`]);
-        } else {
-            this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/${this.partner.parentId}`]);
-        }
+        this.back();
     }
 }
