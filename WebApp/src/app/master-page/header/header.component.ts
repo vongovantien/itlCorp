@@ -114,17 +114,16 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysUserNotification) => {
             if (data) {
-                // this._toast.info(`You have a new message ${data.title}`, 'Infomation');
                 this.getListNotification();
             }
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation');
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation');
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {
@@ -149,6 +148,15 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     selectNotification(noti: SysUserNotification, e: any) {
         e.stopPropagation();
+        if (noti.actionLink) {
+            if (noti.actionLink.includes("?")) {
+                // TODO handle query param
+                // console.log(window.location.host + "/#" + window.location.pathname + noti.actionLink);
+                // this.router.navigateByUrl(window.location.host + "/#" + window.location.pathname + noti.actionLink, { skipLocationChange: true });
+            } else {
+                this.router.navigate([noti.actionLink]);
+            }
+        }
         if (noti.status === 'Read') {
             return;
         }
@@ -162,12 +170,31 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             .subscribe((res: CommonInterface.IResult) => {
                 if (!res.status) {
                     this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
-
                 } else {
                     noti.status = 'Read';
-                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
+                    this.newMssUnread--;
                 }
+            });
+    }
 
+    deleteNotify(notify: SysUserNotification, index: number, e: any) {
+        e.stopPropagation();
+        this._spinner.show(this.spinnerNotify);
+        this._systemRepo.deleteMessage(notify.id)
+            .pipe(
+                finalize(() => {
+                    this._spinner.hide(this.spinnerNotify);
+                })
+            )
+            .subscribe((res: CommonInterface.IResult) => {
+                if (!res.status) {
+                    this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
+                } else {
+                    this.notifications.splice(index, 1);
+                    if (notify.status === 'New') {
+                        this.newMssUnread--;
+                    }
+                }
             });
     }
 

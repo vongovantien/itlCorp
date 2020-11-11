@@ -15,6 +15,7 @@ import { CommercialFormSearchIncotermComponent } from './components/form-search-
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 const routing: Routes = [
@@ -46,7 +47,8 @@ const routing: Routes = [
         SharedModule,
         CommonModule,
         FormsModule,
-        SelectModule,
+        // SelectModule,
+        NgSelectModule,
         ReactiveFormsModule,
         TabsModule.forRoot(),
         RouterModule.forChild(routing),

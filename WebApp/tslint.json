@@ -150,7 +150,8 @@
         "no-any": [
             true,
             {
-                "ignore-rest-args": true
+                "ignore-rest-args": true,
+                "ignore-params": true
             }
         ]
     }
