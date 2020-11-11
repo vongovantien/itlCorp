@@ -147,8 +147,8 @@ export class CatalogueRepo {
         }
 
     }
-    getPartnersByType(type: number, active: boolean = true) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, { partnerGroup: type, active: active }).pipe(
+    getPartnersByType(type: number, active: boolean = true, exceptId: string = null) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, { partnerGroup: type, active: active, id: exceptId }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -556,6 +556,12 @@ export class CatalogueRepo {
 
     getDetailPartner(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getSubListPartner(id: string, partnerType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetSubListPartnerByID/${id}/${partnerType}`).pipe(
             map((data: any) => data)
         );
     }

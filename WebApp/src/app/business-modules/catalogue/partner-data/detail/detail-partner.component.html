@@ -7,7 +7,7 @@
                 <app-breadcrumb></app-breadcrumb>
             </div>
             <div class="c-button-actions">
-                <button *ngIf="partner.permission.allowDelete && !partner.active" type="button"
+                <button *ngIf="allowDelete && !partner.active && !isAddSubPartner" type="button"
                     class="btn btn-danger   m-btn--icon  m-btn--uppercase" (click)="showConfirmDelete()">
                     <span>
                         <i class="la la-trash"></i>
@@ -17,7 +17,7 @@
                     </span>
                 </button>
                 <button
-                    *ngIf="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true && !partner.active"
+                    *ngIf="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true && !partner.active && !isAddSubPartner"
                     type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
                     (click)="showRejectCommentPopup()">
                     <span>
@@ -26,7 +26,7 @@
                         </span>
                     </span>
                 </button>
-                <button *ngIf="partner.permission.allowUpdate" type=""
+                <button *ngIf="allowUpdate" type=""
                     class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                     <span>
                         <i class="la la la-save"></i>
@@ -35,8 +35,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn  m-btn--icon m-btn--uppercase"
-                    routerLink="/home/catalogue/partner-data">
+                <button type="button" class="btn  m-btn--icon m-btn--uppercase" (click)="gotoList()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -53,8 +52,16 @@
         <!--begin::Form-->
         <form-add-partner (requireSaleman)="isShowSaleMan=$event" [isUpdate]="true"></form-add-partner>
         <!--end::Form-->
-        <commercial-contract-list [openOnPartner]="true"></commercial-contract-list>
-
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Agreement">
+                    <commercial-contract-list [openOnPartner]="true"></commercial-contract-list>
+                </tab>
+                <tab heading="Branch/Sub">
+                    <app-commercial-branch-sub-list [openOnPartner]="true"></app-commercial-branch-sub-list>
+                </tab>
+            </tabset>
+        </div>
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>

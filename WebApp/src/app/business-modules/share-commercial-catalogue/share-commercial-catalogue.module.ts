@@ -15,12 +15,14 @@ import { FormContractCommercialPopupComponent } from "./components/form-contract
 import { CommercialContractListComponent } from "../commercial/components/contract/commercial-contract-list.component";
 import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
 import { PartnerRejectPopupComponent } from "./components/partner-reject/partner-reject.popup";
+import { CommercialBranchSubListComponent } from "../commercial/components/branch-sub/commercial-branch-sub-list.component";
 
 const COMPONENTS = [
     FormContractCommercialPopupComponent,
     CommercialContractListComponent,
     SalesmanCreditLimitPopupComponent,
-    PartnerRejectPopupComponent
+    PartnerRejectPopupComponent,
+    CommercialBranchSubListComponent
 ]
 @NgModule({
     declarations: [

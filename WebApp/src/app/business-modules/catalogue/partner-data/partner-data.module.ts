@@ -37,6 +37,9 @@ const routing: Routes = [
             {
                 path: 'detail/:id', component: PartnerDetailComponent, data: { name: "Detail", level: 3 }
             },
+            {
+                path: 'add-sub/:id', component: PartnerDetailComponent, data: { name: "New PartnerSub", level: 3, action: true }
+            },
         ]
     },
 

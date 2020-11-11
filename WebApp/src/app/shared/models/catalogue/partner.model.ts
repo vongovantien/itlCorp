@@ -57,6 +57,7 @@ export class Partner {
     inactiveOn?: string = '';
     workPlaceId: string = '';
     userCreatedName: string = '';
+    userModifiedName: string = '';
     internalReferenceNo: string = '';
     coLoaderCode: string = '';
     workPhoneEx: string = '';

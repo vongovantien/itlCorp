@@ -178,9 +178,9 @@ export class JobConstants {
 
     public static readonly CONFIG = {
         COMBOGRID_PARTNER: <CommonInterface.IComboGridDisplayField[]>[
+            { field: 'accountNo', label: 'Partner Code' },
             { field: 'shortName', label: 'Name ABBR' },
-            { field: 'partnerNameEn', label: 'Name EN' },
-            { field: 'taxCode', label: 'Tax Code' },
+            { field: 'partnerNameEn', label: 'Name EN' },      
         ],
         COMBOGRID_PORT: <CommonInterface.IComboGridDisplayField[]>[
             { field: 'code', label: 'Port Code' },
