@@ -248,6 +248,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private AccAccountingManagement ModelInvoiceDebit(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> debitCharges, ICurrentUser _currentUser)
         {
+            var debitChargeFirst = debitCharges[0];
             AccAccountingManagement invoice = new AccAccountingManagement();
             invoice.Id = Guid.NewGuid();
             invoice.PartnerId = partner?.Id;
@@ -258,7 +259,7 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.PaymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID; //Set default "Unpaid"
             invoice.Type = ForPartnerConstants.ACCOUNTING_INVOICE_TYPE; //Type is Invoice
             invoice.VoucherId = GenerateVoucherId(invoice.Type, string.Empty); //Auto Gen VoucherId
-            invoice.ReferenceNo = debitCharges[0].ReferenceNo; //Cập nhật Reference No cho Invoice
+            invoice.ReferenceNo = debitChargeFirst.ReferenceNo; //Cập nhật Reference No cho Invoice
             invoice.Currency = model.Currency; //Currency of Invoice
             invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(debitCharges, model.Currency); // Calculator Total Amount
             invoice.UserCreated = invoice.UserModified = _currentUser.UserID;
@@ -266,13 +267,13 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.GroupId = _currentUser.GroupId;
             invoice.DepartmentId = _currentUser.DepartmentId;
 
-            var firstCharge = surchargeRepo.Get(x => x.Id == debitCharges[0].ChargeId).Select(s => new { s.OfficeId, s.CompanyId }).FirstOrDefault();
+            var firstCharge = surchargeRepo.Get(x => x.Id == debitChargeFirst.ChargeId).Select(s => new { s.OfficeId, s.CompanyId }).FirstOrDefault();
             invoice.OfficeId = firstCharge?.OfficeId ?? Guid.Empty; //Lấy OfficeId của first charge
             invoice.CompanyId = firstCharge?.CompanyId ?? Guid.Empty; //Lấy CompanyId của first charge
 
-            invoice.PaymentTerm = debitCharges[0].PaymentTerm;
+            invoice.PaymentTerm = debitChargeFirst.PaymentTerm;
             invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
-            invoice.AccountNo = SetAccountNoForInvoice(partner?.PartnerMode, model.Currency);
+            invoice.AccountNo = !string.IsNullOrEmpty(debitChargeFirst.AccountNo) ? debitChargeFirst.AccountNo : SetAccountNoForInvoice(partner?.PartnerMode, model.Currency);
             invoice.Description = model.Description;
             return invoice;
         }
@@ -304,7 +305,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
             invoice.PaymentTerm = obhCharges[0].PaymentTerm;
             invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
-            invoice.AccountNo = string.Empty; //Để trống
+            invoice.AccountNo = obhCharges[0].AccountNo;
             invoice.Description = model.Description;
             return invoice;
         }

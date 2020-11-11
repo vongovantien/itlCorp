@@ -24,5 +24,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState SyncListVoucherToBravo(List<Guid> ids, out List<Guid> data);
         HandleState SyncListCdNoteToAccountant(List<Guid> ids);
         HandleState SyncListSoaToAccountant(List<int> ids);
+        void SendMailAndPushNotificationToAccountant(List<SyncCreditModel> syncCreditModels);
     }
 }
