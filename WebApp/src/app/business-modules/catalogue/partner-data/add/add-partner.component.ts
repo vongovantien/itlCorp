@@ -68,6 +68,8 @@ export class AddPartnerDataComponent extends AppList {
     list: any[] = [];
 
     isDup: boolean = false;
+    name: string;
+    isAddSubPartner: boolean;
 
     constructor(private route: ActivatedRoute,
         private _catalogueRepo: CatalogueRepo,
@@ -90,6 +92,10 @@ export class AddPartnerDataComponent extends AppList {
         this.initHeaderSalemanTable();
         this.route.queryParams.subscribe(prams => {
             if (prams.partnerType !== undefined) {
+                if (localStorage.getItem('success_add_sub') === "true") {
+                    localStorage.removeItem('success_add_sub');
+                    this.back();
+                }
                 this.partnerType = Number(prams.partnerType);
                 if (this.partnerType === '3') {
                     this.isShowSaleMan = true;
@@ -265,6 +271,12 @@ export class AddPartnerDataComponent extends AppList {
         if (partnerGroup === PartnerGroupEnum.ALL) {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
+        if (partnerGroup === -1) {
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CARRIER"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "CONSIGNEE"));
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SHIPPER"));
+        }
+
         if (this.partnerGroupActives.find(x => x.id === "ALL")) {
             this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             this.isShowSaleMan = true;
@@ -365,6 +377,7 @@ export class AddPartnerDataComponent extends AppList {
 
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,
+            partnerType: 'Supplier'
         };
 
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
@@ -480,6 +493,7 @@ export class AddPartnerDataComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res.result.success) {
+                        localStorage.setItem('success_add_sub', "true");
                         this._toastService.success("New data added");
                         this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${res.model.id}`]);
                     } else {

@@ -6,8 +6,8 @@
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3 class="w-75">
-                        {{partner?.partnerNameEn}}
-                        <ng-container *ngIf="!!partner">
+                        {{isAddSubPartner ? (type == 'Customer'? 'Customer': 'Agent') : partner?.partnerNameEn}}
+                        <ng-container *ngIf="!!partner && !isAddSubPartner">
                             <ng-container *ngIf="partner.active else inactive">
                                 <span class="m-badge m-badge--success m-badge--wide">
                                     Active
@@ -22,7 +22,9 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
+                            <app-default-button *ngIf="!isAddSubPartner" [buttonSetting]="saveButtonSetting" (onClick)="onSaveDetail()">
+                            </app-default-button>
+                            <app-default-button *ngIf="isAddSubPartner" [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
                             </app-default-button>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
                             </app-default-button>
@@ -31,9 +33,36 @@
                 </div>
                 <hr />
                 <form-create-commercial [isUpdate]="true"></form-create-commercial>
+                <div class="row" *ngIf="!!partner && !isAddSubPartner">
+                    <div class="col-6">
+                        <div class="m--align-left">
+                            Created: {{partner.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                            &nbsp;
+                            By <span class="text-success">{{partner.userCreatedName}}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="m--align-left">
+                            Modified: {{partner.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                            &nbsp;
+                            By <span class="text-success">{{partner.userModifiedName}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <commercial-contract-list (onActiveContract)="updateStatusPartner($event)"></commercial-contract-list>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet__body">
+        <tabset class="custom-class-tab">
+            <tab heading="Agreement">
+                <commercial-contract-list (onActiveContract)="updateStatusPartner($event)"></commercial-contract-list>
+            </tab>
+            <tab heading="Branch/Sub">
+                <app-commercial-branch-sub-list></app-commercial-branch-sub-list>
+            </tab>
+        </tabset>
     </div>
 </div>
 

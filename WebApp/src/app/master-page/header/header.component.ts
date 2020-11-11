@@ -63,7 +63,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             this.getOfficeDepartGroupCurrentUser(this.currenUser);
         }
 
-
         const indentitySub = this._identity.getUserProfile()
             .subscribe(
                 (user: any) => {
@@ -113,18 +112,18 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this.getListNotification();
 
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysUserNotification) => {
-            if (data) {
-                // this._toast.info(`You have a new message ${data.title}`, 'Infomation');
+            if (data && data.userId === this.currenUser.id) {
+                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 3000 });
                 this.getListNotification();
             }
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {

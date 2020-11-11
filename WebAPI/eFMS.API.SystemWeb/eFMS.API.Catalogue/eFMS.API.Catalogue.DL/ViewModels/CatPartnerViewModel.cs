@@ -31,5 +31,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public string PartnerType { get; set; }
+        public string CountryShippingName { get; set; }
     }
 }

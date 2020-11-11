@@ -91,5 +91,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string AtchDocNo { get; set; }
         public DateTime? AtchDocDate { get; set; }
         public string AtchDocSerialNo { get; set; }
+        public decimal? Amount { get; set; }
+        public decimal? Amount3 { get; set; }
     }
 }

@@ -10,5 +10,6 @@ namespace eFMS.API.ForPartner.DL.Models
         public decimal? ExchangeRate { get; set; }
         public string ReferenceNo { get; set; }
         public decimal? PaymentTerm { get; set; }
+        public string AccountNo { get; set; }
     }
 }

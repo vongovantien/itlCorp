@@ -30,11 +30,16 @@
     <!--begin::m-content of Partner-data-addnew-->
     <div class="m-content">
         <form-add-partner></form-add-partner>
-
-        <commercial-contract-list [openOnPartner]="true"></commercial-contract-list>
-
-
-
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Agreement">
+                    <commercial-contract-list [openOnPartner]="true"></commercial-contract-list>
+                </tab>
+                <tab heading="Branch/Sub">
+                    <app-commercial-branch-sub-list [openOnPartner]="true"></app-commercial-branch-sub-list>
+                </tab>
+            </tabset>
+        </div>
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>

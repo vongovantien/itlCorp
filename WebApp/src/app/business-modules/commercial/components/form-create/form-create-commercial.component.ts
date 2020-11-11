@@ -59,6 +59,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;
+    isBranchSub: boolean;
+    partnerId: string = '';
+    parentName: string = '';
     //
     @ViewChild('focusInput', { static: false }) internalReferenceRef: ElementRef;
 
@@ -160,6 +163,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'acRef':
+                this.parentName = null;
                 this.parentId.setValue(data.id);
                 break;
             case 'shippping-country':
@@ -272,4 +276,31 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     handleFocusInternalReference() {
         this.setFocusInput(this.internalReferenceRef);
     }
+
+    getACRefName(parentId: string) {
+        let isFounded = false;
+        this.acRefCustomers
+            .pipe(catchError(this.catchError), finalize(() => { }))
+            .subscribe((x) => {
+                x.every(element => {
+                    if (!isFounded && element.id === parentId) {
+                        isFounded = true;
+                        return true;
+                    }
+                });
+            });
+        if (!isFounded) {
+            this._catalogueRepo.getDetailPartner(parentId)
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res: Partner) => {
+                        if (!!res) {
+                            this.parentId.setValue(parentId);
+                            this.parentName = res.shortName;
+                        }
+                    }
+                );
+        }
+    }
+
 }

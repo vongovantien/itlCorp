@@ -283,12 +283,12 @@ export class StatementOfAccountDetailComponent extends AppList {
             this._toastService.warning("Not allow send soa with type All");
             return;
         }
-        if (this.soa.type === 'Credit' && this.soa.currency === 'VND') {
-            this.paymentMethodPopupComponent.show();
-        } else {
-            this.paymentMethodSelected = '';
-            this.confirmSendToAcc();
-        }
+        // if (this.soa.type === 'Credit' && this.soa.currency === 'VND') {
+        //    this.paymentMethodPopupComponent.show();
+        // } else {
+        this.paymentMethodSelected = '';
+        this.confirmSendToAcc();
+        // }
     }
 
     onApplyPaymentMethod($event) {

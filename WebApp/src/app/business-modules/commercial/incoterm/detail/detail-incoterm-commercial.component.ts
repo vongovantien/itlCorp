@@ -61,11 +61,7 @@ export class CommercialDetailIncotermComponent extends CommercialCreateIncotermC
 
     updateForm(res: Incoterm) {
         this._dataService.setData('incotermService', res.service);
-
-        const formData: Incoterm | any = {
-            service: !!res.service ? [{ id: res.service, text: res.service }] : null,
-        };
-        this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
+        this.formCreateComponent.formGroup.patchValue(res);
     }
 
     setListChargeIncoterm(data: IncotermUpdateModel) {

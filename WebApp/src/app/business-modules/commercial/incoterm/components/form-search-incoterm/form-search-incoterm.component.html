@@ -12,14 +12,15 @@
                     <div class="form-group">
                         <label>Service</label>
                         <ng-select [items]="services" formControlName="service" [multiple]="true"
-                            (selected)="selelectedService($event)" [allowClear]="false">
+                            (add)="selelectedService($event)" bindLabel="text" bindValue="id" class="custom">
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Status</label>
-                        <ng-select [items]="statusSelects" formControlName="status">
+                        <ng-select class="custom" [items]="statusSelects" formControlName="status" bindLabel="text"
+                            bindValue="id">
                         </ng-select>
                     </div>
                 </div>

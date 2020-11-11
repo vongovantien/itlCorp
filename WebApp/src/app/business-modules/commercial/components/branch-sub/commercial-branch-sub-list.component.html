@@ -1,16 +1,12 @@
 <div class="m-portlet">
-
-    <div class="float-right m-3">
-    </div>
     <div class="m-portlet__body">
-        <div class="collapse show" id="data-contract">
+        <div class="collapse show" id="data-partner">
             <div class="row m--margin-bottom-10">
                 <div class="col-lg-12 d-flex align-items-center justify-content-between">
 
                     <div class="form-group col-lg-4 p-1">
                         <div class="m-input-icon m-input-icon--right">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search"
-                                [(ngModel)]="keyword" name=keyword>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search" [(ngModel)]="keyword" name=keyword>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-search"></i>
@@ -19,8 +15,8 @@
                         </div>
                     </div>
 
-                    <div class="form-group" *ngIf="isActiveNewContract">
-                        <app-default-button [buttonSetting]="addButtonSetting" (click)="gotoCreateContract()"
+                    <div class="form-group">
+                        <app-default-button *ngIf="!isAddSubPartner && !!parentId" [buttonSetting]="addButtonSetting" (onClick)="gotoCreatePartner()"
                             [dataTarget]="addButtonSetting.dataTarget">
                         </app-default-button>
                     </div>
@@ -34,39 +30,32 @@
                         </th>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="!!contracts.length">
-                            <tr *ngFor="let item of contracts | filter : keyword :['username', 'contractNo',
-                             'contractType', 'saleService', 'officeNameEn', 'companyNameAbbr'] ; let i = index;">
+                        <ng-container *ngIf="!!partners.length">
+                            <tr *ngFor="let item of partners | filter : keyword :['accountNo', 'shortName',
+                     'partnerNameEn', 'partnerNameVn', 'taxCode', 'countryShippingName'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
-                                        <button (click)="getDetailContract(item.id,i)"
+                                        <button (click)="showDetail(item)"
                                             class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <ng-container *ngIf="!item.active && isActiveNewContract">
-                                            <button (click)="showConfirmDelete(item,i)"
+                                        <ng-container *ngIf="!item.active">
+                                            <button (click)="showConfirmDelete(item)"
                                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </ng-container>
                                     </div>
                                 </td>
-                                <td>{{item.username}}</td>
-                                <td>{{item.contractNo}}</td>
-                                <td>{{item.contractType}}</td>
-                                <td>{{item.saleServiceName}}</td>
-                                <td>{{item.effectiveDate | date: 'dd/MM/yyyy'}}</td>
-                                <td>{{item.expiredDate | date: 'dd/MM/yyyy'}}</td>
-                                <td [ngClass]="item.active ? 'text-success' : 'text-danger'">
-                                    {{item.active ? 'Active' : 'Inactive'}}</td>
-                                <td>{{item.officeNameAbbr}}</td>
-                                <td>{{item.companyNameEn}}</td>
-                                <td>
-                                    <app-switch disabled [(toggle)]="item.arconfirmed" size="sm"></app-switch>
-                                </td>
+                                <td>{{item.accountNo}}</td>
+                                <td>{{item.shortName}}</td>
+                                <td>{{item.partnerNameEn}}</td>
+                                <td>{{item.partnerNameVn}}</td>
+                                <td>{{item.taxCode}}</td>
+                                <td>{{item.countryShippingName}}</td>
                             </tr>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!(isLoading) && !contracts.length"></tr>
+                        <tr app-table-none-record *ngIf="!(isLoading) && !partners.length"></tr>
                         <tr app-table-row-loading *ngIf="isLoading "></tr>
                     </tbody>
                 </table>
@@ -75,6 +64,6 @@
     </div>
 </div>
 
-<confirm-popup body="You want to delete this contract ?" (onSubmit)="onDelete()"></confirm-popup>
-<popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
-</popup-form-contract-commercial-catalogue>
+<confirm-popup body="You want to delete this {{openOnPartner ? 'Partner' : partnerType}}?" (onSubmit)="onDelete()"></confirm-popup>
+
+<permission-403-popup></permission-403-popup>

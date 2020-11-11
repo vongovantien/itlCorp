@@ -50,7 +50,7 @@
                             ABBR Name <span class="m--font-danger">(*)</span>
                         </label>
                         <input type="text" class="form-control m-input m-input--square" formControlName="shortName"
-                            placeholder="please enter Abbr Name" name="shortName" autocomplete="nope"
+                            placeholder="Please enter Abbr Name" name="shortName" autocomplete="nope"
                             [ngClass]="{ 'm-input--square': isSubmitted && shortName.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && shortName.invalid">
                             Partner Name Abbreviation is required
@@ -153,10 +153,11 @@
                             A/C Ref
                         </label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acRef')"
-                            [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value}"
+                            [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value, hardValue: parentName}"
                             [selectedDisplayFields]="['partnerNameVn']" [dataSources]="parentCustomers"
-                            [displayFields]="[{field: 'partnerNameVn', label: 'Name'}]"
-                            (remove)="resetFormControl(partnerAccountRef)" placeholder="Select A/C Ref">
+                            [displayFields]="displayFieldCustomer"
+                            (remove)="resetFormControl(partnerAccountRef)" placeholder="Select A/C Ref"
+                            [disabled]="isAddBranchSub">
                         </app-combo-grid-virtual-scroll>
                     </div>
 
