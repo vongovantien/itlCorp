@@ -121,12 +121,12 @@ export class PartnerDetailComponent extends AppList {
                 if (!!res.id) {
                     this.partner.id = res.id;
                 }
-                if (res.isAddSubPartner) {
+                if (res.action) {
                     if (localStorage.getItem('success_add_sub') === "true") {
                         localStorage.removeItem('success_add_sub');
                         this.back();
                     }
-                    this.isAddSubPartner = res.isAddSubPartner;
+                    this.isAddSubPartner = res.action;
                 }
                 this.getDataCombobox();
                 if (this.isAddSubPartner) {

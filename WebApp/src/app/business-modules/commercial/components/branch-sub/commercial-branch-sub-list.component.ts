@@ -24,7 +24,7 @@ export class CommercialBranchSubListComponent extends AppList {
   @Input() partnerType: string;
   @Input() openOnPartner: boolean = false;
   isAddSubPartner: boolean;
-  
+
   constructor(private _router: Router,
     private _catalogueRepo: CatalogueRepo,
     private _toastService: ToastrService,
@@ -64,13 +64,12 @@ export class CommercialBranchSubListComponent extends AppList {
   }
 
   gotoCreatePartner() {
-    this.isAddSubPartner = true;
     if (this.openOnPartner) {
-      this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/add/${this.parentId}/${this.isAddSubPartner}`]);
+      this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/add-sub/${this.parentId}`]);
     } else if (this.partnerType === 'Customer') {
-      this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/new/${this.parentId}/${this.isAddSubPartner}`]);
+      this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/new-sub/${this.parentId}`]);
     } else {
-      this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/new/${this.parentId}/${this.isAddSubPartner}`]);
+      this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/new-sub/${this.parentId}`]);
     }
   }
 

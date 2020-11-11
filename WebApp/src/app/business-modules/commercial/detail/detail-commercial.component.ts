@@ -50,12 +50,12 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             map(([p, d]) => ({ ...p, ...d }))
         ).subscribe(
             (res: any) => {
-                if (res.isAddSub) {
+                if (res.action) {
                     if (localStorage.getItem('success_add_sub') === "true") {
                         localStorage.removeItem('success_add_sub');
                         this.back();
                     }
-                    this.isAddSubPartner = res.isAddSub;
+                    this.isAddSubPartner = res.action;
                     this.partnerList.isAddSubPartner = this.isAddSubPartner;
                 }
                 if (res.type) {
