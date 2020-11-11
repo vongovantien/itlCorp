@@ -1607,8 +1607,8 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> attachments = null;
 
             List<string> emailCCs = new List<string> { };
-
-            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            List<string> emailBCCs = new List<string> { "alex.phuong@itlvn.com" };
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs, emailBCCs);
 
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
