@@ -77,8 +77,9 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group">
-                                <label>Account No</label>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || accountNo.dirty) && !accountNo.valid }">
+                                <label required>Account No</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'account')"
                                     [currentActiveItemId]="{ field: 'accountCode', value: accountNo.value}"
                                     [selectedDisplayFields]="['accountCode','accountNameLocal']"

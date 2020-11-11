@@ -1,3 +1,4 @@
+// tslint:disable-next-line: file-name-casing
 export class SysUserNotification {
     id: string;
     type: string;
@@ -10,6 +11,7 @@ export class SysUserNotification {
     datetimeModified: string;
     userCreated: string;
     userModified: string;
+    userId: string;
 }
 
 type STATUS_NOTI = 'New' | 'Read' | 'Closed'; 
