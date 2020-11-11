@@ -29,7 +29,7 @@ const routing: Routes = [
                 path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Customer' }
             },
             {
-                path: 'new/:partnerId/:isAddSub', component: CommercialDetailComponent, data: { name: 'New Branch/Sub', path: "partnerId" }
+                path: 'new/:partnerId/:isAddSub', component: CommercialDetailComponent, data: { name: 'New SubCustomer', path: "partnerId" }
             },
         ]
     }
