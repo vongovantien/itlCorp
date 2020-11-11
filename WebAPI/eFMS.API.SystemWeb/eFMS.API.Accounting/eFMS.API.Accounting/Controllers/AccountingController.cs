@@ -63,6 +63,12 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
         #endregion -- Test API --
+        [HttpPost("GetListVoucherToSync")]
+        public IActionResult GetListVoucherToSync(List<Guid> Ids)
+        {
+            var data = accountingService.GetListVoucherToSyncBravo(Ids);
+            return Ok(data);
+        }
 
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]
