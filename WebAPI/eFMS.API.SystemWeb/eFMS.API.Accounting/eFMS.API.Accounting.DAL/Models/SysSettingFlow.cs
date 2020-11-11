@@ -13,6 +13,9 @@ namespace eFMS.API.Accounting.Service.Models
         public string Manager { get; set; }
         public string Accountant { get; set; }
         public string Bod { get; set; }
+        public bool? CreditLimit { get; set; }
+        public bool? OverPaymentTerm { get; set; }
+        public bool? ExpiredAgreement { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

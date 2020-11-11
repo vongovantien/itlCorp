@@ -615,7 +615,7 @@ namespace eFMS.API.Documentation.DL.Services
                             string description = string.Empty;
                             foreach (var item in dataPartner)
                             {
-                                description =  string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over credit limit with " + dataAgreements.Where(x => x.CreditRate >= 120 && x.PartnerId == item.Id).Select(t => t.CreditRate).FirstOrDefault() + "</br>");
+                                description += string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over credit limit with " + dataAgreements.Where(x => x.CreditRate >= 120 && x.PartnerId == item.Id).Select(t => t.CreditRate).FirstOrDefault() + "</br>");
                             }
                             description += " Please check it soon ";
 
@@ -698,7 +698,7 @@ namespace eFMS.API.Documentation.DL.Services
                             string description = string.Empty;
                             foreach (var item in dataPartner)
                             {
-                                description = string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over Expired Date with" + dataAgreements.Where(x => ((x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now)) && x.PartnerId == item.Id).Select(t => t.ExpiredDate).FirstOrDefault() + "</br>");
+                                description += string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over Expired Date with" + dataAgreements.Where(x => ((x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now)) && x.PartnerId == item.Id).Select(t => t.ExpiredDate).FirstOrDefault() + "</br>");
                             }
                             description += " Please check it soon ";
                             // Add Notification
