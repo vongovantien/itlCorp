@@ -120,10 +120,7 @@ export class DepartmentDetailComponent extends AppList {
                     Validators.required
                 ])
             ],
-            email: ['',
-                Validators.compose([
-                    Validators.maxLength(150)
-                ])],
+            email: [],
             company: [],
             status: [],
             departmentType: []
