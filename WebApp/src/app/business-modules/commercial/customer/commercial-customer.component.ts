@@ -72,6 +72,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             settingFields: this.headers.filter(h => h.field !== 'datetimeModified').map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
+        localStorage.removeItem('success_add_sub');
         this.dataSearch = { All: '' };
         this.dataSearch.partnerType = 'Customer';
         this.getPartners();

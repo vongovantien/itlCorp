@@ -51,6 +51,9 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+        if (localStorage.getItem('success_add_sub') === "true") {
+            this.back();
+        }
         this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
             this.type = result.type;
         });
@@ -119,7 +122,6 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                         catchError((err, caught) => this.catchError),
                         concatMap((res: any) => {
                             if (res.result.success) {
-                                localStorage.setItem('success_add_sub', "true");
                                 this._toastService.success("New data added");
                                 this.contractList.contracts.forEach(element => {
                                     if (!!element.fileList) {
@@ -171,9 +173,6 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                     return;
                 }
                 if (res.status === true) {
-                    if (this.isAddSubPartner) {
-                        localStorage.setItem('success_add_sub', "true");
-                    }
                     if (this.type === 'Customer') {
                         this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${res.id}`]);
                     } else {
