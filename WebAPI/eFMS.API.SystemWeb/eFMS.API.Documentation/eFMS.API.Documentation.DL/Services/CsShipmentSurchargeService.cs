@@ -612,15 +612,13 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             //string title = "Over Credit Term";
                             var dataPartner = partnerRepository.Get(x => listPartner.Contains(x.Id)).ToList();
-                            string description = string.Empty;
+                            List<string> descriptions = new List<string>();
                             foreach (var item in dataPartner)
                             {
-                                description += string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over credit limit with " + dataAgreements.Where(x => x.CreditRate >= 120 && x.PartnerId == item.Id).Select(t => t.CreditRate).FirstOrDefault() + "</br>");
+                                descriptions.Add(string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over credit limit with " + dataAgreements.Where(x => x.CreditRate >= 120 && x.PartnerId == item.Id).Select(t => t.CreditRate).FirstOrDefault() + " Please check it soon "));
                             }
-                            description += " Please check it soon ";
-
                             // Add Notification
-                            HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
+                            HandleState resultAddNotification = AddNotifications(descriptions, dataAgreements.ToList());
                             if (resultAddNotification.Success)
                             {
                                 return resultAddNotification;
@@ -695,14 +693,13 @@ namespace eFMS.API.Documentation.DL.Services
                         if (hs.Success)
                         {
                             var dataPartner = partnerRepository.Get(x => listPartner.Contains(x.Id)).ToList();
-                            string description = string.Empty;
+                            List<string> descriptions = new List<string>();
                             foreach (var item in dataPartner)
                             {
-                                description += string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over Expired Date with" + dataAgreements.Where(x => ((x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now)) && x.PartnerId == item.Id).Select(t => t.ExpiredDate).FirstOrDefault() + "</br>");
+                                descriptions.Add( string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over Expired Date with" + dataAgreements.Where(x => ((x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now)) && x.PartnerId == item.Id).Select(t => t.ExpiredDate).FirstOrDefault() + " Please check it soon "));
                             }
-                            description += " Please check it soon ";
                             // Add Notification
-                            HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
+                            HandleState resultAddNotification = AddNotifications(descriptions, dataAgreements.ToList());
                             if (resultAddNotification.Success)
                             {
                                 return resultAddNotification;
@@ -778,7 +775,7 @@ namespace eFMS.API.Documentation.DL.Services
                         catContractRepository.SubmitChanges();
                         if (hs.Success)
                         {
-                            string description = string.Empty;
+                            List<string> descriptions = new List<string>();
                             var dataPartner = partnerRepository.Get(x => listPartner.Contains(x.Id)).ToList();
                             foreach (var item in dataPartner)
                             {
@@ -795,11 +792,10 @@ namespace eFMS.API.Documentation.DL.Services
                                 {
                                     type = "Partner Data";
                                 }
-                                description += type + " " + string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> has debit overdue" + dataAgreements.Where(x=> x.PartnerId == item.Id).Select(t => t.PaymentTerm).FirstOrDefault() + "</br>");
+                                descriptions.Add(type + " " + string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> has debit overdue" + dataAgreements.Where(x=> x.PartnerId == item.Id).Select(t => t.PaymentTerm).FirstOrDefault() + " Please check it soon "));
                             }
-                            description += " Please check it soon ";
                             // Add Notification
-                            HandleState resultAddNotification = AddNotifications(description, dataAgreements.ToList());
+                            HandleState resultAddNotification = AddNotifications(descriptions, dataAgreements.ToList());
                             if (resultAddNotification.Success)
                             {
                                 return resultAddNotification;
@@ -922,42 +918,52 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
 
-        private HandleState AddNotifications(string description, List<CatContract> dataAgreements)
+        private HandleState AddNotifications(List<string> descriptions, List<CatContract> dataAgreements)
         {
-            SysNotifications sysNotification = new SysNotifications
+            HandleState hsSysNotification = new HandleState(false);
+            List<SysNotifications> notifications = new List<SysNotifications>();
+            foreach (var description in descriptions)
             {
-                Id = Guid.NewGuid(),
-                Title = description,
-                Description = description,
-                Type = "User",
-                UserCreated = currentUser.UserID,
-                DatetimeCreated = DateTime.Now,
-                DatetimeModified = DateTime.Now,
-                UserModified = currentUser.UserID,
-                Action = "Detail",
-                ActionLink = string.Empty,
-                IsClosed = false,
-                IsRead = false
-            };
-            HandleState hsSysNotification = notificationRepository.Add(sysNotification, false);
+                SysNotifications sysNotification = new SysNotifications
+                {
+                    Id = Guid.NewGuid(),
+                    Title = description,
+                    Description = description,
+                    Type = "User",
+                    UserCreated = currentUser.UserID,
+                    DatetimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now,
+                    UserModified = currentUser.UserID,
+                    Action = "Detail",
+                    ActionLink = string.Empty,
+                    IsClosed = false,
+                    IsRead = false
+                };
+                notifications.Add(sysNotification);
+            }
+            hsSysNotification = notificationRepository.Add(notifications, false);
             if (hsSysNotification.Success)
             {
                 List<string> users = GetUserSaleAndDepartmentAR(dataAgreements);
                 List<SysUserNotification> userNotifications = new List<SysUserNotification>();
                 foreach (var item in users)
                 {
-                    SysUserNotification userNotify = new SysUserNotification
+                    foreach (var noti in notifications)
                     {
-                        Id = Guid.NewGuid(),
-                        DatetimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now,
-                        Status = "New",
-                        NotitficationId = sysNotification.Id,
-                        UserId = item,
-                        UserCreated = currentUser.UserID,
-                        UserModified = currentUser.UserID,
-                    };
-                    userNotifications.Add(userNotify);
+                        SysUserNotification userNotify = new SysUserNotification
+                        {
+                            Id = Guid.NewGuid(),
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            Status = "New",
+                            NotitficationId = noti.Id,
+                            UserId = item,
+                            UserCreated = currentUser.UserID,
+                            UserModified = currentUser.UserID,
+                        };
+                        userNotifications.Add(userNotify);
+                    }
+
                 }
                 HandleState hsSysUserNotification = sysUserNotifyRepository.Add(userNotifications, false);
                 notificationRepository.SubmitChanges();
