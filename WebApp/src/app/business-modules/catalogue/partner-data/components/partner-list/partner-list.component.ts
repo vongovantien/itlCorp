@@ -61,6 +61,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
+        localStorage.removeItem('success_add_sub');
         this.dataSearch = this.criteria;
         if (this.criteria.partnerGroup === PartnerGroupEnum.CUSTOMER) {
             this.isCustomer = true;

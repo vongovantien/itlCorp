@@ -292,6 +292,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     gotoList() {
+        localStorage.setItem('success_add_sub', "true");
         this.back();
     }
 }
