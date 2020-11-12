@@ -75,10 +75,7 @@ export class DepartmentAddNewComponent extends AppForm {
                     Validators.required
                 ])
             ],
-            email: ['',
-                Validators.compose([
-                    Validators.maxLength(150)
-                ])],
+            email: [],
             status: [],
             departmentType: [this.departmentTypeActive]
         });
