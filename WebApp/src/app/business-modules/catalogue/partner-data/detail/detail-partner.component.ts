@@ -507,7 +507,6 @@ export class PartnerDetailComponent extends AppList {
                 .subscribe(
                     (res: any) => {
                         if (res.result.success) {
-                            localStorage.setItem('success_add_sub', "true");
                             this._toastService.success("New data added");
                             this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${res.model.id}`]);
                         } else {
@@ -669,6 +668,7 @@ export class PartnerDetailComponent extends AppList {
     }
 
     gotoList() {
+        localStorage.setItem('success_add_sub', "true");
         this.back();
     }
 }
