@@ -1797,33 +1797,10 @@ namespace eFMS.API.Accounting.DL.Services
             data.AmountDebitUSD = Math.Round(chargeShipments.Sum(x => x.AmountDebitUSD), 3);
             data.AmountCreditUSD = Math.Round(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
             //Thông tin các Service Name của SOA
-            data.ServicesNameSoa = GetServiceNameOfSoa(data.ServiceTypeId).ToString();
+            data.ServicesNameSoa = DataTypeEx.GetServiceNameOfSoa(data.ServiceTypeId).ToString();
             return data;
         }
-
-        private string GetServiceNameOfSoa(string serviceTypeId)
-        {
-            var serviceName = string.Empty;
-
-            if (!string.IsNullOrEmpty(serviceTypeId))
-            {
-                //Tách chuỗi servicetype thành mảng
-                string[] arrayStrServiceTypeId = serviceTypeId.Split(';').Where(x => x.ToString() != string.Empty).ToArray();
-
-                //Xóa các serviceTypeId trùng
-                string[] arrayGrpServiceTypeId = arrayStrServiceTypeId.Distinct<string>().ToArray();
-
-                foreach (var item in arrayGrpServiceTypeId)
-                {
-                    //Lấy ra DisplayName của serviceTypeId
-                    serviceName += Common.CustomData.Services.Where(x => x.Value == item).FirstOrDefault() != null ?
-                                Common.CustomData.Services.Where(x => x.Value == item).FirstOrDefault().DisplayName.Trim() + ";"
-                                : string.Empty;
-                }
-                serviceName = (serviceName + ")").Replace(";)", string.Empty);
-            }
-            return serviceName;
-        }
+        
         #endregion --Details Soa--
 
         #region -- Data Export Details --
@@ -2388,7 +2365,7 @@ namespace eFMS.API.Accounting.DL.Services
                              {
                                  ServiceDate = chg.ServiceDate,
                                  SOANo = s.Soano,
-                                 Service = GetServiceNameOfSoa(chg.Service).ToString(),
+                                 Service = DataTypeEx.GetServiceNameOfSoa(chg.Service).ToString(),
                                  PartnerCode = pat.TaxCode,
                                  Debit = cd.DebitAccountNo,
                                  Credit = cd.CreditAccountNo,

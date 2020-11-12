@@ -3,7 +3,7 @@ import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCance
 import { IdentityRepo, SystemRepo } from '@repositories';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { Employee, Office, SysUserNotification } from '@models';
+import { Employee, Office, SysNotification, SysUserNotification, SysUserNotificationModel } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
@@ -63,7 +63,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             this.getOfficeDepartGroupCurrentUser(this.currenUser);
         }
 
-
         const indentitySub = this._identity.getUserProfile()
             .subscribe(
                 (user: any) => {
@@ -112,18 +111,20 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this._signalRService.startConnection();
         this.getListNotification();
 
-        this._signalRService.listenEvent("NotificationWhenChange", (data: SysUserNotification) => {
-            if (data) {
+        this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
+            console.log("notification", data);
+            if (data && data.userIds.includes(this.currenUser.id)) {
+                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 1000 });
                 this.getListNotification();
             }
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            this._toast.info(`You have a new message ${data}`, 'Infomation');
+            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            this._toast.info(`You have a new message ${data}`, 'Infomation');
+            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {

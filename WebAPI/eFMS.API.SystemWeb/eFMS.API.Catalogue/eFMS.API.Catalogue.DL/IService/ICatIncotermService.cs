@@ -15,7 +15,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatIncotermModel> Query(CatIncotermCriteria criteria);
         IQueryable<CatIncotermModel> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount);
         HandleState Update(CatIncotermEditModel model);
-        HandleState AddNew(CatIncotermEditModel model);
+        HandleState AddNew(CatIncotermEditModel model, out Guid Id);
         HandleState Delete(Guid Id);
         CatIncotermEditModel GetDetail(Guid id);
         IQueryable<CatIncotermModel> QueryExport(CatIncotermCriteria criteria);

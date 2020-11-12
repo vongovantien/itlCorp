@@ -58,9 +58,10 @@ export class ShareBussinessCdNoteAddRemainingChargeAirPopupComponent extends Pop
             if (this.listChargePartner.length > 0) {
                 for (const item of this.listChargePartner) {
                     item.isDeleted = false;
-                    if (item.hwbno == group.hwbno && item.id == group.id) {
+                    if (item.hwbno == group.hwbno && item.id === group.id) {
                         for (const charge of group.listCharges) {
-                            item.listCharges.push(charge)
+                            charge.canEdit = true;
+                            item.listCharges.push(charge);
                         }
                     }
                 }

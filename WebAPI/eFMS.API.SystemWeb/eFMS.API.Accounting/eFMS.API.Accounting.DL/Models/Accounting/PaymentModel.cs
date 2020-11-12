@@ -31,5 +31,6 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string BankAccountNo { get; set; }
         public string Stt_Cd_Htt { get; set; }
         public string ChargeType { get; set; }
+        public string DebitAccount { get; set; }
     }
 }
