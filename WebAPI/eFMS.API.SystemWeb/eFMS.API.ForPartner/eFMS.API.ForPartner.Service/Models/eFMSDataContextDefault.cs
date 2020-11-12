@@ -954,10 +954,6 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.Description).HasMaxLength(200);
-
-                entity.Property(e => e.Title).HasMaxLength(150);
-
                 entity.Property(e => e.Type)
                     .HasMaxLength(50)
                     .IsUnicode(false);
