@@ -115,8 +115,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             console.log("notification", data);
             if (data && data.userIds.includes(this.currenUser.id)) {
                 this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 1000 });
-                this.getListNotification();
             }
+            this.getListNotification();
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {

@@ -110,7 +110,7 @@ namespace eFMS.API.System.DL.Services
                                                                            DatetimeModified = u.DatetimeModified,
                                                                        };
 
-                queryNotiDetail = queryNotiDetail?.OrderByDescending(x => x.DatetimeModified);
+                queryNotiDetail = queryNotiDetail?.OrderByDescending(x => x.Status == SystemConstants.NOTIFICATION_STATUS_NEW);
                 return queryNotiDetail;
             }
             return dataQuery;
