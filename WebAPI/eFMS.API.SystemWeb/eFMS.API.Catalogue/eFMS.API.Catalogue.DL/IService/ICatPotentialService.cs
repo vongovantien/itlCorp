@@ -15,11 +15,10 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         IQueryable<CatPotentialModel> Query(CatPotentialCriteria criteria);
         IQueryable<CatPotentialModel> Paging(CatPotentialCriteria criteria, int page, int size, out int rowsCount);
-        HandleState Update(CatPotentialEditModel model);
-        HandleState AddNew(CatPotentialEditModel model);
+        HandleState Update(CatPotential model);
+        HandleState AddNew(CatPotential model);
         HandleState Delete(Guid Id);
         CatPotentialEditModel GetDetail(Guid id);
-
         IQueryable<CatPotentialModel> QueryExport(CatPotentialCriteria criteria);
     }
 }

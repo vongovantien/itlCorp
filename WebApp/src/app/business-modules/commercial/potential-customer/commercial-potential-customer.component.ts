@@ -1,19 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList, IPermissionBase } from 'src/app/app.list';
-
-import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { CatPotentialModel, PotentialUpdateModel } from '@models';
+import { AppList, IPermissionBase } from '@app';
+import { CatPotentialModel } from '@models';
 import { CatalogueRepo } from '@repositories';
-import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
-import { CommercialPotentialCustomerPopupComponent } from './components/popup/potential-customer-commercial.popup';
-import { of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
-import { CommercialFormSearchPotentialCustomerComponent } from './components/form-search/form-search-potential-customer.component';
 import { SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+
+import { CommercialFormSearchPotentialCustomerComponent } from './components/form-search/form-search-potential-customer.component';
+import { CommercialPotentialCustomerPopupComponent } from './components/popup/potential-customer-commercial.popup';
+
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+
 
 @Component({
     selector: 'app-commercial-potential-customer',
@@ -24,12 +25,9 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
     @ViewChild(CommercialPotentialCustomerPopupComponent, { static: false }) potentialCustomerPopup: CommercialPotentialCustomerPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    //
+
     selectedPotentialId: string;
-    //
 
-
-    //
     potentialCustomers: CatPotentialModel[] = [];
 
     constructor(
@@ -57,13 +55,13 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
             { title: 'Status', field: 'active', sortable: true },
         ];
         this.configSearch = {
-            settingFields: this.headers
+            settingFields: [...this.headers.slice(0, 4)]
                 .map(x => ({ "fieldName": x.field === 'userCreatedName' ? 'creator' : x.field, "displayName": x.title })),
-            typeSearch: TypeSearch.intab
+            typeSearch: CommonEnum.TypeSearch.intab
         };
         this.getPotentialCustomerListPaging();
     }
-    //
+
     getPotentialCustomerListPaging() {
         this.isLoading = true;
         this._catalogueRepo.getPotentialCustomerListPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
@@ -80,45 +78,41 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
                 (res: CommonInterface.IResponsePaging) => {
                     this.totalItems = res.totalItems || 0;
                     this.potentialCustomers = (res.data || []).map(i => new CatPotentialModel(i)) || [];
-
                 },
             );
     }
-    //
+
     sortPotentialCustomerList(sortField: string, order: boolean) {
         this.potentialCustomers = this._sortService.sort(this.potentialCustomers, sortField, order);
     }
-    //
+
     checkAllowDetail(potentialId: string): void {
+        this._progressRef.start();
         this._catalogueRepo.checkAllowGetDetailPotential(potentialId)
             .pipe(
                 switchMap(
                     (res: boolean) => {
                         if (res) {
-                            this._progressRef.start();
                             return this._catalogueRepo.getDetailPotential(potentialId);
-                        } else {
-                            return of(null);
                         }
+                        return of(null);
                     }
                 ),
+                finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (res: PotentialUpdateModel) => {
-                    this._progressRef.complete();
+                (res: any) => {
                     if (res === null) {
                         this.permissionPopup.show();
-                    }
-                    else {
-                        this.potentialCustomerPopup.handleBindPotentialDetail(res);
+                    } else {
+                        this.potentialCustomerPopup.handleBindPotentialDetail(res.potential);
                         [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [true, false];
                         this.potentialCustomerPopup.show();
                     }
                 }
             );
-
     }
-    //
+
     checkAllowDelete(potentialId: string): void {
         this.selectedPotentialId = potentialId;
         this._catalogueRepo.checkAllowDeletePotential(potentialId)
@@ -132,7 +126,7 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
                 }
             });
     }
-    //
+
     onDelete() {
         this._progressRef.start();
         this._catalogueRepo.deletePotential(this.selectedPotentialId)
@@ -147,7 +141,7 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
                             field: 'all',
                             displayName: 'All',
                             searchString: ""
-                        }
+                        };
                         this.onResetPotentialCustomer({});
 
                     } else {
@@ -155,31 +149,30 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
                     }
                 }
             );
-
     }
-    //
+
     onSearchPotentialCustomer(event) {
         this.dataSearch = { [event.field]: event.searchString };
 
         this.page = 1;
         this.getPotentialCustomerListPaging();
     }
-    //
+
     onResetPotentialCustomer(event) {
         this.onSearchPotentialCustomer(event);
     }
-    //
+
     addNew() {
         [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [false, false];
         this.potentialCustomerPopup.initForm();
         this.potentialCustomerPopup.show();
     }
-    //
+
     handleChangePotentialPopup(event: any) {
         this.dataSearch = {};
         this.getPotentialCustomerListPaging();
     }
-    //
+
     exportExcel() {
         this._catalogueRepo.downloadPotentialCustomerListExcel(this.dataSearch)
             .subscribe(

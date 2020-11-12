@@ -64,7 +64,7 @@ export class CommercialCreateIncotermComponent extends AppForm implements OnInit
         }
 
         if (!!this.listChargeBuying.incotermCharges.length) {
-            this.listChargeSelling.isSubmitted = true;
+            this.listChargeBuying.isSubmitted = true;
             if (!this.listChargeBuying.validateListCharge()) {
                 this.infoPopup.show();
 
@@ -105,6 +105,7 @@ export class CommercialCreateIncotermComponent extends AppForm implements OnInit
             (res: CommonInterface.IResult) => {
                 if (res.status) {
                     this._toastService.success(res.message);
+                    this._router.navigate([`${RoutingConstants.COMMERCIAL.INCOTERM}/${res.data}`]);
                 }
             }
         );

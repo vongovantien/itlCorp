@@ -76,6 +76,7 @@ export class CommercialDetailIncotermComponent extends CommercialCreateIncotermC
         model.incoterm.id = this.incotermDetail.incoterm.id;
         model.incoterm.userCreated = this.incotermDetail.incoterm.userCreated;
         model.incoterm.datetimeCreated = this.incotermDetail.incoterm.datetimeCreated;
+
         this._catalogueRepo.updateIncoterm(model).pipe(
             catchError(this.catchError),
             switchMap((res: CommonInterface.IResult) => {
