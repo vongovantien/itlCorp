@@ -4,18 +4,11 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <ng-container>
-                <app-permission-button title="add new" (click)="addNew()">
-                </app-permission-button>
-            </ng-container>
-            <ng-container>
-                <app-permission-button type="export" (onClick)="exportExcel()">
-                </app-permission-button>
-            </ng-container>
-
+            <app-permission-button title="add new" (click)="addNew()">
+            </app-permission-button>
+            <app-permission-button type="export" (onClick)="exportExcel()">
+            </app-permission-button>
         </div>
-
-
     </div>
 </div>
 <div class="m-content">
@@ -34,7 +27,6 @@
                 <table class="table table-striped table-brand dataTable">
                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                         <th class="m--w-50 first table-actions-col">
-
                         </th>
                     </thead>
                     <tbody>
@@ -95,7 +87,10 @@
         </div>
     </div>
 </div>
+
 <potential-customer-commercial-popup (onChange)="handleChangePotentialPopup($event)">
 </potential-customer-commercial-popup>
+
 <confirm-popup body="You want to delete this Potential Customer ?" (onSubmit)="onDelete()"></confirm-popup>
+
 <permission-403-popup></permission-403-popup>

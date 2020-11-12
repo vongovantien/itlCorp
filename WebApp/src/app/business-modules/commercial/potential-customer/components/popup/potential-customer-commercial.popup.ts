@@ -1,9 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
-import { FormBuilder, FormGroup, AbstractControl, Validators, FormControl } from '@angular/forms';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { PopupBase } from '@app';
+import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
+import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { CatPotentialModel, PotentialUpdateModel } from '@models';
+import { CatPotentialModel } from '@models';
 import { SystemConstants } from '@constants';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
@@ -19,14 +19,12 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
 
     isSubmitted: boolean = false;
     isUpdate: boolean = false;
-    //
     potentialTypes: CommonInterface.INg2Select[] = [
         { id: 'Company', text: 'Company' },
         { id: 'Invidual', text: 'Invidual' }
     ];
-    //form
+
     formPotential: FormGroup;
-    //fields
     nameEn: AbstractControl;
     nameLocal: AbstractControl;
     taxcode: AbstractControl;
@@ -38,7 +36,6 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
     potentialType: AbstractControl;
     active: AbstractControl;
 
-    //detail
     id: string = SystemConstants.EMPTY_GUID;
     userCreatedName: string = null;
     userModifiedName: string = null;
@@ -101,31 +98,20 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
         this.isSubmitted = true;
         const dataForm: { [key: string]: any } = this.formPotential.getRawValue();
 
-
         if (this.formPotential.valid) {
             const potential: CatPotentialModel = new CatPotentialModel({
                 ...dataForm,
                 potentialType: dataForm.potentialType.id,
                 id: this.id,
             });
-            const body: PotentialUpdateModel = {
-                potential: potential,
-
-            };
-
-
-
-
 
             if (this.isUpdate) {
                 this._progressRef.start();
-                this._catalogueRepo.updatePotential(body)
+                this._catalogueRepo.updatePotential(potential)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {
                             this._progressRef.complete();
-
-
                         })
                     )
                     .subscribe(
@@ -135,13 +121,11 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
                     );
             } else {
                 this._progressRef.start();
-                this._catalogueRepo.createPotential(body)
+                this._catalogueRepo.createPotential(potential)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {
                             this._progressRef.complete();
-
-
                         })
                     )
                     .subscribe(
@@ -153,22 +137,20 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
         }
 
     }
-    //
-    handleBindPotentialDetail(data: PotentialUpdateModel) {
+    handleBindPotentialDetail(data: CatPotentialModel) {
         this.formPotential.patchValue({
-            ...data.potential,
-            potentialType: { id: data.potential.potentialType, text: data.potential.potentialType }
+            ...data,
+            potentialType: { id: data.potentialType, text: data.potentialType }
         });
 
-
-        this.id = data.potential.id;
-        this.userCreatedName = data.potential.userCreatedName;
-        this.userModifiedName = !!data.potential.userModifiedName ? data.potential.userModifiedName : data.potential.userCreatedName;
-        this.datetimeCreated = data.potential.datetimeCreated;
-        this.datatimeModified = !!data.potential.datetimeModified ? data.potential.datetimeModified : data.potential.datetimeCreated;
+        this.id = data.id;
+        this.userCreatedName = data.userCreatedName;
+        this.userModifiedName = !!data.userModifiedName ? data.userModifiedName : data.userCreatedName;
+        this.datetimeCreated = data.datetimeCreated;
+        this.datatimeModified = !!data.datetimeModified ? data.datetimeModified : data.datetimeCreated;
 
     }
-    //
+
     handleResponseResult(res: CommonInterface.IResult) {
         if (res.status) {
             this._toastService.success(res.message);

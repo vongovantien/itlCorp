@@ -88,7 +88,7 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
                 takeUntil(this.ngUnsubscribe),
                 map((s: { default: string, incotermService: string }) => !!s.incotermService ? s.incotermService : null),
                 tap((s) => {
-                    this.serviceTypeId = s; console.log(this.serviceTypeId);
+                    this.serviceTypeId = s;
                 }),
                 distinctUntilChanged(),
                 switchMap((service: string) => this._catalogueRepo.getListCharge(null, null, { active: true, serviceTypeId: service, type: this.utility.getChargeType(this.type) })),
@@ -121,7 +121,8 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
         this.incotermCharges.push(new CatChargeIncoterm(newCharge));
     }
 
-    deleteCharge(index: number) {
+    deleteCharge(index: number, chargeItem: CatChargeIncoterm) {
+        [this.isSubmitted, chargeItem.isDuplicate] = [false, false];
         this.incotermCharges.splice(index, 1);
     }
 
