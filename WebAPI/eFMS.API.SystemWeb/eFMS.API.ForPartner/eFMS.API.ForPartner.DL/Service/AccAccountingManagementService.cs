@@ -232,7 +232,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     catch (Exception ex)
                     {
                         trans.Rollback();
-                        return new HandleState(ex.Message);
+                        return new HandleState((object)ex.Message);
                     }
                     finally
                     {
@@ -242,7 +242,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                return new HandleState((object)ex.Message);
             }
         }
 
@@ -391,7 +391,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    return new HandleState(ex.Message);
+                    return new HandleState((object)ex.Message);
                 }
                 finally
                 {
@@ -560,6 +560,14 @@ namespace eFMS.API.ForPartner.DL.Service
             return accountNo;
         }
 
+        /// <summary>
+        /// Công thức lấy tỷ giá quy đổi ngược
+        /// </summary>
+        /// <param name="exchangeRateNew">Tỷ giá của currencyTo so với CurrencyLocal (VD: 1 USD[CurrencyTo] = 23.000 VND[CurrencyLocal])</param>
+        /// <param name="exchangeDate">Ngày Exchange của charge</param>
+        /// <param name="currencyFrom">Currency gốc của charge</param>
+        /// <param name="currencyTo">Currency của Invoice/</param>
+        /// <returns>ExchangeRate</returns>
         private decimal? CalculatorExchangeRate(decimal? exchangeRateNew, DateTime? exchangeDate, string currencyFrom, string currencyTo)
         {
             if (currencyFrom == currencyTo) return exchangeRateNew;
@@ -1184,7 +1192,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
         /// <summary>
         /// Type là VOUCHER => eFMS sẽ xóa mã VOUCHER tương ứng
-        /// Type là CDNOTE/SOA/SETTLEMENT => Reset trạng thái "Reject" Cho từng phiều tương ứng
+        /// Type là CDNOTE/SOA/SETTLEMENT => Reset trạng thái "Rejected" Cho từng phiều tương ứng
         /// </summary>
         /// <param name="model"></param>
         /// <param name="apiKey"></param>
