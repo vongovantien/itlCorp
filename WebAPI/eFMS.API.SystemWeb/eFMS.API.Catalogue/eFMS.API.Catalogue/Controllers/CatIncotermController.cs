@@ -118,16 +118,16 @@ namespace eFMS.API.Catalogue.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            bool checkExistMessage = CheckExisIncoterm(Guid.Empty, model.Incoterm.Code);
+            bool checkExistMessage = CheckExisIncoterm(Guid.Empty, model.Incoterm.Code, model.Incoterm.Service);
             if (checkExistMessage)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value });
             }
 
-            HandleState hs = catIncotermService.AddNew(model);
+            HandleState hs = catIncotermService.AddNew(model, out Guid Id);
 
             string message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Id };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -159,7 +159,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            bool checkExistMessage = CheckExisIncoterm(model.Incoterm.Id, model.Incoterm.Code);
+            bool checkExistMessage = CheckExisIncoterm(model.Incoterm.Id, model.Incoterm.Code, model.Incoterm.Service);
             if (checkExistMessage)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value });
@@ -215,16 +215,16 @@ namespace eFMS.API.Catalogue.Controllers
 
             return Ok(catIncotermService.CheckAllowPermissionAction(id, permissionRange));
         }
-        private bool CheckExisIncoterm(Guid Id, string code)
+        private bool CheckExisIncoterm(Guid Id, string code, string service)
         {
             bool isDuplicate = false;
             if (Id == Guid.Empty)
             {
-                isDuplicate = catIncotermService.Any(x => !string.IsNullOrEmpty(x.Code) && x.Code == code);
+                isDuplicate = catIncotermService.Any(x => !string.IsNullOrEmpty(x.Code) && x.Code == code && x.Service == service);
             }
             else
             {
-                isDuplicate = catIncotermService.Any(x => !string.IsNullOrEmpty(x.Code) && x.Code == code && x.Id != Id);
+                isDuplicate = catIncotermService.Any(x => !string.IsNullOrEmpty(x.Code) && x.Code == code && x.Service == service && x.Id != Id);
 
             }
 

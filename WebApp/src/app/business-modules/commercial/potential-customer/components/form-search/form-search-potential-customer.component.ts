@@ -1,8 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input, } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
-import { ChargeConstants } from '@constants';
-import { Incoterm } from '@models';
 
 @Component({
     selector: 'form-search-potential-customer',
@@ -22,7 +19,6 @@ export class CommercialFormSearchPotentialCustomerComponent extends AppForm impl
         displayName: "",
         searchString: ""
     };
-
 
     constructor(
     ) {
@@ -57,7 +53,7 @@ export class CommercialFormSearchPotentialCustomerComponent extends AppForm impl
     }
 
     searchTypeChange(field) {
-        if (field == 'All') {
+        if (field === 'All') {
             this.searchObject.displayName = "All";
         } else {
             this.searchObject.displayName = field.displayName;

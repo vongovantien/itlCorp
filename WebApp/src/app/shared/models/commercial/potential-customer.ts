@@ -1,5 +1,4 @@
 import { SystemConstants } from "@constants";
-import { BaseModel } from "../base.model";
 
 export class CatPotentialCustomer {
     id: string = SystemConstants.EMPTY_GUID;
@@ -17,10 +16,6 @@ export class CatPotentialCustomer {
     datetimeModified?: Date = null;
     userCreated: string = null;
     userModified: string = null;
-
-    // Custom
-
-
 }
 export class CatPotentialModel extends CatPotentialCustomer {
     userCreatedName: string = null;
@@ -36,16 +31,3 @@ export class CatPotentialModel extends CatPotentialCustomer {
         }
     }
 };
-
-export class PotentialUpdateModel {
-    potential: CatPotentialModel = null;
-    constructor(object: Object) {
-
-        const self = this;
-        for (const key in object) {
-            if (self.hasOwnProperty(key)) {
-                self[key] = object[key];
-            }
-        }
-    }
-}
