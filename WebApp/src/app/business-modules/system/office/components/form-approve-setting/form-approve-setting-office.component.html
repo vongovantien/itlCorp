@@ -110,6 +110,37 @@
         <hr />
         <div class="row m--margin-top-20">
             <div class="col-lg-12">
+                <h6 class="text-primary">Account Receivable :
+                    <span>
+                        <i class="la la-user text-warning" style="font-size:30px"></i>
+                    </span>
+                </h6>
+            </div>
+            <div class="form-group row ng-star-inserted">
+
+                <div class="col-lg-12 d-flex">
+                    <label class="col-lg-3 col-form-label"> Credit Limit </label>
+                    <div class="col-lg-4">
+                        <app-switch [(toggle)]="accountReceivable.creditLimit"></app-switch>
+                    </div>
+                    <label class="col-lg-3 col-form-label"> Over Payment Term </label>
+                    <div class="col-lg-4">
+                        <app-switch [(toggle)]="accountReceivable.overPaymentTerm"></app-switch>
+                    </div>
+                    <label class="col-lg-3 col-form-label"> Expired Agreement </label>
+                    <div class="col-lg-4">
+                        <app-switch [(toggle)]="accountReceivable.expiredAgreement"></app-switch>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+        <hr />
+        <hr />
+        <div class="row m--margin-top-20">
+            <div class="col-lg-12">
                 <h6 class="text-primary">Lock Shipment Setting :
                     <span>
                         <i class="la la-lock text-warning" style="font-size:30px"></i>

@@ -9,6 +9,9 @@ export class FlowSetting {
     manager: string = "Approval";
     accountant: string = "Approval";
     bod: string = "Auto";
+    creditLimit: boolean = false;
+    overPaymentTerm: boolean = false;
+    expiredAgreement: boolean = false;
     userCreated: string = null;
     userModified: string = null;
     datetimeCreated: string = null;
