@@ -748,6 +748,7 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
                     detail.Stt_Cd_Htt = invoice.ReferenceNo; //ReferenceNo of Invoice (Bravo Updated)
                     detail.ChargeType = "DEBIT";
+                    detail.DebitAccount = string.Empty;
 
                     details.Add(detail);
                 }
@@ -793,6 +794,7 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.BankAccountNo = soaPartner?.BankAccountNo; //Partner Bank Account no
                     detail.Stt_Cd_Htt = "TEST"; //Sẽ update sau
                     detail.ChargeType = "OBH";
+                    detail.DebitAccount = string.Empty;
 
                     details.Add(detail);
                 }
