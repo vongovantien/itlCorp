@@ -4,8 +4,6 @@ import { environment } from "src/environments/environment";
 import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
-import { IncotermUpdateModel } from "../models/commercial/incoterm";
-import { PotentialUpdateModel } from "../models/commercial/potential-customer";
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
@@ -1140,11 +1138,11 @@ export class CatalogueRepo {
         );
     }
 
-    createIncoterm(body: IncotermUpdateModel) {
+    createIncoterm(body) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/Add`, body);
     }
 
-    updateIncoterm(body: IncotermUpdateModel) {
+    updateIncoterm(body) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Update`, body);
     }
 
@@ -1191,7 +1189,7 @@ export class CatalogueRepo {
         });
     }
     //
-    createPotential(body: PotentialUpdateModel) {
+    createPotential(body) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/Create`, body);
     }
     //
@@ -1207,7 +1205,7 @@ export class CatalogueRepo {
         );
     }
     //
-    updatePotential(body: PotentialUpdateModel) {
+    updatePotential(body) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPotential/Update`, body);
     }
     //
