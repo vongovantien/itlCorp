@@ -688,8 +688,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.Email).HasMaxLength(150);
-
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UserCreated)
@@ -3236,10 +3234,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Description).HasMaxLength(200);
-
-                entity.Property(e => e.Title).HasMaxLength(150);
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(50)
