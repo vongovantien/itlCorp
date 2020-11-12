@@ -642,6 +642,10 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     else
                     {
+                        if (listAdd_NVCP_DiffCurrLocal.Count > 0 || listUpdate_NVCP_DiffCurrLocal.Count > 0)
+                        {
+                            return Ok(new ResultHandle { Status = true });
+                        }
                         var result = new ResultHandle { Status = false, Message = responseAddModel_NVHD.Msg + "\n" + responseUpdateModel_NVHD.Msg + "\n" + responseAddModel_NVCP.Msg + "\n" + responseUpdateModel_NVCP.Msg, Data = ids };
                         return BadRequest(result);
                     }
@@ -796,6 +800,10 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     else
                     {
+                        if (listAdd_NVCP_DiffCurrLocal.Count > 0 || listUpdate_NVCP_DiffCurrLocal.Count > 0)
+                        {
+                            return Ok(new ResultHandle { Status = true });
+                        }
                         var result = new ResultHandle { Status = false, Message = responseAddModel_NVHD.Msg + "\n" + responseUpdateModel_NVHD.Msg + "\n" + responseAddModel_NVCP.Msg + "\n" + responseUpdateModel_NVCP.Msg, Data = ids };
                         return BadRequest(result);
                     }
