@@ -851,9 +851,10 @@ namespace eFMS.API.Accounting.DL.Services
                                     Type = "User",
                                     UserCreated = currentUser.UserID,
                                     UserModified = currentUser.UserID,
-                                    Title = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", adv.AdvanceNo),
-                                    Description = string.Format(@"Advance <b style='color:#3966b6'>{0}</b> has been synced", adv.AdvanceNo),
+                                    Title = string.Format(@"Advance {0} has been synced", adv.AdvanceNo),
+                                    Description = "",
                                     ActionLink = string.Format(@"home/accounting/advance-payment/{0}", adv.Id),
+                                    UserIds = currentUser.UserID + "," + adv.UserCreated,
                                 };
 
                                 sysNotifyRepository.Add(sysNotify, false);
@@ -963,9 +964,10 @@ namespace eFMS.API.Accounting.DL.Services
                                     Type = "User",
                                     UserCreated = currentUser.UserID,
                                     UserModified = currentUser.UserID,
-                                    Title = string.Format(@"Settlement <b style='color:#3966b6'>{0}</b> has been synced", settle.SettlementNo),
-                                    Description = string.Format(@"Settlement <b style='color:#3966b6'>{0}</b> has been synced", settle.SettlementNo),
+                                    Title = string.Format(@"Settlement {0} has been synced", settle.SettlementNo),
+                                    Description = "",
                                     ActionLink = string.Format(@"home/accounting/settlement-payment/{0}", settle.Id),
+                                    UserIds = currentUser.UserID + "," + settle.UserCreated,
                                 };
 
                                 sysNotifyRepository.Add(sysNotify, false);
@@ -1073,9 +1075,10 @@ namespace eFMS.API.Accounting.DL.Services
                                     Type = "User",
                                     UserCreated = currentUser.UserID,
                                     UserModified = currentUser.UserID,
-                                    Title = string.Format(@"Voucher <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
-                                    Description = string.Format(@"Voucher <b style='color:#3966b6'>{0}</b> has been synced", voucher.VoucherId),
+                                    Title = string.Format(@"Voucher {0} has been synced", voucher.VoucherId),
+                                    Description = "",
                                     ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
+                                    UserIds = currentUser.UserID + "," + voucher.UserCreated,
                                 };
 
                                 sysNotifyRepository.Add(sysNotify, false);
@@ -1156,13 +1159,13 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.LastSyncDate = DateTime.Now;
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
 
-                        string description = string.Format(@"CD Note <b style='color:#3966b6'>{0}</b> has been synced", cdNote.Code);
+                        string description = string.Format(@"CD Note {0} has been synced", cdNote.Code);
                         // Add Notification
                         SysNotifications sysNotification = new SysNotifications
                         {
                             Id = Guid.NewGuid(),
                             Title = description,
-                            Description = description,
+                            Description = "",
                             Type = "User",
                             UserCreated = currentUser.UserID,
                             DatetimeCreated = DateTime.Now,
@@ -1171,7 +1174,8 @@ namespace eFMS.API.Accounting.DL.Services
                             Action = "Detail",
                             ActionLink = GetLinkCdNote(cdNote.Code, cdNote.JobId),
                             IsClosed = false,
-                            IsRead = false
+                            IsRead = false,
+                            UserIds = currentUser.UserID + "," + cdNote.UserCreated,
                         };
                         HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
                         if (hsSysNotification.Success)
@@ -1239,13 +1243,13 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.LastSyncDate = DateTime.Now;
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
 
-                        string description = string.Format(@"SOA No <b style='color:#3966b6'>{0}</b> has been synced", soa.Soano);
+                        string description = string.Format(@"SOA No {0} has been synced", soa.Soano);
                         // Add Notification
                         SysNotifications sysNotification = new SysNotifications
                         {
                             Id = Guid.NewGuid(),
                             Title = description,
-                            Description = description,
+                            Description = "",
                             Type = "User",
                             UserCreated = currentUser.UserID,
                             DatetimeCreated = DateTime.Now,
@@ -1254,7 +1258,8 @@ namespace eFMS.API.Accounting.DL.Services
                             Action = "Detail",
                             ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency=VND", soa.Soano),
                             IsClosed = false,
-                            IsRead = false
+                            IsRead = false,
+                            UserIds = soa.UserCreated + "," + currentUser.UserID,
                         };
                         HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
                         if (hsSysNotification.Success)
@@ -1325,7 +1330,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return exchangeRate;
         }
-
         private string GetDeptCode(string JobNo)
         {
             string deptCode = "ITLCS";
@@ -1348,7 +1352,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return deptCode;
         }
-
         private decimal GetOrgVatAmount(decimal? vatrate, decimal? orgAmount, string currency)
         {
             decimal amount = 0;
@@ -1359,7 +1362,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return amount;
         }
-
         private string GetCustomerHBL(Guid? Id)
         {
             string customerName = "";
@@ -1371,7 +1373,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return customerName;
         }
-        
         private string GetLinkCdNote(string cdNoteNo, Guid jobId)
         {
             string _link = string.Empty;
@@ -1455,7 +1456,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _originAmount;
         }
-
         private decimal GetOrgVatAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _orgVatAmout = 0;
@@ -1471,7 +1471,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _orgVatAmout;
         }
-        
         private string GetServiceNameOfCdNote(string cdNoteNo)
         {
             string _serviceName = string.Empty;
@@ -1520,6 +1519,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return _serviceName;
         }
+        
         #endregion -- Private Method --
 
         #region --- Send Mail & Push Notification to Accountant ---
@@ -1607,8 +1607,8 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> attachments = null;
 
             List<string> emailCCs = new List<string> { };
-
-            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            List<string> emailBCCs = new List<string> { "alex.phuong@itlvn.com" };
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs, emailBCCs);
 
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
@@ -1631,8 +1631,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 try
                 {
+                    var idAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID).FirstOrDefault()?.Id;
+                    // Danh sách user Id của group thuộc department Accountant (Không lấy manager của department Acct)
+                    var idUserGroupAccts = sysUserLevelRepo.Get(x => x.GroupId != AccountingConstants.SpecialGroup && x.DepartmentId == idAccountantDept).Select(s => s.UserId);
+
                     string _type = type == "CDNOTE" ? "Credit Note" : "SOA";
-                    string title = string.Format(@"Voucher Request - {0}: <b>{1}</b>", _type, refNo);
+                    string title = string.Format(@"Voucher Request - {0}: {1}", _type, refNo);
                     string description = string.Format(@"You received a <b>{0}</b> from <b>{1}</b>. Ref No <b>{2}</b> of <b>{3}</b> with Amount <b>{4}</b>", _type, creatorEnName, refNo, serviceName, amountCurr);
                     // Add Notification
                     SysNotifications sysNotification = new SysNotifications
@@ -1648,14 +1652,13 @@ namespace eFMS.API.Accounting.DL.Services
                         Action = "Detail",
                         ActionLink = urlFunc,
                         IsClosed = false,
-                        IsRead = false
+                        IsRead = false,
+                        UserIds = idUserGroupAccts.ToString()
                     };
                     HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
                     if (hsSysNotification.Success)
                     {
-                        var idAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID).FirstOrDefault()?.Id;
-                        // Danh sách user Id của group thuộc department Accountant (Không lấy manager của department Acct)
-                        var idUserGroupAccts = sysUserLevelRepo.Get(x => x.GroupId != AccountingConstants.SpecialGroup && x.DepartmentId == idAccountantDept).Select(s => s.UserId);
+                       
                         foreach (var idUserGroupAcct in idUserGroupAccts)
                         {
                             SysUserNotification userNotifySync = new SysUserNotification
