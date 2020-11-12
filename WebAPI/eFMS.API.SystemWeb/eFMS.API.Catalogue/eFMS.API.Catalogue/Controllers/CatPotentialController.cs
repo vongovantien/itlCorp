@@ -7,6 +7,7 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
+using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -57,7 +58,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("Create")]
         [Authorize]
-        public IActionResult Create(CatPotentialEditModel model)
+        public IActionResult Create(CatPotential model)
         {
             PermissionRange permissionRange;
             ICurrentUser _user = null;
@@ -77,7 +78,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            bool checkExistMessage = CheckExistPotential(Guid.Empty, model.Potential.Taxcode);
+            bool checkExistMessage = CheckExistPotential(Guid.Empty, model.Taxcode);
             if (checkExistMessage)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value });
@@ -98,7 +99,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public IActionResult Update(CatPotentialEditModel model)
+        public IActionResult Update(CatPotential model)
         {
             PermissionRange permissionRange;
             ICurrentUser _user = null;
@@ -118,7 +119,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            bool checkExistMessage = CheckExistPotential(model.Potential.Id, model.Potential.Taxcode);
+            bool checkExistMessage = CheckExistPotential(model.Id, model.Taxcode);
             if (checkExistMessage)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value });

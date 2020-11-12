@@ -44,7 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatChargeIncoterm>("Id", "IncotermId");
         }
 
-        public HandleState AddNew(CatIncotermEditModel model)
+        public HandleState AddNew(CatIncotermEditModel model, out Guid Id)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -85,14 +85,16 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         DataContext.SubmitChanges();
                         catChargeIncotermRepository.SubmitChanges();
-
                         trans.Commit();
                     }
+
+                    Id = model.Incoterm.Id;
                     return hs;
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    Id = Guid.Empty;
                     return new HandleState(ex.Message);
                 }
                 finally

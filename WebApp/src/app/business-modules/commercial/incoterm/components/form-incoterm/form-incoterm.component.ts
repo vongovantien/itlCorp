@@ -59,6 +59,7 @@ export class CommercialFormIncotermComponent extends AppForm implements OnInit {
     }
 
     onSelectService(service: SelectItem) {
+        console.log(service);
         if (!!service) {
             this._dataService.setData('incotermService', service.id);
         }

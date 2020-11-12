@@ -68,7 +68,6 @@ export class AddPartnerDataComponent extends AppList {
 
     isDup: boolean = false;
     name: string;
-    isAddSubPartner: boolean;
 
     constructor(private route: ActivatedRoute,
         private _catalogueRepo: CatalogueRepo,
@@ -92,7 +91,6 @@ export class AddPartnerDataComponent extends AppList {
         this.route.queryParams.subscribe(prams => {
             if (prams.partnerType !== undefined) {
                 if (localStorage.getItem('success_add_sub') === "true") {
-                    localStorage.removeItem('success_add_sub');
                     this.back();
                 }
                 this.partnerType = Number(prams.partnerType);
@@ -492,7 +490,6 @@ export class AddPartnerDataComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res.result.success) {
-                        localStorage.setItem('success_add_sub', "true");
                         this._toastService.success("New data added");
                         this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${res.model.id}`]);
                     } else {
