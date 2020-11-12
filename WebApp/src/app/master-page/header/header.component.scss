@@ -83,9 +83,22 @@
 }
 
 .m-list-timeline__item {
+    &:hover {
+        background-color: #f4f5f8;
+    }
     .m-list-timeline__text {
         &:hover {
             color: #2739c1 !important;
+        }
+        .m-list-timeline__title {
+            max-width: 90%;
+        }
+        .m-list-timeline__icon {
+            font-size: 1rem;
+            position: absolute;
+            right: 0;
+            top: 15px;
+            right: 0px;
         }
     }
     .m-list-timeline__badge {
@@ -98,10 +111,19 @@
             height: 95% !important;
         }
     }
-}
-
-.m-list-timeline__item {
-    &:hover {
-        background-color: #f4f5f8;
+    &.m-list-timeline__item--read {
+        .m-list-timeline__badge {
+            &::before {
+                background-color: initial !important;
+            }
+        }
+        .m-list-timeline__time {
+            color: rgb(176, 179, 184);
+            font-weight: 600;
+        }
+    }
+    .m-list-timeline__time {
+        color: rgb(46, 137, 255);
+        font-weight: 600;
     }
 }

@@ -73,6 +73,18 @@
                                                         </ng-container>
                                                     </ng-container>
                                                 </td>
+                                                <td [ngSwitch]="cdNote.syncStatus">
+                                                    <span *ngSwitchCase="'Synced'" class="text-success">
+                                                        {{cdNote.syncStatus}}</span>
+                                                    <span *ngSwitchCase="'Rejected'" class="text-danger">
+                                                        {{cdNote.syncStatus}}</span>
+                                                    <span *ngSwitchDefault>
+                                                        {{cdNote.syncStatus}}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{cdNote.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                                </td>
                                             </tr>
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!isLoading && !cdNotes.length"

@@ -36,10 +36,6 @@ namespace eFMS.API.System.DL.Services
             throw new NotImplementedException();
         }
 
-        public HandleState Delete(Guid Id)
-        {
-            throw new NotImplementedException();
-        }
 
         public IQueryable<SysUserNotificationModel> GetAll()
         {
@@ -72,11 +68,12 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        IQueryable<SysUserNotificationModel> ISysUserNotification.Paging(int page, int size, out int rowsCount)
+        IQueryable<SysUserNotificationModel> ISysUserNotification.Paging(int page, int size, out int rowsCount, out int totalNoRead)
         {
             IQueryable<SysUserNotificationModel> data = GetQuery();
 
             rowsCount = data.Count();
+            totalNoRead = data.Count(x => x.Status == SystemConstants.NOTIFICATION_STATUS_NEW);
             if (page == 0)
             {
                 page = 1;

@@ -3,7 +3,7 @@ import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCance
 import { IdentityRepo, SystemRepo } from '@repositories';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { Employee, Office, SysUserNotification } from '@models';
+import { Employee, Office, SysNotification, SysUserNotification, SysUserNotificationModel } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
@@ -63,7 +63,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             this.getOfficeDepartGroupCurrentUser(this.currenUser);
         }
 
-
         const indentitySub = this._identity.getUserProfile()
             .subscribe(
                 (user: any) => {
@@ -112,19 +111,20 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this._signalRService.startConnection();
         this.getListNotification();
 
-        this._signalRService.listenEvent("NotificationWhenChange", (data: SysUserNotification) => {
-            if (data) {
-                // this._toast.info(`You have a new message ${data.title}`, 'Infomation');
+        this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
+            console.log("notification", data);
+            if (data && data.userIds.includes(this.currenUser.id)) {
+                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 1000 });
                 this.getListNotification();
             }
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            console.log(data);
+            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {
@@ -142,14 +142,22 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 (res: CommonInterface.IResponsePaging) => {
                     this.notifications = res.data || [];
                     this.totalItem = res.totalItems;
-
-                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
+                    this.newMssUnread = res.totalNoRead;
                 }
             );
     }
 
     selectNotification(noti: SysUserNotification, e: any) {
         e.stopPropagation();
+        if (noti.actionLink) {
+            if (noti.actionLink.includes("?")) {
+                // TODO handle query param
+                // console.log(window.location.host + "/#" + window.location.pathname + noti.actionLink);
+                // this.router.navigateByUrl(window.location.host + "/#" + window.location.pathname + noti.actionLink, { skipLocationChange: true });
+            } else {
+                this.router.navigate([noti.actionLink]);
+            }
+        }
         if (noti.status === 'Read') {
             return;
         }
@@ -163,12 +171,31 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             .subscribe((res: CommonInterface.IResult) => {
                 if (!res.status) {
                     this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
-
                 } else {
                     noti.status = 'Read';
-                    this.newMssUnread = this.notifications.filter(x => x.status === 'New').length;
+                    this.newMssUnread--;
                 }
+            });
+    }
 
+    deleteNotify(notify: SysUserNotification, index: number, e: any) {
+        e.stopPropagation();
+        this._spinner.show(this.spinnerNotify);
+        this._systemRepo.deleteMessage(notify.id)
+            .pipe(
+                finalize(() => {
+                    this._spinner.hide(this.spinnerNotify);
+                })
+            )
+            .subscribe((res: CommonInterface.IResult) => {
+                if (!res.status) {
+                    this._toast.error("Có lỗi xảy ra, vui lòng kiểm tra lại tin nhắn");
+                } else {
+                    this.notifications.splice(index, 1);
+                    if (notify.status === 'New') {
+                        this.newMssUnread--;
+                    }
+                }
             });
     }
 
@@ -187,6 +214,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 if (!!res.data) {
                     this.notifications = [...this.notifications, ...res.data];
                     this.totalItem = res.totalItems;
+                    this.newMssUnread = res.totalNoRead;
                 }
             });
 

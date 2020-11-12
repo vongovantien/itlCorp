@@ -73,6 +73,7 @@ const authConfig: AuthConfig = {
         BrowserAnimationsModule,
         ToastrModule.forRoot({
             positionClass: 'toast-bottom-right',
+            easeTime: 500
         }),
         NgxSpinnerModule,
         PerfectScrollbarModule,

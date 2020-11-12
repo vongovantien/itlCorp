@@ -157,7 +157,8 @@
                                                         <span *ngSwitchCase="'Synced'" class="text-success">
                                                             {{cdNote.syncStatus}}</span>
                                                         <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                            {{cdNote.syncStatus}}</span>
+                                                            {{cdNote.syncStatus}}{{cdNote.reasonReject ? ' - ' + cdNote.reasonReject : ''}}
+                                                        </span>
                                                         <span *ngSwitchDefault>
                                                             {{cdNote.syncStatus}}
                                                         </span>

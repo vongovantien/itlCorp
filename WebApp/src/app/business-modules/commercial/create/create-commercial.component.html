@@ -19,10 +19,21 @@
                 <form-create-commercial></form-create-commercial>
             </div>
         </div>
-        <commercial-contract-list></commercial-contract-list>
     </div>
 </div>
+<div class="m-content">
+    <div class="m-portlet__body">
 
+        <tabset class="custom-class-tab">
+            <tab heading="Agreement">
+                <commercial-contract-list></commercial-contract-list>
+            </tab>
+            <tab heading="Branch/Sub">
+                <app-commercial-branch-sub-list></app-commercial-branch-sub-list>
+            </tab>
+        </tabset>
+    </div>
+</div>
 <info-popup [body]="invalidFormText"></info-popup>
 
 

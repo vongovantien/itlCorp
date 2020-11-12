@@ -46,12 +46,8 @@ export class AccountPaymentFormSearchComponent extends AppForm implements OnInit
         { field: 'taxCode', label: 'Tax Code' },
     ];
 
-    payments: CommonInterface.INg2Select[] = [
-        { id: 'All', text: 'All' },
-        { id: 'Unpaid', text: 'Unpaid' },
-        { id: 'Paid A Part', text: 'Paid A Part' },
-        { id: 'Paid', text: 'Paid' },
-    ];
+    payments: string[] = ['All', 'Unpaid', 'Paid A Part', 'Paid'];
+
     overDueDays: CommonInterface.INg2Select[] = [
         { id: '0', text: 'All' },
         { id: 1, text: '01-15 days' },
@@ -82,7 +78,7 @@ export class AccountPaymentFormSearchComponent extends AppForm implements OnInit
             issuedDate: [],
             updatedDate: [],
             dueDate: [],
-            overdueDate: [[this.overDueDays[0]]],
+            overdueDate: [this.overDueDays[0].id],
             paymentStatus: [[this.payments[1], this.payments[2]]]
         });
 
@@ -111,7 +107,7 @@ export class AccountPaymentFormSearchComponent extends AppForm implements OnInit
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
             paymentStatus: status,
-            overDueDays: !!dataForm.overdueDate ? +dataForm.overdueDate[0].id : OverDueDays.All,
+            overDueDays: !!dataForm.overdueDate ? +dataForm.overdueDate : OverDueDays.All,
             fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             fromUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.startDate) ? formatDate(dataForm.updatedDate.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -129,8 +125,8 @@ export class AccountPaymentFormSearchComponent extends AppForm implements OnInit
             strStatus = [];
 
             paymentStatus.forEach(element => {
-                if (element['id'] !== 'All') {
-                    strStatus.push(element['id']);
+                if (element !== 'All') {
+                    strStatus.push(element);
                 } else {
                     return [];
                 }
@@ -146,17 +142,16 @@ export class AccountPaymentFormSearchComponent extends AppForm implements OnInit
         this.onSearch.emit({ paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
     }
 
-    selelectedStatus(event) {
+    selelectedStatus(event: string) {
         const currStatus = this.paymentStatus.value;
-        if (currStatus.filter(x => x.id === 'All').length > 0 && event.id !== 'All') {
+        if (currStatus.filter(x => x === 'All').length > 0 && event !== 'All') {
             currStatus.splice(0);
             currStatus.push(event);
             this.paymentStatus.setValue(currStatus);
 
         }
-        if (event.id === 'All') {
-            const onlyAllObj = currStatus.filter(ele => ele.id === 'All');
-            this.paymentStatus.setValue(onlyAllObj);
+        if (event === 'All') {
+            this.paymentStatus.setValue(['All']);
         }
 
     }

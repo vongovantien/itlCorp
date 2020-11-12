@@ -282,7 +282,7 @@ namespace eFMS.API.Documentation.DL.Services
                     _partnerAcRef = _partner;
                 }
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
-                var _contractAcRef = catContractRepo.Get(x => x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
                 if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
                 {
                     model.CurrencyId = _contractAcRef.CurrencyId;
@@ -385,14 +385,14 @@ namespace eFMS.API.Documentation.DL.Services
                     _partnerAcRef = _partner;
                 }
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
-                var _contractAcRef = catContractRepo.Get(x => x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
                 if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
                 {
                     entity.CurrencyId = _contractAcRef.CurrencyId;
                 }
                 else
                 {
-                    entity.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_DOMESTIC) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                    entity.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
                 #endregion  --- Set Currency For CD Note ---
 
@@ -1677,7 +1677,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CDNoteModel> results = null;
             var data = Query(criteria);
             if (data == null) { rowsCount = 0; return results; }
-            var cdNotes = Query(criteria)?.OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
+            var cdNotes = Query(criteria)?.ToArray().OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
             {
                 ReferenceNo = x.Code,
                 PartnerId = x.PartnerId,
@@ -1685,6 +1685,8 @@ namespace eFMS.API.Documentation.DL.Services
                 IssuedDate = x.DatetimeCreated,
                 Creator = x.UserCreated,
                 JobId = x.JobId,
+                SyncStatus = x.SyncStatus,
+                LastSyncDate = x.LastSyncDate
             })?.ToList();
 
             rowsCount = cdNotes.Count;
@@ -1720,8 +1722,9 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     page = 1;
                 }
-                cdNotesGroupByCurrency = cdNotesGroupByCurrency.Skip((page - 1) * size).Take(size);
+                // cdNotesGroupByCurrency = cdNotesGroupByCurrency.Skip((page - 1) * size).Take(size);
                 results = GetCDNotes(cdNotes, cdNotesGroupByCurrency);
+                results = results.Skip((page - 1) * size).Take(size).ToList();
             }
             return results;
         }
@@ -1761,7 +1764,9 @@ namespace eFMS.API.Documentation.DL.Services
                             IssuedDate = cd.IssuedDate,
                             Creator = creator.Username,
                             HBLNo = charge.HBLNo,
-                            Status = charge.Status
+                            Status = charge.Status,
+                            SyncStatus = cd.SyncStatus,
+                            LastSyncDate = cd.LastSyncDate
                         })?.AsQueryable();
             var results = new List<CDNoteModel>();
             foreach (var item in data)

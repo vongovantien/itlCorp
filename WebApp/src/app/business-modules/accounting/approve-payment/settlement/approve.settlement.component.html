@@ -7,7 +7,10 @@
                     <ng-container
                         *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
                         <span
-                            class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">{{settlementPayment.settlement.syncStatus}}</span>
+                            class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
+                            {{settlementPayment.settlement.syncStatus}}{{settlementPayment.settlement.syncStatus === 'Rejected' && 
+                            settlementPayment.settlement.reasonReject ? ' - ' + settlementPayment.settlement.reasonReject : ''}}
+                        </span>
                     </ng-container>
                 </settle-payment-form-create>
                 <div class="row" *ngIf="!!settlementPayment">

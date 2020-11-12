@@ -64,6 +64,8 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             { title: 'Issue Date', field: 'issuedDate', sortable: true },
             { title: 'Creator', field: 'creator', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
+            { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
         this.getCreditDebitInvoices();
     }

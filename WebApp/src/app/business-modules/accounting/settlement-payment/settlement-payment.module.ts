@@ -11,6 +11,8 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { StoreModule } from '@ngrx/store';
 
 import { SettlementPaymentComponent } from './settlement-payment.component';
 import { SettlementFormSearchComponent } from './components/form-search-settlement/form-search-settlement.component';
@@ -31,8 +33,6 @@ import { SettlementTableListChargePopupComponent } from './components/popup/tabl
 import { ShareAccountingModule } from '../share-accouting.module';
 import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 import { ReportPreviewComponent } from '@common';
-import { SelectModule } from 'ng2-select';
-import { StoreModule } from '@ngrx/store';
 import { reducers } from './components/store';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
@@ -105,7 +105,7 @@ const customCurrencyMaskConfig = {
         ShareApprovePaymentModule,
         BsDropdownModule.forRoot(),
         ShareAccountingModule,
-        SelectModule,
+        NgSelectModule,
         StoreModule.forFeature('settlement-payment', reducers),
     ],
     exports: [],

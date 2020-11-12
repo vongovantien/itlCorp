@@ -1319,7 +1319,20 @@ button {
     position: relative;
 }
 
+.m-form__group.has-danger {
+    .ng-invalid {
+        .ng-select-container {
+            border-color: #f4516c;
+        }
+    }
+}
 .ng-select.custom {
+    &.ng-invalid.ng-touched .ng-select-container {
+        border-color: #f4516c;
+    }
+    .ng-input {
+        left: -4px !important;
+    }
     .ng-select-container {
         border-color: #ebedf2;
         background-color: #fbfbfb;
@@ -1331,6 +1344,9 @@ button {
         color: #fff !important;
     }
     &.ng-select-multiple {
+        .ng-select-container {
+            height: auto;
+        }
         .ng-value {
             font-size: 14px !important;
             color: #fff;

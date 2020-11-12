@@ -83,10 +83,11 @@
                             <div class="form-group">
                                 <label>A/C Ref</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acRef')"
-                                    [currentActiveItemId]="{ field: 'id', value: parentId.value}"
+                                    [currentActiveItemId]="{ field: 'id', value: parentId.value, hardValue: parentName }"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="acRefCustomers | async"
                                     [displayFields]="displayFieldCustomer" placeholder="Select partner"
-                                    (remove)="resetFormControl(parentId)">
+                                    (remove)="resetFormControl(parentId)"
+                                    [disabled]="isBranchSub">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

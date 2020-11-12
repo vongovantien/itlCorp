@@ -31,6 +31,8 @@ export class AdvancePayment {
     paymentTermDate: string = null;
     lastSyncDate: string = null;
     syncStatus: string = null;
+    reasonReject: string = null;
+
 
     isRequester: boolean = false;
     isManager: boolean = false;

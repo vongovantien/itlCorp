@@ -19,6 +19,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public List<string> idsContract { get; set; }
         public string UserCreatedContract { get; set; }
         public PermissionAllowBase Permission { get; set; }
-
+        public string UserCreatedName { get; set; }
+        public string UserModifiedName { get; set; }
     }
 }

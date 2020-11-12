@@ -59,6 +59,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerNameVn: AbstractControl;
     shortName: AbstractControl;
     partnerAccountRef: AbstractControl;
+    parentName: string = '';
 
     taxCode: AbstractControl;
     partnerGroup: AbstractControl;
@@ -96,6 +97,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerMode: AbstractControl;
     partnerLocation: AbstractControl;
     internalCode: AbstractControl;
+    isAddBranchSub: boolean;
 
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
@@ -118,6 +120,7 @@ export class FormAddPartnerComponent extends AppForm {
         { id: 'Oversea', text: 'Oversea' }
     ];
 
+    displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
 
     constructor(
@@ -387,6 +390,7 @@ export class FormAddPartnerComponent extends AppForm {
 
         switch (type) {
             case 'acRef':
+                this.parentName = null;
                 this.partnerAccountRef.setValue(data.id);
                 break;
             case 'shippping-country':
@@ -434,8 +438,9 @@ export class FormAddPartnerComponent extends AppForm {
         let billingProvinceActive = [];
         let shippingProvinceActive = [];
         index = this.parentCustomers.findIndex(x => x.id === partner.parentId);
-        if (index > -1) { parentCustomerActive = [this.parentCustomers[index]]; }
-
+        if (index > -1) {
+            parentCustomerActive = [this.parentCustomers[index]];
+        }
         index = this.countries.findIndex(x => x.id === partner.countryId);
         if (index > - 1) {
             countryIdActive = [this.countries[index]];
@@ -455,14 +460,14 @@ export class FormAddPartnerComponent extends AppForm {
         this.public = partner.public;
 
         this.partnerForm.setValue({
-            partnerAccountNo: partner.accountNo,
+            partnerAccountNo: this.isAddBranchSub ? null : partner.accountNo,
             internalReferenceNo: partner.internalReferenceNo,
             partnerNameEn: partner.partnerNameEn,
             partnerNameVn: partner.partnerNameVn,
             shortName: partner.shortName,
             //
-            partnerAccountRef: partner.parentId,
-            taxCode: partner.taxCode,
+            partnerAccountRef: this.isAddBranchSub ? partner.id : partner.parentId,
+            taxCode: this.isAddBranchSub ? null : partner.taxCode,
             partnerGroup: partnerGroupActives,
             countryShippingId: partner.countryShippingId,
             provinceShippingId: partner.provinceShippingId,
@@ -490,7 +495,7 @@ export class FormAddPartnerComponent extends AppForm {
             bankAccountAddress: partner.bankAccountAddress,
             swiftCode: partner.swiftCode,
 
-            active: partner.active === null ? false : partner.active,
+            active: this.isAddBranchSub ? false : (partner.active === null ? false : partner.active),
             note: partner.note,
             coLoaderCode: partner.coLoaderCode,
             roundUpMethod: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
@@ -506,10 +511,7 @@ export class FormAddPartnerComponent extends AppForm {
         const partnerGroupActives = [];
         if (arg0.length > 0) {
             for (let i = 0; i < arg0.length; i++) {
-                const group = this.partnerGroups.find(x => x.id === arg0[i]);
-                if (group) {
-                    partnerGroupActives.push(group);
-                }
+                partnerGroupActives.push(arg0[i]);
             }
         }
         return partnerGroupActives;
@@ -546,5 +548,17 @@ export class FormAddPartnerComponent extends AppForm {
         } else {
             this.isDisabledInternalCode = true;
         }
+    }
+
+    getACRefName(parentId: string) {
+        this._catalogueRepo.getDetailPartner(parentId)
+            .pipe(catchError(this.catchError), finalize(() => { }))
+            .subscribe(
+                (res: Partner) => {
+                    if (!!res) {
+                        this.parentName = res.shortName;
+                    }
+                }
+            );
     }
 }

@@ -291,7 +291,7 @@
                     </span>
                 </button>
                 <button class="btn btn-info  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv' && (CdNoteDetail.cdNote.type === 'DEBIT' || CdNoteDetail.cdNote.type === 'INVOICE')"
+                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv'"
                     title="Send to Accountant">
                     <span>
                         <i class="la la-cloud-upload"></i>
@@ -322,3 +322,5 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<payment-method-popup (onApply)="onApplyPaymentMethod($event)"></payment-method-popup>

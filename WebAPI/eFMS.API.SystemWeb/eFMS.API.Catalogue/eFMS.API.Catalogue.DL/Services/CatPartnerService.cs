@@ -85,6 +85,7 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<OpsTransaction>("Id", "SupplierId");
             SetChildren<OpsTransaction>("Id", "AgentId");
             SetChildren<CatPartnerCharge>("Id", "PartnerId");
+            SetChildren<CatContract>("Id", "PartnerId");
             SetChildren<CsManifest>("Id", "Supplier");
             SetChildren<CsShipmentSurcharge>("Id", "PayerID");
             SetChildren<CsShipmentSurcharge>("Id", "PaymentObjectID");
@@ -207,7 +208,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string body = string.Empty;
 
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
-            var creatorObj= sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            var creatorObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
 
             string address = webUrl.Value.Url + "/en/#/" + "home/catalogue/partner-data/detail/" + partner.Id;
             subject = "Reject Partner - " + partner.PartnerNameVn;
@@ -222,7 +223,7 @@ namespace eFMS.API.Catalogue.DL.Services
                    "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
                    + linkEn + "</br>" + linkVn + "</br> </br>" +
                   "<i> Thanks and Regards </i>" + "</br> </br>" +
-                  "eFMS System </div>" );
+                  "eFMS System </div>");
 
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
@@ -322,7 +323,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-   
+
         private void SendMailCreatedSuccess(CatPartner partner)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
@@ -380,7 +381,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (lstToAccountant.Any() || lstCc.Any())
                 {
-                    if(lstToAccountant.Count() == 0)
+                    if (lstToAccountant.Count() == 0)
                     {
                         lstToAccountant = lstCc;
                     }
@@ -557,6 +558,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var s = contractRepository.Delete(x => x.PartnerId == id);
                 contractRepository.SubmitChanges();
+                var partnerUpdate = DataContext.Get(x => x.ParentId == id);
+                foreach (var partner in partnerUpdate)
+                {
+                    partner.ParentId = partner.Id;
+                    DataContext.Update(partner, x => x.Id == partner.Id);
+                }
                 ClearCache();
                 Get();
             }
@@ -983,6 +990,16 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
                 queryDetail.ProvinceShippingName = province.NameEn;
+            }
+            // Get usercreate name
+            if (queryDetail.UserCreated != null)
+            {
+                queryDetail.UserCreatedName = sysUserRepository.Get(x => x.Id == queryDetail.UserCreated)?.FirstOrDefault()?.Username;
+            }
+            // Get usermodified name
+            if (queryDetail.UserCreated != null)
+            {
+                queryDetail.UserModifiedName = sysUserRepository.Get(x => x.Id == queryDetail.UserModified)?.FirstOrDefault()?.Username;
             }
             return queryDetail;
         }
@@ -1722,6 +1739,10 @@ namespace eFMS.API.Catalogue.DL.Services
             var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(criteria.Id))
+            {
+                data = data.Where(x => x.ParentId != criteria.Id);
+            }
             if (data == null) return null;
             var results = data.Select(x => new CatPartnerViewModel
             {
@@ -1740,6 +1761,45 @@ namespace eFMS.API.Catalogue.DL.Services
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo
             });
+            return results;
+        }
+
+        /// <summary>
+        /// Get partner list by parentId
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public List<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType)
+        {
+            if (id == null) return null;
+            var currPartnerId = Get(x => x.Id == id).FirstOrDefault()?.AccountNo;
+            var data = Get(x => x.ParentId == id && x.AccountNo != currPartnerId && x.PartnerType == partnerType);
+            if (data == null) return null;
+            var results = new List<CatPartnerViewModel>();
+            foreach (var partner in data)
+            {
+                var item = new CatPartnerViewModel()
+                {
+                    Id = partner.Id,
+                    PartnerGroup = partner.PartnerGroup,
+                    PartnerNameVn = partner.PartnerNameVn,
+                    PartnerNameEn = partner.PartnerNameEn,
+                    ShortName = partner.ShortName,
+                    TaxCode = partner.TaxCode,
+                    SalePersonId = partner.SalePersonId,
+                    Tel = partner.Tel,
+                    AddressEn = partner.AddressEn,
+                    Fax = partner.Fax,
+                    CoLoaderCode = partner.CoLoaderCode,
+                    RoundUpMethod = partner.RoundUpMethod,
+                    ApplyDim = partner.ApplyDim,
+                    AccountNo = partner.AccountNo,
+                    Active = partner.Active,
+                    PartnerType = partner.PartnerType,
+                    CountryShippingName = catCountryRepository.Where(k => k.Id == partner.CountryShippingId)?.FirstOrDefault().NameEn
+                };
+                results.Add(item);
+            }
             return results;
         }
     }

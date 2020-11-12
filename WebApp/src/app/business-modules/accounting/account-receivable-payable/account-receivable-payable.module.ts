@@ -7,7 +7,6 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SelectModule } from 'ng2-select';
 
 import { AccountPaymentFormSearchComponent } from './components/form-search/account-payment/form-search-account-payment.component';
 import { AccountReceivablePayableComponent } from './account-receivable-payable.component';
@@ -22,6 +21,7 @@ import { AccountReceivablePayableImportOBHPaymentComponent } from './components/
 
 import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
 import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 
@@ -70,7 +70,7 @@ const routing: Routes = [
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
         NgxDaterangepickerMd,
-        SelectModule,
+        NgSelectModule,
         PerfectScrollbarModule,
     ],
     exports: [],

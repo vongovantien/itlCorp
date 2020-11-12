@@ -123,7 +123,7 @@
                                 </ul>
                             </div>
                         </li>
-                        <li class="m-nav__item m-topbar__notifications" title="Notification">
+                        <li class="m-nav__item m-topbar__notifications">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-nav__link-badge m-badge m-badge--danger"
                                     *ngIf="!!newMssUnread">{{newMssUnread}}</span>
@@ -148,17 +148,19 @@
                                         <div class="m-list-timeline__items ">
                                             <div class="m-list-timeline__item pointer"
                                                 [class.m-list-timeline__item--read]="item.status !== 'New'"
-                                                *ngFor="let item of notifications; let i = index"
-                                                (click)="selectNotification(item, $event)">
+                                                *ngFor="let item of notifications; let i = index; trackBy: i">
                                                 <span
                                                     class="m-list-timeline__badge -m-list-timeline__badge--state-success">
                                                 </span>
                                                 <div class="m-list-timeline__text">
-                                                    <div class="" [innerHTML]="item.title">
+                                                    <div class="m-list-timeline__title" [innerHTML]="item.title"
+                                                        (click)="selectNotification(item, $event)">
                                                     </div>
                                                     <div class="text-left m-list-timeline__time ">
                                                         {{item.datetimeCreated | date : 'HH:mm dd/MM'}}
                                                     </div>
+                                                    <i class="la la-trash m--margin-right-5 m-list-timeline__icon collapse-toggle"
+                                                        (click)="deleteNotify(item,i, $event)"></i>
                                                 </div>
                                             </div>
                                             <ng-container *ngIf="totalItem > notifications.length">

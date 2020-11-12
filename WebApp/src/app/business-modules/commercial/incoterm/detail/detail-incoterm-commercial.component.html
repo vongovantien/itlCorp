@@ -53,6 +53,6 @@
 
 <info-popup [body]="invalidFormText"></info-popup>
 
-<confirm-popup #confirmCancelPopup body="'Do you want to cancel without saving?'"
+<confirm-popup #confirmCancelPopup body="Do you want to cancel without saving?"
     (onSubmit)="confirmCancelPopup.hide(); gotoList()">
 </confirm-popup>

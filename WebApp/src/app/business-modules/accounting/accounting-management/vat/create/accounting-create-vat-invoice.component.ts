@@ -69,9 +69,6 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
     }
 
     checkValidateForm() {
-        this.setError(this.formCreateComponent.currency);
-        this.setError(this.formCreateComponent.paymentMethod);
-
         let valid: boolean = true;
         if (!this.formCreateComponent.formGroup.valid) {
             valid = false;

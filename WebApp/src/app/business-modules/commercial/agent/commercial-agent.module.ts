@@ -26,7 +26,10 @@ const routing: Routes = [
             },
             {
                 path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Agent' }
-            }
+            },
+            {
+                path: 'new-sub/:partnerId', component: CommercialDetailComponent, data: { name: 'New SubAgent', path: ':partnerId', action: true }
+            },
         ]
     }
 ];
