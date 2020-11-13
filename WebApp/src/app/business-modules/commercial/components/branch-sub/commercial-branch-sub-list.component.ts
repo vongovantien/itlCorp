@@ -99,14 +99,14 @@ export class CommercialBranchSubListComponent extends AppList {
 
   showConfirmDelete(partner: Partner) {
     this.selectedPartner = partner;
+    const partnerType = this.openOnPartner ? "Partner" : this.selectedPartner.partnerType;
     this._catalogueRepo.getDetailPartner(this.selectedPartner.id)
       .subscribe(
         (res: any) => {
           if (!res) {
-            this._toastService.warning("This " + this.openOnPartner ? "Partner" : this.selectedPartner.partnerType + " has been deleted, Please check again!");
+            this._toastService.warning("This " + partnerType + " has been deleted, Please check again!");
           } else {
             if (res.active) {
-              const partnerType = this.openOnPartner ? "Partner" : this.selectedPartner.partnerType;
               this._toastService.warning("This " + partnerType + " can't delete, Please reload " + partnerType + "!");
             } else {
               this.checkDeletePartnerPermission(partner.id);

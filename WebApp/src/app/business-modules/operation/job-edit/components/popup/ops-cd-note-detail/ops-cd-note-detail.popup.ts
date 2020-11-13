@@ -230,12 +230,12 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     }
 
     showConfirmed() {
-        // if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.cdNote.currencyId === 'VND') {
-        //    this.paymentMethodPopupComponent.show();
-        // } else {
-        this.paymentMethodSelected = '';
-        this.confirmSendToAcc();
-        // }
+        if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
+            this.paymentMethodPopupComponent.show();
+        } else {
+            this.paymentMethodSelected = '';
+            this.confirmSendToAcc();
+        }
     }
 
     onApplyPaymentMethod($event) {
