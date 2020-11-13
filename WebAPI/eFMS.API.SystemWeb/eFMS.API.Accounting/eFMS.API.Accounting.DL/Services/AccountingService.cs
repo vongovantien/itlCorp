@@ -1640,7 +1640,13 @@ namespace eFMS.API.Accounting.DL.Services
                     string _type = type == "CDNOTE" ? "Credit Note" : "SOA";
                     string title = string.Format(@"Voucher Request - {0}: {1}", _type, refNo);
                     string description = string.Format(@"You received a <b>{0}</b> from <b>{1}</b>. Ref No <b>{2}</b> of <b>{3}</b> with Amount <b>{4}</b>", _type, creatorEnName, refNo, serviceName, amountCurr);
+                    
                     // Add Notification
+                    string userIds = "";
+                    foreach (var item in idUserGroupAccts)
+                    {
+                        userIds += item;
+                    }
                     SysNotifications sysNotification = new SysNotifications
                     {
                         Id = Guid.NewGuid(),
@@ -1655,7 +1661,7 @@ namespace eFMS.API.Accounting.DL.Services
                         ActionLink = urlFunc,
                         IsClosed = false,
                         IsRead = false,
-                        UserIds = idUserGroupAccts.ToString()
+                        UserIds = userIds
                     };
                     HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
                     if (hsSysNotification.Success)
