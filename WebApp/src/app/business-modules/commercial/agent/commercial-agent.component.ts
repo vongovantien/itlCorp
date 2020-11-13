@@ -138,7 +138,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
                         this._toastService.warning("This Agent " + this.selectedAgent.partnerNameEn + " has been deleted, Please check again!");
                     } else {
                         if (res.active) {
-                            this._toastService.warning("This Agent can't delete, Please reset Agent!");
+                            this._toastService.warning("This Agent can't delete, Please reload Agent!");
                         } else {
                             this._catalogueRepo.checkDeletePartnerPermission(this.selectedAgent.id)
                                 .pipe(

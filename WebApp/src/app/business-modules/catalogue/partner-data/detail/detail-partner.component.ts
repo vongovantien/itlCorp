@@ -532,7 +532,7 @@ export class PartnerDetailComponent extends AppList {
                         this._toastService.warning("This Partner has been deleted, Please check again!");
                     } else {
                         if (res.active) {
-                            this._toastService.warning("This Partner can't delete, Please reset Partner!");
+                            this._toastService.warning("This Partner can't delete, Please reload Partner!");
                         } else {
                             this.deleteMessage = `Do you want to delete this partner  ${this.partner.partnerNameEn}?`;
                             this.confirmDeletePartnerPopup.show();

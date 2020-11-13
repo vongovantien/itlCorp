@@ -107,7 +107,7 @@ export class CommercialBranchSubListComponent extends AppList {
           } else {
             if (res.active) {
               const partnerType = this.openOnPartner ? "Partner" : this.selectedPartner.partnerType;
-              this._toastService.warning("This " + partnerType + " can't delete, Please reset " + partnerType + "!");
+              this._toastService.warning("This " + partnerType + " can't delete, Please reload " + partnerType + "!");
             } else {
               this.checkDeletePartnerPermission(partner.id);
             }

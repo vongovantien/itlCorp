@@ -141,7 +141,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                         this.resetSearch({});
                     } else {
                         if (res.active) {
-                            this._toastService.warning("This Customer can't delete, Please reset Customer!");
+                            this._toastService.warning("This Customer can't delete, Please reload Customer!");
                         } else {
                             this._catalogueRepo.checkDeletePartnerPermission(this.selectedCustomer.id)
                                 .pipe(
