@@ -87,14 +87,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         this.formCommercialComponent.handleFocusInternalReference();
     }
 
-    getDetailPartner(partnerId: string) {
-        this._catalogueRepo.getDetailPartner(partnerId)
-            .subscribe(
-                (res: Partner) => {
-                    this.partner = res;
-                });
-    }
-
     getDetailCustomer(partnerId: string) {
         this._catalogueRepo.getDetailPartner(partnerId)
             .subscribe(
