@@ -69,7 +69,7 @@
                                         <span *ngSwitchCase="'Synced'"
                                             class="m--margin-left-5 m-badge m-badge--success m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
                                         <span *ngSwitchCase="'Rejected'"
-                                            class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{CdNoteDetail.syncStatus}}{{CdNoteDetail.reasonReject ? ' - ' + CdNoteDetail.reasonReject : ''}}</span>
+                                            class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
                                         <span *ngSwitchCase="'Removed Inv'"
                                             class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{CdNoteDetail.syncStatus}}</span>
                                         <span *ngSwitchDefault
@@ -86,7 +86,7 @@
                                     <span class="m--font-bolder">
                                         {{labelDetail.reasonReject}}:
                                     </span>
-                                    <span>{{CdNoteDetail.reasonReject}}</span>
+                                    <span class="text-danger">{{CdNoteDetail.reasonReject}}</span>
                                 </div>
                             </div>
                             <div class="col-xl-8">

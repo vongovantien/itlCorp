@@ -146,6 +146,18 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                         element.listCharges.forEach(ele => {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
                             ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
+                            ele.canEdit = true;
+                            if (ele.type === "OBH") {
+                                if (ele.creditNo !== null && ele.debitNo !== null) {
+                                    if ((ele.paySoano !== null && ele.soano !== null) || ele.voucherId !== null) {
+                                        ele.canEdit = false;
+                                    }
+                                }
+                            } else {
+                                if ((ele.debitNo !== null || ele.creditNo !== null) && (ele.soano !== null || ele.voucherId !== null)) {
+                                    ele.canEdit = false;
+                                }
+                            }
                         });
                     });
                     this.listChargePartner = dataCharges;
@@ -195,7 +207,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             for (const item of group.listCharges) {
                 if (item.creditNo === null && item.debitNo === null) {
                     item.isSelected = this.isCheckAllCharge;
-                } else if (item.voucherId === null && (item.soano === null && item.paySoano === null)) {
+                } else if (item.canEdit) {
                     item.isSelected = this.isCheckAllCharge;
                 }
             }
@@ -207,7 +219,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         for (const charge of charges.listCharges) {
             if (charge.creditNo === null && charge.debitNo === null) {
                 charge.isSelected = charges.isSelected;
-            } else if (charge.voucherId === null && (charge.soano === null && charge.paySoano === null)) {
+            } else if (charge.canEdit) {
                 charge.isSelected = charges.isSelected;
             }
         }
@@ -223,8 +235,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
-                    charge.isDeleted = (charge.creditNo === null || charge.debitNo === null) ? true :
-                                        (charge.voucherId === null && (charge.soano === null && charge.paySoano === null));
+                    charge.isDeleted = (charge.creditNo === null || charge.debitNo === null) ? true : charge.canEdit;
                 }
             }
         }
