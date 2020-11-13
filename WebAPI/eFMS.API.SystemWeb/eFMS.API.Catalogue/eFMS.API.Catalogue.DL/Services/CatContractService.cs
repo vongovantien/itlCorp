@@ -800,8 +800,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"
                     + linkEn + "</br>" + linkVn + "</br> </br>" +
                     "<i> Thanks and Regards </i>" + "</br> </br>" +
-                    "eFMS System </div>");
-           
+                    "<b> eFMS System, </b>" +
+                    "</br>"
+                    + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+
+                body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
                 if (lstTo.Any())
                 {
                     lstCc = lstTo;
@@ -828,10 +832,13 @@ namespace eFMS.API.Catalogue.DL.Services
                   "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>" +
                   "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" +
                   "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
-
-                  + linkEn + "</br>" + linkVn + "</br> </br>" +
+                 + linkEn + "</br>" + linkVn + "</br> </br>" +
                   "<i> Thanks and Regards </i>" + "</br> </br>" +
-                  "eFMS System </div>");
+                  "<b> eFMS System, </b>" +
+                  "</br>"
+                 + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+
+                body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc.Add(objInfoSalesman?.Email);
                 //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
@@ -891,9 +898,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         "\t  Service  / <i> Dịch vụ: </i> " + "<b>" + contract.SaleService + "</b>" + "</br>" +
                         "\t  Agreement type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
                         "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
-                         + linkEn + "</br>" + linkVn + "</br> </br>" +
+                        + linkEn + "</br>" + linkVn + "</br> </br>" +
                         "<i> Thanks and Regards </i>" + "</br> </br>" +
-                       "eFMS System </div>");
+                        "<b> eFMS System, </b>" +
+                        "</br>"
+                        + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+
+            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
 
@@ -980,11 +991,15 @@ namespace eFMS.API.Catalogue.DL.Services
 
               "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + saleService + "</b>" + "</br>" +
               "\t  Agreement  type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
-              "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br></br>" +
+              "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br></br>"
 
-              linkEn + "</br>" + linkVn + "</br> </br>" +
+              +linkEn + "</br>" + linkVn + "</br> </br>" +
               "<i> Thanks and Regards </i>" + "</br> </br>" +
-              "eFMS System </div>");
+              "<b> eFMS System, </b>" +
+              "</br>"
+              + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+
+            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             bool result =  SendMail.Send(subject, body, lstTo, null, null, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
