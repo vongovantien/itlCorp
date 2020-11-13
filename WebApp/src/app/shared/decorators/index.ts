@@ -66,6 +66,25 @@ export function NgLog(): ClassDecorator {
                 };
             });
         }
-
-    }
+    };
 }
+
+export function Controller(strCtrlName?: string) {
+    return (target: any) => {
+        let ctrl = target.prototype.constructor.name;
+        if (strCtrlName != null) {
+            ctrl = strCtrlName;
+        }
+        Object.defineProperty(target.prototype, 'CONTROLLER', { value: ctrl, writable: false });
+    };
+}
+
+export function Key(target: any, key: string) {
+    if (!target.constructor.prototype.hasOwnProperty('KEYS')) {
+        Object.defineProperty(target, 'KEYS', { value: new Array<string>() });
+    }
+
+    const keys: Array<string> = target.constructor.prototype.KEYS;
+    keys.push(key);
+}
+

@@ -29,7 +29,7 @@ import { ToastrModule } from "ngx-toastr";
 import { EffectsModule } from "@ngrx/effects";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { RouterStateSerializer } from '@ngrx/router-store';
-import { AuthInterceptor, MenuResolveGuard } from "@core";
+import { AuthInterceptor, MenuResolveGuard, LoadingInterceptor } from "@core";
 
 import { GlobalState } from "./global-state";
 import { AppRoutingModule } from "./app-routing.module";
@@ -104,6 +104,7 @@ const authConfig: AuthConfig = {
             useClass: AuthInterceptor,
             multi: true,
         },
+        { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: AuthConfig, useValue: authConfig },
         {
             provide: RouterStateSerializer, useClass: CustomSerializer
