@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
@@ -14,7 +12,6 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaConsolImportHBLComponent } from './sea-consol-import-hbl.component';
 import { SeaConsolImportCreateHBLComponent } from './create/create-hbl-consol-import.component';
 import { SeaConsolImportDetailHBLComponent } from './detail/detail-hbl-consol-import.component';
-import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -44,11 +41,8 @@ const LIB = [
         SeaConsolImportDetailHBLComponent
     ],
     imports: [
-        CommonModule,
         SharedModule,
         ShareBussinessModule,
-        FormsModule,
-        ReactiveFormsModule,
         RouterModule.forChild(routing),
         NgxSpinnerModule,
         ...LIB

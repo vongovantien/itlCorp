@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -83,16 +81,13 @@ const maskConfig: Partial<IConfig> = {
 
 @NgModule({
     imports: [
-        CommonModule,
         RouterModule.forChild(routing),
         ShareBussinessModule,
         SharedModule,
         TabsModule.forRoot(),
         NgxDaterangepickerMd,
         NgSelectModule,
-        ReactiveFormsModule,
         ModalModule,
-        FormsModule,
         // StoreModule.forFeature('accounting-management', reducers), // * Dua ra shaeAccounting
         PaginationModule.forRoot(),
         NgxCurrencyModule.forRoot({

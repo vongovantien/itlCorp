@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -90,13 +88,10 @@ const customCurrencyMaskConfig = {
 
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
-        FormsModule,
         NgxDaterangepickerMd,
         PaginationModule.forRoot(),
         PerfectScrollbarModule,
-        ReactiveFormsModule,
         ModalModule.forRoot(),
         NgProgressModule,
         RouterModule.forChild(routing),

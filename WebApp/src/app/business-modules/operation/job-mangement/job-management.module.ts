@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { JobManagementComponent } from './job-management.component';
 import { Routes, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 
@@ -50,11 +48,8 @@ const LIB = [
 
 @NgModule({
     imports: [
-        CommonModule,
         RouterModule.forChild(routing),
         SharedModule,
-        FormsModule,
-        ReactiveFormsModule,
         ...LIB
     ],
     exports: [],

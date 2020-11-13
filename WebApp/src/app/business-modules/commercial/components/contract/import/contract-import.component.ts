@@ -10,7 +10,6 @@ import { CatalogueRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router, ActivatedRoute } from '@angular/router';
-import moment from 'moment';
 
 @Component({
     selector: 'app-contract-import',

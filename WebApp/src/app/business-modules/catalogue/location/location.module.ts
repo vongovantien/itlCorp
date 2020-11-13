@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
@@ -37,12 +35,9 @@ const routing: Routes = [
 
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
         SelectModule,
         NgProgressModule,
-        FormsModule,
-        ReactiveFormsModule,
         RouterModule.forChild(routing),
         ModalModule.forRoot(),
         TabsModule.forRoot(),

@@ -1,11 +1,9 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { CommercialCreateComponent } from './create/create-commercial.component';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { CommercialFormCreateComponent } from './components/form-create/form-create-commercial.component';
-import { CommercialContractListComponent } from './components/contract/commercial-contract-list.component';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { CommercialDetailComponent } from './detail/detail-commercial.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/share-commercial-catalogue.module';
@@ -16,7 +14,6 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 import { CustomerAgentImportComponent } from './components/customer-agent-import/customer-agent-import.component';
 import { ContractImportComponent } from './components/contract/import/contract-import.component';
-import {CommercialBranchSubListComponent} from './components/branch-sub/commercial-branch-sub-list.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 
 @NgModule({
@@ -26,10 +23,9 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
         CommercialDetailComponent,
         CustomerAgentImportComponent,
         ContractImportComponent,
-        
+
     ],
     imports: [
-        CommonModule,
         CommonComponentModule,
         DirectiveModule,
         ReactiveFormsModule,
@@ -38,7 +34,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
         SelectModule,
-        FormsModule,
         TabsModule.forRoot(),
     ],
     exports: [

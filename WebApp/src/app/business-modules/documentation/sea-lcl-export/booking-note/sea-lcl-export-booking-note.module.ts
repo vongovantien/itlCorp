@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { SeaLCLExportBookingNoteComponent } from './sea-lcl-export-booking-note.component';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { SeaLCLExportBookingNoteDetailComponent } from './detail/detail-booking-note-lcl-export.component';
 import { SeaLCLExportBookingNoteCreateComponent } from './create/create-booking-note-lcl-export.component';
@@ -33,15 +31,11 @@ const config: LocaleConfig = {
 
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
-        FormsModule,
         PaginationModule.forRoot(),
-        ReactiveFormsModule,
         RouterModule.forChild(routing),
         NgxDaterangepickerMd.forRoot(config),
         FroalaEditorModule.forRoot(),
-        ReactiveFormsModule,
         SelectModule,
     ],
     exports: [],
