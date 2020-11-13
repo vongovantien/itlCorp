@@ -4,7 +4,7 @@ import { Router, Event, NavigationStart, NavigationEnd, NavigationCancel, Naviga
 import { NgProgress, NgProgressRef } from '@ngx-progressbar/core';
 import { OAuthService, OAuthEvent, OAuthInfoEvent, TokenResponse } from 'angular-oauth2-oidc';
 import { ToastrService } from 'ngx-toastr';
-import { SignalRService, JwtService, SEOService } from '@services';
+import { JwtService, SEOService } from '@services';
 import { map, filter, mergeMap, tap } from 'rxjs/operators';
 
 @Component({
@@ -25,7 +25,6 @@ export class AppComponent {
         private _jwt: JwtService,
         private _seoService: SEOService,
         private _activatedRoute: ActivatedRoute,
-        private _signalRService: SignalRService
     ) {
         this.progressRef = this._ngProgressService.ref();
         this.oauthService.setStorage(localStorage);

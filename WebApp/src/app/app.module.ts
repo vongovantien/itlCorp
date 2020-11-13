@@ -39,6 +39,7 @@ import { reducers, CustomSerializer, effects } from "./store";
 import { ForbiddenPageComponent } from "./403/403.component";
 import { CustomRouteReuseStrategy } from "./router-reuse";
 import { DEFAULT_TIMEOUT } from "./core/inject/default-timeout.token";
+import { LoadingInterceptor } from "./core/interceptors/loading.interceptor";
 
 const authConfig: AuthConfig = {
     issuer: environment.HOST.INDENTITY_SERVER_URL,
@@ -104,6 +105,7 @@ const authConfig: AuthConfig = {
             useClass: AuthInterceptor,
             multi: true,
         },
+        { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: AuthConfig, useValue: authConfig },
         {
             provide: RouterStateSerializer, useClass: CustomSerializer
