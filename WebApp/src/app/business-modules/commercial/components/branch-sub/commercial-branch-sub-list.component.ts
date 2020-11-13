@@ -103,9 +103,14 @@ export class CommercialBranchSubListComponent extends AppList {
       .subscribe(
         (res: any) => {
           if (!res) {
-            this._toastService.warning("This Partner '" + this.selectedPartner.shortName + "' has been deleted, Please check again!");
+            this._toastService.warning("This " + this.openOnPartner ? "Partner" : this.selectedPartner.partnerType + " has been deleted, Please check again!");
           } else {
-            this.checkDeletePartnerPermission(partner.id);
+            if (res.active) {
+              const partnerType = this.openOnPartner ? "Partner" : this.selectedPartner.partnerType;
+              this._toastService.warning("This " + partnerType + " can't delete, Please reload " + partnerType + "!");
+            } else {
+              this.checkDeletePartnerPermission(partner.id);
+            }
           }
         });
   }
