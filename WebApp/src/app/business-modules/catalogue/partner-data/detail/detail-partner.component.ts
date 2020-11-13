@@ -397,7 +397,7 @@ export class PartnerDetailComponent extends AppList {
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
-                    s = s + item['id'] + ';';
+                    s += (item['id'] === undefined ? item : item['id']) + ';';
                 }
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }
