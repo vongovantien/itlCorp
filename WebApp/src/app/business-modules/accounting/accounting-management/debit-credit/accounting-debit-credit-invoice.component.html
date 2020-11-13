@@ -39,7 +39,8 @@
                                     </thead>
                                     <tbody>
                                         <ng-container *ngIf="!!cdNotes">
-                                            <tr *ngFor="let cdNote of cdNotes; let i = index; trackBy: trackByFn">
+                                            <tr *ngFor="let cdNote of cdNotes; let i = index; trackBy: trackByFn"
+                                                [class.invalid-row]="cdNote.syncStatus === 'Rejected'">
                                                 <td class="table-actions-col" ngi>
                                                     <div class="table-actions" *ngIf="cdNote.status === 'New'">
                                                         <label class="m-checkbox">
@@ -77,7 +78,8 @@
                                                     <span *ngSwitchCase="'Synced'" class="text-success">
                                                         {{cdNote.syncStatus}}</span>
                                                     <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                        {{cdNote.syncStatus}}</span>
+                                                        {{cdNote.syncStatus}}
+                                                    </span>
                                                     <span *ngSwitchDefault>
                                                         {{cdNote.syncStatus}}
                                                     </span>
