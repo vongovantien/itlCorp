@@ -1642,11 +1642,6 @@ namespace eFMS.API.Accounting.DL.Services
                     string description = string.Format(@"You received a <b>{0}</b> from <b>{1}</b>. Ref No <b>{2}</b> of <b>{3}</b> with Amount <b>{4}</b>", _type, creatorEnName, refNo, serviceName, amountCurr);
                     
                     // Add Notification
-                    string userIds = "";
-                    foreach (var item in idUserGroupAccts)
-                    {
-                        userIds += item;
-                    }
                     SysNotifications sysNotification = new SysNotifications
                     {
                         Id = Guid.NewGuid(),
@@ -1661,8 +1656,8 @@ namespace eFMS.API.Accounting.DL.Services
                         ActionLink = urlFunc,
                         IsClosed = false,
                         IsRead = false,
-                        UserIds = userIds
-                    };
+                        UserIds = string.Join(",", idUserGroupAccts.ToList())
+                };
                     HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
                     if (hsSysNotification.Success)
                     {
