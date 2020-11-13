@@ -13,7 +13,6 @@ export class LoadingInterceptor implements HttpInterceptor {
     }
     intercept(req: HttpRequest<any>, next: HttpHandler) {
         this._totalRequests++;
-        console.log(this._totalRequests);
         this._spinner.show();
         return next.handle(req).pipe(
             finalize(() => {

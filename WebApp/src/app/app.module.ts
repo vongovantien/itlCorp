@@ -29,7 +29,7 @@ import { ToastrModule } from "ngx-toastr";
 import { EffectsModule } from "@ngrx/effects";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { RouterStateSerializer } from '@ngrx/router-store';
-import { AuthInterceptor, MenuResolveGuard } from "@core";
+import { AuthInterceptor, MenuResolveGuard, LoadingInterceptor } from "@core";
 
 import { GlobalState } from "./global-state";
 import { AppRoutingModule } from "./app-routing.module";
@@ -39,7 +39,6 @@ import { reducers, CustomSerializer, effects } from "./store";
 import { ForbiddenPageComponent } from "./403/403.component";
 import { CustomRouteReuseStrategy } from "./router-reuse";
 import { DEFAULT_TIMEOUT } from "./core/inject/default-timeout.token";
-import { LoadingInterceptor } from "./core/interceptors/loading.interceptor";
 
 const authConfig: AuthConfig = {
     issuer: environment.HOST.INDENTITY_SERVER_URL,
