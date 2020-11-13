@@ -133,20 +133,32 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     showConfirmDelete(customer: Customer) {
         this.selectedCustomer = customer;
-        this._catalogueRepo.checkDeletePartnerPermission(this.selectedCustomer.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (res: boolean) => {
-                    if (res) {
-                        this.confirmDeletePopup.show();
+        this._catalogueRepo.getDetailPartner(this.selectedCustomer.id)
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.warning("This Customer " + this.selectedCustomer.partnerNameEn + " has been deleted, Please check again!");
+                        this.resetSearch({});
                     } else {
-                        this.info403Popup.show();
+                        if (res.active) {
+                            this._toastService.warning("This Customer can't delete, Please reset Customer!");
+                        } else {
+                            this._catalogueRepo.checkDeletePartnerPermission(this.selectedCustomer.id)
+                                .pipe(
+                                    catchError(this.catchError),
+                                    finalize(() => this._progressRef.complete())
+                                ).subscribe(
+                                    (res: boolean) => {
+                                        if (res) {
+                                            this.confirmDeletePopup.show();
+                                        } else {
+                                            this.info403Popup.show();
+                                        }
+                                    }
+                                );
+                        }
                     }
-                }
-            );
-
+                });
     }
 
     onDelete() {

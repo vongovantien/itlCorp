@@ -159,7 +159,11 @@ export class PartnerComponent extends AppList implements OnInit {
                         this._toastService.warning("This Partner '" + this.partner.shortName + "' has been deleted, Please check again!");
                         this.allPartnerComponent.getPartners();
                     } else {
-                        this.checkDeletePartnerPermission(this.partner.id);
+                        if (res.active) {
+                            this._toastService.warning("This Partner can't delete, Please reset Partner!");
+                        } else {
+                            this.checkDeletePartnerPermission(this.partner.id);
+                        }
                     }
                 });
     }

@@ -131,20 +131,31 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     showConfirmDelete(customer: Partner) {
         this.selectedAgent = customer;
-        this._catalogueRepo.checkDeletePartnerPermission(this.selectedAgent.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
+        this._catalogueRepo.getDetailPartner(this.selectedAgent.id)
+            .subscribe(
                 (res: any) => {
-                    if (res) {
-                        this.confirmDeletePopup.show();
+                    if (!res) {
+                        this._toastService.warning("This Agent " + this.selectedAgent.partnerNameEn + " has been deleted, Please check again!");
                     } else {
-                        this.info403Popup.show();
+                        if (res.active) {
+                            this._toastService.warning("This Agent can't delete, Please reset Agent!");
+                        } else {
+                            this._catalogueRepo.checkDeletePartnerPermission(this.selectedAgent.id)
+                                .pipe(
+                                    catchError(this.catchError),
+                                    finalize(() => this._progressRef.complete())
+                                ).subscribe(
+                                    (res: any) => {
+                                        if (res) {
+                                            this.confirmDeletePopup.show();
+                                        } else {
+                                            this.info403Popup.show();
+                                        }
+                                    }
+                                );
+                        }
                     }
-                }
-            );
-
+                });
     }
 
     onDelete() {

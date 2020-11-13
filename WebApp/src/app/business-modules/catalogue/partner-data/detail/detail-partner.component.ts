@@ -397,7 +397,7 @@ export class PartnerDetailComponent extends AppList {
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
-                    s = s + item + ';';
+                    s = s + item['id'] + ';';
                 }
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }
@@ -525,8 +525,21 @@ export class PartnerDetailComponent extends AppList {
     }
 
     showConfirmDelete() {
-        this.deleteMessage = `Do you want to delete this partner  ${this.partner.partnerNameEn}?`;
-        this.confirmDeletePartnerPopup.show();
+        this._catalogueRepo.getDetailPartner(this.partner.id)
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.warning("This Partner has been deleted, Please check again!");
+                    } else {
+                        if (res.active) {
+                            this._toastService.warning("This Partner can't delete, Please reset Partner!");
+                        } else {
+                            this.deleteMessage = `Do you want to delete this partner  ${this.partner.partnerNameEn}?`;
+                            this.confirmDeletePartnerPopup.show();
+                        }
+                    }
+                });
+
     }
 
     onDelete() {
