@@ -30,7 +30,8 @@
                                     <tbody>
                                         <tr *ngIf="!isLoading && !SOAs.length" app-table-none-record>
                                         </tr>
-                                        <tr *ngFor="let soa of SOAs; let i = index; trackBy: trackByFn">
+                                        <tr *ngFor="let soa of SOAs; let i = index; trackBy: trackByFn"
+                                            [class.invalid-row]="soa.syncStatus === 'Rejected'">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <button type="button"

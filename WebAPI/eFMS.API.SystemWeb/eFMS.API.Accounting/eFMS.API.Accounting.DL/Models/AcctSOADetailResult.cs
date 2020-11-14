@@ -16,5 +16,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string ServicesNameSoa { get; set; }
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
+        public string CreditPayment { get; set; }
     }
 }

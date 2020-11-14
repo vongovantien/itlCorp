@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -17,10 +15,7 @@ const routing: Routes = [
 
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
-        FormsModule,
-        ReactiveFormsModule,
         ModalModule.forRoot(),
         NgProgressModule,
         PaginationModule.forRoot(),

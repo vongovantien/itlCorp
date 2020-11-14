@@ -1,12 +1,10 @@
 import { NgModule } from '@angular/core';
 
 import { PartnerComponent } from './partner.component';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
 import { PartnerDataImportComponent } from './import/partner-data-import.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -46,12 +44,9 @@ const routing: Routes = [
 ]
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
         RouterModule.forChild(routing),
         NgProgressModule,
-        FormsModule,
-        ReactiveFormsModule,
         SelectModule,
         NgxDaterangepickerMd,
         PaginationModule.forRoot(),

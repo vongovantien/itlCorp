@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
@@ -19,14 +17,11 @@ const routing: Routes = [
 
 @NgModule({
     imports: [
-        CommonModule,
         PaginationModule.forRoot(),
         ModalModule.forRoot(),
         SharedModule,
-        FormsModule,
         SelectModule,
         NgProgressModule,
-        ReactiveFormsModule,
         RouterModule.forChild(routing)
     ],
     exports: [],

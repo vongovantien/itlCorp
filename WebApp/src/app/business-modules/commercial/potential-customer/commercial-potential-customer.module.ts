@@ -35,8 +35,6 @@ const routing: Routes = [
     ],
     imports: [
         SharedModule,
-        CommonModule,
-        FormsModule,
         ReactiveFormsModule,
         TabsModule.forRoot(),
         RouterModule.forChild(routing),

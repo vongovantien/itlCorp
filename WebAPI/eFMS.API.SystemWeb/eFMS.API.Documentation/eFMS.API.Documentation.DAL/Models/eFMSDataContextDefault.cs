@@ -770,6 +770,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.CreditPayment)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
