@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SelectModule } from 'ng2-select';
 import { FroalaViewModule, FroalaEditorModule } from 'angular-froala-wysiwyg';
@@ -11,7 +9,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-
 
 import { SeaFCLImportHBLComponent } from './sea-fcl-import-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -32,7 +29,7 @@ const routing: Routes = [
     {
         path: 'new', component: CreateHouseBillComponent,
         data: { name: 'New House Bill', path: ':id', level: 5 }
-    }, 
+    },
     {
         path: ':hblId',
         data: { name: 'House Bill Detail', path: ':id', level: 5 },
@@ -68,11 +65,8 @@ const LIB = [
         FormSearchHouseBillComponent,
     ],
     imports: [
-        CommonModule,
         SharedModule,
         ShareBussinessModule,
-        FormsModule,
-        ReactiveFormsModule,
         RouterModule.forChild(routing),
         NgxSpinnerModule,
         ...LIB

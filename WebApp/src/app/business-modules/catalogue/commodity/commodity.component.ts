@@ -14,6 +14,7 @@ import { CommodityAddPopupComponent } from './components/form-create-commodity/f
 import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+
 type COMMODITY_TAB = 'Commodity list' | 'Commodity group';
 enum CommodityTab {
   LIST = 'Commodity list',
@@ -25,11 +26,6 @@ enum CommodityTab {
   templateUrl: './commodity.component.html',
 })
 export class CommodityComponent extends AppList {
-
-  /*
-  declare variable
-  */
-  //@ViewChild(SearchOptionsComponent, { static: false }) searchOption;
   @ViewChild(CommodityAddPopupComponent, { static: false }) commodityAddPopupComponent: CommodityAddPopupComponent;
   @ViewChild(CommodityGroupAddPopupComponent, { static: false }) commodityGroupAddPopupComponent: CommodityGroupAddPopupComponent;
   @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
@@ -37,10 +33,9 @@ export class CommodityComponent extends AppList {
   commodities: Commodity[] = [];
   commodity: Commodity;
   commoditySettings: ColumnSetting[] = COMMODITYCOLUMNSETTING;
-  //dataSearch: any = {};
 
   configSearchCommonity: any = {
-    settingFields: this.commoditySettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
+    settingFields: this.commoditySettings.filter(x => x.allowSearch === true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
     typeSearch: TypeSearch.intab,
     searchString: ''
   };
@@ -56,7 +51,7 @@ export class CommodityComponent extends AppList {
     private _exportRepo: ExportRepo,
     private _cd: ChangeDetectorRef,
     private _ngProgessSerice: NgProgress,
-    private _sortService: SortService, ) {
+    private _sortService: SortService,) {
     super();
     this._progressRef = this._ngProgessSerice.ref();
     this.requestList = this.getCommodities;

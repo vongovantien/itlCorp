@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { EcusConnectionComponent } from './ecus-connection.component';
 import { SelectModule } from 'ng2-select';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { EcusConnectionFormPopupComponent } from './form-ecus/form-ecus.component';
@@ -26,14 +24,11 @@ const routing: Routes = [
         EcusConnectionFormPopupComponent
     ],
     imports: [
-        CommonModule,
         RouterModule.forChild(routing),
         SharedModule,
         SelectModule,
-        FormsModule,
         PaginationModule,
         ModalModule,
-        ReactiveFormsModule
     ],
     exports: [],
     providers: [],

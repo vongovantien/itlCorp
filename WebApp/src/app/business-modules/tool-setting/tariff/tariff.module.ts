@@ -3,8 +3,6 @@ import { TariffComponent } from './tariff.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
 import { TariffFormSearchComponent } from './components/form-search-tariff/form-search-tariff.component';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { TariffAddComponent } from './add/add-tariff.component';
@@ -59,10 +57,7 @@ const COMPONENTS = [
         ...COMPONENTS
     ],
     imports: [
-        CommonModule,
         SharedModule,
-        FormsModule,
-        ReactiveFormsModule,
         TabsModule.forRoot(),
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),

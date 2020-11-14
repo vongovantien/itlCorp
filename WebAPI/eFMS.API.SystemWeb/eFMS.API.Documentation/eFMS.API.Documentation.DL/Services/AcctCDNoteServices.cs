@@ -742,6 +742,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.PartnerId = partner?.Id;
             soaDetails.PartnerFax = partner?.Fax;
             soaDetails.PartnerPersonalContact = partner.ContactPerson;
+            soaDetails.CreditPayment = partner.CreditPayment;
             soaDetails.JobId = transaction != null ? transaction.Id : opsTransaction.Id;
             soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTransaction?.JobNo;
             soaDetails.Pol = pol?.NameEn;

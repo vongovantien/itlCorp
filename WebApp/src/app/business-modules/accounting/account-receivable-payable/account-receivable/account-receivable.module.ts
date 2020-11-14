@@ -38,9 +38,6 @@ const routing: Routes = [
         TabsModule.forRoot(),
         RouterModule.forChild(routing),
         SharedModule,
-        CommonModule,
-        ReactiveFormsModule,
-        // SelectModule,
         NgSelectModule
     ],
     exports: [

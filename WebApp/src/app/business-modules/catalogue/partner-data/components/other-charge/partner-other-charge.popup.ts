@@ -143,7 +143,11 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
             .pipe()
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.status) {
-                    this._toastService.success(res.message);
+                    if (this.initCharges.length === 0) {
+                        this._toastService.success("Successfully updated");
+                    } else {
+                        this._toastService.success(res.message);
+                    }
                 } else {
                     this._toastService.error(res.message);
                 }
