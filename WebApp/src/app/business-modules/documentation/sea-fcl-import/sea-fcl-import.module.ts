@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { Routes, RouterModule } from '@angular/router';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -70,11 +69,8 @@ const LIB = [
         SeaFclImportManifestComponent
     ],
     imports: [
-        CommonModule,
         SharedModule,
         RouterModule.forChild(routing),
-        FormsModule,
-        ReactiveFormsModule,
         ...LIB,
         SeaFCLImportLazyLoadModule, // ?  Lazy loading module with  tab component (CD Note, Assignment).
         ShareBussinessModule

@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SelectModule } from 'ng2-select';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 
@@ -45,9 +43,6 @@ const routing: Routes = [
     ],
     imports: [
         SharedModule,
-        CommonModule,
-        FormsModule,
-        // SelectModule,
         NgSelectModule,
         ReactiveFormsModule,
         TabsModule.forRoot(),

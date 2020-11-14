@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -61,11 +58,8 @@ const routing: Routes = [
 
     ],
     imports: [
-        CommonModule,
         RouterModule.forChild(routing),
-        ReactiveFormsModule,
         SharedModule,
-        FormsModule,
         TabsModule.forRoot(),
         ModalModule.forRoot(),
         PaginationModule.forRoot(),

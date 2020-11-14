@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { CommonComponentModule } from "./common/common.module";
 import { DirectiveModule } from "./directives/directive.module";
@@ -10,7 +10,9 @@ const APP_MODULES = [
   DirectiveModule,
   CommonComponentModule,
   PipeModule,
-
+  CommonModule,
+  FormsModule,
+  ReactiveFormsModule
 ];
 @NgModule({
   imports: [

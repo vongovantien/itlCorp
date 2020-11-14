@@ -1097,7 +1097,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         if (!!this.componentRef) {
             this.componentRef.instance.headers = this.headerPartner;
             this.componentRef.instance.data = this.listPartner;
-            this.componentRef.instance.fields = ['taxCode', 'partnerNameEn'];
+            this.componentRef.instance.fields = ['shortName', 'taxCode', 'partnerNameEn'];
             this.componentRef.instance.active = charge.paymentObjectId;
 
             this.subscription = ((this.componentRef.instance) as AppComboGridComponent<Partner>).onClick.subscribe(
