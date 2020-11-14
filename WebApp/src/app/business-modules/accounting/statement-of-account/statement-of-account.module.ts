@@ -5,7 +5,6 @@ import { StatementOfAccountDetailComponent } from './detail/detail-soa.component
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
 import { Routes, RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -76,7 +75,6 @@ const COMPONENTS = [
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
-        FormsModule,
         SelectModule,
         NgxDaterangepickerMd,
         TabsModule.forRoot(),
@@ -87,8 +85,6 @@ const COMPONENTS = [
         NgProgressModule,
         ShareAccountingModule,
         BsDropdownModule.forRoot(),
-        ReactiveFormsModule
-
     ],
     exports: [],
     providers: [

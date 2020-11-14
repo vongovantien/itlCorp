@@ -1,6 +1,5 @@
-import { Component, Output, EventEmitter} from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 
 @Component({
     selector: 'department-form-search',
@@ -8,71 +7,47 @@ import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 })
 
 export class DepartmentFormSearchComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISearchDepartment> = new EventEmitter<ISearchDepartment>();    
+    @Output() onSearch: EventEmitter<ISearchDepartment> = new EventEmitter<ISearchDepartment>();
+    configSearch: any;
 
-    formSearch: FormGroup;
-    fieldSearchs: CommonInterface.ICommonTitleValue[] = [];
-    selectedTitleFilter: string;
-    selectedValueFilter: string;
-    searchKey: AbstractControl ;
-    constructor(
-        private _fb: FormBuilder,
-    ) {
+    constructor() {
         super();
-        this.requestSearch = this.onSubmit;
+        this.requestSearch = this.searchData;
+        this.requestReset = this.onReset;
     }
 
     ngOnInit() {
-        this.initForm();
-        this.initDataInform();
-    }
-
-    initForm() {
-        this.formSearch = this._fb.group({
-            searchKey: [],            
-        });
-
-        this.searchKey = this.formSearch.controls['searchKey'];
-        
-    }
-
-    initDataInform() {
-        this.fieldSearchs = this.getFieldSearch();
-        this.selectedTitleFilter = this.fieldSearchs[0].title;
-        this.selectedValueFilter = this.fieldSearchs[0].value;
-    }
-
-    onSubmit() {
-        const body: ISearchDepartment = {
-            type: this.selectedValueFilter,
-            keyword: this.searchKey.value,            
+        this.configSearch = {
+            typeSearch: 'outtab',
+            settingFields: <CommonInterface.IValueDisplay[]>[
+                { displayName: 'Department Code', fieldName: 'Code' },
+                { displayName: 'Name EN', fieldName: 'DeptNameEn' },
+                { displayName: 'Name Local', fieldName: 'DeptName' },
+                { displayName: 'Name Abbr', fieldName: 'DeptNameAbbr' },
+                { displayName: 'Office', fieldName: 'OfficeName' },
+            ]
         };
-        this.onSearch.emit(body);
     }
 
-    getFieldSearch(): CommonInterface.ICommonTitleValue[] {
-        return [
-            { title: 'All', value: 'All' },
-            { title: 'Department Code', value: 'Code' },
-            { title: 'Name EN', value: 'DeptName' },
-            { title: 'Name Local', value: 'DeptNameEn' },
-            { title: 'Name Abbr', value: 'DeptNameAbbr' },
-            { title: 'Office', value: 'OfficeName' },
-        ];
+    searchData(searchObject: ISearchObject) {
+        const searchData: ISearchDepartment = {
+            type: searchObject.field,
+            keyword: searchObject.searchString
+        };
+        this.onSearch.emit(searchData);
     }
 
-    search() {
-        this.onSubmit();
-    }
-
-    reset() {
-        this.initDataInform();
-        this.resetFormControl(this.searchKey);
-        this.onSearch.emit(<any>{});
+    onReset(data: any) {
+        this.onSearch.emit(data);
     }
 }
 
 interface ISearchDepartment {
     type: string;
     keyword: string;
+}
+
+interface ISearchObject extends CommonInterface.IValueDisplay {
+    searchString: string;
+    field: string;
 }

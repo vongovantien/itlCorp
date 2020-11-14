@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -90,11 +88,8 @@ const LIBS = [
 
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
         RouterModule.forChild(routing),
-        FormsModule,
-        ReactiveFormsModule,
         ShareBussinessModule,
         SeaLCLExportLazyLoadModule,
         ...LIBS,

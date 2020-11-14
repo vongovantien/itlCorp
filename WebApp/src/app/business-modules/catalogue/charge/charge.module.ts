@@ -1,25 +1,24 @@
 import { NgModule } from '@angular/core';
 
 import { ChargeComponent } from './charge.component';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
-import { ChargeImportComponent } from './charge-import/charge-import.component';
-import { ChargeImportAccountVoucherComponent } from './charge-import-account-voucher/charge-import-account-voucher.component';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { StoreModule } from '@ngrx/store';
 
+import { ChargeImportComponent } from './charge-import/charge-import.component';
+import { ChargeImportAccountVoucherComponent } from './charge-import-account-voucher/charge-import-account-voucher.component';
 import { FormSearchChargeComponent } from './components/form-search-charge/form-search-charge.component';
 import { AddChargeComponent } from './add-charge/add-charge.component';
 import { DetailChargeComponent } from './detail-charge/detail-charge.component';
 import { FormAddChargeComponent } from './components/form-add-charge/form-add-charge.component';
 import { VoucherListComponent } from './components/voucher-list/voucher-list.component';
 import { GenerateSellingChargePopupComponent } from './components/popup/generate-selling-charge/generate-selling-charge.popup';
-import { StoreModule } from '@ngrx/store';
 import { reducers } from './store';
+
 const routing: Routes = [
     {
         path: '', data: { name: "", title: 'eFMS Charge' },
@@ -50,14 +49,11 @@ const routing: Routes = [
 ];
 @NgModule({
     imports: [
-        CommonModule,
-        FormsModule,
         SelectModule,
         NgProgressModule,
         SharedModule,
         PaginationModule.forRoot(),
         RouterModule.forChild(routing),
-        ReactiveFormsModule,
         StoreModule.forFeature('charge', reducers),
         ModalModule.forRoot(),
     ],
@@ -75,6 +71,4 @@ const routing: Routes = [
     ],
     providers: [],
 })
-export class
-
-    ChargeModule { }
+export class ChargeModule { }

@@ -8,8 +8,6 @@ import { UnlockShipmentComponent } from './components/unlock-shipment/unlock-shi
 import { UnlockAccountingComponent } from './components/unlock-accounting/unlock-accouting.component';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { UnlockHistoryPopupComponent } from './components/unlock-history/unlock-history.popup';
 
 const routing: Route[] = [
@@ -19,14 +17,12 @@ const routing: Route[] = [
 
 @NgModule({
     imports: [
-        CommonModule,
         RouterModule.forChild(routing),
         SharedModule,
         TabsModule.forRoot(),
         SelectModule,
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
-        FormsModule
     ],
     exports: [],
     declarations: [

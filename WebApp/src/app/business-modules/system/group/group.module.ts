@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
@@ -49,13 +47,10 @@ const routing: Routes = [
         FormUserGroupComponent
     ],
     imports: [
-        CommonModule,
         SharedModule,
-        FormsModule,
         ModalModule.forRoot(),
         TabsModule.forRoot(),
         PaginationModule.forRoot(),
-        ReactiveFormsModule,
         PerfectScrollbarModule,
         RouterModule.forChild(routing),
         ShareSystemModule

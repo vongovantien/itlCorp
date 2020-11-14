@@ -1,9 +1,6 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -25,12 +22,9 @@ const routing: Routes = [
 ]
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
         SelectModule,
-        FormsModule,
         PaginationModule.forRoot(),
-        ReactiveFormsModule,
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
