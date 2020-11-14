@@ -397,7 +397,11 @@ export class PartnerDetailComponent extends AppList {
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
-                    s = s + item['id'] + ';';
+                    if (!!item.id) {
+                        s = s + item['id'] + ';';
+                    } else {
+                        s = s + item + ';';
+                    }
                 }
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }
@@ -415,6 +419,7 @@ export class PartnerDetailComponent extends AppList {
             partnerMode: formBody.partnerMode != null && formBody.partnerMode.length > 0 ? formBody.partnerMode[0].id : null,
             partnerLocation: formBody.partnerLocation != null && formBody.partnerLocation.length > 0 ? formBody.partnerLocation[0].id : null,
             id: this.isAddSubPartner ? null : this.partner.id,
+            creditPayment: formBody.creditPayment != null && formBody.creditPayment.length > 0 ? formBody.creditPayment[0].id : null,
         };
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);
