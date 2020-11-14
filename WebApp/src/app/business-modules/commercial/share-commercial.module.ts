@@ -3,7 +3,7 @@ import { CommercialCreateComponent } from './create/create-commercial.component'
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { CommercialFormCreateComponent } from './components/form-create/form-create-commercial.component';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommercialDetailComponent } from './detail/detail-commercial.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/share-commercial-catalogue.module';
@@ -15,6 +15,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { CustomerAgentImportComponent } from './components/customer-agent-import/customer-agent-import.component';
 import { ContractImportComponent } from './components/contract/import/contract-import.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
     declarations: [
@@ -26,6 +27,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 
     ],
     imports: [
+        CommonModule,
+        FormsModule,
         CommonComponentModule,
         DirectiveModule,
         ReactiveFormsModule,
@@ -40,8 +43,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
         CommercialCreateComponent,
         CommercialFormCreateComponent,
         CommercialDetailComponent,
-
-
     ],
     providers: [],
 })
