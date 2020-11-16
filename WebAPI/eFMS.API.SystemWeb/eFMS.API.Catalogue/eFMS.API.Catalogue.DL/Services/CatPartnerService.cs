@@ -846,8 +846,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState CheckDeletePermission(string id)
         {
-            var detail = Get(x => x.Id == id).FirstOrDefault();
-            if(detail == null)
+            var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (detail == null)
             {
                 return new HandleState("has been deleted, Please check again!");
             }
