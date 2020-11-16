@@ -31,7 +31,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPartnerViewModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria);
         int CheckDetailPermission(string id);
         CatPartnerModel GetDetail(string id);
-        int CheckDeletePermission(string id);
+        HandleState CheckDeletePermission(string id);
         bool SendMailRejectComment(string partnerId, string comment);
         List<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType);
 
