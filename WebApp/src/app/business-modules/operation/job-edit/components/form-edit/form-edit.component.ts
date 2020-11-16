@@ -162,9 +162,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             if (!!packageType) { this.formEdit.controls['packageTypeId'].setValue([packageType]); }
         }
 
-        this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
         const sType = this.shipmentTypes.find(type => type.id === this.opsTransaction.shipmentType);
         if (!!sType) { this.formEdit.controls['shipmentType'].setValue([sType]); }
+
+        this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
+
     }
 
     getCommodityGroup() {

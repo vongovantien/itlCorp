@@ -7,17 +7,18 @@ import { Store } from '@ngrx/store';
 import { DocumentationRepo, AccountingRepo } from '@repositories';
 import { SortService } from '@services';
 import { PartnerOfAcctManagementResult, CDNoteViewModel } from '@models';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { AccountingConstants, RoutingConstants } from '@constants';
 
 import { AppList } from 'src/app/app.list';
-import { IAccountingManagementPartnerState, SelectPartner } from '../store';
+import { SelectPartner } from '../store';
 
 import { AccountingManagementSelectPartnerPopupComponent } from '../components/popup/select-partner/select-partner.popup';
 import { AccountingDetailCdNoteComponent } from '../components/popup/detail-cd-note/detail-cd-note.component';
 
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { getMenuUserPermissionState, IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { AccountingConstants, RoutingConstants } from '@constants';
+
 
 
 type TAB = 'CDI' | 'VAT' | 'VOUCHER';

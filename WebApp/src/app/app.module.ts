@@ -99,22 +99,16 @@ const authConfig: AuthConfig = {
     providers: [
         GlobalState,
         CookieService,
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: AuthInterceptor,
-            multi: true,
-        },
+        MenuResolveGuard,
+
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true, },
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: AuthConfig, useValue: authConfig },
-        {
-            provide: RouterStateSerializer, useClass: CustomSerializer
-        },
         { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 200000 : 30000 },
-        MenuResolveGuard,
-        {
-            provide: RouteReuseStrategy,
-            useClass: CustomRouteReuseStrategy
-        }
+        // {
+        //     provide: RouterStateSerializer, useClass: CustomSerializer
+        // },
+        // { provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy }
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     bootstrap: [AppComponent],
