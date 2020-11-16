@@ -6,13 +6,11 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
 import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
 import { PaymentType } from './components/form-search/account-payment/form-search-account-payment.component';
-import { AccountReceivableListTrialOfficialComponent } from './components/list-trial-official/list-trial-official-account-receivable.component';
-import { AccountReceivableListGuaranteedComponent } from './components/list-guaranteed/list-guaranteed-account-receivable.component';
-import { AccountReceivableListOtherComponent } from './components/list-other/list-other-account-receivable.component';
-import { AccountReceivableFormSearchComponent } from './components/form-search/account-receivable/form-search-account-receivable.component';
-import { CommonEnum } from '@enums';
+
 import { Router, ActivatedRoute } from '@angular/router';
 import { RoutingConstants } from '@constants';
+
+
 type TAB = 'INVOICE' | 'OBH';
 
 
@@ -26,10 +24,9 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     @ViewChild(AccountPaymentListInvoicePaymentComponent, { static: false }) invoiceListComponent: AccountPaymentListInvoicePaymentComponent;
     @ViewChild(AccountPaymentListOBHPaymentComponent, { static: false }) obhSOAListComponent: AccountPaymentListOBHPaymentComponent;
 
-
     selectedTab: TAB | string = "INVOICE";
     selectedTabAR: string = 'payment';
-    //selectedTab:
+
     isAccountPaymentTab: boolean = true;
 
     constructor(
@@ -47,14 +44,10 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this._activeRouter.queryParams
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(param => {
-
-
                 if (param.tab) {
                     this.selectedTabAR = param.tab;
                 }
-
             });
-
     }
 
     ngAfterViewInit() {
@@ -62,12 +55,10 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.invoiceListComponent.dataSearch = this.dataSearch;
         this.obhSOAListComponent.dataSearch = this.dataSearch;
 
-
         this.invoiceListComponent.getPagingData();
         this._cd.detectChanges();
 
     }
-    // when selected tab
     changeTabAccount(tab: string) {
         this.selectedTabAR = tab;
 
@@ -93,8 +84,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.requestSearchShipment();
     }
 
-
-
     getPaymentType() {
         let paymentType: number;
         if (this.selectedTab === "INVOICE") {
@@ -104,7 +93,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         }
         return paymentType;
     }
-
 
     onSearchPayment(event) {
         this.dataSearch = event;
@@ -116,7 +104,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
             this.obhSOAListComponent.dataSearch = this.dataSearch;
             this.requestSearchShipment();
         }
-
     }
 
     requestSearchShipment() {
@@ -127,8 +114,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-
-
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {

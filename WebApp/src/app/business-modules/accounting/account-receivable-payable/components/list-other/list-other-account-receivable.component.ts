@@ -1,17 +1,13 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
-import { AppList } from 'src/app/app.list';
+import { Component, OnInit } from '@angular/core';
+import { AppList } from '@app';
 import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants } from '@constants';
-
-
-
-
 
 @Component({
     selector: 'list-other-account-receivable',
@@ -46,16 +42,17 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
 
             { title: 'Status', field: 'agreementStatus', sortable: true },
         ];
-        //seed page
 
     }
+
     sortOtherList(sortField: string, order: boolean) {
         this.otherList = this._sortService.sort(this.otherList, sortField, order);
     }
+
     getPagingList() {
         this._progressRef.start();
         this.isLoading = true;
-        //call api
+
         this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
