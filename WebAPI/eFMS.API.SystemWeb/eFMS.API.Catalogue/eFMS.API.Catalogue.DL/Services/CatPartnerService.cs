@@ -844,9 +844,20 @@ namespace eFMS.API.Catalogue.DL.Services
             return code;
         }
 
-        public int CheckDeletePermission(string id)
+        public HandleState CheckDeletePermission(string id)
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
+            if(detail == null)
+            {
+                return new HandleState("has been deleted, Please check again!");
+            }
+            else
+            {
+                if (detail.Active == true)
+                {
+                    return new HandleState("can't delete, Please reload!");
+                }
+            }
             var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = null;
             switch (detail.PartnerType)
@@ -863,7 +874,8 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int code = GetPermissionToDelete(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange);
-            return code;
+            if (code == 403) return new HandleState(403, "");
+            return new HandleState();
         }
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, int? flagDetail)

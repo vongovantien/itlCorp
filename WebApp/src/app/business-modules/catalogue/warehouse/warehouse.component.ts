@@ -9,11 +9,11 @@ import { Warehouse } from '@models';
 import { AppList } from 'src/app/app.list';
 import { FormWarehouseComponent } from './components/form-warehouse.component';
 
-import { forkJoin, of } from 'rxjs';
-import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
-import { SystemConstants } from 'src/constants/system.const';
+import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
+import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
 
 @Component({
     selector: 'app-warehouse',
@@ -51,14 +51,14 @@ export class WarehouseComponent extends AppList implements OnInit {
             { title: 'Name(EN)', field: 'nameEn', sortable: true },
             { title: 'Name(Local)', field: 'nameVn', sortable: true },
             { title: 'Name(ABBR)', field: 'displayName', sortable: true },
-            // { title: 'Country', field: 'countryName', sortable: true },
-            // { title: 'City/Province', field: 'provinceName', sortable: true },
-            // { title: 'District', field: 'districtName', sortable: true },
-            // { title: 'Address', field: 'address', sortable: true },
-            // { title: 'Status', field: 'active', sortable: true },
+            { title: 'Country', field: 'countryName', sortable: true },
+            { title: 'City/Province', field: 'provinceName', sortable: true },
+            { title: 'District', field: 'districtName', sortable: true },
+            { title: 'Address', field: 'address', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
         ];
         this.configSearch = {
-            settingFields: this.headers.map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            settingFields: [...this.headers.slice(0, 3)].map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
         this.getDataCombobox();

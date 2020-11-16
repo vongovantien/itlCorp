@@ -26,8 +26,8 @@
                         </span>
                     </span>
                 </button>
-                <button *ngIf="allowUpdate" type=""
-                    class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onSubmit()">
+                <button *ngIf="allowUpdate" type="" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                    (click)="onSubmit()">
                     <span>
                         <i class="la la la-save"></i>
                         <span>
@@ -51,7 +51,26 @@
     <div class="m-content">
         <!--begin::Form-->
         <form-add-partner (requireSaleman)="isShowSaleMan=$event" [isUpdate]="true"></form-add-partner>
+        <div class="row" *ngIf="!!partner && !isAddSubPartner">
+            <div class="col-6">
+                <div class="m--align-left">
+                    Created: {{partner.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                    &nbsp;
+                    By <span class="text-success">{{partner.userCreatedName}}</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="m--align-left">
+                    Modified: {{partner.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                    &nbsp;
+                    By <span class="text-success">{{partner.userModifiedName}}</span>
+                </div>
+            </div>
+        </div>
         <!--end::Form-->
+
+    </div>
+    <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="Agreement">

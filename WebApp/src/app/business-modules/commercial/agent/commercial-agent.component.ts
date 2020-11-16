@@ -131,31 +131,23 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     showConfirmDelete(customer: Partner) {
         this.selectedAgent = customer;
-        this._catalogueRepo.getDetailPartner(this.selectedAgent.id)
-            .subscribe(
-                (res: any) => {
-                    if (!res) {
-                        this._toastService.warning("This Agent " + this.selectedAgent.partnerNameEn + " has been deleted, Please check again!");
+        this._catalogueRepo.checkDeletePartnerPermission(this.selectedAgent.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.confirmDeletePopup.show();
                     } else {
-                        if (res.active) {
-                            this._toastService.warning("This Agent can't delete, Please reload Agent!");
+                        if (res.data === 403) {
+                            this.info403Popup.show();
                         } else {
-                            this._catalogueRepo.checkDeletePartnerPermission(this.selectedAgent.id)
-                                .pipe(
-                                    catchError(this.catchError),
-                                    finalize(() => this._progressRef.complete())
-                                ).subscribe(
-                                    (res: any) => {
-                                        if (res) {
-                                            this.confirmDeletePopup.show();
-                                        } else {
-                                            this.info403Popup.show();
-                                        }
-                                    }
-                                );
+                            this._toastService.warning("This Agent " + res.message);
                         }
                     }
-                });
+                }
+            );
     }
 
     onDelete() {
@@ -164,9 +156,13 @@ export class CommercialAgentComponent extends AppList implements OnInit {
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
-                (res: boolean) => {
+                (res: CommonInterface.IResult) => {
                     if (!res) {
-                        this.info403Popup.show();
+                        if (res.data === 403) {
+                            this.info403Popup.show();
+                        } else {
+                            this._toastService.warning("This Agent " + res.message);
+                        }
                         this.confirmDeletePopup.hide();
                         return;
                     } else {

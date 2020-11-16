@@ -6,7 +6,7 @@ import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { combineLatest } from 'rxjs';
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { getSettlementPaymentSearchParamsState, ISettlementPaymentState, SearchList } from '../store';
 import { Store } from '@ngrx/store';
 

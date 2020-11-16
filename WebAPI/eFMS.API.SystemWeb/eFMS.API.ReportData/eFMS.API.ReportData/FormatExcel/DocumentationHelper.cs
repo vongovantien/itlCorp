@@ -3372,6 +3372,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[17, 1, addressOfTotal, 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
             addressLastRow = addressOfTotal + 1;
 
             string footer = "Vui lòng chuyển tiền vào tài khoản của chúng tôi như sau/Please transfer funds to our account as follow:";

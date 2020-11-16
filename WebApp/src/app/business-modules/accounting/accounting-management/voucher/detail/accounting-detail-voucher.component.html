@@ -31,9 +31,8 @@
                                 </span>
                             </button>
 
-                            <app-default-button [buttonSetting]="cancelButtonSetting"
-                                (onClick)="accountingManagement.status !== 'New' ||
-                                 accountingManagement.syncStatus === 'Synced' ? gotoList() : confirmCancelPopup.show()">
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="accountingManagement.status !== 'New' ||
+                                 accountingManagement.syncStatus === 'Synced' ? gotoList() : handleCancelForm()">
                             </app-default-button>
                         </div>
                     </div>
@@ -57,7 +56,8 @@
 
 <info-popup [body]="invalidFormText"></info-popup>
 
-<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="confirmCancel()">
+</confirm-popup>
 
 <confirm-popup #confirmSyncVoucher (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
     body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
