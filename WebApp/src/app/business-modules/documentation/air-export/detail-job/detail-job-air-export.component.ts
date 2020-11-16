@@ -11,7 +11,7 @@ import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, Info
 import { DIM, CsTransaction } from '@models';
 import { ICanComponentDeactivate } from '@core';
 
-import { combineLatest, of, Observable, merge, race } from 'rxjs';
+import { combineLatest, of, Observable, merge } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';

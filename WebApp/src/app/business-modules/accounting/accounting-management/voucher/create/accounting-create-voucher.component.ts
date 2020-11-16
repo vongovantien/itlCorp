@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 
-import { InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { AccountingRepo } from '@repositories';
 import { Store } from '@ngrx/store';
@@ -27,6 +27,7 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
     @ViewChild(AccountingManagementFormCreateVoucherComponent, { static: false }) formCreateComponent: AccountingManagementFormCreateVoucherComponent;
     @ViewChild(AccountingManagementListChargeComponent, { static: false }) listChargeComponent: AccountingManagementListChargeComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCancelPopup: ConfirmPopupComponent;
 
     invalidUpdateExchangeRate: string = 'You can only adjust the exchange rate increase or decrease by 1% compared to the general exchange rate!';
 
