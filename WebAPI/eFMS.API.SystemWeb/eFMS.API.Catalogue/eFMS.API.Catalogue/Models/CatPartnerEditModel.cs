@@ -75,7 +75,7 @@ namespace eFMS.API.Catalogue.Models
         public string PartnerLocation { get; set; }
         public string PartnerMode { get; set; }
         public string InternalCode { get; set; }
-
+        public string CreditPayment { get; set; }
 
 
     }
