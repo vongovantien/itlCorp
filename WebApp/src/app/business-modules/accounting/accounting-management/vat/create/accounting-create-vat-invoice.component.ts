@@ -4,7 +4,7 @@ import { AppForm } from 'src/app/app.form';
 import { ToastrService } from 'ngx-toastr';
 import { AccAccountingManagementModel } from '@models';
 import { Store } from '@ngrx/store';
-import { InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { formatDate } from '@angular/common';
 import { AccountingRepo } from '@repositories';
 
@@ -27,6 +27,7 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
     @ViewChild(AccountingManagementFormCreateVATInvoiceComponent, { static: false }) formCreateComponent: AccountingManagementFormCreateVATInvoiceComponent;
     @ViewChild(AccountingManagementListChargeComponent, { static: false }) listChargeComponent: AccountingManagementListChargeComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCancelPopup: ConfirmPopupComponent;
 
     invalidUpdateExchangeRate: string = 'You can only adjust the exchange rate increase or decrease by 1% compared to the general exchange rate!';
 

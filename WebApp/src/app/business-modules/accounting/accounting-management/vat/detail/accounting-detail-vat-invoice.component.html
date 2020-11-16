@@ -18,7 +18,7 @@
                                 </app-permission-button>
                             </ng-container>
                             <app-default-button [buttonSetting]="cancelButtonSetting"
-                                (onClick)="accountingManagement.status !== 'New' ? gotoList() : confirmCancelPopup.show()">
+                                (onClick)="accountingManagement.status !== 'New' ? gotoList() : handleCancelForm()">
                             </app-default-button>
                         </div>
                     </div>
@@ -42,4 +42,5 @@
 
 <info-popup [body]="invalidFormText"></info-popup>
 
-<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="confirmCancel()">
+</confirm-popup>
