@@ -16,11 +16,10 @@ import { RoutingConstants } from '@constants';
 })
 export class AccountReceivableTabComponent extends AppList implements OnInit {
 
-    //
     @ViewChild(AccountReceivableListTrialOfficialComponent, { static: false }) trialOfficalListComponent: AccountReceivableListTrialOfficialComponent;
     @ViewChild(AccountReceivableListGuaranteedComponent, { static: false }) guaranteedListComponent: AccountReceivableListGuaranteedComponent;
     @ViewChild(AccountReceivableListOtherComponent, { static: false }) otherListComponent: AccountReceivableListOtherComponent;
-    //
+
     @ViewChild(AccountReceivableFormSearchComponent, { static: false }) accountReceivableFormComponent: AccountReceivableFormSearchComponent;
 
     selectedSubTab: string = "TRIAL_OFFICIAL";
@@ -40,7 +39,6 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     ngOnInit() {
 
     }
-    //
     ngAfterViewInit() {
         this._activeRouter
             .queryParams
@@ -51,16 +49,12 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 } else {
                     this.selectedSubTab = 'trial_official'.toUpperCase();
                     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
-
                 }
 
             });
         this._cd.detectChanges();
-
-
     }
 
-    //
     onSearchReceivable(body: AccountingInterface.IAccReceivableSearch) {
 
         switch (body.arType) {
@@ -77,18 +71,18 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 break;
         }
     }
-    //
+
     changeTabAccount(tab: string) {
         if (tab === 'payment') {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
         }
     }
-    //
+
     setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
     }
-    //
+
     onSelectTabAccountReceivable(tabname: string) {
 
         this.selectedSubTab = tabname;
@@ -113,10 +107,8 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
 
     setParameterToPagingTab(tab: CommonEnum.TabTypeAccountReceivableEnum, tabComponent: any) {
-
-
         this.accountReceivableFormComponent.arType = tab;
-        //
+
         const dataSearch: AccountingInterface.IAccReceivableSearch = {
             arType: tab,
             acRefId: null,
@@ -129,6 +121,4 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
     }
-
-
 }

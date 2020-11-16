@@ -115,7 +115,6 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     saveJob(body: any) {
-        console.log("test body: ", body);
         this._documenRepo.createTransaction(body)
             .pipe(
                 catchError(this.catchError),
@@ -149,8 +148,6 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         this.formImportJobDetailPopup.selectedShipment = null;
         this.formImportJobDetailPopup.show();
     }
-
-
     importJob(body: any) {
         this._documenRepo.importCSTransaction(body)
             .pipe(
