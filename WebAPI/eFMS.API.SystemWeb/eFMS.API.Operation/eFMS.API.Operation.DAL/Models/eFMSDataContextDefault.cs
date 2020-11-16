@@ -150,6 +150,10 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.CreditPayment)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -174,6 +178,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.InternalCode).HasMaxLength(250);
+
                 entity.Property(e => e.InternalReferenceNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -191,6 +197,14 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PartnerLocation)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerMode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PartnerNameEn)
                     .HasColumnName("PartnerName_EN")
                     .HasMaxLength(4000);
@@ -198,6 +212,10 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.PartnerNameVn)
                     .HasColumnName("PartnerName_VN")
                     .HasMaxLength(4000);
+
+                entity.Property(e => e.PartnerType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.PaymentBeneficiary).HasMaxLength(4000);
 
@@ -288,6 +306,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.AirlineInfo).HasMaxLength(800);
+
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 
                 entity.Property(e => e.BranchId).HasColumnName("BranchID");
@@ -346,6 +366,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.IsHawb).HasColumnName("IsHAWB");
 
                 entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 
@@ -1091,6 +1113,10 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ShipmentType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Shipper).HasMaxLength(500);
 
                 entity.Property(e => e.SumCbm)
@@ -1195,6 +1221,14 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.AccessDescription).HasMaxLength(1600);
 
+                entity.Property(e => e.BankAccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Birthday).HasColumnType("datetime");
 
                 entity.Property(e => e.Bonus).HasColumnType("decimal(10, 4)");
@@ -1238,7 +1272,7 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.Photo).HasColumnType("image");
+                entity.Property(e => e.Photo).HasMaxLength(500);
 
                 entity.Property(e => e.Position)
                     .HasMaxLength(50)
@@ -1280,6 +1314,10 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CreditRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")

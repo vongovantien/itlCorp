@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
@@ -57,12 +55,9 @@ const customCurrencyMaskConfig = {
 
 @NgModule({
     imports: [
-        CommonModule,
         RouterModule.forChild(routing),
         PaginationModule.forRoot(),
         SharedModule,
-        FormsModule,
-        ReactiveFormsModule,
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         JobEditLazyLoadComponentModule, // ? Lazy loading module with 3 tab component (CD, Credit/Debit, Stage),
         ShareBussinessModule,

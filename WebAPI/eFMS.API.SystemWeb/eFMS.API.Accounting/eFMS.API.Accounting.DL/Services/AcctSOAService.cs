@@ -1674,7 +1674,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  PaymentDueDate = s.PaymentDueDate,
                                  SyncStatus = s.SyncStatus,
                                  LastSyncDate = s.LastSyncDate,
-                                 ReasonReject = s.ReasonReject
+                                 ReasonReject = s.ReasonReject,
+                                 CreditPayment = pat.CreditPayment
                              };
             var result = resultData.FirstOrDefault();
             if (result != null)

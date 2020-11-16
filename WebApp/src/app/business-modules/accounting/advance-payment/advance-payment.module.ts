@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { AdvancePaymentComponent } from './advance-payment.component';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -78,15 +76,12 @@ const customCurrencyMaskConfig = {
 
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
-        FormsModule,
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
         PerfectScrollbarModule,
         RouterModule.forChild(routing),
-        ReactiveFormsModule,
         NgProgressModule,
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,

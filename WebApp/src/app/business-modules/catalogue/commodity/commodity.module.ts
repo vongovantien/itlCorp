@@ -3,10 +3,8 @@ import { CommodityComponent } from './commodity.component';
 import { Routes, RouterModule } from '@angular/router';
 import { CommodityImportComponent } from '../commodity-import/commodity-import.component';
 import { CommodityGroupImportComponent } from '../commodity-group-import/commodity-group-import.component';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SelectModule } from 'ng2-select';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { CommodityAddPopupComponent } from './components/form-create-commodity/form-create-commodity.popup';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -34,13 +32,10 @@ const routing: Routes = [
 ];
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
         SelectModule,
-        FormsModule,
         NgProgressModule,
         RouterModule.forChild(routing),
-        ReactiveFormsModule,
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
         TabsModule.forRoot(),

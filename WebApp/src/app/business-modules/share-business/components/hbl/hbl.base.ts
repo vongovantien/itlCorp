@@ -81,15 +81,15 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
         this.isLocked = this._store.select(getTransactionLocked);
         this.isLoading = this._store.select(getHBLLoadingState);
 
-        this._store.select(getSurchargeLoadingState).subscribe(
-            (loading: boolean) => {
-                if (loading) {
-                    this._spinner.show(this.spinnerSurcharge);
-                } else {
-                    this._spinner.hide(this.spinnerSurcharge);
-                }
-            }
-        );
+        // this._store.select(getSurchargeLoadingState).subscribe(
+        //     (loading: boolean) => {
+        //         if (loading) {
+        //             this._spinner.show(this.spinnerSurcharge);
+        //         } else {
+        //             this._spinner.hide(this.spinnerSurcharge);
+        //         }
+        //     }
+        // );
 
         this.listenShortcutMovingTab();
     }

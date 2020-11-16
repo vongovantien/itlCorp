@@ -38,7 +38,8 @@
                                     </thead>
                                     <tbody>
                                         <ng-container *ngIf="!!vouchers.length">
-                                            <tr *ngFor="let voucher of vouchers; let i = index; trackBy: trackByFn">
+                                            <tr *ngFor="let voucher of vouchers; let i = index; trackBy: trackByFn"
+                                                [class.invalid-row]="voucher.syncStatus === 'Rejected'">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
                                                         <ng-container

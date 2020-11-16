@@ -44,6 +44,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        private readonly IOptions<ApiUrl> ApiUrl;
+
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -61,7 +63,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CsTransactionDetail> transactionDetailRepo,
             IContextBase<CatDepartment> catDepartmentRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, cacheService, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -78,6 +81,7 @@ namespace eFMS.API.Catalogue.DL.Services
             catDepartmentRepository = catDepartmentRepo;
             userlevelRepository = userlevelRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
+            ApiUrl = apiurl;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -300,7 +304,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
               + linkEn + "</br>" + linkVn + "</br> </br>" +
               "<i> Thanks and Regards </i>" + "</br> </br>" +
-              "eFMS System </div>");
+              "<b> eFMS System, </b>" +
+              "</br>"
+              + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+
+            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
 
             List<string> lstCc = ListMailCC();
 
@@ -374,7 +383,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
                 "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
-                "eFMS System </div>");
+                "<b> eFMS System, </b>" + "</br>" +
+                "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+
+            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             bool resultSenmail = false;
             if ( (partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))

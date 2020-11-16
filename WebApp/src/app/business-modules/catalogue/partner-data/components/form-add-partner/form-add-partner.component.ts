@@ -98,6 +98,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerLocation: AbstractControl;
     internalCode: AbstractControl;
     isAddBranchSub: boolean;
+    creditPayment: AbstractControl;
 
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
@@ -118,6 +119,11 @@ export class FormAddPartnerComponent extends AppForm {
     partnerLocations: CommonInterface.INg2Select[] = [
         { id: 'Domestic', text: 'Domestic' },
         { id: 'Oversea', text: 'Oversea' }
+    ];
+
+    creditPayments: CommonInterface.INg2Select[] = [
+        { id: 'Credit', text: 'Credit' },
+        { id: 'Direct', text: 'Direct' }
     ];
 
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
@@ -334,7 +340,8 @@ export class FormAddPartnerComponent extends AppForm {
             roundUpMethod: [null],
             partnerMode: [null],
             partnerLocation: [null, Validators.required],
-            internalCode: [null]
+            internalCode: [null],
+            creditPayment: [null]
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -375,6 +382,7 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerMode = this.partnerForm.controls['partnerMode'];
         this.partnerLocation = this.partnerForm.controls['partnerLocation'];
         this.internalCode = this.partnerForm.controls['internalCode'];
+        this.creditPayment = this.partnerForm.controls['creditPayment'];
 
         if (!this.isUpdate) {
             this.partnerMode.setValue([<CommonInterface.INg2Select>{ id: this.partnerModes.find(x => x.text === 'External').id, text: 'External' }]);
@@ -502,7 +510,8 @@ export class FormAddPartnerComponent extends AppForm {
             applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }],
             partnerMode: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerMode }],
             partnerLocation: [<CommonInterface.INg2Select>{ id: partner.partnerLocation, text: partner.partnerLocation }],
-            internalCode: partner.internalCode
+            internalCode: partner.internalCode,
+            creditPayment: [<CommonInterface.INg2Select>{ id: partner.creditPayment, text: partner.creditPayment }]
         });
 
     }

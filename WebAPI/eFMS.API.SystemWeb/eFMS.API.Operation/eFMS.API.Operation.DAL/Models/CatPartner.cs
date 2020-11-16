@@ -68,5 +68,10 @@ namespace eFMS.API.Operation.Service.Models
         public string ApplyDim { get; set; }
         public string BillingPhone { get; set; }
         public string BillingEmail { get; set; }
+        public string PartnerType { get; set; }
+        public string PartnerMode { get; set; }
+        public string PartnerLocation { get; set; }
+        public string InternalCode { get; set; }
+        public string CreditPayment { get; set; }
     }
 }

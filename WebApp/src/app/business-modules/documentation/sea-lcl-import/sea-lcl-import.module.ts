@@ -53,11 +53,8 @@ const LIBS = [
 
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
         RouterModule.forChild(routing),
-        FormsModule,
-        ReactiveFormsModule,
         ShareBussinessModule,
         ...LIBS,
         SeaLCLImportLazyLoadModule, // ?  Lazy loading module with  tab component (CD Note).

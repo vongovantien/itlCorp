@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -39,12 +36,9 @@ const LIB = [
 ];
 @NgModule({
     imports: [
-        CommonModule,
         SharedModule,
         ShareBussinessModule,
-        FormsModule,
         RouterModule.forChild(routing),
-        ReactiveFormsModule,
         NgxSpinnerModule,
         ...LIB
 
