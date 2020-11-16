@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 
 import { SortService } from '@services';
@@ -11,9 +11,6 @@ import { GuaranteedModel } from '@models';
 import { RoutingConstants } from '@constants';
 
 
-
-
-
 @Component({
     selector: 'list-guaranteed-account-receivable',
     templateUrl: './list-guaranteed-account-receivable.component.html',
@@ -22,6 +19,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
     guaranteedList: any[] = [];
 
     subHeaders: any[];
+
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
@@ -80,7 +78,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
     getPagingList() {
         this._progressRef.start();
         this.isLoading = true;
-        //call api
+
         this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
@@ -95,7 +93,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
                 },
             );
     }
-    //
+
     viewDetail(agreementId: string) {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
             queryParams: {

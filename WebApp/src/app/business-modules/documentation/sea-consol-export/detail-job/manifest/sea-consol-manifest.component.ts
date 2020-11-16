@@ -19,8 +19,6 @@ import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 
-
-
 @Component({
     selector: 'app-sea-consol-export-manifest',
     templateUrl: './sea-consol-manifest.component.html'
@@ -42,7 +40,6 @@ export class SeaConsolExportManifestComponent extends AppList {
     checkAll = false;
     totalGW = 0;
     totalCBM = 0;
-    fistOpen: boolean = true;
 
     constructor(
         protected _store: Store<any>,
@@ -53,8 +50,6 @@ export class SeaConsolExportManifestComponent extends AppList {
         protected _router: Router,
         private cdRef: ChangeDetectorRef,
         private _activedRouter: ActivatedRoute
-
-
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -76,7 +71,6 @@ export class SeaConsolExportManifestComponent extends AppList {
 
         this.isLocked = this._store.select(getTransactionLocked);
         this.permissionShipments = this._store.select(getTransactionPermission);
-
     }
     ngAfterViewInit() {
         this._activedRouter.params
@@ -87,12 +81,10 @@ export class SeaConsolExportManifestComponent extends AppList {
                     this.formManifest.jobId = this.jobId;
 
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-                    // this.formManifest.getShipmentDetail(this.formManifest.jobId);
 
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
                     this.cdRef.detectChanges();
-
                 }
             });
     }
@@ -106,9 +98,8 @@ export class SeaConsolExportManifestComponent extends AppList {
     }
 
     refreshManifest() {
-        //this.getManifest(this.jobId);
         this.formManifest.getShipmentDetail();
-        this.isShowUpdate = false; //refresh hide preview button
+        this.isShowUpdate = false;
         this.getHblList(this.jobId);
     }
 
@@ -138,15 +129,12 @@ export class SeaConsolExportManifestComponent extends AppList {
         this.manifest.volume = this.totalCBM;
         this.formManifest.volume.setValue(this.manifest.volume);
         this.formManifest.weight.setValue(this.manifest.weight);
-
     }
 
     getManifest(id: string) {
         this._documentationRepo.getManifest(id).subscribe(
             (res: any) => {
                 if (!!res) {
-                    console.log("res manifest: ", res);
-
                     this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);

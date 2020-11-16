@@ -214,10 +214,6 @@ export class StatementOfAccountEditComponent extends AppList {
                     * and 
         * startDate must <= soaFromDate
         */
-        // if (!(moment(this.soa.soaformDate).isSameOrAfter(moment(this.selectedRange.startDate), 'day') && moment(this.selectedRange.endDate).isSameOrAfter(moment(this.soa.soatoDate), 'day'))) {
-        //     this._toastService.warning(`Range date invalid `, '', { positionClass: 'toast-bottom-right' });
-        //     return;
-        // }
         if ((new Date(this.selectedRange.startDate).getDate() > new Date(this.soa.soaformDate).getDate()) || new Date(this.selectedRange.endDate).getDate() < new Date(this.soa.soatoDate).getDate()) {
             this._toastService.warning(`Range date invalid `);
             return;

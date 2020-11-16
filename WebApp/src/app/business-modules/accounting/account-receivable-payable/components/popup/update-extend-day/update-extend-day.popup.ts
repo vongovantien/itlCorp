@@ -9,14 +9,13 @@ import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/fo
 export class AccountPaymentUpdateExtendDayPopupComponent extends PopupBase implements OnInit {
     @Output() onUpdateExtendDate: EventEmitter<any> = new EventEmitter<any>();
     formUpdateExtenDate: FormGroup;
-    //
+
     refId: string;
     numberDaysExtend: AbstractControl;
     note: AbstractControl;
     paymentType: number;
-    //
+
     checkError: boolean = false; // flag -> click update button -> check validate
-    //
 
     constructor(
         private _fb: FormBuilder,

@@ -3287,7 +3287,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 // Border
                 workSheet.Cells[21, 1, addressLastRow, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[22, 1, addressLastRow, 10].Style.Border.Top.Style = ExcelBorderStyle.Dotted;
+                workSheet.Cells[21, 1, addressLastRow, 10].Style.Border.Top.Style = ExcelBorderStyle.Dotted;
             }
             decimal? sumFee = 0, sumVat = 0;
             decimal? totalFee = surchargeOBHLst.Select(x => x.Amount).Sum();
