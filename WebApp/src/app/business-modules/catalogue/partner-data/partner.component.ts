@@ -152,33 +152,20 @@ export class PartnerComponent extends AppList implements OnInit {
 
     showConfirmDelete(event) {
         this.partner = event;
-        this._catalogueRepo.getDetailPartner(this.partner.id)
-            .subscribe(
-                (res: any) => {
-                    if (!res) {
-                        this._toastService.warning("This Partner '" + this.partner.shortName + "' has been deleted, Please check again!");
-                        this.allPartnerComponent.getPartners();
-                    } else {
-                        if (res.active) {
-                            this._toastService.warning("This Partner can't delete, Please reload Partner!");
-                        } else {
-                            this.checkDeletePartnerPermission(this.partner.id);
-                        }
-                    }
-                });
-    }
-
-    checkDeletePartnerPermission(partnerId: string) {
-        this._catalogueRepo.checkDeletePartnerPermission(partnerId)
+        this._catalogueRepo.checkDeletePartnerPermission(this.partner.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
-                (res: any) => {
-                    if (res) {
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
                         this.confirmDeletePopup.show();
                     } else {
-                        this.info403Popup.show();
+                        if (res.data === 403) {
+                            this.info403Popup.show();
+                        } else {
+                            this._toastService.warning("This Partner " + res.message);
+                        }
                     }
                 }
             );
@@ -207,9 +194,13 @@ export class PartnerComponent extends AppList implements OnInit {
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
-                (res: any) => {
+                (res: CommonInterface.IResult) => {
                     if (!res) {
-                        this.info403Popup.show();
+                        if (res.data === 403) {
+                            this.info403Popup.show();
+                        } else {
+                            this._toastService.warning("This Partner " + res.message);
+                        }
                         this.confirmDeletePopup.hide();
                         return;
                     } else {

@@ -133,32 +133,23 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     showConfirmDelete(customer: Customer) {
         this.selectedCustomer = customer;
-        this._catalogueRepo.getDetailPartner(this.selectedCustomer.id)
-            .subscribe(
-                (res: any) => {
-                    if (!res) {
-                        this._toastService.warning("This Customer " + this.selectedCustomer.partnerNameEn + " has been deleted, Please check again!");
-                        this.resetSearch({});
+        this._catalogueRepo.checkDeletePartnerPermission(this.selectedCustomer.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.confirmDeletePopup.show();
                     } else {
-                        if (res.active) {
-                            this._toastService.warning("This Customer can't delete, Please reload Customer!");
+                        if (res.data === 403) {
+                            this.info403Popup.show();
                         } else {
-                            this._catalogueRepo.checkDeletePartnerPermission(this.selectedCustomer.id)
-                                .pipe(
-                                    catchError(this.catchError),
-                                    finalize(() => this._progressRef.complete())
-                                ).subscribe(
-                                    (res: boolean) => {
-                                        if (res) {
-                                            this.confirmDeletePopup.show();
-                                        } else {
-                                            this.info403Popup.show();
-                                        }
-                                    }
-                                );
+                            this._toastService.warning("This Customer " + res.message);
                         }
                     }
-                });
+                }
+            );
     }
 
     onDelete() {
@@ -167,9 +158,13 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
-                (res: boolean) => {
+                (res: CommonInterface.IResult) => {
                     if (!res) {
-                        this.info403Popup.show();
+                        if (res.data === 403) {
+                            this.info403Popup.show();
+                        } else {
+                            this._toastService.warning("This Customer " + res.message);
+                        }
                         this.confirmDeletePopup.hide();
                         return;
                     } else {
