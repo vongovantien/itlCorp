@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { Currency } from 'src/app/shared/models';
 import { catchError, finalize } from 'rxjs/operators';
@@ -12,13 +12,15 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { environment } from 'src/environments/environment';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
 @Component({
     selector: 'pl-sheet-popup',
     templateUrl: './pl-sheet.popup.html'
 })
 
-export class PlSheetPopupComponent extends PopupBase {
+export class PlSheetPopupComponent extends PopupBase implements ICrystalReport, OnInit {
     @Input() jobId: string;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('formPL', { static: false }) formPL: ElementRef;
@@ -26,7 +28,6 @@ export class PlSheetPopupComponent extends PopupBase {
 
     selectedCurrency: Currency;
     currencyList: Currency[];
-    dataReport: any = null;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -40,6 +41,8 @@ export class PlSheetPopupComponent extends PopupBase {
         this._progressRef = this._progressService.ref();
     }
 
+
+
     ngOnInit() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
             this.currencyList = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY) || [];
@@ -47,6 +50,15 @@ export class PlSheetPopupComponent extends PopupBase {
         } else {
             this.getCurrency();
         }
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        if (!this.popupReport.isShown) {
+            this.popupReport.config = this.options;
+            this.popupReport.show();
+        }
+        this.submitFormPreview();
     }
 
     getCurrency() {
@@ -78,13 +90,7 @@ export class PlSheetPopupComponent extends PopupBase {
                     }
                     this.dataReport = JSON.stringify(res);
 
-                    setTimeout(() => {
-                        if (!this.popupReport.isShown) {
-                            this.popupReport.config = this.options;
-                            this.popupReport.show();
-                        }
-                        this.submitFormPreview();
-                    }, 1000);
+                    this.showReport();
                 },
             );
     }

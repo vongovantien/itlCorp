@@ -30,6 +30,7 @@ import { AccountingManagementFormCreateVoucherComponent } from './components/for
 import { AccountingManagementDetailVoucherComponent } from './voucher/detail/accounting-detail-voucher.component';
 import { AccountingManagementImportVatInvoiceComponent } from './vat/import/accounting-import-vat-invoice.component';
 import { ShareAccountingModule } from '../share-accouting.module';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -51,7 +52,7 @@ const routing: Routes = [
                 path: 'import', component: AccountingManagementImportVatInvoiceComponent, data: { name: "Import" }
             },
             {
-                path: ':vatInvoiceId', component: AccountingManagementDetailVatInvoiceComponent, data: { name: 'Edit' }
+                path: ':vatInvoiceId', component: AccountingManagementDetailVatInvoiceComponent, data: { name: 'Edit' }, canDeactivate: [DeactivateGuardService]
             },
 
         ]
@@ -66,7 +67,7 @@ const routing: Routes = [
                 path: 'new', component: AccountingManagementCreateVoucherComponent, data: { name: 'New' }
             },
             {
-                path: ':voucherId', component: AccountingManagementDetailVoucherComponent, data: { name: 'Edit' }
+                path: ':voucherId', component: AccountingManagementDetailVoucherComponent, data: { name: 'Edit' }, canDeactivate: [DeactivateGuardService]
             }
         ]
     },
