@@ -16,6 +16,7 @@ namespace eFMS.API.Operation.Service.Models
         }
 
         public virtual DbSet<CatCommodity> CatCommodity { get; set; }
+        public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CsTransaction> CsTransaction { get; set; }
         public virtual DbSet<CsTransactionDetail> CsTransactionDetail { get; set; }
         public virtual DbSet<CustomsDeclaration> CustomsDeclaration { get; set; }
@@ -36,7 +37,7 @@ namespace eFMS.API.Operation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<CatCommodity>(entity =>
             {
@@ -79,6 +80,209 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatPartner>(entity =>
+            {
+                entity.ToTable("catPartner");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.AddressEn)
+                    .HasColumnName("Address_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.AddressShippingEn)
+                    .HasColumnName("AddressShipping_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.AddressShippingVn)
+                    .HasColumnName("AddressShipping_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.AddressVn)
+                    .HasColumnName("Address_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.ApplyDim)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankAccountAddress).HasMaxLength(4000);
+
+                entity.Property(e => e.BankAccountName).HasMaxLength(4000);
+
+                entity.Property(e => e.BankAccountNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingEmail)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingPhone)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CoLoaderCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.ContactPerson).HasMaxLength(4000);
+
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
+
+                entity.Property(e => e.CountryShippingId).HasColumnName("CountryShippingID");
+
+                entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CreditPayment)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DebitAmount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Fax)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.InternalCode).HasMaxLength(250);
+
+                entity.Property(e => e.InternalReferenceNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Note).HasMaxLength(4000);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.ParentId)
+                    .HasColumnName("ParentID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerGroup)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerLocation)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerMode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerNameEn)
+                    .HasColumnName("PartnerName_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.PartnerNameVn)
+                    .HasColumnName("PartnerName_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.PartnerType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentBeneficiary).HasMaxLength(4000);
+
+                entity.Property(e => e.PercentCredit).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
+
+                entity.Property(e => e.ProvinceShippingId).HasColumnName("ProvinceShippingID");
+
+                entity.Property(e => e.ReceiveEtaemail).HasColumnName("ReceiveETAEmail");
+
+                entity.Property(e => e.RoundUpMethod)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RoundedSoamethod)
+                    .HasColumnName("RoundedSOAMethod")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SalePersonId)
+                    .HasColumnName("SalePersonID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShortName).HasMaxLength(4000);
+
+                entity.Property(e => e.SugarId)
+                    .HasColumnName("SugarID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SwiftCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TaxCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Tel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Website)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.WorkPhoneEx)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
+
+                entity.Property(e => e.ZipCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ZipCodeShipping)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
