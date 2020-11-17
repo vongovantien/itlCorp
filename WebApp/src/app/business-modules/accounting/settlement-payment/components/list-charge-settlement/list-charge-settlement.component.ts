@@ -127,12 +127,15 @@ export class SettlementListChargeComponent extends AppList {
             const chargeWithNoId: Surcharge[] = charges.filter(x => x.id === null || x.id === SystemConstants.EMPTY_GUID);
             const chargeWithId: Surcharge[] = charges.filter(x => x.id !== null && x.id !== SystemConstants.EMPTY_GUID);
 
-            for (const i of chargeWithId) {
-                const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === i.hblid && item.id === i.id);
-                if (indexChargeUpdating !== -1) {
-                    this.updateSurchargeWithIndex(indexChargeUpdating, i);
+            if (chargeWithId.length) {
+                for (const i of chargeWithId) {
+                    const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === i.hblid && item.id === i.id);
+                    if (indexChargeUpdating !== -1) {
+                        this.updateSurchargeWithIndex(indexChargeUpdating, i);
+                    }
                 }
             }
+
             // * Nếu có thêm charge mới
             if (chargeWithNoId.length) {
                 // * Xóa những charge mới thêm từ trước
@@ -206,9 +209,7 @@ export class SettlementListChargeComponent extends AppList {
         data.event.preventDefault();
 
         this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
-        // setTimeout(() => {
-        //     this.paymentManagementPopup.show();
-        // }, 500);
+
         this.showPaymentManagementPopup();
         return false;
     }
