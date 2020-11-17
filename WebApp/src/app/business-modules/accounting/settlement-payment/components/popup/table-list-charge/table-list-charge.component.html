@@ -42,7 +42,7 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'advanceNo')"
                                     [selectedDisplayFields]="['advanceNo','amount','requestCurrency']"
                                     [dataSources]="advs" [displayFields]="configAdvanceDisplayFields"
-                                    (remove)="removeAdvanceNo(advanceNo)">
+                                    (remove)="removeAdvanceNo(advanceNo.value)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
