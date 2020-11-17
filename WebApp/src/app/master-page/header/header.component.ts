@@ -112,19 +112,19 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this.getListNotification();
 
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
-            console.log("notification", data);
+            console.log("new notification", data);
             if (data && data.userIds.includes(this.currenUser.id)) {
-                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 1000 });
+                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 3000, });
             }
             this.getListNotification();
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
+            this._toast.info(`${data}`, 'eFMS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 3000, });
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            this._toast.info(`You have a new message ${data}`, 'Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true });
+            this._toast.info(`${data}`, 'eMFS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 3000, });
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {
