@@ -142,10 +142,11 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult CheckDetailPermission(string id)
         {
-
-            var result = catPartnerService.CheckDetailPermission(id);
-            if (result == 403) return Ok(false);
-            return Ok(true);
+            var hs = catPartnerService.CheckDetailPermission(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            result.Data = hs.Code;
+            return Ok(result);
         }
 
         /// <summary>

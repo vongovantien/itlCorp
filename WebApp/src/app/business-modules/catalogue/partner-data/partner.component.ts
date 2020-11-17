@@ -178,11 +178,15 @@ export class PartnerComponent extends AppList implements OnInit {
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
-                (res: any) => {
-                    if (res) {
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
                         this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${this.partner.id}`]);
                     } else {
-                        this.info403Popup.show();
+                        if (res.data === 403) {
+                            this.info403Popup.show();
+                        } else {
+                            this._toastService.warning("This Partner " + res.message);
+                        }
                     }
                 },
             );

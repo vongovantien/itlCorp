@@ -560,14 +560,18 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     getACRefName(parentId: string) {
-        this._catalogueRepo.getDetailPartner(parentId)
-            .pipe(catchError(this.catchError), finalize(() => { }))
-            .subscribe(
-                (res: Partner) => {
-                    if (!!res) {
-                        this.parentName = res.shortName;
+        const isFounded = this.parentCustomers.findIndex(x => x.id === parentId) > -1;
+        if (!isFounded) {
+            this._catalogueRepo.getDetailPartner(parentId)
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res: Partner) => {
+                        if (!!res) {
+                            this.partnerAccountRef.setValue(parentId);
+                            this.parentName = res.shortName;
+                        }
                     }
-                }
-            );
+                );
+        }
     }
 }
