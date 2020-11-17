@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { CatalogueRepo, AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { takeUntil, distinctUntilChanged, catchError, map } from 'rxjs/operators';
+import { takeUntil, distinctUntilChanged, catchError, map, debounceTime } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -135,13 +135,13 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         );
 
         // * Detect close autocomplete when user click outside chargename control or select charge.
-        this.$isShowAutoComplete
+        this._isShowAutoComplete
             .pipe(
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe((isShow: boolean) => {
                 this.isShow = isShow;
-                this.chargeName.setValue(!!this.selectedCharge ? this.selectedCharge.chargeNameVn : null);
+                this.chargeName.setValue(!!this.selectedCharge ? this.selectedCharge.chargeNameVn : null, { emitEvent: false });
             });
     }
 
@@ -186,6 +186,15 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.unit = this.form.controls['unit'];
         this.serieNo = this.form.controls['serieNo'];
         this.isOBH = this.form.controls['isOBH'];
+
+        this.chargeName.valueChanges.pipe(
+            debounceTime(200),
+            distinctUntilChanged(),
+        ).subscribe(
+            (keyword: string) => {
+                this.term$.next(keyword);
+            }
+        );
     }
 
     initFormUpdate(data: any) {
@@ -268,19 +277,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         });
     }
 
-    onSearchAutoComplete(keyword: string = '') {
-        this.term$.next(keyword);
-    }
-
-    // autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
-    //     source$.pipe(
-    //         debounceTime(time),
-    //         distinctUntilChanged(),
-    //         switchMap((...args: any[]) =>
-    //             callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
-    //         )
-    //     )
-
     getCustomNo() {
         this._operationRepo.getListCustomsDeclaration()
             .pipe(
@@ -296,7 +292,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     selectCharge(charge: any) {
         this._isShowAutoComplete.next(false);
-        this.chargeName.setValue(charge.chargeNameVn);
+        this.chargeName.setValue(charge.chargeNameVn, { emitEvent: false });
         this.selectedCharge = charge;
 
         if (this.selectedCharge.type !== 'OBH') {
