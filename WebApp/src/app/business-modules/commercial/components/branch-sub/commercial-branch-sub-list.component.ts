@@ -99,33 +99,21 @@ export class CommercialBranchSubListComponent extends AppList {
 
   showConfirmDelete(partner: Partner) {
     this.selectedPartner = partner;
-    const partnerType = this.openOnPartner ? "Partner" : this.selectedPartner.partnerType;
-    this._catalogueRepo.getDetailPartner(this.selectedPartner.id)
-      .subscribe(
-        (res: any) => {
-          if (!res) {
-            this._toastService.warning("This " + partnerType + " has been deleted, Please check again!");
-          } else {
-            if (res.active) {
-              this._toastService.warning("This " + partnerType + " can't delete, Please reload " + partnerType + "!");
-            } else {
-              this.checkDeletePartnerPermission(partner.id);
-            }
-          }
-        });
-  }
-
-  checkDeletePartnerPermission(partnerId: string) {
-    this._catalogueRepo.checkDeletePartnerPermission(partnerId)
+    const partnerType = this.openOnPartner ? "Partner " : this.selectedPartner.partnerType + " ";
+    this._catalogueRepo.checkDeletePartnerPermission(this.selectedPartner.id)
       .pipe(
         catchError(this.catchError),
         finalize(() => this._progressRef.complete())
       ).subscribe(
-        (res: any) => {
-          if (res) {
+        (res: CommonInterface.IResult) => {
+          if (res.status) {
             this.confirmDeletePopup.show();
           } else {
-            this.info403Popup.show();
+            if (res.data === 403) {
+              this.info403Popup.show();
+            } else {
+              this._toastService.warning("This " + partnerType + res.message);
+            }
           }
         }
       );
@@ -137,9 +125,14 @@ export class CommercialBranchSubListComponent extends AppList {
         catchError(this.catchError),
         finalize(() => this._progressRef.complete())
       ).subscribe(
-        (res: boolean) => {
+        (res: CommonInterface.IResult) => {
           if (!res) {
-            this.info403Popup.show();
+            if (res.data === 403) {
+              this.info403Popup.show();
+            } else {
+              const partnerType = this.openOnPartner ? "Partner " : this.selectedPartner.partnerType + " ";
+              this._toastService.warning("This " + partnerType + res.message);
+            }
             this.confirmDeletePopup.hide();
           } else {
             this.confirmDeletePopup.hide();

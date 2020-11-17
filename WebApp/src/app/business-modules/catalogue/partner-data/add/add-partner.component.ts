@@ -105,6 +105,7 @@ export class AddPartnerDataComponent extends AppList {
     ngAfterViewInit() {
         this.contractList.isActiveNewContract = false;
         this.formPartnerComponent.isUpdate = false;
+        this.formPartnerComponent.creditPayment.setValue([<CommonInterface.INg2Select>{ id: "Direct", text: "Direct" }]);
         this._cd.detectChanges();
     }
 
@@ -374,7 +375,8 @@ export class AddPartnerDataComponent extends AppList {
 
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,
-            partnerType: 'Supplier'
+            partnerType: 'Supplier',
+            creditPayment: formBody.creditPayment != null && formBody.creditPayment.length > 0 ? formBody.creditPayment[0].id : null,
         };
 
         const mergeObj = Object.assign(_merge(formBody, cloneObject));

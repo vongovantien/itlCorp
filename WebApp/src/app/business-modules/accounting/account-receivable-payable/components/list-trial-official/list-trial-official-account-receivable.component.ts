@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo } from '@repositories';
@@ -14,10 +14,8 @@ import { RoutingConstants } from '@constants';
     templateUrl: './list-trial-official-account-receivable.component.html',
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
-    //
-    trialOfficialList: TrialOfficialOtherModel[] = [];
-    isLoading: boolean = true;
 
+    trialOfficialList: TrialOfficialOtherModel[] = [];
 
     constructor(
         private _sortService: SortService,
@@ -61,7 +59,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     getPagingList() {
         this._progressRef.start();
         this.isLoading = true;
-        //call api
+
         this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),

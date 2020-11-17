@@ -52,5 +52,6 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string ChargeType { get; set; } // CREDIT / OBH
         public decimal? Amount { get; set; }
         public decimal? Amount3 { get; set; }
+        public string CustomerCodeBook { get; set; } // Mã đối tượng Payer
     }
 }

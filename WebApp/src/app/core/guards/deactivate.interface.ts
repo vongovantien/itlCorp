@@ -9,4 +9,8 @@ export interface ICanComponentDeactivate {
     getDeactivateNextState?(): RouterStateSnapshot;
 
     getDeactivateCurrenctState?(): RouterStateSnapshot;
+
+    handleCancelForm?(): void;
+
+    confirmCancel?(): void;
 }

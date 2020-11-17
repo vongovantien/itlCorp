@@ -680,8 +680,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.Email).HasMaxLength(150);
-
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UserCreated)
@@ -808,6 +806,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.CountryShippingId).HasColumnName("CountryShippingID");
 
                 entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CreditPayment)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")

@@ -1,36 +1,39 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 import { AccountingRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
-import { IAccountingManagementState, UpdateChargeList } from '../../store';
 import { AccAccountingManagementModel, ChargeOfAccountingManagementModel } from '@models';
-
-import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
-
-import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { isUUID } from 'validator';
-import _merge from 'lodash/merge';
 import { formatDate } from '@angular/common';
 import { RoutingConstants } from '@constants';
 import { ConfirmPopupComponent } from '@common';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AccountingConstants } from '@constants';
+import { ICanComponentDeactivate } from '@core';
 
+import { IAccountingManagementState, UpdateChargeList } from '../../store';
+import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
+
+import { Observable, of } from 'rxjs';
+import { isUUID } from 'validator';
+import _merge from 'lodash/merge';
+import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 @Component({
     selector: 'app-accounting-detail-voucher',
     templateUrl: './accounting-detail-voucher.component.html',
 })
-export class AccountingManagementDetailVoucherComponent extends AccountingManagementCreateVoucherComponent implements OnInit {
+export class AccountingManagementDetailVoucherComponent extends AccountingManagementCreateVoucherComponent implements OnInit, ICanComponentDeactivate {
     @ViewChild('confirmSyncVoucher', { static: false }) confirmVoucherPopup: ConfirmPopupComponent;
 
     voucherId: string;
     accountingManagement: AccAccountingManagementModel = new AccAccountingManagementModel();
 
     voucherSync: any[] = [];
+
+    nextState: RouterStateSnapshot;
+    isCancelFormPopupSuccess: boolean = false;
 
     constructor(
         protected _router: Router,
@@ -74,8 +77,6 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                         this.updateChargeList(res);
                     }
 
-                    console.log(this.accountingManagement);
-
                     if (!!this.accountingManagement.lastSyncDate) {
                         this.formCreateComponent.isReadonly = true;
                         this.listChargeComponent.isReadOnly = true;
@@ -89,6 +90,8 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
             date: !!res.date ? { startDate: new Date(res.date), endDate: new Date(res.date) } : null,
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
+
+        this.currentFormValue = this.formCreateComponent.formGroup.getRawValue();
     }
 
     updateChargeList(res: AccAccountingManagementModel) {
@@ -252,6 +255,46 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                     console.log(error);
                 }
             );
+    }
+
+    canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
+        this.nextState = nextState; // * Save nextState for Deactivate service.
+
+        // * USER CONFIRM CANCEL => GO OUT
+        if (this.isCancelFormPopupSuccess
+            || this.accountingManagement.status !== 'New'
+            || this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
+            return of(true);
+        }
+        const isEdited = JSON.stringify(this.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+
+        // *  USER EDITED AND NOT CONFIRM
+        if (isEdited && !this.isCancelFormPopupSuccess) {
+            this.confirmCancelPopup.show();
+            return;
+        }
+        return of(!isEdited);
+    }
+
+    handleCancelForm() {
+        const isEdited = JSON.stringify(this.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+        if (isEdited) {
+            this.confirmCancelPopup.show();
+        } else {
+            this.isCancelFormPopupSuccess = true;
+            this.gotoList();
+        }
+    }
+
+    confirmCancel() {
+        this.confirmCancelPopup.hide();
+        this.isCancelFormPopupSuccess = true;
+
+        if (this.nextState) {
+            this._router.navigate([this.nextState.url.toString()]);
+        } else {
+            this.gotoList();
+        }
     }
 
 }

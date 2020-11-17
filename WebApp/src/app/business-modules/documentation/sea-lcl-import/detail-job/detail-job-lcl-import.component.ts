@@ -16,6 +16,8 @@ import { switchMap, map, tap, skip, takeUntil, catchError, finalize, concatMap }
 import * as fromShareBussiness from './../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -25,7 +27,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
     templateUrl: './detail-job-lcl-import.component.html'
 })
 
-export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit, ICanComponentDeactivate {
+export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
@@ -60,6 +62,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         super(_router, _documenRepo, _toastService);
         this._progressRef = this._ngProgressService.ref();
     }
+
 
     ngOnInit() { }
 
@@ -257,10 +260,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -353,8 +353,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
+                            this.showReport();
                         }, 1000);
                     } else {
                         this._toastService.warning('There is no data to display preview');
@@ -396,6 +395,12 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
             return;
         }
         return of(!isEdited);
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 
 }

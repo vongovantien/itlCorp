@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AccountingRepo } from '@repositories';
@@ -13,19 +13,23 @@ import { IAccountingManagementState, UpdateChargeList } from '../../store';
 import { AccountingManagementCreateVATInvoiceComponent } from '../create/accounting-create-vat-invoice.component';
 
 import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _merge from 'lodash/merge';
+import { ICanComponentDeactivate } from '@core';
 
 @Component({
     selector: 'app-accounting-detail-vat-invoice',
     templateUrl: './accounting-detail-vat-invoice.component.html',
 })
-export class AccountingManagementDetailVatInvoiceComponent extends AccountingManagementCreateVATInvoiceComponent implements OnInit {
+export class AccountingManagementDetailVatInvoiceComponent extends AccountingManagementCreateVATInvoiceComponent implements OnInit, ICanComponentDeactivate {
 
     vatInvoiceId: string;
 
     accountingManagement: AccAccountingManagementModel = new AccAccountingManagementModel();
+
+    nextState: RouterStateSnapshot;
+    isCancelFormPopupSuccess: boolean = false;
 
     constructor(
         protected _router: Router,
@@ -81,6 +85,9 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
         if (this.accountingManagement.status !== 'New') {
             this.formCreateComponent.isReadonly = true;
         }
+
+        this.currentFormValue = this.formCreateComponent.formGroup.getRawValue();
+
     }
 
     updateChargeList(res: AccAccountingManagementModel) {
@@ -172,4 +179,45 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
     gotoList() {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/vat-invoice`]);
     }
+
+    canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
+        this.nextState = nextState; // * Save nextState for Deactivate service.
+
+        // * USER CONFIRM CANCEL => GO OUT
+        if (this.isCancelFormPopupSuccess || this.accountingManagement.status !== 'New') {
+            return of(true);
+        }
+        const isEdited = JSON.stringify(this.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+
+        // *  USER EDITED AND NOT CONFIRM
+        if (isEdited && !this.isCancelFormPopupSuccess) {
+            this.confirmCancelPopup.show();
+            return;
+        }
+        return of(!isEdited);
+    }
+
+    handleCancelForm() {
+        const isEdited = JSON.stringify(this.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+        if (isEdited) {
+            this.confirmCancelPopup.show();
+        } else {
+            this.isCancelFormPopupSuccess = true;
+            this.gotoList();
+        }
+    }
+
+    confirmCancel() {
+        this.confirmCancelPopup.hide();
+        this.isCancelFormPopupSuccess = true;
+
+        if (this.nextState) {
+            this._router.navigate([this.nextState.url.toString()]);
+        } else {
+            this.gotoList();
+        }
+    }
+
+
+
 }

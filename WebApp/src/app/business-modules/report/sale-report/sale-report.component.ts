@@ -4,12 +4,11 @@ import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
 import { DocumentationRepo } from "@repositories";
 import { catchError, finalize } from "rxjs/operators";
-import { Crystal } from "@models";
 import { ReportPreviewComponent } from "@common";
 import { CommonEnum } from "@enums";
 import { NgxSpinnerService } from "ngx-spinner";
-import { ICrystalReport, ReportInterface } from "src/app/shared/interfaces/report-interface";
 import { delayTime } from "@decorators";
+import { ICrystalReport, ReportInterface } from "@interfaces";
 
 @Component({
     selector: 'app-sale-report',

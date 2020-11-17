@@ -157,10 +157,11 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("CheckPermissionDelete/{id}")]
         public IActionResult CheckDeletePermission(string id)
         {
-
-            var result = catPartnerService.CheckDeletePermission(id);
-            if (result == 403) return Ok(false);
-            return Ok(true);
+            var hs = catPartnerService.CheckDeletePermission(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            result.Data = hs.Code;
+            return Ok(result);
         }
 
         /// <summary>

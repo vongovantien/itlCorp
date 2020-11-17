@@ -155,9 +155,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acRef')"
                             [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value, hardValue: parentName}"
                             [selectedDisplayFields]="['partnerNameVn']" [dataSources]="parentCustomers"
-                            [displayFields]="displayFieldCustomer"
-                            (remove)="resetFormControl(partnerAccountRef)" placeholder="Select A/C Ref"
-                            [disabled]="isAddBranchSub">
+                            [displayFields]="displayFieldCustomer" (remove)="resetFormControl(partnerAccountRef)"
+                            placeholder="Select A/C Ref" [disabled]="isAddBranchSub">
                         </app-combo-grid-virtual-scroll>
                     </div>
 
@@ -187,10 +186,25 @@
                         <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode" />
 
                     </div>
+                    <div classs="form-group" *ngIf="isUpdate">
+                        <div class="text-left text-underline m--margin-top-10">
+                            <a (click)="showOtherCharge()" class="pointer font-weight-bold">Other
+                                Charge</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-4" *ngIf="isUpdate">
+                <div class="col-lg-4">
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label class="form-control-label"> Credit Payment </label>
+                                <ng-select [items]="creditPayments" name="creditPayment" formControlName="creditPayment"
+                                    [disabled]="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true  ? null : 'disabled'"
+                                    placeholder="Select credit payment">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4" *ngIf="isUpdate">
                             <div class="form-group">
                                 <label class="form-control-label"> Active </label>
                                 <div class="m-checkbox-inline">
@@ -202,14 +216,14 @@
 
                             </div>
                         </div>
-                        <div class="col-lg-8">
+                        <!-- <div class="col-lg-8">
                             <div class="form-group">
                                 <div class="text-center text-underline m--margin-top-10">
                                     <a (click)="showOtherCharge()" class="pointer font-weight-bold">Other
                                         Charge</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
 
