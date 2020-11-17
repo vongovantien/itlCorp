@@ -207,7 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                   ExchangeRate = GetExchangeRate(voucher.Date, voucher.Currency),
                                                                   Description0 = voucher.Description,
                                                                   AccountNo = voucher.AccountNo,
-                                                                  PaymentMethod = voucher.PaymentMethod
+                                                                  PaymentMethod = voucher.PaymentMethod,
                                                               };
 
                 List<BravoVoucherModel> data = queryVouchers.ToList();
@@ -222,6 +222,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                   join charge in charges on surcharge.ChargeId equals charge.Id
                                                                                   join obhP in partners on surcharge.PaymentObjectId equals obhP.Id into obhPGrps
                                                                                   from obhP in obhPGrps.DefaultIfEmpty()
+                                                                                  join partner in obhPartners on surcharge.PayerId equals partner.Id into partnerGrps
+                                                                                  from partnerGrp in partnerGrps.DefaultIfEmpty()
                                                                                   join chgDef in chargesDefault on charge.Id equals chgDef.ChargeId into chgDef2
                                                                                   from chgDef in chgDef2.DefaultIfEmpty()
                                                                                   join unit in catUnits on surcharge.UnitId equals unit.Id
@@ -257,6 +259,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       ContracAccount = chgDef.CreditAccountNo,
                                                                                       VATAccount = chgDef.CreditVat,
                                                                                       ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
+                                                                                      CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo
                                                                                   };
                         if (queryChargesVoucher.Count() > 0)
                         {
@@ -307,6 +310,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
                                                                                          join obhP in partners on surcharge.PaymentObjectId equals obhP.Id into obhPGrps
                                                                                          from obhP in obhPGrps.DefaultIfEmpty()
+                                                                                         join partner in obhPartners on surcharge.PayerId equals partner.Id into partnerGrps
+                                                                                         from partnerGrp in partnerGrps.DefaultIfEmpty()
                                                                                          join unit in catUnits on surcharge.UnitId equals unit.Id
                                                                                          select new BravoSettlementRequestModel
                                                                                          {
@@ -330,6 +335,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              AtchDocDate = surcharge.InvoiceDate,
                                                                                              AtchDocSerieNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
+                                                                                             CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -515,6 +521,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                         charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+                        charge.CustomerCodeBook = sync.CustomerCode;
 
                         charges.Add(charge);
                     }
@@ -702,6 +709,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.AtchDocNo = surcharge.InvoiceNo;
                         charge.AtchDocDate = surcharge.InvoiceDate;
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
+                        charge.CustomerCodeBook = sync.CustomerCode;
 
                         charges.Add(charge);
                     }
@@ -1589,7 +1597,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string _type = type == "CDNOTE" ? "Credit Note" : "SOA";
             string subject = string.Format(@"eFMS - Voucher Request - {0} {1}", _type, refNo);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i>Dear Accountant Team,</i></p><p><div>You received a <b>[SOA_CreditNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div><div><i>Bạn có nhận một đề nghị thanh toán chi phí bằng <b>[SOA_CreditNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div></p><ul><li>Ref No/ <i>Số tham chiếu</i>: <b><i>[RefNo]</i></b></li><li>Partner Name/ <i>Tên đối tượng</i>: <b><i>[PartnerEn]</i></b></li><li>Tax Code/ <i>Mã số thuế</i>: <b><i>[Taxcode]</i></b></li><li>Service/ <i>Dịch vụ</i>: <b><i>[ServiceName]</i></b></li><li>Amount/ <i>Số tiền</i>: <b><i>[AmountCurr]</i></b></li><li>Payment Method/ <i>Phương Thức thanh toán</i>: <b><i>[PaymentMethod]</i></b></li></ul><p><div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div><div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p><i>Dear Accountant Team,</i></p><p><div>You received a <b>[SOA_CreditNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div><div><i>Bạn có nhận một đề nghị thanh toán chi phí bằng <b>[SOA_CreditNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div></p><ul><li>Ref No/ <i>Số tham chiếu</i>: <b><i>[RefNo]</i></b></li><li>Partner Name/ <i>Tên đối tượng</i>: <b><i>[PartnerEn]</i></b></li><li>Tax Code/ <i>Mã số thuế</i>: <b><i>[Taxcode]</i></b></li><li>Service/ <i>Dịch vụ</i>: <b><i>[ServiceName]</i></b></li><li>Amount/ <i>Số tiền</i>: <b><i>[AmountCurr]</i></b></li><li>Payment Method/ <i>Phương Thức thanh toán</i>: <b><i>[PaymentMethod]</i></b></li></ul><p><div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div><div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
             body = body.Replace("[SOA_CreditNote]", _type);
             body = body.Replace("[CreatorEnName]", creatorEnName);
             body = body.Replace("[RefNo]", refNo);

@@ -184,8 +184,10 @@
 
 <existing-charge-popup (onRequest)="onRequestSurcharge($event)"></existing-charge-popup>
 
-<form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
-    (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
+<ng-container *ngIf="!!STATE && STATE === 'WRITE'">
+    <form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
+        (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
+</ng-container>
 
 <copy-settlement-popup (onCopy)="onRequestSurcharge($event)"></copy-settlement-popup>
 

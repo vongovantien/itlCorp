@@ -48,7 +48,6 @@ export class AirExportManifestComponent extends AppList {
     totalGW = 0;
     totalCBM = 0;
     fistOpen: boolean = true;
-    dataReport: Crystal;
 
     constructor(
         protected _store: Store<any>,

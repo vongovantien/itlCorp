@@ -3,7 +3,6 @@ import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { NgxSpinnerService } from 'ngx-spinner';
 
 import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
 import { DocumentationRepo } from '@repositories';
@@ -63,7 +62,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
-        private _spinner: NgxSpinnerService,
 
     ) {
         super(_toastService, _documenRepo, _router, _store);
@@ -189,11 +187,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     duplicateJob(body: any) {
-        this._spinner.show();
         this._documenRepo.importCSTransaction(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._spinner.hide())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

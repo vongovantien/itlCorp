@@ -1,29 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { AppList } from 'src/app/app.list';
+import { AppList } from '@app';
 
 import { SortService } from '@services';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-
 import { AccountingRepo } from '@repositories';
-import _merge from 'lodash/merge';
 import { NgProgress } from '@ngx-progressbar/core';
-import { takeUntil, switchMap } from 'rxjs/operators';
 import { AccReceivableDetailModel, AccReceivableOfficesDetailModel } from '@models';
 import { RoutingConstants } from '@constants';
 
+import _merge from 'lodash/merge';
+import { takeUntil, switchMap } from 'rxjs/operators';
 @Component({
     selector: 'detail-account-receivable',
     templateUrl: 'detail-account-receivable.component.html'
 })
-
-
-
 export class AccountReceivableDetailComponent extends AppList implements OnInit {
     subTab: string;
 
     accReceivableDetail: AccReceivableDetailModel = new AccReceivableDetailModel();
     accReceivableMoreDetail: AccReceivableOfficesDetailModel[] = [];
     subHeaders: any[];
+
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
@@ -51,17 +48,14 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 }),
             ).subscribe(
                 (data: any) => {
-
                     this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
                     this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
                         .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
-
                 }
             );
 
-
     }
-    //
+
     initHeaders() {
         this.headers = [
             { title: 'Office (Branch)', field: 'officeName', sortable: true },
@@ -87,6 +81,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
             { title: 'Over 30 Days', field: 'over30Day', sortable: true },
         ];
     }
+
     sortDetailList(sortField: string, order: boolean) {
         this.accReceivableMoreDetail = this._sortService.sort(this.accReceivableMoreDetail, sortField, order);
     }
@@ -101,10 +96,6 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     goBack() {
-
-
-        //window.history.back();
-
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`],
             { queryParams: { subTab: this.subTab } });
     }

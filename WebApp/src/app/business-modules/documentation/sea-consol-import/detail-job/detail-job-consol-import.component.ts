@@ -9,6 +9,8 @@ import { DocumentationRepo } from '@repositories';
 import { ICanComponentDeactivate } from '@core';
 import { CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, SubHeaderComponent, ReportPreviewComponent } from '@common';
+import { RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
 
 import { combineLatest, of, Observable } from 'rxjs';
 import { map, tap, switchMap, skip, catchError, takeUntil, finalize, concatMap } from 'rxjs/operators';
@@ -18,13 +20,14 @@ import * as fromShareBussiness from './../../../share-business/store';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants } from '@constants';
+import { delayTime } from '@decorators';
+
 
 @Component({
     selector: 'app-detail-job-consol-import',
     templateUrl: './detail-job-consol-import.component.html',
 })
-export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobComponent implements OnInit, ICanComponentDeactivate {
+export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
     @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
@@ -59,6 +62,8 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
 
         this._progressRef = this._ngProgressService.ref();
     }
+
+
 
     ngAfterViewInit() {
         combineLatest([
@@ -363,10 +368,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -381,10 +383,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -429,5 +428,9 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         return of(!isEdited);
     }
 
-
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
+    }
 }
