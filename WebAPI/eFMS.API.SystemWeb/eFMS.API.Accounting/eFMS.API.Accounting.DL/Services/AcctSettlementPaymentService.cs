@@ -435,27 +435,38 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrenct = currentUser.UserID;
 
                 var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
-                if (settlement == null) return new HandleState("Not found Settlement Payment");
+                if (settlement == null) return new HandleState((object)"Not found Settlement Payment");
                 if (!settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW)
                     && !settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
-                    return new HandleState("Not allow delete. Settlements are awaiting approval.");
+                    return new HandleState((object)"Not allow delete. Settlements are awaiting approval.");
                 }
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        //Phí chừng từ (chỉ cập nhật lại SettlementCode bằng null)
+                        //Phí chừng từ (cập nhật lại SettlementCode, AdvanceNo bằng null)
                         var surchargeShipment = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == true).ToList();
                         if (surchargeShipment != null && surchargeShipment.Count > 0)
                         {
                             foreach (var item in surchargeShipment)
                             {
+                                //Cập nhật status payment of Advance Request = NotSettled (Nếu có)
+                                var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).FirstOrDefault();
+                                if (advanceRequest != null)
+                                {
+                                    advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                    advanceRequest.DatetimeModified = DateTime.Now;
+                                    advanceRequest.UserModified = userCurrenct;
+                                    var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                }
+
                                 item.SettlementCode = null;
+                                item.AdvanceNo = null;
                                 item.UserModified = userCurrenct;
                                 item.DatetimeModified = DateTime.Now;
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);                              
                             }
                         }
                         //Phí hiện trường (Xóa khỏi surcharge)
@@ -478,12 +489,11 @@ namespace eFMS.API.Accounting.DL.Services
                             trans.Rollback();
                         }
                         return hs;
-
                     }
                     catch (Exception ex)
                     {
                         trans.Rollback();
-                        return new HandleState(ex.Message);
+                        return new HandleState((object)ex.Message);
                     }
                     finally
                     {
@@ -2133,28 +2143,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 mailLeaderOrManager = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
                             }
-                            //if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO) && (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO) && (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO))
-                            //{
-                            //    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                            //    settlementApprove.BuheadApr = userCurrent;
-                            //    settlementApprove.BuheadAprDate = DateTime.Now;
-                            //    settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
-                            //    if (leaderLevel.Role != AccountingConstants.ROLE_NONE)
-                            //    {
-                            //        settlementApprove.LeaderApr = userCurrent;
-                            //        settlementApprove.LeaderAprDate = DateTime.Now;
-                            //    }
-                            //    if (managerLevel.Role != AccountingConstants.ROLE_NONE)
-                            //    {
-                            //        settlementApprove.ManagerApr = userCurrent;
-                            //        settlementApprove.ManagerAprDate = DateTime.Now;
-                            //    }
-                            //    if (accountantLevel.Role != AccountingConstants.ROLE_NONE)
-                            //    {
-                            //        settlementApprove.AccountantApr = userCurrent;
-                            //        settlementApprove.AccountantAprDate = DateTime.Now;
-                            //    }
-                            //}
                         }
                         else
                         {
@@ -2176,6 +2164,8 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
+                            //Update Status Payment of Advance Request by Settlement Code [17-11-2020]
+                            acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlementPayment.SettlementNo);
                         }
                         else
                         {
@@ -3732,24 +3722,8 @@ namespace eFMS.API.Accounting.DL.Services
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
             totalAmount = Math.Round(totalAmount, 2);
 
-            //Lấy ra list shipment(JobId,MBL,HBL,HBLID) dựa vào SettlementNo
-            //var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
-            string advanceNos = string.Empty;
-            //if (shipments != null && shipments.Count() > 0)
-            //{
-            //    foreach (var shipment in shipments)
-            //    {
-            //        var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
-            //        foreach (var advanceNo in listAdvanceNo)
-            //        {
-            //            advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
-            //        }
-            //    }
-            //    advanceNos += ")";
-            //    advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
-            //}
-
+            string advanceNos = string.Empty;            
             var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
             advanceNos = string.Join("; ", listAdvanceNo);
 
@@ -3762,11 +3736,11 @@ namespace eFMS.API.Accounting.DL.Services
             string subject = "eFMS - Settlement Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
             subject = subject.Replace("[RequesterName]", requesterName);
             subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p> <i> <b>Dear Mr/Mrs [UserName],</b> </i></p><p>You have new Settlement Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p> <i>Anh/ Chị có một yêu cầu duyệt thanh toán từ <b>[RequesterName]</b> với thông tin như sau: </i></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Detail Payment Request</a> </span></p><p> <i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Chi tiết phiếu đề nghị thanh toán</a> </span> </i></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p> <i> <b>Dear Mr/Mrs [UserName],</b> </i></p><p><div>You have new Settlement Payment Approval Request from <b>[RequesterName]</b> as below info:</div><div> <i>Anh/ Chị có một yêu cầu duyệt thanh toán từ <b>[RequesterName]</b> với thông tin như sau: </i></div></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p><div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Detail Payment Request</a> </span></div><div> <i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Chi tiết phiếu đề nghị thanh toán</a> </span> </i></p></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
             body = body.Replace("[UserName]", userReciverName);
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[SettlementNo]", settlementNo);
-            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
+            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencySettlement]", settlement.SettlementCurrency);
             body = body.Replace("[AdvanceNos]", advanceNos);
             body = body.Replace("[JobIds]", jobIds);
@@ -3856,35 +3830,19 @@ namespace eFMS.API.Accounting.DL.Services
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
             totalAmount = Math.Round(totalAmount, 2);
 
-            //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
-            //var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
-            //if (shipments != null && shipments.Count() > 0)
-            //{
-            //    foreach (var shipment in shipments)
-            //    {
-            //        var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
-            //        foreach (var advanceNo in listAdvanceNo)
-            //        {
-            //            advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
-            //        }
-            //    }
-            //    advanceNos += ")";
-            //    advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
-            //}
-
             var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
             advanceNos = string.Join("; ", listAdvanceNo);
 
             //Mail Info
             string subject = "eFMS - Settlement Payment from [RequesterName] is approved";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p><p>You have an Settlement Payment is approved at <b>[ApprovedDate]</b> as below info:</p><p> <i>Anh/ Chị có một đề nghị thanh toán đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau: </i></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></p><p> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p><p><div>You have an Settlement Payment is approved at <b>[ApprovedDate]</b> as below info:</div><div> <i>Anh/ Chị có một đề nghị thanh toán đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau: </i></div></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p><div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div><div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></div></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[SettlementNo]", settlementNo);
-            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
+            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencySettlement]", settlement.SettlementCurrency);
             body = body.Replace("[AdvanceNos]", advanceNos);
             body = body.Replace("[JobIds]", jobIds);
@@ -3955,35 +3913,19 @@ namespace eFMS.API.Accounting.DL.Services
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
             totalAmount = Math.Round(totalAmount, 2);
 
-            //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
-            //var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
-            //if (shipments != null && shipments.Count() > 0)
-            //{
-            //    foreach (var shipment in shipments)
-            //    {
-            //        var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
-            //        foreach (var advanceNo in listAdvanceNo)
-            //        {
-            //            advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
-            //        }
-            //    }
-            //    advanceNos += ")";
-            //    advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
-            //}
-
             var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
             advanceNos = string.Join("; ", listAdvanceNo);
 
             //Mail Info
             string subject = "eFMS - Settlement Payment from [RequesterName] is denied";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p><p>You have an Settlement Payment is denied at <b>[DeniedDate]</b> by as below info:</p><p> <i>Anh/ Chị có một yêu cầu đề nghị thanh toán đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau: </i></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></p><p> <i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p><p><div>You have an Settlement Payment is denied at <b>[DeniedDate]</b> by as below info:</div><div> <i>Anh/ Chị có một yêu cầu đề nghị thanh toán đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau: </i></div></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p><div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div><div> <i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></div></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[SettlementNo]", settlementNo);
-            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
+            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencySettlement]", settlement.SettlementCurrency);
             body = body.Replace("[AdvanceNos]", advanceNos);
             body = body.Replace("[JobIds]", jobIds);
