@@ -540,7 +540,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     calculateTotal(vat: number, quantity: number, unitPrice: number, chargeItem: Surcharge) {
         this.isSubmitted = false;
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(vat, quantity, unitPrice);
+        chargeItem.total = Math.round(this.utility.calculateTotalAmountWithVat(vat, quantity, unitPrice));
     }
 
     getPartnerById(id: string) {

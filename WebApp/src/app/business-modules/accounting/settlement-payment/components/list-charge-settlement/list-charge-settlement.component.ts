@@ -209,9 +209,7 @@ export class SettlementListChargeComponent extends AppList {
         data.event.preventDefault();
 
         this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
-        // setTimeout(() => {
-        //     this.paymentManagementPopup.show();
-        // }, 500);
+
         this.showPaymentManagementPopup();
         return false;
     }
