@@ -622,6 +622,12 @@ namespace eFMS.API.Accounting.DL.Services
                 // Lấy thông tin advance theo group settlement.
                 AdvanceInfo advInfo = GetAdvanceInfo(item.SettlementNo, item.MBL, item.HblId, item.CurrencyShipment, item.AdvanceNo, currencyExchange);
 
+                int roundDecimal = 0;
+                if (item.CurrencyShipment != AccountingConstants.CURRENCY_LOCAL)
+                {
+                    roundDecimal = 3;
+                }
+
                 shipmentSettlement.Add(new ShipmentSettlement
                 {
                     SettlementNo = item.SettlementNo,
@@ -638,7 +644,7 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalAmount = advInfo.TotalAmount ?? 0,
                     AdvanceNo = advInfo.AdvanceNo,
                     AdvanceAmount = advInfo.AdvanceAmount,
-                    Balance = advInfo.TotalAmount - advInfo.AdvanceAmount,
+                    Balance = Math.Round((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo
                 });
             }
@@ -1379,6 +1385,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.SettlementCode = settlement.SettlementNo;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;
+                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
                             }
@@ -1400,6 +1407,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         }
                                     }
                                 }
+                                
                                 foreach (var item in listChargeSceneAdd)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -1407,6 +1415,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
+                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }
@@ -1448,6 +1457,9 @@ namespace eFMS.API.Accounting.DL.Services
                     amount += charge.Total * rate;
                 }
             }
+
+            int roundDecimal = model.Settlement.SettlementCurrency != AccountingConstants.CURRENCY_LOCAL ? 3 : 0;
+            amount = Math.Round(amount, roundDecimal);
             return amount;
         }
 
@@ -1559,6 +1571,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
+                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }
@@ -1604,6 +1617,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.VoucherIddate = sceneCharge?.VoucherIddate;
                                     item.VoucherIdre = sceneCharge?.VoucherIdre;
                                     item.VoucherIdredate = sceneCharge?.VoucherIdredate;
+                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
                             }
