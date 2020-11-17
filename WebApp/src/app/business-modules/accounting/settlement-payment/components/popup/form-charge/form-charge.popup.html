@@ -22,8 +22,7 @@
                                         <input name="keyword"
                                             class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             placeholder="Input keyword" (click)="isShow = !isShow"
-                                            formControlName="chargeName" (ngModelChange)="onSearchAutoComplete($event)"
-                                            [attr.disabled]="isFromshipment ? '' : null">
+                                            formControlName="chargeName" [attr.disabled]="isFromshipment ? '' : null">
                                         <div class="dropdown e--combogrid combogrid-autocomplete" *ngIf="isShow">
                                             <div class="dropdown-menu e--combogrid-content d-block">
                                                 <div class="tabel-wrapper table-fixed">

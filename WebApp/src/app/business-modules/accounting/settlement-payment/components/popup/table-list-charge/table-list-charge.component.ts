@@ -179,7 +179,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             );
     }
 
-    getAdvances(jobNo: string) {
+    getAdvances(jobNo: string, isUpdateFControl: boolean = true) {
         this._accountingRepo.getAdvanceOfShipment(jobNo)
             .pipe(
                 catchError(this.catchError),
@@ -192,7 +192,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             ).subscribe(
                 (res: any[] = []) => {
                     this.advs = cloneDeep(res);
-                    if (!this.advanceNo.value) {
+
+                    // ? Have rewrite default value
+                    if (!this.advanceNo.value && isUpdateFControl) {
                         const advance: IAdvanceShipment = this.advs.find(i => i.jobId === this.selectedShipment.jobId);
                         if (!!advance) {
                             this.advanceNo.setValue(advance.advanceNo);
@@ -571,25 +573,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         return valid;
     }
 
-    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): boolean {
-        let seenDuplicate = false;
-        const testObject = {};
-
-        inputArray.map(function (item: { [x: string]: any; duplicate: boolean; }) {
-            const itemPropertyName = item[propertyName];
-            if (itemPropertyName in testObject) {
-                testObject[itemPropertyName].duplicate = true;
-                item.duplicate = true;
-                seenDuplicate = true;
-            } else {
-                testObject[itemPropertyName] = item;
-                delete item.duplicate;
-            }
-        });
-
-        return seenDuplicate;
-    }
-
     checkDuplicate() {
         let valid: boolean = true;
         const chargeIdInvoiceGroup = this.charges.map(c => {
@@ -639,6 +622,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             default:
                 return CommonEnum.SurchargeTypeEnum.OBH;
         }
+    }
+
+    removeAdvanceNo(advNo: string) {
+        this.resetFormControl(this.advanceNo);
+        this.selectedAdvance = null;
     }
 
 }
