@@ -633,7 +633,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet("GetAdvancesOfShipment")]
         public IActionResult GetAdvancesOfShipment(string jobId)
         {
-            var data = acctAdvancePaymentService.GetAdvancesOfShipment().Where(x => x.JobId == jobId).OrderByDescending(o => o.RequestDate);
+            var data = acctAdvancePaymentService.GetAdvancesOfShipment().Where(x => x.JobId == jobId);
             return Ok(data);
         }
 
