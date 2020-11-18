@@ -87,6 +87,9 @@ export class ChargeOfAccountingManagementModel {
     requesterId: string = null;
     // * Custom
     isSelected: boolean = false;
+    isValidAmount: boolean = true;    // ? +- 1000
+    isValidVatAmount: boolean = true; // ? +- 1000
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

@@ -119,6 +119,11 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
             return;
         }
 
+        if (!this.checkValidAmountRangeChange()) {
+            this._toastService.warning(this.invalidFormText);
+            return;
+        }
+
         this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.voucherId)
             .pipe(
                 switchMap(
