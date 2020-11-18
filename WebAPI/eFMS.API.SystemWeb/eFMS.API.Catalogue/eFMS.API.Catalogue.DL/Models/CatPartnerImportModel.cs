@@ -15,6 +15,8 @@ namespace eFMS.API.Catalogue.DL.Models
         public string Status { get; set; }
         public string Profile { get; set; }
         public string PartnerNameEnError { get; set; }
+        public string PartnerLocationError { get; set; }
+        public string PartnerInternalCodeError { get; set; }
         public string AcReferenceError { get; set; }
         public string PartnerNameVnError { get; set; }
         public string ShortNameError { get; set; }

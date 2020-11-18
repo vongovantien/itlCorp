@@ -7,7 +7,7 @@ import { ShipmentOverviewComponent } from './shipment-overview/shipment-overview
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'pl-report'
+    redirectTo: 'general-report'
   },
   {
     path: 'pl-report',
