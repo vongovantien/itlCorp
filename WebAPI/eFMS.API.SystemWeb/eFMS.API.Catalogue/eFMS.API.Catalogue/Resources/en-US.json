@@ -32,6 +32,8 @@
   "MSG_PARTNER_SALEMAN_DEFAULT_OFFICE_NOT_ALLOW_EMPTY": "Office - Sale man Default is not allow empty!",
   "MSG_PARTNER_NAME_EN_EMPTY": "Partner name EN is not allow empty!",
   "MSG_PARTNER_NAME_VN_EMPTY": "Partner name local is not allow empty!",
+  "MSG_PARTNER_LOCATION_EMPTY": "Partner location is not allow empty!",
+  "MSG_PARTNER_INTERNAL_CODE_EMPTY": "Partner internal code is not allow empty when partner mode is Internal!",
   "MSG_PARTNER_SHORT_NAME_EMPTY": "Short name is not allow empty!",
   "MSG_PARTNER_COUNTRY_BILLING_EMPTY": "Country billing is empty. Please check again!",
   "MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND": "Country billing '{0}' is not found!",
@@ -46,7 +48,7 @@
   "MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND": "Billing address local is not allow empty. Please check again!",
   "MSG_PARTNER_AC_REFERENCE_NOT_FOUND": "A/c reference '{0}' is not found!",
 
-  "MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND": "Shipping address is not allow empty. Please check again!",
+  "MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND": "Shipping address en is not allow empty. Please check again!",
   "MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND": "Shipping address local is not allow empty. Please check again!",
   "MSG_PARTNER_WORKPLACE_NOT_FOUND": "Workplace '{0}' is not found!",
   "MSG_PARTNER_TAXCODE_LENGTH": "Tax Code include 8 - 14 characters!",
