@@ -142,10 +142,11 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult CheckDetailPermission(string id)
         {
-
-            var result = catPartnerService.CheckDetailPermission(id);
-            if (result == 403) return Ok(false);
-            return Ok(true);
+            var hs = catPartnerService.CheckDetailPermission(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            result.Data = hs.Code;
+            return Ok(result);
         }
 
         /// <summary>
@@ -458,32 +459,38 @@ namespace eFMS.API.Catalogue.Controllers
                         ShortName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         PartnerNameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         PartnerNameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                        TaxCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        AcReference = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        PartnerGroup = worksheet.Cells[row, 6].Value?.ToString().Trim(),
-                        ContactPerson = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                        Tel = worksheet.Cells[row, 8].Value?.ToString().Trim(),
-                        Fax = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        AddressEn = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        AddressVn = worksheet.Cells[row, 11].Value?.ToString().Trim(),
-                        CityBilling = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                        CountryBilling = worksheet.Cells[row, 13].Value?.ToString().Trim(),
-                        ZipCode = worksheet.Cells[row, 14].Value?.ToString().Trim(),
-                        AddressShippingEn = worksheet.Cells[row, 15].Value?.ToString().Trim(),
-                        AddressShippingVn = worksheet.Cells[row, 16].Value?.ToString().Trim(),
-                        CityShipping = worksheet.Cells[row, 17].Value?.ToString().Trim(),
-                        CountryShipping = worksheet.Cells[row, 18].Value?.ToString().Trim(),
-                        ZipCodeShipping = worksheet.Cells[row, 19].Value?.ToString().Trim(),
-                        Email = worksheet.Cells[row, 20].Value?.ToString().Trim(),
-                        SaleManName = worksheet.Cells[row, 21].Value?.ToString().Trim(),
-                        Profile = worksheet.Cells[row, 22].Value?.ToString().Trim(),
-                        BankAccountNo = worksheet.Cells[row, 23].Value?.ToString().Trim(),
-                        BankAccountName = worksheet.Cells[row, 24].Value?.ToString().Trim(),
-                        SwiftCode = worksheet.Cells[row, 25].Value?.ToString().Trim(),
-                        BankAccountAddress = worksheet.Cells[row, 26].Value?.ToString().Trim(),
-                        Note = worksheet.Cells[row, 27].Value?.ToString().Trim(),
+                        PartnerLocation = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        TaxCode = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        InternalReferenceNo = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        PartnerMode = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                        InternalCode = worksheet.Cells[row, 8].Value?.ToString().Trim(),
+                        AcReference = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        PartnerGroup = worksheet.Cells[row, 10].Value?.ToString().Trim(),
+                        CoLoaderCode = worksheet.Cells[row, 11].Value?.ToString().Trim(),
+                        AddressShippingEn = worksheet.Cells[row, 12].Value?.ToString().Trim(),
+                        AddressShippingVn = worksheet.Cells[row, 13].Value?.ToString().Trim(),
+                        CountryShipping = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        CityShipping = worksheet.Cells[row, 15].Value?.ToString().Trim(),
+                        ZipCodeShipping = worksheet.Cells[row, 16].Value?.ToString().Trim(),
+                        AddressEn = worksheet.Cells[row, 17].Value?.ToString().Trim(),
+                        AddressVn = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                        CountryBilling = worksheet.Cells[row, 19].Value?.ToString().Trim(),
+                        CityBilling = worksheet.Cells[row, 20].Value?.ToString().Trim(),
+                        ZipCode = worksheet.Cells[row, 21].Value?.ToString().Trim(),
+                        ContactPerson = worksheet.Cells[row, 22].Value?.ToString().Trim(),
+                        Tel = worksheet.Cells[row, 23].Value?.ToString().Trim(),
+                        Fax = worksheet.Cells[row, 24].Value?.ToString().Trim(),
+                        WorkPhoneEx = worksheet.Cells[row, 25].Value?.ToString().Trim(),
+                        Email = worksheet.Cells[row, 26].Value?.ToString().Trim(),
+                        BillingEmail = worksheet.Cells[row, 27].Value?.ToString(),
                         BillingPhone = worksheet.Cells[row, 28].Value?.ToString(),
-                        BillingEmail = worksheet.Cells[row, 29].Value?.ToString()
+                        BankAccountNo = worksheet.Cells[row, 29].Value?.ToString().Trim(),
+                        BankAccountName = worksheet.Cells[row, 30].Value?.ToString().Trim(),
+                        BankAccountAddress = worksheet.Cells[row, 31].Value?.ToString().Trim(),
+                        SwiftCode = worksheet.Cells[row, 32].Value?.ToString().Trim(),
+                        RoundUpMethod = worksheet.Cells[row, 33].Value?.ToString().Trim(),
+                        ApplyDim = worksheet.Cells[row, 34].Value?.ToString().Trim(),
+                        Note = worksheet.Cells[row, 35].Value?.ToString().Trim(),
                     };
                     list.Add(partner);
                 }
@@ -520,34 +527,27 @@ namespace eFMS.API.Catalogue.Controllers
                         ShortName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         PartnerNameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         PartnerNameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                        TaxCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        InternalReferenceNo = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        ContactPerson = worksheet.Cells[row, 6].Value?.ToString().Trim(),
-                        Tel = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                        Fax = worksheet.Cells[row, 8].Value?.ToString().Trim(),
-                        AddressEn = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        AddressVn = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        CityBilling = worksheet.Cells[row, 11].Value?.ToString().Trim(),
-                        CountryBilling = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                        ZipCode = worksheet.Cells[row, 13].Value?.ToString().Trim(),
-
-                        AddressShippingEn = worksheet.Cells[row, 14].Value?.ToString().Trim(),
-                        AddressShippingVn = worksheet.Cells[row, 15].Value?.ToString().Trim(),
-                        CityShipping = worksheet.Cells[row, 16].Value?.ToString().Trim(),
-                        CountryShipping = worksheet.Cells[row, 17].Value?.ToString().Trim(),
-                        ZipCodeShipping = worksheet.Cells[row, 18].Value?.ToString().Trim(),
-
-
-                        Email = worksheet.Cells[row, 19].Value?.ToString().Trim(),
-                        SaleManName = worksheet.Cells[row, 20].Value?.ToString().Trim(),
-                        AcReference = worksheet.Cells[row, 21].Value?.ToString(),
-                        BankAccountNo = worksheet.Cells[row, 22].Value?.ToString().Trim(),
-                        BankAccountName = worksheet.Cells[row, 23].Value?.ToString().Trim(),
-                        SwiftCode = worksheet.Cells[row, 24].Value?.ToString().Trim(),
-                        BankAccountAddress = worksheet.Cells[row, 25].Value?.ToString().Trim(),
-                        Note = worksheet.Cells[row, 26].Value?.ToString().Trim(),
-                        BillingPhone = worksheet.Cells[row, 27].Value?.ToString().Trim(),
-                        BillingEmail = worksheet.Cells[row, 28].Value?.ToString().Trim(),
+                        PartnerLocation = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        TaxCode = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        InternalReferenceNo = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        AcReference = worksheet.Cells[row, 7].Value?.ToString(),
+                        AddressShippingEn = worksheet.Cells[row, 8].Value?.ToString().Trim(),
+                        AddressShippingVn = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        CountryShipping = worksheet.Cells[row, 10].Value?.ToString().Trim(),
+                        CityShipping = worksheet.Cells[row, 11].Value?.ToString().Trim(),
+                        ZipCodeShipping = worksheet.Cells[row, 12].Value?.ToString().Trim(),
+                        AddressEn = worksheet.Cells[row, 13].Value?.ToString().Trim(),
+                        AddressVn = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        CountryBilling = worksheet.Cells[row, 15].Value?.ToString().Trim(),
+                        CityBilling = worksheet.Cells[row, 16].Value?.ToString().Trim(),
+                        ZipCode = worksheet.Cells[row, 17].Value?.ToString().Trim(),
+                        ContactPerson = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                        Tel = worksheet.Cells[row, 19].Value?.ToString().Trim(),
+                        Fax = worksheet.Cells[row, 20].Value?.ToString().Trim(),
+                        WorkPhoneEx = worksheet.Cells[row, 21].Value?.ToString().Trim(),
+                        Email = worksheet.Cells[row, 22].Value?.ToString().Trim(),
+                        BillingEmail = worksheet.Cells[row, 23].Value?.ToString().Trim(),
+                        BillingPhone = worksheet.Cells[row, 24].Value?.ToString().Trim(),
                     };
                     list.Add(partner);
                 }

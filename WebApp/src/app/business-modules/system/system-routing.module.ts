@@ -5,7 +5,7 @@ import { RoleComponent } from './role/role.component';
 const routes: Routes = [
     {
         path: '',
-        redirectTo: 'company-info',
+        redirectTo: 'company',
         pathMatch: 'full'
     },
     {

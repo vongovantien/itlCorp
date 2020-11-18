@@ -29,6 +29,8 @@
         public static readonly string MSG_PARTNER_NAME_EN_EMPTY = "MSG_PARTNER_NAME_EN_EMPTY";
         public static readonly string MSG_PARTNER_NAME_VN_EMPTY = "MSG_PARTNER_NAME_VN_EMPTY";
         public static readonly string MSG_PARTNER_SHORT_NAME_EMPTY = "MSG_PARTNER_SHORT_NAME_EMPTY";
+        public static readonly string MSG_PARTNER_PARTNER_LOCATION_EMPTY = "MSG_PARTNER_PARTNER_LOCATION_EMPTY";
+        public static readonly string MSG_PARTNER_INTERNAL_CODE_EMPTY = "MSG_PARTNER_INTERNAL_CODE_EMPTY";
         public static readonly string MSG_PARTNER_COUNTRY_BILLING_EMPTY = "MSG_PARTNER_COUNTRY_BILLING_EMPTY";
         public static readonly string MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND = "MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND";
         public static readonly string MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY = "MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY";

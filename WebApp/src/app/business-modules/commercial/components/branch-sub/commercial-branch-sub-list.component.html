@@ -32,7 +32,7 @@
                     <tbody>
                         <ng-container *ngIf="!!partners.length">
                             <tr *ngFor="let item of partners | filter : keyword :['accountNo', 'shortName',
-                     'partnerNameEn', 'partnerNameVn', 'taxCode', 'countryShippingName'] ; let i = index;">
+                     'partnerNameEn', 'partnerNameVn', 'taxCode', 'countryShippingName'] ;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <button (click)="showDetail(item)"

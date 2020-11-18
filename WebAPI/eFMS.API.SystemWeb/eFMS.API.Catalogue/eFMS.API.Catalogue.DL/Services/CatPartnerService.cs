@@ -219,15 +219,20 @@ namespace eFMS.API.Catalogue.DL.Services
             linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
 
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + creatorObj.EmployeeNameVn + "," + " </br> </br>" +
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + creatorObj.EmployeeNameVn + "," + " </br> </br>" +
                    "<i> Your Partner " + partner.PartnerNameVn + " is rejected by AR/Accountant as info below </i> </br>" +
                    "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" +
                    "\t  Customer Name  / <i> Tên khách hàng: </i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
                    "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
                    "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
-                   + linkEn + "</br>" + linkVn + "</br> </br>" +
+                  + linkEn + "</br>" + linkVn + "</br> </br>" +
                   "<i> Thanks and Regards </i>" + "</br> </br>" +
-                  "eFMS System </div>");
+                  "<b> eFMS System, </b>" +
+                  "</br>"
+                  + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+
+            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
@@ -288,7 +293,7 @@ namespace eFMS.API.Catalogue.DL.Services
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
             subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
 
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
               "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
               "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
@@ -307,7 +312,7 @@ namespace eFMS.API.Catalogue.DL.Services
               "<b> eFMS System, </b>" +
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-
+            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
 
@@ -373,7 +378,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
             string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
             string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br> </br>" +
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant Team: </br> </br>" +
                 "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" +
                 "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
                 "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
@@ -385,7 +390,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "<b> eFMS System, </b>" + "</br>" +
                 "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-
+            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             bool resultSenmail = false;
@@ -821,10 +826,20 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
-        public int CheckDetailPermission(string id)
+
+        /// <summary>
+        /// Check detail partner to view
+        /// </summary>
+        /// <param name="id">partner id</param>
+        /// <returns></returns>
+        public HandleState CheckDetailPermission(string id)
         {
             ClearCache();
-            var detail = Get(x => x.Id == id).FirstOrDefault();
+            var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (detail == null)
+            {
+                return new HandleState("has been deleted, Please check again!");
+            }
             var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = null;
             switch (detail.PartnerType)
@@ -841,9 +856,15 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
-            return code;
+            if (code == 403) return new HandleState(403, "");
+            return new HandleState();
         }
 
+        /// <summary>
+        /// Check detail partner to delete
+        /// </summary>
+        /// <param name="id">partner id</param>
+        /// <returns></returns>
         public HandleState CheckDeletePermission(string id)
         {
             var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
@@ -1122,25 +1143,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
                     partner.PartnerType = "Supplier";
-
-                    //var salesman = new CatContract
-                    //{
-                    //    Id = Guid.NewGuid(),
-                    //    //OfficeId = item.OfficeId,
-                    //    CompanyId = item.CompanyId,
-                    //    SaleManId = item.SalePersonId,
-                    //    PaymentMethod = item.PaymentTerm,
-                    //    EffectiveDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
-                    //    Active = true,
-                    //    PartnerId = partner.Id,
-                    //    DatetimeCreated = DateTime.Now,
-                    //    DatetimeModified = DateTime.Now,
-                    //    UserCreated = currentUser.UserID,
-                    //    UserModified = currentUser.UserID,
-                    //    SaleService = item.ServiceId
-                    //};
                     partners.Add(partner);
-                    //salesmans.Add(salesman);
                 }
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -1149,15 +1152,6 @@ namespace eFMS.API.Catalogue.DL.Services
                         var hs = DataContext.Add(partners);
                         if (hs.Success)
                         {
-                            //hs = contractRepository.Add(salesmans);
-                            //if (hs.Success)
-                            //{
-                            //    trans.Commit();
-                            //}
-                            //else
-                            //{
-                            //    trans.Rollback();
-                            //}
                             trans.Commit();
                         }
                         else
@@ -1335,6 +1329,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     //item = GetSaleManInfo(item, salemans, offices, services);
                 }
+                if (string.IsNullOrEmpty(item.PartnerLocation))
+                {
+                    item.PartnerLocationError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PARTNER_LOCATION_EMPTY]);
+                    item.IsValid = false;
+                }
+
+                if(!string.IsNullOrEmpty(item.PartnerMode) && item.PartnerMode == "Internal")
+                {
+                    if (string.IsNullOrEmpty(item.InternalCode))
+                    {
+                        item.PartnerInternalCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_INTERNAL_CODE_EMPTY]);
+                        item.IsValid = false;
+                    }
+                }
+
                 if (string.IsNullOrEmpty(item.PartnerNameEn))
                 {
                     item.PartnerNameEnError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_NAME_EN_EMPTY]);
@@ -1366,6 +1375,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (string.IsNullOrEmpty(item.AddressShippingVn))
                 {
                     item.AddressShippingVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
+                    item.IsValid = false;
+                }
+
+                if (string.IsNullOrEmpty(item.AddressShippingEn))
+                {
+                    item.AddressShippingEnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND];
                     item.IsValid = false;
                 }
 
@@ -1494,14 +1509,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode == taxCode) && string.IsNullOrEmpty(internalReferenceNo))
+                        if (partners.Any(x => x.TaxCode?.Replace(" ", "") == taxCode))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
                         }
                     }
-
-
                     if (taxCode.Length < 8 || taxCode.Length > 14)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_LENGTH]);
@@ -1562,6 +1575,16 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (string.IsNullOrEmpty(item.AddressShippingVn))
                 {
                     item.AddressShippingVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.AddressShippingEn))
+                {
+                    item.AddressShippingEnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerLocation))
+                {
+                    item.PartnerLocationError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PARTNER_LOCATION_EMPTY]);
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CountryBilling))

@@ -791,7 +791,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
 
-                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + EnNameCreatetor + ", </br> </br>" +
                     Title +
                     "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
                     Name +
@@ -804,6 +804,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     "</br>"
                     + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+                ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
                 if (lstTo.Any())
@@ -819,7 +820,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
                 subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
 
-                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
                   "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
                   "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
@@ -838,6 +839,7 @@ namespace eFMS.API.Catalogue.DL.Services
                   "</br>"
                  + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+                ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc.Add(objInfoSalesman?.Email);
@@ -890,7 +892,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
                         "Your Agreement of " + "<b>" + partner.PartnerNameVn + "</b>" + " is rejected by AR/Accountant as info bellow</br>" +
                         "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName +
                         "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
@@ -904,6 +906,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         "</br>"
                         + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
@@ -977,7 +980,7 @@ namespace eFMS.API.Catalogue.DL.Services
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
             subject = "eFMS - Partner Confirm Credit Term Request From " + FullNameCreatetor;
 
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
               "<i> You have a Partner Confirm Credit Term request From " + FullNameCreatetor + " as info below </i> </br>" +
               "<i> Bạn có một yêu cầu xác duyệt đối tượng từ " + FullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
@@ -999,6 +1002,7 @@ namespace eFMS.API.Catalogue.DL.Services
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             bool result =  SendMail.Send(subject, body, lstTo, null, null, lstBCc);
 
