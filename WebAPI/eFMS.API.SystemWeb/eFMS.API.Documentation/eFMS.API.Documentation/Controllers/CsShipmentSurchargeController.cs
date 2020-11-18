@@ -139,6 +139,7 @@ namespace eFMS.API.Documentation.Controllers
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             model.DatetimeCreated = DateTime.Now;
+            model.Total = Math.Round(model.Total, model.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0);
             var hs = csShipmentSurchargeService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -172,6 +173,9 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
+            list.ForEach(fe => {
+                fe.Total = Math.Round(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn charge VND
+            });
             var hs = csShipmentSurchargeService.AddAndUpate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -195,6 +199,7 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
+            model.Total = Math.Round(model.Total, model.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0);
             var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
