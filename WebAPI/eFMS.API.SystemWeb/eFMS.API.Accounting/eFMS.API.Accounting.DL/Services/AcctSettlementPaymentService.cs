@@ -2943,6 +2943,31 @@ namespace eFMS.API.Accounting.DL.Services
             return new HandleState();
         }
 
+        public HandleState CheckValidateMailByUserId(string userId)
+        {
+            var requesterId = userBaseService.GetEmployeeIdOfUser(userId);
+            var _requester = userBaseService.GetEmployeeByEmployeeId(requesterId);
+            var emailRequester = _requester?.Email;
+            if (string.IsNullOrEmpty(emailRequester))
+            {
+                return new HandleState("Not found email of [name]");
+            }
+            if (!SendMail.IsValidEmail(emailRequester))
+            {
+                return new HandleState("The [name] email address is incorrect");
+            }
+            return new HandleState();
+        }
+
+        /// <summary>
+        /// Check exist leader/manager/accountant/BOD, email, valid email
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="groupId"></param>
+        /// <param name="departmentId"></param>
+        /// <param name="officeId"></param>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
         public HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
             var infoLevelApprove = LeaderLevel(type, groupId, departmentId, officeId, companyId);
@@ -2952,6 +2977,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (string.IsNullOrEmpty(infoLevelApprove.UserId)) return new HandleState("Not found leader");
                     if (string.IsNullOrEmpty(infoLevelApprove.EmailUser)) return new HandleState("Not found email of leader");
+                    if (!SendMail.IsValidEmail(infoLevelApprove.EmailUser)) return new HandleState("The leader email address is incorrect");
                 }
             }
 
@@ -2960,6 +2986,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (string.IsNullOrEmpty(managerLevel.UserId)) return new HandleState("Not found manager");
                 if (string.IsNullOrEmpty(managerLevel.EmailUser)) return new HandleState("Not found email of manager");
+                if (!SendMail.IsValidEmail(managerLevel.EmailUser)) return new HandleState("The manager email address is incorrect");
             }
 
             var accountantLevel = AccountantLevel(type, officeId, companyId);
@@ -2967,6 +2994,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (string.IsNullOrEmpty(accountantLevel.UserId)) return new HandleState("Not found accountant");
                 if (string.IsNullOrEmpty(accountantLevel.EmailUser)) return new HandleState("Not found email of accountant");
+                if (!SendMail.IsValidEmail(accountantLevel.EmailUser)) return new HandleState("The accountant email address is incorrect");
             }
 
             var buHeadLevel = BuHeadLevel(type, officeId, companyId);
@@ -2974,6 +3002,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (string.IsNullOrEmpty(buHeadLevel.UserId)) return new HandleState("Not found BOD");
                 if (string.IsNullOrEmpty(buHeadLevel.EmailUser)) return new HandleState("Not found email of BOD");
+                if (!SendMail.IsValidEmail(buHeadLevel.EmailUser)) return new HandleState("The BOD email address is incorrect");
             }
             return new HandleState();
         }
