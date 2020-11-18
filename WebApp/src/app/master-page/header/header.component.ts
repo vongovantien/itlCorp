@@ -3,7 +3,7 @@ import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCance
 import { IdentityRepo, SystemRepo } from '@repositories';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { Employee, Office, SysNotification, SysUserNotification, SysUserNotificationModel } from '@models';
+import { Employee, Office, SysNotification, SysUserNotification } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
@@ -42,7 +42,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
     spinnerNotify: string = "spinnerNotify";
     page: number = 1;
-    size: number = 10;
     totalItem: number = 0;
 
     constructor(
@@ -57,6 +56,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     ) { }
 
     ngOnInit() {
+        this.pageTitle = this.getPageTitle();
         this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         if (!!this.currenUser) {
@@ -79,12 +79,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             .subscribe((event: Event) => {
                 switch (true) {
                     case event instanceof NavigationEnd:
-                        const data = this.createBreadcrumbs(this._activedRouter.root);
-                        if (!!data.length && data.length > 2) {
-                            this.pageTitle = data[2].name;
-                        } else {
-                            this.pageTitle = "Home";
-                        }
+                        this.pageTitle = this.getPageTitle();
                         break;
                     case event instanceof NavigationStart:
                     case event instanceof NavigationCancel:
@@ -107,10 +102,11 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         });
 
         this.subscriptions.push(indentitySub, routerSub);
-        // * Realtime
+
         this._signalRService.startConnection();
         this.getListNotification();
 
+        // * Subscribe notification change.
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
             console.log("new notification", data);
             if (data && data.userIds.includes(this.currenUser.id)) {
@@ -132,9 +128,20 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         });
     }
 
+    getPageTitle() {
+        let pageTitle: string = 'eFMS';
+        const data = this.createBreadcrumbs(this._activedRouter.root);
+        if (!!data.length && data.length > 2) {
+            pageTitle = data[2].name;
+        }
+
+        return pageTitle;
+    }
+
     testSendToClient() {
         this._signalRService.invoke('BroadCastMessage', "hello world");
     }
+
     getListNotification() {
         this._systemRepo.getListNotifications()
             .pipe()
@@ -204,7 +211,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this._spinner.show(this.spinnerNotify);
         this.page++;
 
-        this._systemRepo.getListNotifications(this.page, this.size)
+        this._systemRepo.getListNotifications(this.page, 10)
             .pipe(
                 finalize(() => {
                     this._spinner.hide(this.spinnerNotify);

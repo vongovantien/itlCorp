@@ -108,7 +108,8 @@
                                                     (click)="selectPartnerTypes(type, charge, 'payer')">{{type.displayName}}</a>
                                             </div>
                                             <app-combo-grid #d [headers]="headerPartner" [data]="listPartner"
-                                                [fields]="['taxCode','partnerNameEn']" [active]="charge.payerId"
+                                                [fields]="['shortName','taxCode','partnerNameEn']"
+                                                [active]="charge.payerId"
                                                 (onClick)="onSelectPayerReceiver($event, charge, 'payer')">
                                             </app-combo-grid>
 
