@@ -27,7 +27,7 @@ import { StatementOfAccountPaymentMethodComponent } from './components/poup/paym
 const routing: Routes = [
     {
         path: "",
-        data: { name: "", title: 'eFMS Statement Of Account' },
+        data: { name: "" },
         children: [
             {
                 path: "", component: StatementOfAccountComponent,

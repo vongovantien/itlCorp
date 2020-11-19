@@ -25,7 +25,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 const routing: Routes = [
     {
         path: "",
-        data: { name: "", title: 'eFMS Advance Payment' },
+        data: { name: "", },
         children: [
             {
                 path: '', component: AdvancePaymentComponent
@@ -44,7 +44,7 @@ const routing: Routes = [
             },
             {
                 path: ":id/approve", component: ApproveAdvancePaymentComponent,
-                data: { name: "Approve" }
+                data: { name: "Approve", title: 'eFMS Approve Advance' }
             }
         ]
     },
