@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { AbstractControl } from '@angular/forms';
 
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
 import { CsTransaction } from '@models';
@@ -14,7 +14,7 @@ import { RoutingConstants } from '@constants';
 import {
     ShareBusinessImportJobDetailPopupComponent,
     ShareBusinessFormCreateAirComponent
-} from 'src/app/business-modules/share-business';
+} from '@share-bussiness';
 
 import * as fromShareBusiness from './../../../share-business/store';
 
@@ -62,13 +62,6 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             packageType: !!form.packageType && !!form.packageType.length ? form.packageType[0].id : null,
             commodity: !!form.commodity && !!form.commodity.length ? form.commodity.map(i => i.id).toString() : null,
 
-            agentId: form.agentId,
-            pol: form.pol,
-            pod: form.pod,
-            coloaderId: form.coloaderId,
-            warehouseId: form.warehouseId,
-
-            airlineInfo: form.airlineInfo,
         };
         const csTransaction: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         csTransaction.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;
@@ -132,7 +125,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             );
     }
 
-    onImport(selectedData: any) {
+    onImport(selectedData: CsTransaction) {
         this.selectedJob = selectedData;
         this.isImport = true;
         this.formCreateComponent.isUpdate = true;
@@ -157,7 +150,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // TODO goto detail.
+
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);

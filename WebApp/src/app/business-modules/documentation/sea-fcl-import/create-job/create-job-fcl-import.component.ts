@@ -4,21 +4,21 @@ import { ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
-import { AppForm } from 'src/app/app.form';
-import { FCLImportAddModel, CsTransaction } from 'src/app/shared/models';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
+import { AppForm } from '@app';
+import { CsTransaction, Container } from '@models';
+import { DocumentationRepo } from '@repositories';
 
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business/components/import-job-detail/import-job-detail.popup';
-import { ShareBussinessFormCreateSeaImportComponent } from 'src/app/business-modules/share-business';
+import { InfoPopupComponent } from '@common';
+import { CommonEnum } from '@enums';
+import {
+    ShareBussinessFormCreateSeaImportComponent,
+    ShareBussinessShipmentGoodSummaryComponent,
+    ShareBusinessImportJobDetailPopupComponent
+} from '@share-bussiness';
+import { RoutingConstants } from '@constants';
 
 import { catchError, takeUntil } from 'rxjs/operators';
-
 import * as fromShareBussiness from './../../../share-business/store';
-import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -171,7 +171,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // TODO goto detail.
+
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
@@ -190,7 +190,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        // TODO goto detail.
+
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error(res.message);
