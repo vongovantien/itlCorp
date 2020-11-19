@@ -130,7 +130,7 @@
                             <tbody class="tbody-group" *ngIf="listChargePartner.length > 0">
                                 <ng-container
                                     *ngFor="let charges of listChargePartner; let i = index; trackBy: trackByFn">
-                                    <ng-container>
+                                    <ng-container *ngIf="!charges.isDeleted">
                                         <tr class="collapse-toggle-row tgroup">
                                             <td colspan="12" *ngIf="charges.listCharges.length > 0">
                                                 <label class="m-checkbox m-checkbox--bold m-checkbox--state-brand">

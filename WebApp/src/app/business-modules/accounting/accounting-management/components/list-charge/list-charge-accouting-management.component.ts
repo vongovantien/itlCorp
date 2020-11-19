@@ -97,6 +97,9 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
     isReadOnly: boolean = false;
 
+    listAmountDefault: IListChargeAmountDefault[] = [];
+    titleErrorRangeAmount: string = 'New value is grather than previous value over (+/-1000 VND)';
+
     constructor(
         private _sortService: SortService,
         private _store: Store<IAccountingManagementState>,
@@ -110,6 +113,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
     ngOnInit(): void {
 
+        // * Listen charge state from Store.
         this._store.select(getAccountingManagementPartnerChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -117,6 +121,15 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                     console.log(charges);
                     if (!this.detectDuplicateCharge([...this.charges, ...charges])) {
                         this.charges = [...this.charges, ...cloneDeep(charges)]; // * CloneDeep to avoid shadow copy after call fn => refreshListCharge()
+
+                        this.listAmountDefault = [...this.charges].map((item: ChargeOfAccountingManagementModel) => {
+                            return <IListChargeAmountDefault>{
+                                id: item.surchargeId,
+                                amountVnd: item.amountVnd,
+                                vatAmountVnd: item.vatAmountVnd
+                            };
+                        });
+                        console.log("list charge default", this.listAmountDefault);
 
                         this.updateTotalAmount();
 
@@ -135,15 +148,15 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 }
             );
 
+        // * Listen general Exchange rate 
         this._dataService.currentMessage
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((res: { [key: string]: any }) => {
-                    console.log(res);
                     if (res.generalExchangeRate) {
                         if (!!this.charges.length) {
                             this.charges.forEach(c => {
-                                if (c.currency !== 'VND') { // ! CURENCY LOCAL
+                                if (c.currency !== 'VND') {
                                     c.exchangeRate = res.generalExchangeRate; // * for Display
                                     c.finalExchangeRate = res.generalExchangeRate; // * for Calculating
                                 }
@@ -335,6 +348,45 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         });
     }
 
+    VatAmountChange(amount: number, charge: ChargeOfAccountingManagementModel, type: string = 'amount') {
+        if (this.isReadOnly) {
+            return;
+        }
+        if (type === 'vat') {
+            charge.isValidVatAmount = this.checkValidAmountDataChange(+amount, charge.surchargeId, 'vat');
+        } else {
+            charge.isValidAmount = this.checkValidAmountDataChange(+amount, charge.surchargeId, 'amount');
+        }
+    }
+
+    checkValidAmountDataChange(data: number, surchargeId: string, type: string): boolean {
+        let valid: boolean = false;
+        let validRangeAmountData: number[] = [];
+        const vatAmountDataCharge = this.listAmountDefault.find((i: IListChargeAmountDefault) => i.id === surchargeId);
+
+        if (!!vatAmountDataCharge) {
+            if (type === 'vat') {
+                validRangeAmountData = [
+                    (vatAmountDataCharge.vatAmountVnd + 1000) as number,
+                    (vatAmountDataCharge.vatAmountVnd - 1000) as number,
+                ];
+                if (data >= validRangeAmountData[1] && data <= validRangeAmountData[0]) {
+                    valid = true;
+                }
+            } else {
+                validRangeAmountData = [
+                    (vatAmountDataCharge.amountVnd + 1000) as number,
+                    (vatAmountDataCharge.amountVnd - 1000) as number,
+                ];
+                if (data >= validRangeAmountData[1] && data <= validRangeAmountData[0]) {
+                    valid = true;
+                }
+            }
+
+        }
+        return valid;
+    }
+
 }
 
 interface ITotalAmountVatVnd {
@@ -345,5 +397,11 @@ interface ITotalAmountVatVnd {
 interface IChargeAccountingMngtTotal extends ITotalAmountVatVnd {
     charges: ChargeOfAccountingManagementModel[];
     totalAmount: number;
+}
+
+interface IListChargeAmountDefault {
+    id: string;
+    amountVnd: number;
+    vatAmountVnd: number;
 }
 

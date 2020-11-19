@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PARTNERDATACOLUMNSETTING } from './partner-data.columns';
-import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -15,11 +14,12 @@ import { PartnerListComponent } from './components/partner-list/partner-list.com
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { ExportRepo, CatalogueRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { RoutingConstants } from '@constants';
+import { CommonEnum } from '@enums';
 
+import { catchError, finalize } from 'rxjs/operators';
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 
 
@@ -47,7 +47,7 @@ export class PartnerComponent extends AppList implements OnInit {
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
     configSearch: any = {
         settingFields: this.partnerDataSettings.filter(x => x.allowSearch === true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
-        typeSearch: TypeSearch.intab
+        typeSearch: CommonEnum.TypeSearch.outtab
     };
 
     criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };

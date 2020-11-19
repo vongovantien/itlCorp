@@ -237,6 +237,12 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
                     charge.isDeleted = (charge.creditNo === null || charge.debitNo === null) ? true : charge.canEdit;
                 }
+
+                const chargeLen = charges.listCharges.length;
+                const chargeDeletedLen = charges.listCharges.filter(group => group.isDeleted).length;
+                if (chargeLen === chargeDeletedLen) {
+                    charges.isDeleted = true;
+                }
             }
         }
         // Tính toán Amount Credit, Debit, Balance
