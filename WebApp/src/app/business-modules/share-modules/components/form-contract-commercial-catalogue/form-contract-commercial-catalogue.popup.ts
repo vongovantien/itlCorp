@@ -13,9 +13,9 @@ import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyActio
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
-import { SalesmanCreditLimitPopupComponent } from '../../commercial/components/popup/salesman-credit-limit.popup';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
 import { ConfirmPopupComponent } from '@common';
+import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',

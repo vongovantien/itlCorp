@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter } from "@angular/core";
+import { Component, Output, EventEmitter, ViewChild, Input } from "@angular/core";
 import { AppForm } from "src/app/app.form";
 import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
-import { Customer, PortIndex } from "@models";
+import { Customer, PortIndex, Partner } from "@models";
 import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
@@ -11,14 +11,19 @@ import { catchError, finalize, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
+import { ShareModulesInputShipmentPopupComponent } from "src/app/business-modules/share-modules/components";
+import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
+
 
 @Component({
     selector: 'sale-report-form-search',
     templateUrl: './form-search-sale-report.component.html'
 })
-
 export class SaleReportFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ReportInterface.ISaleReportCriteria> = new EventEmitter<ReportInterface.ISaleReportCriteria>();
+    @ViewChild(ShareModulesInputShipmentPopupComponent, { static: false }) inputShipmentPopup: ShareModulesInputShipmentPopupComponent;
+
+    @Input() isCommissionIncentive: boolean = false;
 
     menuPermission: SystemInterface.IUserPermission;
 
@@ -40,6 +45,8 @@ export class SaleReportFormSearchComponent extends AppForm {
     pol: AbstractControl;
     pod: AbstractControl;
     typeReport: AbstractControl;
+    partnerAccount: AbstractControl;
+    exchangeRate: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'taxCode', label: 'Tax Code' },
@@ -51,10 +58,16 @@ export class SaleReportFormSearchComponent extends AppForm {
         { field: 'nameEn', label: 'Port Name' }
     ];
 
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'partnerNameVn', label: 'Partner Name' },
+        { field: 'taxCode', label: 'Tax Code' }
+    ];
+
     customers: Observable<Customer[]>;
     carriers: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
+    partners: Observable<Partner[]>;
 
     dateTypeList: any[] = [];
     dateTypeActive: any[] = [];
@@ -85,6 +98,9 @@ export class SaleReportFormSearchComponent extends AppForm {
     staffsInit: any[] = [];
 
     groupSpecial: any[] = [];
+    numberOfShipment: number = 0;
+    shipmentInput: OperationInteface.IInputShipment;
+    
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -101,6 +117,9 @@ export class SaleReportFormSearchComponent extends AppForm {
         this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
         this.carriers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
         this.ports = this._catalogueRepo.getListPort({ placeType: CommonEnum.PlaceTypeEnum.Port });
+        if (this.isCommissionIncentive) {
+            this.partners = this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL });
+        }
 
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this._store.select(getMenuUserPermissionState)
@@ -147,6 +166,8 @@ export class SaleReportFormSearchComponent extends AppForm {
             staffType: [this.staffTypeActive],
             pol: [],
             pod: [],
+            partnerAccount: [],
+            exchangeRate: 20000,
             typeReport: [this.typeReportActive]
         });
 
@@ -166,13 +187,17 @@ export class SaleReportFormSearchComponent extends AppForm {
         this.staffType = this.formSearch.controls['staffType'];
         this.pol = this.formSearch.controls['pol'];
         this.pod = this.formSearch.controls['pod'];
+        this.partnerAccount = this.formSearch.controls['partnerAccount'];
+        this.exchangeRate = this.formSearch.controls['exchangeRate'];
         this.typeReport = this.formSearch.controls['typeReport'];
     }
 
     initDataInform() {
         this.getDateType();
         this.getService();
-        this.getCurrency();
+        if (!this.isCommissionIncentive) {
+            this.getCurrency();
+        }
         this.getRefNoType();
         this.getStaffType();
         this.getTypeReport();
@@ -260,6 +285,9 @@ export class SaleReportFormSearchComponent extends AppForm {
                 this.typeReportActive = [];
                 this.typeReportActive.push(data);
                 this.typeReport.setValue(this.typeReportActive);
+                break;
+            case 'acPartner':
+                this.partnerAccount.setValue(data.id);
                 break;
             default:
                 break;
@@ -432,7 +460,6 @@ export class SaleReportFormSearchComponent extends AppForm {
         this.officeList = data
             .map((item: any) => ({ text: item.officeAbbrName, id: item.officeId }))
             .filter((o, i, arr) => arr.findIndex(t => t.id === o.id) === i); // Distinct office
-
         if (this.officeList.length > 0) {
             this.officeList.unshift({ id: 'All', text: 'All' });
             if (this.menuPermission.list === 'Office'
@@ -574,14 +601,22 @@ export class SaleReportFormSearchComponent extends AppForm {
     }
 
     getTypeReport() {
-        this.typeReportList = [
-            { text: 'Monthly Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY },
-            { text: 'Sale Report By Department', id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT },
-            { text: 'Sale Report By Quarter', id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER },
-            { text: 'Summary Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY },
-            { text: 'Combination Statistic Report', id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION },
+        if (this.isCommissionIncentive) {
+            this.typeReportList = [
+                { text: 'Commission PR for Air/Sea', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_AS },
+                { text: 'Commission PR for OPS', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_OPS },
+                { text: 'Incentive', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.INCENTIVE_RPT }
+            ];
+        } else {
+            this.typeReportList = [
+                { text: 'Monthly Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY },
+                { text: 'Sale Report By Department', id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT },
+                { text: 'Sale Report By Quarter', id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER },
+                { text: 'Summary Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY },
+                { text: 'Combination Statistic Report', id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION },
 
-        ];
+            ];
+        }
         // Default value: Monthly Sale Report
         this.typeReportActive = [this.typeReportList[0]];
     }
@@ -641,8 +676,10 @@ export class SaleReportFormSearchComponent extends AppForm {
         this.serviceActive = [this.serviceList[0]];
         this.service.setValue(this.serviceActive);
 
-        this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
-        this.currency.setValue(this.currencyActive);
+        if (!this.isCommissionIncentive) {
+            this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
+            this.currency.setValue(this.currencyActive);
+        }
 
         this.refNoTypeActive = [this.refNoTypeList[0]];
         this.refNoType.setValue(this.refNoTypeActive);
@@ -751,5 +788,19 @@ export class SaleReportFormSearchComponent extends AppForm {
                 },
             );
     }
+
+    openInputShipment() {
+        this.inputShipmentPopup.show();
+    }
+
+    onShipmentList(data: any) {
+        this.shipmentInput = data;
+        if (data) {
+            this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
+        } else {
+            this.numberOfShipment = 0;
+        }
+    }
+
 }
 

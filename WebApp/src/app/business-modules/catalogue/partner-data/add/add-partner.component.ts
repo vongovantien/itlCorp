@@ -14,7 +14,7 @@ import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { Company } from '@models';
-import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';

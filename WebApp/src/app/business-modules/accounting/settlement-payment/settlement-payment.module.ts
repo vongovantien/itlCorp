@@ -33,6 +33,7 @@ import { SettlementChargeFromShipmentPopupComponent } from './components/popup/c
 import { ReportPreviewComponent } from '@common';
 import { reducers } from './components/store';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
+import { ShareModulesModule } from '../../share-modules/share-modules.module';
 
 const routing: Routes = [
     {
@@ -102,6 +103,7 @@ const customCurrencyMaskConfig = {
         ShareAccountingModule,
         NgSelectModule,
         StoreModule.forFeature('settlement-payment', reducers),
+        ShareModulesModule
     ],
     exports: [],
     declarations: [

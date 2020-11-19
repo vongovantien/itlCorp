@@ -6,10 +6,10 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from '@common';
-import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { SortService } from '@services';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
 
 @Component({
     selector: 'commercial-contract-list',

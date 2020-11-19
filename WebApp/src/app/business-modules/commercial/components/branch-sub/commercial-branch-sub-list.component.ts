@@ -7,8 +7,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Partner } from '@models';
 import { CatalogueRepo } from '@repositories';
-import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants } from '@constants';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
 
 @Component({
   selector: 'app-commercial-branch-sub-list',

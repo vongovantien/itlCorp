@@ -33,6 +33,10 @@ const routes: Routes = [
     path: 'sheet-debit-report', loadChildren: () => import('./sheet-debit-report/sheet-debit-report.module').then(m => m.SheetDebitReportModule),
     data: { name: 'Accountant Report' }
   },
+  {
+    path: 'commission-incentive-report', loadChildren: () => import('./commission-incentive-report/commission-incentive-report.module').then(m => m.CommissionIncentiveReportModule),
+    data: { name: 'Commission/ Incentive' }
+  },
 ];
 
 @NgModule({
