@@ -16,7 +16,7 @@ import { PipeModule } from "src/app/shared/pipes/pipe.module";
 
 import { ShareSystemAddUserComponent } from "./components/add-user/add-user.component";
 import { ShareSystemDetailPermissionComponent } from "./components/permission/permission-detail.component";
-import { PermissionFormCreateComponent } from "../system/permission/components/form-create-permission/form-create-permission.component";
+import { PermissionFormCreateComponent } from "./permission/components/form-create-permission/form-create-permission.component";
 import { reducers, shareSystemEffects } from "./store";
 
 
