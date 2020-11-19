@@ -161,7 +161,7 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "CustomerImportTemplate.xlsx");
+                    this.downLoadFile(res, "application/ms-excel", "CustomerAgentImportTemplate.xlsx");
                 },
             );
     }

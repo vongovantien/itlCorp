@@ -1257,7 +1257,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string taxCode = item.TaxCode.Replace(" ", "");
+                    string taxCode = item.TaxCode;
                     var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
                     var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
                     if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
@@ -1282,6 +1282,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (taxCode.Length < 8 || taxCode.Length > 14)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_LENGTH], item.TaxCode);
+                        item.IsValid = false;
+                    }
+                    if(taxCode.Any(x => Char.IsWhiteSpace(x)))
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_SPACE], item.TaxCode);
                         item.IsValid = false;
                     }
                 }
@@ -1476,7 +1481,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string taxCode = item.TaxCode.Replace(" ", "");
+                    string taxCode = item.TaxCode;
                     string internalReferenceNo = !string.IsNullOrEmpty(item.InternalReferenceNo) ? item.InternalReferenceNo.Replace(" ", "") : string.Empty;
 
                     var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
@@ -1502,6 +1507,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (taxCode.Length < 8 || taxCode.Length > 14)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_LENGTH]);
+                        item.IsValid = false;
+                    }
+                    if (taxCode.Any(x => Char.IsWhiteSpace(x)))
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_SPACE], item.TaxCode);
                         item.IsValid = false;
                     }
                 }

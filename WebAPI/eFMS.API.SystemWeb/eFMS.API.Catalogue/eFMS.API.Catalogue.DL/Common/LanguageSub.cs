@@ -14,6 +14,7 @@
 
         public static readonly string MSG_PARTNER_TAXCODE_NOT_NUMBER = "MSG_PARTNER_TAXCODE_NOT_NUMBER";
         public static readonly string MSG_PARTNER_TAXCODE_EXISTED = "MSG_PARTNER_TAXCODE_EXISTED";
+        public static readonly string MSG_PARTNER_TAXCODE_SPACE = "MSG_PARTNER_TAXCODE_SPACE";
         public static readonly string MSG_PARTNER_TAXCODE_DUPLICATED = "MSG_PARTNER_TAXCODE_DUPLICATED";
         public static readonly string MSG_PARTNER_TAXCODE_INVALID = "MSG_PARTNER_TAXCODE_INVALID";
         public static readonly string MSG_PARTNER_TAXCODE_LENGTH = "MSG_PARTNER_TAXCODE_LENGTH";
