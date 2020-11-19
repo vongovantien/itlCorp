@@ -81,6 +81,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState CheckExistSettingFlow(string type, Guid? officeId);
 
+        HandleState CheckValidateMailByUserId(string userId);
+
         HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);     
     }
 }

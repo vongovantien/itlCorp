@@ -745,9 +745,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 fe.Containers = fe.ContSealNo;
                 var containers = fe.ContSealNo != null ? fe.ContSealNo.Split('\n').Where(x => x.Length > 0) : null;
-                fe.ContSealNo = containers != null ? string.Join(", ", containers) : null;
+                fe.ContSealNo = containers != null ? string.Join(", ", containers.Where(x => !string.IsNullOrEmpty(x))) : null;
                 var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id && x.PackageTypeId != null).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
-                fe.Packages = string.Join(", ", packages);
+                fe.Packages = string.Join(", ", packages.Where(x => !string.IsNullOrEmpty(x)));
             });
             return results;
         }

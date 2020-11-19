@@ -456,7 +456,16 @@ namespace eFMS.API.Accounting.Controllers
                 //    }
                 //}
             }
-            
+
+            #region -- Check Validate Email Requester --
+            var isValidEmail = acctAdvancePaymentService.CheckValidateMailByUserId(model.Requester);
+            if (!isValidEmail.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = isValidEmail.Exception.Message.Replace("[name]", "requester") };
+                return BadRequest(_result);
+            }
+            #endregion -- Check Validate Email Requester --
+
             HandleState hs;
             var message = string.Empty;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
@@ -575,6 +584,26 @@ namespace eFMS.API.Accounting.Controllers
         [Route("UpdateApprove")]
         public IActionResult UpdateApprove(Guid advanceId)
         {
+            #region -- Check Validate Email Requester --
+            var advance = acctAdvancePaymentService.Get(x => x.Id == advanceId).FirstOrDefault();
+            if (advance == null) return BadRequest(new ResultHandle { Status = false, Message = "Not found advance payment" });
+            var isValidEmail = acctAdvancePaymentService.CheckValidateMailByUserId(advance.Requester);
+            if (!isValidEmail.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isValidEmail.Exception.Message.Replace("[name]", "requester") };
+                return BadRequest(result);
+            }
+            #endregion -- Check Validate Email Requester --
+
+            #region -- Check Exist User Approval --
+            var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval(typeApproval, currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+            if (!isExistUserApproval.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                return BadRequest(result);
+            }
+            #endregion -- Check Exist User Approval --
+
             var updateApproval = acctAdvancePaymentService.UpdateApproval(advanceId);
             ResultHandle _result;
             if (!updateApproval.Success)
@@ -599,6 +628,26 @@ namespace eFMS.API.Accounting.Controllers
         [Route("DeniedApprove")]
         public IActionResult DeniedApprove(Guid advanceId, string comment)
         {
+            #region -- Check Validate Email Requester --
+            var advance = acctAdvancePaymentService.Get(x => x.Id == advanceId).FirstOrDefault();
+            if (advance == null) return BadRequest(new ResultHandle { Status = false, Message = "Not found advance payment" });
+            var isValidEmail = acctAdvancePaymentService.CheckValidateMailByUserId(advance.Requester);
+            if (!isValidEmail.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isValidEmail.Exception.Message.Replace("[name]", "requester") };
+                return BadRequest(result);
+            }
+            #endregion -- Check Validate Email Requester --
+
+            #region -- Check Exist User Approval --
+            var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval(typeApproval, currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+            if (!isExistUserApproval.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                return BadRequest(result);
+            }
+            #endregion -- Check Exist User Approval --
+
             var denieApproval = acctAdvancePaymentService.DeniedApprove(advanceId, comment);
             ResultHandle _result;
             if (!denieApproval.Success)

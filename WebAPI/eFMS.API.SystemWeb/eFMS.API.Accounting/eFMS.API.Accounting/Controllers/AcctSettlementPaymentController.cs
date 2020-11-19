@@ -492,7 +492,16 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
             }
-            
+
+            #region -- Check Validate Email Requester --
+            var isValidEmail = acctSettlementPaymentService.CheckValidateMailByUserId(model.Settlement.Requester);
+            if (!isValidEmail.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = isValidEmail.Exception.Message.Replace("[name]", "requester") };
+                return BadRequest(_result);
+            }
+            #endregion -- Check Validate Email Requester --
+
             HandleState hs;
             var message = string.Empty;
             if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
@@ -608,6 +617,26 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult UpdateApprove(Guid settlementId)
         {
+            #region -- Check Validate Email Requester --
+            var advance = acctSettlementPaymentService.Get(x => x.Id == settlementId).FirstOrDefault();
+            if (advance == null) return BadRequest(new ResultHandle { Status = false, Message = "Not found settlement payment" });
+            var isValidEmail = acctSettlementPaymentService.CheckValidateMailByUserId(advance.Requester);
+            if (!isValidEmail.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isValidEmail.Exception.Message.Replace("[name]", "requester") };
+                return BadRequest(result);
+            }
+            #endregion -- Check Validate Email Requester --
+
+            #region -- Check Exist User Approval --
+            var isExistUserApproval = acctSettlementPaymentService.CheckExistUserApproval(typeApproval, currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+            if (!isExistUserApproval.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                return BadRequest(result);
+            }
+            #endregion -- Check Exist User Approval --
+
             var updateApproval = acctSettlementPaymentService.UpdateApproval(settlementId);
             ResultHandle _result;
             if (!updateApproval.Success)
@@ -633,6 +662,26 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult DeniedApprove(Guid settlementId, string comment)
         {
+            #region -- Check Validate Email Requester --
+            var advance = acctSettlementPaymentService.Get(x => x.Id == settlementId).FirstOrDefault();
+            if (advance == null) return BadRequest(new ResultHandle { Status = false, Message = "Not found settlement payment" });
+            var isValidEmail = acctSettlementPaymentService.CheckValidateMailByUserId(advance.Requester);
+            if (!isValidEmail.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isValidEmail.Exception.Message.Replace("[name]", "requester") };
+                return BadRequest(result);
+            }
+            #endregion -- Check Validate Email Requester --
+
+            #region -- Check Exist User Approval --
+            var isExistUserApproval = acctSettlementPaymentService.CheckExistUserApproval(typeApproval, currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+            if (!isExistUserApproval.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                return BadRequest(result);
+            }
+            #endregion -- Check Exist User Approval --
+
             var denieApproval = acctSettlementPaymentService.DeniedApprove(settlementId, comment);
             ResultHandle _result;
             if (!denieApproval.Success)
