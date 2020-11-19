@@ -30,15 +30,15 @@
             </button>
         </div>
     </div>
-    <div class="bg-secondary m--padding-10">
-        <app-search-options [configSearch]="configSearchGroup" (search)="onSearch($event)"
+    <div class="m--padding-10">
+        <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
             (reset_search)="resetSearch($event)"></app-search-options>
     </div>
 </div>
 <!--end:: Search-form-->
 <div class="table-wrapper">
     <table class="table table-brand table-striped dataTable">
-        <thead app-table-header [headers]="headerCommodityGroup" (onClick)="sortCommodityGroup($event)">
+        <thead app-table-header [headers]="headers" (onClick)="sortCommodityGroup($event)">
             <th class="m--w-50 first table-actions-col">
                 Actions
             </th>
@@ -66,8 +66,7 @@
                     </td>
                 </tr>
             </ng-container>
-            <tr *ngIf="!isLoading && !commodityGroups.length" app-table-none-record
-                [colspan]="headerCommodityGroup.length + 1"></tr>
+            <tr *ngIf="!isLoading && !commodityGroups.length" app-table-none-record [colspan]="headers.length + 1"></tr>
             <tr *ngIf="isLoading" app-table-row-loading></tr>
         </tbody>
     </table>
