@@ -23,8 +23,7 @@ export const environment = {
                 // INDENTITY_SERVER_URL: "https://localhost:44369",
                 // EXPORT_CRYSTAL: "http://localhost:53717/ExportCrystal.aspx",
                 EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
-                PARTNER_API: "test.api-efms.itlvn.com/partner",
-                ESB: "test-esb.itlvn.com:8280/itl-bravo"
+                PARTNER_API: "test.api-efms.itlvn.com/partner"
         },
 
         AUTHORIZATION:
