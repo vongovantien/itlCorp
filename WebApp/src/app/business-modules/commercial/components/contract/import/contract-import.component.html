@@ -95,19 +95,9 @@
                                 <span>Customer ID *</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'contractNo'), 'sorting_desc': (!isDesc && sortKey == 'contractNo') }"
-                                (click)="sort('contractNo')">
-                                <span>Agreement/Contract No </span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'contractType'), 'sorting_desc': (!isDesc && sortKey == 'contractType') }"
-                                (click)="sort('contractType')">
-                                <span>Agreement Type* </span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'saleService'), 'sorting_desc': (!isDesc && sortKey == 'saleService') }"
-                                (click)="sort('saleService')">
-                                <span>Sale Service *</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'salesman'), 'sorting_desc': (!isDesc && sortKey == 'salesman') }"
+                                (click)="sort('salesman')">
+                                <span>Salesman</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'company'), 'sorting_desc': (!isDesc && sortKey == 'company') }"
@@ -120,9 +110,25 @@
                                 <span>Office *</span>
                             </th>
                             <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'contractNo'), 'sorting_desc': (!isDesc && sortKey == 'contractNo') }"
+                                (click)="sort('contractNo')">
+                                <span>Agreement/Contract No </span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'contractType'), 'sorting_desc': (!isDesc && sortKey == 'contractType') }"
+                                (click)="sort('contractType')">
+                                <span>Agreement Type * </span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'saleService'), 'sorting_desc': (!isDesc && sortKey == 'saleService') }"
+                                (click)="sort('saleService')">
+                                <span>Sale Service *</span>
+                            </th>
+
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'effectDate'), 'sorting_desc': (!isDesc && sortKey == 'effectDate') }"
                                 (click)="sort('effectDate')">
-                                <span>Effective Date</span>
+                                <span>Effective Date *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'expireDate'), 'sorting_desc': (!isDesc && sortKey == 'expireDate') }"
@@ -136,19 +142,25 @@
                                 <span>Payment Method *</span>
                             </th>
                             <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currencyId'), 'sorting_desc': (!isDesc && sortKey == 'currencyId') }"
+                                (click)="sort('currencyId')">
+                                <span>Currency</span>
+                            </th>
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vas'), 'sorting_desc': (!isDesc && sortKey == 'vas') }"
                                 (click)="sort('vas')">
                                 <span>VAS</span>
                             </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'salesman'), 'sorting_desc': (!isDesc && sortKey == 'salesman') }"
-                                (click)="sort('salesman')">
-                                <span>Salesman</span>
-                            </th>
+
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentTermTrialDay'), 'sorting_desc': (!isDesc && sortKey == 'paymentTermTrialDay') }"
                                 (click)="sort('paymentTermTrialDay')">
                                 <span>Payment Term/Trial Day</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'baseOn'), 'sorting_desc': (!isDesc && sortKey == 'baseOn') }"
+                                (click)="sort('baseOn')">
+                                <span>Base On</span>
                             </th>
 
                             <th class="sorting"
@@ -162,9 +174,9 @@
                                 <span>Credit Limited Rate(%)</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }"
-                                (click)="sort('status')">
-                                <span>Active</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'description'), 'sorting_desc': (!isDesc && sortKey == 'description') }"
+                                (click)="sort('description')">
+                                <span>Description</span>
                             </th>
                         </tr>
                     </thead>
@@ -178,6 +190,21 @@
                                     <span *ngIf="item.customerIdError === null">{{ item.customerId }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.customerIdError !== null">{{ item.customerIdError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.salesmanError === null">{{ item.salesman }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.salesmanError !== null">{{ item.salesmanError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.companyError === null">{{ item.company }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.companyError !== null">{{ item.companyError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.officeError === null">{{ item.office }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.officeError !== null">{{ item.officeError }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.contractNoError === null">{{ item.contractNo }}</span>
@@ -194,16 +221,7 @@
                                     <span class="m--font-danger"
                                         *ngIf="item.saleServiceError !== null">{{ item.saleServiceError }}</span>
                                 </td>
-                                <td>
-                                    <span *ngIf="item.companyError === null">{{ item.company }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.companyError !== null">{{ item.companyError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.officeError === null">{{ item.office }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.officeError !== null">{{ item.officeError }}</span>
-                                </td>
+
                                 <td>
 
                                     <span *ngIf="item.effectDateError === null">
@@ -223,17 +241,19 @@
                                         *ngIf="item.paymentMethodError !== null">{{ item.paymentMethodError }}</span>
                                 </td>
                                 <td>
-                                    {{item.vas}}
+                                    {{item.currencyId}}
                                 </td>
                                 <td>
-                                    <span *ngIf="item.salesmanError === null">{{ item.salesman }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.salesmanError !== null">{{ item.salesmanError }}</span>
+                                    {{item.vas}}
                                 </td>
+
                                 <td>
                                     <span *ngIf="item.paymentTermError === null"> {{item.paymentTermTrialDay}}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.paymentTermError !== null">{{ item.paymentTermError }}</span>
+                                </td>
+                                <td>
+                                    {{item.baseOn}}
                                 </td>
                                 <td>
                                     <span *ngIf="item.creditLimitError === null"> {{item.creditLimited}}</span>
@@ -244,9 +264,7 @@
                                     {{item.creditLimitedRated}}
                                 </td>
                                 <td>
-                                    <span *ngIf="item.activeError === null">{{ item.status }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.activeError !== null">{{ item.activeError }}</span>
+                                    {{item.description}}
                                 </td>
 
                             </tr>

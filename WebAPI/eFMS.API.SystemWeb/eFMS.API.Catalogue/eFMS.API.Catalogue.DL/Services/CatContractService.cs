@@ -610,17 +610,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
                         item.IsValid = false;
                     }
-                    if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    {
-                        item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
-                        item.IsValid = false;
+                    //if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    //{
+                    //    item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
+                    //    item.IsValid = false;
 
-                    }
-                    if (!item.EffectDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    {
-                        item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
-                        item.IsValid = false;
-                    }
+                    //}
+                    //if (!item.EffectDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    //{
+                    //    item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
+                    //    item.IsValid = false;
+                    //}
                     if (string.IsNullOrEmpty(item.CreditLimited) && (item.ContractType == "Trial" || item.ContractType == "Official"))
                     {
                         item.CreditLimitError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CREDIT_LIMIT_EMPTY]);
@@ -706,6 +706,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
                     }
                 }
+                else
+                {
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_SALESMAN_EMPTY]);
+                    item.IsValid = false;
+                }
 
                 if (!string.IsNullOrEmpty(item.Status))
                 {
@@ -716,6 +721,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
 
+                if (!item.EffectDate.HasValue)
+                {
+                    item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
+                    item.IsValid = false;
+                }
+
+
                 if (item.EffectDate.HasValue && item.ExpireDate.HasValue)
                 {
                     if (item.ExpireDate.Value < item.EffectDate.Value)
@@ -724,6 +736,65 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
                     }
                 }
+                string saleManId = sysUserRepository.Get(x => x.Username == item.Salesman).Select(t => t.Id).FirstOrDefault();
+                var listOfficeId = sysOfficeRepository.Get(x => officeArr.Contains(x.Code)).Select(t => t.Id.ToString()).ToList();
+                var saleServiceArr = item.SaleService.Split(";").ToArray();
+                string saleServices = string.Empty;
+                foreach(var it in saleServiceArr)
+                {
+                    if (it.Trim() == "Air Import")
+                    {
+                        saleServices += "AI;";
+                    }
+                    if (it.Trim() == "Air Export")
+                    {
+                        saleServices += "AE;";
+                    }
+                    if (it.Trim() == "Sea FCL Export")
+                    {
+                        saleServices += "SFE;";
+                    }
+                    if (it.Trim() == "Sea LCL Export")
+                    {
+                        saleServices += "SLE;";
+                    }
+                    if (it.Trim() == "Sea FCL Import")
+                    {
+                        saleServices += "SFI;";
+                    }
+                    if (it.Trim() == "Sea LCL Import")
+                    {
+                        saleServices += "SLI;";
+                    }
+                    if (it.Trim() == "Custom Logistic")
+                    {
+                        saleServices += "CL;";
+                    }
+                    if (it.Trim() == "Trucking")
+                    {
+                        saleServices += "IT;";
+                    }
+                    if (it.Trim() == "All")
+                    {
+                        saleServices = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                    }
+
+                }
+                var sale = saleServices.Remove(saleServices.Length - 1);
+                
+                if (DataContext.Any(x => x.SaleService == sale && x.OfficeId != null && listOfficeId.Contains(x.OfficeId) && x.SaleManId == saleManId))// && x.SaleManId == saleManId))
+                {
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    item.IsValid = false;
+                }
+
+                if (list.Count(x => x.SaleService == item.SaleService && x.Office != null && officeArr.Contains(x.Office) && x.SaleManId == saleManId) > 1)
+                {
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    item.IsValid = false;
+                }
+
+
             });
             return list;
         }
@@ -845,7 +916,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstCc.Add(objInfoSalesman?.Email);
                 //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
-               
+
             }
 
             var logSendMail = new SysSentEmailHistory
@@ -942,7 +1013,7 @@ namespace eFMS.API.Catalogue.DL.Services
             saleService = GetContractServicesName(contract.SaleService);
             contract.Arconfirmed = true;
             contract.DatetimeModified = DateTime.Now;
-            var hs  = DataContext.Update(contract, x => x.Id == new Guid( contractId),false);
+            var hs = DataContext.Update(contract, x => x.Id == new Guid(contractId), false);
             DataContext.SubmitChanges();
             string url = string.Empty;
 
@@ -996,7 +1067,7 @@ namespace eFMS.API.Catalogue.DL.Services
               "\t  Agreement  type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
               "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br></br>"
 
-              +linkEn + "</br>" + linkVn + "</br> </br>" +
+              + linkEn + "</br>" + linkVn + "</br> </br>" +
               "<i> Thanks and Regards </i>" + "</br> </br>" +
               "<b> eFMS System, </b>" +
               "</br>"
@@ -1004,7 +1075,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
-            bool result =  SendMail.Send(subject, body, lstTo, null, null, lstBCc);
+            bool result = SendMail.Send(subject, body, lstTo, null, null, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
             {
