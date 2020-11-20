@@ -310,8 +310,6 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
                                                                                          join obhP in partners on surcharge.PaymentObjectId equals obhP.Id into obhPGrps
                                                                                          from obhP in obhPGrps.DefaultIfEmpty()
-                                                                                         join partner in obhPartners on surcharge.PayerId equals partner.Id into partnerGrps
-                                                                                         from partnerGrp in partnerGrps.DefaultIfEmpty()
                                                                                          join unit in catUnits on surcharge.UnitId equals unit.Id
                                                                                          select new BravoSettlementRequestModel
                                                                                          {
@@ -335,7 +333,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              AtchDocDate = surcharge.InvoiceDate,
                                                                                              AtchDocSerieNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
-                                                                                             CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo
+                                                                                             CustomerCodeBook = obhP.AccountNo 
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
