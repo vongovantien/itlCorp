@@ -70,6 +70,13 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetListSettleToSync")]
+        public IActionResult GetListSettleToSync(List<Guid> Ids)
+        {
+            var data = accountingService.GetListSettlementToSyncBravo(Ids);
+            return Ok(data);
+        }
+
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]
         public async Task<IActionResult> GetListInvoicePaymentToSync(List<RequestGuidListModel> request)

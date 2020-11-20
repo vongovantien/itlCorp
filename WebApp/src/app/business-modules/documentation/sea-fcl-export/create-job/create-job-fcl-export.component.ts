@@ -4,22 +4,21 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { ActionsSubject } from '@ngrx/store';
 
-import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransaction } from 'src/app/shared/models';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Container } from 'src/app/shared/models/document/container.model';
+import { AppForm } from '@app';
+import { InfoPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransaction, Container } from '@models';
+import { CommonEnum } from '@enums';
 import {
     ShareBussinessFormCreateSeaExportComponent,
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBusinessImportJobDetailPopupComponent
-} from 'src/app/business-modules/share-business';
+} from '@share-bussiness';
+import { RoutingConstants } from '@constants';
 
 import * as fromShareBussiness from './../../../share-business/store';
 
 import { catchError, takeUntil } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-job-fcl-export',
@@ -193,7 +192,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // TODO goto detail.
+
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);

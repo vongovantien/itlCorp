@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessShipmentGoodSummaryLCLComponent, ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
@@ -149,7 +149,6 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // TODO goto detail.
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);

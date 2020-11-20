@@ -7,7 +7,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { PermissionCreateComponent } from './add/add-permission.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PermissionDetailComponent } from './detail/detail-permission.component';
-import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemModule } from '../share-system.module';
 
 const routing: Routes = [
     {

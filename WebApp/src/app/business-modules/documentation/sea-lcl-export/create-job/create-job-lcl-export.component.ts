@@ -4,20 +4,19 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { ActionsSubject } from '@ngrx/store';
 
-import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransaction } from 'src/app/shared/models';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Container } from 'src/app/shared/models/document/container.model';
+import { AppForm } from '@app';
+import { InfoPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransaction, Container } from '@models';
+import { CommonEnum } from '@enums';
 import {
     ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessImportJobDetailPopupComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent
-} from 'src/app/business-modules/share-business';
+} from '@share-bussiness';
+import { RoutingConstants } from '@constants';
 
 import { catchError } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-job-lcl-export',

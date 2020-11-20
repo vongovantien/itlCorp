@@ -15,7 +15,7 @@ import { DocumentationRepo } from '@repositories';
 import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
 
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 
 import { takeUntil, catchError } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';

@@ -18,7 +18,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     {
-        path: '', data: { name: "", title: 'eFMS Commercial Incoterm' }, children: [
+        path: '', data: { name: "" }, children: [
             {
                 path: '', component: CommercialIncotermComponent
             },

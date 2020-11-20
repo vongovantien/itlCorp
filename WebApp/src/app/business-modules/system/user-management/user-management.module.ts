@@ -13,8 +13,8 @@ import { FormAddUserComponent } from './components/form-add-user/form-add-user.c
 import { UserDetailsComponent } from './details/user-details.component';
 import { UserManagementImportComponent } from './import/user-management-import.component';
 import { AddRoleUserComponent } from './components/add-role-user/add-role-user.component';
-import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
-import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
+import { ShareSystemModule } from '../share-system.module';
 import { UserManagementAddGroupPopupComponent } from './components/popup/add-group/user-management-add-group.popup';
 
 const routing: Routes = [
