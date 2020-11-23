@@ -129,9 +129,11 @@
                                         <td>
                                             <div class="form-group"
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && !charge.unitId}">
-                                                <select class="form-control" [(ngModel)]="charge.unitId">
+                                                <select class="form-control" [(ngModel)]="charge.unitId"
+                                                    (ngModelChange)="onSelectUnit($event, charge)">
                                                     <option value="null" disabled>Please select</option>
-                                                    <option *ngFor="let unit of (listUnits | async)" [value]="unit.id">
+                                                    <option *ngFor="let unit of (listUnits | async)"
+                                                        [ngValue]="unit.id">
                                                         {{unit.code}}
                                                     </option>
                                                 </select>
