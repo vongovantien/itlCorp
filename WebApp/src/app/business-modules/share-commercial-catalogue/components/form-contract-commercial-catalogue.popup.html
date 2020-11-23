@@ -409,7 +409,7 @@
             <div class="modal-footer m--align-center">
                 <ng-container *ngIf="openOnPartner === false">
                     <button
-                        *ngIf="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true &&  (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true) || !isUpdate"
+                        *ngIf="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true &&  (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true) || !isUpdate || isCreateNewCommercial"
                         (click)="onSubmit()" class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-save"></i>

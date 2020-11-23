@@ -741,7 +741,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onUpdateTrialEffectiveDate(value: { startDate: any; endDate: any }) {
         const trialDays = !!this.formGroup.controls['trialCreditDays'].value ? this.formGroup.controls['trialCreditDays'].value : 0;
-        if (!!this.trialEffectDate.value.startDate) {
+        if (!!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate) {
             this.effectiveDate.setValue({
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
