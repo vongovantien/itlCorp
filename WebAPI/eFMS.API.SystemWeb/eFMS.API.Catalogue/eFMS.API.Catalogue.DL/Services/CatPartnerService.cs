@@ -1405,6 +1405,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.CityBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY], item.CityBilling);
                         item.IsValid = false;
                     }
+                    item.CountryBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_EMPTY]);
+                    item.IsValid = false;
                 }
                 else
                 {
@@ -1441,6 +1443,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.CityShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY], item.CityShipping);
                         item.IsValid = false;
                     }
+                    item.CountryShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_EMPTY]);
+                    item.IsValid = false;
                 }
                 else
                 {
