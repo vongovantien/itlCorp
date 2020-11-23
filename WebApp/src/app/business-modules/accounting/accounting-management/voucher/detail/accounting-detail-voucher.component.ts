@@ -77,7 +77,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                         this.updateChargeList(res);
                     }
 
-                    if (!!this.accountingManagement.lastSyncDate) {
+                    if (this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
                         this.formCreateComponent.isReadonly = true;
                         this.listChargeComponent.isReadOnly = true;
                     }
