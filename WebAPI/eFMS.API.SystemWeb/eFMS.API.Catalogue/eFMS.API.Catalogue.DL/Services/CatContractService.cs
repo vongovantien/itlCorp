@@ -575,6 +575,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list)
         {
+            var officeIds = DataContext.Get().Select(t => t.OfficeId).ToArray();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.CustomerId))
@@ -632,9 +633,9 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
                     }
                 }
+                var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                 if (!string.IsNullOrEmpty(item.ContractNo))
                 {
-                    var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                     if (DataContext.Any(x => x.PartnerId == customerId && x.ContractNo == item.ContractNo))
                     {
                         item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], item.ContractNo);
@@ -673,7 +674,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_NOT_FOUND]);
                     item.IsValid = false;
                 }
-                var officeArr = item.Office.Split(";").ToArray();
+                var officeArr = item.Office.Replace(" ","").Split(";").ToArray();
 
                 if (string.IsNullOrEmpty(item.Office))
                 {
@@ -782,19 +783,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 var sale = saleServices.Remove(saleServices.Length - 1);
                 
-                if (DataContext.Any(x => x.SaleService == sale && x.OfficeId != null && listOfficeId.Contains(x.OfficeId) && x.SaleManId == saleManId))// && x.SaleManId == saleManId))
+                if (DataContext.Any(x => x.SaleService.Contains(sale) && x.OfficeId != null && listOfficeId.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId != saleManId && x.PartnerId == customerId))// && x.SaleManId == saleManId))
                 {
-                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
                     item.IsValid = false;
                 }
 
-                if (list.Count(x => x.SaleService == item.SaleService && x.Office != null && officeArr.Contains(x.Office) && x.SaleManId == saleManId) > 1)
+                if (list.GroupBy(x=> new { x.Office, x.SaleService }).Where(t => t.Count() > 1).Select(y => y.Key).ToList().Count() > 0)
                 {
-                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
                     item.IsValid = false;
                 }
-
-
             });
             return list;
         }

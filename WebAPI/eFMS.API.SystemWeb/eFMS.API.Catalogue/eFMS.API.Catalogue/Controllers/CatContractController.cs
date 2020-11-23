@@ -185,7 +185,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.OfficeId != null && office.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                    if (catContractService.Any(x => x.SaleService.Contains(model.SaleService) && x.OfficeId != null && office.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -200,7 +200,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-                    if (catContractService.Any(x => x.SaleService == model.SaleService  && x.SaleManId != model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => x.SaleService.Contains(model.SaleService) && x.SaleManId != model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
