@@ -1,21 +1,20 @@
-import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, QueryList, ViewChildren } from '@angular/core';
+import { FormGroup, AbstractControl, FormBuilder, FormControl } from '@angular/forms';
+import { formatDate } from '@angular/common';
 
 import { CustomDeclaration, Surcharge, Partner, Unit } from '@models';
 import { CatalogueRepo, DocumentationRepo, OperationRepo, AccountingRepo } from '@repositories';
 import { CommonEnum } from '@enums';
+import { PopupBase } from '@app';
+import { ComboGridVirtualScrollComponent } from '@common';
+import { IAppState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
+import { SystemConstants } from '@constants';
+import { ToastrService } from 'ngx-toastr';
+import { Store } from '@ngrx/store';
 
-import { PopupBase } from 'src/app/popup.base';
-
+import cloneDeep from 'lodash/cloneDeep';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { FormGroup, AbstractControl, FormBuilder, FormControl } from '@angular/forms';
-import { formatDate } from '@angular/common';
-import { SystemConstants } from 'src/constants/system.const';
-import { ToastrService } from 'ngx-toastr';
-import cloneDeep from 'lodash/cloneDeep';
-import { Store } from '@ngrx/store';
-import { IAppState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
-import { ComboGridVirtualScrollComponent } from '@common';
 
 
 @Component({
@@ -320,6 +319,16 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
+    onSelectUnit(unitId: number, charge: Surcharge) {
+        this.listUnits.subscribe(
+            (units: Unit[] = []) => {
+                const selectedUnit: Unit = units.find(u => u.id === unitId);
+                if (selectedUnit) {
+                    charge.unitName = selectedUnit.unitNameEn;
+                    charge.unitId = unitId;
+                }
+            });
+    }
     checkExistCharge(chargeId: string, charges: Surcharge[] = []) {
         if (!charges.length) {
             return false;

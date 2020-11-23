@@ -171,6 +171,8 @@ namespace eFMS.API.Catalogue.Controllers
         private string CheckExistedContract(CatContractModel model)
         {
             string messageDuplicate = string.Empty;
+
+            var officeIds = catContractService.Get().Select(t => t.OfficeId).ToArray();
             var office = model.OfficeId.Split(";").ToArray();
             if (model.Id != Guid.Empty)
             {
@@ -183,7 +185,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.OfficeId != null && office.Any(y=> x.OfficeId.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                    if (catContractService.Any(x => x.SaleService.Contains(model.SaleService) && x.OfficeId != null && office.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -198,7 +200,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-                    if (catContractService.Any(x => x.SaleService == model.SaleService  && x.SaleManId == model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => x.SaleService.Contains(model.SaleService) && x.SaleManId != model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -222,7 +224,8 @@ namespace eFMS.API.Catalogue.Controllers
                         }
                     }
 
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.OfficeId != null && office.Any(y => x.OfficeId.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
+
+                    if (catContractService.Any(x => x.SaleService.Contains( model.SaleService) && x.OfficeId != null && office.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -239,7 +242,7 @@ namespace eFMS.API.Catalogue.Controllers
                         }
                     }
 
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.SaleManId == model.SaleManId && office.Any(y => x.OfficeId.Contains(y)) && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.SaleManId != model.SaleManId && office.Any(y => officeIds.Contains(y.ToLower())) && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -511,7 +514,7 @@ namespace eFMS.API.Catalogue.Controllers
                 List<CatContractImportModel> list = new List<CatContractImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    string dateEffect = worksheet.Cells[row, 7].Value?.ToString().Trim();
+                    string dateEffect = worksheet.Cells[row, 8].Value?.ToString().Trim();
                     DateTime? dateToPase = null;
                     if (DateTime.TryParse(dateEffect, out temp))
                     {
@@ -527,7 +530,7 @@ namespace eFMS.API.Catalogue.Controllers
                         }
                     }
 
-                    string dateExpired = worksheet.Cells[row, 8].Value?.ToString().Trim();
+                    string dateExpired = worksheet.Cells[row, 9].Value?.ToString().Trim();
                     DateTime? dateToPaseExpired = null;
                     if (DateTime.TryParse(dateExpired, out temp))
                     {
@@ -548,20 +551,22 @@ namespace eFMS.API.Catalogue.Controllers
                     {
                         IsValid = true,
                         CustomerId = worksheet.Cells[row, 1].Value?.ToString().Trim(),
-                        ContractNo = worksheet.Cells[row, 2].Value?.ToString().Trim(),
-                        ContractType = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                        SaleService = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        Company = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        Office = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        Salesman = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        Company = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        Office = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        ContractNo = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        ContractType = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        SaleService = worksheet.Cells[row, 7].Value?.ToString().Trim(),
                         EffectDate = !string.IsNullOrEmpty(dateEffect) ? dateToPase : (DateTime?)null,
                         ExpireDate = !string.IsNullOrEmpty(dateExpired) ? dateToPaseExpired : (DateTime?)null,
-                        PaymentMethod = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        Vas = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        Salesman = worksheet.Cells[row, 11].Value?.ToString().Trim(),
-                        PaymentTermTrialDay = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                        CreditLimited = worksheet.Cells[row, 13].Value?.ToString().Trim(),
-                        CreditLimitedRated = worksheet.Cells[row, 14].Value?.ToString().Trim(),
-                        Status = worksheet.Cells[row, 15].Value?.ToString().Trim()
+                        PaymentMethod = worksheet.Cells[row, 10].Value?.ToString().Trim(),
+                        CurrencyId = worksheet.Cells[row, 11].Value?.ToString().Trim(),
+                        Vas = worksheet.Cells[row, 12].Value?.ToString().Trim(),
+                        PaymentTermTrialDay = worksheet.Cells[row, 13].Value?.ToString().Trim(),
+                        BaseOn = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        CreditLimited = worksheet.Cells[row, 15].Value?.ToString().Trim(),
+                        CreditLimitedRated = worksheet.Cells[row, 16].Value?.ToString().Trim(),
+                        Description = worksheet.Cells[row, 17].Value?.ToString().Trim()
                     };
                     list.Add(contract);
                 }

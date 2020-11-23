@@ -12,13 +12,21 @@ export class LoadingInterceptor implements HttpInterceptor {
     constructor(private _spinner: NgxSpinnerService) {
     }
     intercept(req: HttpRequest<any>, next: HttpHandler) {
-        this._totalRequests++;
-        this._spinner.show();
+        const hideSpinner = req.headers.get('hideSpinner'); // * Allow API not showing ~Loading~
+        if (hideSpinner === null) {
+            this._totalRequests++;
+        }
+        if (this._totalRequests > 0) {
+            this._spinner.show();
+        }
         return next.handle(req).pipe(
             finalize(() => {
                 this._totalRequests--;
-                if (this._totalRequests === 0) {
+                if (this._totalRequests <= 0) {
                     this._spinner.hide();
+                }
+                if (this._totalRequests < 0) {
+                    this._totalRequests = 0;
                 }
             })
         );
