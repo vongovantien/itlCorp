@@ -543,14 +543,14 @@ namespace eFMS.API.System.DL.Services
             result.EmployeeNameVn = currEmployee?.EmployeeNameVn;
             result.UserCreatedName = userCreate?.Username;
             result.UserModifiedName = userModified?.Username;
-            result.SysEmployeeModel.EmployeeNameEn = currEmployee.EmployeeNameEn;
-            result.SysEmployeeModel.EmployeeNameVn = currEmployee.EmployeeNameVn;
-            result.SysEmployeeModel.Title = currEmployee.Title;
-            result.SysEmployeeModel.Email = currEmployee.Email;
-            result.SysEmployeeModel.BankAccountNo = currEmployee.BankAccountNo;
-            result.SysEmployeeModel.BankName = currEmployee.BankName;
-            result.SysEmployeeModel.Tel = currEmployee.Tel;
-            result.SysEmployeeModel.StaffCode = currEmployee.StaffCode;
+            result.SysEmployeeModel.EmployeeNameEn = currEmployee?.EmployeeNameEn;
+            result.SysEmployeeModel.EmployeeNameVn = currEmployee?.EmployeeNameVn;
+            result.SysEmployeeModel.Title = currEmployee?.Title;
+            result.SysEmployeeModel.Email = currEmployee?.Email;
+            result.SysEmployeeModel.BankAccountNo = currEmployee?.BankAccountNo;
+            result.SysEmployeeModel.BankName = currEmployee?.BankName;
+            result.SysEmployeeModel.Tel = currEmployee?.Tel;
+            result.SysEmployeeModel.StaffCode = currEmployee?.StaffCode;
             // get avatar through last modified date.
             result.Avatar = currEmployee?.Photo;
 
