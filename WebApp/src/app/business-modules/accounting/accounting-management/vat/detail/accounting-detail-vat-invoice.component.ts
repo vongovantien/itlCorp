@@ -8,6 +8,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { AccAccountingManagementModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
+import { ICanComponentDeactivate } from '@core';
 
 import { IAccountingManagementState, UpdateChargeList } from '../../store';
 import { AccountingManagementCreateVATInvoiceComponent } from '../create/accounting-create-vat-invoice.component';
@@ -16,7 +17,6 @@ import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators'
 import { Observable, of } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _merge from 'lodash/merge';
-import { ICanComponentDeactivate } from '@core';
 
 @Component({
     selector: 'app-accounting-detail-vat-invoice',
