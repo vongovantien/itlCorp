@@ -235,7 +235,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       Unit = unit.UnitNameVn,
                                                                                       // CR 14952
                                                                                       CurrencyCode = (item.AccountNo == "3311" || item.AccountNo == "3313") ? item.CurrencyCode : surcharge.CurrencyId,
-                                                                                      ExchangeRate = (item.AccountNo == "3311" || item.AccountNo == "3313") && item.CurrencyCode == AccountingConstants.CURRENCY_LOCAL ? 1 
+                                                                                      ExchangeRate = (item.AccountNo == "3311" || item.AccountNo == "3313") && item.CurrencyCode == AccountingConstants.CURRENCY_LOCAL ? 1
                                                                                       : currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL),
                                                                                       BillEntryNo = surcharge.Hblno,
                                                                                       Ma_SpHt = surcharge.JobNo,
@@ -333,7 +333,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              AtchDocDate = surcharge.InvoiceDate,
                                                                                              AtchDocSerieNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
-                                                                                             CustomerCodeBook = obhP.AccountNo 
+                                                                                             CustomerCodeBook = obhP.AccountNo
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -1456,7 +1456,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 // Tính toán như cũ
                 _originAmount = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
-                if(surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
                     _originAmount = Math.Round(_originAmount, 0);
                 }
@@ -1527,7 +1527,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return _serviceName;
         }
-        
+
         #endregion -- Private Method --
 
         #region --- Send Mail & Push Notification to Accountant ---
@@ -1595,7 +1595,26 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string _type = type == "CDNOTE" ? "Credit Note" : "SOA";
             string subject = string.Format(@"eFMS - Voucher Request - {0} {1}", _type, refNo);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p><i>Dear Accountant Team,</i></p><p><div>You received a <b>[SOA_CreditNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div><div><i>Bạn có nhận một đề nghị thanh toán chi phí bằng <b>[SOA_CreditNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div></p><ul><li>Ref No/ <i>Số tham chiếu</i>: <b><i>[RefNo]</i></b></li><li>Partner Name/ <i>Tên đối tượng</i>: <b><i>[PartnerEn]</i></b></li><li>Tax Code/ <i>Mã số thuế</i>: <b><i>[Taxcode]</i></b></li><li>Service/ <i>Dịch vụ</i>: <b><i>[ServiceName]</i></b></li><li>Amount/ <i>Số tiền</i>: <b><i>[AmountCurr]</i></b></li><li>Payment Method/ <i>Phương Thức thanh toán</i>: <b><i>[PaymentMethod]</i></b></li></ul><p><div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div><div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+                                            "<p><i>Dear Accountant Team,</i></p>" +
+                                            "<p>" +
+                                                "<div>You received a <b>[SOA_CreditNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div>" +
+                                                "<div><i>Bạn có nhận một đề nghị thanh toán chi phí bằng <b>[SOA_CreditNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div>" +
+                                            "</p>" +
+                                            "<ul>" +
+                                                "<li>Ref No/ <i>Số tham chiếu</i>: <b><i>[RefNo]</i></b></li>" +
+                                                "<li>Partner Name/ <i>Tên đối tượng</i>: <b><i>[PartnerEn]</i></b></li>" +
+                                                "<li>Tax Code/ <i>Mã số thuế</i>: <b><i>[Taxcode]</i></b></li>" +
+                                                "<li>Service/ <i>Dịch vụ</i>: <b><i>[ServiceName]</i></b></li>" +
+                                                "<li>Amount/ <i>Số tiền</i>: <b><i>[AmountCurr]</i></b></li>" +
+                                                "<li>Payment Method/ <i>Phương Thức thanh toán</i>: <b><i>[PaymentMethod]</i></b></li>" +
+                                            "</ul>" +
+                                            "<p>" +
+                                                "<div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div>" +
+                                                "<div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div>" +
+                                            "</p>" +
+                                            "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p>" +
+                                         "</div>");
             body = body.Replace("[SOA_CreditNote]", _type);
             body = body.Replace("[CreatorEnName]", creatorEnName);
             body = body.Replace("[RefNo]", refNo);
@@ -1622,8 +1641,10 @@ namespace eFMS.API.Accounting.DL.Services
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
+                Bccs = string.Join("; ", emailBCCs),
                 Subject = subject,
                 Sent = sendMailResult,
                 SentDateTime = DateTime.Now,
@@ -1647,7 +1668,7 @@ namespace eFMS.API.Accounting.DL.Services
                     string _type = type == "CDNOTE" ? "Credit Note" : "SOA";
                     string title = string.Format(@"Voucher Request - {0}: {1}", _type, refNo);
                     string description = string.Format(@"You received a <b>{0}</b> from <b>{1}</b>. Ref No <b>{2}</b> of <b>{3}</b> with Amount <b>{4}</b>", _type, creatorEnName, refNo, serviceName, amountCurr);
-                    
+
                     // Add Notification
                     SysNotifications sysNotification = new SysNotifications
                     {
@@ -1664,10 +1685,10 @@ namespace eFMS.API.Accounting.DL.Services
                         IsClosed = false,
                         IsRead = false,
                         UserIds = string.Join(",", idUserGroupAccts.ToList())
-                };
+                    };
                     HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
                     if (hsSysNotification.Success)
-                    {                       
+                    {
                         foreach (var idUserGroupAcct in idUserGroupAccts)
                         {
                             SysUserNotification userNotifySync = new SysUserNotification
