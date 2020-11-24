@@ -398,8 +398,9 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
 
-                    var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
-                    charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPayer?.AccountNo : string.Empty;
+                    // var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
+                    var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault(); //CR: 24-11-2020
+                    charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                     charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
 
                     //Đối với phí DEBIT - Quy đổi theo currency của Debit Note
@@ -581,8 +582,9 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
 
-                    var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
-                    charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPayer?.AccountNo : string.Empty;
+                    // var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
+                    var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault(); //CR: 24-11-2020
+                    charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                     charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
 
                     //Đối với phí DEBIT - Quy đổi theo currency của SOA (Type Debit)
