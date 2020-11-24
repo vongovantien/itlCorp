@@ -1921,5 +1921,123 @@ namespace eFMS.API.Accounting.DL.Services
 
             settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id,false);
         }
+
+        #region --- CONFIRM BILLING ---
+        private Expression<Func<AccAccountingManagement, bool>> ConfirmBillingExpressionQuery(ConfirmBillingCriteria criteria)
+        {
+            Expression<Func<AccAccountingManagement, bool>> query = q => q.Type == "Invoice" || q.Type == "InvoiceTemp";
+            
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                if (criteria.SearchOption == "DEBITNOTE")
+                {
+                    var surcharge = surchargeRepo.Get(x => criteria.ReferenceNos.Contains(x.DebitNo));
+                }
+                else if (criteria.SearchOption == "SOA")
+                {
+
+                }
+                else if (criteria.SearchOption == "VATINVOICE")
+                {
+                    query = query.And(x => criteria.ReferenceNos.Contains(x.InvoiceNoReal));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                query = query.And(x => x.PartnerId == criteria.PartnerId);
+            }
+
+            if (criteria.FromDate != null && criteria.ToDate != null)
+            {
+                if (!string.IsNullOrEmpty(criteria.DateType))
+                {
+                    if (criteria.DateType == "VATINVOICEDATE")
+                    {
+                        query = query.And(x => x.Date.Value.Date >= criteria.FromDate.Value.Date && x.Date.Value.Date <= criteria.ToDate.Value.Date);
+                    }
+                    else if (criteria.DateType == "CONFIRMBILLINGDATE")
+                    {
+                        query = query.And(x => x.ConfirmBillingDate.Value.Date >= criteria.FromDate.Value.Date && x.ConfirmBillingDate.Value.Date <= criteria.ToDate.Value.Date);
+                    }
+                }
+            }
+
+            if (criteria.IsConfirmedBilling == true)
+            {
+                query = query.And(x => x.ConfirmBillingDate != null);
+            }
+            else if (criteria.IsConfirmedBilling == false)
+            {
+                query = query.And(x => x.ConfirmBillingDate == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Services))
+            {
+                
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CsHandling))
+            {
+                
+            }
+            return query;
+        }
+
+        private IQueryable<ConfirmBillingResult> GetDataConfirmBilling(ConfirmBillingCriteria criteria)
+        {
+            var query = ConfirmBillingExpressionQuery(criteria);
+            var partners = partnerRepo.Get();
+            var users = userRepo.Get();
+            var acct = DataContext.Get(query);
+            var data = from acc in acct
+                       join pat in partners on acc.PartnerId equals pat.Id into pat2
+                       from pat in pat2.DefaultIfEmpty()
+                       join user in users on acc.UserCreated equals user.Id into user2
+                       from user in user2.DefaultIfEmpty()
+                       select new ConfirmBillingResult
+                       {
+                           Id = acc.Id,
+                           InvoiceNoReal = acc.InvoiceNoReal,
+                           PartnerId = pat.TaxCode, //Tax Code of Partner
+                           PartnerName = pat.ShortName,
+                           TotalAmount = acc.TotalAmount,
+                           Currency = acc.Currency,
+                           Date = acc.Date, //Invoice Date
+                           PaymentTerm = acc.PaymentTerm,
+                           ConfirmBillingDate = acc.ConfirmBillingDate,
+                           DueDate = acc.ConfirmBillingDate != null ? acc.ConfirmBillingDate.Value.AddDays((double)acc.PaymentTerm) : acc.Date.Value.AddDays((double)acc.PaymentTerm),
+                           PaymentStatus = acc.PaymentStatus,
+                           DatetimeModified = acc.DatetimeModified
+                       };
+            return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
+        }
+
+        public List<ConfirmBillingResult> ConfirmBillingPaging(ConfirmBillingCriteria criteria, int page, int size, out int rowsCount)
+        {
+            var data = GetDataConfirmBilling(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+
+            //Phân trang
+            var _totalItem = data.Select(s => s.Id).Count();
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            return data.ToList();
+        }
+        
+        #endregion --- CONFIRM BILLING ---
+
     }
 }

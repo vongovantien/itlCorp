@@ -155,6 +155,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
+                entity.Property(e => e.ConfirmBillingDate).HasColumnType("datetime");
+
                 entity.Property(e => e.Currency)
                     .HasMaxLength(30)
                     .IsUnicode(false);

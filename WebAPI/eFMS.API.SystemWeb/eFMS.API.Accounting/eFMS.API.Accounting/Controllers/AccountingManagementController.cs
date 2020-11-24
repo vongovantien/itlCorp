@@ -453,5 +453,23 @@ namespace eFMS.API.Accounting.Controllers
             ChargeAccountingMngtTotalViewModel result = accountingService.CalculateListChargeAccountingMngt(charges);
             return Ok(result);
         }
+
+        /// <summary>
+        /// get and paging the list of Confirm Biling by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ConfirmBillingPaging")]
+        [Authorize]
+        public IActionResult ConfirmBillingPaging(ConfirmBillingCriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = accountingService.ConfirmBillingPaging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
+        }
+
     }
 }
