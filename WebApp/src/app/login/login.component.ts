@@ -33,6 +33,7 @@ export class LoginComponent {
     company$: Observable<Company[]>;
 
     selectedCompanyId: any;
+    spinnerLogin: string = 'spinnerLogin';
 
     ngAfterViewInit(): void {
         // if (this.route.snapshot.paramMap.get("isEndSession")) {
@@ -78,14 +79,14 @@ export class LoginComponent {
     async Login(form: NgForm) {
         if (form.form.status !== "INVALID" && !!this.selectedCompanyId) {
             try {
-                this._spinner.show();
                 this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
+                this._spinner.show(this.spinnerLogin);
 
                 await this.configureWithNewConfigApi();
                 const passwordEncoded = RSAHelper.serverEncode(this.password);
 
                 const header: HttpHeaders = new HttpHeaders({
-                    companyId: this.selectedCompanyId
+                    companyId: this.selectedCompanyId,
                 });
                 this.oauthService.fetchTokenUsingPasswordFlow(this.username, passwordEncoded, header) // * Request Access Token.
                     .then(async (resp: TokenResponse) => {
@@ -103,7 +104,7 @@ export class LoginComponent {
                                 this.currenURL = "home/dashboard";
                             }
                             this.router.navigateByUrl(this.currenURL);
-                            this._spinner.hide();
+                            this._spinner.hide(this.spinnerLogin);
 
                             const cookieData = this.cookieService.getAll();
                             console.log(cookieData);
@@ -119,14 +120,12 @@ export class LoginComponent {
 
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
                         }
-                    }).then(() => {
-
                     })
                     .catch((err) => {
-                        this._spinner.hide();
+                        this._spinner.hide(this.spinnerLogin);
                     });
             } catch (error) {
-                this._spinner.hide();
+                this._spinner.hide(this.spinnerLogin);
             }
         }
     }
