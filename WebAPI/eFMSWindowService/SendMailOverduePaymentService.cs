@@ -107,6 +107,20 @@ namespace eFMSWindowService
                     if (overduePayments != null && overduePayments.Count > 0 && mail != null && mail.Count > 0)
                     {
                         var s = SendMailHelper.Send(subject, body, mail);
+
+                        #region --- Ghi Log Send Mail ---
+                        var logSendMail = new sysSentEmailHistory
+                        {
+                            SentUser = SendMailHelper._emailFrom,
+                            Receivers = string.Join("; ", mail),
+                            Subject = subject,
+                            Sent = s,
+                            SentDateTime = DateTime.Now,
+                            Body = body
+                        };
+                        var hsLogSendMail = db.sysSentEmailHistories.Add(logSendMail);
+                        var hsSc = db.SaveChanges();
+                        #endregion --- Ghi Log Send Mail ---
                     }
                 }
 

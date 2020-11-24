@@ -466,7 +466,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.AdvanceNo = null;
                                 item.UserModified = userCurrenct;
                                 item.DatetimeModified = DateTime.Now;
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);                              
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                             }
                         }
                         //Phí hiện trường (Xóa khỏi surcharge)
@@ -554,67 +554,67 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             IQueryable<ShipmentSettlement> dataOperation = from sur in surcharge
-                                join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
-                                from cdNoGroup in cdNoGroups.DefaultIfEmpty()
-                                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
-                                from settle in settle2.DefaultIfEmpty()
-                                join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                from advGrp in advGrps.DefaultIfEmpty()
-                                where sur.SettlementCode == settlementNo
-                                select new ShipmentSettlement
-                                {
-                                    SettlementNo = sur.SettlementCode,
-                                    JobId = opst.JobNo,
-                                    HBL = opst.Hwbno,
-                                    MBL = opst.Mblno,
-                                    HblId = opst.Hblid,
-                                    CurrencyShipment = settle.SettlementCurrency,
-                                    // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
-                                    ShipmentId = opst.Id,
-                                    Type = "OPS",
-                                    AdvanceNo = advGrp.AdvanceNo
-                                };
+                                                           join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                                           join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
+                                                           from cdNoGroup in cdNoGroups.DefaultIfEmpty()
+                                                           join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+                                                           from settle in settle2.DefaultIfEmpty()
+                                                           join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                                                           from advGrp in advGrps.DefaultIfEmpty()
+                                                           where sur.SettlementCode == settlementNo
+                                                           select new ShipmentSettlement
+                                                           {
+                                                               SettlementNo = sur.SettlementCode,
+                                                               JobId = opst.JobNo,
+                                                               HBL = opst.Hwbno,
+                                                               MBL = opst.Mblno,
+                                                               HblId = opst.Hblid,
+                                                               CurrencyShipment = settle.SettlementCurrency,
+                                                               // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
+                                                               ShipmentId = opst.Id,
+                                                               Type = "OPS",
+                                                               AdvanceNo = advGrp.AdvanceNo
+                                                           };
 
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
-                               join cstd in csTransD on sur.Hblid equals cstd.Id
-                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                               from cst in cst2.DefaultIfEmpty()
-                               join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
-                               from settle in settle2.DefaultIfEmpty()
-                               join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                               from advGrp in advGrps.DefaultIfEmpty()
-                               where sur.SettlementCode == settlementNo
-                               select new ShipmentSettlement
-                               {
-                                   SettlementNo = sur.SettlementCode,
-                                   JobId = cst.JobNo,
-                                   HBL = cstd.Hwbno,
-                                   MBL = cst.Mawb,
-                                   CurrencyShipment = settle.SettlementCurrency,
-                                   // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
-                                   HblId = cstd.Id,
-                                   ShipmentId = cst.Id,
-                                   Type = "DOC",
-                                   AdvanceNo = advGrp.AdvanceNo
-                               };
+                                                          join cstd in csTransD on sur.Hblid equals cstd.Id
+                                                          join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                                                          from cst in cst2.DefaultIfEmpty()
+                                                          join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+                                                          from settle in settle2.DefaultIfEmpty()
+                                                          join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                                                          from advGrp in advGrps.DefaultIfEmpty()
+                                                          where sur.SettlementCode == settlementNo
+                                                          select new ShipmentSettlement
+                                                          {
+                                                              SettlementNo = sur.SettlementCode,
+                                                              JobId = cst.JobNo,
+                                                              HBL = cstd.Hwbno,
+                                                              MBL = cst.Mawb,
+                                                              CurrencyShipment = settle.SettlementCurrency,
+                                                              // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
+                                                              HblId = cstd.Id,
+                                                              ShipmentId = cst.Id,
+                                                              Type = "DOC",
+                                                              AdvanceNo = advGrp.AdvanceNo
+                                                          };
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo})
+                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo })
                 .Select(x => new ShipmentSettlement
-            {
-                SettlementNo = x.Key.SettlementNo,
-                JobId = x.Key.JobId,
-                HBL = x.Key.HBL,
-                MBL = x.Key.MBL,
-                CurrencyShipment = x.Key.CurrencyShipment,
-                //TotalAmount = x.Sum(t => t.TotalAmount),
-                HblId = x.Key.HblId,
-                Type = x.Key.Type,
-                ShipmentId = x.Key.ShipmentId,
-                AdvanceNo = x.Key.AdvanceNo
-            });
+                {
+                    SettlementNo = x.Key.SettlementNo,
+                    JobId = x.Key.JobId,
+                    HBL = x.Key.HBL,
+                    MBL = x.Key.MBL,
+                    CurrencyShipment = x.Key.CurrencyShipment,
+                    //TotalAmount = x.Sum(t => t.TotalAmount),
+                    HblId = x.Key.HblId,
+                    Type = x.Key.Type,
+                    ShipmentId = x.Key.ShipmentId,
+                    AdvanceNo = x.Key.AdvanceNo
+                });
 
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (ShipmentSettlement item in dataGroups)
@@ -660,7 +660,7 @@ namespace eFMS.API.Accounting.DL.Services
             var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
 
             var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid == _hbl && x.Key.Mblno == _mbl);
-            if(surchargeGrp != null && surchargeGrp.Count() > 0)
+            if (surchargeGrp != null && surchargeGrp.Count() > 0)
             {
                 var advDataMatch = surchargeGrp.Where(x => x.Key.AdvanceNo == _advanceNo);
                 advNo = advDataMatch?.FirstOrDefault().Key.AdvanceNo;
@@ -688,7 +688,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                if(surchargeGrp != null && surchargeGrp.Count() > 0)
+                if (surchargeGrp != null && surchargeGrp.Count() > 0)
                 {
                     result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
                 }
@@ -1407,7 +1407,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         }
                                     }
                                 }
-                                
+
                                 foreach (var item in listChargeSceneAdd)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -1666,16 +1666,16 @@ namespace eFMS.API.Accounting.DL.Services
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
             var advanceNoDone = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceNo && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE).Select(s => s.AdvanceNo).FirstOrDefault();
-            var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo 
-            && x.AdvanceNo == advanceNoDone 
+            var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo
+            && x.AdvanceNo == advanceNoDone
             //&& x.JobId == jobNo 
             //&& x.Mbl == mbl
             //&& x.Hbl == hbl
             && x.Hblid == hblId);
             //var query = from adv in advance
-                        //join req in request on adv.AdvanceNo equals req.AdvanceNo //into req1
-                        //from req in req1.DefaultIfEmpty()
-                        //select req;
+            //join req in request on adv.AdvanceNo equals req.AdvanceNo //into req1
+            //from req in req1.DefaultIfEmpty()
+            //select req;
             var advanceAmount = request.Sum(x => x.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.RequestCurrency, Currency));
             return advanceAmount.Value;
         }
@@ -1689,7 +1689,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
-            
+
             var customer = catPartnerRepo.Get();
             var consignee = catPartnerRepo.Get();
             var consigner = catPartnerRepo.Get();
@@ -1745,7 +1745,7 @@ namespace eFMS.API.Accounting.DL.Services
             decimal? _nw = 0;
             int? _psc = 0;
             decimal? _cbm = 0;
-            foreach(var hblid in hblids)
+            foreach (var hblid in hblids)
             {
                 _gw += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumGrossWeight) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.GrossWeight);
                 _nw += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumNetWeight) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.NetWeight);
@@ -3282,8 +3282,8 @@ namespace eFMS.API.Accounting.DL.Services
                )
             {
                 isShowBtnDeny = false;
-                if (settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW 
-                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED 
+                if (settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                     && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
                 {
                     isShowBtnDeny = true;
@@ -3439,71 +3439,7 @@ namespace eFMS.API.Accounting.DL.Services
                             .Select(s => s.Key.JobId);
             return listJobId;
         }
-
-        /// <summary>
-        /// Lấy ra danh sách shipment dựa vào SettlementNo
-        /// </summary>
-        /// <param name="settlementNo"></param>
-        /// <returns></returns>
-        //private IQueryable<Shipments> GetShipmentBySettlementNo(string settlementNo)
-        //{
-        //    var surcharge = csShipmentSurchargeRepo.Get();
-        //    var opst = opsTransactionRepo.Get();
-        //    var csTrans = csTransactionRepo.Get();
-        //    var csTransDe = csTransactionDetailRepo.Get();
-        //    var query = from sur in surcharge
-        //                join ops in opst on sur.Hblid equals ops.Hblid into op
-        //                from ops in op.DefaultIfEmpty()
-        //                join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
-        //                from cstd in csd.DefaultIfEmpty()
-        //                join cst in csTrans on cstd.JobId equals cst.Id into cs
-        //                from cst in cs.DefaultIfEmpty()
-        //                where
-        //                    sur.SettlementCode == settlementNo
-        //                && (ops.JobNo == null ? cst.JobNo : ops.JobNo) != null
-        //                && (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno) != null
-        //                && (ops.Mblno == null ? cst.Mawb : ops.Mblno) != null
-        //                select new Shipments
-        //                {
-        //                    JobId = (ops.JobNo == null ? cst.JobNo : ops.JobNo),
-        //                    HBL = (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno),
-        //                    MBL = (ops.Mblno == null ? cst.Mawb : ops.Mblno),
-        //                    HBLID = (ops.Hblid == null ? cstd.Id : ops.Hblid)
-        //                };
-        //    var listShipment = query
-        //                    .GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.HBLID })
-        //                    .Select(s => new Shipments { JobId = s.Key.JobId, MBL = s.Key.MBL, HBL = s.Key.HBL, HBLID = s.Key.HBLID });
-        //    return listShipment;
-        //}
-
-        /// <summary>
-        /// Lấy ra danh sách AdvanceNo(chỉ lấy ra các advance có status là done) dựa vào Shipment
-        /// </summary>
-        /// <param name="JobId"></param>
-        /// <param name="MBL"></param>
-        /// <param name="HBL"></param>
-        /// <returns></returns>
-        //private IQueryable<string> GetAdvanceNoByShipment(string JobId, string MBL, string HBL)
-        //{
-        //    //Chỉ lấy ra những Advance thuộc shipment có status là done
-        //    var request = acctAdvanceRequestRepo.Get();
-        //    var advance = acctAdvancePaymentRepo.Get();
-        //    var query = from req in request
-        //                join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
-        //                from ad in ad2.DefaultIfEmpty()
-        //                where
-        //                       ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-        //                    && req.JobId == JobId
-        //                    && req.Mbl == MBL
-        //                    && req.Hbl == HBL
-        //                select new
-        //                {
-        //                    AdvanceNo = req.AdvanceNo
-        //                };
-        //    var listAdvanceNo = query.GroupBy(x => new { x.AdvanceNo }).Where(x => x.Key.AdvanceNo != null).Select(s => s.Key.AdvanceNo);
-        //    return listAdvanceNo;
-        //}
-
+        
         //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
         //Nếu group hiện tại đã được approve thì không cho approve nữa
         private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string settlementNo, ICurrentUser _userCurrent, string deptOfUser)
@@ -3766,7 +3702,7 @@ namespace eFMS.API.Accounting.DL.Services
             totalAmount = Math.Round(totalAmount, 2);
 
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
-            string advanceNos = string.Empty;            
+            string advanceNos = string.Empty;
             var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
             advanceNos = string.Join("; ", listAdvanceNo);
 
@@ -3779,7 +3715,26 @@ namespace eFMS.API.Accounting.DL.Services
             string subject = "eFMS - Settlement Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
             subject = subject.Replace("[RequesterName]", requesterName);
             subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p> <i> <b>Dear Mr/Mrs [UserName],</b> </i></p><p><div>You have new Settlement Payment Approval Request from <b>[RequesterName]</b> as below info:</div><div> <i>Anh/ Chị có một yêu cầu duyệt thanh toán từ <b>[RequesterName]</b> với thông tin như sau: </i></div></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p><div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Detail Payment Request</a> </span></div><div> <i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Chi tiết phiếu đề nghị thanh toán</a> </span> </i></p></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+                                            "<p><i><b>Dear Mr/Mrs [UserName],</b> </i></p>" +
+                                            "<p>" +
+                                                "<div>You have new Settlement Payment Approval Request from <b>[RequesterName]</b> as below info:</div>" +
+                                                "<div><i>Anh/ Chị có một yêu cầu duyệt thanh toán từ <b>[RequesterName]</b> với thông tin như sau: </i></div>" +
+                                            "</p>" +
+                                            "<ul>" +
+                                                "<li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li>" +
+                                                "<li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li>" +
+                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li>" +
+                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+                                            "</ul>" +
+                                            "<p>" +
+                                                "<div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Detail Payment Request</a> </span></div>" +
+                                                "<div><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Chi tiết phiếu đề nghị thanh toán</a> </span> </i></div>" +
+                                            "</p>" +
+                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+                                         "</div>");
             body = body.Replace("[UserName]", userReciverName);
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[SettlementNo]", settlementNo);
@@ -3826,6 +3781,7 @@ namespace eFMS.API.Accounting.DL.Services
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
                 Subject = subject,
@@ -3881,7 +3837,26 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             string subject = "eFMS - Settlement Payment from [RequesterName] is approved";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p><p><div>You have an Settlement Payment is approved at <b>[ApprovedDate]</b> as below info:</div><div> <i>Anh/ Chị có một đề nghị thanh toán đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau: </i></div></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p><div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div><div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></div></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+                                            "<p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p>" +
+                                            "<p>" +
+                                                "<div>You have an Settlement Payment is approved at <b>[ApprovedDate]</b> as below info:</div>" +
+                                                "<div><i>Anh/ Chị có một đề nghị thanh toán đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau: </i></div>" +
+                                            "</p>" +
+                                            "<ul>" +
+                                                "<li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li>" +
+                                                "<li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li>" +
+                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li>" +
+                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+                                            "</ul>" +
+                                            "<p>" +
+                                                "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div>" +
+                                                "<div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></div>" +
+                                            "</p>" +
+                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+                                         "</div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[SettlementNo]", settlementNo);
@@ -3909,6 +3884,7 @@ namespace eFMS.API.Accounting.DL.Services
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
                 Subject = subject,
@@ -3949,7 +3925,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
             string jobIds = string.Empty;
-            jobIds = String.Join("; ", listJobId.ToList());
+            jobIds = string.Join("; ", listJobId.ToList());
 
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
@@ -3964,7 +3940,27 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             string subject = "eFMS - Settlement Payment from [RequesterName] is denied";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'><p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p><p><div>You have an Settlement Payment is denied at <b>[DeniedDate]</b> by as below info:</div><div> <i>Anh/ Chị có một yêu cầu đề nghị thanh toán đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau: </i></div></p><ul><li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li><li>Settlement Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencySettlement]</b></li><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p><div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div><div> <i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></div></p><p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+                                            "<p> <i> <b>Dear Mr/Mrs [RequesterName],</b> </i></p>" +
+                                            "<p>" +
+                                                "<div>You have an Settlement Payment is denied at <b>[DeniedDate]</b> by as below info:</div>" +
+                                                "<div> <i>Anh/ Chị có một yêu cầu đề nghị thanh toán đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau: </i></div>" +
+                                            "</p>" +
+                                            "<ul>" +
+                                                "<li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li>" +
+                                                "<li>Settlement Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencySettlement]</b></li>" +
+                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li>" +
+                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+                                                "<li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li>" +
+                                            "</ul>" +
+                                            "<p>" +
+                                                "<div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div>" +
+                                                "<div> <i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Chi tiết đề nghị thanh toán</a> </span> </i></div>" +
+                                            "</p>" +
+                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+                                         "</div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[SettlementNo]", settlementNo);
@@ -3993,6 +3989,7 @@ namespace eFMS.API.Accounting.DL.Services
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
                 Subject = subject,
@@ -4404,7 +4401,7 @@ namespace eFMS.API.Accounting.DL.Services
                         shipmentSettlement.Cw = tranDetail.ChargeWeight;
                         shipmentSettlement.Pcs = tranDetail.PackageQty;
                         shipmentSettlement.Cbm = tranDetail.Cbm;
-                        
+
                         listData.Add(shipmentSettlement);
                     }
                 }
@@ -4441,7 +4438,7 @@ namespace eFMS.API.Accounting.DL.Services
                 infoShipmentCharge.ChargeType = _chargeType;
 
                 listCharge.Add(infoShipmentCharge);
-            }            
+            }
             return listCharge;
         }
 
@@ -4466,7 +4463,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return listAdvance;
-        } 
+        }
 
         public List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode)
         {
@@ -4477,7 +4474,6 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransations = csTransactionRepo.Get();
             var csTranstionDetails = csTransactionDetailRepo.Get();  // HBL
             var custom = customsDeclarationRepo.Get();
-            
 
             try
             {
@@ -4504,7 +4500,6 @@ namespace eFMS.API.Accounting.DL.Services
                                             join ops in opsTransations on sur.Hblid equals ops.Hblid // Join OpsTranstion
                                             join cus in custom on new { JobNo = (ops.JobNo != null ? ops.JobNo : ops.JobNo), HBL = (ops.Hwbno != null ? ops.Hwbno : ops.Hwbno), MBL = (ops.Mblno != null ? ops.Mblno : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
                                             from cus in cus1.DefaultIfEmpty()
-                                            
                                             //join ar in advRequest on sur.JobNo equals ar.JobId
                                             where sur.SettlementCode == settleCode
                                             select new SettlementExportDefault
@@ -4521,20 +4516,19 @@ namespace eFMS.API.Accounting.DL.Services
                                                 ApproveDate = approveDate,
                                                 Description = sur.Notes,
                                                 SettlementAmount = sur.Total,
-
                                             };
 
                         // Get Document
                         var dataService = from set in settlements
                                           join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc  // Join Surcharge.
                                           from sur in sc.DefaultIfEmpty()
-                                          
+
                                           join cstd in csTranstionDetails on sur.Hblid equals cstd.Id // Join HBL
                                           join cst in csTransations on cstd.JobId equals cst.Id into cs // join Cs Transation
                                           from cst in cs.DefaultIfEmpty()
                                           join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : cst.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : cstd.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : cstd.Mawb) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
                                           from cus in cus1.DefaultIfEmpty()
-                                          
+
                                           where sur.SettlementCode == settleCode
                                           select new SettlementExportDefault
                                           {
@@ -4542,7 +4536,6 @@ namespace eFMS.API.Accounting.DL.Services
                                               HBL = cstd.Hwbno,
                                               MBL = cst.Mawb,
                                               SettlementAmount = sur.Total,
-                                              
                                               CustomNo = cus.ClearanceNo,
                                               SettleNo = currentSettlement.SettlementNo,
                                               Currency = currentSettlement.SettlementCurrency,
@@ -4550,25 +4543,23 @@ namespace eFMS.API.Accounting.DL.Services
                                               Requester = requesterName,
                                               RequestDate = currentSettlement.RequestDate,
                                               ApproveDate = approveDate,
-                                              Description = sur.Notes,
-
+                                              Description = sur.Notes
                                           };
 
                         var data = dataOperation.Union(dataService).ToList();
-                      
+
                         decimal? advTotalAmount;
-                        var group = data.GroupBy(d => new {d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo})
+                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo })
                             .Select(s => new SettlementExportGroupDefault
-                        {
-                            JobID = s.Key.JobID,
-                            MBL = s.Key.MBL,
-                            HBL = s.Key.HBL,
-                            CustomNo = s.Key.CustomNo,
-                            
-                            SettlementTotalAmount = s.Sum(d => d.SettlementAmount),                          
-                            requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL , s.Key.SettleNo, out advTotalAmount),
-                            AdvanceTotalAmount = advTotalAmount,
-                            BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount),
+                            {
+                                JobID = s.Key.JobID,
+                                MBL = s.Key.MBL,
+                                HBL = s.Key.HBL,
+                                CustomNo = s.Key.CustomNo,
+                                SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
+                                requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo, out advTotalAmount),
+                                AdvanceTotalAmount = advTotalAmount,
+                                BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount)
                             });
 
                         // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
@@ -4613,10 +4604,22 @@ namespace eFMS.API.Accounting.DL.Services
                                       };
             //
             var groupData = data
-                .GroupBy(d => new { d.JobID, d.HBL, d.MBL, d.AdvanceNo, d.SettleNo, d.Currency,
-                d.ApproveDate, d.CustomNo, d.RequestDate, d.Requester})
+                .GroupBy(d => new
+                {
+                    d.JobID,
+                    d.HBL,
+                    d.MBL,
+                    d.AdvanceNo,
+                    d.SettleNo,
+                    d.Currency,
+                    d.ApproveDate,
+                    d.CustomNo,
+                    d.RequestDate,
+                    d.Requester
+                })
                 .Where(x => x.Key.JobID == JobID && x.Key.HBL == HBL && x.Key.MBL == MBL && x.Key.SettleNo == SettleNo)
-                .Select(y => new SettlementExportDefault{
+                .Select(y => new SettlementExportDefault
+                {
                     JobID = y.Key.JobID,
                     HBL = y.Key.HBL,
                     MBL = y.Key.MBL,
@@ -4633,40 +4636,41 @@ namespace eFMS.API.Accounting.DL.Services
             var groupDataAdvanceNoIsNull = groupData.Where(x => x.AdvanceNo == null);
             groupData = groupData.Where(x => x.AdvanceNo != null);
             var result = from gd in groupData
-                         join gar in /*groupAdvReq*/ groupAdvReqByStatus on new { gd.AdvanceNo , gd.JobID, gd.HBL, gd.MBL } equals
+                         join gar in /*groupAdvReq*/ groupAdvReqByStatus on new { gd.AdvanceNo, gd.JobID, gd.HBL, gd.MBL } equals
                          new { gar.AdvanceNo, JobID = gar.JobId, HBL = gar.Hbl, MBL = gar.Mbl } into res
                          from gar in res.DefaultIfEmpty()
-                         select new SettlementExportDefault {
-                                JobID = gd.JobID,
-                                HBL = gd.HBL,
-                                MBL = gd.MBL,
-                                SettleNo = gd.SettleNo,
-                                AdvanceNo = gd.AdvanceNo,
+                         select new SettlementExportDefault
+                         {
+                             JobID = gd.JobID,
+                             HBL = gd.HBL,
+                             MBL = gd.MBL,
+                             SettleNo = gd.SettleNo,
+                             AdvanceNo = gd.AdvanceNo,
 
-                                SettlementAmount = gd.SettlementAmount,
-                                ApproveDate = gd.ApproveDate,
-                                Currency = gd.Currency,
-                                CustomNo = gd.CustomNo,
-                                Description = gd.Description,
-                                RequestDate = gd.RequestDate,
-                                Requester = gd.Requester,
-                                AdvanceAmount = gar == null ? 0 : gar.AdvanceAmount,
-                            };
+                             SettlementAmount = gd.SettlementAmount,
+                             ApproveDate = gd.ApproveDate,
+                             Currency = gd.Currency,
+                             CustomNo = gd.CustomNo,
+                             Description = gd.Description,
+                             RequestDate = gd.RequestDate,
+                             Requester = gd.Requester,
+                             AdvanceAmount = gar == null ? 0 : gar.AdvanceAmount,
+                         };
             var output = result.ToList();
-            if(groupDataAdvanceNoIsNull.Count() > 0)
+            if (groupDataAdvanceNoIsNull.Count() > 0)
             {
-                foreach(var item in groupDataAdvanceNoIsNull)
+                foreach (var item in groupDataAdvanceNoIsNull)
                 {
                     item.AdvanceAmount = 0;
                 }
                 output.AddRange(groupDataAdvanceNoIsNull);
             }
-           
+
             advTotalAmount = result.Sum(z => z.AdvanceAmount).Value;
-            
+
             //;
             return output;
-            
+
         }
 
         #endregion --- EXPORT SETTLEMENT ---

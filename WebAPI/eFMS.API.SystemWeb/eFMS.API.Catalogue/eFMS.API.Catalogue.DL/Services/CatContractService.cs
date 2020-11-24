@@ -920,6 +920,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstTo),
                 Ccs = string.Join("; ", lstCc),
                 Subject = subject,
@@ -987,6 +988,7 @@ namespace eFMS.API.Catalogue.DL.Services
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstTo),
                 Ccs = string.Join("; ", lstCc),
                 Subject = subject,
@@ -1078,6 +1080,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstTo),
                 Ccs = string.Join("; ", lstBCc),
                 Subject = subject,

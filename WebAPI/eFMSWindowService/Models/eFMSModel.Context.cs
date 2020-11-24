@@ -28,6 +28,7 @@ namespace eFMSWindowService.Models
         }
     
         public virtual DbSet<catDepartment> catDepartments { get; set; }
+        public virtual DbSet<sysSentEmailHistory> sysSentEmailHistories { get; set; }
     
         public virtual ObjectResult<Nullable<int>> sp_QueryAndUpdateCurrentStatusOfJob()
         {

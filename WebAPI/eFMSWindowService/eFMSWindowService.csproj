@@ -110,8 +110,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>eFMSModel.edmx</DependentUpon>
-    </Compile>   
+    </Compile>
     <Compile Include="Models\sp_GetShipmentInThreeDayToSendARDept_Result.cs">
+      <DependentUpon>eFMSModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\sysSentEmailHistory.cs">
       <DependentUpon>eFMSModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ProjectInstaller.cs">
