@@ -19,6 +19,7 @@ import { SeaConsolExportShippingInstructionComponent } from './detail-job/si/sea
 import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 import { FormsModule } from '@angular/forms';
 import { DeactivateGuardService } from '@core';
+import { ShareSeaServiceModule } from '../share-sea/share-sea-service.module';
 
 const routing: Routes = [
     {
@@ -81,7 +82,8 @@ const routing: Routes = [
         FormsModule,
         DirectiveModule,
         TabsModule.forRoot(),
-        SeaConsolExportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note)
+        SeaConsolExportLazyLoadModule, // ?  Lazy loading module with  tab component (CD Note),
+        ShareSeaServiceModule
     ],
     exports: [],
     declarations: [

@@ -4,15 +4,17 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from '@app';
-import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessShipmentGoodSummaryLCLComponent, ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
+import { ShareBussinessShipmentGoodSummaryLCLComponent, ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent } from '@common';
-
-import { catchError } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 
+import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/components/form-create-sea-import/form-create-sea-import.component';
+
+import { catchError } from 'rxjs/operators';
+import _merge from 'lodash/merge';
 @Component({
     selector: 'app-create-job-lcl-import',
     templateUrl: './create-job-lcl-import.component.html'
@@ -20,7 +22,7 @@ import { RoutingConstants } from '@constants';
 
 export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareBussinessFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaImportComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -58,30 +60,14 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
     }
 
     onSubmitData() {
-        const form: any = this.formCreateComponent.formCreate.getRawValue();
+        const form = this.formCreateComponent.formCreate.getRawValue();
 
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            mawb: form.mawb,
-            voyNo: form.voyNo,
-            pono: form.pono,
-            notes: form.notes,
-            personIncharge: this.formCreateComponent.personIncharge.value, // TODO user with Role = CS.
-            subColoader: form.subColoader || null,
-
-            flightVesselName: form.flightVesselName,
-
-            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
-
-            agentId: form.agentId,
-            pol: form.pol,
-            pod: form.pod,
-            deliveryPlace: form.deliveryPlace,
+            personIncharge: this.formCreateComponent.personIncharge.value,
             coloaderId: form.coloader,
 
             // * containers summary
@@ -92,16 +78,15 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
             packageType: this.shipmentGoodSummaryComponent.packageTypes.map(type => type.id).toString(),
         };
 
+        const model: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
+        model.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaLCLImport;
 
-        const fclExportAddModel: CsTransaction = new CsTransaction(formData);
-        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaLCLImport;
+        return model;
 
-        return fclExportAddModel;
     }
 
     checkValidateForm() {
         let valid: boolean = true;
-        this.setError(this.formCreateComponent.mbltype);
         if (
             !this.formCreateComponent.formCreate.valid
             || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)

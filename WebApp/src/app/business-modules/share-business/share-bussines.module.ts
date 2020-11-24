@@ -22,7 +22,6 @@ import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import {
-    ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessBuyingChargeComponent,
     ShareBussinessSellingChargeComponent,
     ShareBussinessOBHChargeComponent,
@@ -51,7 +50,6 @@ import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
     ShareBussinessCdNoteListAirComponent,
     ShareBussinessCdNoteAddAirPopupComponent,
@@ -102,7 +100,6 @@ const COMPONENTS = [
     ShareBusinessFormManifestComponent,
     ShareBusinessAddHblToManifestComponent,
     ShareBussinessGoodsListPopupComponent,
-    ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
@@ -115,7 +112,6 @@ const COMPONENTS = [
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
     ShareBussinessCdNoteListAirComponent,
     ShareBussinessCdNoteAddAirPopupComponent,

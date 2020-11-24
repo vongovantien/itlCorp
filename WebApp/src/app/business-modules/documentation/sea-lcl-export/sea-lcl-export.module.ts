@@ -5,7 +5,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
-import { SelectModule } from 'ng2-select';
 import { CommonEnum } from '@enums';
 import { DeactivateGuardService } from '@core';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -21,6 +20,7 @@ import { SeaLCLExportDetailJobComponent } from './detail-job/detail-job-lcl-expo
 import { SeaLclExportManifestComponent } from './detail-job/manifest/sea-lcl-export-manifest.component';
 import { SeaLclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-lcl-export-shipping-instruction.component';
 import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
+import { ShareSeaServiceModule } from '../share-sea/share-sea-service.module';
 
 const routing: Routes = [
     {
@@ -82,7 +82,6 @@ const LIBS = [
     TabsModule.forRoot(),
     PaginationModule.forRoot(),
     PerfectScrollbarModule,
-    SelectModule,
     NgxDaterangepickerMd.forRoot(),
 ];
 
@@ -92,6 +91,7 @@ const LIBS = [
         RouterModule.forChild(routing),
         ShareBussinessModule,
         SeaLCLExportLazyLoadModule,
+        ShareSeaServiceModule,
         ...LIBS,
     ],
     exports: [],
