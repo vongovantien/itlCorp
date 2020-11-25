@@ -7,30 +7,23 @@ const routes: Routes = [
     },
     {
         path: 'statement-of-account', loadChildren: () => import('./statement-of-account/statement-of-account.module').then(m => m.StatementOfAccountModule),
-        data: {
-            name: 'Statement Of Account'
-        }
+        data: { name: 'Statement Of Account', title: 'eFMS SOA' }
     },
     {
         path: 'advance-payment', loadChildren: () => import('./advance-payment/advance-payment.module').then(m => m.AdvancePaymentModule),
-        data: {
-            name: 'Advance Payment'
-        }
+        data: { name: 'Advance Payment', title: 'eFMS Advance' }
     },
     {
         path: 'settlement-payment', loadChildren: () => import('./settlement-payment/settlement-payment.module').then(m => m.SettlementPaymentModule),
-        data: {
-            name: 'Settlement Payment'
-        }
+        data: { name: 'Settlement Payment', title: 'eFMS Settlement' }
     },
     {
         path: 'account-receivable-payable', loadChildren: () => import('./account-receivable-payable/account-receivable-payable.module').then(m => m.AccountReceivePayableModule),
-        data: {
-            name: 'Accounts Receivable Payable'
-        }
+        data: { name: 'Accounts Receivable Payable', title: 'eFMS AR' }
     },
     {
-        path: 'management', loadChildren: () => import('./accounting-management/accounting-managment.module').then(m => m.AccountingManagementModule), data: { name: 'Accounting Management' }
+        path: 'management', loadChildren: () => import('./accounting-management/accounting-managment.module').then(m => m.AccountingManagementModule),
+        data: { name: 'Accounting Management', title: 'eFMS Accounting' }
     },
     // TODO another MODULE...
 ];

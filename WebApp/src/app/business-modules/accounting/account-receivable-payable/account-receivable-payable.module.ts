@@ -25,7 +25,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 const routing: Routes = [
     {
         path: "",
-        data: { name: "", title: 'eFMS Receivable Payable' },
+        data: { name: "" },
         children: [
             {
                 path: '', component: AccountReceivablePayableComponent,

@@ -1,17 +1,15 @@
-import { AppList } from "src/app/app.list";
+import { AppList } from "@app";
 import { Component, ChangeDetectorRef, ViewChild } from "@angular/core";
-import { SortService } from "src/app/shared/services";
+import { SortService } from "@services";
 import { ToastrService } from "ngx-toastr";
-import { CommodityGroup } from "src/app/shared/models/catalogue/commonity-group.model";
-import { COMMODITYGROUPCOLUMNSETTING } from "../../commonity-group.column";
-import { ColumnSetting } from "src/app/shared/models/layout/column-setting.model";
-import { TypeSearch } from "src/app/shared/enums/type-search.enum";
-import { CatalogueRepo, ExportRepo } from "src/app/shared/repositories";
+import { CommodityGroup } from "@models";
+import { CatalogueRepo, ExportRepo } from "@repositories";
 import { NgProgress } from "@ngx-progressbar/core";
-import { catchError, finalize, map } from "rxjs/operators";
-import { CommodityGroupAddPopupComponent } from "../form-create-commodity-group/form-create-commodity-group.popup";
-import { ConfirmPopupComponent } from "src/app/shared/common/popup";
+import { ConfirmPopupComponent } from "@common";
+import { CommonEnum } from "@enums";
 
+import { CommodityGroupAddPopupComponent } from "../form-create-commodity-group/form-create-commodity-group.popup";
+import { catchError, finalize, map } from "rxjs/operators";
 @Component({
     selector: 'commodity-group-list',
     templateUrl: './list-commodity-group.component.html',
@@ -23,14 +21,6 @@ export class CommodityGroupListComponent extends AppList {
 
     commodityGroups: CommodityGroup[] = [];
     commodityGroup: CommodityGroup;
-    commodityGroupSettings: ColumnSetting[] = COMMODITYGROUPCOLUMNSETTING;
-    configSearchGroup: any = {
-        settingFields: this.commodityGroupSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
-        typeSearch: TypeSearch.intab,
-        searchString: ''
-    };
-    //dataSearch: any = {};
-    headerCommodityGroup: CommonInterface.IHeaderTable[];
 
     constructor(
         private catalogueRepo: CatalogueRepo,
@@ -47,12 +37,17 @@ export class CommodityGroupListComponent extends AppList {
     }
 
     ngOnInit() {
-        this.headerCommodityGroup = [
+        this.headers = [
             { title: 'Id', sortable: true, field: 'id' },
             { title: 'Name(EN)', sortable: true, field: 'groupNameEn' },
             { title: 'Name(Local)', sortable: true, field: 'groupNameVn' },
             { title: 'Status', sortable: true, field: 'active' },
         ];
+
+        this.configSearch = {
+            settingFields: this.headers.slice(1, 3).map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            typeSearch: CommonEnum.TypeSearch.outtab,
+        };
         this.getGroupCommodities();
     }
 
@@ -93,7 +88,7 @@ export class CommodityGroupListComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res.id !== 0) {
-                        var _commodityGroup = new CommodityGroup(res);
+                        const _commodityGroup = new CommodityGroup(res);
                         this.commodityGroupAddPopupComponent.action = "update"
                         this.commodityGroupAddPopupComponent.commodityGroup = _commodityGroup;
                         this.commodityGroupAddPopupComponent.getDetail();

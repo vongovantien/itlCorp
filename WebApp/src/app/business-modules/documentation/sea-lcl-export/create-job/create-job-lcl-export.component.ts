@@ -4,20 +4,21 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { ActionsSubject } from '@ngrx/store';
 
-import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransaction } from 'src/app/shared/models';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Container } from 'src/app/shared/models/document/container.model';
+import { AppForm } from '@app';
+import { InfoPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransaction, Container } from '@models';
+import { CommonEnum } from '@enums';
 import {
-    ShareBussinessFormCreateSeaExportComponent,
     ShareBusinessImportJobDetailPopupComponent,
     ShareBussinessShipmentGoodSummaryLCLComponent
-} from 'src/app/business-modules/share-business';
+} from '@share-bussiness';
+import { RoutingConstants } from '@constants';
+
+import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/components/form-create-sea-export/form-create-sea-export.component';
 
 import { catchError } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
+import _merge from 'lodash/merge';
 
 @Component({
     selector: 'app-create-job-lcl-export',
@@ -26,7 +27,7 @@ import { RoutingConstants } from '@constants';
 
 export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareBussinessFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaExportComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -60,23 +61,9 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            mawb: form.mawb,
-            voyNo: form.voyNo,
-            notes: form.notes,
-            personIncharge: form.personalIncharge, // TODO user with Role = CS.
-            coloader: form.coloader,
-            bookingNo: form.bookingNo,
-            flightVesselName: form.flightVesselName,
-            pono: form.pono,
-
-            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
-            paymentTerm: !!form.term && !!form.term.length ? form.term[0].id : null,
-
+            personIncharge: form.personalIncharge,
+            paymentTerm: form.term,
             agentId: form.agent,
-            pol: form.pol,
-            pod: form.pod,
             coloaderId: form.coloader,
 
             // * containers summary
@@ -86,11 +73,11 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
             packageQty: this.shipmentGoodSummaryComponent.packageQuantity,
             packageType: this.shipmentGoodSummaryComponent.packageTypes.map(type => type.id).toString(),
         };
+        const model: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
+        model.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaLCLExport;
 
-        const fclExportAddModel: CsTransaction = new CsTransaction(formData);
-        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaLCLExport;
 
-        return fclExportAddModel;
+        return model;
     }
 
     checkValidateForm() {
@@ -174,7 +161,6 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // TODO goto detail.
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);

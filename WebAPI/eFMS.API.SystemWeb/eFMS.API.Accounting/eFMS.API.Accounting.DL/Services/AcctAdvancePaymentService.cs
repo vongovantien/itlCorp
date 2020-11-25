@@ -397,7 +397,7 @@ namespace eFMS.API.Accounting.DL.Services
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return data;
         }
-        
+
         public string GetAdvanceStatusPayment(string advanceNo)
         {
             var requestTmp = acctAdvanceRequestRepo.Get();
@@ -1064,7 +1064,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 acctAdvance
             };
-            
+
             result = new Crystal
             {
                 //ReportName = "AdvancePaymentRequest.rpt",
@@ -1076,7 +1076,7 @@ namespace eFMS.API.Accounting.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
-        
+
         private AdvancePaymentRequestReport GetAdvancePaymentRequestReportByAdvanceId(Guid advanceId)
         {
             string strJobId = string.Empty;
@@ -1245,10 +1245,10 @@ namespace eFMS.API.Accounting.DL.Services
 
             var _totalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM).Select(s => s.Amount).Sum();
             var _totalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE).Select(s => s.Amount).Sum();
-            var _totalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER).Select(s => s.Amount).Sum();            
+            var _totalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER).Select(s => s.Amount).Sum();
             acctAdvance.TotalNorm = _totalNorm != 0 ? _totalNorm : null;
             acctAdvance.TotalInvoice = _totalInvoice != 0 ? _totalInvoice : null;
-            acctAdvance.TotalOrther = _totalOrther != 0 ? _totalOrther : null;            
+            acctAdvance.TotalOrther = _totalOrther != 0 ? _totalOrther : null;
             acctAdvance.CompanyName = AccountingConstants.COMPANY_NAME;
             acctAdvance.CompanyAddress = AccountingConstants.COMPANY_ADDRESS1;
             acctAdvance.Website = AccountingConstants.COMPANY_WEBSITE;
@@ -1266,7 +1266,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvance.Inword = _inword;
 
             return acctAdvance;
-        } 
+        }
 
         public Crystal PreviewMultipleAdvance(List<Guid> advanceIds)
         {
@@ -1277,7 +1277,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var acctAdvance = GetAdvancePaymentRequestReportByAdvanceId(advanceIds[i]);
                 listAdvance.Add(acctAdvance);
-                    
+
                 var advId = new AdvancePaymentMulti();
                 advId.AdvID = acctAdvance.AdvID;
                 advIds.Add(advId);
@@ -1293,7 +1293,7 @@ namespace eFMS.API.Accounting.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
-        
+
         #endregion PREVIEW ADVANCE PAYMENT
 
         #region APPROVAL ADVANCE PAYMENT        
@@ -1426,13 +1426,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 advanceApprove.AccountantApr = userCurrent;
                                 advanceApprove.AccountantAprDate = DateTime.Now;
                                 advanceApprove.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
-                                //if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
-                                //{
-                                //    advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                //    advanceApprove.BuheadApr = advanceApprove.AccountantApr = userCurrent;
-                                //    advanceApprove.BuheadAprDate = advanceApprove.AccountantAprDate = DateTime.Now;
-                                //    advanceApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
-                                //}
                             }
                             if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL
                                 && managerLevel.Role != AccountingConstants.ROLE_APPROVAL
@@ -1480,28 +1473,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 mailLeaderOrManager = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
                             }
-                            //if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO) && (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO) && (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO))
-                            //{
-                            //    advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                            //    advanceApprove.BuheadApr = userCurrent;
-                            //    advanceApprove.BuheadAprDate = DateTime.Now;
-                            //    advanceApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
-                            //    if (leaderLevel.Role != AccountingConstants.ROLE_NONE)
-                            //    {
-                            //        advanceApprove.LeaderApr = userCurrent;
-                            //        advanceApprove.LeaderAprDate = DateTime.Now;
-                            //    }
-                            //    if (managerLevel.Role != AccountingConstants.ROLE_NONE)
-                            //    {
-                            //        advanceApprove.ManagerApr = userCurrent;
-                            //        advanceApprove.ManagerAprDate = DateTime.Now;
-                            //    }
-                            //    if (accountantLevel.Role != AccountingConstants.ROLE_NONE)
-                            //    {
-                            //        advanceApprove.AccountantApr = userCurrent;
-                            //        advanceApprove.AccountantAprDate = DateTime.Now;
-                            //    }
-                            //}
                         }
                         else
                         {
@@ -2159,7 +2130,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
             var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
             string jobIds = string.Empty;
-            jobIds = String.Join("; ", requests.ToList());
+            jobIds = string.Join("; ", requests.ToList());
 
             var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
@@ -2176,11 +2147,29 @@ namespace eFMS.API.Accounting.DL.Services
             string subject = "eFMS - Advance Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
             subject = subject.Replace("[RequesterName]", requesterName);
             subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+                                            "<p><i><b>Dear Mr/Mrs [UserName],</b> </i></p>" +
+                                            "<p>" +
+                                                "<div>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</div>" +
+                                                "<div> <i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau: </i></div>" +
+                                            "</p>" +
+                                            "<ul>" +
+                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li>" +
+                                                "<li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b></li>" +
+                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+                                            "</ul>" +
+                                            "<p>" +
+                                                "<div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></div>" +
+                                                "<div><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a> </span></i></div>" +
+                                            "</p>" +
+                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+                                         "</div>");
             body = body.Replace("[UserName]", userReciverName);
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[AdvanceNo]", advanceNo);
-            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
+            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
             body = body.Replace("[JobIds]", jobIds);
             body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
@@ -2223,6 +2212,7 @@ namespace eFMS.API.Accounting.DL.Services
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
                 Subject = subject,
@@ -2514,7 +2504,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
             var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
             string jobIds = string.Empty;
-            jobIds = String.Join("; ", requests.ToList());
+            jobIds = string.Join("; ", requests.ToList());
 
             var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
@@ -2525,11 +2515,29 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             string subject = "eFMS - Advance Payment from [RequesterName] is approved";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is approved at <b>[ApprovedDate]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You can click here to check more detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+                                            "<p><i><b>Dear Mr/Mrs [RequesterName],</b> </i></p>" +
+                                            "<p>" +
+                                                "<div>You have an Advance Payment is approved at <b>[ApprovedDate]</b> as below info:</div>" +
+                                                "<div><i>Anh/ Chị có một yêu cầu tạm ứng đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau: </i></div>" +
+                                            "</p>" +
+                                            "<ul>" +
+                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li>" +
+                                                "<li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b></li>" +
+                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+                                            "</ul>" +
+                                            "<p>" +
+                                                "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a> </span></div>" +
+                                                "<div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a> </span> </i></div>" +
+                                            "</p>" +
+                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+                                         "</div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[AdvanceNo]", advanceNo);
-            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
+            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
             body = body.Replace("[JobIds]", jobIds);
             body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
@@ -2548,10 +2556,11 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
-            
+
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
                 Subject = subject,
@@ -2582,7 +2591,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
             var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
             string jobIds = string.Empty;
-            jobIds = String.Join("; ", requests.ToList());
+            jobIds = string.Join("; ", requests.ToList());
 
             var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
@@ -2593,11 +2602,30 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             string subject = "eFMS - Advance Payment from [RequesterName] is denied";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is denied at <b>[DeniedDate]</b> by as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p>You click here to recheck detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+                                            "<p><i><b>Dear Mr/Mrs [RequesterName],</b> </i></p>" +
+                                            "<p>" +
+                                                "<div>You have an Advance Payment is denied at <b>[DeniedDate]</b> by as below info:</div>" +
+                                                "<div><i>Anh/ Chị có một yêu cầu tạm ứng đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau: </i></div>" +
+                                            "</p>" +
+                                            "<ul>" +
+                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li>" +
+                                                "<li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b></li>" +
+                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+                                                "<li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li>" +
+                                            "</ul>" +
+                                            "<p>" +
+                                                "<div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></div>" +
+                                                "<div><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></div>" +
+                                            "</p>" +
+                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+                                         "</div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[AdvanceNo]", advanceNo);
-            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
+            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
             body = body.Replace("[JobIds]", jobIds);
             body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
@@ -2617,10 +2645,11 @@ namespace eFMS.API.Accounting.DL.Services
             };
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
-            
+
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
                 Subject = subject,
@@ -2796,6 +2825,31 @@ namespace eFMS.API.Accounting.DL.Services
             return new HandleState();
         }
 
+        public HandleState CheckValidateMailByUserId(string userId)
+        {
+            var requesterId = userBaseService.GetEmployeeIdOfUser(userId);
+            var _requester = userBaseService.GetEmployeeByEmployeeId(requesterId);
+            var emailRequester = _requester?.Email;
+            if (string.IsNullOrEmpty(emailRequester))
+            {
+                return new HandleState("Not found email of [name]");
+            }
+            if (!SendMail.IsValidEmail(emailRequester))
+            {
+                return new HandleState("The [name] email address is incorrect");
+            }
+            return new HandleState();
+        }
+
+        /// <summary>
+        /// Check exist leader/manager/accountant/BOD, email, valid email
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="groupId"></param>
+        /// <param name="departmentId"></param>
+        /// <param name="officeId"></param>
+        /// <param name="companyId"></param>
+        /// <returns></returns>
         public HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
             var infoLevelApprove = LeaderLevel(type, groupId, departmentId, officeId, companyId);
@@ -2805,6 +2859,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (string.IsNullOrEmpty(infoLevelApprove.UserId)) return new HandleState("Not found leader");
                     if (string.IsNullOrEmpty(infoLevelApprove.EmailUser)) return new HandleState("Not found email of leader");
+                    if (!SendMail.IsValidEmail(infoLevelApprove.EmailUser)) return new HandleState("The leader email address is incorrect");
                 }
             }
 
@@ -2813,6 +2868,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (string.IsNullOrEmpty(managerLevel.UserId)) return new HandleState("Not found manager");
                 if (string.IsNullOrEmpty(managerLevel.EmailUser)) return new HandleState("Not found email of manager");
+                if (!SendMail.IsValidEmail(managerLevel.EmailUser)) return new HandleState("The manager email address is incorrect");
             }
 
             var accountantLevel = AccountantLevel(type, officeId, companyId);
@@ -2820,6 +2876,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (string.IsNullOrEmpty(accountantLevel.UserId)) return new HandleState("Not found accountant");
                 if (string.IsNullOrEmpty(accountantLevel.EmailUser)) return new HandleState("Not found email of accountant");
+                if (!SendMail.IsValidEmail(accountantLevel.EmailUser)) return new HandleState("The accountant email address is incorrect");
             }
 
             var buHeadLevel = BuHeadLevel(type, officeId, companyId);
@@ -2827,6 +2884,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (string.IsNullOrEmpty(buHeadLevel.UserId)) return new HandleState("Not found BOD");
                 if (string.IsNullOrEmpty(buHeadLevel.EmailUser)) return new HandleState("Not found email of BOD");
+                if (!SendMail.IsValidEmail(buHeadLevel.EmailUser)) return new HandleState("The BOD email address is incorrect");
             }
             return new HandleState();
         }
@@ -3155,7 +3213,9 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvanceNo = s.First().AdvanceNo,
                 RequestCurrency = s.First().RequestCurrency,
                 JobId = s.First().JobId,
-                Hbl = s.First().Hbl
+                Hbl = s.First().Hbl,
+                Hblid = s.First().Hblid,
+                Mbl = s.First().Mbl
             });
 
             //So sánh bằng
@@ -3169,6 +3229,8 @@ namespace eFMS.API.Accounting.DL.Services
                                Id = req.Id,
                                JobId = req.JobId,
                                Hbl = req.Hbl,
+                               Hblid = req.Hblid,
+                               Mbl = req.Mbl,
                                RequestDate = adv.RequestDate,
                                Amount = req.Amount,
                                AdvanceNo = req.AdvanceNo,
@@ -3186,6 +3248,8 @@ namespace eFMS.API.Accounting.DL.Services
                                Id = req.Id,
                                JobId = req.JobId,
                                Hbl = req.Hbl,
+                               Hblid = req.Hblid,
+                               Mbl = req.Mbl,
                                RequestDate = adv.RequestDate,
                                Amount = req.Amount,
                                AdvanceNo = req.AdvanceNo,
@@ -3193,8 +3257,8 @@ namespace eFMS.API.Accounting.DL.Services
                            };
             var mergeAdvRequest = queryOps.Union(queryDoc);
 
-            //Get advance theo shipment và advance chưa làm settlement; order giảm dần theo ngày request date
-            var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo && a.Hblid == x.Hblid));
+            //Get advance theo shipment và advance chưa làm settlement; order tăng dần theo ngày request date
+            var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo && a.Hblid == x.Hblid)).OrderBy(x => x.RequestDate);
             return data.ToList();
         }
 
@@ -3438,10 +3502,10 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Select list HBLID, AdvanceNo by SettlementCode
             var hblIdAdvList = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Select(s => new { s.Hblid, s.AdvanceNo }).Distinct().ToList();
-            foreach(var hblIdAdv in hblIdAdvList)
+            foreach (var hblIdAdv in hblIdAdvList)
             {
                 var avdRequests = acctAdvanceRequestRepo.Get(x => x.Hblid == hblIdAdv.Hblid && x.AdvanceNo == hblIdAdv.AdvanceNo);
-                foreach(var avdRequest in avdRequests)
+                foreach (var avdRequest in avdRequests)
                 {
                     avdRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_SETTLED;
                     var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(avdRequest, x => x.Id == avdRequest.Id);
@@ -3543,7 +3607,7 @@ namespace eFMS.API.Accounting.DL.Services
                         item.AdvanceNoError = string.Format(stringLocalizer[AccountingLanguageSub.MSG_ADVANCE_NO_DUPLICATE], item.AdvanceNo);
                         item.IsValid = false;
                     }
-                    if (DataContext.Any(x => x.AdvanceNo == item.AdvanceNo && x.StatusApproval != "Done"))
+                    if (DataContext.Any(x => x.AdvanceNo == item.AdvanceNo && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE))
                     {
                         item.AdvanceNoError = string.Format(stringLocalizer[AccountingLanguageSub.MSG_ADVANCE_NO_NOT_APPROVAL], item.AdvanceNo);
                         item.IsValid = false;
@@ -3588,7 +3652,7 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState result = new HandleState();
 
             AcctAdvancePayment adv = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
-            if(adv != null)
+            if (adv != null)
             {
                 DateTime? deadlineDate = null;
 
@@ -3596,7 +3660,7 @@ namespace eFMS.API.Accounting.DL.Services
                 adv.DeadlinePayment = deadlineDate;
                 adv.PaymentTerm = days;
 
-                result = DataContext.Update(adv,x => x.Id == Id);
+                result = DataContext.Update(adv, x => x.Id == Id);
             }
 
             return result;

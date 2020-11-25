@@ -575,6 +575,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list)
         {
+            var officeIds = DataContext.Get().Select(t => t.OfficeId).ToArray();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.CustomerId))
@@ -610,17 +611,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
                         item.IsValid = false;
                     }
-                    if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    {
-                        item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
-                        item.IsValid = false;
+                    //if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    //{
+                    //    item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
+                    //    item.IsValid = false;
 
-                    }
-                    if (!item.EffectDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    {
-                        item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
-                        item.IsValid = false;
-                    }
+                    //}
+                    //if (!item.EffectDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    //{
+                    //    item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
+                    //    item.IsValid = false;
+                    //}
                     if (string.IsNullOrEmpty(item.CreditLimited) && (item.ContractType == "Trial" || item.ContractType == "Official"))
                     {
                         item.CreditLimitError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CREDIT_LIMIT_EMPTY]);
@@ -632,9 +633,9 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
                     }
                 }
+                var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                 if (!string.IsNullOrEmpty(item.ContractNo))
                 {
-                    var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                     if (DataContext.Any(x => x.PartnerId == customerId && x.ContractNo == item.ContractNo))
                     {
                         item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], item.ContractNo);
@@ -673,7 +674,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_NOT_FOUND]);
                     item.IsValid = false;
                 }
-                var officeArr = item.Office.Split(";").ToArray();
+                var officeArr = item.Office.Replace(" ","").Split(";").ToArray();
 
                 if (string.IsNullOrEmpty(item.Office))
                 {
@@ -706,6 +707,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
                     }
                 }
+                else
+                {
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_SALESMAN_EMPTY]);
+                    item.IsValid = false;
+                }
 
                 if (!string.IsNullOrEmpty(item.Status))
                 {
@@ -716,6 +722,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
 
+                if (!item.EffectDate.HasValue)
+                {
+                    item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
+                    item.IsValid = false;
+                }
+
+
                 if (item.EffectDate.HasValue && item.ExpireDate.HasValue)
                 {
                     if (item.ExpireDate.Value < item.EffectDate.Value)
@@ -723,6 +736,63 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_NOT_VALID]);
                         item.IsValid = false;
                     }
+                }
+                string saleManId = sysUserRepository.Get(x => x.Username == item.Salesman).Select(t => t.Id).FirstOrDefault();
+                var listOfficeId = sysOfficeRepository.Get(x => officeArr.Contains(x.Code)).Select(t => t.Id.ToString()).ToList();
+                var saleServiceArr = item.SaleService.Split(";").ToArray();
+                string saleServices = string.Empty;
+                foreach(var it in saleServiceArr)
+                {
+                    if (it.Trim() == "Air Import")
+                    {
+                        saleServices += "AI;";
+                    }
+                    if (it.Trim() == "Air Export")
+                    {
+                        saleServices += "AE;";
+                    }
+                    if (it.Trim() == "Sea FCL Export")
+                    {
+                        saleServices += "SFE;";
+                    }
+                    if (it.Trim() == "Sea LCL Export")
+                    {
+                        saleServices += "SLE;";
+                    }
+                    if (it.Trim() == "Sea FCL Import")
+                    {
+                        saleServices += "SFI;";
+                    }
+                    if (it.Trim() == "Sea LCL Import")
+                    {
+                        saleServices += "SLI;";
+                    }
+                    if (it.Trim() == "Custom Logistic")
+                    {
+                        saleServices += "CL;";
+                    }
+                    if (it.Trim() == "Trucking")
+                    {
+                        saleServices += "IT;";
+                    }
+                    if (it.Trim() == "All")
+                    {
+                        saleServices = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                    }
+
+                }
+                var sale = saleServices.Remove(saleServices.Length - 1);
+                
+                if (DataContext.Any(x => x.SaleService.Contains(sale) && x.OfficeId != null && listOfficeId.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId != saleManId && x.PartnerId == customerId))// && x.SaleManId == saleManId))
+                {
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
+                    item.IsValid = false;
+                }
+
+                if (list.GroupBy(x=> new { x.Office, x.SaleService }).Where(t => t.Count() > 1).Select(y => y.Key).ToList().Count() > 0)
+                {
+                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
+                    item.IsValid = false;
                 }
             });
             return list;
@@ -791,7 +861,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
 
-                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + EnNameCreatetor + ", </br> </br>" +
                     Title +
                     "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
                     Name +
@@ -804,6 +874,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     "</br>"
                     + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+                ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
                 if (lstTo.Any())
@@ -819,7 +890,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
                 subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
 
-                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
                   "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
                   "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
@@ -838,16 +909,18 @@ namespace eFMS.API.Catalogue.DL.Services
                   "</br>"
                  + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+                ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc.Add(objInfoSalesman?.Email);
                 //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
-               
+
             }
 
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstTo),
                 Ccs = string.Join("; ", lstCc),
                 Subject = subject,
@@ -890,7 +963,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
                         "Your Agreement of " + "<b>" + partner.PartnerNameVn + "</b>" + " is rejected by AR/Accountant as info bellow</br>" +
                         "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName +
                         "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
@@ -904,6 +977,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         "</br>"
                         + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
@@ -914,6 +988,7 @@ namespace eFMS.API.Catalogue.DL.Services
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstTo),
                 Ccs = string.Join("; ", lstCc),
                 Subject = subject,
@@ -939,7 +1014,7 @@ namespace eFMS.API.Catalogue.DL.Services
             saleService = GetContractServicesName(contract.SaleService);
             contract.Arconfirmed = true;
             contract.DatetimeModified = DateTime.Now;
-            var hs  = DataContext.Update(contract, x => x.Id == new Guid( contractId),false);
+            var hs = DataContext.Update(contract, x => x.Id == new Guid(contractId), false);
             DataContext.SubmitChanges();
             string url = string.Empty;
 
@@ -977,7 +1052,7 @@ namespace eFMS.API.Catalogue.DL.Services
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
             subject = "eFMS - Partner Confirm Credit Term Request From " + FullNameCreatetor;
 
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
               "<i> You have a Partner Confirm Credit Term request From " + FullNameCreatetor + " as info below </i> </br>" +
               "<i> Bạn có một yêu cầu xác duyệt đối tượng từ " + FullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
@@ -993,17 +1068,19 @@ namespace eFMS.API.Catalogue.DL.Services
               "\t  Agreement  type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
               "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br></br>"
 
-              +linkEn + "</br>" + linkVn + "</br> </br>" +
+              + linkEn + "</br>" + linkVn + "</br> </br>" +
               "<i> Thanks and Regards </i>" + "</br> </br>" +
               "<b> eFMS System, </b>" +
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
+            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
-            bool result =  SendMail.Send(subject, body, lstTo, null, null, lstBCc);
+            bool result = SendMail.Send(subject, body, lstTo, null, null, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
             {
+                SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstTo),
                 Ccs = string.Join("; ", lstBCc),
                 Subject = subject,

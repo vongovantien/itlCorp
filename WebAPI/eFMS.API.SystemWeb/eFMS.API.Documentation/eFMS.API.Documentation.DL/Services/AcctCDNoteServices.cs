@@ -544,7 +544,7 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var cdNote in cdNotesModel)
                     {
                         var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                        cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
+                        cdNote.soaNo = string.Join(", ", chargesOfCDNote.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
                         var _cdCurrency = chargesOfCDNote.Select(s => new
@@ -654,7 +654,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (transaction != null)
             {
                 soaDetails.MbLadingNo = transaction?.Mawb;
-                hbOfLadingNo = string.Join(", ", HBList.Select(x => x.Hwbno).Distinct());
+                hbOfLadingNo = string.Join(", ", HBList.Where(x => !string.IsNullOrEmpty(x.Hwbno)).Select(x => x.Hwbno).Distinct());
                 soaDetails.HbLadingNo = hbOfLadingNo;
             }
             else
@@ -731,8 +731,8 @@ namespace eFMS.API.Documentation.DL.Services
             sealsContsNo += ".";
             sealsContsNo = sealsContsNo != "." ? sealsContsNo.Replace(", .", "") : string.Empty;
 
-            hbShippers = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ShipperId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
-            hbConsignees = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ConsigneeId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
+            hbShippers = string.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ShipperId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
+            hbConsignees = string.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ConsigneeId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
 
             var countries = countryRepository.Get().ToList();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
@@ -767,7 +767,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.CDNote = cdNote;
             soaDetails.ProductService = opsTransaction?.ProductService;
             soaDetails.ServiceMode = opsTransaction?.ServiceMode;
-            soaDetails.SoaNo = String.Join(", ", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
+            soaDetails.SoaNo = string.Join(", ", charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
             soaDetails.HbSealNo = sealsContsNo;//SealNo/ContNo
             soaDetails.HbGrossweight = hbGw;
             soaDetails.HbShippers = hbShippers; //Shipper
@@ -1333,7 +1333,7 @@ namespace eFMS.API.Documentation.DL.Services
             bool isOriginCurr = criteria.Currency == DocumentConstants.CURRENCY_ORIGIN;
             if (data != null)
             {
-                _hbllist = string.Join("\r\n", data.ListSurcharges.Select(s => s.Hwbno).Distinct());
+                _hbllist = string.Join("\r\n", data.ListSurcharges.Where(x => !string.IsNullOrEmpty(x.Hwbno)).Select(s => s.Hwbno).Distinct());
                 int i = 1;
                 foreach (var item in data.ListSurcharges)
                 {

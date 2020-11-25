@@ -10,24 +10,24 @@ const routes: Routes = [
     {
         path: "job-management",
         loadChildren: () => import('./job-mangement/job-management.module').then(m => m.JobManagementModule),
-        data: { name: 'Job Management' }
+        data: { name: 'Job Management', title: 'eFMS Ops Job' }
     },
     {
         path: "assigment",
         loadChildren: () => import('./assigment/assignment.module').then(m => m.AssignmentModule),
-        data: { name: 'Assignment' }
+        data: { name: 'Assignment', title: 'eFMS Assignment' }
     },
 
     {
         path: "custom-clearance",
         loadChildren: () => import('./custom-clearance/custom-clearance.module').then(m => m.CustomClearanceModule),
-        data: { name: 'Custom Clearance' }
+        data: { name: 'Custom Clearance', title: 'eFMS Custom Clearance' }
     },
     {
         path: "trucking-assigment",
         component: TruckingAssignmentComponent,
         data: {
-            name: "Trucking Assigment",
+            name: "Trucking Assigment", title: 'eFMS Trucking'
         },
     }
 ];

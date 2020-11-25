@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 import { Store } from '@ngrx/store';
 
-import { IShareSystemState, SystemLoadUserLevelAction } from 'src/app/business-modules/share-system/store';
+import { IShareSystemState, SystemLoadUserLevelAction } from '../../store';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
 import { forkJoin } from 'rxjs';

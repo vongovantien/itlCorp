@@ -2221,7 +2221,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _shipmentType = GetShipmentTypeForPreviewPL(shipment.TransactionType) + shipment.TypeOfService;
             if (listHousebill.Count > 0)
             {
-                _hblNoList = String.Join(";", listHousebill.Select(x => x.Hwbno));
+                _hblNoList = String.Join(";", listHousebill.Where(x => !string.IsNullOrEmpty(x.Hwbno)).Select(x => x.Hwbno));
 
                 var housebillFirst = listHousebill.First();
                 var userSaleman = sysUserRepo.Get(x => x.Id == housebillFirst.SaleManId).FirstOrDefault();

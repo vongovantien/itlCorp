@@ -4,30 +4,26 @@ import { ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
-import { AppForm } from 'src/app/app.form';
-import { FCLImportAddModel, CsTransaction } from 'src/app/shared/models';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
-
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business/components/import-job-detail/import-job-detail.popup';
-import { ShareBussinessFormCreateSeaImportComponent } from 'src/app/business-modules/share-business';
-
-import { catchError, takeUntil } from 'rxjs/operators';
-
-import * as fromShareBussiness from './../../../share-business/store';
+import { AppForm } from '@app';
+import { CsTransaction, Container } from '@models';
+import { DocumentationRepo } from '@repositories';
+import { InfoPopupComponent } from '@common';
+import { CommonEnum } from '@enums';
+import { ShareBusinessImportJobDetailPopupComponent, ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
+import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/components/form-create-sea-import/form-create-sea-import.component';
+import * as fromShareBussiness from './../../../share-business/store';
 
+import { catchError, takeUntil } from 'rxjs/operators';
+import _merge from 'lodash/merge';
 @Component({
     selector: 'app-create-job-consol-import',
     templateUrl: './create-job-consol-import.component.html',
 })
 export class SeaConsolImportCreateJobComponent extends AppForm {
 
-    @ViewChild(ShareBussinessFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaImportComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -74,23 +70,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            mawb: form.mawb,
-            voyNo: form.voyNo,
-            pono: form.pono,
-            notes: form.notes,
-            personIncharge: this.formCreateComponent.personIncharge.value, // TODO user with Role = CS.
-            subColoader: form.subColoader || null,
-
-            flightVesselName: form.flightVesselName,
-
-            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
-
-            agentId: form.agentId,
-            pol: form.pol,
-            pod: form.pod,
-            deliveryPlace: form.deliveryPlace,
+            personIncharge: form.personIncharge,
             coloaderId: form.coloader,
 
             // * containers summary
@@ -104,8 +84,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
 
         };
 
-
-        const model = new CsTransaction(formData);
+        const model: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         model.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaConsolImport;
 
         return model;
@@ -127,7 +106,6 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
     }
 
     checkValidateForm() {
-        this.setError(this.formCreateComponent.mbltype);
         let valid: boolean = true;
         if (!this.formCreateComponent.formCreate.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)) {
             valid = false;
@@ -144,11 +122,6 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
             this.infoPopup.show();
             return;
         }
-
-        // if (!this.containers.length) {
-        //     this._toastService.warning('Please add container to create new job');
-        //     return;
-        // }
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
@@ -171,7 +144,6 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // TODO goto detail.
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
@@ -190,7 +162,6 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        // TODO goto detail.
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error(res.message);

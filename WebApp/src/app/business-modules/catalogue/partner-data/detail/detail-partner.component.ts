@@ -127,6 +127,8 @@ export class PartnerDetailComponent extends AppList {
                         this.back();
                     }
                     this.isAddSubPartner = res.action;
+                } else {
+                    localStorage.removeItem('success_add_sub');
                 }
                 this.getDataCombobox();
                 if (this.isAddSubPartner) {
@@ -368,7 +370,7 @@ export class PartnerDetailComponent extends AppList {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
         if (this.partnerGroupActives.find(x => x.id === "ALL")) {
-            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
+            this.partner.partnerGroup = 'CARRIER;CONSIGNEE;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             this.isShowSaleMan = true;
         }
         this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
@@ -393,7 +395,7 @@ export class PartnerDetailComponent extends AppList {
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
-                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
+                this.partner.partnerGroup = 'CARRIER;CONSIGNEE;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
@@ -551,7 +553,8 @@ export class PartnerDetailComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.confirmDeletePartnerPopup.hide();
-                        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}`]);
+                        localStorage.setItem('success_add_sub', "true");
+                        this.back();
                     } else {
                         this._toastService.error(res.message);
                     }

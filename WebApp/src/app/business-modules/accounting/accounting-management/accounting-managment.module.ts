@@ -34,16 +34,16 @@ import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
-        path: "", data: { name: "", title: 'eFMS Accounting Management' }, redirectTo: 'cd-invoice',
+        path: "", data: { name: "" }, redirectTo: 'cd-invoice',
     },
     {
-        path: 'cd-invoice', component: AccountingManagementDebitCreditInvoiceComponent, data: { name: 'Debit/Credit/Invoice' }
+        path: 'cd-invoice', component: AccountingManagementDebitCreditInvoiceComponent, data: { name: 'Debit/Credit/Invoice', title: 'eFMS Debit-Credit-Invoice' }
     },
     {
         path: 'vat-invoice', data: { name: 'VAT Invoice' },
         children: [
             {
-                path: '', component: AccountingManagementVatInvoiceComponent, data: { name: '' }
+                path: '', component: AccountingManagementVatInvoiceComponent, data: { name: '', title: 'eFMS Vat Invoice' }
             },
             {
                 path: 'new', component: AccountingManagementCreateVATInvoiceComponent, data: { name: 'New' }
@@ -61,7 +61,7 @@ const routing: Routes = [
         path: 'voucher', data: { name: 'Voucher' },
         children: [
             {
-                path: '', component: AccountingManagementVoucherComponent, data: { name: '' }
+                path: '', component: AccountingManagementVoucherComponent, data: { name: '', title: 'eFMS Voucher' }
             },
             {
                 path: 'new', component: AccountingManagementCreateVoucherComponent, data: { name: 'New' }

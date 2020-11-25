@@ -8,19 +8,19 @@ import { SystemConstants } from 'src/constants/system.const';
 
 import { skip, takeUntil, catchError } from 'rxjs/operators';
 
-import * as fromStore from './../../store';
 import { DocumentationRepo } from '@repositories';
 import { ConfirmPopupComponent } from '@common';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
 import { CommonEnum } from '@enums';
+import { getDimensionVolumesState, getTransactionLocked, IShareBussinessState } from '@share-bussiness';
 
 @Component({
-    selector: 'dim-volume-popup',
+    selector: 'app-dim-volume-popup',
     templateUrl: './dim-volume.popup.html'
 })
 
-export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements OnInit {
+export class ShareAirServiceDIMVolumePopupComponent extends PopupBase implements OnInit {
     @ViewChild('confirmDeleteDim', { static: false }) confirmDeleteDIMpopup: ConfirmPopupComponent;
 
 
@@ -50,14 +50,14 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
 
     constructor(
         private _toastService: ToastrService,
-        private _store: Store<fromStore.IShareBussinessState>,
+        private _store: Store<IShareBussinessState>,
         private _documentRepo: DocumentationRepo
     ) {
         super();
     }
 
     ngOnInit() {
-        this._store.select<any>(fromStore.getDimensionVolumesState)
+        this._store.select<any>(getDimensionVolumesState)
             .pipe(
                 skip(1),
                 takeUntil(this.ngUnsubscribe)
@@ -85,7 +85,7 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
                 }
             );
 
-        this.isLocked = this._store.select<any>(fromStore.getTransactionLocked);
+        this.isLocked = this._store.select<any>(getTransactionLocked);
     }
 
     addDIM() {

@@ -57,6 +57,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     }
                     this.isAddSubPartner = res.action;
                     this.partnerList.isAddSubPartner = this.isAddSubPartner;
+                } else {
+                    localStorage.removeItem('success_add_sub');
                 }
                 if (res.type) {
                     this.type = res.type;

@@ -3,33 +3,32 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-
-import { DataService } from '@services';
 import { DocumentationRepo } from '@repositories';
-import { CsTransaction } from '@models';
+import { CsTransaction, CsShippingInstruction } from '@models';
 import { SystemConstants } from '@constants';
 import { ReportPreviewComponent } from '@common';
-import { ShareBussinessBillInstructionSeaExportComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent } from '@share-bussiness';
-
-import { AppList } from 'src/app/app.list';
-import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
+import { AppList } from '@app';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 import {
     getTransactionPermission,
     getTransactionLocked,
     TransactionActions,
     TransactionGetDetailAction,
-    getTransactionDetailCsTransactionState
-} from './../../../../share-business/store';
+    getTransactionDetailCsTransactionState,
+    ShareBussinessBillInstructionSeaExportComponent,
+    ShareBussinessBillInstructionHousebillsSeaExportComponent
+} from '@share-bussiness';
 
+import { forkJoin } from 'rxjs';
+import { catchError, finalize, takeUntil, take, concatMap, pluck } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
-import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
-
 
 @Component({
     selector: 'app-sea-fcl-export-shipping-instruction',
     templateUrl: './sea-fcl-export-shipping-instruction.component.html'
 })
-export class SeaFclExportShippingInstructionComponent extends AppList {
+export class SeaFclExportShippingInstructionComponent extends AppList implements ICrystalReport {
 
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
@@ -43,36 +42,37 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
-        private _dataService: DataService) {
+    ) {
         super();
     }
 
+
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            if (!!param && param.jobId) {
-                this.jobId = param.jobId;
-                this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-                this.getHouseBills();
-            }
-        });
+        this._activedRouter.params
+            .pipe(
+                pluck('jobId'),
+                concatMap((jobId) => {
+                    this.jobId = jobId;
+                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+                    return forkJoin([
+                        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }),
+                        this._documentRepo.getShippingInstruction(jobId)
+                    ]);
+                })
+            ).subscribe(
+                (res) => {
+                    if (!!res) {
+                        if (!!res[0]) {
+                            this.billDetail.housebills = this.houseBills = res[0] || [];
+                        }
+                        this.displayPreview = !!res[1];
+                        this.setDataBillInstructionComponent(res[1]);
+                    }
+                }
+            );
 
         this.permissionShipments = this._store.select(getTransactionPermission);
         this.isLocked = this._store.select(getTransactionLocked);
-    }
-    getHouseBills() {
-
-        this.isLoading = true;
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-                this.houseBills = res;
-                this.billDetail.housebills = res;
-
-                this.getBillingInstruction(this.jobId);
-            },
-        );
     }
 
     getBillingInstruction(jobId: string) {
@@ -83,16 +83,12 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-                    if (!!res) {
-                        this.displayPreview = true;
-                    }
-                    else {
-                        this.displayPreview = false;
-                    }
+                    this.displayPreview = !!res;
                     this.setDataBillInstructionComponent(res);
                 },
             );
     }
+
     setDataBillInstructionComponent(data: any) {
         this._store.select(getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
@@ -103,18 +99,19 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                             this.billSIComponent.shippingInstruction = data;
                             this.billSIComponent.shippingInstruction.refNo = res.jobNo;
                         } else {
+                            // * Set Default
                             this.initNewShippingInstruction(res);
                             if (this.billSIComponent.type === "fcl") {
-                                this.getContainers();
+                                this.calculateGoodInfo();
                             }
                         }
-
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
                         this.billSIComponent.setformValue(this.billSIComponent.shippingInstruction);
                     }
                 }
             );
     }
+
     calculateGoodInfo() {
         if (this.houseBills != null) {
             // let desOfGoods = '';
@@ -156,9 +153,10 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 packagesNote: packages,
                 containerNote: containerNotes,
                 containerSealNo: contSealNos
-            })
+            });
         }
     }
+
     setFormRefresh(res: any) {
         this.billSIComponent.formSI.patchValue({
             grossWeight: res.grossWeight,
@@ -168,18 +166,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             contSealNo: res.containerSealNo,
         });
     }
-    getContainers() {
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-                this.houseBills = res;
-                this.calculateGoodInfo();
-            },
-        );
 
-    }
     getContSealNo(containers: any) {
         let contSealNos = '';
         const contseal = containers.split("; ");
@@ -195,6 +182,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         }
         return contSealNos;
     }
+
     getPackages(lstPackages: any[]): string {
         const t = _groupBy(lstPackages, "package");
         let packages = '';
@@ -210,6 +198,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         }
         return packages;
     }
+
     initNewShippingInstruction(res: CsTransaction) {
         const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.billSIComponent.shippingInstruction = new CsShippingInstruction();
@@ -226,8 +215,10 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         this.billSIComponent.shippingInstruction.voyNo = (!!res.flightVesselName ? res.flightVesselName : '') + " - " + (!!res.voyNo ? res.voyNo : '');
         this.billSIComponent.shippingInstruction.goodsDescription = res.desOfGoods;
         this.billSIComponent.shippingInstruction.remark = res.mbltype;
+
         this.getExportDefault(res);
     }
+
     getExportDefault(res: CsTransaction) {
         this.billSIComponent.shippingInstruction.cargoNoticeRecevier = "SAME AS CONSIGNEE";
         if (res.creatorOffice) {
@@ -252,6 +243,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             }
         }
     }
+
     save() {
         this.billSIComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
@@ -262,16 +254,13 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         data.jobId = this.jobId;
         this.saveData(data);
     }
+
     saveData(data: CsShippingInstruction) {
-        this._documentRepo.updateShippingInstruction(data).pipe(
-            catchError(this.catchError)
-        )
+        this._documentRepo.updateShippingInstruction(data).pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        //
                         this.displayPreview = true;
-                        //
                         this._toastService.success(res.message);
                         this.getBillingInstruction(this.jobId);
                     } else {
@@ -280,6 +269,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 }
             );
     }
+
     checkValidateForm() {
         let valid: boolean = true;
         if (!this.billSIComponent.formSI.valid
@@ -292,10 +282,12 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         }
         return valid;
     }
+
     refresh() {
         this.displayPreview = false;
         this.setDataBillInstructionComponent(null);
     }
+
     previewSummaryReport() {
         if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
@@ -309,10 +301,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
 
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -320,6 +309,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 },
             );
     }
+
     previewSIReport() {
         if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
@@ -333,10 +323,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
 
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -358,15 +345,11 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
 
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
-                    }
-                    else {
+                    } else {
                         this._toastService.warning('This shipment does not have any container ');
                     }
                 },
@@ -384,15 +367,18 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('This shipment does not have any house bill ');
                     }
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 }
 

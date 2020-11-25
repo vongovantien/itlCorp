@@ -10,7 +10,7 @@ import { CustomerAgentImportComponent } from '../components/customer-agent-impor
 
 const routing: Routes = [
     {
-        path: '', data: { name: "", title: 'eFMS Commercial Agent' }, children: [
+        path: '', data: { name: "" }, children: [
             {
                 path: '', component: CommercialAgentComponent
             },

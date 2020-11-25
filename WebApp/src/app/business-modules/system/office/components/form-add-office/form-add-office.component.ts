@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { AppForm } from 'src/app/app.form';
 
 import { Store } from '@ngrx/store';
-import { checkShareSystemUserLevel, IShareSystemState } from 'src/app/business-modules/share-system/store';
+import { checkShareSystemUserLevel, IShareSystemState } from './../../../store';
 import { RoutingConstants } from '@constants';
 
 @Component({

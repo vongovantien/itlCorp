@@ -9,7 +9,7 @@ import { Department, Office } from '@models';
 import { SortService, PreviousRouteService } from '@services';
 
 import { AppList } from 'src/app/app.list';
-import { SystemLoadUserLevelAction, IShareSystemState } from 'src/app/business-modules/share-system/store';
+import { SystemLoadUserLevelAction, IShareSystemState } from './../../store';
 import { IFormAddOffice, OfficeFormAddComponent } from '../components/form-add-office/form-add-office.component';
 
 

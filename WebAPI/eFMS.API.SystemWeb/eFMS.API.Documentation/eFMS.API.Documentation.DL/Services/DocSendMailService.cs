@@ -23,6 +23,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsShippingInstruction> csShippingInstructionRepository;
         private readonly IContextBase<CatUnit> unitRepository;
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
+        private readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -34,7 +35,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPlace> catPlace,
             IContextBase<CsShippingInstruction> csShippingInstruction,
             IContextBase<CatUnit> unitRepo,
-            IContextBase<CsMawbcontainer> csMawbcontainer) : base(repository, mapper)
+            IContextBase<CsMawbcontainer> csMawbcontainer,
+            IContextBase<SysSentEmailHistory> sentEmailHistory) : base(repository, mapper)
         {
             currentUser = user;
             catPartnerRepo = catPartner;
@@ -45,6 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
             csShippingInstructionRepository = csShippingInstruction;
             unitRepository = unitRepo;
             csMawbcontainerRepo = csMawbcontainer;
+            sentEmailHistoryRepo = sentEmailHistory;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -62,9 +65,25 @@ namespace eFMS.API.Documentation.DL.Services
                     ccEmails = emailContent.Cc.Split(';').Where(x => x.Trim().ToString() != string.Empty).ToList();
                 }
                 var sendMailResult = SendMail.Send(emailContent.Subject, emailContent.Body, toEmails, emailContent.AttachFiles, ccEmails);
+                
+                #region --- Ghi Log Send Mail ---
+                var logSendMail = new SysSentEmailHistory
+                {
+                    SentUser = SendMail._emailFrom,
+                    Receivers = string.Join("; ", toEmails),
+                    Ccs = string.Join("; ", ccEmails),
+                    Subject = emailContent.Subject,
+                    Sent = sendMailResult,
+                    SentDateTime = DateTime.Now,
+                    Body = emailContent.Body
+                };
+                var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+                var hsSm = sentEmailHistoryRepo.SubmitChanges();
+                #endregion --- Ghi Log Send Mail ---
+
                 return sendMailResult;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

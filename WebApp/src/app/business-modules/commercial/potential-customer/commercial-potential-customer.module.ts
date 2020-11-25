@@ -18,7 +18,7 @@ import { CommercialPotentialCustomerPopupComponent } from './components/popup/po
 
 const routing: Routes = [
     {
-        path: '', data: { name: "", title: 'eFMS Commercial Potential Customer' }, children: [
+        path: '', data: { name: "" }, children: [
             {
                 path: '', component: CommercialPotentialCustomerComponent
             },

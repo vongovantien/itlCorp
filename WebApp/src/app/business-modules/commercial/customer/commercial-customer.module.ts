@@ -10,7 +10,7 @@ import { ContractImportComponent } from '../components/contract/import/contract-
 
 const routing: Routes = [
     {
-        path: '', data: { name: "", title: 'eFMS Commercial Customer' },
+        path: '', data: { name: "" },
         children: [
             {
                 path: '', component: CommercialCustomerComponent
