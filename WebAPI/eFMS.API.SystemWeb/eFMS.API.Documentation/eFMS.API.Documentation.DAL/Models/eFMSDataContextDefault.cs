@@ -3408,7 +3408,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UserModified)
+                entity.Property(e => e.UserModified);
             
             });
 
