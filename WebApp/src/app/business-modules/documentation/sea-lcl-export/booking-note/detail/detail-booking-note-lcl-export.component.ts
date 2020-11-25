@@ -156,7 +156,7 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                 etd: null,
                 eta: null,
 
-                paymentTerm: !!res.paymentTerm ? [{ id: res.paymentTerm, text: res.paymentTerm }] : null,
+                paymentTerm: res.paymentTerm
 
             };
             this.formBookingNoteComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
@@ -168,7 +168,6 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                 dateOfStuffing: !!res.dateOfStuffing ? { startDate: new Date(res.dateOfStuffing), endDate: new Date(res.dateOfStuffing) } : null,
                 bookingDate: !!res.bookingDate ? { startDate: new Date(res.bookingDate), endDate: new Date(res.bookingDate) } : null,
 
-                paymentTerm: !!res.paymentTerm ? [{ id: res.paymentTerm, text: res.paymentTerm }] : null,
 
                 pol: res.pol,
                 pod: res.pod,

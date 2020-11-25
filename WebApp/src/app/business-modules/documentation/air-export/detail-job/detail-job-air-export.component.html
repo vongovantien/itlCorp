@@ -59,7 +59,7 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')" [active]="selectedTab === 'SHIPMENT'">
-                <form-create-air type="export">
+                <app-form-create-air type="export">
                     <div class="row m--margin-top-20" *ngIf="!!shipmentDetail">
                         <div class="col-md-4">
                             <span>Created: {{shipmentDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
@@ -80,7 +80,7 @@
                             </div>
                         </ng-container>
                     </div>
-                </form-create-air>
+                </app-form-create-air>
                 <grant-total-profit></grant-total-profit>
             </tab>
             <tab heading="HAWB List" (selectTab)="onSelectTab('hbl')" [active]="selectedTab === 'HBL'"

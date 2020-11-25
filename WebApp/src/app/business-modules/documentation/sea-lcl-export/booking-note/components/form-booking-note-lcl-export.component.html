@@ -17,7 +17,6 @@
                             <label>Booking Date</label>
                         </div>
                         <div class="col-lg-10">
-                            <!-- <input type="text" class="form-control" formControlName="telFrom"> -->
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
@@ -222,10 +221,10 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Payment Term</label>
-                                <ng-select #airFreight [items]="termTypes" [allowClear]="true"
-                                    (opened)="closeOtherSelects(airFreight)" formControlName="paymentTerm"
+                                <ng-select class="custom" [items]="termTypes" formControlName="paymentTerm"
                                     placeholder="Please Select">
                                 </ng-select>
+
                             </div>
                         </div>
                         <div class="col-lg-6">
