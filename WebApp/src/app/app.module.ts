@@ -5,7 +5,6 @@ import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { StoreModule } from "@ngrx/store";
-import { RouteReuseStrategy } from "@angular/router";
 
 import { HeaderComponent } from "./master-page/header/header.component";
 import { FooterComponent } from "./master-page/footer/footer.component";
@@ -28,16 +27,14 @@ import { NgProgressModule } from "@ngx-progressbar/core";
 import { ToastrModule } from "ngx-toastr";
 import { EffectsModule } from "@ngrx/effects";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
-import { RouterStateSerializer } from '@ngrx/router-store';
 import { AuthInterceptor, MenuResolveGuard, LoadingInterceptor } from "@core";
 
 import { GlobalState } from "./global-state";
 import { AppRoutingModule } from "./app-routing.module";
 import { environment } from "src/environments/environment";
 
-import { reducers, CustomSerializer, effects } from "./store";
+import { reducers, effects } from "./store";
 import { ForbiddenPageComponent } from "./403/403.component";
-import { CustomRouteReuseStrategy } from "./router-reuse";
 import { DEFAULT_TIMEOUT } from "./core/inject/default-timeout.token";
 
 const authConfig: AuthConfig = {
@@ -93,7 +90,6 @@ const authConfig: AuthConfig = {
             maxAge: 25, // Retains last 25 states
             logOnly: !environment.production, // Restrict extension to log-only mode
         }),
-        // StoreRouterConnectingModule.forRoot(),
 
     ],
     providers: [
@@ -105,10 +101,6 @@ const authConfig: AuthConfig = {
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: AuthConfig, useValue: authConfig },
         { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 200000 : 30000 },
-        // {
-        //     provide: RouterStateSerializer, useClass: CustomSerializer
-        // },
-        // { provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy }
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     bootstrap: [AppComponent],

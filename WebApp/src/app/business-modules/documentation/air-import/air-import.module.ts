@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
-import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -13,6 +12,7 @@ import { AirImportLazyLoadModule } from './air-import-lazy-load.module';
 import { AirImportCreateJobComponent } from './create-job/create-job-air-import.component';
 import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.component';
 import { DeactivateGuardService } from '@core';
+import { ShareAirServiceModule } from '../share-air/share-air-service.module';
 
 const routing: Routes = [
     {
@@ -45,7 +45,6 @@ const routing: Routes = [
 ];
 
 const LIB = [
-    SelectModule,
     NgxDaterangepickerMd.forRoot(),
     PerfectScrollbarModule,
     TabsModule.forRoot(),
@@ -58,6 +57,7 @@ const LIB = [
         SharedModule,
         ShareBussinessModule,
         AirImportLazyLoadModule,
+        ShareAirServiceModule,
         ...LIB,
     ],
     exports: [],

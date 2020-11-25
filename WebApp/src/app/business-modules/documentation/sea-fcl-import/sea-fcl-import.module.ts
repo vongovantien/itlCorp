@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { Routes, RouterModule } from '@angular/router';
-import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -18,6 +17,7 @@ import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-imp
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { DeactivateGuardService } from '@core';
+import { ShareSeaServiceModule } from '../share-sea/share-sea-service.module';
 
 const routing: Routes = [
     {
@@ -56,7 +56,6 @@ const LIB = [
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     PaginationModule.forRoot(),
-    SelectModule,
     NgxDaterangepickerMd.forRoot()
 ];
 
@@ -73,7 +72,8 @@ const LIB = [
         RouterModule.forChild(routing),
         ...LIB,
         SeaFCLImportLazyLoadModule, // ?  Lazy loading module with  tab component (CD Note, Assignment).
-        ShareBussinessModule
+        ShareBussinessModule,
+        ShareSeaServiceModule
 
     ],
     exports: [],

@@ -51,19 +51,16 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>MBL Type</label>
-                            <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select" ng2ControlTrigger
-                                formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
-                            </ng-select>
+                            <ng-select class="custom" [items]="ladingTypes" placeholder="Please Select"
+                                formControlName="mbltype"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (shipmentType.dirty && !shipmentType.valid) || (isSubmitted && !shipmentType.valid)}">
                             <label required>Shipment Type</label>
-                            <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
-                                ng2ControlTrigger formControlName="shipmentType"
-                                (opened)="closeOtherSelects(selectShipmentType)" [allowClear]="true">
-                            </ng-select>
+                            <ng-select class="custom" [items]="shipmentTypes" placeholder="Please Select"
+                                formControlName="shipmentType" [clearable]="false"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -158,10 +155,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.valid)}">
                             <label required>Service Type</label>
-                            <ng-select #selectServiceType [items]="serviceTypes" placeholder="Please Select"
-                                ng2ControlTrigger formControlName="typeOfService"
-                                (opened)="closeOtherSelects(selectServiceType)" [allowClear]="true">
-                            </ng-select>
+                            <ng-select class="custom" [items]="serviceTypes" placeholder="Please Select"
+                                formControlName="typeOfService" [clearable]="false"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">

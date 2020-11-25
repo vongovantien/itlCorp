@@ -11,15 +11,15 @@ import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
 import {
-    ShareBussinessFormCreateSeaImportComponent,
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBusinessImportJobDetailPopupComponent
 } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
+import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/components/form-create-sea-import/form-create-sea-import.component';
 
 import { catchError, takeUntil } from 'rxjs/operators';
 import * as fromShareBussiness from './../../../share-business/store';
-
+import _merge from 'lodash/merge';
 
 @Component({
     selector: 'app-create-job-fcl-import',
@@ -27,7 +27,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 })
 export class SeaFCLImportCreateJobComponent extends AppForm {
 
-    @ViewChild(ShareBussinessFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaImportComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -68,29 +68,13 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     }
 
     onSubmitData() {
-        const form: any = this.formCreateComponent.formCreate.getRawValue();
+        const form = this.formCreateComponent.formCreate.getRawValue();
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            mawb: form.mawb,
-            voyNo: form.voyNo,
-            pono: form.pono,
-            notes: form.notes,
-            personIncharge: this.formCreateComponent.personIncharge.value, // TODO user with Role = CS.
-            subColoader: form.subColoader || null,
-
-            flightVesselName: form.flightVesselName,
-
-            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
-
-            agentId: form.agentId,
-            pol: form.pol,
-            pod: form.pod,
-            deliveryPlace: form.deliveryPlace,
+            personIncharge: this.formCreateComponent.personIncharge.value,
             coloaderId: form.coloader,
 
             // * containers summary
@@ -103,12 +87,10 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
 
         };
+        const model: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
+        model.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLImport;
 
-
-        const fclImportAddModel = new CsTransaction(formData);
-        fclImportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLImport;
-
-        return fclImportAddModel;
+        return model;
 
     }
 
@@ -127,7 +109,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     }
 
     checkValidateForm() {
-        this.setError(this.formCreateComponent.mbltype);
         let valid: boolean = true;
         if (!this.formCreateComponent.formCreate.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)) {
             valid = false;
@@ -144,11 +125,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             this.infoPopup.show();
             return;
         }
-
-        // if (!this.containers.length) {
-        //     this._toastService.warning('Please add container to create new job');
-        //     return;
-        // }
 
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
@@ -171,7 +147,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
@@ -189,8 +164,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                 (res: any) => {
                     if (res.result.success) {
                         this._toastService.success("New data added");
-
-
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${res.model.id}`]);
                     } else {
                         this._toastService.error(res.message);
@@ -200,7 +173,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     }
 
     showImportPopup() {
-
         this.formImportJobDetailPopup.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
         this.formImportJobDetailPopup.getShippments();
         this.formImportJobDetailPopup.show();

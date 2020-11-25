@@ -1,40 +1,45 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators, CheckboxControlValueAccessor } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { CommonEnum } from '@enums';
 import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity, Warehouse } from '@models';
 import { FormValidators } from '@validators';
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 import {
     getCataloguePortLoadingState, getCatalogueCarrierState, getCatalogueCarrierLoadingState, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueAgentLoadingState, GetCatalogueAgentAction, GetCatalogueUnitAction, getCatalogueUnitState, GetCatalogueCommodityAction, getCatalogueCommodityState
 } from '@store';
 
-import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
-
-import * as fromStore from './../../store/index';
-import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
 import { JobConstants } from '@constants';
-import { GetDimensionAction } from './../../store/index';
+import {
+    DimensionActions,
+    DimensionActionTypes,
+    GetDimensionAction,
+    getTransactionDetailCsTransactionState,
+    InitDimensionAction,
+    IShareBussinessState,
+} from '@share-bussiness';
+import { ShareAirServiceDIMVolumePopupComponent } from '../dim/dim-volume.popup';
 
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 
-
 @Component({
-    selector: 'form-create-air',
+    selector: 'app-form-create-air',
     templateUrl: './form-create-air.component.html',
-    styleUrls: ['./form-create-air.component.scss'],
+    styleUrls: ['./form-create-air.component.scss']
 })
 
-export class ShareBusinessFormCreateAirComponent extends AppForm implements OnInit {
+export class ShareAirServiceFormCreateComponent extends AppForm implements OnInit {
 
     @Input() type: string = 'import';
-    @ViewChild(ShareBusinessDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareBusinessDIMVolumePopupComponent;
+    @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
+    // @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareBusinessDIMVolumePopupComponent;
 
     formGroup: FormGroup;
     etd: AbstractControl;
@@ -62,19 +67,15 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     //
     airlineInfo: AbstractControl; // Airline Information
 
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
-    billTypes: CommonInterface.INg2Select[] = [
-        { id: 'Copy', text: 'Copy' },
-        { id: 'Original', text: 'Original' },
-        { id: 'Surrendered', text: 'Surrendered' },
-    ];
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
+    billTypes: string[] = ['Copy', 'Original', 'Surrendered'];
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
-    units: CommonInterface.INg2Select[];
-    commodities: CommonInterface.INg2Select[];
+    units: Observable<Unit[]>;
+    commodities: Observable<Commodity[]>;
     listUsers: Observable<User[]>;
     warehouses: Warehouse[];
     // ? initWarehouses: Warehouse[];
@@ -110,7 +111,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     constructor(
         private _fb: FormBuilder,
-        private _store: Store<fromStore.IShareBussinessState>,
+        private _store: Store<IShareBussinessState>,
         private _route: ActivatedRoute,
         private _actionSubject: ActionsSubject,
         private _systemRepo: SystemRepo,
@@ -124,8 +125,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (action: fromStore.DimensionActions) => {
-                    if (action.type === fromStore.DimensionActionTypes.GET_DIMENSION_SUCESS) {
+                (action: DimensionActions) => {
+                    if (action.type === DimensionActionTypes.GET_DIMENSION_SUCESS) {
                         this.dimensionDetails = action.payload;
                     }
                 }
@@ -154,6 +155,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
 
         this.carries = this._store.select(getCatalogueCarrierState)
+        this.units = this._store.select(getCatalogueUnitState);
+        this.commodities = this._store.select(getCatalogueCommodityState);
 
         this.listUsers = this._systemRepo.getSystemUsers();
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR })
@@ -171,10 +174,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.initForm();
         this.getUserLogged();
         this.getAgents();
-        this.getUnits();
-        this.getCommodities();
 
-        this._store.select(fromStore.getTransactionDetailCsTransactionState)
+        this._store.select(getTransactionDetailCsTransactionState)
             .pipe(skip(1), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: CsTransaction) => {
@@ -199,43 +200,18 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                         try {
                             this.supplierName = res.supplierName;
                             this.agentName = res.agentName;
-                            const formData: any = {
+                            const formData = {
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
                                 flightDate: !!res.flightDate ? { startDate: new Date(res.flightDate), endDate: new Date(res.flightDate) } : null,
                                 serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
 
-                                mbltype: !!res.mbltype ? [this.billTypes.find(type => type.id === res.mbltype)] : null,
-                                paymentTerm: !!res.paymentTerm ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
-                                shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
-
+                                commodity: !!res.commodity ? res.commodity.split(",") : [],
+                                packageType: +res.packageType, // * Unit
                             };
-                            const dataSelectValue: Partial<{ packageType: CommonInterface.INg2Select[], commodity: CommonInterface.INg2Select[] }> = {};
-
-                            // * Unit
-                            if (!!res.packageType) {
-                                dataSelectValue.packageType = [this.units.find(u => u.id === +res.packageType)];
-                            }
-
-                            // * commodity
-                            if (!!res.commodity) {
-                                const commodities: CommonInterface.INg2Select[] = (res.commodity || '').split(',').map((i: string) => <CommonInterface.INg2Select>({ id: i, text: i }));
-
-                                const commodity: CommonInterface.INg2Select[] = [];
-                                commodities.forEach((c: CommonInterface.INg2Select) => {
-                                    const dataTempInPackages = (this.commodities || []).find((t: CommonInterface.INg2Select) => t.id === c.id);
-                                    if (!!dataTempInPackages) {
-                                        commodity.push(dataTempInPackages);
-                                    }
-                                });
-                                if (commodity.length) {
-                                    dataSelectValue.commodity = commodity;
-                                }
-
-                            }
 
                             // * Update Form
-                            this.formGroup.patchValue(Object.assign(_merge(res, formData, dataSelectValue)));
+                            this.formGroup.patchValue(Object.assign(_merge(res, formData)));
 
                             // * Assign for detect form change (Deactivate).
                             this.currentFormValue = this.formGroup.getRawValue();
@@ -248,30 +224,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 }
             );
     }
-
-    getUnits() {
-        this._store.select(getCatalogueUnitState).subscribe(
-            ((units: Unit[]) => {
-                this.units = this.utility.prepareNg2SelectData(units, 'id', 'code');
-            }),
-        );
-    }
-
-    getCommodities() {
-        this._store.select(getCatalogueCommodityState)
-            .subscribe(
-                (commodities: Commodity[]) => {
-                    this.commodities = this.utility.prepareNg2SelectData(commodities, 'code', 'commodityNameEn');
-                    if (!!this.commodities.length && this.type === 'import') {
-                        const asPerBill = this.commodities.filter(e => e.id === 'CM04');
-                        if (!!asPerBill) {
-                            this.commodity.setValue(asPerBill);
-                        }
-                    }
-                },
-            );
-    }
-
     initForm() {
         this.formGroup = this._fb.group({
             jobNo: [{ value: null, disabled: true }],
@@ -311,7 +263,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
             // * select
             mbltype: [],
-            shipmentType: [[this.shipmentTypes[0]], Validators.required],
+            shipmentType: [this.shipmentTypes[0], Validators.required],
             paymentTerm: [],
             commodity: [],
             packageType: [],
@@ -364,6 +316,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                     }
                 });
         } else {
+            this.commodities.subscribe(
+                (data) => {
+                    const asPerBill = (data || []).find((e: any) => e.code === 'CM04');
+                    if (!!asPerBill) {
+                        this.commodity.setValue([asPerBill.code]);
+                    }
+                }
+            );
             this.formGroup.controls['eta'].valueChanges
                 .pipe(
                     distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
@@ -443,7 +403,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     showDIMVolume() {
         if (!this.isUpdate && !this.isUpdateDIM) {
-            this._store.dispatch(new fromStore.InitDimensionAction([new DIM(), new DIM(), new DIM()]));  // * Dimension default = 3
+            this._store.dispatch(new InitDimensionAction([new DIM(), new DIM(), new DIM()]));  // * Dimension default = 3
             this.dimVolumePopup.isShowGetFromHAWB = false;
         }
         this.dimVolumePopup.show();

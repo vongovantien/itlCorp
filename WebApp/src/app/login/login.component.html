@@ -1,5 +1,5 @@
 <div class="m-grid m-grid--hor login-background"
-    style="background-image: url('assets/app/media/img/bg/bg-login.webp');">
+    style="background-image: url('assets/app/media/img/bg/bg-login.webp'); ">
     <div class="m-login-wrap">
         <div class="lang-nav">
             <span>Language:</span>
@@ -12,8 +12,10 @@
                     src="assets/app/media/img/lang/en-login.png">
             </a>
         </div>
-
         <div class="m-login m-login--signin" id="m_login">
+            <ngx-spinner class="spinnerLogin" [name]="spinnerLogin" bdColor="rgba(0,0,0,0.3)" size="large"
+                color="#3966b6" type="ball-spin-clockwise">
+            </ngx-spinner>
             <div class="m-login__wrapper-1 m-portlet-full-height" style="background-color: #fff">
                 <div class="m-login__wrapper-1-1">
                     <div class="m-login__contanier">

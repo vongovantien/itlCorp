@@ -56,9 +56,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':   (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.valid)}">
                             <label required>MBL Type</label>
-                            <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select" ng2ControlTrigger
-                                formControlName="mbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
-                            </ng-select>
+                            <ng-select class="custom" [items]="ladingTypes" formControlName="mbltype"
+                                placeholder="Please Select" [clearable]="false"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -68,7 +67,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloader.value, hardValue: supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
-                                [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(coloader)">
+                                [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(coloader)"
+                                placeholder="Please select">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -88,10 +88,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.valid)}">
                             <label required>Services Type</label>
-                            <ng-select #select2 [items]="serviceTypes" placeholder="Please Select" ng2ControlTrigger
-                                formControlName="typeOfService" (opened)="closeOtherSelects(select2)"
-                                [allowClear]="true">
-                            </ng-select>
+                            <ng-select class="custom" [items]="serviceTypes" formControlName="typeOfService"
+                                placeholder="Please Select" [clearable]="false"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -110,7 +108,8 @@
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)">
+                                [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)"
+                                placeholder="Please select">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -134,9 +133,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':  (term.dirty && !term.valid) || (isSubmitted && !term.valid)}">
                             <label required>Term</label>
-                            <ng-select #selectTerm [items]="termTypes" placeholder="Please Select" ng2ControlTrigger
-                                formControlName="term" (opened)="closeOtherSelects(selectTerm)" [allowClear]="true">
-                            </ng-select>
+                            <ng-select class="custom" [items]="termTypes" formControlName="term"
+                                placeholder="Please Select" [clearable]="false"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -155,10 +153,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':  (shipmentType.dirty && !shipmentType.valid) || (isSubmitted && !shipmentType.valid)}">
                             <label required>Shipment Type</label>
-                            <ng-select #selectShipmentType [items]="shipmentTypes" placeholder="Please Select"
-                                formControlName="shipmentType" (opened)="closeOtherSelects(selectShipmentType)"
-                                [allowClear]="true" ng2ControlTrigger>
-                            </ng-select>
+                            <ng-select class="custom" [items]="shipmentTypes" formControlName="shipmentType"
+                                placeholder="Please Select" [clearable]="false"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">

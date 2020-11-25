@@ -2,23 +2,24 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 import { ICanComponentDeactivate } from '@core';
 import { CsTransaction } from '@models';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
+import { RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
+
+import * as fromShareBussiness from './../../../share-business/store';
 
 import { combineLatest, of, Observable } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
 
-import * as fromShareBussiness from './../../../share-business/store';
-import { NgProgress } from '@ngx-progressbar/core';
 
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants } from '@constants';
-import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
@@ -44,7 +45,6 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     shipmentDetail: CsTransaction;
-    dataReport: any = null;
 
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;

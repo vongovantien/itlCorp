@@ -1,29 +1,28 @@
 import { Component, ViewEncapsulation, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
+import { ActivatedRoute, Params } from '@angular/router';
 
-import { AppForm } from 'src/app/app.form';
-import { DocumentationRepo, CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { User } from 'src/app/shared/models';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Customer } from 'src/app/shared/models/catalogue/customer.model';
-import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
+import { AppForm } from '@app';
+import { DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
+import { User, Customer, PortIndex, CsTransaction } from '@models';
+import { CommonEnum } from '@enums';
+import { getTransactionDetailCsTransactionState, ITransactionState } from '@share-bussiness';
+import { FormValidators } from '@validators';
+import { JobConstants, SystemConstants } from '@constants';
 
-import * as fromShare from '../../store';
+import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
+
+
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
-import { ActivatedRoute, Params } from '@angular/router';
-import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
-import { SystemConstants } from 'src/constants/system.const';
-import { FormValidators } from '@validators';
-import { JobConstants } from '@constants';
 
 @Component({
-    selector: 'form-create-sea-import',
+    selector: 'app-form-create-sea-import',
     templateUrl: './form-create-sea-import.component.html',
     encapsulation: ViewEncapsulation.None
 })
-export class ShareBussinessFormCreateSeaImportComponent extends AppForm implements OnInit {
+export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm implements OnInit {
 
     @Input() set service(s: string) {
         this._service = s;
@@ -33,9 +32,10 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
     private _service: string = 'fcl';
 
-    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
-    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES;
+    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
+    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
+
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldsPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
@@ -66,7 +66,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     deliveryPlace: AbstractControl;
 
     userLogged: User;
-    fclImportDetail: any; // TODO model;
+    fclImportDetail: CsTransaction;
 
     commonData: any;
 
@@ -74,7 +74,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         protected _documentRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _fb: FormBuilder,
-        private _store: Store<fromShare.ITransactionState>,
+        private _store: Store<ITransactionState>,
         private _route: ActivatedRoute,
         private _systemRepo: SystemRepo
 
@@ -91,17 +91,16 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
-
         this.listUsers = this._systemRepo.getListSystemUser();
 
         this.initForm();
         this.getUserLogged();
 
         // * Subscribe state to update form.
-        this._store.select(fromShare.getTransactionDetailCsTransactionState)
+        this._store.select(getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
-                (res: any) => {
+                (res: CsTransaction) => {
                     if (!!res) {
                         this.fclImportDetail = res;
                         this._route.queryParams.subscribe((param: Params) => {
@@ -115,6 +114,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                         try {
                             this.supplierName = res.supplierName;
                             this.agentName = res.agentName;
+
                             this.formCreate.setValue({
                                 jobId: this.fclImportDetail.jobNo,
                                 mawb: this.fclImportDetail.mawb,
@@ -128,9 +128,9 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                                 eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null,
                                 serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
 
-                                mbltype: !!this.fclImportDetail.mbltype ? [(this.ladingTypes || []).find(type => type.id === this.fclImportDetail.mbltype)] : null,
-                                shipmentType: !!this.fclImportDetail.shipmentType ? [(this.shipmentTypes || []).find(type => type.id === this.fclImportDetail.shipmentType)] : null,
-                                typeOfService: !!this.fclImportDetail.typeOfService ? [{ id: this.fclImportDetail.typeOfService, text: this.fclImportDetail.typeOfService }] : null,
+                                mbltype: this.fclImportDetail.mbltype,
+                                shipmentType: this.fclImportDetail.shipmentType,
+                                typeOfService: this.fclImportDetail.typeOfService,
                                 personIncharge: this.fclImportDetail.personIncharge,
 
                                 pod: this.fclImportDetail.pod,
@@ -143,9 +143,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                             this.currentFormValue = this.formCreate.getRawValue(); // * For Candeactivate
                         } catch (error) {
                             console.log(error);
-
                         }
-
                     }
                 }
             );
@@ -167,7 +165,7 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
             mawb: [],
             // * select
             mbltype: [null],
-            shipmentType: [null, Validators.required],
+            shipmentType: [this.shipmentTypes[0], Validators.required],
             typeOfService: [null, Validators.required],
             personIncharge: [],
             notes: [],
@@ -193,14 +191,10 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.coloader = this.formCreate.controls["coloader"];
         this.deliveryPlace = this.formCreate.controls["deliveryPlace"];
 
-
-        // * Set default 
-        this.shipmentType.setValue([this.shipmentTypes[0]]);
-
         if (this.service === 'fcl') {
-            this.typeOfService.setValue([this.serviceTypes[0] || []]);
+            this.typeOfService.setValue(this.serviceTypes[0]);
         } else {
-            this.typeOfService.setValue([this.serviceTypes[1] || []]);
+            this.typeOfService.setValue(this.serviceTypes[1]);
         }
 
         // * Handle etd, eta change.
@@ -237,21 +231,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
         this.personIncharge.setValue(this.userLogged.id);
         this.personIncharge.disable();
-    }
-
-    getServices() {
-        this._documentRepo.getShipmentDataCommon().subscribe(
-            (commonData: any) => {
-                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-
-                // * Set default service type.
-                if (this.service === 'fcl') {
-                    this.typeOfService.setValue([this.serviceTypes[0] || []]);
-                } else {
-                    this.typeOfService.setValue([this.serviceTypes[1] || []]);
-                }
-            }
-        );
     }
 
     onSelectDataFormInfo(data: any, key: string | any) {

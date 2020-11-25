@@ -59,7 +59,7 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')" [active]="selectedTab === 'SHIPMENT'">
-                <form-create-sea-export>
+                <app-form-create-sea-export>
                     <ng-container *ngIf="!!shipmentDetail">
                         <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
                             [userCreated]="shipmentDetail.userNameCreated"
@@ -80,7 +80,7 @@
 
                     </ng-container>
 
-                </form-create-sea-export>
+                </app-form-create-sea-export>
 
                 <shipment-good-summary type="export"> Shipment Goods Summary </shipment-good-summary>
 
