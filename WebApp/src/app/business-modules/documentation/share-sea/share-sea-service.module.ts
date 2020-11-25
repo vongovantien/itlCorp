@@ -8,6 +8,7 @@ import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from './componen
 import { ShareSeaServiceFormCreateSeaExportComponent } from './components/form-create-sea-export/form-create-sea-export.component';
 import { ShareSeaServiceFormCreateSeaImportComponent } from './components/form-create-sea-import/form-create-sea-import.component';
 import { ShareSeaServiceFormSISeaExportComponent } from './components/form-si-sea-export/form-si-sea-export.component';
+import { ShareSeaServiceShipmentGoodSummaryLCLComponent } from './components/shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 
 
 const COMPONENTS = [
@@ -15,7 +16,8 @@ const COMPONENTS = [
     ShareSeaServiceFormCreateSeaImportComponent,
     ShareSeaServiceFormSISeaExportComponent,
     ShareSeaServiceFormCreateHouseBillSeaExportComponent,
-    ShareSeaServiceFormCreateHouseBillSeaImportComponent
+    ShareSeaServiceFormCreateHouseBillSeaImportComponent,
+    ShareSeaServiceShipmentGoodSummaryLCLComponent
 ];
 
 @NgModule({

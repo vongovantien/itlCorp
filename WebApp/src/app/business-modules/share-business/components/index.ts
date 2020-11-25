@@ -20,7 +20,6 @@ export * from './import-job-detail/import-job-detail.popup';
 export * from './import-job-detail/components/form-search-import/form-search-import-job-detail.component';
 
 export * from './shipment-good-summary/shipment-good-summary.component';
-export * from './shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 export * from './hbl-good-summary-lcl/hbl-good-summary-lcl.component';
 export * from './hbl-good-summary-fcl/hbl-good-summary-fcl.component';
 export * from './goods-import/goods-import.component';
