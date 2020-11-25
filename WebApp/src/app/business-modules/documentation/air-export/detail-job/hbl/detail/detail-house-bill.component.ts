@@ -1,19 +1,19 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
-import { Crystal, CsTransactionDetail, HouseBill } from '@models';
+import { CsTransactionDetail, HouseBill } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
-import { RoutingConstants } from '@constants';
-import { SystemConstants, ChargeConstants } from '@constants';
+import { SystemConstants, ChargeConstants, RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
 import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
-
 
 import { merge } from 'rxjs';
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
@@ -23,17 +23,12 @@ import isUUID from 'validator/lib/isUUID';
     selector: 'app-detail-hbl-air-export',
     templateUrl: './detail-house-bill.component.html',
 })
-export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent implements OnInit {
+export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent implements OnInit, ICrystalReport {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(InputBookingNotePopupComponent, { static: false }) inputBookingNotePopupComponent: InputBookingNotePopupComponent;
 
-
     hblId: string;
     hblDetail: CsTransactionDetail;
-
-    dataReport: Crystal;
-
-    allowUpdate: boolean | any = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -55,8 +50,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             _router,
         );
     }
-
-
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
@@ -141,6 +134,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     confirmUpdateData() {
         this.confirmExistedHbl.hide();
         const modelUpdate = this.getDataForm();
+
         this.setDataToUpdate(modelUpdate);
         this.updateHbl(modelUpdate);
     }
@@ -194,10 +188,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -215,10 +206,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -254,5 +242,11 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         this.inputBookingNotePopupComponent.hblId = this.hblId;
         this.inputBookingNotePopupComponent.bindingFormBN(this.hblDetail);
         this.inputBookingNotePopupComponent.show();
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 }

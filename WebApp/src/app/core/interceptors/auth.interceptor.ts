@@ -66,7 +66,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     detectError(error: HttpErrorResponse): string {
-        let message: string = '';
+        let message: string = 'Something wrong!';
         if (!!error.error) {
             if (!!error.error.error) {
                 if (error.error.error === 'invalid_grant') {
