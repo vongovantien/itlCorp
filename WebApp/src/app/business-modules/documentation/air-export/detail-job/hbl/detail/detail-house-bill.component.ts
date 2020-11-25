@@ -87,8 +87,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         //#endregion --- Shortcut ---
     }
 
-
-
     getDetailHbl() {
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
