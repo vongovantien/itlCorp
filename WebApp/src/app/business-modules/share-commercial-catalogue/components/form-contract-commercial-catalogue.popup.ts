@@ -65,9 +65,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     users: User[] = [];
     companies: Company[] = [];
-    // offices: Office[] = [];
-    offices: CommonInterface.INg2Select[] = [];
     contracts: Contract[] = [];
+
+    offices: CommonInterface.INg2Select[] = [];
     activeServices: any = [];
     activeVas: any = [];
     activeOffice: any = [];
@@ -87,12 +87,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     fileToUpload: File = null;
     fileList: any = null;
-
     files: any = {};
 
-
     menuSpecialPermission: Observable<any[]>;
-
     listCurrency: Observable<CommonInterface.INg2Select[]>;
 
     contractTypes: CommonInterface.INg2Select[] = [
@@ -296,7 +293,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     handleFileInput(event: any) {
         this.fileList = event.target['files'];
-        console.log(this.fileList);
         if (this.isUpdate && !this.isCreateNewCommercial) {
             if (!!this.files && !!this.files.id && this.fileList.length > 0) {
                 this.deleteFileContract();
@@ -332,7 +328,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .subscribe(
                 (res: any = []) => {
                     this.files = res;
-                    console.log(this.files);
                 }
             );
     }
@@ -371,7 +366,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.paymentMethod);
         this.setError(this.currencyId);
         this.isSubmitted = true;
-
         this.selectedContract.index = this.indexDetailContract;
         if (!this.effectiveDate.value.startDate) {
             return;
@@ -416,7 +410,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 const body = new Contract(this.selectedContract);
                 if (this.contractTypeDetail !== this.contractType.value[0].id && this.selectedContract.active === true && this.isAllowActiveContract === false) { //&& this.isChangeAgrmentType === false && this.isAllowActiveContract === false) {
                     this.status = this.statusContract;
-                    this.confirmChangeAgreementTypeText = "You have changed Agreement type " + this.contractTypeDetail + " to " + this.selectedContract.contractType + ", So your agreement will be inactive and request approval again. do you want to change it?";
+                    this.confirmChangeAgreementTypeText = "You have changed Agreement type "
+                        + this.contractTypeDetail + " to "
+                        + this.selectedContract.contractType
+                        + ", So your agreement will be inactive and request approval again. do you want to change it?";
                     this.confirmChangeAgreementTypePopup.show();
                     this.isChangeAgrmentType = true;
                     return;
@@ -429,7 +426,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.isChangeAgrmentType = null;
                 }
                 this.updateContract(body);
-
             } else {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
                 if (this.selectedContract.officeId.includes(';')) {
@@ -444,7 +440,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 } else {
                     this.selectedContract.officeId = this.selectedContract.officeId.toLowerCase();
                     const obj = this.offices.find(x => x.id === this.selectedContract.officeId);
-
                     this.selectedContract.officeNameEn = !!obj ? obj.text : null;
                 }
 
@@ -463,9 +458,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
                     this.selectedContract.saleServiceName = !!obj ? obj.text : null;
                 }
-
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
-
                 this.selectedContract.fileList = this.fileList;
                 const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
                 if (!objCheckContract) {
@@ -557,8 +550,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.activeOffice = this.getCurrentActiveOffice(this.selectedContract.officeId);
         }
         this.setError(this.saleService);
-        // this.effectiveDate.setValue(null);
-
         this.formGroup.patchValue({
             salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId : null,
             companyId: !!this.selectedContract.companyId ? this.selectedContract.companyId : null,
@@ -593,12 +584,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         } else {
             this.isDisabledExpiredDateField = false;
         }
-
     }
-
-
     asignValueToModel() {
-        // this.selectedContract = new Contract();
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
         }
@@ -637,14 +624,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate())),
                 });
             }
-
             if (!!this.expiredDate.value.startDate) {
                 this.trialExpiredDate.setValue({
                     startDate: new Date(new Date(this.expiredDate.value.startDate).setDate(new Date(this.expiredDate.value.startDate).getDate())),
                     endDate: new Date(new Date(this.expiredDate.value.endDate).setDate(new Date(this.expiredDate.value.endDate).getDate())),
                 });
             }
-
             if (!!this.effectiveDate.value.startDate && !!this.expiredDate.value.startDate) {
                 const date2: any = new Date(this.selectedContract.expiredDate);
                 const date1: any = new Date(this.selectedContract.effectiveDate);
@@ -653,13 +638,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.trialCreditDays.setValue(diffDays);
             }
         }
-
         if (this.contractType.value[0].id === 'Official') {
             this.trialEffectDate.setValue(null);
             this.trialCreditDays.setValue(null);
             this.trialExpiredDate.setValue(null);
         }
-
         this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
@@ -674,7 +657,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.description = this.formGroup.controls['description'].value;
         this.selectedContract.trialCreditDays = this.trialCreditDays.value;
         this.selectedContract.partnerId = this.partnerId;
-
     }
 
     activeInactiveContract(id: string) {
@@ -690,9 +672,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onSalesmanCreditRequest($event: any) {
         const data = $event;
-        console.log(data);
         if (!!data.creditRate || data.creditLimit) {
-            this.processActiveInActiveContract(this.selectedContract.id, true, data);
+            this.processActiveInActiveContract(this.selectedContract.id, data);
             this.selectedContract.creditLimit = data.creditLimit;
             this.selectedContract.creditLimitRate = data.creditRate;
             this.formGroup.controls['creditLimit'].setValue(this.selectedContract.creditLimit);
@@ -700,7 +681,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
     }
 
-    processActiveInActiveContract(id: string, salesmanCreditRequest?: boolean, bodyCredit?: any) {
+    processActiveInActiveContract(id: string, bodyCredit?: any) {
         this._progressRef.start();
         this._catalogueRepo.activeInactiveContract(id, this.partnerId, bodyCredit)
             .pipe(catchError(this.catchError), finalize(() => {
@@ -720,8 +701,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         }
                         this._toastService.success(message);
                         this.onRequest.emit(this.selectedContract);
-
-
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -747,7 +726,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
             });
         }
-
     }
 
     onUpdateEffectiveDate(value: { startDate: any; endDate: any }) {
@@ -758,7 +736,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
         }
-
     }
 
     selectedService($event: any) {
@@ -783,7 +760,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     selectedAgreementType($event: any) {
-        console.log($event);
         if ($event.id === 'Trial') {
             this.isDisabledExpiredDateField = true;
             if (!!this.effectiveDate.value.startDate) {
