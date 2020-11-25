@@ -4,19 +4,19 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { SeaLCLImportCreateHouseBillComponent } from '../create/sea-lcl-import-create-house-bill.component';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { DocumentationRepo, ExportRepo } from '@repositories';
+import { Container } from '@models';
+import { ReportPreviewComponent } from '@common';
+import { DataService } from '@services';
+import { ChargeConstants, RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+import { SeaLCLImportCreateHouseBillComponent } from '../create/sea-lcl-import-create-house-bill.component';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { DataService } from '@services';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { RoutingConstants } from '@constants';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -28,14 +28,13 @@ enum HBL_TAB {
     selector: 'sea-lcl-import-detail-house-bill',
     templateUrl: './sea-lcl-import-detail-house-bill.component.html',
 })
-export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHouseBillComponent {
+export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHouseBillComponent implements ICrystalReport {
 
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     containers: Container[] = [];
     hblDetail: any; // TODO model here!!
-    dataReport: Crystal;
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
@@ -56,6 +55,12 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
+    }
+
     ngOnInit() {
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
@@ -67,7 +72,9 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
                 this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
+
                 this.getDetailHbl();
 
             } else {
@@ -78,9 +85,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     getListContainer() {
         this._store.select<any>(fromShareBussiness.getHBLContainersState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
@@ -123,7 +128,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     combackToHBLList() {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.hblDetail.jobId}/hbl`]);
-
     }
 
     onUpdateHblDetail() {
@@ -182,13 +186,12 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     }
 
     getDetailHbl() {
-        this.formHouseBill.isDetail = true;
         // this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 skip(1),
                 catchError(this.catchError),
-                // takeUntil(this.ngUnsubscribe),
+                takeUntil(this.ngUnsubscribe),
                 finalize(() => this._progressRef.complete()),
             )
             .subscribe(
@@ -250,11 +253,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.frm.nativeElement.submit();
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    this.showReport();
                 },
             );
     }
@@ -268,10 +267,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data charge to display preview');
                     }
@@ -289,10 +285,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
+
                     } else {
                         this._toastService.warning('There is no container data to display preview');
                     }

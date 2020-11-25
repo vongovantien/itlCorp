@@ -165,7 +165,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.shipmmentDetail = new CsTransaction(shipment);
-
                         this.formCreate.patchValue({
                             bookingNo: this.shipmmentDetail.bookingNo,
                             mawb: this.shipmmentDetail.mawb,
@@ -219,14 +218,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     setDefaultOriginBLNumber(shipment: CsTransaction) {
         if (!!shipment.transactionType) {
-            if (shipment.transactionType === ChargeConstants.SFE_CODE) {
-                return this.originNumbers[3];
+            if (shipment.transactionType === ChargeConstants.SFE_CODE || shipment.transactionType === ChargeConstants.SCE_CODE) {
+                return this.originNumbers[3].id;
             }
-            if (shipment.transactionType === ChargeConstants.SLE_CODE) {
+            if (shipment.transactionType === ChargeConstants.SLE_CODE || shipment.transactionType === ChargeConstants.SCI_CODE) {
                 if (shipment.mbltype === 'Original') {
-                    return this.originNumbers[3];
+                    return this.originNumbers[3].id;
                 } else {
-                    return this.originNumbers[1];
+                    return this.originNumbers[1].id;
                 }
             }
         } else {
@@ -269,7 +268,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             hbltype: [null, Validators.required],
             serviceType: [],
             freightPayment: [null, Validators.required],
-            originBlnumber: [[this.originNumbers[1]]],
+            originBlnumber: [this.originNumbers[1].id],
 
             // * date
             sailingDate: [null, Validators.required],
@@ -409,11 +408,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             shippingMark: data.shippingMark,
             inWord: data.inWord,
             onBoardStatus: data.onBoardStatus,
-            originBlnumber: [<CommonInterface.INg2Select>{ id: data.originBlnumber, text: data.originBlnumber }],
-            freightCharge: [<CommonInterface.INg2Select>{ id: data.freightPayment, text: data.freightPayment }],
-            moveType: [<CommonInterface.INg2Select>{ id: data.moveType, text: data.moveType }],
-            serviceType: [<CommonInterface.INg2Select>{ id: data.serviceType, text: data.serviceType }],
-            hbltype: [<CommonInterface.INg2Select>{ id: data.hbltype, text: data.hbltype }]
+            originBlnumber: data.originBlnumber,
+            freightCharge: data.freightPayment,
+            moveType: data.moveType,
+            serviceType: data.serviceType,
+            hbltype: data.hbltype
         });
     }
 
@@ -495,7 +494,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     onSelectHblType(data: string) {
         if (!!data && data === 'Original') {
-            this.originBlnumber.setValue(this.originNumbers[3]);
+            this.originBlnumber.setValue(this.originNumbers[3].id);
         }
     }
 

@@ -1,29 +1,29 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { AppForm } from 'src/app/app.form';
-import { DataService } from 'src/app/shared/services';
-import { SystemConstants } from 'src/constants/system.const';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { AppForm } from '@app';
+import { DataService } from '@services';
+import { JobConstants } from '@constants';
+import { CsTransactionDetail, PortIndex, CsTransaction, ProviceModel, Customer } from '@models';
+import { CommonEnum } from '@enums';
+import { InfoPopupComponent } from '@common';
+import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
+
+import * as fromShareBussiness from './../../../../share-business/store';
 
 import { Observable } from 'rxjs';
-import { catchError, distinctUntilChanged, skip, takeUntil, tap } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+import { FormValidators } from '@validators';
 
-import * as fromShare from './../../store';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-
-import { User, CsTransactionDetail, PortIndex, CsTransaction } from 'src/app/shared/models';
-import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
-import { InfoPopupComponent } from '@common';
-import * as fromShareBussiness from './../../../share-business/store';
 @Component({
-    selector: 'form-create-house-bill-import',
-    templateUrl: './form-create-house-bill-import.component.html'
+    selector: 'app-form-create-hbl-sea-import',
+    templateUrl: './form-create-hbl-sea-import.component.html'
 })
-export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
+export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppForm {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+
     formGroup: FormGroup;
     customer: AbstractControl;
     saleMan: AbstractControl;
@@ -49,7 +49,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     documentDate: AbstractControl;
     documentNo: AbstractControl;
     etawarehouse: AbstractControl;
-    // warehouseNotice: AbstractControl;
     inWord: AbstractControl;
 
     shippingMark: AbstractControl;
@@ -63,58 +62,43 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     alsonotifyPartyDescription: AbstractControl;
 
     oceanVoyNo: AbstractControl;
-    configCustomer: CommonInterface.IComboGirdConfig | any = {};
     configSaleman: CommonInterface.IComboGirdConfig | any = {};
-    configShipper: CommonInterface.IComboGirdConfig | any = {};
-    configConsignee: CommonInterface.IComboGirdConfig | any = {};
-    configNotifyParty: CommonInterface.IComboGirdConfig | any = {};
-    configAlsoNotifyParty: CommonInterface.IComboGirdConfig | any = {};
-    configSupplier: CommonInterface.IComboGirdConfig | any = {};
     configPlaceOfIssued: CommonInterface.IComboGirdConfig | any = {};
     configPartner: CommonInterface.IComboGirdConfig | any = {};
     configPort: CommonInterface.IComboGirdConfig | any = {};
-    shipperdescriptionModel: string;
-    consigneedescriptionModel: string;
-    notifyPartydescriptinModel: string;
-    notifyPartyModel: string;
-    isSubmited: boolean = false;
-    PortChargeLikePortLoading: boolean = false;
 
-    mindateEta: any = null;
-    mindateEtaWareHouse: any = null;
     saleMans: any = [];
-    headersSaleman: CommonInterface.IHeaderTable[];
-    saleManInCustomerFilter: any = {};
-    serviceTypesString: string[] = [];
-    hbOfladingTypesString: string[] = [];
-    jobId: string = '';
 
-    hbOfladingTypes: CommonInterface.IValueDisplay[];
-    serviceTypes: CommonInterface.IValueDisplay[];
-    shipmentDetail: CsTransaction;
+    serviceTypesString: string[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
+    hbOfladingTypesString: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
     numberOfOrigins: CommonInterface.ICommonTitleValue[] = [
         { title: 'One(1)', value: 1 },
         { title: 'Two(2)', value: 2 },
         { title: 'Three(3)', value: 3 }
-
     ];
-    isLoading: boolean = false;
+
+    jobId: string = '';
+    type: string;
+
+    shipmentDetail: CsTransaction;
     ports: Observable<PortIndex[]>;
+    provinces: Observable<ProviceModel[]>;
+    suppliers: Observable<Customer[]>;
+    shippers: Observable<Customer[]>;
+    customers: Observable<Customer[]>;
+    consignees: Observable<Customer[]>;
+    consigneesAndCustomers: Observable<Customer[]>;
 
+    isLoading: boolean = false;
     isLoadingPort: Observable<boolean>;
-    object: any = { items: [] };
-    listSaleMan: any = [];
-    type: string = '';
-    @Input() isDetail: boolean = false;
-
+    isSubmited: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _documentRepo: DocumentationRepo,
         private _systemRepo: SystemRepo,
         private _dataService: DataService,
-        protected _store: Store<fromShare.ITransactionState>,
+        protected _store: Store<fromShareBussiness.ITransactionState>,
 
     ) {
         super();
@@ -122,11 +106,40 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
     ngOnInit() {
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
-        this.getListSaleman();
-        this.getCommonData();
-        this.headersSaleman = [
-            { title: 'User Name', field: 'username' },
-        ];
+
+        this.getMasterData();
+        this.getConfigComboGrid();
+
+        this.initForm();
+
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: CsTransaction) => {
+                    this.shipmentDetail = res;
+                    this.jobId = this.shipmentDetail.id;
+
+                    const formData = {
+                        mtBill: this.shipmentDetail.mawb,
+                        servicetype: this.shipmentDetail.typeOfService,
+                        documentDate: { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) },
+                        supplier: this.shipmentDetail.coloaderId,
+                        issueHBLDate: { startDate: new Date(), endDate: new Date() },
+                        pol: this.shipmentDetail.pol,
+                        pod: this.shipmentDetail.pod,
+                        localVessel: this.shipmentDetail.flightVesselName,
+                        localVoyNo: this.shipmentDetail.voyNo,
+                        finalDestinationPlace: this.shipmentDetail.podName,
+                        eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
+                        etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
+                    };
+
+                    this.formGroup.patchValue(formData);
+                }
+            );
+    }
+
+    getConfigComboGrid() {
         this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'shortName', label: 'Name ABBR' },
@@ -158,93 +171,18 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
-        this.initForm();
-        this.getPorts();
-        if (!this.isDetail) {
-            this._store.select(fromShare.getTransactionDetailCsTransactionState)
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: CsTransaction) => {
-                        this.shipmentDetail = res;
-                        this.jobId = this.shipmentDetail.id;
-                        this.mtBill.setValue(this.shipmentDetail.mawb);
-                        this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
-                        this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                        this.supplier.setValue(this.shipmentDetail.coloaderId);
-                        this.issueHBLDate.setValue(new Date());
-                        this.pol.setValue(this.shipmentDetail.pol);
-                        this.pod.setValue(this.shipmentDetail.pod);
-                        this.localVessel.setValue(this.shipmentDetail.flightVesselName);
-                        this.localVoyNo.setValue(this.shipmentDetail.voyNo);
-                        this.finalDestinationPlace.setValue(this.shipmentDetail.podName);
-                        if (this.shipmentDetail.eta != null) {
-
-                            this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                            if (this.shipmentDetail.etd != null) {
-                                this.etd.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
-                                this.mindateEta = this.createMoment(new Date(this.shipmentDetail.etd));
-
-                            }
-                            this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                            this.mindateEtaWareHouse = this.createMoment(new Date(this.shipmentDetail.eta));
-
-                        }
-
-                        // this._dataService.setDataService("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
-                        // this._dataService.setData("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
-
-                    }
-                );
-        } else {
-            this._store.select(fromShareBussiness.getDetailHBlState)
-                .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
-                .subscribe(
-                    (res: CsTransactionDetail) => {
-                        if (!!res) {
-                            this.jobId = res.jobId;
-                        }
-                    }
-                );
-        }
-
-
-
     }
 
-
-    getPorts() {
-        this.ports = this._store.select(getCataloguePortState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        );
-
-        this.isLoadingPort = this._store.select(getCataloguePortLoadingState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        );
-    }
-    refreshValue(value: any) {
-        this.object.items = [value];
-    }
-
-    async getCommonData() {
-        try {
-            if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-                const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-                this.serviceTypes = commonData.serviceTypes;
-                this.hbOfladingTypes = commonData.billOfLadings;
-                this.hbOfladingTypesString = this.hbOfladingTypes.map(x => x.displayName);
-                this.serviceTypesString = this.serviceTypes.map(a => a.displayName);
-            } else {
-                const commonData: any = await this._documentRepo.getShipmentDataCommon().toPromise();
-                this.serviceTypes = commonData.serviceTypes;
-                this.serviceTypesString = this.serviceTypes.map(a => a.displayName);
-                this.hbOfladingTypes = commonData.billOfLadings;
-                this.hbOfladingTypesString = this.hbOfladingTypes.map(x => x.displayName);
-                this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-            }
-        } catch (error) {
-        }
-        finally {
-        }
+    getMasterData() {
+        this.saleMans = this._systemRepo.getListSystemUser();
+        this.ports = this._store.select(getCataloguePortState);
+        this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
+        this.provinces = this._catalogueRepo.getAllProvinces();
+        this.suppliers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER });
+        this.shippers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.SHIPPER });
+        this.customers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER });
+        this.consignees = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CONSIGNEE });
+        this.consigneesAndCustomers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
     }
 
     initForm() {
@@ -283,26 +221,25 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
             documentNo: [],
             referenceNo: [],
-            // warehousenotice: [],
             inWord: [],
             shippingMark: [],
             documnentDate: [],
             remark: [],
             feederVoyageNo: [
             ],
-            numberOfOrigin: [this.numberOfOrigins[0]],
-            dateETA: [],
+            originBLNumber: [this.numberOfOrigins[0].value],
+            etawarehouse: [],
             dateOfIssued: [],
             etd: [],
-            eta: ['', Validators.required],
+            eta: [null, Validators.required],
             shipperDescription: [],
             consigneeDescription: [],
             notifyPartyDescription: [],
             alsonotifyPartyDescription: [],
-            serviceType: ['',
+            serviceType: [null,
                 Validators.required]
+        }, { validator: [FormValidators.comparePort] });
 
-        });
         this.customer = this.formGroup.controls["customer"];
         this.saleMan = this.formGroup.controls["saleMan"];
         this.shipper = this.formGroup.controls["shipper"];
@@ -327,44 +264,18 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.oceanVoyNo = this.formGroup.controls['feederVoyageNo'];
         this.documentDate = this.formGroup.controls['documnentDate'];
         this.documentNo = this.formGroup.controls['documentNo'];
-        this.etawarehouse = this.formGroup.controls['dateETA'];
-        // this.warehouseNotice = this.formGroup.controls['warehousenotice'];
+        this.etawarehouse = this.formGroup.controls['etawarehouse'];
         this.inWord = this.formGroup.controls["inWord"];
         this.shippingMark = this.formGroup.controls['shippingMark'];
         this.remark = this.formGroup.controls['remark'];
         this.issueHBLDate = this.formGroup.controls['dateOfIssued'];
-        this.originBLNumber = this.formGroup.controls['numberOfOrigin'];
+        this.originBLNumber = this.formGroup.controls['originBLNumber'];
         this.referenceNo = this.formGroup.controls['referenceNo'];
         this.consigneeDescription = this.formGroup.controls['consigneeDescription'];
         this.shipperDescription = this.formGroup.controls['shipperDescription'];
         this.notifyPartyDescription = this.formGroup.controls['notifyPartyDescription'];
         this.alsonotifyPartyDescription = this.formGroup.controls['alsonotifyPartyDescription'];
-        this.etd.valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((value: { startDate: any, endDate: any }) => {
-                this.mindateEta = value.startDate; // * Update min date
-                this.resetFormControl(this.eta);
-            });
-        if (this.eta.value !== "") {
-            this.eta.valueChanges
-                .pipe(
-                    distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                    takeUntil(this.ngUnsubscribe)
-                )
-                .subscribe((value: { startDate: any, endDate: any }) => {
-                    if (value != null) {
-                        this.mindateEtaWareHouse = value.startDate; // * Update min date
-                        this.resetFormControl(this.etawarehouse);
-                    }
-                });
-        }
-        this.getListCustomer();
-        this.getListShipper();
-        this.getListSupplier();
-        this.getListProvince();
+
     }
 
     onUpdateDataToImport(data: CsTransactionDetail) {
@@ -376,7 +287,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             localVoyNo: data.localVoyNo,
             oceanVessel: data.oceanVessel,
             oceanVoyNo: data.oceanVoyNo,
-            originBlnumber: [<CommonInterface.INg2Select>{ id: data.originBlnumber, text: data.originBlnumber }],
+            originBlnumber: data.originBlnumber,
             alsonotifyPartyDescription: data.alsoNotifyPartyDescription,
             customer: data.customerId,
             saleMan: data.saleManId,
@@ -387,21 +298,25 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             pol: data.pol,
             pod: data.pod,
             alsoNotifyParty: data.alsoNotifyPartyId,
-            hbltype: [<CommonInterface.INg2Select>{ id: data.hbltype, text: data.hbltype }],
+            hbltype: data.hbltype,
             supplier: data.coloaderId,
             pickupPlace: data.pickupPlace,
             finalDestinationPlace: data.finalDestinationPlace,
             shippingMark: data.shippingMark,
             remark: data.remark,
             inWord: data.inWord,
-            serviceType: [<CommonInterface.INg2Select>{ id: data.serviceType, text: data.serviceType }],
-
+            serviceType: data.serviceType,
         });
     }
 
     updateDataToForm(res: CsTransactionDetail) {
         this.formGroup.setValue({
             etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null, // * Date;,
+            eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null, // * Date;
+            etawarehouse: !!res.etawarehouse ? { startDate: new Date(res.etawarehouse), endDate: new Date(res.etawarehouse) } : null, // * Date;
+            dateOfIssued: !!res.issueHbldate ? { startDate: new Date(res.issueHbldate), endDate: new Date(res.issueHbldate) } : null, // * Date;
+            documnentDate: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
+
             masterBill: res.mawb,
             shipperDescription: res.shipperDescription,
             consigneeDescription: res.consigneeDescription,
@@ -409,23 +324,18 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             alsonotifyPartyDescription: res.alsoNotifyPartyDescription,
             hbOfladingNo: res.hwbno,
             placeofReceipt: res.pickupPlace,
-            eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null, // * Date;
             finalDestination: res.finalDestinationPlace,
             shipper: res.shipperId,
             feederVessel1: res.oceanVoyNo,
             feederVoyageNo: res.oceanVessel,
             arrivalVoyage: res.localVoyNo,
             arrivalVessel: res.localVessel,
-            documnentDate: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
             documentNo: res.documentNo,
-            dateETA: !!res.etawarehouse ? { startDate: new Date(res.etawarehouse), endDate: new Date(res.etawarehouse) } : null, // * Date;
-            // warehousenotice: res.warehouseNotice,
             inWord: res.inWord,
             shippingMark: res.shippingMark,
             remark: res.remark,
-            dateOfIssued: !!res.issueHbldate ? { startDate: new Date(res.issueHbldate), endDate: new Date(res.issueHbldate) } : null, // * Date;
             referenceNo: res.referenceNo,
-            numberOfOrigin: !!res.originBlnumber ? this.numberOfOrigins.filter(i => i.value === res.originBlnumber)[0] : null,
+            originBLNumber: res.originBlnumber,
             saleMan: res.saleManId,
             customer: res.customerId,
             consignee: res.consigneeId,
@@ -435,12 +345,9 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             pod: res.pod,
             supplier: res.coloaderId,
             placeOfIssues: res.issueHblplace,
-            serviceType: [<CommonInterface.INg2Select>{ id: res.serviceType, text: res.serviceType }],
-            hbOfladingType: [<CommonInterface.INg2Select>{ id: res.hbltype, text: res.hbltype }],
+            serviceType: res.serviceType,
+            hbOfladingType: res.hbltype,
         });
-
-        this.mindateEta = !!this.mindateEta ? this.createMoment(res.etd) : null;
-        this.mindateEtaWareHouse = !!res.eta ? this.createMoment(res.eta) : null;
     }
 
     onSelectDataFormInfo(data: any, key: string) {
@@ -493,21 +400,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.pod.setValue(data.id);
                 this.finalDestinationPlace.setValue(data.nameEn);
 
-                // * Validate duplicate port.
-                if (this.pol.value !== undefined && this.pod.value !== undefined) {
-                    if (this.pol.value === this.pod.value) {
-                        this.PortChargeLikePortLoading = true;
-                    } else {
-                        this.PortChargeLikePortLoading = false;
-                    }
-                }
-
                 // * Update default value for sentTo delivery order.
-                // this._dataService.setDataService("podName", data.nameVn || "");
-                // this._dataService.$data.next(data.nameVn);
                 this._dataService.setData("podName", data.nameVn || "");
-
-
                 break;
             case 'Supplier':
                 this.supplier.setValue(data.id);
@@ -516,15 +410,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.placeOfIssues.setValue(data.id);
                 break;
         }
-    }
-
-    getListCustomer() {
-        this.isLoading = true;
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER })
-            .subscribe((res: any) => {
-                this.configCustomer.dataSource = res;
-                this.getListConsignee();
-            });
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
@@ -543,50 +428,13 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         }
         return strDescription;
     }
-    getListShipper() {
-        this.isLoading = true;
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.SHIPPER })
-            .subscribe((res: any) => { this.configShipper.dataSource = res; this.isLoading = false; });
-    }
 
-    getListConsignee() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CONSIGNEE })
-            .subscribe((res: any) => {
-                this.configConsignee.dataSource = res;
-                this.configNotifyParty.dataSource = res;
-                this.configAlsoNotifyParty.dataSource = res;
-                const result = this.configCustomer.dataSource.concat(this.configConsignee.dataSource).filter(function (value, index, self) {
-                    return self.indexOf(value) === index;
-                });
-                this.configConsignee.dataSource = result;
-                this.isLoading = false;
-
-            });
-    }
-
-    getListSupplier() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CARRIER })
-            .subscribe((res: any) => {
-                this.configSupplier.dataSource = res;
-
-            });
-    }
-
-    getListProvince() {
-        this._catalogueRepo.getAllProvinces().subscribe((res: any) => { this.configPlaceOfIssued.dataSource = res; });
-    }
-
-    getListSaleman() {
-        this.isLoading = true;
-        this.saleMans = this._systemRepo.getListSystemUser();
-    }
-
-    selectedHblType($event: any) {
+    selectedHblType($event: string) {
         const selectedHblType = $event;
-        if (selectedHblType.id === "Original") {
-            this.originBLNumber.setValue(this.numberOfOrigins[2]);
+        if (selectedHblType === "Original") {
+            this.originBLNumber.setValue(this.numberOfOrigins[2].value);
         } else {
-            this.originBLNumber.setValue(this.numberOfOrigins[0]);
+            this.originBLNumber.setValue(this.numberOfOrigins[0].value);
         }
     }
 }

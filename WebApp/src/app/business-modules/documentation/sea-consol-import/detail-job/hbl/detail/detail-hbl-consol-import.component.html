@@ -52,7 +52,7 @@
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
-                    <form-create-house-bill-import [isDetail]="true"> </form-create-house-bill-import>
+                    <app-form-create-hbl-sea-import></app-form-create-hbl-sea-import>
                     <hbl-goods-summary-fcl>HBL Goods Summary</hbl-goods-summary-fcl>
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
