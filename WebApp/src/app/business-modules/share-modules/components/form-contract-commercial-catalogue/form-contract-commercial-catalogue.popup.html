@@ -179,7 +179,7 @@
                             <div class="form-group">
                                 <label>VAS</label>
                                 <div class="pos-rel">
-                                    <ng-select #vas [items]="vaslst" [allowClear]="true" [disabled]="type === 'Agent'"
+                                    <ng-select #vasl [items]="vaslst" [allowClear]="true" [disabled]="type === 'Agent'"
                                         (selected)="selectedVas($event)" (opened)="closeOtherSelects(vas)"
                                         [active]="activeVas" [multiple]="true" formControlName="vas"
                                         placeholder="Please select">

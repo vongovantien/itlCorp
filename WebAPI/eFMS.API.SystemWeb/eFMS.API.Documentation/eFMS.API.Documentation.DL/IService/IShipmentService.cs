@@ -26,5 +26,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<SummaryOfCostsIncurredExportResult> GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria);
         SummaryOfRevenueModel GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria);
         IQueryable<Shipments> GetShipmentAssignPIC();
+        CommissionExportResult GetOpsCommissionReport(CommissionReportCriteria criteria, string userId);
     }
 }

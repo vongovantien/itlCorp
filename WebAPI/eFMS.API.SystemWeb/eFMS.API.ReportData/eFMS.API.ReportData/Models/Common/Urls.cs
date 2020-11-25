@@ -68,6 +68,8 @@
             public const string GetDataHousebillDailyExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
 
             public const string GetDataCDNoteExportUrl = "/Documentation/api/v1/en-US/AcctCDNote/ExportOpsCdNote?jobId=";
+
+            public const string GetDataCommissionPROpsReportUrl = "/Documentation/api/v1/en-US/Shipment/GetOpsCommissionReport?userId=";
         }
     }
 }

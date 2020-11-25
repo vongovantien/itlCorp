@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using eFMS.API.ReportData.Models.Criteria;
 
-namespace eFMS.API.Documentation.DL.Models.Criteria
+namespace eFMS.API.ReportData.Models.Criteria
 {
     public class CommissionReportCriteria : GeneralReportCriteria
     {

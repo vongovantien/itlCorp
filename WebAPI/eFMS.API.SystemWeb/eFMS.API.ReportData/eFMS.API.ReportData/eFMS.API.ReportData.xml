@@ -307,6 +307,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportCommissionPROpsReport(eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.String)">
+            <summary>
+            Export Commission PR For OPS Report
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
@@ -454,6 +461,30 @@
             <param name="stream"></param>
             <returns></returns>
             
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPROpsReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
+            <summary>
+            Generate Commission Report Excel
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <param name="stream"></param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.SetImgAndCompanyInfo(OfficeOpenXml.ExcelWorksheet)">
+            <summary>
+            Set Image and Company Info to Excel
+            </summary>
+            <param name="workSheet">excel sheet</param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPROpsReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
+            <summary>
+            Binding Commission Report
+            </summary>
+            <param name="workSheet"></param>
+            <param name="resultData"></param>
+            <param name="criteria"></param>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>

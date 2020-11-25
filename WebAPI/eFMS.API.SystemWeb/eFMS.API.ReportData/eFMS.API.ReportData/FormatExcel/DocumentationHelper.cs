@@ -3419,5 +3419,294 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressLastRow + 3, 8].Value = "Authorizied signature";
         }
         #endregion
+
+        /// <summary>
+        /// Generate Commission Ops Report Excel
+        /// </summary>
+        /// <param name="listData"></param>
+        /// <param name="criteria"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        /// 
+        public Stream GenerateCommissionPROpsReportExcel(CommissionExportResult resultData, CommissionReportCriteria criteria, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Commission PR for OPS");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BinddingDataCommissionPROpsReport(workSheet, resultData, criteria);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Set Image and Company Info to Excel
+        /// </summary>
+        /// <param name="workSheet">excel sheet</param>
+        private void SetImgAndCompanyInfo(ExcelWorksheet workSheet)
+        {
+            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            {
+                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                //add the image to row 1, column B
+                excelImage.SetPosition(0, 0, 1, 0);
+            }
+            var headers = new List<string>()
+            {
+               "INDO TRANS LOGISTICS CORPORATION", //0
+               "HEAD OFFICE:", //1
+               "52 Truong Son St., Tan Binh Dist.\nHo Chi Minh City, Vietnam\nTel: (848) 848 8567 (8 lines)" +
+               "\nFax: (848) 848 8593 - 848 8570\nE-mail: indo-trans@itlvn.com\nWebsite: www.itlvn.com", //2
+               "COMMISSION PAYMENT REQUEST", //3
+               "FOR MONTH: {0}", //4
+            };
+            // CompanyInfo Header0
+            workSheet.Cells["N1:S1"].Merge = true;
+            workSheet.Cells["N1"].Value = headers[0];
+            workSheet.Cells["N1"].Style.Font.SetFromFont(new Font("Arial Black", 13, FontStyle.Bold));
+            workSheet.Cells["N1"].Style.Font.Italic = true;
+            // CompanyInfo Header1
+            workSheet.Cells["N2:S2"].Merge = true;
+            workSheet.Cells["N2"].Value = headers[1];
+            workSheet.Cells["N2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10, FontStyle.Bold));
+            // CompanyInfo Header2
+            workSheet.Cells["N3:S6"].Merge = true;
+            workSheet.Cells["N3:S6"].Style.WrapText = true;
+            workSheet.Cells["N3"].Value = headers[2];
+            workSheet.Cells["N3"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
+        }
+
+        /// <summary>
+        /// Binding Commission Ops Report
+        /// </summary>
+        /// <param name="workSheet"></param>
+        /// <param name="resultData"></param>
+        /// <param name="criteria"></param>
+        private void BinddingDataCommissionPROpsReport(ExcelWorksheet workSheet, CommissionExportResult resultData, CommissionReportCriteria criteria)
+        {
+            SetImgAndCompanyInfo(workSheet);
+
+            var title = new List<string>()
+            {
+               "COMMISSION PAYMENT REQUEST",    // 0
+               "FOR MONTH: {0}",                // 1
+            };
+
+            List<string> tableHeaders = new List<string>
+            {
+                "Flt/shipping month",               // 0
+                "Customer",                         // 1
+                "Job ID",                           // 2
+                "Custom sheet",                     // 3
+                "Cont.",                            // 3
+                "BUYING\nRATE",                     // 4
+                "SELLING\nRATE",                    // 5
+                "GROSS FROFIT\nBEFORE\nCOMMISSION", // 6
+                "RATE\nOF\nCOM",                    // 7
+                "COM\nAMOUNT",                      // 8
+                "GROSS FROFIT\nAFTER\nCOMMISSION",  // 10
+                "COMMISSION\nCAP",                  // 11
+                "% COM ",                           // 12
+                "VND",                              // 13
+                "COM OVER\nCAP",                    // 14
+                "CIT\nCHARGED\nON OVERCAP",         // 15
+                "ENTITLED COM",                     // 16
+                "PIT (30%)",                        // 17
+                "NET DUE TO\nCUSTOMERS"             // 18
+            };
+
+            var subTableHeaders = new List<string>
+            {
+                "[1]",                      // 0
+                "[2]",                      // 1
+                "[3]",                      // 2
+                "[4]",                      // 3
+                "[5]",                      // 4
+                "[6]",                      // 5
+                "[7]=[4]-[6]",              // 6
+                "[8]=[7]X40%/60%",          // 7
+                "",                         // 8
+                "[9]=[6] X 19,000 /19,000", // 9
+                "[10]=([6]-[8])X19,000",    // 10
+                "[11]=[10]X25%",            // 11
+                "[12]=[9]-[11]",            // 12
+                "[13]=[12]X30%",            // 13
+                "[12]-[13]",                // 14
+            };
+
+            // Custom With Column
+            workSheet.Column(1).Width = 12;  //Cột A
+            workSheet.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Column(2).Width = 10; //Cột B
+            workSheet.Column(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Column(3).Width = 15; //Cột C
+            workSheet.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Column(4).Width = 15; //Cột D
+            workSheet.Column(5).Width = 10; //Cột E
+            workSheet.Column(6).Width = 10; //Cột F
+            workSheet.Column(7).Width = 10; //Cột G
+            workSheet.Column(8).Width = 13; //Cột H            
+            workSheet.Column(9).Width = 8; //Cột I
+            workSheet.Column(10).Width = 12; //Cột J
+            workSheet.Column(11).Width = 15; //Cột K
+            workSheet.Column(12).Width = 15; //Cột L
+            workSheet.Column(13).Width = 8; //Cột M
+            workSheet.Column(14).Width = 10; //Cột N
+            workSheet.Column(15).Width = 10; //Cột O
+            workSheet.Column(16).Width = 12; //Cột P
+            workSheet.Column(17).Width = 10; //Cột Q
+            workSheet.Column(18).Width = 10; //Cột R
+            workSheet.Column(19).Width = 13; //Cột S
+
+            // Header 0
+            workSheet.Cells["A8:S8"].Merge = true;
+            workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A8"].Value = title[0];
+            workSheet.Cells["A8"].Style.Font.SetFromFont(new Font("Calibri", 20, FontStyle.Bold));
+            // Header 1
+            workSheet.Cells["A9:S9"].Merge = true;
+            workSheet.Cells["A9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth);
+            workSheet.Cells["A9"].Style.Font.SetFromFont(new Font("Calibri", 11, FontStyle.Bold));
+
+            workSheet.Cells["N10"].Value = "Ex.rate";
+            workSheet.Cells["O10"].Value = criteria.ExchangeRate;
+            workSheet.Cells["O10"].Style.Numberformat.Format = numberFormats;
+            workSheet.Row(11).CustomHeight = true;
+            // Set header of table
+            for (int cell = 1; cell < 20; cell++)
+            {
+                workSheet.Cells[11, cell].Value = tableHeaders[cell - 1];
+            }
+            // Set subheader of table
+            for (int cell = 5; cell < 20; cell++)
+            {
+                workSheet.Cells[12, cell].Value = subTableHeaders[cell - 5];
+            }
+            workSheet.Cells["A11:S12"].Style.Font.Bold = true;
+            workSheet.Cells["A11:S12"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A11:S12"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A11:S12"].Style.WrapText = true;
+            workSheet.View.FreezePanes(13, 2);
+
+            int startRow = 13;
+            foreach (var item in resultData.Details)
+            {
+                workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("MMM");
+                workSheet.Cells[startRow, 2].Value = resultData.CustomerName;
+                workSheet.Cells[startRow, 3].Value = item.JobId;
+                workSheet.Cells[startRow, 4].Value = item.CustomSheet;
+                workSheet.Cells[startRow, 5].Value = "";
+                workSheet.Cells[startRow, 6].Value = item.BuyingRate;
+                workSheet.Cells[startRow, 7].Value = item.SellingRate;
+                // Gross profit before commission
+                var _statement = "G" + startRow + "-F" + startRow;
+                workSheet.Cells[startRow, 8].Formula = _statement;
+                // Com Amount
+                workSheet.Cells[startRow, 10].Value = item.ComAmount;
+                // Gross profit after commission
+                _statement = "H" + startRow + "-J" + startRow;
+                workSheet.Cells[startRow, 11].Formula = _statement;
+                // Commission cap
+                _statement = "K" + startRow + "*(40%/60%)";
+                workSheet.Cells[startRow, 12].Formula = _statement;
+                // %Com
+                _statement = string.Format("IF(K{0}=0,0,J{0}/(K{0}/60%))", startRow);
+                workSheet.Cells[startRow, 13].Formula = _statement;
+                // VND
+                _statement = "J" + startRow + "*O10/O10";
+                workSheet.Cells[startRow, 14].Formula = _statement;
+                // Com over cap
+                _statement = "IF(J" + startRow + "-L" + startRow + "<0,0,1)";
+                workSheet.Cells[startRow, 15].Formula = _statement;
+                // CIT charge on overcap
+                _statement = "O" + startRow + "*25%";
+                workSheet.Cells[startRow, 16].Formula = _statement;
+                // Entitled COM
+                _statement = string.Format("ROUND(N{0}-P{0},0)", startRow);
+                workSheet.Cells[startRow, 17].Formula = _statement;
+                // PIT (30%)
+                _statement = "Q" + startRow + "*30%";
+                workSheet.Cells[startRow, 18].Formula = _statement;
+                // Net due to customers
+                _statement = "Q" + startRow + "-R" + startRow;
+                workSheet.Cells[startRow, 19].Formula = _statement;
+                startRow += 1;
+            }
+            workSheet.Cells[12, 1, startRow, 19].Style.Font.Size = 10;
+            // Row of total
+            workSheet.Cells[startRow, 1].Value = "TOTAL";
+            workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Row(startRow).Style.Font.Bold = true;
+            workSheet.Cells[startRow, 1, startRow, 7].Merge = true;
+            var amountOfCus = string.Empty;
+            if (resultData.Details.Count > 0)
+            {
+                int rowEndSum = startRow - 1;
+                char startCol = 'F';
+                for (int i = 6; i < 20; i++)
+                {
+                    var _statement = string.Format("SUM({0}13:{0}{1})", startCol, rowEndSum);
+                    workSheet.Cells[startRow, i].Formula = _statement;
+                    if (i == 19)
+                    {
+                        amountOfCus = workSheet.Cells[startRow, i].Address;
+                    }
+                    startCol++;
+                }
+            }
+            string formatNumber = "_(* #,##0_);_(* (#,##0);_(* \" - \"??_);_(@_)";
+            workSheet.Cells[13, 6, startRow, 12].Style.Numberformat.Format = formatNumber;
+            workSheet.Cells[13, 13, startRow, 13].Style.Numberformat.Format = "0%";
+            workSheet.Cells[13, 14, startRow, 19].Style.Numberformat.Format = formatNumber;
+
+            // Border
+            workSheet.Cells[11, 1, startRow, 19].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[11, 1, startRow, 19].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[11, 1, startRow, 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[startRow, 1, startRow, 19].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+            // Footer
+            startRow += 2;
+            workSheet.Cells[startRow, 1, startRow + 13, 19].Style.Font.SetFromFont(new Font("Calibri", 12));
+            workSheet.Cells[startRow, 1].Value = "The payment should be transfer to:";
+            workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells[startRow + 1, 1].Value = "Beneficiary:";
+            workSheet.Cells[startRow + 1, 4].Value = resultData.BeneficiaryName;
+            workSheet.Cells[startRow + 2, 1].Value = "Amount:";
+            workSheet.Cells[startRow + 2, 4].Formula = amountOfCus;
+            workSheet.Cells[startRow + 2, 4].Style.Numberformat.Format = formatNumber;
+            workSheet.Cells[startRow + 2, 5].Value = "VND";
+            workSheet.Cells[startRow + 3, 1].Value = "A/C:";
+            workSheet.Cells[startRow + 3, 4].Value = resultData.BankAccountNo;
+            workSheet.Cells[startRow + 4, 1].Value = "Via:";
+            workSheet.Cells[startRow + 4, 4].Value = resultData.BankName;
+            workSheet.Cells[startRow + 5, 1].Value = "ID code:";
+            workSheet.Cells[startRow + 5, 4].Value = resultData.TaxCode;
+            workSheet.Cells[startRow + 6, 1].Value = "Tax code:";
+            // Prepared by
+            workSheet.Cells[startRow + 8, 5].Value = "Prepared by";
+            workSheet.Cells[startRow + 13, 5].Value = resultData.PreparedBy;
+            // Verified by
+            workSheet.Cells[startRow + 8, 8].Value = "Verified by";
+            workSheet.Cells[startRow + 13, 8].Value = resultData.VerifiedBy;
+            // Approved by
+            workSheet.Cells[startRow + 8, 12].Value = "Approved by";
+            workSheet.Cells[startRow + 9, 12].Value = "(only in exception case)";
+            workSheet.Cells[startRow + 9, 12].Style.Font.Italic = true;
+            // Cross-checked by
+            workSheet.Cells[startRow + 8, 17].Value = "Cross-checked by";
+            workSheet.Row(startRow + 8).Style.Font.Bold = true;
+        }
+
     }
 }

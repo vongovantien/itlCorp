@@ -251,5 +251,18 @@ namespace eFMS.API.Documentation.Controllers
             var data = shipmentService.GetDataJobProfitAnalysis(criteria);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Query data for commission OPS report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpPost("GetOpsCommissionReport")]
+        public IActionResult GetOpsCommissionReport(CommissionReportCriteria criteria, string userId)
+        {
+            var data = shipmentService.GetOpsCommissionReport(criteria, userId);
+            return Ok(data);
+        }
     }
 }

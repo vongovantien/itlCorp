@@ -445,5 +445,32 @@ namespace eFMS.API.ReportData.Controllers
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
             return fileContent;
         }
+
+        /// <summary>
+        /// Export Commission PR For OPS Report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("ExportCommissionPROpsReport")]
+        [HttpPost]
+        public async Task<IActionResult> ExportCommissionPROpsReport(CommissionReportCriteria criteria, string currentUserId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataCommissionPROpsReportUrl + currentUserId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<CommissionExportResult>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateCommissionPROpsReportExcel(dataObjects.Result, criteria, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Commission PR for OPS Report.xlsx");
+
+            return fileContent;
+        }
     }
 }

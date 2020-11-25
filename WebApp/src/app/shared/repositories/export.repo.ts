@@ -321,5 +321,12 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportCommissionPROpsReport(searchObject: any = {}, currentUserId: string){
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportCommissionPROpsReport`, searchObject, {currentUserId: currentUserId}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

@@ -21,6 +21,8 @@ import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
 })
 export class SaleReportFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ReportInterface.ISaleReportCriteria> = new EventEmitter<ReportInterface.ISaleReportCriteria>();
+    @Output() onSearchCom: EventEmitter<ReportInterface.ICommissionReportCriteria> = new EventEmitter<ReportInterface.ICommissionReportCriteria>();
+
     @ViewChild(ShareModulesInputShipmentPopupComponent, { static: false }) inputShipmentPopup: ShareModulesInputShipmentPopupComponent;
 
     @Input() isCommissionIncentive: boolean = false;
@@ -100,7 +102,7 @@ export class SaleReportFormSearchComponent extends AppForm {
     groupSpecial: any[] = [];
     numberOfShipment: number = 0;
     shipmentInput: OperationInteface.IInputShipment;
-    
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -622,30 +624,60 @@ export class SaleReportFormSearchComponent extends AppForm {
     }
 
     searchReport() {
-        const body: ReportInterface.ISaleReportCriteria = {
-            serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customer.value,
-            service: this.mapObject(this.serviceActive, this.serviceList), // ---*
-            currency: this.currencyActive[0].id, // ---**
-            jobId: this.refNoType.value[0].id === "JOBID" ? this.refNo.value : null,
-            mawb: this.refNoType.value[0].id === "MBL" ? this.refNo.value : null,
-            hawb: this.refNoType.value[0].id === "HBL" ? this.refNo.value : null,
-            officeId: this.mapObject(this.officeActive, this.officeList), // ---*
-            departmentId: this.mapObject(this.departmentActive, this.departmentList), // ---*
-            groupId: this.mapObject(this.groupActive, this.groupList), // ---*
-            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            carrierId: this.carrier.value,
-            agentId: this.agent.value,
-            pol: this.pol.value,
-            pod: this.pod.value,
-            typeReport: this.typeReportActive[0].id
-        };
-        this.onSearch.emit(body);
+        if (!this.isCommissionIncentive) {
+            const body: ReportInterface.ISaleReportCriteria = {
+                serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+                serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+                createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+                createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+                customerId: this.customer.value,
+                service: this.mapObject(this.serviceActive, this.serviceList), // ---*
+                currency: this.currencyActive[0].id, // ---**
+                jobId: this.refNoType.value[0].id === "JOBID" ? this.refNo.value : null,
+                mawb: this.refNoType.value[0].id === "MBL" ? this.refNo.value : null,
+                hawb: this.refNoType.value[0].id === "HBL" ? this.refNo.value : null,
+                officeId: this.mapObject(this.officeActive, this.officeList), // ---*
+                departmentId: this.mapObject(this.departmentActive, this.departmentList), // ---*
+                groupId: this.mapObject(this.groupActive, this.groupList), // ---*
+                personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+                salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+                creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+                carrierId: this.carrier.value,
+                agentId: this.agent.value,
+                pol: this.pol.value,
+                pod: this.pod.value,
+                typeReport: this.typeReportActive[0].id
+            };
+            this.onSearch.emit(body);
+        } else {
+            const body: ReportInterface.ICommissionReportCriteria = {
+                serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+                serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+                createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+                createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+                customerId: this.customer.value,
+                service: this.mapObject(this.serviceActive, this.serviceList),
+                currency: "VND",
+                jobId: this.mapShipment('JOBID'),
+                mawb: this.mapShipment('MBL'),
+                hawb: this.mapShipment('HBL'),
+                officeId: this.mapObject(this.officeActive, this.officeList),
+                departmentId: this.mapObject(this.departmentActive, this.departmentList),
+                groupId: this.mapObject(this.groupActive, this.groupList),
+                personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+                salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+                creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
+                carrierId: this.carrier.value,
+                agentId: this.agent.value,
+                pol: this.pol.value,
+                pod: this.pod.value,
+                customNo: this.mapShipment('CustomNo'),
+                beneficiary: this.partnerAccount.value,
+                exchangeRate: this.exchangeRate.value,
+                typeReport: this.typeReportActive[0].id
+            };
+            this.onSearchCom.emit(body);
+        }
     }
 
     mapObject(dataSelected: any[], dataList: any[]) {
@@ -669,6 +701,7 @@ export class SaleReportFormSearchComponent extends AppForm {
         this.resetFormControl(this.pol);
         this.resetFormControl(this.pod);
         this.onSearch.emit(<any>{});
+        this.onSearchCom.emit(<any>{});
 
         this.dateTypeActive = [this.dateTypeList[0]];
         this.dateType.setValue(this.dateTypeActive);
@@ -720,6 +753,8 @@ export class SaleReportFormSearchComponent extends AppForm {
             startDate: this.createMoment().startOf('month').toDate(),
             endDate: this.createMoment().endOf('month').toDate(),
         });
+
+        this.resetFormShipmentInput();
     }
 
     getAllOffice() {
@@ -802,5 +837,24 @@ export class SaleReportFormSearchComponent extends AppForm {
         }
     }
 
+    resetFormShipmentInput() {
+        this.numberOfShipment = 0;
+        this.inputShipmentPopup.shipmentSearch = '';
+        this.shipmentInput = null;
+        this.inputShipmentPopup.selectedShipmentType = "JOBID";
+    }
+
+    mapShipment(type: string) {
+        let _shipment = '';
+        if (this.shipmentInput) {
+            if (this.shipmentInput.keyword.length > 0) {
+                const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).join();
+                if (this.shipmentInput.type === type) {
+                    _shipment = _keyword;
+                }
+            }
+        }
+        return _shipment;
+    }
 }
 

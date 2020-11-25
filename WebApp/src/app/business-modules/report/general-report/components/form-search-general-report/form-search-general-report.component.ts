@@ -10,6 +10,7 @@ import { formatDate } from "@angular/common";
 import { SystemConstants } from "src/constants/system.const";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
+import { ReportInterface } from "@interfaces";
 
 @Component({
     selector: 'general-report-form-search',
@@ -17,7 +18,7 @@ import { IAppState, getMenuUserPermissionState } from "@store";
 })
 
 export class GeneralReportFormSearchComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISearchDataCriteria> = new EventEmitter<ISearchDataCriteria>();
+    @Output() onSearch: EventEmitter<ReportInterface.ISearchDataCriteria> = new EventEmitter<ReportInterface.ISearchDataCriteria>();
 
     menuPermission: SystemInterface.IUserPermission;
 
@@ -563,7 +564,7 @@ export class GeneralReportFormSearchComponent extends AppForm {
     }
 
     searchReport() {
-        const body: ISearchDataCriteria = {
+        const body: ReportInterface.ISearchDataCriteria = {
             serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -725,27 +726,4 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 },
             );
     }
-}
-
-interface ISearchDataCriteria {
-    serviceDateFrom: string;
-    serviceDateTo: string;
-    createdDateFrom: string;
-    createdDateTo: string;
-    customerId: string;
-    service: string;
-    currency: string;
-    jobId: string;
-    mawb: string;
-    hawb: string;
-    officeId: string;
-    departmentId: string;
-    groupId: string;
-    personInCharge: string;
-    salesMan: string;
-    creator: string;
-    carrierId: string;
-    agentId: string;
-    pol: string;
-    pod: string;
 }

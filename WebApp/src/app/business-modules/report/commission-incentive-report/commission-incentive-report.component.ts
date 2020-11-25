@@ -3,6 +3,12 @@ import { AppList } from "src/app/app.list";
 import { ReportPreviewComponent } from "@common";
 import { CommonEnum } from "@enums";
 import { ICrystalReport, ReportInterface } from "@interfaces";
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+import { DocumentationRepo, ExportRepo } from '@repositories';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { catchError, finalize } from 'rxjs/operators';
+import { SystemConstants } from '@constants';
 
 @Component({
   selector: 'app-commission-incentive-report',
@@ -13,6 +19,14 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
   shipmentInput: OperationInteface.IInputShipment;
   numberOfShipment: number = 0;
 
+  constructor(
+    private _progressService: NgProgress,
+    private _exportRepo: ExportRepo,
+  ) {
+    super();
+    this._progressRef = this._progressService.ref();
+  }
+
   showReport(): void {
     this.reportPopup.frm.nativeElement.submit();
     this.reportPopup.show();
@@ -21,28 +35,42 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
   ngOnInit() {
   }
 
-  onSearchSaleReport(data: ReportInterface.ISaleReportCriteria) {
+  onSearchSaleReport(data: ReportInterface.ICommissionReportCriteria) {
     console.log(data);
     switch (data.typeReport) {
       case CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_AS:
         break;
       case CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_OPS:
+        console.log('COMMISSION_PR_OPS', data);
+        this.previewComPROpsReport(data);
         break;
       case CommonEnum.COMMISSION_INCENTIVE_TYPE.INCENTIVE_RPT:
         break;
     }
   }
 
-  previewComPROpsReport(data: ReportInterface.ISaleReportCriteria) {
-
+  previewComPROpsReport(data: ReportInterface.ICommissionReportCriteria) {
+        this._progressRef.start();
+        const currentUser: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this._exportRepo.exportCommissionPROpsReport(data, currentUser.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    const fileName = "Commission PR for OPS Report.xlsx";
+                    this.downLoadFile(response, "application/ms-excel", fileName);
+                },
+            );
   }
 
   onShipmentList(data: any) {
     this.shipmentInput = data;
     if (data) {
-        this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
+      this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
     } else {
-        this.numberOfShipment = 0;
+      this.numberOfShipment = 0;
     }
-}
+  }
 }

@@ -988,6 +988,14 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetOpsCommissionReport(eFMS.API.Documentation.DL.Models.Criteria.CommissionReportCriteria,System.String)">
+            <summary>
+            Query data for commission OPS report
+            </summary>
+            <param name="criteria"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
             <summary>
             
