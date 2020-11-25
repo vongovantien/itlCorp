@@ -2,7 +2,6 @@
 
     <div class="form" [formGroup]="formSI">
 
-        <!--begin:: m-portlet-->
         <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
             <div class="alert-block__heading">
                 <h3 class="alert-block__title">General Info</h3>
@@ -201,9 +200,12 @@
                                 <label class="form-control-label" for="">
                                     Payment Type <span class="m--font-danger">(*)</span>
                                 </label>
-                                <ng-select [allowClear]="true" [items]="termTypes" placeholder="Please selected"
+                                <!-- <ng-select [allowClear]="true" [items]="termTypes" placeholder="Please selected"
                                     formControlName="term">
-                                </ng-select>
+                                </ng-select> -->
+                                <ng-select class="custom" [items]="termTypes" [clearable]="false"
+                                    placeholder="Please selected" formControlName="term"></ng-select>
+
                                 <div class="form-control-feedback" *ngIf="isSubmitted && term.value.length <= 0">
                                     Payment Type is required
                                 </div>
@@ -220,8 +222,7 @@
                 </div>
             </div>
         </div>
-        <!--end:: m-portlet-->
-        <!--begin:: m-portlet-->
+
         <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
             <div class="alert-block__heading">
                 <h3 class="alert-block__title">Route Info</h3>
@@ -325,8 +326,7 @@
                 </div>
             </div>
         </div>
-        <!--end:: m-portlet-->
-        <!--begin:: m-portlet-->
+
         <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
             <div class="alert-block__heading">
                 <h3 class="alert-block__title">Goods Info</h3>
@@ -393,6 +393,5 @@
                 </div>
             </div>
         </div>
-        <!--end:: m-portlet-->
     </div>
 </div>

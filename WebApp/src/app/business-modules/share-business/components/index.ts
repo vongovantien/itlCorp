@@ -54,7 +54,6 @@ export * from './manifest/housebill-in-manifest/housebills-in-manifest.component
 export * from './arrival-note-air/arrival-note-air.component';
 export * from './date-time-modified/date-time-modified.component';
 
-export * from './bill-instruction-sea-export/bill-instruction-sea-export.component';
 export * from './bill-instruction-housebills-sea-export/bill-instruction-housebills-sea-export.component';
 export * from './attach-list/attach-list-house-bill.component';
 export * from './input-daily-export/input-daily-export.popup';
