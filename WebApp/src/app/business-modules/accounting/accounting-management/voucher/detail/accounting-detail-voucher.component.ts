@@ -7,10 +7,9 @@ import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { AccAccountingManagementModel, ChargeOfAccountingManagementModel } from '@models';
 import { formatDate } from '@angular/common';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, AccountingConstants } from '@constants';
 import { ConfirmPopupComponent } from '@common';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { AccountingConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 
 import { IAccountingManagementState, UpdateChargeList } from '../../store';
@@ -264,7 +263,6 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
 
     canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
         this.nextState = nextState; // * Save nextState for Deactivate service.
-
         // * USER CONFIRM CANCEL => GO OUT
         if (this.isCancelFormPopupSuccess
             || this.accountingManagement.status !== 'New'
