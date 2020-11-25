@@ -8,8 +8,8 @@ import { DepartmentDetailComponent } from './detail/detail-department.component'
 import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ShareSystemModule } from '../../share-system/share-system.module';
-import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
+import { ShareSystemModule } from '../share-system.module';
+import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
 const routing: Routes = [
     {
         path: '', data: { name: "" },

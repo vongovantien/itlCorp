@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 import { SeaLCLExportFormBookingNoteComponent } from '../components/form-booking-note-lcl-export.component';
 import { InfoPopupComponent } from '@common';
 import { csBookingNote } from '@models';
@@ -8,10 +8,10 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo } from '@repositories';
 import { Router } from '@angular/router';
+import { RoutingConstants } from '@constants';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-create',
@@ -45,8 +45,6 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
     }
 
     checkValidateForm(): boolean {
-        this.setError(this.formBookingNoteComponent.paymentTerm);
-
         let valid: boolean = true;
         if (!this.formBookingNoteComponent.formGroup.valid
             || (!!this.formBookingNoteComponent.etd.value && !this.formBookingNoteComponent.etd.value.startDate)
@@ -65,7 +63,6 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
             dateOfStuffing: !!form.dateOfStuffing && !!form.dateOfStuffing.startDate ? formatDate(form.dateOfStuffing.startDate, 'yyyy-MM-dd', 'en') : null,
             bookingDate: !!form.bookingDate && !!form.bookingDate.startDate ? formatDate(form.bookingDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            paymentTerm: !!form.paymentTerm && !!form.paymentTerm.length ? form.paymentTerm[0].id : null,
             pol: form.pol,
             pod: form.pod,
             shipperId: form.shipperId,

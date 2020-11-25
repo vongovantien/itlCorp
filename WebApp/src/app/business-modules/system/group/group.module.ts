@@ -12,8 +12,8 @@ import { AddGroupComponent } from './add/add-group/add-group.component';
 import { GroupDetailComponent } from './detail/detail-group/detail-group.component';
 import { FormSearchGroupComponent } from './components/form-search-group/form-search-group.component';
 import { FormUserGroupComponent } from './components/form-user-group/form-user-group.component';
-import { ShareSystemModule } from '../../share-system/share-system.module';
-import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
+import { ShareSystemModule } from '../share-system.module';
+import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
 
 
 const routing: Routes = [

@@ -6,9 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ReportPreviewComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
 import { SystemConstants } from '@constants';
-import { CsTransaction } from '@models';
+import { CsTransaction, CsShippingInstruction } from '@models';
 
-import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
 import {
     ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
@@ -18,17 +17,20 @@ import {
     TransactionGetDetailAction,
     getTransactionDetailCsTransactionState
 } from '@share-bussiness';
-import { AppList } from 'src/app/app.list';
+import { AppList } from '@app';
+import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
 
 import _groupBy from 'lodash/groupBy';
-import { catchError, finalize, takeUntil, take, startWith } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, take, startWith, pluck, concatMap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
     selector: 'app-sea-consol-export-si',
     templateUrl: './sea-consol-si.component.html'
 })
-export class SeaConsolExportShippingInstructionComponent extends AppList {
+export class SeaConsolExportShippingInstructionComponent extends AppList implements ICrystalReport {
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComponent: ShareBussinessBillInstructionSeaExportComponent;
@@ -52,27 +54,28 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
     }
 
     ngAfterViewInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            if (!!param && param.jobId) {
-                this.jobId = param.jobId;
-                this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-
-                this.getHouseBills();
-                this.getBillingInstruction(this.jobId);
-            }
-        });
-    }
-
-    getHouseBills() {
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            startWith([]),
-            catchError(this.catchError),
-        ).subscribe(
-            (res: any) => {
-                this.houseBills = res;
-                this.billDetail.housebills = res;
-            },
-        );
+        this._activedRouter.params
+            .pipe(
+                pluck('jobId'),
+                concatMap((jobId) => {
+                    this.jobId = jobId;
+                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+                    return forkJoin([
+                        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }),
+                        this._documentRepo.getShippingInstruction(jobId)
+                    ]);
+                })
+            ).subscribe(
+                (res) => {
+                    if (!!res) {
+                        if (!!res[0]) {
+                            this.billDetail.housebills = this.houseBills = res[0] || [];
+                        }
+                        this.displayPreview = !!res[1];
+                        this.setDataBillInstructionComponent(res[1]);
+                    }
+                }
+            );
     }
 
     getBillingInstruction(jobId: string) {
@@ -83,13 +86,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-
-                    if (!!res) {
-                        this.displayPreview = true;
-                    }
-                    else {
-                        this.displayPreview = false;
-                    }
+                    this.displayPreview = !!res;
                     this.setDataBillInstructionComponent(res);
                 },
             );
@@ -107,7 +104,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                         } else {
                             this.initNewShippingInstruction(res);
                             if (this.billSIComponent.type === "fcl") {
-                                this.getContainers();
+                                this.calculateGoodInfo();
                             }
                         }
 
@@ -159,7 +156,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                 packagesNote: packages,
                 containerNote: containerNotes,
                 containerSealNo: contSealNos
-            })
+            });
         }
     }
 
@@ -171,19 +168,6 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             sumContainers: res.containerNote,
             contSealNo: res.containerSealNo,
         });
-    }
-
-    getContainers() {
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-                this.houseBills = res;
-                this.calculateGoodInfo();
-            },
-        );
-
     }
 
     getContSealNo(containers: any) {
@@ -234,6 +218,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
         this.billSIComponent.shippingInstruction.voyNo = (!!res.flightVesselName ? res.flightVesselName : '') + " - " + (!!res.voyNo ? res.voyNo : '');
         this.billSIComponent.shippingInstruction.goodsDescription = res.desOfGoods;
         this.billSIComponent.shippingInstruction.remark = res.mbltype;
+
         this.getExportDefault(res);
     }
 
@@ -318,13 +303,9 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res != null) {
-
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -343,13 +324,9 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res != null) {
-
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -368,18 +345,13 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res != null) {
-
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
-                    }
-                    else {
+                    } else {
                         this._toastService.warning('This shipment does not have any container ');
                     }
                 },
@@ -397,15 +369,18 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('This shipment does not have any house bill ');
                     }
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 }
 

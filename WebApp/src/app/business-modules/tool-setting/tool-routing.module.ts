@@ -13,25 +13,25 @@ const routes: Routes = [
     },
     {
         path: 'ecus-connection', loadChildren: () => import('./ecus-connection/ecus-connection.module').then(m => m.EcusConectionModule),
-        data: { name: 'Ecus Connection' }
+        data: { name: 'Ecus Connection', title: 'eFMS Ecus' }
     },
     {
         path: 'tariff', loadChildren: () => import('./tariff/tariff.module').then(m => m.TariffModule),
-        data: { name: 'Tariff' }
+        data: { name: 'Tariff', title: 'eFMS Tariff' }
     },
     {
         path: 'exchange-rate', loadChildren: () => import('./exchange-rate/exchange-rate.module').then(m => m.ExchangeRateModule),
         data: {
-            name: "Exchange Rate",
+            name: "Exchange Rate", title: 'eFMS Exchange Rate'
         }
     },
     {
         path: 'unlock', loadChildren: () => import('./unlock/unlock.module').then(m => m.UnlockModule),
-        data: { name: 'Unlock' }
+        data: { name: 'Unlock', title: 'eFMS Unlock' }
     },
     {
         path: 'unlock-request', loadChildren: () => import('./unlock-request/unlock-request.module').then(m => m.UnlockRequestModule),
-        data: { name: 'Unlock Request' }
+        data: { name: 'Unlock Request', title: 'eFMS Unlock Request' }
     },
     {
         path: 'log-viewer',

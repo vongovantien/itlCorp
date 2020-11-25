@@ -17,7 +17,7 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string StaffPartner = "STAFF";
         public static readonly string PersonalPartner = "PERSONAL";
         public static readonly string AllPartner = "ALL";
-        public static readonly string PARTNER_GROUP = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
+        public static readonly string PARTNER_GROUP = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;STAFF;PERSONAL";
 
         public static List<ModeOfTransport> ModeOfTransportData = new List<ModeOfTransport>
         {

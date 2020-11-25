@@ -30,19 +30,16 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>MAWB Type </label>
-                                    <ng-select #hawb [items]="billTypes" placeholder="Please select" [allowClear]="true"
-                                        (opened)="closeOtherSelects(hawb)" formControlName="mbltype" ng2ControlTrigger>
-                                    </ng-select>
+                                    <ng-select class="custom" [items]="billTypes" placeholder="Please select"
+                                        formControlName="mbltype"></ng-select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !shipmentType.valid}">
                                     <label required>Shipment Type</label>
-                                    <ng-select #typeSipment [items]="shipmentTypes" placeholder="Please select"
-                                        ng2ControlTrigger (opened)="closeOtherSelects(typeSipment)"
-                                        formControlName="shipmentType">
-                                    </ng-select>
+                                    <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
+                                        formControlName="shipmentType" [clearable]="false"></ng-select>
                                 </div>
                             </div>
                         </div>
@@ -158,10 +155,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Payment Method</label>
-                            <ng-select #pmethod [items]="termTypes" placeholder="Select payment method"
-                                ng2ControlTrigger [allowClear]="true" (opened)="closeOtherSelects(pmethod)"
-                                formControlName="paymentTerm">
-                            </ng-select>
+                            <ng-select class="custom" [items]="termTypes" placeholder="Select payment method"
+                                formControlName="paymentTerm"></ng-select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -222,9 +217,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Unit</label>
-                                    <ng-select #unit [items]="units " (opened)="closeOtherSelects(unit)"
-                                        ng2ControlTrigger [allowClear]="true" formControlName="packageType"
-                                        placeholder="Select unit">
+                                    <ng-select class="custom" [items]="units | async" bindLabel="code" bindValue="id"
+                                        [clearable]="false" formControlName="packageType" placeholder="Unit">
                                     </ng-select>
                                 </div>
                             </div>
@@ -302,15 +296,10 @@
                                 <div class="form-group">
                                     <label>Commodities</label>
                                     <div class="pos-rel">
-                                        <ng-select #commoditiy [items]="commodities"
-                                            (opened)="closeOtherSelects(commoditiy)" [multiple]="true"
-                                            formControlName="commodity" [allowClear]="true"
-                                            placeholder="Select commodity">
+                                        <ng-select [items]="commodities | async" formControlName="commodity"
+                                            class="custom" [multiple]="true" bindLabel="commodityNameEn"
+                                            bindValue="code" [clearable]="false">
                                         </ng-select>
-                                        <combo-grid-icon
-                                            *ngIf="!commodity.value || (!!commodity.value && !commodity.value.length)"
-                                            (onDropdown)="openNg2Select(commoditiy)">
-                                        </combo-grid-icon>
                                     </div>
                                 </div>
                             </div>
@@ -365,4 +354,4 @@
     </div>
 </div>
 
-<dim-volume-popup (onUpdate)="onUpdateDIM($event)"></dim-volume-popup>
+<app-dim-volume-popup (onUpdate)="onUpdateDIM($event)"></app-dim-volume-popup>

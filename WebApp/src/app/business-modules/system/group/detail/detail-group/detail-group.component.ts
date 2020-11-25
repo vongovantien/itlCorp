@@ -12,9 +12,9 @@ import { Group, UserGroup } from '@models';
 import { AppForm } from 'src/app/app.form';
 
 import { catchError, finalize } from 'rxjs/operators';
-import { IShareSystemState, checkShareSystemUserLevel, SystemLoadUserLevelAction } from 'src/app/business-modules/share-system/store';
 import { PreviousRouteService } from 'src/app/shared/services/previous-route';
 import { RoutingConstants } from '@constants';
+import { checkShareSystemUserLevel, IShareSystemState, SystemLoadUserLevelAction } from '../../../store';
 
 
 @Component({

@@ -1,21 +1,20 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
-import { COMMODITYCOLUMNSETTING } from './commodity.column';
-import _map from 'lodash/map';
 import { CatalogueRepo } from 'src/app/shared/repositories/catalogue.repo';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
 import { ExportRepo } from 'src/app/shared/repositories';
 import { AppList } from 'src/app/app.list';
-import { catchError, finalize, map } from 'rxjs/operators';
 import { CommodityAddPopupComponent } from './components/form-create-commodity/form-create-commodity.popup';
 import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
+import { catchError, finalize, map } from 'rxjs/operators';
+
 type COMMODITY_TAB = 'Commodity list' | 'Commodity group';
+
 enum CommodityTab {
   LIST = 'Commodity list',
   GROUP = 'Commodity group',
@@ -32,19 +31,9 @@ export class CommodityComponent extends AppList {
 
   commodities: Commodity[] = [];
   commodity: Commodity;
-  commoditySettings: ColumnSetting[] = COMMODITYCOLUMNSETTING;
 
-  configSearchCommonity: any = {
-    settingFields: this.commoditySettings.filter(x => x.allowSearch === true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
-    typeSearch: TypeSearch.intab,
-    searchString: ''
-  };
   selectedTab: COMMODITY_TAB = CommodityTab.LIST; // Default tab.
 
-  headerCommodity: CommonInterface.IHeaderTable[];
-  /*
-  end declare variable
-  */
 
   constructor(private catalogueRepo: CatalogueRepo,
     private _toastService: ToastrService,
@@ -60,13 +49,18 @@ export class CommodityComponent extends AppList {
 
 
   ngOnInit() {
-    this.headerCommodity = [
+    this.headers = [
       { title: 'Code', sortable: true, field: 'code' },
       { title: 'Name(EN)', sortable: true, field: 'commodityNameEn' },
       { title: 'Name(Local)', sortable: true, field: 'commodityNameVn' },
       { title: 'Group', sortable: true, field: 'commodityGroupNameVn' },
       { title: 'Status', sortable: true, field: 'active' },
     ];
+
+    this.configSearch = {
+      settingFields: this.headers.slice(0, 4).map(x => ({ "fieldName": x.field, "displayName": x.title })),
+      typeSearch: TypeSearch.outtab,
+    };
 
     this.getCommodities();
   }
@@ -118,7 +112,7 @@ export class CommodityComponent extends AppList {
     this.catalogueRepo.getDetailCommodity(commodity.id).subscribe(
       (res: any) => {
         if (res.id !== 0) {
-          var _commodity = new Commodity(res);
+          const _commodity = new Commodity(res);
           this.commodityAddPopupComponent.action = "update";
           this.commodityAddPopupComponent.commodity = _commodity;
           this.commodityAddPopupComponent.getDetail();

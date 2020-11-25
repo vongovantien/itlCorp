@@ -53,6 +53,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
+        public virtual DbSet<SysSentEmailHistory> SysSentEmailHistory { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
         public virtual DbSet<SysUserNotification> SysUserNotification { get; set; }
@@ -3408,6 +3409,40 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+            
+            });
+
+            modelBuilder.Entity<SysSentEmailHistory>(entity =>
+            {
+                entity.ToTable("sysSentEmailHistory");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Bccs)
+                    .HasColumnName("BCCs")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Ccs)
+                    .HasColumnName("CCs")
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Description).HasMaxLength(4000);
+
+                entity.Property(e => e.Receivers)
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SentDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.SentUser)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Subject).HasMaxLength(4000);
+
+                entity.Property(e => e.Type)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });

@@ -5,7 +5,6 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
 import {
-    ShareBussinessFormCreateSeaExportComponent,
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBusinessImportJobDetailPopupComponent,
     ContainerAction, ContainerActionTypes
@@ -14,12 +13,13 @@ import { InfoPopupComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
 import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
-
-import { AppForm } from 'src/app/app.form';
-
-import { takeUntil, catchError } from 'rxjs/operators';
+import { AppForm } from '@app';
 import { RoutingConstants } from '@constants';
 
+import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/components/form-create-sea-export/form-create-sea-export.component';
+
+import { takeUntil, catchError } from 'rxjs/operators';
+import _merge from 'lodash/merge';
 
 @Component({
     selector: ' app-create-job-consol-export',
@@ -27,7 +27,7 @@ import { RoutingConstants } from '@constants';
 })
 export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareBussinessFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaExportComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -76,24 +76,10 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            mawb: form.mawb,
-            voyNo: form.voyNo,
-            notes: form.notes,
             personIncharge: form.personalIncharge,
-            coloader: form.coloader,
-            bookingNo: form.bookingNo,
-            flightVesselName: form.flightVesselName,
-            pono: form.pono,
-
-            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
-            paymentTerm: !!form.term && !!form.term.length ? form.term[0].id : null,
-
             agentId: form.agent,
-            pol: form.pol,
-            pod: form.pod,
             coloaderId: form.coloader,
+            paymentTerm: form.term,
 
             // * containers summary
             commodity: this.shipmentGoodSummaryComponent.commodities,
@@ -105,7 +91,7 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
         };
 
-        const seaConsolExportModel: CsTransaction = new CsTransaction(formData);
+        const seaConsolExportModel: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         seaConsolExportModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaConsolExport;
 
         return seaConsolExportModel;
@@ -128,12 +114,6 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
             this.infoPopup.show();
             return;
         }
-
-        // if (!this.containers.length) {
-        //     this._toastService.warning('Please add container to create new job');
-        //     return;
-        // }
-
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
 

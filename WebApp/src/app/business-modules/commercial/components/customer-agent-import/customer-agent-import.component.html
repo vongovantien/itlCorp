@@ -92,7 +92,7 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'shortName'), 'sorting_desc': (!isDesc && sortKey == 'shortName') }"
                                 (click)="sort('shortName')">
-                                <span>Name(Abreviation) *</span>
+                                <span>Name ABBR *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameEn'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameEn') }"
@@ -102,7 +102,12 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameVn'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameVn') }"
                                 (click)="sort('partnerNameVn')">
-                                <span>Name(Local)</span>
+                                <span>Name(Local) *</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerLocation'), 'sorting_desc': (!isDesc && sortKey == 'partnerLocation') }"
+                                (click)="sort('partnerLocation')">
+                                <span>Partner Location *</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'taxCode'), 'sorting_desc': (!isDesc && sortKey == 'taxCode') }"
@@ -112,22 +117,37 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'internalReferenceNo'), 'sorting_desc': (!isDesc && sortKey == 'internalReferenceNo') }"
                                 (click)="sort('internalReferenceNo')">
-                                <span>InternalReferenceNo </span>
+                                <span>Internal Reference </span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'contactPerson'), 'sorting_desc': (!isDesc && sortKey == 'contactPerson') }"
-                                (click)="sort('contactPerson')">
-                                <span>Contact person</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'acReference'), 'sorting_desc': (!isDesc && sortKey == 'acReference') }"
+                                (click)="sort('profile')">
+                                <span>A/C Reference</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'tel'), 'sorting_desc': (!isDesc && sortKey == 'tel') }"
-                                (click)="sort('tel')">
-                                <span>Phone</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressShippingEn'), 'sorting_desc': (!isDesc && sortKey == 'addressShippingEn') }"
+                                (click)="sort('addressShippingEn')">
+                                <span>Shipping Address EN *</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'fax'), 'sorting_desc': (!isDesc && sortKey == 'fax') }"
-                                (click)="sort('addressEn')">
-                                <span>Fax</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressShippingVn'), 'sorting_desc': (!isDesc && sortKey == 'addressShippingVn') }"
+                                (click)="sort('addressShippingVn')">
+                                <span>Shipping Address Local(*)</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryShipping'), 'sorting_desc': (!isDesc && sortKey == 'countryShipping') }"
+                                (click)="sort('countryShipping')">
+                                <span>Shipping Country *</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cityShipping'), 'sorting_desc': (!isDesc && sortKey == 'cityShipping') }"
+                                (click)="sort('cityShipping')">
+                                <span>Shipping City</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'zipCodeShipping'), 'sorting_desc': (!isDesc && sortKey == 'zipCodeShipping') }"
+                                (click)="sort('zipCodeShipping')">
+                                <span>Shipping Zipcode</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressEn'), 'sorting_desc': (!isDesc && sortKey == 'addressEn') }"
@@ -140,14 +160,14 @@
                                 <span>Billing Address Local *</span>
                             </th>
                             <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryBilling'), 'sorting_desc': (!isDesc && sortKey == 'countryBilling') }"
+                                (click)="sort('countryBilling')">
+                                <span>Billing Country *</span>
+                            </th>
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cityBilling'), 'sorting_desc': (!isDesc && sortKey == 'cityBilling') }"
                                 (click)="sort('cityBilling')">
                                 <span>Billing City</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryBilling'), 'sorting_desc': (!isDesc && sortKey == 'countryBilling') }"
-                                (click)="sort('countryBilling')">
-                                <span>Billing Country</span>
                             </th>
 
                             <th class="sorting"
@@ -156,29 +176,24 @@
                                 <span>Zipcode</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressShippingEn'), 'sorting_desc': (!isDesc && sortKey == 'addressShippingEn') }"
-                                (click)="sort('addressShippingEn')">
-                                <span>Shipping Address EN</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'contactPerson'), 'sorting_desc': (!isDesc && sortKey == 'contactPerson') }"
+                                (click)="sort('contactPerson')">
+                                <span>Person Contact</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressShippingVn'), 'sorting_desc': (!isDesc && sortKey == 'addressShippingVn') }"
-                                (click)="sort('addressShippingVn')">
-                                <span>Shipping Address Local(*)</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'tel'), 'sorting_desc': (!isDesc && sortKey == 'tel') }"
+                                (click)="sort('tel')">
+                                <span>Contact Phone Number</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cityShipping'), 'sorting_desc': (!isDesc && sortKey == 'cityShipping') }"
-                                (click)="sort('cityShipping')">
-                                <span>Shipping City</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'fax'), 'sorting_desc': (!isDesc && sortKey == 'fax') }"
+                                (click)="sort('fax')">
+                                <span>Fax No</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryShipping'), 'sorting_desc': (!isDesc && sortKey == 'countryShipping') }"
-                                (click)="sort('countryShipping')">
-                                <span>Shipping Country</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'zipCodeShipping'), 'sorting_desc': (!isDesc && sortKey == 'zipCodeShipping') }"
-                                (click)="sort('zipCodeShipping')">
-                                <span>Shipping Zipcode</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'workPhoneEx'), 'sorting_desc': (!isDesc && sortKey == 'workPhoneEx') }"
+                                (click)="sort('workPhoneEx')">
+                                <span>Work Phone</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'email'), 'sorting_desc': (!isDesc && sortKey == 'email') }"
@@ -186,51 +201,15 @@
                                 <span>Email</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'saleManName'), 'sorting_desc': (!isDesc && sortKey == 'saleManName') }"
-                                (click)="sort('saleManName')">
-                                <span>Salesman</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'acReference'), 'sorting_desc': (!isDesc && sortKey == 'acReference') }"
-                                (click)="sort('profile')">
-                                <span>A/C Reference</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'bankAccountNo'), 'sorting_desc': (!isDesc && sortKey == 'bankAccountNo') }"
-                                (click)="sort('bankAccountNo')">
-                                <span>Partners Bank Account</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'bankAccountName'), 'sorting_desc': (!isDesc && sortKey == 'bankAccountName') }"
-                                (click)="sort('bankAccountName')">
-                                <span>Bank Name</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'swiftCode'), 'sorting_desc': (!isDesc && sortKey == 'swiftCode') }"
-                                (click)="sort('swiftCode')">
-                                <span>Swift Code</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'bankAccountAddress'), 'sorting_desc': (!isDesc && sortKey == 'bankAccountAddress') }"
-                                (click)="sort('bankAccountAddress')">
-                                <span>Bank Address</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                                (click)="sort('note')">
-                                <span>Note</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'billingEmail'), 'sorting_desc': (!isDesc && sortKey == 'billingEmail') }"
+                                (click)="sort('billingEmail')">
+                                <span>Billing Email</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'billingPhone'), 'sorting_desc': (!isDesc && sortKey == 'billingPhone') }"
                                 (click)="sort('billingPhone')">
                                 <span>Billing Phone</span>
                             </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'billingEmail'), 'sorting_desc': (!isDesc && sortKey == 'billingEmail') }"
-                                (click)="sort('billingEmail')">
-                                <span>Billing Email</span>
-                            </th>
-
                         </tr>
                     </thead>
                     <tbody *ngIf="data">
@@ -255,6 +234,11 @@
                                         *ngIf="item.partnerNameVnError !== null">{{ item.partnerNameVnError }}</span>
                                 </td>
                                 <td>
+                                    <span *ngIf="item.partnerLocationError === null">{{ item.partnerLocation }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.partnerLocationError !== null">{{ item.partnerLocationError }}</span>
+                                </td>
+                                <td>
                                     <span *ngIf="item.taxCodeError === null">{{ item.taxCode }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.taxCodeError !== null">{{ item.taxCodeError }}</span>
@@ -266,42 +250,9 @@
                                         *ngIf="item.internalReferenceNoError !== null">{{ item.internalReferenceNoError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.contactPersonError === null">{{ item.contactPerson }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.contactPersonError !== null">{{ item.contactPersonError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.telError === null">{{ item.tel }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.telError !== null">{{ item.telError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.faxError === null">{{ item.fax }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.faxError !== null">{{ item.faxError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.addressEnError === null">{{ item.addressEn }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.addressEnError !== null">{{ item.addressEnError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.addressVnError === null">{{ item.addressVn }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.addressVnError !== null">{{ item.addressVnError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.cityBillingError === null">{{ item.cityBilling }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.cityBillingError !== null">{{ item.cityBillingError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.countryBillingError === null">{{ item.countryBilling }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.countryBillingError !== null">{{ item.countryBillingError }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.zipCode }}</span>
+                                    <span *ngIf="item.acReferenceError === null">{{ item.acReference }}</span> <span
+                                        class="m--font-danger"
+                                        *ngIf="item.acReferenceError !== null">{{ item.acReferenceError  }}</span>
                                 </td>
                                 <td>
                                     <span
@@ -316,53 +267,62 @@
                                         *ngIf="item.addressShippingVnError !== null">{{ item.addressShippingVnError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.cityShippingError === null">{{ item.cityShipping }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.cityShippingError !== null">{{ item.cityShippingError }}</span>
-                                </td>
-                                <td>
                                     <span *ngIf="item.countryShippingError === null">{{ item.countryShipping }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.countryShippingError !== null">{{ item.countryShippingError }}</span>
                                 </td>
                                 <td>
+                                    <span *ngIf="item.cityShippingError === null">{{ item.cityShipping }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.cityShippingError !== null">{{ item.cityShippingError }}</span>
+                                </td>
+                                <td>
                                     <span>{{ item.zipCodeShipping }}</span>
                                 </td>
+                                <td>
+                                    <span *ngIf="item.addressEnError === null">{{ item.addressEn }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.addressEnError !== null">{{ item.addressEnError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.addressVnError === null">{{ item.addressVn }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.addressVnError !== null">{{ item.addressVnError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.countryBillingError === null">{{ item.countryBilling }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.countryBillingError !== null">{{ item.countryBillingError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.cityBillingError === null">{{ item.cityBilling }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.cityBillingError !== null">{{ item.cityBillingError }}</span>
+                                </td>
+                                <td>{{item.zipCode}}</td>
+                                <td>
+                                    <span *ngIf="item.contactPersonError === null">{{ item.contactPerson }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.contactPersonError !== null">{{ item.contactPersonError }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.telError === null">{{ item.tel }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.telError !== null">{{ item.telError }}</span>
+                                </td>
+                                <td>
+                                    {{item.fax}}
+                                </td>
+                                <td>{{item.workPhoneEx}}</td>
                                 <td>
                                     <span>{{ item.email }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.saleManNameError === null">{{ item.saleManName }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.saleManNameError !== null">{{ item.saleManNameError }}</span>
-                                </td>
-                                <td>
-                                    <span *ngIf="item.acReferenceError === null">{{ item.acReference }}</span> <span
-                                        class="m--font-danger"
-                                        *ngIf="item.acReferenceError !== null">{{ item.acReferenceError  }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.bankAccountNo }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.bankAccountName }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.swiftCode }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.bankAccountAddress }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.note }}</span>
+                                    <span>{{ item.billingEmail }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.billingPhone }}</span>
                                 </td>
-                                <td>
-                                    <span>{{ item.billingEmail }}</span>
-                                </td>
-
                             </tr>
                         </ng-container>
                     </tbody>

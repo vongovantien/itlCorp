@@ -15,7 +15,7 @@ export class SignalRService {
 
     startConnection() {
         this.hubConnection = new HubConnectionBuilder()
-            .configureLogging(LogLevel.Debug)
+            .configureLogging(LogLevel.None)
             .withAutomaticReconnect()
             .withUrl(`http${environment.AUTHORIZATION.requireHttps ? 's' : ''}://${environment.HOST.SYSTEM}/notification`, { accessTokenFactory: () => this.getToken() }).build();
 
@@ -26,12 +26,12 @@ export class SignalRService {
                 return this.hubConnection.invoke('getConnectionId');
             })
             .then((connectionId: string) => {
-                console.log("ConnectionId", connectionId);
+                // console.log("ConnectionId", connectionId);
                 this.connectionId = connectionId;
                 return this.hubConnection.invoke('GetConnectionIds');
             })
             .then((connectionIds: any) => {
-                console.log("ConnectionIds", connectionIds);
+                // console.log("ConnectionIds", connectionIds);
             })
             .catch(err => {
                 console.log('Error while starting connection ' + err)
@@ -44,6 +44,10 @@ export class SignalRService {
 
     getConnectionState(): HubConnectionState {
         return this.hubConnection.state;
+    }
+
+    getConnectionId() {
+        return this.hubConnection.connectionId;
     }
 
     listenEvent(eventName: string, cb: (...arrg: any[]) => void) {

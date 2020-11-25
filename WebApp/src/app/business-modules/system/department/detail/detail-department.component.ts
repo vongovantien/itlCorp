@@ -9,7 +9,7 @@ import { Department } from 'src/app/shared/models/system/department';
 import { Group } from 'src/app/shared/models/system/group';
 import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
-import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel } from 'src/app/business-modules/share-system/store';
+import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel } from './../../store';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { RoutingConstants } from '@constants';

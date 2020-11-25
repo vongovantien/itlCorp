@@ -4,9 +4,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 
-import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
@@ -19,6 +19,7 @@ import { AirExportManifestComponent } from './detail-job/manifest/air-export-man
 import { AirExportMAWBFormComponent } from './detail-job/mawb/air-export-mawb.component';
 import { ShareAirExportModule } from './share-air-export.module';
 import { DeactivateGuardService } from 'src/app/core/guards/deactivate.guard';
+import { ShareAirServiceModule } from '../share-air/share-air-service.module';
 
 const routing: Routes = [
     {
@@ -62,7 +63,7 @@ const routing: Routes = [
 ];
 
 const LIB = [
-    SelectModule,
+    NgSelectModule,
     NgxDaterangepickerMd.forRoot(),
     PerfectScrollbarModule,
     TabsModule.forRoot(),
@@ -77,6 +78,7 @@ const LIB = [
         AirExportLazyLoadModule,
         ShareAirExportModule,
         ...LIB,
+        ShareAirServiceModule
     ],
     exports: [],
     declarations: [

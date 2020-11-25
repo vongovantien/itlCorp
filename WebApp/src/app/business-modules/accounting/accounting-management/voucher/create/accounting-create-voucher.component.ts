@@ -1,5 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { formatDate } from '@angular/common';
 
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
@@ -8,15 +11,12 @@ import { Store } from '@ngrx/store';
 import { IAccountingManagementState, InitPartner } from '../../store';
 import { AccAccountingManagementModel } from '@models';
 import { AccountingConstants, RoutingConstants } from '@constants';
-import { formatDate } from '@angular/common';
 
 import { AccountingManagementFormCreateVoucherComponent } from '../../components/form-create-voucher/form-create-voucher.component';
 import { AccountingManagementListChargeComponent } from '../../components/list-charge/list-charge-accouting-management.component';
 
 import _merge from 'lodash/merge';
 import { catchError } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-accounting-create-voucher',
@@ -58,6 +58,11 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
 
         if (!this.checkValidateExchangeRate()) {
             this._toastService.warning(this.invalidUpdateExchangeRate);
+            return;
+        }
+
+        if (!this.checkValidAmountRangeChange()) {
+            this._toastService.warning(this.invalidFormText);
             return;
         }
 
@@ -134,6 +139,10 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
 
     gotoList() {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher`]);
+    }
+
+    checkValidAmountRangeChange() {
+        return this.listChargeComponent.charges.every(x => (x.isValidAmount !== false && x.isValidVatAmount !== false));
     }
 
     ngOnDestroy() {

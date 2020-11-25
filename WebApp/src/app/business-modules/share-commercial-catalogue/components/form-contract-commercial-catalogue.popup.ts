@@ -557,7 +557,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.activeOffice = this.getCurrentActiveOffice(this.selectedContract.officeId);
         }
         this.setError(this.saleService);
-        this.effectiveDate.setValue(null);
+        // this.effectiveDate.setValue(null);
 
         this.formGroup.patchValue({
             salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId : null,
@@ -741,10 +741,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onUpdateTrialEffectiveDate(value: { startDate: any; endDate: any }) {
         const trialDays = !!this.formGroup.controls['trialCreditDays'].value ? this.formGroup.controls['trialCreditDays'].value : 0;
-        this.effectiveDate.setValue({
-            startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
-            endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
-        });
+        if (!!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate) {
+            this.effectiveDate.setValue({
+                startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
+                endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
+            });
+        }
+
     }
 
     onUpdateEffectiveDate(value: { startDate: any; endDate: any }) {

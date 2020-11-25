@@ -56,7 +56,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected cdr: ChangeDetectorRef,
-        private _ngProgressService: NgProgress
+        private readonly _ngProgressService: NgProgress
     ) {
         super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr);
 

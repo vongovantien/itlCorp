@@ -205,11 +205,15 @@ export class CommercialAgentComponent extends AppList implements OnInit {
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
-                (res: boolean) => {
-                    if (res) {
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
                         this._router.navigate([`${RoutingConstants.COMMERCIAL.AGENT}/${this.selectedAgent.id}`]);
                     } else {
-                        this.info403Popup.show();
+                        if (res.data === 403) {
+                            this.info403Popup.show();
+                        } else {
+                            this._toastService.warning("This Agent " + res.message);
+                        }
                     }
                 },
             );

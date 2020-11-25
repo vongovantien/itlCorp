@@ -16,6 +16,7 @@ import { SeaConsolImportDetailJobComponent } from './detail-job/detail-job-conso
 import { SeaConsolImportManifestComponent } from './manifest/sea-consol-import-manifest.component';
 import { SeaConsolImportLazyLoadModule } from './sea-consol-import-lazy-load.module';
 import { DeactivateGuardService } from '@core';
+import { ShareSeaServiceModule } from '../share-sea/share-sea-service.module';
 
 const routing: Routes = [
     {
@@ -65,7 +66,8 @@ const routing: Routes = [
         DirectiveModule,
         PipeModule,
         TabsModule.forRoot(),
-        SeaConsolImportLazyLoadModule
+        SeaConsolImportLazyLoadModule,
+        ShareSeaServiceModule
     ],
     exports: [],
     providers: [],

@@ -14,6 +14,7 @@
 
         public static readonly string MSG_PARTNER_TAXCODE_NOT_NUMBER = "MSG_PARTNER_TAXCODE_NOT_NUMBER";
         public static readonly string MSG_PARTNER_TAXCODE_EXISTED = "MSG_PARTNER_TAXCODE_EXISTED";
+        public static readonly string MSG_PARTNER_TAXCODE_SPACE = "MSG_PARTNER_TAXCODE_SPACE";
         public static readonly string MSG_PARTNER_TAXCODE_DUPLICATED = "MSG_PARTNER_TAXCODE_DUPLICATED";
         public static readonly string MSG_PARTNER_TAXCODE_INVALID = "MSG_PARTNER_TAXCODE_INVALID";
         public static readonly string MSG_PARTNER_TAXCODE_LENGTH = "MSG_PARTNER_TAXCODE_LENGTH";
@@ -29,6 +30,8 @@
         public static readonly string MSG_PARTNER_NAME_EN_EMPTY = "MSG_PARTNER_NAME_EN_EMPTY";
         public static readonly string MSG_PARTNER_NAME_VN_EMPTY = "MSG_PARTNER_NAME_VN_EMPTY";
         public static readonly string MSG_PARTNER_SHORT_NAME_EMPTY = "MSG_PARTNER_SHORT_NAME_EMPTY";
+        public static readonly string MSG_PARTNER_PARTNER_LOCATION_EMPTY = "MSG_PARTNER_PARTNER_LOCATION_EMPTY";
+        public static readonly string MSG_PARTNER_INTERNAL_CODE_EMPTY = "MSG_PARTNER_INTERNAL_CODE_EMPTY";
         public static readonly string MSG_PARTNER_COUNTRY_BILLING_EMPTY = "MSG_PARTNER_COUNTRY_BILLING_EMPTY";
         public static readonly string MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND = "MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND";
         public static readonly string MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY = "MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY";
@@ -66,10 +69,12 @@
         public static readonly string MSG_CONTRACT_SALESMAN_NOT_FOUND = "MSG_CONTRACT_SALESMAN_NOT_FOUND";
         public static readonly string MSG_CONTRACT_ACTIVE_NOT_FOUND = "MSG_CONTRACT_ACTIVE_NOT_FOUND";
         public static readonly string MSG_CONTRACT_EXPERIED_DATE_NOT_VALID = "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID";
-
+        public static readonly string MSG_CONTRACT_DUPLICATE_SERVICE = "MSG_CONTRACT_DUPLICATE_SERVICE";
+        public static readonly string MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT = "MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT";
 
         public static readonly string MSG_CONTRACT_EFFECTIVE_DATE_EMPTY = "MSG_CONTRACT_EFFECTIVE_DATE_EMPTY";
         public static readonly string MSG_CONTRACT_EXPERIED_DATE_EMPTY = "MSG_CONTRACT_EXPERIED_DATE_EMPTY";
+        public static readonly string MSG_CONTRACT_SALESMAN_EMPTY = "MSG_CONTRACT_SALESMAN_EMPTY";
         public static readonly string MSG_CONTRACT_CREDIT_LIMIT_EMPTY = "MSG_CONTRACT_CREDIT_LIMIT_EMPTY";
         public static readonly string MSG_CONTRACT_PAYMENT_TERM_EMPTY = "MSG_CONTRACT_PAYMENT_TERM_EMPTY";
         public static readonly string MSG_CONTRACT_CONTRACT_NO_DUPLICATE = "MSG_CONTRACT_CONTRACT_NO_DUPLICATE";

@@ -13,7 +13,7 @@ import { User, csBookingNote, CsTransaction } from 'src/app/shared/models';
 import { takeUntil, skip, distinctUntilChanged, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-import * as fromShare from './../../../share-business/store';
+import * as fromShare from './../../../../share-business/store';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, } from '@store';
 import { FormValidators } from '@validators';
 import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
@@ -21,11 +21,11 @@ import { AppComboGridComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { DataService } from '@services';
 @Component({
-    selector: 'form-create-sea-export',
+    selector: 'app-form-create-sea-export',
     templateUrl: './form-create-sea-export.component.html'
 })
 
-export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
+export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm implements OnInit {
 
     @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
     @Input() set type(t: string) { this._type = t; }
@@ -76,10 +76,10 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         { field: 'bookingNo', label: 'Booking No' },
     ];
 
-    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES;
-    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
+    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
+    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
 
     userLogged: User;
 
@@ -129,16 +129,17 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                             });
                             this.supplierName = res.supplierName;
                             this.agentName = res.agentName;
+                            console.log(res);
                             this.formGroup.patchValue({
                                 jobID: res.jobNo,
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
                                 serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
 
-                                mbltype: !!res.mbltype ? [this.ladingTypes.find(type => type.id === res.mbltype)] : null,
-                                typeOfService: !!res.typeOfService ? [{ id: res.typeOfService, text: res.typeOfService }] : null,
-                                term: !!res.paymentTerm ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
-                                shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
+                                mbltype: res.mbltype,
+                                typeOfService: res.typeOfService,
+                                term: res.paymentTerm,
+                                shipmentType: res.shipmentType,
 
                                 coloader: res.coloaderId,
                                 bookingNo: res.bookingNo,
@@ -176,7 +177,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             flightVesselName: [],
             pono: [],
             notes: [],
-            term: [[this.termTypes[1]]],
+            term: [this.termTypes[1]],
             bookingNo: [],
 
             coloader: [null, Validators.required],
@@ -185,7 +186,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             agent: [],
 
             mbltype: [], // * select
-            shipmentType: [[this.shipmentTypes[0]]], // * select
+            shipmentType: [this.shipmentTypes[0], Validators.required], // * select
             typeOfService: [], // * select
             personalIncharge: [],  // * select
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
@@ -279,7 +280,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                         etd: !!bookingNote.etd ? { startDate: new Date(bookingNote.etd), endDate: new Date(bookingNote.etd) } : null,
                         pol: bookingNote.pol,
                         pod: bookingNote.pod,
-                        term: [{ id: bookingNote.paymentTerm, text: bookingNote.paymentTerm }],
+                        term: bookingNote.paymentTerm,
                         flightVesselName: bookingNote.vessel,
                         voyNo: bookingNote.voy
                     };
@@ -310,7 +311,7 @@ interface ISyncBookingNoteFormData {
     etd: any;
     pol: string;
     pod: string;
-    term: CommonInterface.INg2Select[];
+    term: string;
     flightVesselName: string;
     voyNo: string;
 }

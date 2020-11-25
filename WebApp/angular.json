@@ -249,13 +249,15 @@
                                 }
                             ]
                         },
-                        "production": {
+                        "prod-en": {
                             "fileReplacements": [
                                 {
                                     "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.test.ts"
+                                    "with": "src/environments/environment.prod.ts"
                                 }
                             ],
+                            "baseHref": "/en/",
+                            "outputPath": "dist/prod/eFMS-en/",
                             "optimization": true,
                             "outputHashing": "all",
                             "sourceMap": false,
@@ -263,7 +265,7 @@
                             "namedChunks": false,
                             "aot": true,
                             "extractLicenses": true,
-                            "vendorChunk": false,
+                            "vendorChunk": true,
                             "buildOptimizer": true,
                             "budgets": [
                                 {
@@ -273,6 +275,48 @@
                                 }
                             ],
                             "serviceWorker": true
+                        },
+                        "prod-vi": {
+                            "baseHref": "/vi/",
+                            "outputPath": "dist/prod/eFMS-vi/",
+                            "i18nFile": "src/src/locale/messages.vi.xlf",
+                            "i18nFormat": "xlf",
+                            "i18nLocale": "vi",
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
+                                },
+                                {
+                                    "replace": "src/languages/language.en.ts",
+                                    "with": "src/languages/language.vi.ts"
+                                }
+                            ],
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "2mb",
+                                    "maximumError": "5mb"
+                                }
+                            ],
+                            "serviceWorker": true
+                        },
+                        "prod-debug": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
+                                }
+                            ]
                         }
                     }
                 },
@@ -305,6 +349,9 @@
                         },
                         "uat": {
                             "browserTarget": "eFMS-Web:build:uat-debug"
+                        },
+                        "prod": {
+                            "browserTarget": "eFMS-Web:build:prod-debug"
                         }
                     }
                 },

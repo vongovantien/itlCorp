@@ -10,8 +10,8 @@ import { OfficeFormSearchComponent } from './components/form-search-office/form-
 import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ShareSystemModule } from 'src/app/business-modules/share-system/share-system.module';
-import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
+import { ShareSystemModule } from 'src/app/business-modules/system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
 import { OfficeFormApproveSettingComponent } from './components/form-approve-setting/form-approve-setting-office.component';
 const routing: Routes = [
     {

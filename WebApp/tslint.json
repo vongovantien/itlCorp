@@ -75,6 +75,9 @@
         "no-trailing-whitespace": false,
         "no-unnecessary-initializer": true,
         "no-unused-expression": true,
+        "no-unused-variable": true,
+        "no-unnecessary-qualifier": true,
+        "no-duplicate-imports": true,
         "no-use-before-declare": false,
         "no-var-keyword": true,
         "object-literal-sort-keys": false,
@@ -153,6 +156,7 @@
                 "ignore-rest-args": true,
                 "ignore-params": true
             }
-        ]
+        ],
+        "no-invalid-template-strings": true
     }
 }
