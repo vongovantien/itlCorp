@@ -254,7 +254,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                       AtchDocNo = surcharge.InvoiceNo,
                                                                                       AtchDocDate = surcharge.InvoiceDate,
-                                                                                      AtchDocSerieNo = surcharge.SeriesNo,
+                                                                                      AtchDocSerialNo = surcharge.SeriesNo,
                                                                                       AccountNo = item.AccountNo, // AccountNo của voucher
                                                                                       ContracAccount = chgDef.CreditAccountNo,
                                                                                       VATAccount = chgDef.CreditVat,
@@ -331,7 +331,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
                                                                                              AtchDocDate = surcharge.InvoiceDate,
-                                                                                             AtchDocSerieNo = surcharge.SeriesNo,
+                                                                                             AtchDocSerialNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
                                                                                              CustomerCodeBook = obhP.AccountNo
                                                                                          };

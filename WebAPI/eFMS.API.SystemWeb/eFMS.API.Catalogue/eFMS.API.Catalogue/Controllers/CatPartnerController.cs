@@ -401,7 +401,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            string fileName = Templates.CatPartner.ExelImportFileName + Templates.ExelImportEx;
+            string fileName = Templates.CatPartner.ExcelImportFileName + Templates.ExcelImportEx;
             string templateName = _hostingEnvironment.ContentRootPath;
             var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
@@ -421,7 +421,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcelCommercial")]
         public async Task<ActionResult> DownloadExcelCommercial()
         {
-            string fileName = Templates.CatPartner.ExelImportCommercialCustomerFileName + Templates.ExelImportEx;
+            string fileName = Templates.CatPartner.ExelImportCommercialCustomerFileName + Templates.ExcelImportEx;
             string templateName = _hostingEnvironment.ContentRootPath;
             var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)

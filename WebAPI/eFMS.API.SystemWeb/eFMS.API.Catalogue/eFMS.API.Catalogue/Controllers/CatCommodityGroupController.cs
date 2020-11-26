@@ -15,6 +15,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -35,6 +36,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityGroupService catComonityGroupService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// constructor
@@ -44,12 +46,14 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="iMapper">inject interface IMapper</param>
         /// <param name="user"></param>
         public CatCommodityGroupController(IStringLocalizer<LanguageSub> localizer, ICatCommodityGroupService service, IMapper iMapper,
-            ICurrentUser user)
+            ICurrentUser user,
+            IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catComonityGroupService = service;
             mapper = iMapper;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -285,15 +289,14 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("downloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-
             try
             {
-                string templateName = "CommodityGroup" + Templates.ExelImportEx;
-                var result = await new FileHelper().ExportExcel(templateName);
+                string fileName = Templates.CatCommodityGroup.ExcelImportFileName + Templates.ExcelImportEx;
+                string templateName = _hostingEnvironment.ContentRootPath;
+                var result = await new FileHelper().ExportExcel(templateName, fileName);
                 if (result != null)
                 {
                     return result;
-
                 }
                 else
                 {
@@ -304,8 +307,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "File not found !" });
             }
-
-
         }
 
     }
