@@ -14,7 +14,6 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
@@ -73,6 +72,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
 import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
 import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 
@@ -150,7 +150,7 @@ const customCurrencyMaskConfig = {
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,
         PipeModule,
-        SelectModule,
+        NgSelectModule,
         ValidatorModule,
         PaginationModule.forRoot(),
         BsDropdownModule.forRoot(),
