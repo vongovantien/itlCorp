@@ -108,14 +108,14 @@
                         </div>
                         <div class="col-lg-6 ">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (statusStageActive[0].id === 'Pending' || statusStageActive[0].id === 'Deleted') && !comment.value}">
+                                [ngClass]="{'m-form__group has-danger': (status.value === 'Pending' || status.value === 'Deleted') && !comment.value}">
                                 <label class="form-control-label ">
                                     Comment
                                 </label>
                                 <textarea class="form-control m-input m-input--square " rows="3 "
                                     [formControl]="comment" formControlName="comment"></textarea>
                                 <div class="form-control-feedback"
-                                    *ngIf="(statusStageActive[0].id === 'Pending' || statusStageActive[0].id === 'Deleted') && !comment.value">
+                                    *ngIf="(status.value === 'Pending' || status.value === 'Deleted') && !comment.value">
                                     Comment is required!
                                 </div>
                             </div>
@@ -127,8 +127,8 @@
                                 <label class="form-control-label ">
                                     Status
                                 </label>
-                                <ng-select [allowClear]="false" [items]="statusStage" [active]="statusStageActive"
-                                    (selected)="selected($event)" placeholder="Select filter">
+                                <ng-select class="custom" [items]="statusStage" formControlName="status"
+                                    placeholder="Select status">
                                 </ng-select>
                             </div>
                         </div>

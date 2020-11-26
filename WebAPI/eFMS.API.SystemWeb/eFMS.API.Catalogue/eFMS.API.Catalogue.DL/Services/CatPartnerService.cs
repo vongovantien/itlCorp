@@ -239,8 +239,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
             lstTo.Add(creatorObj?.Email);
 
-            //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
-
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
             var logSendMail = new SysSentEmailHistory
             {
@@ -316,11 +314,9 @@ namespace eFMS.API.Catalogue.DL.Services
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-
             List<string> lstCc = ListMailCC();
 
             lstCc.Add(objInfoSalesman?.Email);
-            //SendMail.Send(subject, body, lstTo, null, null, lstCc);
 
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
 
@@ -336,7 +332,6 @@ namespace eFMS.API.Catalogue.DL.Services
             };
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
-
         }
 
 
@@ -396,7 +391,7 @@ namespace eFMS.API.Catalogue.DL.Services
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             bool resultSenmail = false;
-            if ( (partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
+            if ((partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
             {
                 if (lstToAccountant.Any() || lstCc.Any())
                 {
@@ -404,7 +399,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         lstToAccountant = lstCc;
                     }
-                    resultSenmail  = SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
+                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
                 }
             }
 
@@ -456,8 +451,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = new HandleState();
             ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
             List<SysImage> resultUrls = new List<SysImage>();
-            //foreach (var file in model.Files)
-            //{
             fileName = model.Files.FileName;
             string objectId = model.PartnerId;
             await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
@@ -480,7 +473,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 list.Add(sysImage);
             }
-            //}
             if (list.Count > 0)
             {
                 list.ForEach(x => x.IsTemp = model.IsTemp);
@@ -505,27 +497,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                //var hsoldman = contractRepository.Delete(x => x.PartnerId == model.Id && !model.contracts.Any(sale => sale.Id == x.Id));
-                //var salemans = mapper.Map<List<CatContract>>(model.contracts);
-
-                //foreach (var item in model.contracts)
-                //{
-                //    if (item.Id == Guid.Empty)
-                //    {
-                //        item.Id = Guid.NewGuid();
-                //        item.PartnerId = entity.Id;
-                //        item.DatetimeCreated = DateTime.Now;
-                //        item.UserCreated = currentUser.UserID;
-                //        contractRepository.Add(item);
-                //    }
-                //    else
-                //    {
-                //        item.DatetimeCreated = DateTime.Now;
-                //        item.UserModified = currentUser.UserID;
-                //        contractRepository.Update(item, x => x.Id == item.Id);
-                //    }
-                //}
-                //contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
             }
@@ -565,7 +536,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Delete(string id)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!string.IsNullOrEmpty(id))
             {
                 if (transactionDetailRepository.Any(x => x.CustomerId == id))
@@ -1130,7 +1100,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
                     DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var partner = mapper.Map<CatPartner>(item);
-                    partner.UserCreated = currentUser.UserID;
+                    partner.UserCreated = partner.UserModified = currentUser.UserID;
                     partner.DatetimeModified = DateTime.Now;
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = Guid.NewGuid().ToString();
@@ -1192,7 +1162,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     DateTime? inactiveDate = DateTime.Now;
                     var partner = mapper.Map<CatPartner>(item);
-                    partner.UserCreated = currentUser.UserID;
+                    partner.UserCreated = partner.UserModified = currentUser.UserID;
                     partner.DatetimeModified = DateTime.Now;
                     partner.DatetimeCreated = DateTime.Now;
 
@@ -1303,7 +1273,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_LENGTH], item.TaxCode);
                         item.IsValid = false;
                     }
-                    if(taxCode.Any(x => Char.IsWhiteSpace(x)))
+                    if (taxCode.Any(x => Char.IsWhiteSpace(x)))
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_SPACE], item.TaxCode);
                         item.IsValid = false;
@@ -1343,7 +1313,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.IsValid = false;
                 }
 
-                if(!string.IsNullOrEmpty(item.PartnerMode) && item.PartnerMode == "Internal")
+                if (!string.IsNullOrEmpty(item.PartnerMode) && item.PartnerMode == "Internal")
                 {
                     if (string.IsNullOrEmpty(item.InternalCode))
                     {

@@ -17,6 +17,8 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class ShareBusinessFormManifestComponent extends AppForm {
     @Input() type: CommonEnum.PORT_TYPE;
+    @Input() isAir: boolean = false;
+
     formGroup: FormGroup;
     referenceNo: AbstractControl;
     supplier: AbstractControl;
@@ -26,10 +28,8 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     date: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
-    selectedPortOfLoading: any = {};
-    selectedPortOfDischarge: any = {};
 
-    isSubmitted: boolean = false;
+
     freightCharge: AbstractControl;
     consolidator: AbstractControl;
     deconsolidator: AbstractControl;
@@ -37,21 +37,23 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     volume: AbstractControl;
     agent: AbstractControl;
     shipperDescription: AbstractControl;
+
     freightCharges: Array<string> = ['Prepaid', 'Collect'];
     shipmentDetail: any = {}; // TODO model.
+
     manifest: CsManifest;
     jobId: string = '';
-    @Input() isAir: boolean = false;
-    isImport: boolean = false;
     defaultMarksOfNationality: string = '';
-    defaultVoyNo: string = '';
+
     ports: Observable<PortIndex[]>;
-    freightChargeEmpty: boolean = false;
+
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
         { field: 'nameEn', label: 'Port Name' },
         { field: 'countryNameEN', label: 'Country' },
     ];
+
+    isImport: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -95,7 +97,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
 
                         this.marksOfNationality.setValue(this.defaultMarksOfNationality);
                         if (!!this.shipmentDetail.paymentTerm) {
-                            this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
+                            this.freightCharge.setValue(this.shipmentDetail.paymentTerm);
                         }
 
                         if (this.isAir) {
@@ -140,7 +142,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
             marksOfNationality: !!res.masksOfRegistration ? res.masksOfRegistration : null,
             vesselNo: !!res.voyNo ? res.voyNo : null,
             date: !!res.invoiceDate ? { startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) } : null,
-            freightCharge: [<CommonInterface.INg2Select>{ id: res.paymentTerm, text: res.paymentTerm }],
+            freightCharge: res.paymentTerm,
             consolidator: !!res.consolidator ? res.consolidator : null,
             deconsolidator: !!res.deConsolidator ? res.deConsolidator : null,
             weight: !!res.weight ? res.weight : null,
@@ -189,9 +191,4 @@ export class ShareBusinessFormManifestComponent extends AppForm {
         this.pod = this.formGroup.controls['pod'];
         this.shipperDescription = this.formGroup.controls['shipperDescription'];
     }
-
-    selectedFreightCharge() {
-        this.freightChargeEmpty = false;
-    }
-
 }

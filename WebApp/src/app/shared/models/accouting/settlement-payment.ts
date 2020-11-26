@@ -33,6 +33,7 @@ export class SettlementPayment {
     lastSyncDate: string = null;
     syncStatus: string = null;
     reasonReject: string = null;
+    payee: string = null;
 
     constructor(object?: any) {
         const self = this;
