@@ -3,33 +3,33 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-import { CreateHouseBillComponent } from '../create/create-house-bill.component';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
-import { Container } from 'src/app/shared/models/document/container.model';
 
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
-import { ReportPreviewComponent } from 'src/app/shared/common';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
-
-import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
-
-import * as fromShareBussiness from './../../../../../share-business/store';
-import isUUID from 'validator/lib/isUUID';
+import { DocumentationRepo, ExportRepo } from '@repositories';
+import { Container } from '@models';
+import { ReportPreviewComponent } from '@common';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
+import { ChargeConstants, RoutingConstants } from '@constants';
 import { DataService } from '@services';
-import { RoutingConstants } from '@constants';
+
+import { CreateHouseBillComponent } from '../create/create-house-bill.component';
+import { ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
+import * as fromShareBussiness from './../../../../../share-business/store';
+
+import isUUID from 'validator/lib/isUUID';
+import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
     DELIVERY = 'DELIVERY'
-
 }
 
 @Component({
     selector: 'app-detail-house-bill',
     templateUrl: './detail-house-bill.component.html',
 })
-export class DetailHouseBillComponent extends CreateHouseBillComponent {
+export class DetailHouseBillComponent extends CreateHouseBillComponent implements ICrystalReport {
 
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
@@ -37,7 +37,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     hblId: string;
     containers: Container[] = [];
     hblDetail: any; // TODO model here!!
-    dataReport: Crystal;
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
@@ -58,8 +57,16 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
+    }
+
     ngOnInit() {
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+        this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
+
     }
 
     ngAfterViewInit() {
@@ -69,7 +76,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
                 this.getDetailHbl();
             } else {
                 this.combackToHBLList();
@@ -79,9 +85,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     getListContainer() {
         this._store.select<any>(fromShareBussiness.getHBLContainersState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
@@ -159,7 +163,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     updateHbl(body: any) {
         this._progressRef.start();
-        body.transactionType = 'SFI';
+        body.transactionType = ChargeConstants.SCI_CODE;
+
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
@@ -177,7 +182,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     getDetailHbl() {
-        this.formHouseBill.isDetail = true;
         this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
@@ -192,7 +196,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     if (!!res) {
                         this.hblDetail = res;
 
-                        this.formHouseBill.getListSaleman();
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.
@@ -248,11 +251,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.frm.nativeElement.submit();
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    if (this.dataReport.dataSource.length > 0) {
+                        this.showReport();
+                    }
                 },
             );
     }
@@ -266,10 +267,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data charge to display preview');
                     }
@@ -290,10 +288,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no container data to display preview');
                     }

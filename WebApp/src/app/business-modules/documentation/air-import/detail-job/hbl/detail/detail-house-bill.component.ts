@@ -10,13 +10,13 @@ import { CsTransactionDetail, HouseBill } from '@models';
 import { ChargeConstants } from '@constants';
 import { DataService } from '@services';
 import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 
 import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { delayTime } from '@decorators';
 
 
 enum HBL_TAB {
@@ -33,7 +33,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
-
     hblDetail: any;
 
     selectedTab: string = HBL_TAB.DETAIL;
@@ -206,7 +205,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl`]);
                     } else {
                         this._toastService.error(res.message);
                     }

@@ -9,7 +9,6 @@ import { SystemConstants } from '@constants';
 import { CsTransaction, CsShippingInstruction } from '@models';
 
 import {
-    ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     getTransactionPermission,
     getTransactionLocked,
@@ -21,8 +20,10 @@ import { AppList } from '@app';
 import { delayTime } from '@decorators';
 import { ICrystalReport } from '@interfaces';
 
+import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/components/form-si-sea-export/form-si-sea-export.component';
+
 import _groupBy from 'lodash/groupBy';
-import { catchError, finalize, takeUntil, take, startWith, pluck, concatMap } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, take, pluck, concatMap } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 
@@ -33,7 +34,7 @@ import { forkJoin } from 'rxjs';
 export class SeaConsolExportShippingInstructionComponent extends AppList implements ICrystalReport {
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComponent: ShareBussinessBillInstructionSeaExportComponent;
+    @ViewChild(ShareSeaServiceFormSISeaExportComponent, { static: false }) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
 
     jobId: string;
     houseBills: any[] = [];
