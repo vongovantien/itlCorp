@@ -21,6 +21,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
 
   constructor(
     private _progressService: NgProgress,
+    private _toastService: ToastrService,
     private _exportRepo: ExportRepo,
   ) {
     super();
@@ -59,8 +60,12 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
             )
             .subscribe(
                 (response: ArrayBuffer) => {
+                  if (response.byteLength > 0) {
                     const fileName = "Commission PR for OPS Report.xlsx";
                     this.downLoadFile(response, "application/ms-excel", fileName);
+                  } else {
+                    this._toastService.warning("No data to download. Please try again.");
+                  }
                 },
             );
   }

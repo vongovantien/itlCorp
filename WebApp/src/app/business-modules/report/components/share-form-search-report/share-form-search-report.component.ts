@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter } from "@angular/core";
+import { Component, Output, EventEmitter, ViewChild, Input } from "@angular/core";
 import { AppForm } from "src/app/app.form";
-import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
+import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
 import { Observable } from "rxjs";
-import { Customer, PortIndex } from "@models";
+import { Customer, PortIndex, Partner } from "@models";
 import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
@@ -11,21 +11,32 @@ import { catchError, finalize, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
+import { ShareModulesInputShipmentPopupComponent } from "src/app/business-modules/share-modules/components";
+import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
+
 
 @Component({
-    selector: 'sheet-debit-report-form-search',
-    templateUrl: './form-search-sheet-debit-report.component.html'
+    selector: 'share-report-form-search',
+    templateUrl: './share-form-search-report.component.html'
 })
-
-export class SheetDebitReportFormSearchComponent extends AppForm {
+export class ShareFormSearchReportComponent extends AppForm {
     @Output() onSearch: EventEmitter<ReportInterface.ISaleReportCriteria> = new EventEmitter<ReportInterface.ISaleReportCriteria>();
+    @Output() onSearchCom: EventEmitter<ReportInterface.ICommissionReportCriteria> = new EventEmitter<ReportInterface.ICommissionReportCriteria>();
+    @Output() onGeneralSearch: EventEmitter<ReportInterface.ISearchDataCriteria> = new EventEmitter<ReportInterface.ISearchDataCriteria>();
 
+    @ViewChild(ShareModulesInputShipmentPopupComponent, { static: false }) inputShipmentPopup: ShareModulesInputShipmentPopupComponent;
+
+    @Input() isCommissionIncentive: boolean = false;
+    @Input() isGeneralReport: boolean = false;
+    @Input() isSheetDebitRpt: boolean = false;
     menuPermission: SystemInterface.IUserPermission;
 
     formSearch: FormGroup;
     serviceDate: AbstractControl;
     dateType: AbstractControl;
     customer: AbstractControl;
+    carrier: AbstractControl;
+    agent: AbstractControl;
     service: AbstractControl;
     currency: AbstractControl;
     refNo: AbstractControl;
@@ -38,6 +49,8 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     pol: AbstractControl;
     pod: AbstractControl;
     typeReport: AbstractControl;
+    partnerAccount: AbstractControl;
+    exchangeRate: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'taxCode', label: 'Tax Code' },
@@ -49,8 +62,16 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         { field: 'nameEn', label: 'Port Name' }
     ];
 
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'partnerNameVn', label: 'Partner Name' },
+        { field: 'taxCode', label: 'Tax Code' }
+    ];
+
     customers: Observable<Customer[]>;
+    carriers: Observable<Customer[]>;
+    agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
+    partners: Observable<Partner[]>;
 
     dateTypeList: any[] = [];
     dateTypeActive: any[] = [];
@@ -81,6 +102,9 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     staffsInit: any[] = [];
 
     groupSpecial: any[] = [];
+    numberOfShipment: number = 0;
+    shipmentInput: OperationInteface.IInputShipment;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -93,22 +117,18 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     ngOnInit() {
         this.initDataInform();
         this.initFormSearch();
-        /*const partnerGroup = [
-            CommonEnum.PartnerGroupEnum.CUSTOMER,
-            CommonEnum.PartnerGroupEnum.AGENT,
-            CommonEnum.PartnerGroupEnum.CARRIER,
-            CommonEnum.PartnerGroupEnum.CONSIGNEE,
-            CommonEnum.PartnerGroupEnum.SHIPPER,
-            CommonEnum.PartnerGroupEnum.SUPPLIER,
-            CommonEnum.PartnerGroupEnum.PAYMENTOBJECT,
-            CommonEnum.PartnerGroupEnum.SHIPPINGLINE,
-            CommonEnum.PartnerGroupEnum.SUPPLIERMATERIAL,
-            CommonEnum.PartnerGroupEnum.AIRSHIPSUP,
-            CommonEnum.PartnerGroupEnum.PETROLSTATION
-        ];*/
-        // Get All Partner
-        this.customers = this._catalogueRepo.getPartnerByGroups(null, null);
+        if (this.isSheetDebitRpt) { // Partner for Accountant Report
+            // Get All Partner
+            this.customers = this._catalogueRepo.getPartnerByGroups(null, null);
+        } else {
+            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
+            this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
+            this.carriers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
+        }
         this.ports = this._catalogueRepo.getListPort({ placeType: CommonEnum.PlaceTypeEnum.Port });
+        if (this.isCommissionIncentive) {
+            this.partners = this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL });
+        }
 
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this._store.select(getMenuUserPermissionState)
@@ -141,7 +161,9 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                 endDate: this.createMoment().endOf('month').toDate(),
             }],
             dateType: [this.dateTypeActive],
-            customer: [],
+            customer: [null, Validators.required],
+            carrier: [],
+            agent: [],
             service: [this.serviceActive],
             currency: [this.currencyActive],
             refNo: [],
@@ -153,12 +175,16 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             staffType: [this.staffTypeActive],
             pol: [],
             pod: [],
+            partnerAccount: [],
+            exchangeRate: 20000,
             typeReport: [this.typeReportActive]
         });
 
         this.serviceDate = this.formSearch.controls['serviceDate'];
         this.dateType = this.formSearch.controls['dateType'];
         this.customer = this.formSearch.controls['customer'];
+        this.carrier = this.formSearch.controls['carrier'];
+        this.agent = this.formSearch.controls['agent'];
         this.service = this.formSearch.controls['service'];
         this.currency = this.formSearch.controls['currency'];
         this.refNo = this.formSearch.controls['refNo'];
@@ -170,22 +196,34 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         this.staffType = this.formSearch.controls['staffType'];
         this.pol = this.formSearch.controls['pol'];
         this.pod = this.formSearch.controls['pod'];
+        this.partnerAccount = this.formSearch.controls['partnerAccount'];
+        this.exchangeRate = this.formSearch.controls['exchangeRate'];
         this.typeReport = this.formSearch.controls['typeReport'];
     }
 
     initDataInform() {
         this.getDateType();
         this.getService();
-        this.getCurrency();
+        if (!this.isCommissionIncentive) {
+            this.getCurrency();
+        }
         this.getRefNoType();
         this.getStaffType();
-        this.getTypeReport();
+        if (!this.isGeneralReport) {
+            this.getTypeReport();
+        }
     }
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
                 this.customer.setValue(data.id);
+                break;
+            case 'carrier':
+                this.carrier.setValue(data.id);
+                break;
+            case 'agent':
+                this.agent.setValue(data.id);
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
@@ -258,6 +296,9 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                 this.typeReportActive = [];
                 this.typeReportActive.push(data);
                 this.typeReport.setValue(this.typeReportActive);
+                break;
+            case 'acPartner':
+                this.partnerAccount.setValue(data.id);
                 break;
             default:
                 break;
@@ -430,7 +471,6 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         this.officeList = data
             .map((item: any) => ({ text: item.officeAbbrName, id: item.officeId }))
             .filter((o, i, arr) => arr.findIndex(t => t.id === o.id) === i); // Distinct office
-
         if (this.officeList.length > 0) {
             this.officeList.unshift({ id: 'All', text: 'All' });
             if (this.menuPermission.list === 'Office'
@@ -567,22 +607,79 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             { "text": 'Salesman', "id": 'SALESMAN' },
             { "text": 'Creator', "id": 'CREATOR' }
         ];
-        // Default value: Salesman
-        this.staffTypeActive = [this.staffTypeList[1]];
+        // Default value: Salesman, General Report: Person In Charge
+        this.staffTypeActive = this.isGeneralReport ? [this.staffTypeList[0]] : [this.staffTypeList[1]];
     }
 
     getTypeReport() {
-        this.typeReportList = [
-            { text: 'Accountant P/L Sheet', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET },
-            { text: 'Job Profit Analysis', id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS },
-            { text: 'Summary Of Costs Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST },
-            { text: 'Summary Of Revenue Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE }
-        ];
-        // Default value: Accountant P/L Sheet
+        if (this.isCommissionIncentive) { // Commission Incentive Report
+            this.typeReportList = [
+                { text: 'Commission PR for Air/Sea', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_AS },
+                { text: 'Commission PR for OPS', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_OPS },
+                { text: 'Incentive', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.INCENTIVE_RPT }
+            ];
+            // Default value: Commission PR for Air/Sea
+        } else if (this.isSheetDebitRpt) { // Accountant Report
+            this.typeReportList = [
+                { text: 'Accountant P/L Sheet', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET },
+                { text: 'Job Profit Analysis', id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS },
+                { text: 'Summary Of Costs Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST },
+                { text: 'Summary Of Revenue Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE }
+            ];
+            // Default value: Accountant P/L Sheet
+        } else { // Sale Report
+            this.typeReportList = [
+                { text: 'Monthly Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY },
+                { text: 'Sale Report By Department', id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT },
+                { text: 'Sale Report By Quarter', id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER },
+                { text: 'Summary Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY },
+                { text: 'Combination Statistic Report', id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION },
+
+            ];
+            // Default value: Monthly Sale Report
+        }
         this.typeReportActive = [this.typeReportList[0]];
     }
 
     searchReport() {
+        this.isSubmitted = true;
+        if (this.isGeneralReport) {
+            this.onGeneralSearch.emit(this.getGeneralSearchBody());
+        } else if (this.isCommissionIncentive) {
+            this.onSearchCom.emit(this.getCommissionSearchBody());
+        } else {
+            this.onSearch.emit(this.getSaleSearchBody());
+        }
+    }
+
+    getGeneralSearchBody() {
+        const body: ReportInterface.ISearchDataCriteria = {
+            serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            customerId: this.customer.value,
+            service: this.mapObject(this.serviceActive, this.serviceList), // ---*
+            currency: this.currencyActive[0].id, // ---**
+            jobId: this.refNoType.value[0].id === "JOBID" ? this.refNo.value : null,
+            mawb: this.refNoType.value[0].id === "MBL" ? this.refNo.value : null,
+            hawb: this.refNoType.value[0].id === "HBL" ? this.refNo.value : null,
+            officeId: this.mapObject(this.officeActive, this.officeList), // ---*
+            departmentId: this.mapObject(this.departmentActive, this.departmentList), // ---*
+            groupId: this.mapObject(this.groupActive, this.groupList), // ---*
+            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            carrierId: this.carrier.value,
+            agentId: this.agent.value,
+            pol: this.pol.value,
+            pod: this.pod.value
+        };
+        console.log('General search:', body);
+        return body;
+    }
+
+    getSaleSearchBody() {
         const body: ReportInterface.ISaleReportCriteria = {
             serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
@@ -600,13 +697,45 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
             salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
             creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            carrierId: null,
-            agentId: null,
+            carrierId: this.carrier.value,
+            agentId: this.agent.value,
             pol: this.pol.value,
             pod: this.pod.value,
             typeReport: this.typeReportActive[0].id
         };
-        this.onSearch.emit(body);
+        console.log('Sale search:', body);
+        return body;
+    }
+
+    getCommissionSearchBody() {
+        const body: ReportInterface.ICommissionReportCriteria = {
+            serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            customerId: this.customer.value,
+            service: this.mapObject(this.serviceActive, this.serviceList),
+            currency: "VND",
+            jobId: this.mapShipment('JOBID'),
+            mawb: this.mapShipment('MBL'),
+            hawb: this.mapShipment('HBL'),
+            officeId: this.mapObject(this.officeActive, this.officeList),
+            departmentId: this.mapObject(this.departmentActive, this.departmentList),
+            groupId: this.mapObject(this.groupActive, this.groupList),
+            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
+            carrierId: this.carrier.value,
+            agentId: this.agent.value,
+            pol: this.pol.value,
+            pod: this.pod.value,
+            customNo: this.mapShipment('CustomNo'),
+            beneficiary: this.partnerAccount.value,
+            exchangeRate: this.exchangeRate.value,
+            typeReport: this.typeReportActive[0].id
+        };
+        console.log('Com search:', body);
+        return body;
     }
 
     mapObject(dataSelected: any[], dataList: any[]) {
@@ -625,9 +754,13 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     resetSearch() {
         this.formSearch.reset();
         this.resetFormControl(this.customer);
+        this.resetFormControl(this.carrier);
+        this.resetFormControl(this.agent);
         this.resetFormControl(this.pol);
         this.resetFormControl(this.pod);
         this.onSearch.emit(<any>{});
+        this.onSearchCom.emit(<any>{});
+        this.onGeneralSearch.emit(<any>{});
 
         this.dateTypeActive = [this.dateTypeList[0]];
         this.dateType.setValue(this.dateTypeActive);
@@ -635,8 +768,10 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         this.serviceActive = [this.serviceList[0]];
         this.service.setValue(this.serviceActive);
 
-        this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
-        this.currency.setValue(this.currencyActive);
+        if (!this.isCommissionIncentive) {
+            this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
+            this.currency.setValue(this.currencyActive);
+        }
 
         this.refNoTypeActive = [this.refNoTypeList[0]];
         this.refNoType.setValue(this.refNoTypeActive);
@@ -677,6 +812,8 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             startDate: this.createMoment().startOf('month').toDate(),
             endDate: this.createMoment().endOf('month').toDate(),
         });
+
+        this.resetFormShipmentInput();
     }
 
     getAllOffice() {
@@ -744,6 +881,39 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                     this.getStaff(staff);
                 },
             );
+    }
+
+    openInputShipment() {
+        this.inputShipmentPopup.show();
+    }
+
+    onShipmentList(data: any) {
+        this.shipmentInput = data;
+        if (data) {
+            this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
+        } else {
+            this.numberOfShipment = 0;
+        }
+    }
+
+    resetFormShipmentInput() {
+        this.numberOfShipment = 0;
+        this.inputShipmentPopup.shipmentSearch = '';
+        this.shipmentInput = null;
+        this.inputShipmentPopup.selectedShipmentType = "JOBID";
+    }
+
+    mapShipment(type: string) {
+        let _shipment = '';
+        if (this.shipmentInput) {
+            if (this.shipmentInput.keyword.length > 0) {
+                const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).join();
+                if (this.shipmentInput.type === type) {
+                    _shipment = _keyword;
+                }
+            }
+        }
+        return _shipment;
     }
 }
 

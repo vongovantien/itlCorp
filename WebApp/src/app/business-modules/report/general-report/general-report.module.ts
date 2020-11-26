@@ -9,7 +9,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { GeneralReportComponent } from './general-report.component';
-import { GeneralReportFormSearchComponent } from './components/form-search-general-report/form-search-general-report.component';
+import { ShareReportModule } from '../share-report.module';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -19,7 +19,7 @@ const routing: Routes = [
             }
         ]
     },
-]
+];
 @NgModule({
     imports: [
         SharedModule,
@@ -28,12 +28,12 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
-        BsDropdownModule.forRoot()
+        BsDropdownModule.forRoot(),
+        ShareReportModule
     ],
     exports: [],
     declarations: [
-        GeneralReportComponent,
-        GeneralReportFormSearchComponent
+        GeneralReportComponent
     ],
     providers: [],
 })

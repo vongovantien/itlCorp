@@ -464,7 +464,7 @@
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPROpsReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
             <summary>
-            Generate Commission Report Excel
+            Generate Commission Ops Report Excel
             </summary>
             <param name="listData"></param>
             <param name="criteria"></param>
@@ -480,7 +480,7 @@
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPROpsReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
             <summary>
-            Binding Commission Report
+            Binding Commission Ops Report
             </summary>
             <param name="workSheet"></param>
             <param name="resultData"></param>

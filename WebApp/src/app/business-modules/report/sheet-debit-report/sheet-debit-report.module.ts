@@ -7,7 +7,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SheetDebitReportComponent } from './sheet-debit-report.component';
-import { SheetDebitReportFormSearchComponent } from './components/form-search-sheet-debit-report/form-search-sheet-debit-report.component';
+import { ShareReportModule } from '../share-report.module';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -17,7 +17,7 @@ const routing: Routes = [
             }
         ]
     },
-]
+];
 @NgModule({
     imports: [
         SharedModule,
@@ -26,11 +26,11 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
+        ShareReportModule
     ],
     exports: [],
     declarations: [
-        SheetDebitReportComponent,
-        SheetDebitReportFormSearchComponent
+        SheetDebitReportComponent
     ],
     providers: [],
 })

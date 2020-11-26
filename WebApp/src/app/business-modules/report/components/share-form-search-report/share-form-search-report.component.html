@@ -1,4 +1,4 @@
-<div class="m-portlet margin-bottom-100">
+<div class="m-portlet" [ngClass]="{'margin-bottom-100': !isGeneralReport}">
     <div class="m-portlet__body">
         <!--begin::Form-->
         <form class="m-form m-form--state" [formGroup]="formSearch" (ngSubmit)="searchReport()">
@@ -25,16 +25,21 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !customer.valid)}">
                         <label class="form-control-label">
-                            Customer
+                            {{ isSheetDebitRpt ? "Partner": "Customer" }}
                         </label>
+                        <label *ngIf="isCommissionIncentive" required></label>
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: customer.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             [displayFields]="displayFieldsCustomer" [height]="150"
                             (remove)="resetFormControl(customer)">
                         </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !customer.valid">
+                            Please select customer
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,8 +104,8 @@
                             </div>
                             <div class="col-lg-5">
                                 <a class="pointer" style="text-decoration: underline;"
-                                (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
-                                class="text-warning">{{numberOfShipment}} item</span>
+                                    (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
+                                    class="text-warning">{{numberOfShipment}} item</span>
                             </div>
                         </div>
                     </div>
@@ -108,7 +113,7 @@
             </div>
             <!--begin::Advance-search-->
 
-            <div class="collapse" id="advance-filter-sale-report">
+            <div class="collapse" id="advance-filter-search-report">
                 <div class="div-inside bg-secondary">
                     <div class="row">
                         <div class="col-lg-4">
@@ -171,10 +176,10 @@
                                 </ng-select>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4" *ngIf="!isSheetDebitRpt">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Carrier/Supplier/Vendor
+                                    {{isGeneralReport? "Carrier" : "Carrier/Supplier/Vendor"}}
                                 </label>
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{ field: 'id', value: carrier.value}"
@@ -187,7 +192,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4" *ngIf="!isSheetDebitRpt">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
                                     Agent
@@ -226,7 +231,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <!--end::Advance-search-->
@@ -236,8 +241,8 @@
                         <div class="form-group">
                             <label class="form-control-label" for="">&nbsp;</label>
                             <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse"
-                                href="#advance-filter-sale-report" role="button" aria-expanded="false"
-                                aria-controls="advance-filter-sale-report">
+                                href="#advance-filter-search-report" role="button" aria-expanded="false"
+                                aria-controls="advance-filter-search-report">
                                 <span>
                                     <i class="la la-angle-up"></i>
                                     <span>Advance Filter</span>
@@ -246,7 +251,7 @@
                         </div>
                     </div>
                     <div class="col-lg-5">
-                        <div class="form-group">
+                        <div class="form-group" *ngIf="!isGeneralReport">
                             <label class="form-control-label" for="">
                                 Report Type
                             </label>

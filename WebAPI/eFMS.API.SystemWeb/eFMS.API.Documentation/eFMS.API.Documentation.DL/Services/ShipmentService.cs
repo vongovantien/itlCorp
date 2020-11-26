@@ -3536,6 +3536,10 @@ namespace eFMS.API.Documentation.DL.Services
                                select ops;
             }
             var data = dataShipment.GroupBy(x => x.JobNo).AsQueryable();
+            if(data.Count() == 0)
+            {
+                return null;
+            }
             CommissionExportResult commissionData = new CommissionExportResult();
             var forMonth = string.Empty;
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
@@ -3578,7 +3582,8 @@ namespace eFMS.API.Documentation.DL.Services
                     ServiceDate = item.Select(x => x.ServiceDate).FirstOrDefault(),
                     JobId = item.Select(x => x.JobNo).FirstOrDefault(),
                     HBLNo = item.Select(x => x.Hwbno).FirstOrDefault(),
-                    CustomSheet = string.IsNullOrEmpty(criteria.CustomNo) ? string.Empty : string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Where(c => criteria.CustomNo.Contains(c.ClearanceNo)).Select(c => c.ClearanceNo).ToArray()),
+                    CustomSheet = string.IsNullOrEmpty(criteria.CustomNo) ? string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Select(c => c.ClearanceNo).ToArray())
+                                                                          : string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Where(c => criteria.CustomNo.Contains(c.ClearanceNo)).Select(c => c.ClearanceNo).ToArray()),
                     ChargeWeight = 0,
                     PortCode = string.Empty,
                     BuyingRate = GetBuyingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault()),
