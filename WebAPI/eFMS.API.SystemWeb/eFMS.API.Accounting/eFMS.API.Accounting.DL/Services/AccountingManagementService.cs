@@ -1931,11 +1931,19 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (criteria.SearchOption == "DEBITNOTE")
                 {
-                    var surcharge = surchargeRepo.Get(x => criteria.ReferenceNos.Contains(x.DebitNo));
+                    var acctManagementIds = surchargeRepo.Get(x => criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                    if (acctManagementIds != null)
+                    {
+                        query = query.And(x => acctManagementIds.Contains(x.Id));
+                    }
                 }
                 else if (criteria.SearchOption == "SOA")
                 {
-
+                    var acctManagementIds = surchargeRepo.Get(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                    if (acctManagementIds != null)
+                    {
+                        query = query.And(x => acctManagementIds.Contains(x.Id));
+                    }
                 }
                 else if (criteria.SearchOption == "VATINVOICE")
                 {
@@ -1974,12 +1982,33 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (!string.IsNullOrEmpty(criteria.Services))
             {
-                
+                var acctManagementIds = surchargeRepo.Get(x => criteria.Services.Contains(x.TransactionType)).Select(se => se.AcctManagementId).Distinct().ToList();
+                if (acctManagementIds != null)
+                {
+                    query = query.And(x => acctManagementIds.Contains(x.Id));
+                }
             }
 
             if (!string.IsNullOrEmpty(criteria.CsHandling))
             {
-                
+                var acctManagementIdOps = (from sur in surchargeRepo.Get(x => x.AcctManagementId != null)
+                                          join ops in opsTransactionRepo.Get(x => criteria.CsHandling.Contains(x.BillingOpsId)) on sur.JobNo equals ops.JobNo
+                                          select sur.AcctManagementId).Distinct().ToList();
+                var acctManagementIdDoc = (from sur in surchargeRepo.Get(x => x.AcctManagementId != null)
+                                          join ops in csTransactionRepo.Get(x => criteria.CsHandling.Contains(x.PersonIncharge)) on sur.JobNo equals ops.JobNo
+                                          select sur.AcctManagementId).Distinct().ToList();
+                if (acctManagementIdOps != null && acctManagementIdDoc == null)
+                {
+                    query = query.And(x => acctManagementIdOps.Contains(x.Id));
+                }
+                else if (acctManagementIdDoc != null && acctManagementIdOps == null)
+                {
+                    query = query.And(x => acctManagementIdDoc.Contains(x.Id));
+                }
+                else if (acctManagementIdOps != null && acctManagementIdDoc != null)
+                {
+                    query = query.And(x => acctManagementIdOps.Contains(x.Id) || acctManagementIdDoc.Contains(x.Id));
+                }
             }
             return query;
         }
@@ -2037,6 +2066,51 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
         
+        public HandleState UpdateConfirmBillingDate(List<Guid> ids)
+        {
+            try
+            {
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = new HandleState();
+                        foreach(var id in ids)
+                        {
+                            var accounting = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                            if (accounting != null)
+                            {
+                                hs = DataContext.Update(accounting, x => x.Id == accounting.Id, false);
+                            }
+                            else
+                            {
+                                return new HandleState((object)"An invoice does not exist in the system. Update confirm billing failed!");
+                            }
+                        }
+                        if (hs.Success)
+                        {
+                            DataContext.SubmitChanges();
+                            trans.Commit();
+                        }
+                        return hs;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
         #endregion --- CONFIRM BILLING ---
 
     }

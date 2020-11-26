@@ -33,5 +33,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<Guid> GetSurchargeIdByAcctMngtId(Guid? acctMngt);
         ChargeAccountingMngtTotalViewModel CalculateListChargeAccountingMngt(List<ChargeOfAccountingManagementModel> charges);
         List<ConfirmBillingResult> ConfirmBillingPaging(ConfirmBillingCriteria criteria, int page, int size, out int rowsCount);
+        HandleState UpdateConfirmBillingDate(List<Guid> ids);
     }
 }

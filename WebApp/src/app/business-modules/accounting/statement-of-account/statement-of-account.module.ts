@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StatementOfAccountComponent } from './statement-of-account.component';
-import { AccountReceivePayableComponent } from './account-receive-payable/account-receive-payable.component';
+import { ConfirmBillingComponent } from './confirm-billing/confirm-billing.component';
 import { StatementOfAccountDetailComponent } from './detail/detail-soa.component';
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
@@ -23,6 +23,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { ShareAccountingModule } from '../share-accouting.module';
 import { StatementOfAccountPaymentMethodComponent } from './components/poup/payment-method/soa-payment-method.popup';
+import { ConfirmBillingFormSearchComponent } from './components/form-search-confirm-billing/form-search-confirm-billing.component';
 
 const routing: Routes = [
     {
@@ -61,6 +62,7 @@ const COMPONENTS = [
     StatementOfAccountSummaryComponent,
     StatementOfAccountFormCreateComponent,
     StatementOfAccountPaymentMethodComponent,
+    ConfirmBillingFormSearchComponent
 ];
 
 @NgModule({
@@ -69,7 +71,7 @@ const COMPONENTS = [
         StatementOfAccountAddnewComponent,
         StatementOfAccountEditComponent,
         StatementOfAccountDetailComponent,
-        AccountReceivePayableComponent,
+        ConfirmBillingComponent,
         ...COMPONENTS
     ],
     imports: [
