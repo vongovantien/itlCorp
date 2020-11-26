@@ -568,7 +568,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         private string GetFileName(CatPlaceTypeEnum type)
         {
-            string templateName = Templates.ExelImportEx;
+            string templateName = Templates.ExcelImportEx;
             switch (type)
             {
                 case CatPlaceTypeEnum.Port:

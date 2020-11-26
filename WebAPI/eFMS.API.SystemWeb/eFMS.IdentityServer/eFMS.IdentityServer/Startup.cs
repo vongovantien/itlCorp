@@ -63,6 +63,7 @@ namespace AuthServer
             ServiceRegister.AddConfigureSetting(services, _appConfig.Configuration);
             
             IdentityModelEventSource.ShowPII = true;
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
