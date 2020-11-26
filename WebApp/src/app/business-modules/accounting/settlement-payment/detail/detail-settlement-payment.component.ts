@@ -1,24 +1,29 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
-import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
-import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
-import { Surcharge } from 'src/app/shared/models';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
-import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+
+import { AppPage } from '@app';
+import { Surcharge } from '@models';
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
+import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
+import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
+
+import { catchError, finalize, pluck } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
 })
 
-export class SettlementPaymentDetailComponent extends AppPage {
+export class SettlementPaymentDetailComponent extends AppPage implements ICrystalReport {
 
     @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
@@ -28,8 +33,6 @@ export class SettlementPaymentDetailComponent extends AppPage {
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
-
-    dataReport: any = null;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -42,22 +45,44 @@ export class SettlementPaymentDetailComponent extends AppPage {
         super();
 
         this._progressRef = this._progressService.ref();
-
     }
 
+
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            if (!!param.id) {
-                this.settlementId = param.id;
-                this.getDetailSettlement(this.settlementId, 'LIST');
-            }
-        });
+        this._activedRouter.params
+            .pipe(pluck('id'))
+            .subscribe((id: string) => {
+                if (!!id && isUUID(id)) {
+                    this.settlementId = id;
+                    this.getDetailSettlement(this.settlementId, 'LIST');
+                } else {
+                    this.back();
+                }
+            });
     }
 
     onChangeCurrency(currency: string) {
         if (!!this.requestSurchargeListComponent) {
             this.requestSurchargeListComponent.changeCurrency(currency);
         }
+    }
+
+    getBodySettlement() {
+        const settlement = {
+            id: this.settlementPayment.settlement.id,
+            settlementNo: this.formCreateSurcharge.settlementNo.value,
+            requester: this.formCreateSurcharge.requester.value,
+            requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
+            paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
+            settlementCurrency: this.formCreateSurcharge.currency.value,
+            note: this.formCreateSurcharge.note.value,
+            userCreated: this.settlementPayment.settlement.userCreated,
+            datetimeCreated: this.settlementPayment.settlement.datetimeCreated,
+            statusApproval: this.settlementPayment.settlement.statusApproval,
+            payee: this.formCreateSurcharge.payee.value
+        };
+
+        return settlement;
     }
 
     updateSettlement() {
@@ -74,18 +99,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
         });
         this._progressRef.start();
         const body: any = {
-            settlement: {
-                id: this.settlementPayment.settlement.id,
-                settlementNo: this.formCreateSurcharge.settlementNo.value,
-                requester: this.formCreateSurcharge.requester.value,
-                requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
-                paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value,
-                note: this.formCreateSurcharge.note.value,
-                userCreated: this.settlementPayment.settlement.userCreated,
-                datetimeCreated: this.settlementPayment.settlement.datetimeCreated,
-                statusApproval: this.settlementPayment.settlement.statusApproval
-            },
+            settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
@@ -118,7 +132,6 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         return;
                     }
                     this.settlementPayment = res;
-                    console.log(this.settlementPayment)
                     switch (this.settlementPayment.settlement.statusApproval) {
                         case 'New':
                         case 'Denied':
@@ -139,9 +152,9 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
                         note: this.settlementPayment.settlement.note,
                         statusApproval: this.settlementPayment.settlement.statusApproval,
-                        // amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
                         amount: this.settlementPayment.settlement.amount,
-                        currency: this.settlementPayment.settlement.settlementCurrency
+                        currency: this.settlementPayment.settlement.settlementCurrency,
+                        payee: this.settlementPayment.settlement.payee
                     });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
@@ -164,18 +177,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
     saveAndSendRequest() {
         this._progressRef.start();
         const body: any = {
-            settlement: {
-                id: this.settlementPayment.settlement.id,
-                settlementNo: this.formCreateSurcharge.settlementNo.value,
-                requester: this.formCreateSurcharge.requester.value,
-                requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
-                paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value,
-                note: this.formCreateSurcharge.note.value,
-                userCreated: this.settlementPayment.settlement.userCreated,
-                datetimeCreated: this.settlementPayment.settlement.datetimeCreated,
-                statusApproval: this.settlementPayment.settlement.statusApproval
-            },
+            settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
@@ -208,10 +210,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
                     (this.componentRef.instance as ReportPreviewComponent).data = res;
 
-                    setTimeout(() => {
-                        this.componentRef.instance.frm.nativeElement.submit();
-                        this.componentRef.instance.show();
-                    }, 1000);
+                    this.showReport();
 
                     this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
                         (v: any) => {
@@ -244,6 +243,12 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     this.downLoadFile(response, "application/ms-excel", 'Settlement Form - eFMS.xlsx');
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 }
 

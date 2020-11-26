@@ -2,7 +2,7 @@
 {
     public struct Templates
     {
-        public static string ExelImportEx = "ImportTemplate.xlsx";
+        public static string ExcelImportEx = "ImportTemplate.xlsx";
         public struct CatArea
         {
             public struct NameCaching
@@ -12,7 +12,7 @@
         }
         public struct CatCharge
         {
-            public static string ExelImportFileName = "Charge";
+            public static string ExcelImportFileName = "Charge";
             public struct NameCaching
             {
                 public static string ListName = "CatCharge";
@@ -21,7 +21,7 @@
 
         public struct CatChartOfAccounts
         {
-            public static string ExelImportFileName = "ChartOfAccounts";
+            public static string ExcelImportFileName = "ChartOfAccounts";
             public struct NameCaching
             {
                 public static string ListName = "CatChartOfAccounts";
@@ -30,7 +30,7 @@
 
         public struct CatChargeDefaultAccount
         {
-            public static string ExelImportFileName = "VoucherTypeAccount";
+            public static string ExcelImportFileName = "VoucherTypeAccount";
 
             public struct NameCaching
             {
@@ -39,14 +39,25 @@
         }
         public struct CatCommodity
         {
-            public static string ExelImportFileName = "Commodity";
+            public static string ExcelImportFileName = "Commodity";
             public struct NameCaching
             {
                 public static string ListName = "commodities";
             }
         }
+
+        public struct CatCommodityGroup
+        {
+            public static string ExcelImportFileName = "CommodityGroup";
+            public struct NameCaching
+            {
+                public static string ListName = "commoditiesgroup";
+            }
+        }
+
         public struct CatCountry
         {
+            public static string ExcelImportFileName = "Country";
             public struct NameCaching
             {
                 public static string ListName = "Countries";
@@ -61,7 +72,7 @@
         }
         public struct CatPartner
         {
-            public static string ExelImportFileName = "Partner";
+            public static string ExcelImportFileName = "Partner";
             public static string ExelImportCommercialCustomerFileName = "CommercialCustomer";
             public struct NameCaching
             {
@@ -71,7 +82,7 @@
 
         public struct CatContract
         {
-            public static string ExelImportFileName = "CustomerContract";
+            public static string ExcelImportFileName = "CustomerContract";
         }
 
 
@@ -93,7 +104,7 @@
         }
         public struct CatPlace
         {
-            public static string ExelImportFileName = "Place";
+            public static string ExcelImportFileName = "Place";
             public struct NameCaching
             {
                 public static string ListName = "Places";
@@ -101,7 +112,7 @@
         }
         public struct CatStage
         {
-            public static string ExelImportFileName = "Stage";
+            public static string ExcelImportFileName = "Stage";
             public struct NameCaching
             {
                 public static string ListName = "Stages";

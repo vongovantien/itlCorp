@@ -254,7 +254,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                       AtchDocNo = surcharge.InvoiceNo,
                                                                                       AtchDocDate = surcharge.InvoiceDate,
-                                                                                      AtchDocSerieNo = surcharge.SeriesNo,
+                                                                                      AtchDocSerialNo = surcharge.SeriesNo,
                                                                                       AccountNo = item.AccountNo, // AccountNo của voucher
                                                                                       ContracAccount = chgDef.CreditAccountNo,
                                                                                       VATAccount = chgDef.CreditVat,
@@ -278,12 +278,15 @@ namespace eFMS.API.Accounting.DL.Services
             if (Ids.Count() > 0)
             {
                 // Get list settlement
+                // IQueryable<AcctSettlementPayment> settlements = SettlementRepository.Get(x => Ids.Contains(x.Id));
                 IQueryable<AcctSettlementPayment> settlements = SettlementRepository.Get(x => Ids.Contains(x.Id) && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
 
                 IQueryable<BravoSettlementModel> querySettlement = from settle in settlements
                                                                    join user in users on settle.Requester equals user.Id
                                                                    join employee in employees on user.EmployeeId equals employee.Id
                                                                    join office in offices on settle.OfficeId equals office.Id
+                                                                   join partner in partners on settle.Payee equals partner.Id into payeeGrps
+                                                                   from partner in payeeGrps.DefaultIfEmpty()
                                                                    select new BravoSettlementModel
                                                                    {
                                                                        Stt = settle.Id,
@@ -294,7 +297,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        Description0 = settle.Note,
                                                                        CustomerName = employee.EmployeeNameVn,
                                                                        CustomerCode = employee.StaffCode,
-                                                                       PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod
+                                                                       PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
+                                                                       CustomerMode = partner.PartnerMode ?? "Internal"
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -331,7 +335,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
                                                                                              AtchDocDate = surcharge.InvoiceDate,
-                                                                                             AtchDocSerieNo = surcharge.SeriesNo,
+                                                                                             AtchDocSerialNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
                                                                                              CustomerCodeBook = obhP.AccountNo
                                                                                          };

@@ -14,6 +14,7 @@ using eFMS.API.Common.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -33,6 +34,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatStageService catStageService;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// constructor
@@ -40,11 +42,12 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="localizer">inject IStringLocalizer service</param>
         /// <param name="service">inject ICatStageService service</param>
         /// <param name="user">inject ICurrentUser service</param>
-        public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user)
+        public CatStageController(IStringLocalizer<LanguageSub> localizer, ICatStageService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catStageService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -270,15 +273,14 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("downloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
- 
             try
             {
-                string templateName = Templates.CatStage.ExelImportFileName + Templates.ExelImportEx;
-                var result = await new FileHelper().ExportExcel(templateName);
+                string fileName = Templates.CatStage.ExcelImportFileName + Templates.ExcelImportEx;
+                string templateName = _hostingEnvironment.ContentRootPath;
+                var result = await new FileHelper().ExportExcel(templateName, fileName);
                 if (result != null)
                 {
                     return result;
-
                 }
                 else
                 {
@@ -288,15 +290,8 @@ namespace eFMS.API.Catalogue.Controllers
             catch(Exception ex)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = ex.Message});
-            }
-                
-            
+            }                
         }
-
-
-
-
-
 
     }
 }
