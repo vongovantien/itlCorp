@@ -110,8 +110,6 @@ export class AirExportManifestComponent extends AppList {
     }
 
     refreshManifest() {
-        //this.getManifest(this.jobId);
-
         this.formManifest.getShipmentDetail();
         this.isShowUpdate = false;
         this.getHblList(this.jobId);
@@ -164,12 +162,7 @@ export class AirExportManifestComponent extends AppList {
     addOrUpdateManifest() {
         this.formManifest.isSubmitted = true;
         this.getTotalWeight();
-        if (this.formManifest.freightCharge.value.length > 0 && !this.formManifest.freightCharge.value[0].id) {
-            this.formManifest.freightChargeEmpty = true;
-            return;
-        } else {
-            this.formManifest.freightChargeEmpty = false;
-        }
+
         if (this.formManifest.formGroup.valid) {
 
             this._progressRef.start();
@@ -183,7 +176,7 @@ export class AirExportManifestComponent extends AppList {
                 invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
                 pol: this.formManifest.pol.value,
                 pod: this.formManifest.pod.value,
-                paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
+                paymentTerm: this.formManifest.freightCharge.value,
                 consolidator: this.formManifest.consolidator.value,
                 deConsolidator: this.formManifest.deconsolidator.value,
                 volume: this.formManifest.volume.value,
@@ -317,7 +310,7 @@ export class AirExportManifestComponent extends AppList {
             invoiceDate: !!this.formManifest.date.value && this.formManifest.date.value.startDate != null ? formatDate(this.formManifest.date.value.startDate !== undefined ? this.formManifest.date.value.startDate : this.formManifest.date.value, 'yyyy-MM-dd', 'en') : null,
             pol: this.formManifest.pol.value,
             pod: this.formManifest.pod.value,
-            paymentTerm: this.formManifest.freightCharge.value !== null ? this.formManifest.freightCharge.value[0].text : null,
+            paymentTerm: this.formManifest.freightCharge.value,
             consolidator: this.formManifest.consolidator.value,
             deConsolidator: this.formManifest.deconsolidator.value,
             volume: this.formManifest.volume.value,
