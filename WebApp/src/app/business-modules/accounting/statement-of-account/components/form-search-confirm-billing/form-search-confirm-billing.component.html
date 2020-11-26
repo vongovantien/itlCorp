@@ -3,8 +3,7 @@
         <div class="col-lg-4">
             <div class="form-group">
                 <label class="form-control-label" for="">Search Option</label>
-                <ng-select formControlName="invoiceStatus" [items]="invoiceStatusList" placeholder="New/Updated Invoice"
-                    class="custom">
+                <ng-select formControlName="searchOption" [items]="searchOptionList" placeholder="" class="custom">
                 </ng-select>
             </div>
         </div>
@@ -46,16 +45,16 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="form-control-label" for="">Date Type</label>
-                                <ng-select formControlName="voucherType" [items]="voucherTypeList"
-                                    placeholder="Select type" class="custom">
+                                <ng-select formControlName="dateType" [items]="dateTypeList" placeholder=""
+                                    class="custom">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="form-control-label" for="">Confirmed Billing</label>
-                                <ng-select formControlName="voucherType" [items]="voucherTypeList"
-                                    placeholder="Select type" class="custom">
+                                <ng-select formControlName="confirmedBilling" [items]="confirmedBillingList"
+                                    placeholder="" class="custom">
                                 </ng-select>
                             </div>
                         </div>
@@ -66,19 +65,16 @@
                         <label class="form-control-label" for="">
                             Service
                         </label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: creator.value}"
-                            (itemSelected)="onSelectDataFormInfo($event, 'creator')"
-                            [selectedDisplayFields]="['username']" [dataSources]="creators | async"
-                            [displayFields]="displayFieldsCreator" [height]="150" (remove)="resetFormControl(creator)"
-                            placeholder="Select creator">
-                        </app-combo-grid-virtual-scroll>
+                        <ng-select [multiple]="true" formControlName="service" [items]="services"
+                            placeholder="Select service" class="custom">
+                        </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label class="form-control-label" for="">Cs Handling</label>
-                        <ng-select formControlName="voucherType" [items]="voucherTypeList" placeholder="Select type"
-                            class="custom">
+                        <ng-select [multiple]="true" formControlName="csHandling" [items]="csHandlings"
+                            placeholder="Select cs handling" class="custom">
                         </ng-select>
                     </div>
                 </div>

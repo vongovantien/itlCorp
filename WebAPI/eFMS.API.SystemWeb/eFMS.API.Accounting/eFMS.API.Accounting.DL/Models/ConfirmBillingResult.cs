@@ -10,6 +10,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string PartnerName { get; set; }
         public decimal? TotalAmount { get; set; }
         public string Currency { get; set; }
+        public string Type { get; set; }
         public DateTime? Date { get; set; }
         public decimal? PaymentTerm { get; set; }
         public DateTime? ConfirmBillingDate { get; set; }

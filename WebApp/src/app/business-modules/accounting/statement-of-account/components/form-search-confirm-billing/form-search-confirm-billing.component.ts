@@ -7,8 +7,10 @@ import { Partner, User } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, catchError } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
+import { SortService } from '@services';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'form-search-confirm-billing',
@@ -16,19 +18,18 @@ import { AppForm } from 'src/app/app.form';
 })
 
 export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit {
-
-    @Input() accountType: string = AccountingConstants.ISSUE_TYPE.INVOICE;
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
 
-    partner: AbstractControl;
-    creator: AbstractControl;
+    searchOption: AbstractControl;
     referenceNo: AbstractControl;
+    partner: AbstractControl;
+    dateType: AbstractControl;
     issueDate: AbstractControl;
-    invoiceStatus: AbstractControl;
-    voucherType: AbstractControl;
+    confirmedBilling: AbstractControl;
+    service: AbstractControl;
+    csHandling: AbstractControl;
 
     partners: Observable<Partner[]>;
-    creators: Observable<User[]>;
     formSearch: FormGroup;
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
@@ -38,15 +39,24 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
         { field: 'employeeNameVn', label: 'Full Name' }
     ];
 
-    invoiceStatusList: string[] = ['New', 'Updated Invoice'];
+    searchOptionList: string[] = ['Debit Note', 'SOA', 'VAT Invoice'];
+    dateTypeList: string[] = ['Confirm Billing Date', 'VAT Invoice Date'];
+    confirmedBillingList: string[] = ['All', 'Yes', 'No'];
 
-    voucherTypeList: string[] = AccountingConstants.VOUCHER_TYPE.map(i => i.id);
+    services: any[] = [];
+    selectedService: any[] = [];
+    csHandlings: any[] = [];
+    selectedCsHandlings: any[] = [];
+
     dataSearch: any;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
-        private _fb: FormBuilder
+        private _fb: FormBuilder,
+        private _sysRepo: SystemRepo,
+        private _sortService: SortService,
+        private _toastService: ToastrService,
     ) {
         super();
         this.requestReset = this.reset;
@@ -56,24 +66,56 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
         this.initFormSearch();
         this.loadPartnerList();
         this.loadUserList();
-
+        this.getService();
     }
 
     initFormSearch() {
         this.formSearch = this._fb.group({
+            searchOption: [],
             referenceNo: [],
             partner: [],
+            dateType: [],
             issueDate: [{ startDate: new Date(), endDate: new Date() }],
-            creator: [],
-            invoiceStatus: [],
-            voucherType: []
+            confirmedBilling: [],
+            service: [],
+            csHandling: []
         });
+        this.searchOption = this.formSearch.controls['searchOption'];
         this.referenceNo = this.formSearch.controls['referenceNo'];
         this.partner = this.formSearch.controls['partner'];
+        this.dateType = this.formSearch.controls['dateType'];
         this.issueDate = this.formSearch.controls['issueDate'];
-        this.creator = this.formSearch.controls['creator'];
-        this.invoiceStatus = this.formSearch.controls['invoiceStatus'];
-        this.voucherType = this.formSearch.controls['voucherType'];
+        this.confirmedBilling = this.formSearch.controls['confirmedBilling'];
+        this.service = this.formSearch.controls['service'];
+        this.csHandling = this.formSearch.controls['csHandling'];
+    }
+
+    getService() {
+        this._sysRepo.getListServiceByPermision()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+
+                        this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                        //
+                        // sort A -> Z theo text services 
+                        this.sortIncreaseServices('text', true);
+
+                        this.services.unshift({ id: 'All', text: 'All' });
+
+                        this.selectedService = [this.services[0]];
+                    } else {
+                        this.handleError(null, (data) => {
+                            this._toastService.error(data.message, data.title);
+                        });
+                    }
+                },
+            );
+    }
+
+    sortIncreaseServices(sortField: string, order: boolean) {
+        this.services = this._sortService.sort(this.services, sortField, order);
     }
 
     loadPartnerList() {
@@ -81,7 +123,26 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
     }
 
     loadUserList() {
-        this.creators = this._systemRepo.getSystemUsers({});
+        this._systemRepo.getSystemUsers({}).pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+
+                        this.csHandlings = this.utility.prepareNg2SelectData(res, 'id', 'username');
+                        //
+                        // sort A -> Z theo text services 
+                        this.sortIncreaseServices('text', true);
+
+                        this.csHandlings.unshift({ id: 'All', text: 'All' });
+
+                        this.selectedCsHandlings = [this.csHandlings[0]];
+                    } else {
+                        this.handleError(null, (data) => {
+                            this._toastService.error(data.message, data.title);
+                        });
+                    }
+                },
+            );
     }
 
     onSelectDataFormInfo(data: { id: any; }, type: string) {
@@ -89,7 +150,10 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
             case 'partner':
                 this.formSearch.controls['partner'].setValue(data.id);
                 break;
-            case 'creator':
+            case 'service':
+                this.formSearch.controls['creator'].setValue(data.id);
+                break;
+            case 'csHandling':
                 this.formSearch.controls['creator'].setValue(data.id);
                 break;
             default:
@@ -99,15 +163,17 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
 
     onSubmit() {
         const criteria: any = {
+            searchOption: this.searchOption.value,
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: this.partner.value,
-            fromIssuedDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
-            toIssuedDate: this.issueDate.value ? (this.issueDate.value.endDate !== null ? formatDate(this.issueDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
-            creatorId: this.creator.value,
-            invoiceStatus: this.invoiceStatus.value,
-            voucherType: this.voucherType.value,
-            typeOfAcctManagement: this.accountType,
+            dateType: this.dateType.value,
+            fromDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+            toDate: this.issueDate.value ? (this.issueDate.value.endDate !== null ? formatDate(this.issueDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
+            confirmedBilling: this.confirmedBilling.value,
+            services: this.service.value,
+            csHandling: this.csHandling.value
         };
+        console.log(criteria);
         this.onSearch.emit(criteria);
     }
 

@@ -723,6 +723,15 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getListConfirmBilling(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/ConfirmBillingPaging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

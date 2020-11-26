@@ -1925,11 +1925,11 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- CONFIRM BILLING ---
         private Expression<Func<AccAccountingManagement, bool>> ConfirmBillingExpressionQuery(ConfirmBillingCriteria criteria)
         {
-            Expression<Func<AccAccountingManagement, bool>> query = q => q.Type == "Invoice" || q.Type == "InvoiceTemp";
+            Expression<Func<AccAccountingManagement, bool>> query = q => q.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || q.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE;
             
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                if (criteria.SearchOption == "DEBITNOTE")
+                if (criteria.SearchOption == "Debit Note")
                 {
                     var acctManagementIds = surchargeRepo.Get(x => criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
                     if (acctManagementIds != null)
@@ -1945,7 +1945,7 @@ namespace eFMS.API.Accounting.DL.Services
                         query = query.And(x => acctManagementIds.Contains(x.Id));
                     }
                 }
-                else if (criteria.SearchOption == "VATINVOICE")
+                else if (criteria.SearchOption == "VAT Invoice")
                 {
                     query = query.And(x => criteria.ReferenceNos.Contains(x.InvoiceNoReal));
                 }
@@ -1960,22 +1960,22 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (!string.IsNullOrEmpty(criteria.DateType))
                 {
-                    if (criteria.DateType == "VATINVOICEDATE")
+                    if (criteria.DateType == "VAT Invoice Date")
                     {
                         query = query.And(x => x.Date.Value.Date >= criteria.FromDate.Value.Date && x.Date.Value.Date <= criteria.ToDate.Value.Date);
                     }
-                    else if (criteria.DateType == "CONFIRMBILLINGDATE")
+                    else if (criteria.DateType == "Confirm Billing Date")
                     {
                         query = query.And(x => x.ConfirmBillingDate.Value.Date >= criteria.FromDate.Value.Date && x.ConfirmBillingDate.Value.Date <= criteria.ToDate.Value.Date);
                     }
                 }
             }
 
-            if (criteria.IsConfirmedBilling == true)
+            if (criteria.ConfirmedBilling == "Yes")
             {
                 query = query.And(x => x.ConfirmBillingDate != null);
             }
-            else if (criteria.IsConfirmedBilling == false)
+            else if (criteria.ConfirmedBilling == "No")
             {
                 query = query.And(x => x.ConfirmBillingDate == null);
             }
@@ -2032,6 +2032,7 @@ namespace eFMS.API.Accounting.DL.Services
                            PartnerName = pat.ShortName,
                            TotalAmount = acc.TotalAmount,
                            Currency = acc.Currency,
+                           Type = acc.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? "Debit" : (acc.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE ? "OBH" : string.Empty),
                            Date = acc.Date, //Invoice Date
                            PaymentTerm = acc.PaymentTerm,
                            ConfirmBillingDate = acc.ConfirmBillingDate,

@@ -11,7 +11,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string DateType { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
-        public bool? IsConfirmedBilling { get; set; }
+        public string ConfirmedBilling { get; set; }
         public string Services { get; set; }
         public string CsHandling { get; set; }
     }
