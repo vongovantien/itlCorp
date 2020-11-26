@@ -1,16 +1,18 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
-import { Currency, Surcharge } from 'src/app/shared/models';
-import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
-import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
-import { formatDate } from '@angular/common';
-import { AccountingRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
+
+import { AppPage } from '@app';
+import { Surcharge } from '@models';
+import { AccountingRepo } from '@repositories';
+import { ToastrService } from 'ngx-toastr';
 import { RoutingConstants } from '@constants';
 
+import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
+import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
+
+import { catchError, finalize } from 'rxjs/operators';
 @Component({
     selector: 'app-settle-payment-new',
     templateUrl: './add-settle-payment.component.html'
@@ -61,15 +63,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
 
         this._progressRef.start();
         const body: IDataSettlement = {
-            settlement: {
-                id: "00000000-0000-0000-0000-000000000000",
-                settlementNo: this.formCreateSurcharge.settlementNo.value,
-                requester: this.formCreateSurcharge.requester.value,
-                requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
-                paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value,
-                note: this.formCreateSurcharge.note.value,
-            },
+            settlement: this.getDataForm(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
@@ -96,15 +90,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         }
         this._progressRef.start();
         const body: IDataSettlement = {
-            settlement: {
-                id: "00000000-0000-0000-0000-000000000000",
-                settlementNo: this.formCreateSurcharge.settlementNo.value,
-                requester: this.formCreateSurcharge.requester.value,
-                requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
-                paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-                settlementCurrency: this.formCreateSurcharge.currency.value,
-                note: this.formCreateSurcharge.note.value,
-            },
+            settlement: this.getDataForm(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
@@ -125,9 +111,26 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             );
     }
 
+    getDataForm() {
+        const dataSettle = {
+            id: "00000000-0000-0000-0000-000000000000",
+            settlementNo: this.formCreateSurcharge.settlementNo.value,
+            requester: this.formCreateSurcharge.requester.value,
+            requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
+            paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
+            settlementCurrency: this.formCreateSurcharge.currency.value,
+            note: this.formCreateSurcharge.note.value,
+            payee: this.formCreateSurcharge.payee.value,
+        };
+
+        return dataSettle;
+    }
+
     back() {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
     }
+
+
 
 }
 interface IDataSettlement {

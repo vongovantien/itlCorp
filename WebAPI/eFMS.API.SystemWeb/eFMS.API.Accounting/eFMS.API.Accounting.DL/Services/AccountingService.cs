@@ -278,12 +278,15 @@ namespace eFMS.API.Accounting.DL.Services
             if (Ids.Count() > 0)
             {
                 // Get list settlement
+                // IQueryable<AcctSettlementPayment> settlements = SettlementRepository.Get(x => Ids.Contains(x.Id));
                 IQueryable<AcctSettlementPayment> settlements = SettlementRepository.Get(x => Ids.Contains(x.Id) && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
 
                 IQueryable<BravoSettlementModel> querySettlement = from settle in settlements
                                                                    join user in users on settle.Requester equals user.Id
                                                                    join employee in employees on user.EmployeeId equals employee.Id
                                                                    join office in offices on settle.OfficeId equals office.Id
+                                                                   join partner in partners on settle.Payee equals partner.Id into payeeGrps
+                                                                   from partner in payeeGrps.DefaultIfEmpty()
                                                                    select new BravoSettlementModel
                                                                    {
                                                                        Stt = settle.Id,
@@ -294,7 +297,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        Description0 = settle.Note,
                                                                        CustomerName = employee.EmployeeNameVn,
                                                                        CustomerCode = employee.StaffCode,
-                                                                       PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod
+                                                                       PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
+                                                                       CustomerMode = partner.PartnerMode ?? "Internal"
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
