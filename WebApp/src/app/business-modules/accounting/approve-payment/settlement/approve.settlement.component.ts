@@ -9,16 +9,15 @@ import { AccountingRepo, ExportRepo } from '@repositories';
 import { InjectViewContainerRefDirective } from '@directives';
 import { AppPage } from 'src/app/app.base';
 import { delayTime } from '@decorators';
+import { RoutingConstants } from '@constants';
 
 import { SettlementListChargeComponent } from '../../settlement-payment/components/list-charge-settlement/list-charge-settlement.component';
 import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
 import { SettlementFormCreateComponent } from '../../settlement-payment/components/form-create-settlement/form-create-settlement.component';
-
-import { finalize, catchError, takeUntil } from 'rxjs/operators';
-import { switchMap, tap } from 'rxjs/operators';
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
-import { RoutingConstants } from '@constants';
 
+import { finalize, catchError, takeUntil, switchMap, tap, pluck } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
 
 @Component({
     selector: 'app-approve-settlement',
@@ -63,10 +62,11 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
     ngOnInit() {
         this._activedRouter.params
+            .pipe(pluck('id'))
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((param: any) => {
-                if (!!param.id) {
-                    this.settlementId = param.id;
+            .subscribe((id: string) => {
+                if (!!id && isUUID(id)) {
+                    this.settlementId = id;
                     this.getDetailSettlement(this.settlementId);
                 }
             });
@@ -102,7 +102,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         note: this.settlementPayment.settlement.note,
                         statusApproval: this.settlementPayment.settlement.statusApproval,
                         amount: this.settlementPayment.settlement.amount,
-                        currency: this.settlementPayment.settlement.settlementCurrency
+                        currency: this.settlementPayment.settlement.settlementCurrency,
+                        payee: this.settlementPayment.settlement.payee
                     });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
