@@ -3,34 +3,30 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
-import { CsTransactionDetail } from 'src/app/shared/models';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransactionDetail } from '@models';
+import { ReportPreviewComponent } from '@common';
+import { ChargeConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
 
+import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
 
 @Component({
     selector: 'app-detail-hbl-lcl-export',
     templateUrl: './detail-house-bill.component.html'
 })
 
-export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLComponent implements OnInit, AfterViewInit {
+export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
 
     hblDetail: CsTransactionDetail;
-
-    dataReport: Crystal;
-
-    allowUpdate: boolean = false;
 
     constructor(
         protected _activedRoute: ActivatedRoute,
@@ -53,6 +49,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
             _cd
         );
     }
+
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
@@ -98,9 +95,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     getListContainer() {
         this._store.select<any>(fromShareBussiness.getHBLContainersState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
@@ -127,13 +122,10 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     }
 
     updateHbl(body: any) {
-        body.transactionType = 'SLE';
-        body.transactionType = body.transactionType = ChargeConstants.SLE_CODE;
+        body.transactionType = ChargeConstants.SLE_CODE;
 
         this._documentationRepo.updateHbl(body)
-            .pipe(
-                catchError(this.catchError),
-            )
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -155,10 +147,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -176,14 +165,16 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        throw new Error('Method not implemented.');
     }
 }

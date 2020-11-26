@@ -58,6 +58,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     onSubmitData() {
         const form: any = this.formCreateComponent.formGroup.getRawValue();
+        console.log(form);
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,

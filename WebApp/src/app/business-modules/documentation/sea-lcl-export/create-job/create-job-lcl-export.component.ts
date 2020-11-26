@@ -11,11 +11,11 @@ import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
 import {
     ShareBusinessImportJobDetailPopupComponent,
-    ShareBussinessShipmentGoodSummaryLCLComponent
 } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
 import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/components/form-create-sea-export/form-create-sea-export.component';
+import { ShareSeaServiceShipmentGoodSummaryLCLComponent } from '../../share-sea/components/shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
@@ -29,8 +29,9 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
+    @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+
     containers: Container[] = [];
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.
@@ -46,7 +47,6 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() {
-
     }
 
     gotoList() {
@@ -71,7 +71,7 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
             grossWeight: this.shipmentGoodSummaryComponent.gw,
             cbm: this.shipmentGoodSummaryComponent.cbm,
             packageQty: this.shipmentGoodSummaryComponent.packageQuantity,
-            packageType: this.shipmentGoodSummaryComponent.packageTypes.map(type => type.id).toString(),
+            packageType: this.shipmentGoodSummaryComponent.packageTypes.toString(),
         };
         const model: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         model.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaLCLExport;

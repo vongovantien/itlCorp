@@ -13,18 +13,20 @@ import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction
 import { FormValidators } from '@validators';
 
 import { AppForm } from 'src/app/app.form';
-import * as fromShareBussiness from './../../../share-business/store';
+import * as fromShareBussiness from './../../../../share-business/store';
 
 import { Observable, of } from 'rxjs';
 import { catchError, takeUntil, skip, finalize, tap, concatMap, startWith } from 'rxjs/operators';
 import { DataService } from '@services';
 
+import _merge from 'lodash/merge';
+import _cloneDeep from 'lodash/cloneDeep';
 
 @Component({
-    selector: 'form-create-house-bill-export',
-    templateUrl: './form-create-house-bill-export.component.html'
+    selector: 'app-form-create-hbl-sea-export',
+    templateUrl: './form-create-hbl-sea-export.component.html'
 })
-export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm implements OnInit {
+export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppForm implements OnInit {
 
     @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
@@ -75,10 +77,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
 
-    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES;
-    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
-    typeOfMoves: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.TYPEOFMOVES;
+    serviceTypes: string[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
+    ladingTypes: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
+    termTypes: string[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
+    typeOfMoves: string[] = JobConstants.COMMON_DATA.TYPEOFMOVES.map(i => i.id);
     originNumbers: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
@@ -163,7 +165,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.shipmmentDetail = new CsTransaction(shipment);
-
                         this.formCreate.patchValue({
                             bookingNo: this.shipmmentDetail.bookingNo,
                             mawb: this.shipmmentDetail.mawb,
@@ -217,14 +218,14 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
     setDefaultOriginBLNumber(shipment: CsTransaction) {
         if (!!shipment.transactionType) {
-            if (shipment.transactionType === ChargeConstants.SFE_CODE) {
-                return [this.originNumbers[3]];
+            if (shipment.transactionType === ChargeConstants.SFE_CODE || shipment.transactionType === ChargeConstants.SCE_CODE) {
+                return this.originNumbers[3].id;
             }
-            if (shipment.transactionType === ChargeConstants.SLE_CODE) {
+            if (shipment.transactionType === ChargeConstants.SLE_CODE || shipment.transactionType === ChargeConstants.SCI_CODE) {
                 if (shipment.mbltype === 'Original') {
-                    return [this.originNumbers[3]];
+                    return this.originNumbers[3].id;
                 } else {
-                    return [this.originNumbers[1]];
+                    return this.originNumbers[1].id;
                 }
             }
         } else {
@@ -267,7 +268,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             hbltype: [null, Validators.required],
             serviceType: [],
             freightPayment: [null, Validators.required],
-            originBlnumber: [[this.originNumbers[1]]],
+            originBlnumber: [this.originNumbers[1].id],
 
             // * date
             sailingDate: [null, Validators.required],
@@ -338,48 +339,26 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     }
 
     updateFormValue(data: CsTransactionDetail) {
-        this.formCreate.setValue({
-            mawb: data.mawb,
-            customer: data.customerId,
-            saleMan: data.saleManId,
-            shipper: data.shipperId,
-            shipperDescription: data.shipperDescription,
-            consignee: data.consigneeId,
-            consigneeDescription: data.consigneeDescription,
-            notifyParty: data.notifyPartyId,
-            notifyPartyDescription: data.notifyPartyDescription,
-            hwbno: data.hwbno,
-            hbltype: !!data.hbltype ? [{ id: data.hbltype, text: data.hbltype }] : null,
-            bookingNo: data.customsBookingNo,
-            localVoyNo: data.localVoyNo,
-            oceanVoyNo: data.oceanVoyNo,
-            country: data.originCountryId,
-            placeReceipt: data.pickupPlace,
-            pol: data.pol,
-            pod: data.pod,
-            placeDelivery: data.deliveryPlace,
-            finalDestinationPlace: data.finalDestinationPlace,
-            freightPayment: !!data.freightPayment ? [{ id: data.freightPayment, text: data.freightPayment }] : null,
+        const formValue = {
             closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
             sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
             issueHbldate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
 
-            placeFreightPay: data.placeFreightPay,
+            customer: data.customerId,
+            saleMan: data.saleManId,
+            shipper: data.shipperId,
+            consignee: data.consigneeId,
+            notifyParty: data.notifyPartyId,
+            bookingNo: data.customsBookingNo,
+            country: data.originCountryId,
+            placeReceipt: data.pickupPlace,
+            placeDelivery: data.deliveryPlace,
             forwardingAgent: data.forwardingAgentId,
             goodsDelivery: data.goodsDeliveryId,
-            goodsDeliveryDescription: data.goodsDeliveryDescription,
-            forwardingAgentDescription: data.forwardingAgentDescription,
-            originBlnumber: !!data.originBlnumber ? [(this.originNumbers || []).find(type => type.id === data.originBlnumber)] : null,
-            referenceNo: data.referenceNo,
-            exportReferenceNo: data.exportReferenceNo,
-            issueHblplace: data.issueHblplace,
-            moveType: !!data.moveType ? [{ id: data.moveType, text: data.moveType }] : null,
-            serviceType: !!data.serviceType ? [{ id: data.serviceType, text: data.serviceType }] : null,
-            purchaseOrderNo: data.purchaseOrderNo,
-            shippingMark: data.shippingMark,
-            inWord: data.inWord,
-            onBoardStatus: data.onBoardStatus
-        });
+
+        };
+
+        this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
     }
 
     getSaleMans() {
@@ -429,11 +408,11 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             shippingMark: data.shippingMark,
             inWord: data.inWord,
             onBoardStatus: data.onBoardStatus,
-            originBlnumber: [<CommonInterface.INg2Select>{ id: data.originBlnumber, text: data.originBlnumber }],
-            freightCharge: [<CommonInterface.INg2Select>{ id: data.freightPayment, text: data.freightPayment }],
-            moveType: [<CommonInterface.INg2Select>{ id: data.moveType, text: data.moveType }],
-            serviceType: [<CommonInterface.INg2Select>{ id: data.serviceType, text: data.serviceType }],
-            hbltype: [<CommonInterface.INg2Select>{ id: data.hbltype, text: data.hbltype }]
+            originBlnumber: data.originBlnumber,
+            freightCharge: data.freightPayment,
+            moveType: data.moveType,
+            serviceType: data.serviceType,
+            hbltype: data.hbltype
         });
     }
 
@@ -497,8 +476,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 this.forwardingAgent.setValue(data.id);
                 break;
             case 'freightPayment':
-                if (!!data && !!data.length || !!data.id) {
-                    if (data.id === 'Collect') {
+                if (!!data) {
+                    if (data === 'Collect') {
                         this.placeFreightPay.setValue('Destination');
                     } else {
                         this.placeFreightPay.setValue('Origin');
@@ -513,9 +492,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         }
     }
 
-    onSelectHblType(data: CommonInterface.INg2Select) {
-        if (!!data && data.id === 'Original') {
-            this.originBlnumber.setValue([this.originNumbers[3]]);
+    onSelectHblType(data: string) {
+        if (!!data && data === 'Original') {
+            this.originBlnumber.setValue(this.originNumbers[3].id);
         }
     }
 

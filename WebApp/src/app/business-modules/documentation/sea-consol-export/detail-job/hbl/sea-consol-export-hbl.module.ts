@@ -12,6 +12,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { SeaConsolExportCreateHBLComponent } from './create/create-hbl-consol-export.component';
 import { SeaConsolExportDetailHBLComponent } from './detail/detail-hbl-consol-export.component';
+import { ShareSeaServiceModule } from '../../../share-sea/share-sea-service.module';
 
 
 const routing: Routes = [
@@ -40,6 +41,7 @@ const LIB = [
         ShareBussinessModule,
         RouterModule.forChild(routing),
         NgxSpinnerModule,
+        ShareSeaServiceModule,
         ...LIB
 
     ],

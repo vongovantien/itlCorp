@@ -3,20 +3,21 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
-import { Container } from 'src/app/shared/models/document/container.model';
 
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
-import { ReportPreviewComponent } from 'src/app/shared/common';
-import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-modules/share-business/components/shipment-good-summary/shipment-good-summary.component';
+import { DocumentationRepo, ExportRepo } from '@repositories';
+import { Container } from '@models';
+import { ReportPreviewComponent } from '@common';
+import { ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
+import { ChargeConstants, RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
+import { DataService } from '@services';
+
+import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-import.component';
+import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
-
-import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { DataService } from '@services';
-import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-import.component';
-import { RoutingConstants } from '@constants';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -29,15 +30,14 @@ enum HBL_TAB {
     selector: 'app-detail-hbl-consol-import',
     templateUrl: './detail-hbl-consol-import.component.html',
 })
-export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLComponent {
+export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLComponent implements ICrystalReport {
 
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     containers: Container[] = [];
-    hblDetail: any; // TODO model here!!
-    dataReport: Crystal;
+    hblDetail: any;
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
@@ -79,9 +79,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
 
     getListContainer() {
         this._store.select<any>(fromShareBussiness.getHBLContainersState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
@@ -134,6 +132,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
             return;
         }
         const modelUpdate: any = this.onsubmitData();
+
         modelUpdate.jobId = this.hblDetail.jobId;
         modelUpdate.id = this.hblDetail.id;
 
@@ -159,7 +158,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
 
     updateHbl(body: any) {
         this._progressRef.start();
-        body.transactionType = 'SFI';
+        body.transactionType = ChargeConstants.SCI_CODE;
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
@@ -177,7 +176,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
     }
 
     getDetailHbl() {
-        this.formHouseBill.isDetail = true;
         this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
@@ -191,7 +189,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                     this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
-                        this.formHouseBill.getListSaleman();
+                        // this.formHouseBill.getListSaleman();
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.
@@ -247,11 +245,9 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.reportPopup.frm.nativeElement.submit();
-                        this.reportPopup.show();
-                    }, 1000);
-
+                    if (this.dataReport.dataSource.length > 0) {
+                        this.showReport();
+                    }
                 },
             );
     }
@@ -265,10 +261,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data charge to display preview');
                     }
@@ -289,10 +282,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no container data to display preview');
                     }
@@ -308,7 +298,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 },
             );
     }
-
     exportGoodsDeclare() {
         this._exportRepository.exportGoodDeclare(this.hblId)
             .pipe(catchError(this.catchError))
@@ -318,7 +307,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 },
             );
     }
-
     exportEManifest() {
         this._exportRepository.exportEManifest(this.hblId)
             .pipe(catchError(this.catchError))
@@ -327,5 +315,11 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                     this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 }

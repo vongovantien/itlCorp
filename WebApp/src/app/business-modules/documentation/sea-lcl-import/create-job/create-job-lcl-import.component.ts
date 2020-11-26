@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from '@app';
-import { ShareBussinessShipmentGoodSummaryLCLComponent, ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
+import { ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import { DocumentationRepo } from '@repositories';
@@ -12,6 +12,7 @@ import { InfoPopupComponent } from '@common';
 import { RoutingConstants } from '@constants';
 
 import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/components/form-create-sea-import/form-create-sea-import.component';
+import { ShareSeaServiceShipmentGoodSummaryLCLComponent } from '../../share-sea/components/shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
@@ -23,7 +24,7 @@ import _merge from 'lodash/merge';
 export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
-    @ViewChild(ShareBussinessShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryLCLComponent;
+    @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
@@ -75,7 +76,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
             grossWeight: this.shipmentGoodSummaryComponent.gw,
             cbm: this.shipmentGoodSummaryComponent.cbm,
             packageQty: this.shipmentGoodSummaryComponent.packageQuantity,
-            packageType: this.shipmentGoodSummaryComponent.packageTypes.map(type => type.id).toString(),
+            packageType: this.shipmentGoodSummaryComponent.packageTypes.toString(),
         };
 
         const model: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
