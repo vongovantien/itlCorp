@@ -1,19 +1,19 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
+import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
+import { PopupBase } from '@app';
 import { AccountingRepo } from '@repositories';
 import { SystemConstants } from '@constants';
 import { PartnerOfAcctManagementResult } from '@models';
 
-import { ToastrService } from 'ngx-toastr';
 import { AccountingManagementSelectPartnerPopupComponent } from '../select-partner/select-partner.popup';
 import { IAccountingManagementState, SelectPartner, SelectRequester } from '../../../store';
-import { Store } from '@ngrx/store';
 import { ShareAccountingManagementSelectRequesterPopupComponent } from 'src/app/business-modules/accounting/components/select-requester/select-requester.popup';
 
 @Component({
     selector: 'input-ref-no-popup',
-    templateUrl: './input-ref-no.popup.html'
+    templateUrl: './input-ref-no.popup.html',
 })
 
 export class AccountingManagementInputRefNoPopupComponent extends PopupBase implements OnInit {
@@ -98,61 +98,82 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                 break;
         }
         if (this.type === 'invoice') {
-            this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
-                .subscribe(
-                    (res: PartnerOfAcctManagementResult[]) => {
-                        if (!!res && !!res.length) {
-                            if (res.length === 1) {
-                                this._store.dispatch(SelectPartner(res[0]));
+            this.getChargeInvoice(body);
+        } else {
+            this.getChargeVoucher(body);
+        }
 
-                                // Search agreement.
+    }
+
+    getChargeInvoice(body: AccountingInterface.IPartnerOfAccountingManagementRef) {
+        this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
+            .subscribe(
+                (res: PartnerOfAcctManagementResult[]) => {
+                    if (!!res && !!res.length) {
+                        if (res.length === 1) {
+                            this._store.dispatch(SelectPartner(res[0]));
+
+                            // Search agreement.
+                            this.hide();
+                            return;
+                        } else {
+                            this.selectPartnerPopup.listPartners = res;
+                            this.selectPartnerPopup.selectedPartner = null;
+
+                            this.selectPartnerPopup.show();
+                        }
+
+                    } else {
+                        this._toastService.warning("Not found data charge");
+                    }
+                }
+            );
+    }
+
+    getChargeVoucher(body: AccountingInterface.IPartnerOfAccountingManagementRef) {
+        this._accountingRepo.getChargeForVoucherByCriteria(body)
+            .subscribe(
+                (res: PartnerOfAcctManagementResult[]) => {
+                    if (!!res && !!res.length) {
+                        if (res.length === 1) {
+                            if (this.selectedOpion.value === 'settlementCodes') {
+                                this._store.dispatch(SelectRequester(res[0]));
                                 this.hide();
-                                return;
+                            } else {
+                                this._store.dispatch(SelectPartner(res[0]));
+                                this.hide();
+                            }
+                            return;
+                        } else {
+                            if (this.selectedOpion.value === 'settlementCodes') {
+                                if (res.some(x => !!x.partnerId)) {
+                                    this.selectRequesterPopup.listRequesters = res.filter(x => !!x.partnerId);
+                                    this.selectRequesterPopup.isPayee = true;
+
+                                    if (this.selectRequesterPopup.listRequesters.length === 1) {
+                                        this._store.dispatch(SelectRequester(this.selectRequesterPopup.listRequesters[0]));
+                                        this.hide();
+                                        return;
+                                    }
+                                } else {
+                                    this.selectRequesterPopup.isPayee = false;
+                                    this.selectRequesterPopup.listRequesters = res;
+                                }
+
+                                this.selectRequesterPopup.selectedRequester = null;
+                                this.selectRequesterPopup.show();
                             } else {
                                 this.selectPartnerPopup.listPartners = res;
                                 this.selectPartnerPopup.selectedPartner = null;
-
                                 this.selectPartnerPopup.show();
                             }
-
-                        } else {
-                            this._toastService.warning("Not found data charge");
                         }
+                    } else {
+                        this._toastService.warning("Not found data charge");
                     }
-                );
-        } else {
-            this._accountingRepo.getChargeForVoucherByCriteria(body)
-                .subscribe(
-                    (res: PartnerOfAcctManagementResult[]) => {
-                        if (!!res && !!res.length) {
-                            if (res.length === 1) {
-                                if (this.selectedOpion.value === 'settlementCodes') {
-                                    this._store.dispatch(SelectRequester(res[0]));
-                                    this.hide();
-                                } else {
-                                    this._store.dispatch(SelectPartner(res[0]));
-                                    this.hide();
-                                }
-                                return;
-                            } else {
-                                if (this.selectedOpion.value === 'settlementCodes') {
-                                    this.selectRequesterPopup.listRequesters = res;
-                                    this.selectRequesterPopup.selectedRequester = null;
-                                    this.selectRequesterPopup.show();
-                                } else {
-                                    this.selectPartnerPopup.listPartners = res;
-                                    this.selectPartnerPopup.selectedPartner = null;
-                                    this.selectPartnerPopup.show();
-                                }
-                            }
-                        } else {
-                            this._toastService.warning("Not found data charge");
-                        }
 
-                    }
-                );
-        }
-
+                }
+            );
     }
 }
 
