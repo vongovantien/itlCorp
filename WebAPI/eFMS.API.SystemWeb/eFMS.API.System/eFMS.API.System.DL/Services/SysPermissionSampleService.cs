@@ -51,8 +51,8 @@ namespace eFMS.API.System.DL.Services
             userRepository = userRepo;
 
             SetChildren<SysUserPermission>("Id", "PermissionSampleId");
-            SetChildren<SysPermissionSampleGeneral>("Id", "PermissionId");
-            SetChildren<SysPermissionSampleSpecial>("Id", "PermissionId");
+            //SetChildren<SysPermissionSampleGeneral>("Id", "PermissionId");
+            //SetChildren<SysPermissionSampleSpecial>("Id", "PermissionId");
         }
 
         public SysPermissionSampleModel GetBy(Guid? id)

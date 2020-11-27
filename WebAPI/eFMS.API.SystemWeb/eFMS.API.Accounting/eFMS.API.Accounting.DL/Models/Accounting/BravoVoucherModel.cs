@@ -22,6 +22,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string CurrencyCode { get; set; }
         public decimal? ExchangeRate { get; set; }  // Tỷ giá ngày tạo voucher
         public string PaymentMethod { get; set; }
+        public decimal? PaymentTerm { get; set; }
         public List<BravoVoucherChargeModel> Details { get; set; }
     }
 
@@ -49,17 +50,11 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string VATAccount { get; set; }
         public string AtchDocNo { get; set; } // Invoice
         public DateTime? AtchDocDate { get; set; } // Invoice Date
-        public string AtchDocSerieNo { get; set; } // Serie
+        public string AtchDocSerialNo { get; set; } // Serie
         public string ChargeType { get; set; } // CREDIT / OBH
         public decimal? Amount { get; set; }
         public decimal? Amount3 { get; set; }
         public string CustomerCodeBook { get; set; } // Mã đối tượng hoạch toán
-
-
-
-
-
-
-
+        public decimal? DueDate { get; set; }
     }
 }

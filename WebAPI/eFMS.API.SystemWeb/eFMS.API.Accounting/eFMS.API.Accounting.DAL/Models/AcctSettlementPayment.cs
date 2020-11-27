@@ -28,5 +28,6 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? LastSyncDate { get; set; }
         public string SyncStatus { get; set; }
         public string ReasonReject { get; set; }
+        public string Payee { get; set; }
     }
 }

@@ -15,6 +15,7 @@ using System.DirectoryServices;
 using System.Net;
 using ITL.NetCore.Common;
 using System.Net.Sockets;
+using Microsoft.AspNetCore.Http;
 
 namespace eFMS.IdentityServer.DL.Services
 {
@@ -24,7 +25,7 @@ namespace eFMS.IdentityServer.DL.Services
         readonly LDAPConfig ldap;
         IContextBase<SysEmployee> employeeRepository;
         public readonly IContextBase<SysUserLevel> userLevelRepository;
-
+        private readonly IHttpContextAccessor _accessor;
 
 
         public AuthenticateService(
@@ -32,13 +33,14 @@ namespace eFMS.IdentityServer.DL.Services
             ISysUserLogService logService,
             IOptions<LDAPConfig> ldapConfig,
             IContextBase<SysUserLevel> userLevelRepo,
-            IContextBase<SysEmployee> employeeRepo) : base(repository, mapper)
+            IContextBase<SysEmployee> employeeRepo,
+            IHttpContextAccessor accessor) : base(repository, mapper)
         {
             userLogService = logService;
             ldap = ldapConfig.Value;
             employeeRepository = employeeRepo;
             userLevelRepository = userLevelRepo;
-
+            _accessor = accessor;
         }
 
         public UserViewModel GetUserById(string id)
@@ -295,16 +297,17 @@ namespace eFMS.IdentityServer.DL.Services
         {
             try
             {
-                string ipv4 = string.Empty;
-                var host = Dns.GetHostEntry(Dns.GetHostName());
-                foreach (var ip in host.AddressList)
-                {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        ipv4 = ip.ToString();
-                    }
-                }
-                return ipv4;
+                //string ipv4 = string.Empty;
+                //var host = Dns.GetHostEntry(Dns.GetHostName());
+                //foreach (var ip in host.AddressList)
+                //{
+                //    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                //    {
+                //        ipv4 = ip.ToString();
+                //    }
+                //}
+                //return ipv4;
+                return _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
             }
             catch (Exception)
             {

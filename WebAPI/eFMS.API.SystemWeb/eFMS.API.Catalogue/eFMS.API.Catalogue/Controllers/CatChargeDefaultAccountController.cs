@@ -261,10 +261,9 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("downloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-
             try
             {
-                string fileName = Templates.CatChargeDefaultAccount.ExelImportFileName + Templates.ExelImportEx;
+                string fileName = Templates.CatChargeDefaultAccount.ExcelImportFileName + Templates.ExcelImportEx;
                 string templateName = _hostingEnvironment.ContentRootPath;
                 var result = await new FileHelper().ExportExcel(templateName, fileName);
                 if (result != null)

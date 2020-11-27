@@ -14,6 +14,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -33,6 +34,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// constructor
@@ -40,11 +42,12 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="localizer">inject IStringLocalizer</param>
         /// <param name="service">inject ICatCountryService serrvice</param>
         /// <param name="user"></param>
-        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user)
+        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catCountryService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -195,8 +198,9 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            string templateName = "Country" + Templates.ExelImportEx;
-            var result = await new FileHelper().ExportExcel(templateName);
+            string fileName = Templates.CatCountry.ExcelImportFileName + Templates.ExcelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
             {
                 return result;

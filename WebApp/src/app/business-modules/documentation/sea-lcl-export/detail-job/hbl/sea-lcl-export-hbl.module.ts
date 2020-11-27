@@ -3,18 +3,16 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { SelectModule } from 'ng2-select';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { ChargeConstants } from 'src/constants/charge.const';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SeaLCLExportHBLComponent } from './sea-lcl-export-hbl.component';
 import { SeaLCLExportCreateHBLComponent } from './create/create-house-bill.component';
 import { SeaLCLExportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
+import { ShareSeaServiceModule } from '../../../share-sea/share-sea-service.module';
 
 const routing: Routes = [
     {
@@ -41,12 +39,8 @@ const routing: Routes = [
 ];
 
 const LIB = [
-    PaginationModule.forRoot(),
     ModalModule.forRoot(),
     TabsModule.forRoot(),
-    SelectModule,
-    NgxDaterangepickerMd.forRoot()
-
 ];
 
 @NgModule({
@@ -55,6 +49,7 @@ const LIB = [
         ShareBussinessModule,
         RouterModule.forChild(routing),
         NgxSpinnerModule,
+        ShareSeaServiceModule,
         ...LIB
 
     ],

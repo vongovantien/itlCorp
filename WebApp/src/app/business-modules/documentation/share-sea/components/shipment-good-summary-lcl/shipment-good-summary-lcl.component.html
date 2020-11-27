@@ -18,12 +18,10 @@
                     <div class="col-md-4">
                         <label for="">Package Type:</label>
                         <div class="pos-rel">
-                            <ng-select #pkg [multiple]="true" [items]="packages" (selected)="selected($event)"
-                                (removed)="removed($event)" placeholder="Please Select" [(ngModel)]="packageTypes"
-                                name="packageTypes">
+                            <ng-select class="custom" [multiple]="true" [items]="packages | async"
+                                placeholder="Please Select" [(ngModel)]="packageTypes" name="packageTypes"
+                                bindLabel="unitNameEn" bindValue="code">
                             </ng-select>
-                            <combo-grid-icon *ngIf="!packageTypes.length" (onDropdown)="openNg2Select(pkg)">
-                            </combo-grid-icon>
                         </div>
                     </div>
                     <div class="col-md-4">

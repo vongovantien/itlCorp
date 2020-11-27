@@ -147,9 +147,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     duplicateJob(body: any) {
         this._documenRepo.importCSTransaction(body)
-            .pipe(
-                catchError(this.catchError)
-            )
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -168,9 +166,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     saveJob(body: any) {
         this._documenRepo.updateCSTransaction(body)
-            .pipe(
-                catchError(this.catchError)
-            )
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -352,9 +348,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.showReport();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }

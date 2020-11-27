@@ -10,18 +10,20 @@ import { AppForm } from 'src/app/app.form';
 import { JobConstants } from '@constants';
 
 @Component({
-    selector: 'bill-instruction-sea-export',
-    templateUrl: './bill-instruction-sea-export.component.html'
+    selector: 'app-form-si-sea-export',
+    templateUrl: './form-si-sea-export.component.html'
 })
-export class ShareBussinessBillInstructionSeaExportComponent extends AppForm implements OnInit {
+export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements OnInit {
     @Input() type: string = 'lcl';
+
     formSI: FormGroup;
     userIssues: any[] = [];
     suppliers: any[] = [];
     consignees: any[] = [];
     shippers: any[] = [];
     ports: any[] = [];
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
+
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
     shippingInstruction: CsShippingInstruction;
 
     siRefNo: AbstractControl;
@@ -90,7 +92,7 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
                 actualShipperDescription: res.actualShipperDescription,
                 realconsignee: res.actualConsigneeId,
                 actualConsigneeDescription: res.actualConsigneeDescription,
-                term: [this.termTypes.find(type => type.id === res.paymenType)],
+                term: res.paymenType,
                 remark: res.remark,
                 pol: res.pol,
                 pod: res.pod,
@@ -300,7 +302,7 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
             actualShipperDescription: form.actualShipperDescription,
             actualConsigneeId: form.realconsignee,
             actualConsigneeDescription: form.actualConsigneeDescription,
-            paymenType: !!form.term ? form.term[0].id : null,
+            paymenType: form.term,
             remark: form.remark,
             pol: form.pol,
             pod: form.pod,

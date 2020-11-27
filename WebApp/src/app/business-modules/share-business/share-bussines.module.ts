@@ -14,7 +14,6 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
@@ -35,7 +34,6 @@ import {
     ShareBussinessCdNoteAddPopupComponent,
     ShareBussinessCdNoteAddRemainingChargePopupComponent,
     ShareBussinessCdNoteDetailPopupComponent,
-    ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBussinessHBLGoodSummaryLCLComponent,
     ShareBussinessGoodsListPopupComponent,
     ShareBusinessFormManifestComponent,
@@ -44,13 +42,11 @@ import {
     ShareBusinessAsignmentComponent,
     ShareBusinessStageManagementDetailComponent,
     ShareBusinessAddHblToManifestComponent,
-    ShareBusinessFormCreateHouseBillImportComponent,
     ShareBusinessArrivalNoteComponent,
     ShareBusinessDeliveryOrderComponent,
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBusinessFormCreateHouseBillExportComponent,
     ShareBussinessCdNoteListAirComponent,
     ShareBussinessCdNoteAddAirPopupComponent,
     ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
@@ -60,7 +56,6 @@ import {
     ShareBusinessArrivalNoteAirComponent,
     ShareBussinessDateTimeModifiedComponent,
     ShareContainerImportComponent,
-    ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     ShareBussinessHBLFCLContainerPopupComponent,
     ShareGoodsImportComponent,
@@ -77,6 +72,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
 import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
 import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 
@@ -100,11 +96,9 @@ const COMPONENTS = [
     ShareBusinessFormManifestComponent,
     ShareBusinessAddHblToManifestComponent,
     ShareBussinessGoodsListPopupComponent,
-    ShareBussinessShipmentGoodSummaryLCLComponent,
     ShareBusinessAssignStagePopupComponent,
     ShareBusinessAsignmentComponent,
     ShareBusinessStageManagementDetailComponent,
-    ShareBusinessFormCreateHouseBillImportComponent,
     ShareBusinessArrivalNoteComponent,
     ShareBusinessDeliveryOrderComponent,
     ShareBusinessFormSearchSeaComponent,
@@ -112,7 +106,6 @@ const COMPONENTS = [
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormSearchHouseBillComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBusinessFormCreateHouseBillExportComponent,
     ShareBussinessCdNoteListAirComponent,
     ShareBussinessCdNoteAddAirPopupComponent,
     ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
@@ -124,7 +117,6 @@ const COMPONENTS = [
     ShareBussinessHBLFCLContainerPopupComponent,
     ShareBusinessReAlertComponent,
     ShareBusinessAddAttachmentPopupComponent,
-    ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     ShareBusinessAttachListHouseBillComponent,
     ShareBussinessInputDailyExportPopupComponent,
@@ -158,7 +150,7 @@ const customCurrencyMaskConfig = {
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,
         PipeModule,
-        SelectModule,
+        NgSelectModule,
         ValidatorModule,
         PaginationModule.forRoot(),
         BsDropdownModule.forRoot(),

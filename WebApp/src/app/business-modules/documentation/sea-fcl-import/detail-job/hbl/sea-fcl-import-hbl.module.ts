@@ -1,13 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { SelectModule } from 'ng2-select';
-import { FroalaViewModule, FroalaEditorModule } from 'angular-froala-wysiwyg';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { SeaFCLImportHBLComponent } from './sea-fcl-import-hbl.component';
@@ -15,11 +9,11 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { DetailHouseBillComponent } from './detail/detail-house-bill.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
-import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
 import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ShareSeaServiceModule } from '../../../share-sea/share-sea-service.module';
 
 const routing: Routes = [
     {
@@ -46,29 +40,21 @@ const routing: Routes = [
 ];
 
 const LIB = [
-    PaginationModule.forRoot(),
-    ModalModule.forRoot(),
-    SelectModule,
-    FroalaEditorModule.forRoot(),
-    FroalaViewModule.forRoot(),
-    NgxDaterangepickerMd,
     TabsModule.forRoot(),
     BsDropdownModule.forRoot()
 ];
-
-
 @NgModule({
     declarations: [
         SeaFCLImportHBLComponent,
         CreateHouseBillComponent,
         DetailHouseBillComponent,
-        FormSearchHouseBillComponent,
     ],
     imports: [
         SharedModule,
         ShareBussinessModule,
         RouterModule.forChild(routing),
         NgxSpinnerModule,
+        ShareSeaServiceModule,
         ...LIB
 
     ],

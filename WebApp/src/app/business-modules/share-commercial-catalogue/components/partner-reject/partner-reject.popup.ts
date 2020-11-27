@@ -8,7 +8,7 @@ import { PopupBase } from 'src/app/popup.base';
 })
 
 export class PartnerRejectPopupComponent extends PopupBase implements OnInit {
-    @Output() onSave: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onSave: EventEmitter<string> = new EventEmitter<string>();
     comment: string = '';
 
     constructor(private _toastService: ToastrService) {
@@ -28,7 +28,5 @@ export class PartnerRejectPopupComponent extends PopupBase implements OnInit {
         }
         this.onSave.emit(this.comment);
         this.hide();
-
     }
-
 }
