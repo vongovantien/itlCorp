@@ -1,13 +1,17 @@
-import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
-import { Validators, FormBuilder, AbstractControl, FormGroup } from '@angular/forms';
+import { Component, Output, ViewChild, EventEmitter } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { Validators, FormBuilder, AbstractControl, FormGroup } from '@angular/forms';
+import { formatDate } from '@angular/common';
+
+import { PopupBase } from '@app';
 import { SystemRepo, CatalogueRepo } from '@repositories';
 import { ConfirmPopupComponent } from '@common';
-import { distinctUntilChanged, map, catchError } from 'rxjs/operators';
-import { Authorization, User } from '@models';
-import { formatDate } from '@angular/common';
+import { User } from '@models';
+
 import { AuthorizedApproval } from 'src/app/shared/models/system/authorizedApproval';
+
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, map, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'add-authorized-approval-popup',
@@ -33,11 +37,10 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     authorized: AuthorizedApproval = new AuthorizedApproval();
     authorizedToUpdate: any = {};
 
-    users: User[] = [];
+    users: Observable<User[]>;
 
-    statusActive: any[] = [];
-    statusList: any[] = [];
-    typeList: any[] = [];
+
+    typeList: any[] = ['Advance', 'Settlement', 'unlock Shipment'];
 
     minDateExpired: any = null;
     minDateEffective: any = null;
@@ -51,13 +54,8 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this.getUsers();
+        this.users = this._systemRepo.getSystemUsers({ active: true });
         this.initForm();
-        this.typeList = [
-            { text: 'Advance', id: 'Advance' },
-            { text: 'Settlement', id: 'Settlement' },
-            { text: 'Unlock Shipment', "id": 'Unlock Shipment' }
-        ];
     }
 
     initForm() {
@@ -96,20 +94,6 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
         }
     }
 
-    getUsers() {
-        this._systemRepo.getSystemUsers({ active: true })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.users = res;
-                        this.users = this.users.filter(x => x.active);
-                    }
-                },
-            );
-    }
-
-
     saveAuthorizedAprroval() {
         [this.type].forEach((control: AbstractControl) => this.setError(control));
         this.isSubmitted = true;
@@ -119,7 +103,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
                 commissioner: !!this.commissioner ? this.commissioner.value : null, //
                 effectiveDate: this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 expirationDate: this.expirationDate.value ? (this.expirationDate.value.startDate !== null ? formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
-                type: this.type.value ? (this.type.value.length > 0 ? this.type.value[0].id : '') : '',
+                type: this.type.value,
                 description: this.formAuthorizedApproval.controls['description'].value,
                 active: this.status.value,
             };
@@ -168,7 +152,6 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     }
 
     changeStatus(status: boolean) {
-        console.log(status);
         if (!status) {
             this.status.setValue(true);
             this.confirmTurnOfPopup.show();

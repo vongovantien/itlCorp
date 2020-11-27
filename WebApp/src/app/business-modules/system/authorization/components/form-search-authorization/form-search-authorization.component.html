@@ -7,8 +7,8 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Service</label>
-                                <ng-select formControlName="service" [allowClear]="true" [items]="serviceList"
-                                    (removed)="service.setValue(null)">
+                                <ng-select class="custom" formControlName="service" [items]="serviceList | async"
+                                    (removed)="service.setValue(null)" bindValue="value" bindLabel="displayName">
                                 </ng-select>
                             </div>
                         </div>
@@ -34,8 +34,8 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Person In Charge</label>
-                                <ng-select formControlName="personInCharge" [allowClear]="true"
-                                    [items]="personInChargeList">
+                                <ng-select class="custom" formControlName="personInCharge"
+                                    [items]="personInChargeList | async" bindValue="id" bindLabel="username">
                                 </ng-select>
                             </div>
                         </div>
@@ -62,16 +62,16 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Authorized Person</label>
-                                <ng-select formControlName="authorizedPerson" [allowClear]="true"
-                                    [items]="authorizedPersonList">
+                                <ng-select class="custom" formControlName="authorizedPerson"
+                                    [items]="personInChargeList | async" bindValue="id" bindLabel="username">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Status</label>
-                                <ng-select formControlName="status" [allowClear]="false" [items]="statusList"
-                                    [active]="statusActive">
+                                <ng-select class="custom" formControlName="status" [items]="statusList" bindValue="id"
+                                    bindLabel="text">
                                 </ng-select>
                             </div>
                         </div>
