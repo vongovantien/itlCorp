@@ -10,7 +10,6 @@ import { CsTransaction, CsShippingInstruction } from '@models';
 import { SystemConstants } from '@constants';
 
 import {
-    ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     TransactionActions,
     TransactionGetDetailAction,
@@ -20,6 +19,7 @@ import {
 } from '@share-bussiness';
 import { delayTime } from '@decorators';
 import { ICrystalReport } from '@interfaces';
+import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/components/form-si-sea-export/form-si-sea-export.component';
 
 import { catchError, finalize, takeUntil, take, pluck, concatMap } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
@@ -31,7 +31,7 @@ import { forkJoin } from 'rxjs';
 })
 export class SeaLclExportShippingInstructionComponent extends AppList implements ICrystalReport {
 
-    @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComponent: ShareBussinessBillInstructionSeaExportComponent;
+    @ViewChild(ShareSeaServiceFormSISeaExportComponent, { static: false }) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 

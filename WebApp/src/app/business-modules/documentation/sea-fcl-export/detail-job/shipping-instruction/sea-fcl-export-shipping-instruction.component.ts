@@ -16,9 +16,9 @@ import {
     TransactionActions,
     TransactionGetDetailAction,
     getTransactionDetailCsTransactionState,
-    ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent
 } from '@share-bussiness';
+import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/components/form-si-sea-export/form-si-sea-export.component';
 
 import { forkJoin } from 'rxjs';
 import { catchError, finalize, takeUntil, take, concatMap, pluck } from 'rxjs/operators';
@@ -32,7 +32,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList implements
 
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComponent: ShareBussinessBillInstructionSeaExportComponent;
+    @ViewChild(ShareSeaServiceFormSISeaExportComponent, { static: false }) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
 
     jobId: string;
     houseBills: any[] = [];

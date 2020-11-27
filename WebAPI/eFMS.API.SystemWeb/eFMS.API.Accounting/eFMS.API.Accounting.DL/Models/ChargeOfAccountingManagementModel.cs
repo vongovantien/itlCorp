@@ -41,5 +41,8 @@ namespace eFMS.API.Accounting.DL.Models
         public string RequesterId { get; set; }
         public string ChargeType { get; set; }
         public bool? IsFromShipment { get; set; }
+        public string PayeeIdSettle { get; set; }
+        public string PayeeNameSettle { get; set; }
+        public string PayeeAddressSettle { get; set; }
     }
 }

@@ -5,24 +5,23 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { formatDate } from '@angular/common';
 
-import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { SystemConstants } from 'src/constants/system.const';
+import { AppForm } from '@app';
+import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { Container, CsTransactionDetail } from '@models';
+import { SystemConstants, RoutingConstants } from '@constants';
 import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBusinessFormCreateHouseBillExportComponent,
     getTransactionPermission,
     ShareBusinessAttachListHouseBillComponent
 } from 'src/app/business-modules/share-business';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-
 import * as fromShareBussiness from './../../../../../share-business/store';
+
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants } from '@constants';
+import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 
 @Component({
     selector: 'app-create-hbl-consol-export',
@@ -33,16 +32,14 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(ShareBusinessFormCreateHouseBillExportComponent, { static: false }) formCreateHBLComponent: ShareBusinessFormCreateHouseBillExportComponent;
+    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent, { static: false }) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
 
     jobId: string;
     containers: Container[] = [];
-    allowAdd: boolean = false;
-
-    selectedHbl: any = {}; // TODO model.
+    selectedHbl: CsTransactionDetail;
 
     constructor(
         protected _progressService: NgProgress,
@@ -149,16 +146,16 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
             exportReferenceNo: form.exportReferenceNo,
             goodsDeliveryDescription: form.goodsDeliveryDescription,
             forwardingAgentDescription: form.forwardingAgentDescription,
-            purchaseOrderNo: form.purchaseOrderNo || null,
+            purchaseOrderNo: form.purchaseOrderNo,
             shippingMark: form.shippingMark,
             inWord: form.inWord,
             onBoardStatus: form.onBoardStatus,
 
-            serviceType: !!form.serviceType && !!form.serviceType.length ? form.serviceType[0].id : null,
-            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? form.originBlnumber[0].id : null,
-            moveType: !!form.moveType && !!form.moveType.length ? form.moveType[0].id : null,
-            freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
-            hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
+            serviceType: form.serviceType,
+            originBlnumber: form.originBlnumber,
+            moveType: form.moveType,
+            freightPayment: form.freightPaymen,
+            hbltype: form.hbltype,
 
             customerId: form.customer,
             saleManId: form.saleMan,
@@ -208,11 +205,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
     checkValidateForm() {
         let valid: boolean = true;
-
-        this.setError(this.formCreateHBLComponent.serviceType);
-        this.setError(this.formCreateHBLComponent.moveType);
-        this.setError(this.formCreateHBLComponent.originBlnumber);
-
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
         }

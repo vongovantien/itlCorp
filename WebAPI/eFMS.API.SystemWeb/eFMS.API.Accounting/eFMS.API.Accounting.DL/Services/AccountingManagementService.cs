@@ -573,6 +573,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         from pat in pat2.DefaultIfEmpty()
                                         join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                         from sett in sett2.DefaultIfEmpty()
+                                        join p in partners on sett.Payee equals p.Id into payeeGrps
+                                        from payeeGrp in payeeGrps.DefaultIfEmpty()
                                         select new ChargeOfAccountingManagementModel
                                         {
                                             SurchargeId = sur.Id,
@@ -611,7 +613,11 @@ namespace eFMS.API.Accounting.DL.Services
                                             AcctManagementId = sur.AcctManagementId,
                                             RequesterId = sett.Requester,
                                             ChargeType = sur.Type,
-                                            IsFromShipment = sur.IsFromShipment
+                                            IsFromShipment = sur.IsFromShipment,
+                                            PayeeIdSettle = payeeGrp.Id ?? null,
+                                            PayeeNameSettle = payeeGrp.ShortName,
+                                            PayeeAddressSettle = payeeGrp.AddressVn
+
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(query);
             var queryBuySellDocumentation = from sur in surcharges
@@ -627,6 +633,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             from pat in pat2.DefaultIfEmpty()
                                             join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                             from sett in sett2.DefaultIfEmpty()
+                                            join p in partners on sett.Payee equals p.Id into payeeGrps
+                                            from payeeGrp in payeeGrps.DefaultIfEmpty()
                                             select new ChargeOfAccountingManagementModel
                                             {
                                                 SurchargeId = sur.Id,
@@ -665,7 +673,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                 AcctManagementId = sur.AcctManagementId,
                                                 RequesterId = sett.Requester,
                                                 ChargeType = sur.Type,
-                                                IsFromShipment = sur.IsFromShipment
+                                                IsFromShipment = sur.IsFromShipment,
+                                                PayeeIdSettle = payeeGrp.Id ?? null,
+                                                PayeeNameSettle = payeeGrp.ShortName,
+                                                PayeeAddressSettle = payeeGrp.AddressVn
                                             };
             queryBuySellDocumentation = queryBuySellDocumentation.Where(query);
             var mergeBuySell = queryBuySellOperation.Union(queryBuySellDocumentation);
@@ -708,6 +719,8 @@ namespace eFMS.API.Accounting.DL.Services
                                        from obhPat in obhPat2.DefaultIfEmpty()
                                        join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                        from sett in sett2.DefaultIfEmpty()
+                                       join p in partners on sett.Payee equals p.Id into payeeGrps
+                                       from payeeGrp in payeeGrps.DefaultIfEmpty()
                                        select new ChargeOfAccountingManagementModel
                                        {
                                            SurchargeId = sur.Id,
@@ -746,7 +759,10 @@ namespace eFMS.API.Accounting.DL.Services
                                            AcctManagementId = sur.AcctManagementId,
                                            RequesterId = sett.Requester,
                                            ChargeType = sur.Type,
-                                           IsFromShipment = sur.IsFromShipment
+                                           IsFromShipment = sur.IsFromShipment,
+                                           PayeeIdSettle = payeeGrp.Id ?? null,
+                                           PayeeNameSettle = payeeGrp.ShortName,
+                                           PayeeAddressSettle = payeeGrp.AddressVn
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(query);
             var queryObhBuyDocumentation = from sur in surcharges
@@ -764,6 +780,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            from obhPat in obhPat2.DefaultIfEmpty()
                                            join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                            from sett in sett2.DefaultIfEmpty()
+                                           join p in partners on sett.Payee equals p.Id into payeeGrps
+                                           from payeeGrp in payeeGrps.DefaultIfEmpty()
                                            select new ChargeOfAccountingManagementModel
                                            {
                                                SurchargeId = sur.Id,
@@ -802,7 +820,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                AcctManagementId = sur.AcctManagementId,
                                                RequesterId = sett.Requester,
                                                ChargeType = sur.Type,
-                                               IsFromShipment = sur.IsFromShipment
+                                               IsFromShipment = sur.IsFromShipment,
+                                               PayeeIdSettle = payeeGrp.Id ?? null,
+                                               PayeeNameSettle = payeeGrp.ShortName,
+                                               PayeeAddressSettle = payeeGrp.AddressVn
                                            };
             queryObhBuyDocumentation = queryObhBuyDocumentation.Where(query);
             var mergeObhBuy = queryObhBuyOperation.Union(queryObhBuyDocumentation);
@@ -875,22 +896,43 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
                 // Group by theo RequesterId
-                chargeGroupByPartner = charges.GroupBy(g => new { SettlementRequesterId = g.RequesterId }).Select(s =>
+                if(charges.Any(x => x.PayeeIdSettle != null))
                 {
-                    List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
-                    return new PartnerOfAcctManagementResult
+                    chargeGroupByPartner = charges.GroupBy(g => new { g.PayeeIdSettle }).Select(s =>
                     {
-                        PartnerId = null,
-                        PartnerName = null,
-                        PartnerAddress = null,
-                        SettlementRequesterId = s.Key.SettlementRequesterId,
-                        SettlementRequester = null, //Tính toán bên dưới
-                        InputRefNo = string.Empty, //Tính toán bên dưới
-                        Charges = s.ToList(),
-                        Service = GetTransactionType(jobNoGrouped)
-                    };
-                }).ToList();
-
+                        List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
+                        return new PartnerOfAcctManagementResult
+                        {
+                            PartnerId = s.Key.PayeeIdSettle,
+                            PartnerName = s.FirstOrDefault()?.PayeeNameSettle,
+                            PartnerAddress = s.FirstOrDefault()?.PayeeAddressSettle,
+                            SettlementRequesterId = null,
+                            SettlementRequester = null, //Tính toán bên dưới
+                            InputRefNo = string.Empty, //Tính toán bên dưới
+                            Charges = s.ToList(),
+                            Service = GetTransactionType(jobNoGrouped)
+                        };
+                    }).ToList();
+                }
+                else
+                {
+                    chargeGroupByPartner = charges.GroupBy(g => new { g.RequesterId }).Select(s =>
+                    {
+                        List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
+                        return new PartnerOfAcctManagementResult
+                        {
+                            PartnerId = null,
+                            PartnerName = null,
+                            PartnerAddress = null,
+                            SettlementRequesterId = s.Key.RequesterId,
+                            SettlementRequester = null, //Tính toán bên dưới
+                            InputRefNo = string.Empty, //Tính toán bên dưới
+                            Charges = s.ToList(),
+                            Service = GetTransactionType(jobNoGrouped)
+                        };
+                    }).ToList();
+                }
+                
             }
             else
             {
@@ -2114,5 +2156,18 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- CONFIRM BILLING ---
 
+        
+        private string GetPayeeIdFromSettlement(string settleCode)
+        {
+            string payeeId = null;
+
+            AcctSettlementPayment settlement = settlementPaymentRepo.Get(x => x.SettlementNo == settleCode).FirstOrDefault();
+            if(settlement != null)
+            {
+                payeeId = settlement.Payee;
+            }
+
+            return payeeId;
+        }
     }
 }

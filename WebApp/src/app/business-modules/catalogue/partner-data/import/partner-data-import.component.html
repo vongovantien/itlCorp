@@ -147,6 +147,11 @@
                                 <span>Airline Code/Co-Loader Code</span>
                             </th>
                             <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'creditPayment'), 'sorting_desc': (!isDesc && sortKey == 'creditPayment') }"
+                                (click)="sort('creditPayment')">
+                                <span>Credit Payment</span>
+                            </th>
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressShippingEn'), 'sorting_desc': (!isDesc && sortKey == 'addressShippingEn') }"
                                 (click)="sort('addressShippingEn')">
                                 <span>Shipping Address EN *</span>
@@ -326,6 +331,9 @@
                                 </td>
                                 <td>
                                     <span> {{ item.coLoaderCode }} </span>
+                                </td>
+                                <td>
+                                    <span> {{ item.creditPayment }} </span>
                                 </td>
                                 <td>
                                     <span

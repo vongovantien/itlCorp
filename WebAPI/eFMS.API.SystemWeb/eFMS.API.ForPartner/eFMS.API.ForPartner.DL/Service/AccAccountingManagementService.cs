@@ -1173,20 +1173,6 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectPayment(string id, string reason)
         {
-            var _idSoa = 0;
-            int.TryParse(id, out _idSoa);
-            if (_idSoa != 0)
-            {
-                var soa = acctSOARepository.Get(x => x.Id == _idSoa).FirstOrDefault();
-                if (soa == null) return new HandleState((object)"Không tìm thấy payment");
-            }
-            else
-            {
-                var _idInvoice = Guid.Empty;
-                Guid.TryParse(id, out _idInvoice);
-                var invoice = (_idInvoice != Guid.Empty) ? DataContext.Get(x => x.Id == _idInvoice).FirstOrDefault() : null;
-                if (invoice == null) return new HandleState((object)"Không tìm thấy payment");
-            }
             return new HandleState();
         }
 

@@ -1,29 +1,32 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
+
+import { AppForm } from '@app';
+import { DocumentationRepo } from '@repositories';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { HouseBill, DIM, CsTransactionDetail } from '@models';
+import {
+    ShareBusinessImportHouseBillDetailComponent,
+    ShareBusinessAttachListHouseBillComponent,
+    getDimensionVolumesState, getDetailHBlState,
+    GetDetailHBLSuccessAction,
+    getTransactionPermission
+} from '@share-bussiness';
+import { SystemConstants, RoutingConstants } from '@constants';
+import { CommonEnum } from '@enums';
 
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { catchError, finalize, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
-import { formatDate } from '@angular/common';
-import { HouseBill, DIM } from '@models';
-import { AbstractControl } from '@angular/forms';
-import { ShareBusinessImportHouseBillDetailComponent, ShareBusinessAttachListHouseBillComponent } from '@share-bussiness';
-import { getDimensionVolumesState, getDetailHBlState, GetDetailHBLSuccessAction, getTransactionPermission } from './../../../../../share-business/store';
-import { SystemConstants } from 'src/constants/system.const';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import _merge from 'lodash/merge';
-
+import { catchError, finalize, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { forkJoin, merge } from 'rxjs';
-import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-hbl-air-export',
@@ -39,7 +42,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
 
     jobId: string;
-    selectedHbl: any = {}; // TODO model.
+    selectedHbl: CsTransactionDetail;
     isImport: boolean = false;
 
     constructor(
@@ -85,9 +88,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     generateHblNo(transactionType: number) {
         this._documentationRepo.generateHBLNo(transactionType)
-            .pipe(
-                catchError(this.catchError),
-            )
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
@@ -103,32 +104,20 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             issueHbldate: !!form.issueHbldate && !!form.issueHbldate.startDate ? formatDate(form.issueHbldate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate && !!form.flightDate.startDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? +form.originBlnumber[0].id : null,
-            freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
-            hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
-            currencyId: !!form.currencyId && !!form.currencyId.length ? form.currencyId[0].id : null,
-            wtorValpayment: !!form.wtorValpayment && !!form.wtorValpayment.length ? form.wtorValpayment[0].id : null,
-            otherPayment: !!form.otherPayment && !!form.otherPayment.length ? form.otherPayment[0].id : null,
-
             customerId: form.customer,
             saleManId: form.saleMan,
             shipperId: form.shipper,
             consigneeId: form.consignee,
-            pol: form.pol,
-            pod: form.pod,
             forwardingAgentId: form.forwardingAgent,
+            shipmentType: form.shipmenttype,
+            rateCharge: form.asArranged ? form.rateChargeAs : form.rateCharge,
 
             cbm: this.formCreateHBLComponent.totalCBM,
             hw: this.formCreateHBLComponent.totalHeightWeight,
             attachList: this.attachListComponent.attachList.replace(form.hwbno, '[[HBLNo]]').replace(formatDate(form.etd.startDate, 'dd/MM/yyyy', 'en'), '[[Date]]'),
             dimensionDetails: form.dimensionDetails,
             hwConstant: this.formCreateHBLComponent.hwconstant,
-            min: form.min,
-            warehouseId: form.warehouseId,
-            shipmentType: !!form.shipmenttype && !!form.shipmenttype.length ? form.shipmenttype[0].id : null,
-            rclass: !!form.rclass && !!form.rclass.length ? form.rclass[0].id : null,
-            asArranged: form.asArranged,
-            rateCharge: form.asArranged ? form.rateChargeAs : form.rateCharge
+
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
@@ -167,9 +156,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 return;
             }
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
-                .pipe(
-                    catchError(this.catchError),
-                )
+                .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {
                         if (res) {
@@ -207,14 +194,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
-        [this.formCreateHBLComponent.hbltype,
-        this.formCreateHBLComponent.rclass,
-        this.formCreateHBLComponent.otherPayment,
-        this.formCreateHBLComponent.originBlnumber,
-        this.formCreateHBLComponent.currencyId,
-        this.formCreateHBLComponent.shipmenttype,
-        this.formCreateHBLComponent.wtorValpayment].forEach((control: AbstractControl) => this.setError(control));
-
         if (!this.formCreateHBLComponent.formCreate.valid
             || (!!this.formCreateHBLComponent.etd.value && !this.formCreateHBLComponent.etd.value.startDate)
             || (!!this.formCreateHBLComponent.issueHbldate.value && !this.formCreateHBLComponent.issueHbldate.value.startDate)
@@ -230,8 +209,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
@@ -240,8 +218,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                         } else {
                             if (!!hbId) {
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}${this.jobId}/hbl/${hbId}/separate`]);
-                            }
-                            else {
+                            } else {
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${res.data}`]);
                             }
                         }
@@ -259,25 +236,19 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.importHouseBillPopup.show();
     }
 
-    onImport(selectedData: any) {
+    onImport(selectedData: CsTransactionDetail) {
         this.selectedHbl = selectedData;
         this._store.dispatch(new GetDetailHBLSuccessAction(this.selectedHbl));
         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.selectedHbl.id));
+
         if (!!this.selectedHbl) {
             this._store.select(getDimensionVolumesState)
                 .pipe(
                     takeUntil(this.ngUnsubscribe),
                     map((dims: DIM[]) => dims.map(d => new DIM(d))),
-                    tap(
-                        (dims: DIM[]) => {
-                            this.formCreateHBLComponent.dims = dims;
-                        }
-                    ),
-                    mergeMap(
-                        () => this._store.select(getDetailHBlState)
-                    )
-                )
-                .subscribe(
+                    tap((dims: DIM[]) => { this.formCreateHBLComponent.dims = dims; }),
+                    mergeMap(() => this._store.select(getDetailHBlState))
+                ).subscribe(
                     (hbl: HouseBill) => {
                         if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
                             this.isImport = true;
@@ -286,11 +257,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.formCreateHBLComponent.jobId = hbl.jobId;
                             this.formCreateHBLComponent.hblId = hbl.id;
                             this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
-                            const hblNo = this.formCreateHBLComponent.hwbno.value;
 
                             this.formCreateHBLComponent.updateFormValue(hbl, true);
-                            this.formCreateHBLComponent.hwbno.setValue(hblNo);
-                            // this.formCreateHBLComponent.hwbno.setValue(null);
+                            this.formCreateHBLComponent.hwbno.setValue(this.formCreateHBLComponent.hwbno.value);
                         }
                     }
                 );

@@ -401,7 +401,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            string fileName = Templates.CatPartner.ExelImportFileName + Templates.ExelImportEx;
+            string fileName = Templates.CatPartner.ExcelImportFileName + Templates.ExcelImportEx;
             string templateName = _hostingEnvironment.ContentRootPath;
             var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
@@ -421,7 +421,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcelCommercial")]
         public async Task<ActionResult> DownloadExcelCommercial()
         {
-            string fileName = Templates.CatPartner.ExelImportCommercialCustomerFileName + Templates.ExelImportEx;
+            string fileName = Templates.CatPartner.ExelImportCommercialCustomerFileName + Templates.ExcelImportEx;
             string templateName = _hostingEnvironment.ContentRootPath;
             var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
@@ -467,30 +467,31 @@ namespace eFMS.API.Catalogue.Controllers
                         AcReference = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         PartnerGroup = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         CoLoaderCode = worksheet.Cells[row, 11].Value?.ToString().Trim(),
-                        AddressShippingEn = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                        AddressShippingVn = worksheet.Cells[row, 13].Value?.ToString().Trim(),
-                        CountryShipping = worksheet.Cells[row, 14].Value?.ToString().Trim(),
-                        CityShipping = worksheet.Cells[row, 15].Value?.ToString().Trim(),
-                        ZipCodeShipping = worksheet.Cells[row, 16].Value?.ToString().Trim(),
-                        AddressEn = worksheet.Cells[row, 17].Value?.ToString().Trim(),
-                        AddressVn = worksheet.Cells[row, 18].Value?.ToString().Trim(),
-                        CountryBilling = worksheet.Cells[row, 19].Value?.ToString().Trim(),
-                        CityBilling = worksheet.Cells[row, 20].Value?.ToString().Trim(),
-                        ZipCode = worksheet.Cells[row, 21].Value?.ToString().Trim(),
-                        ContactPerson = worksheet.Cells[row, 22].Value?.ToString().Trim(),
-                        Tel = worksheet.Cells[row, 23].Value?.ToString().Trim(),
-                        Fax = worksheet.Cells[row, 24].Value?.ToString().Trim(),
-                        WorkPhoneEx = worksheet.Cells[row, 25].Value?.ToString().Trim(),
-                        Email = worksheet.Cells[row, 26].Value?.ToString().Trim(),
-                        BillingEmail = worksheet.Cells[row, 27].Value?.ToString(),
-                        BillingPhone = worksheet.Cells[row, 28].Value?.ToString(),
-                        BankAccountNo = worksheet.Cells[row, 29].Value?.ToString().Trim(),
-                        BankAccountName = worksheet.Cells[row, 30].Value?.ToString().Trim(),
-                        BankAccountAddress = worksheet.Cells[row, 31].Value?.ToString().Trim(),
-                        SwiftCode = worksheet.Cells[row, 32].Value?.ToString().Trim(),
-                        RoundUpMethod = worksheet.Cells[row, 33].Value?.ToString().Trim(),
-                        ApplyDim = worksheet.Cells[row, 34].Value?.ToString().Trim(),
-                        Note = worksheet.Cells[row, 35].Value?.ToString().Trim(),
+                        CreditPayment = worksheet.Cells[row, 12].Value?.ToString().Trim(),
+                        AddressShippingEn = worksheet.Cells[row, 13].Value?.ToString().Trim(),
+                        AddressShippingVn = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        CountryShipping = worksheet.Cells[row, 15].Value?.ToString().Trim(),
+                        CityShipping = worksheet.Cells[row, 16].Value?.ToString().Trim(),
+                        ZipCodeShipping = worksheet.Cells[row, 17].Value?.ToString().Trim(),
+                        AddressEn = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                        AddressVn = worksheet.Cells[row, 19].Value?.ToString().Trim(),
+                        CountryBilling = worksheet.Cells[row, 20].Value?.ToString().Trim(),
+                        CityBilling = worksheet.Cells[row, 21].Value?.ToString().Trim(),
+                        ZipCode = worksheet.Cells[row, 22].Value?.ToString().Trim(),
+                        ContactPerson = worksheet.Cells[row, 23].Value?.ToString().Trim(),
+                        Tel = worksheet.Cells[row, 24].Value?.ToString().Trim(),
+                        Fax = worksheet.Cells[row, 25].Value?.ToString().Trim(),
+                        WorkPhoneEx = worksheet.Cells[row, 26].Value?.ToString().Trim(),
+                        Email = worksheet.Cells[row, 27].Value?.ToString().Trim(),
+                        BillingEmail = worksheet.Cells[row, 28].Value?.ToString(),
+                        BillingPhone = worksheet.Cells[row, 29].Value?.ToString(),
+                        BankAccountNo = worksheet.Cells[row, 30].Value?.ToString().Trim(),
+                        BankAccountName = worksheet.Cells[row, 31].Value?.ToString().Trim(),
+                        BankAccountAddress = worksheet.Cells[row, 32].Value?.ToString().Trim(),
+                        SwiftCode = worksheet.Cells[row, 33].Value?.ToString().Trim(),
+                        RoundUpMethod = worksheet.Cells[row, 34].Value?.ToString().Trim(),
+                        ApplyDim = worksheet.Cells[row, 35].Value?.ToString().Trim(),
+                        Note = worksheet.Cells[row, 36].Value?.ToString().Trim(),
                     };
                     list.Add(partner);
                 }
