@@ -4,7 +4,6 @@ import { CatalogueRepo } from '@repositories';
 import { CatCurrencyExchange, User } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
-import { SelectComponent } from 'ng2-select';
 import { ConfirmPopupComponent } from '@common';
 
 @Component({
@@ -14,7 +13,6 @@ import { ConfirmPopupComponent } from '@common';
 
 export class ExchangeRateFormComponent extends AppForm implements OnInit {
     @Output() onUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
-    @ViewChild('currencyRateSelect', { static: false }) public ngSelectCurrencyRate: SelectComponent;
     @ViewChild('confirmDeletePopup', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     exchangeRateNewest: any = {};
@@ -56,6 +54,7 @@ export class ExchangeRateFormComponent extends AppForm implements OnInit {
         this._catalogueRepo.getListCurrency()
             .subscribe((response: any) => {
                 this.catCurrencies = [];
+                console.log(this.catCurrencies);
                 if (response != null) {
                     response.forEach(element => {
                         if (element.id === this.localCurrency) { return; } else {
@@ -193,8 +192,6 @@ export class ExchangeRateFormComponent extends AppForm implements OnInit {
                         .subscribe(
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
-                                    // this._toastService.success(res.message);
-                                    this.ngSelectCurrencyRate.active = [];
                                     this.exchangeRateToAdd = {
                                         currencyToId: this.localCurrency,
                                         CatCurrencyExchangeRates: new Array<CatCurrencyExchange>(),
