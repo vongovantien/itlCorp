@@ -35,8 +35,9 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !partnerLocation.valid || !partnerLocation.value)}">
                                 <label required class="form-control-label"> Partner Location </label>
-                                <ng-select [items]="partnerLocations" name="partnerLocation"
-                                    formControlName="partnerLocation" placeholder="Partner location">
+                                <ng-select [items]="partnerLocations" class="custom" name="partnerLocation"
+                                    [clearable]="false" formControlName="partnerLocation"
+                                    placeholder="Partner location">
                                 </ng-select>
                             </div>
                         </div>
@@ -86,8 +87,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: parentId.value, hardValue: parentName }"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="acRefCustomers | async"
                                     [displayFields]="displayFieldCustomer" placeholder="Select partner"
-                                    (remove)="resetFormControl(parentId)"
-                                    [disabled]="isBranchSub">
+                                    (remove)="resetFormControl(parentId)" [disabled]="isBranchSub">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

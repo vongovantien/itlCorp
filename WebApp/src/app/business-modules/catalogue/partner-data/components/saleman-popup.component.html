@@ -34,7 +34,7 @@
 
 
                                 <ng-select [disabled]="isDetail ? true : false" [items]="services"
-                                    formControlName="service" [allowClear]="false">
+                                    formControlName="service" [clearable]="false">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSave && !service.value">
                                     Service is required
@@ -63,7 +63,7 @@
                                 <label>Payment Term</label>
 
                                 <ng-select [disabled]="isDetail ? true : false" [items]="termTypes"
-                                    formControlName="freightPayment" [allowClear]="false">
+                                    formControlName="freightPayment" [clearable]="false">
                                 </ng-select>
                             </div>
 

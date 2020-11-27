@@ -97,7 +97,6 @@ export class PartnerDetailComponent extends AppList {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _cd: ChangeDetectorRef,
-        private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>
     ) {
         super();
@@ -411,13 +410,13 @@ export class PartnerDetailComponent extends AppList {
             provinceShippingId: formBody.provinceShippingId,
             parentId: formBody.partnerAccountRef,
 
-            roundUpMethod: formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
-            applyDim: formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
+            roundUpMethod: formBody.roundUpMethod.id,
+            applyDim: formBody.applyDim.id,
             partnerGroup: this.partner.partnerGroup,
-            partnerMode: formBody.partnerMode != null && formBody.partnerMode.length > 0 ? formBody.partnerMode[0].id : null,
-            partnerLocation: formBody.partnerLocation != null && formBody.partnerLocation.length > 0 ? formBody.partnerLocation[0].id : null,
+            partnerMode: formBody.partnerMode.id,
+            partnerLocation: formBody.partnerLocation.id,
             id: this.isAddSubPartner ? null : this.partner.id,
-            creditPayment: formBody.creditPayment != null && formBody.creditPayment.length > 0 ? formBody.creditPayment[0].id : null,
+            creditPayment: formBody.creditPayment.id,
         };
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);

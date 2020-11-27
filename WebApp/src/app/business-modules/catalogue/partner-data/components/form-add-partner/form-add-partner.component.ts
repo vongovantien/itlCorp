@@ -166,26 +166,28 @@ export class FormAddPartnerComponent extends AppForm {
             case 'category':
 
                 // case: current value === All
-                if (event.id === 'ALL') {
-                    const temp = { text: event.text, id: event.id };
-                    this.partnerGroup.setValue([temp]);
-                } else {
-                    // check partnerGroup existed yet.
-                    const checkExistAll = [...this.partnerGroup.value].filter(e => e.id === 'ALL');
-                    // 
-                    if (checkExistAll.length <= 0) {
-                        // don't anything at here
+                if (event.length > 0) {
+                    if (event[event.length - 1].id === 'ALL') {
+                        const temp = { text: event[event.length - 1].text, id: event[event.length - 1].id };
+                        this.partnerGroup.setValue([temp]);
                     } else {
-                        // partnerGroup added current item, so filter delete current item, to avoid duplicate.
-                        const removeAllArray = [...this.partnerGroup.value].filter(e => e.id !== 'ALL' && e.id !== event.id);
+                        // check partnerGroup existed yet.
+                        const checkExistAll = [...this.partnerGroup.value].filter(e => e.id === 'ALL');
+                        // 
+                        if (checkExistAll.length <= 0) {
+                            // don't anything at here
+                        } else {
+                            // partnerGroup added current item, so filter delete current item, to avoid duplicate.
+                            let removeAllArray = [...this.partnerGroup.value].filter(e => e.id !== 'ALL' && e.id !== event.id);
 
-                        removeAllArray.push({ id: event.id, text: event.text });
-                        this.partnerGroup.setValue(removeAllArray);
+                            removeAllArray.push({ id: event.id, text: event.text });
+                            removeAllArray = removeAllArray.filter(x => x.id !== undefined);
+                            this.partnerGroup.setValue(removeAllArray);
+                        }
                     }
                 }
+
                 //
-                const isShowSaleMan = this.checkRequireSaleman();
-                this.requireSaleman.emit(isShowSaleMan);
                 break;
         }
     }
@@ -385,8 +387,8 @@ export class FormAddPartnerComponent extends AppForm {
         this.creditPayment = this.partnerForm.controls['creditPayment'];
 
         if (!this.isUpdate) {
-            this.partnerMode.setValue([<CommonInterface.INg2Select>{ id: this.partnerModes.find(x => x.text === 'External').id, text: 'External' }]);
-            this.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partnerLocations.find(x => x.text === 'Domestic').id, text: 'Domestic' }]);
+            this.partnerMode.setValue({ id: this.partnerModes.find(x => x.text === 'External').id, text: 'External' });
+            this.partnerLocation.setValue({ id: this.partnerLocations.find(x => x.text === 'Domestic').id, text: 'Domestic' });
             this.isDisabledInternalCode = true;
 
         }
@@ -506,12 +508,12 @@ export class FormAddPartnerComponent extends AppForm {
             active: this.isAddBranchSub ? false : (partner.active === null ? false : partner.active),
             note: partner.note,
             coLoaderCode: partner.coLoaderCode,
-            roundUpMethod: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
-            applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }],
-            partnerMode: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerMode }],
-            partnerLocation: [<CommonInterface.INg2Select>{ id: partner.partnerLocation, text: partner.partnerLocation }],
+            roundUpMethod: { id: partner.roundUpMethod, text: partner.roundUpMethod },
+            applyDim: { id: partner.applyDim, text: partner.applyDim },
+            partnerMode: { id: partner.partnerMode, text: partner.partnerMode },
+            partnerLocation: { id: partner.partnerLocation, text: partner.partnerLocation },
             internalCode: partner.internalCode,
-            creditPayment: [<CommonInterface.INg2Select>{ id: partner.creditPayment, text: partner.creditPayment }]
+            creditPayment: { id: partner.creditPayment, text: partner.creditPayment }
         });
 
     }
