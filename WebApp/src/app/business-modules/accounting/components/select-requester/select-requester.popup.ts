@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { PartnerOfAcctManagementResult } from '@models';
 import { Store } from '@ngrx/store';
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
     templateUrl: './select-requester.popup.html',
 })
 export class ShareAccountingManagementSelectRequesterPopupComponent extends PopupBase implements OnInit {
-
+    @Input() isPayee: boolean = false;
     @Output() onSelect: EventEmitter<PartnerOfAcctManagementResult> = new EventEmitter<PartnerOfAcctManagementResult>();
 
     listRequesters: PartnerOfAcctManagementResult[] = [];
@@ -19,7 +19,6 @@ export class ShareAccountingManagementSelectRequesterPopupComponent extends Popu
 
     constructor(
         private _store: Store<IAccountingManagementState>,
-        private _router: Router
     ) {
         super();
     }

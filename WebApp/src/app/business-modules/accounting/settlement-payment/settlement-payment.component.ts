@@ -7,8 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { SelectRequester } from '../accounting-management/store';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, AccountingConstants, SystemConstants } from '@constants';
 import { AppList } from '@app';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
@@ -19,15 +18,14 @@ import {
     InfoPopupComponent,
     ReportPreviewComponent
 } from '@common';
-import { SystemConstants } from '@constants';
-import { AccountingConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
 
+import { SelectRequester } from '../accounting-management/store';
 import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 import { catchError, finalize, map, } from 'rxjs/operators';
-import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
-import { delayTime } from '@decorators';
 
 
 @Component({
@@ -280,10 +278,25 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                         if (res.length === 1) {
                             this._store.dispatch(SelectRequester(res[0]));
                             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/new`]);
-                        } else {
-                            this.selectRequesterPopup.listRequesters = res;
-                            this.selectRequesterPopup.selectedRequester = null;
-                            this.selectRequesterPopup.show();
+                        } else {// * Ưu tiên settlement có partnerId
+                            if (res.some(x => !!x.partnerId)) {
+                                this.selectRequesterPopup.isPayee = true;
+                                this.selectRequesterPopup.listRequesters = res.filter(x => !!x.partnerId);
+
+                                if (this.selectRequesterPopup.listRequesters.length === 1) {
+                                    this._store.dispatch(SelectRequester(this.selectRequesterPopup.listRequesters[0]));
+                                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/new`]);
+                                    return;
+                                }
+
+                                this.selectRequesterPopup.selectedRequester = null;
+                                this.selectRequesterPopup.show();
+                            } else {
+                                this.selectRequesterPopup.isPayee = false;
+                                this.selectRequesterPopup.listRequesters = res;
+                                this.selectRequesterPopup.selectedRequester = null;
+                                this.selectRequesterPopup.show();
+                            }
                         }
                     } else {
                         this._toastService.warning("Not found data charge");

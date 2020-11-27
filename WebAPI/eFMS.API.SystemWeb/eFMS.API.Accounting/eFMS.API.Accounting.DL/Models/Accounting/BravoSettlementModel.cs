@@ -22,6 +22,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string LocalBranchCode { get; set; }
         public string PaymentMethod { get; set; }
         public List<BravoSettlementRequestModel> Details { get; set; }
+       
     }
 
     public class BravoSettlementRequestModel
@@ -52,6 +53,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string ChargeType { get; set; } // CREDIT / OBH
         public decimal? Amount { get; set; }
         public decimal? Amount3 { get; set; }
-        public string CustomerCodeBook { get; set; } // Mã đối tượng Payer
+        public string CustomerCodeBook { get; set; } // Mã đối tượng Payer,
+        public decimal? DueDate { get; set; }
     }
 }
