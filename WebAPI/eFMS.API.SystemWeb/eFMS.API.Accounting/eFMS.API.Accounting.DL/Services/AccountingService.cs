@@ -208,6 +208,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                   Description0 = voucher.Description,
                                                                   AccountNo = voucher.AccountNo,
                                                                   PaymentMethod = voucher.PaymentMethod,
+                                                                  PaymentTerm = voucher.PaymentTerm
                                                               };
 
                 List<BravoVoucherModel> data = queryVouchers.ToList();
@@ -259,7 +260,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       ContracAccount = chgDef.CreditAccountNo,
                                                                                       VATAccount = chgDef.CreditVat,
                                                                                       ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
-                                                                                      CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo
+                                                                                      CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo,
+                                                                                      DueDate = item.PaymentTerm ?? 0
                                                                                   };
                         if (queryChargesVoucher.Count() > 0)
                         {
