@@ -3,9 +3,9 @@ import { DesignModulesRoutingModule } from './design-modules-routing.module';
 import { FormComponent } from './form/form.component';
 import { TableComponent } from './table/table.component';
 import { SharedModule } from '../shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { PerfectScrollbarModule, PerfectScrollbarConfigInterface, PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
@@ -15,7 +15,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     DesignModulesRoutingModule,
     SharedModule,
     NgxDaterangepickerMd,
-    SelectModule,
+    NgSelectModule,
     PerfectScrollbarModule,
   ],
   declarations: [
