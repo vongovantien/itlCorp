@@ -24,7 +24,6 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         private _documentation: DocumentationRepo) {
 
         super();
-
     }
 
     ngOnInit() {
@@ -52,10 +51,9 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
     saveCustomClearance() {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = false;
-        this.detailComponent.formGroup.controls['serviceType'].setErrors(null);
-        this.detailComponent.formGroup.controls['route'].setErrors(null);
-        if (this.detailComponent.isDisableCargo) {
-            this.detailComponent.formGroup.controls['cargoType'].setErrors(null);
+
+        if (!this.detailComponent.isDisableCargo && !this.detailComponent.cargoType.value) {
+            return;
         }
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;
@@ -77,10 +75,9 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
     saveAndConvert() {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = true;
-        this.detailComponent.formGroup.controls['serviceType'].setErrors(null);
-        this.detailComponent.formGroup.controls['route'].setErrors(null);
-        if (this.detailComponent.isDisableCargo) {
-            this.detailComponent.formGroup.controls['cargoType'].setErrors(null);
+
+        if (!this.detailComponent.isDisableCargo && ['Air', 'Express'].includes(this.detailComponent.serviceType.value)) {
+            return;
         }
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;

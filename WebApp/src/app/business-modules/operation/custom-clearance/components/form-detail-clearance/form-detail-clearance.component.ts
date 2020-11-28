@@ -46,28 +46,21 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     countries: Observable<CountryModel[]>;
-    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
-    typeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
-    routeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.ROUTES;
-    cargoTypes: CommonInterface.INg2Select[] = [{ id: 'FCL', text: 'FCL' }, { id: 'LCL', text: 'LCL' }];
     commodities: Observable<Commodity[]>;
     units: Observable<Unit[]>;
 
+    cargoTypes: string[] = ['FCL', 'LCL'];
+    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE.map(i => i.id);
+    typeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES.map(i => i.id);
+    routeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.ROUTES.map(i => i.id);
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
         { field: 'shortName', label: 'Name Abbr' },
         { field: 'partnerNameEn', label: 'Name EN' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
-    displayFieldCountry: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Country Code' },
-        { field: 'nameEn', label: 'Country Name (EN)' }
-    ];
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
+    displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCommodity: CommonInterface.IComboGridDisplayField[] = [
         { 'field': 'code', 'label': 'Commodity Code' },
         { 'field': 'commodityNameEn', 'label': 'Commodity Name (EN)' }
@@ -156,7 +149,6 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     }
 
     setFormValue() {
-        console.log(this.customDeclaration);
         this.formGroup.patchValue({
             clearanceNo: this.customDeclaration.clearanceNo,
             partnerTaxCode: this.customDeclaration.partnerTaxCode,
@@ -175,29 +167,24 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
             unit: this.customDeclaration.unitCode,
             shipper: this.customDeclaration.shipper,
             consignee: this.customDeclaration.consignee,
-            note: this.customDeclaration.note
+            note: this.customDeclaration.note,
+
+            route: this.customDeclaration.route,
+            type: this.customDeclaration.type,
+            serviceType: this.customDeclaration.serviceType,
+            cargoType: this.customDeclaration.cargoType,
         });
 
         if (!!this.customDeclaration.serviceType) {
             if (this.customDeclaration.serviceType === 'Air' || this.customDeclaration.serviceType === 'Express') {
                 this.isDisableCargo = true;
+                this.cargoType.disable();
             } else {
                 this.isDisableCargo = false;
-            }
-            this.formGroup.controls['serviceType'].setValue([this.serviceTypes.find(type => type.id === this.customDeclaration.serviceType)]);
-        }
-        if (!!this.customDeclaration.route) {
-            this.formGroup.controls['route'].setValue([this.routeClearances.find(type => type.id === this.customDeclaration.route)]);
-        }
-        if (!!this.customDeclaration.type) {
-            this.formGroup.controls['type'].setValue([this.typeClearances.find(type => type.id === this.customDeclaration.type)]);
-        }
-        if (!!this.customDeclaration.cargoType) {
-            const value = this.cargoTypes.find(type => type.id === this.customDeclaration.cargoType);
-            if (!!value) {
-                this.formGroup.controls['cargoType'].setValue([value]);
+                this.cargoType.enable();
             }
         }
+
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -226,20 +213,21 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     selectedServiceType(event, type: string) {
         switch (type) {
             case 'service-type':
-                const serviceType = event.active[0];
+                const serviceType = event;
                 if (!!serviceType) {
-                    if (serviceType.id === 'Air' || serviceType.id === 'Express') {
+                    if (serviceType === 'Air' || serviceType === 'Express') {
                         this.isDisableCargo = true;
-                        this.formGroup.controls['cargoType'].setValue([]);
+                        this.formGroup.controls['cargoType'].setValue(null);
+                        this.formGroup.controls['cargoType'].disable();
                     } else {
                         this.isDisableCargo = false;
+                        this.formGroup.controls['cargoType'].enable();
                     }
                 }
                 break;
             case 'cargo-type':
-                this.formGroup.controls['cargoType'].setErrors(null);
-                if (this.serviceType.value === null || this.serviceType.value.length === 0) {
-                    this.formGroup.controls['serviceType'].setValue([this.serviceTypes.find(x => x.id === "Sea")]);
+                if (this.serviceType.value === null) {
+                    this.formGroup.controls['serviceType'].setValue('Sea');
                 }
                 break;
         }
@@ -266,9 +254,10 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.shipper = !!form.shipper ? form.shipper.trim() : null;
         this.customDeclaration.consignee = !!form.consignee ? form.consignee.trim() : null;
         this.customDeclaration.note = !!form.note ? form.note.trim() : null;
-        this.customDeclaration.cargoType = !!form.cargoType ? (form.cargoType.length > 0 && !!form.cargoType[0].id ? form.cargoType[0].id : null) : null;
-        this.customDeclaration.route = !!form.route ? (form.route.length > 0 && !!form.route[0].id ? form.route[0].id : null) : null;
-        this.customDeclaration.serviceType = !!form.serviceType ? (form.serviceType.length > 0 && !!form.serviceType[0] ? form.serviceType[0].id : null) : null;
-        this.customDeclaration.type = !!form.type ? (form.type.length > 0 && !!form.type[0].id ? form.type[0].id : null) : null;
+
+        this.customDeclaration.cargoType = form.cargoType;
+        this.customDeclaration.route = form.route;
+        this.customDeclaration.serviceType = form.serviceType;
+        this.customDeclaration.type = form.type;
     }
 }
