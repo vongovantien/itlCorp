@@ -1,18 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { Customer, PortIndex, User } from '@models';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { CommodityGroup, Customer, PortIndex, User } from '@models';
 import { IShareBussinessState } from '@share-bussiness';
 import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
 import { CommonEnum } from '@enums';
+import { InfoPopupComponent } from '@common';
+import { JobConstants, SystemConstants } from '@constants';
+import { FormValidators } from '@validators';
+import { AppForm } from '@app';
 
-import { AppForm } from 'src/app/app.form';
-import { map, share, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
-import { FormValidators } from '@validators';
-import { JobConstants } from '@constants';
-import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -41,11 +40,11 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     shipmentType: AbstractControl;
     salemansId: AbstractControl;
 
-    productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
-    serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES;
-    shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
-    commodityGroups: Observable<CommonInterface.INg2Select[]>;
+    productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE.map(i => i.id);
+    serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES.map(i => i.id);
+    shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES.map(i => i.id);
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
+    commodityGroups: Observable<CommodityGroup[]>;
 
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
@@ -71,12 +70,10 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         { field: 'employeeNameEn', label: 'Full Name' }
     ];
 
-    commonData$: any;
     userLogged: User;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _documentRepo: DocumentationRepo,
         private _systemRepo: SystemRepo,
         private _store: Store<IShareBussinessState>,
         private _fb: FormBuilder
@@ -85,7 +82,8 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     }
 
     ngOnInit() {
-        this.getUser();
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCarrierAction());
@@ -95,21 +93,13 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.ports = this._store.select(getCataloguePortState);
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
-        this.commodityGroups = <any>this._store.select(getCatalogueCommodityGroupState)
-            .pipe(
-                map((data: any) => this.utility.prepareNg2SelectData(data, 'id', 'groupNameEn'))
-            );
-
+        this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        this.salesmans = this._systemRepo.getSystemUsers();
+        this.salesmans = this._systemRepo.getSystemUsers({ active: true });
+        this.users = this._systemRepo.getListSystemUser();
+
         this.initForm();
     }
-
-    getUser() {
-        this.users = this._systemRepo.getListSystemUser();
-        this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
-    }
-
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':
@@ -126,12 +116,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 break;
             case 'customer':
                 this.customerId.setValue(data.id);
-                // const customerArray = this.customers.toPromise().then(res => {
-                //     const customer: Customer = res.find(x => x.id === data.id);
-                //     if (!!customer) {
-                //         this.salemansId = customer.salePersonId;
-                //     }
-                // });
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id, null).subscribe((res: any) => {
                     if (!!res) {
                         if (!!res.salemanId) {
@@ -140,7 +124,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                             this.salemansId.setValue(null);
                         }
                         if (!!res.officeNameAbbr) {
-                            console.log(res.officeNameAbbr);
                             this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
                             this.infoPopup.show();
                         }
@@ -164,18 +147,18 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
 
             serviceDate: [null, Validators.required],
 
-            productService: [],
-            serviceMode: [],
-            shipmentMode: [],
+            productService: [null, Validators.required],
+            serviceMode: [null, Validators.required],
+            shipmentMode: [null, Validators.required],
             commodityGroupId: [],
-            shipmentType: [[this.shipmentTypes[0]]],
+            shipmentType: [this.shipmentTypes[0], Validators.required],
 
             customerId: [null, Validators.required],
             pol: [],
             pod: [],
             supplierId: [],
             agentId: [],
-            billingOpsId: [null, Validators.required],
+            billingOpsId: [this.userLogged.id, Validators.required],
             salemansId: []
         }, { validator: FormValidators.comparePort });
 
@@ -194,10 +177,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.billingOpsId = this.formCreate.controls['billingOpsId'];
         this.shipmentType = this.formCreate.controls['shipmentType'];
         this.salemansId = this.formCreate.controls['salemansId'];
-
-        if (!!this.userLogged) {
-            this.billingOpsId.setValue(this.userLogged.id);
-        }
 
     }
 

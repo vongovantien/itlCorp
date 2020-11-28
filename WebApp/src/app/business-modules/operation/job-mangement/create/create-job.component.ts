@@ -1,20 +1,19 @@
 import { Component, ViewChild } from "@angular/core";
-import { AbstractControl } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
 import { formatDate } from "@angular/common";
 import { NgxSpinnerService } from "ngx-spinner";
 import { InfoPopupComponent } from "@common";
 
-import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
-import { DocumentationRepo } from "src/app/shared/repositories";
+import { OpsTransaction } from "@models";
+import { AppForm } from "@app";
+import { DocumentationRepo } from "@repositories";
+import { RoutingConstants } from "@constants";
 import { JobManagementFormCreateComponent } from "../components/form-create/form-create-job.component";
-import { AppForm } from "src/app/app.form";
-
-import _merge from 'lodash/merge';
 
 import { takeUntil, catchError, finalize } from "rxjs/operators";
-import { RoutingConstants } from "@constants";
+import _merge from 'lodash/merge';
+
 
 @Component({
     selector: "app-job-mangement-create",
@@ -26,7 +25,6 @@ export class JobManagementCreateJobComponent extends AppForm {
     @ViewChild(InfoPopupComponent, { static: false }) infoPoup: InfoPopupComponent;
 
     constructor(
-        private router: Router,
         private spinner: NgxSpinnerService,
         private _toaster: ToastrService,
         private _documentRepo: DocumentationRepo,
@@ -42,28 +40,14 @@ export class JobManagementCreateJobComponent extends AppForm {
         const form: any = this.formCreateComponent.formCreate.getRawValue();
         const formData = {
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
-
-            commodityGroupId: !!form.commodity && !!form.commodity.length ? form.commodity.map(i => i.id).toString() : null,
-            serviceMode: !!form.serviceMode && !!form.serviceMode.length ? form.serviceMode[0].id : null,
-            productService: !!form.productService && !!form.productService.length ? form.productService[0].id : null,
-            shipmentMode: !!form.shipmentMode && !!form.shipmentMode.length ? form.shipmentMode[0].id : null,
-            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-
-            agentId: form.agentId,
-            pol: form.pol,
-            pod: form.pod,
-            supplierId: form.supplierId,
-            customerId: form.customerId
+            commodityGroupId: form.commodity,
         };
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
-        opsTransaction.salemanId = this.formCreateComponent.salemansId.value;
+
         return opsTransaction;
     }
 
     checkValidateForm() {
-        [this.formCreateComponent.commodityGroupId,
-        ].forEach((control: AbstractControl) => this.setError(control));
-
         let valid: boolean = true;
         if (!this.formCreateComponent.formCreate.valid || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate)) {
             valid = false;
@@ -94,9 +78,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                     this._toaster.error(res.message);
                 } else {
                     this._toaster.success(res.message);
-                    this.router.navigate([
-                        "/home/operation/job-edit/", res.data
-                    ]);
+                    this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
                 }
             }
         );
