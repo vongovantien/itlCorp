@@ -203,22 +203,15 @@ export class FormAddChargeComponent extends AppForm {
             nameEn: res.charge.chargeNameEn,
             nameVn: res.charge.chargeNameVn,
             unitPrice: res.charge.unitPrice,
-            currency: [<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: res.charge.currencyId }],
+            currency: { text: this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId).text, id: res.charge.currencyId },
             vat: res.charge.vatrate,
-            type: [<CommonInterface.INg2Select>{ id: res.charge.type, text: res.charge.type }],
-            service: [<CommonInterface.INg2Select>{ id: res.charge.serviceTypeId, text: '' }],
+            type: { id: res.charge.type, text: res.charge.type },
+            service: { id: res.charge.serviceTypeId, text: '' },
             debitCharge: res.charge.debitCharge,
-            chargeGroup: !!res.charge.chargeGroup ? [<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: '' }] : null,
+            chargeGroup: { id: res.charge.chargeGroup, text: this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup).text },
             active: res.charge.active,
-            productDept: res.charge.productDept
+            productDept: res.charge.productDept,
+            unit: { text: this.ngDataUnit.find(x => x.id === res.charge.unitId).text, id: res.charge.unitId }
         });
-        setTimeout(() => {
-            const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);
-            this.unit.setValue([<CommonInterface.INg2Select>{ id: res.charge.unitId, text: itemUnit.text }]);
-            const itemCurrency = this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId);
-            const itemChargeGroup = this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup);
-            this.currency.setValue([<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: itemCurrency.text }]);
-            !!res.charge.chargeGroup ? this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: itemChargeGroup.text }]) : null;
-        }, 200);
     }
 }
