@@ -226,12 +226,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     onSubmitData() {
         const form: any = this.editForm.formEdit.getRawValue();
+
         this.opsTransaction.serviceDate = !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.finishDate = !!form.finishDate && !!form.finishDate.startDate ? formatDate(form.finishDate.startDate, 'yyyy-MM-dd', 'en') : null;
-        this.opsTransaction.commodityGroupId = !!form.commodity && !!form.commodity.length ? form.commodity.map(i => i.id).toString() : null;
-        this.opsTransaction.serviceMode = !!form.serviceMode && !!form.serviceMode.length ? form.serviceMode[0].id : null;
-        this.opsTransaction.productService = !!form.productService && !!form.productService.length ? form.productService[0].id : null;
-        this.opsTransaction.shipmentMode = !!form.shipmentMode && !!form.shipmentMode.length ? form.shipmentMode[0].id : null;
+
         this.opsTransaction.hwbno = form.hwbno;
         this.opsTransaction.mblno = form.mblno;
         this.opsTransaction.customerId = form.customerId;
@@ -254,10 +252,14 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.sumPackages = form.sumPackages;
         this.opsTransaction.sumContainers = form.sumContainers;
         this.opsTransaction.sumCbm = form.sumCbm;
-        this.opsTransaction.packageTypeId = !!form.packageTypeId && !!form.packageTypeId.length ? form.packageTypeId[0].id : null;
-        this.opsTransaction.commodityGroupId = !!form.commodityGroupId && !!form.commodityGroupId.length ? form.commodityGroupId[0].id : null;
         this.opsTransaction.containerDescription = form.containerDescription;
-        this.opsTransaction.shipmentType = !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null;
+
+        this.opsTransaction.shipmentMode = form.shipmentMode;
+        this.opsTransaction.productService = form.productService;
+        this.opsTransaction.serviceMode = form.serviceMode;
+        this.opsTransaction.packageTypeId = form.packageTypeId;
+        this.opsTransaction.commodityGroupId = form.commodityGroupId;
+        this.opsTransaction.shipmentType = form.shipmentType;
     }
 
     updateShipment() {

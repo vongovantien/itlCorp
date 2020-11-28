@@ -3,10 +3,10 @@ import { OpsModuleStageManagementComponent } from './stage-management.component'
 import { OpsModuleStageManagementAddStagePopupComponent } from './add/add-stage.popup.component';
 import { OpsModuleStageManagementDetailComponent } from './detail/detail-stage-popup.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AssignStagePopupComponent } from './assign-stage/assign-stage.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
     declarations: [
@@ -17,9 +17,9 @@ import { AssignStagePopupComponent } from './assign-stage/assign-stage.popup';
     ],
     imports: [
         SharedModule,
-        SelectModule,
         ModalModule,
         NgxDaterangepickerMd,
+        NgSelectModule
 
     ],
     exports: [
