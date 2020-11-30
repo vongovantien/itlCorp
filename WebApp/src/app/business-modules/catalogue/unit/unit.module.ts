@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -10,6 +9,7 @@ import { UnitComponent } from './unit.component';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormCreateUnitPopupComponent } from './components/form/form-unit.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     { path: '', component: UnitComponent, data: { name: "", title: 'eFMS Unit' } },
@@ -20,7 +20,7 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         ModalModule.forRoot(),
         SharedModule,
-        SelectModule,
+        NgSelectModule,
         NgProgressModule,
         RouterModule.forChild(routing)
     ],

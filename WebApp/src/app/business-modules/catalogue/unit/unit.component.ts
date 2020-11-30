@@ -99,9 +99,8 @@ export class UnitComponent extends AppList implements OnInit {
 
         if (!!this.selectedUnit.code) {
             this.formUnitPopup.isUpdate = true;
-
             this.formUnitPopup.form.patchValue({
-                unitType: [this.formUnitPopup.unitTypes.find(type => type.id === this.selectedUnit.unitType)],
+                unitType: { id: this.selectedUnit.unitType, text: this.formUnitPopup.unitTypes.find(type => type.id === this.selectedUnit.unitType).text },
                 id: unit.id,
                 code: unit.code,
                 unitNameEn: unit.unitNameEn,

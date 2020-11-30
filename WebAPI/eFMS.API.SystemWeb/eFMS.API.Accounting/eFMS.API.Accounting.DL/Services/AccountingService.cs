@@ -807,7 +807,7 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.Description = string.Empty;
                     detail.ObhPartnerCode = string.Empty; //Để trống
                     detail.BankAccountNo = soaPartner?.BankAccountNo; //Partner Bank Account no
-                    detail.Stt_Cd_Htt = "TEST"; //Sẽ update sau
+                    detail.Stt_Cd_Htt = string.Empty; //Sẽ update sau
                     detail.ChargeType = "OBH";
                     detail.DebitAccount = string.Empty;
                     detail.NganhCode = "FWD";

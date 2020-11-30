@@ -140,7 +140,7 @@ export class UserManagementImportComponent extends AppList {
         }
     }
 
-    async import(element) {
+    import(element) {
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
             this.importAlert.show();

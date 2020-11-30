@@ -119,7 +119,7 @@ export class StageImportComponent extends AppPage implements OnInit {
         }
     }
 
-    async downloadSample() {
+    downloadSample() {
         this.catalogueRepo.downloadStageExcel()
             .pipe(catchError(this.catchError))
             .subscribe(

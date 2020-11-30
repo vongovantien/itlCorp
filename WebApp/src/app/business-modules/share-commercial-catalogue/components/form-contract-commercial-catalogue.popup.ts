@@ -92,12 +92,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     menuSpecialPermission: Observable<any[]>;
     listCurrency: Observable<CommonInterface.INg2Select[]>;
 
-    contractTypes: CommonInterface.INg2Select[] = [
-        { id: "Trial", text: "Trial" },
-        { id: "Official", text: "Official" },
-        { id: "Guaranteed", text: "Guaranteed" },
-        { id: "Cash", text: "Cash" }
-    ];
+    contractTypes: Array<string> = ["Trial", "Official", "Guaranteed", "Cash"];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
         { id: "AI", text: "Air Import" },
@@ -111,15 +106,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     ];
 
 
-    paymentMethods: CommonInterface.INg2Select[] = [
-        { id: "All", text: "All" },
-        ...JobConstants.COMMON_DATA.FREIGHTTERMS
-    ];
+    paymentMethods: Array<string> = ["All", "Collect", "Prepaid"];
 
-    basesOn: CommonInterface.INg2Select[] = [
-        { id: "Invoice Date", text: "Invoice Date" },
-        { id: "Confirmed Billing", text: "Confirmed Billing" }
-    ];
+    basesOn: Array<string> = ["Invoice Date", "Confirmed Billing"];
 
     vaslst: CommonInterface.INg2Select[] = this.serviceTypes;
     isCollapsed: boolean = false;
@@ -197,16 +186,16 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
             expiredDate: [],
-            contractType: [[{ id: 'Trial', text: 'Trial' }], Validators.required],
+            contractType: [null, Validators.required],
             saleService: [null, Validators.required],
-            paymentMethod: [[{ id: 'All', text: 'All' }]],
+            paymentMethod: ['All'],
             vas: [],
             trialEffectDate: [],
             trialExpiredDate: [],
             trialCreditLimit: [],
             trialCreditDays: [],
             paymentTerm: [],
-            baseOn: [[{ id: "Invoice Date", text: "Invoice Date" }]],
+            baseOn: [null],
             creditLimit: [],
             creditLimitRate: [],
             creditAmount: [],
@@ -371,7 +360,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             return;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
-            if (this.contractType.value[0].id === this.contractTypes[1].id && !this.contractNo.value) {
+            if (this.contractType.value === this.contractTypes[1] && !this.contractNo.value) {
                 this.isRequiredContractNo = true;
                 return;
             } else {
@@ -408,7 +397,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     );
             } else if (this.isUpdate && !this.isCreateNewCommercial) {
                 const body = new Contract(this.selectedContract);
-                if (this.contractTypeDetail !== this.contractType.value[0].id && this.selectedContract.active === true && this.isAllowActiveContract === false) { //&& this.isChangeAgrmentType === false && this.isAllowActiveContract === false) {
+                if (this.contractTypeDetail !== this.contractType.value && this.selectedContract.active === true && this.isAllowActiveContract === false) { //&& this.isChangeAgrmentType === false && this.isAllowActiveContract === false) {
                     this.status = this.statusContract;
                     this.confirmChangeAgreementTypeText = "You have changed Agreement type "
                         + this.contractTypeDetail + " to "
@@ -553,11 +542,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.formGroup.patchValue({
             salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId : null,
             companyId: !!this.selectedContract.companyId ? this.selectedContract.companyId : null,
-            officeId: !!this.selectedContract.officeId ? [<CommonInterface.INg2Select>{ id: this.selectedContract.officeId, text: '' }] : null,
+            officeId: this.activeOffice,
             contractNo: this.selectedContract.contractNo,
             effectiveDate: !!this.selectedContract.effectiveDate ? { startDate: new Date(this.selectedContract.effectiveDate), endDate: new Date(this.selectedContract.effectiveDate) } : null,
             expiredDate: !!this.selectedContract.expiredDate ? { startDate: new Date(this.selectedContract.expiredDate), endDate: new Date(this.selectedContract.expiredDate) } : null,
-            contractType: !!this.selectedContract.contractType ? [this.contractTypes.find(type => type.id === this.selectedContract.contractType)] : null,
+            contractType: !!this.selectedContract.contractType ? this.selectedContract.contractType : null,
             paymentTerm: this.selectedContract.paymentTerm,
             creditLimit: this.selectedContract.creditLimit,
             creditLimitRate: this.selectedContract.creditLimitRate,
@@ -572,11 +561,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             customerAmount: this.selectedContract.customerAdvanceAmount,
             creditRate: this.selectedContract.creditRate,
             description: this.selectedContract.description,
-            saleService: !!this.selectedContract.saleService ? [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }] : null,
-            vas: !!this.selectedContract.vas ? [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }] : null,
-            paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null,
-            baseOn: !!this.selectedContract.baseOn ? [this.basesOn.find(type => type.id === this.selectedContract.baseOn)] : null,
-            currencyId: !!this.selectedContract.currencyId ? [{ id: this.selectedContract.currencyId, text: this.selectedContract.currencyId }] : null
+            saleService: this.activeServices,
+            vas: this.activeVas,
+            paymentMethod: !!this.selectedContract.paymentMethod ? this.paymentMethods.find(type => type === this.selectedContract.paymentMethod) : null,
+            baseOn: !!this.selectedContract.baseOn ? this.basesOn.find(type => type === this.selectedContract.baseOn) : null,
+            currencyId: !!this.selectedContract.currencyId ? { id: this.selectedContract.currencyId, text: this.selectedContract.currencyId } : null
         });
         this.contractTypeDetail = this.selectedContract.contractType;
         if (this.selectedContract.contractType === 'Trial') {
@@ -589,7 +578,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
         }
-        this.selectedContract.currencyId = !!this.currencyId.value ? this.currencyId.value[0].id : null;
+        this.selectedContract.currencyId = !!this.currencyId.value ? !!this.currencyId.value.id ? this.currencyId.value.id : this.currencyId.value : null;
         this.selectedContract.active = this.statusContract;
         this.selectedContract.saleManId = this.salesmanId.value;
         this.selectedContract.companyId = this.companyId.value;
@@ -597,15 +586,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.contractNo = this.formGroup.controls['contractNo'].value;
         this.selectedContract.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.selectedContract.expiredDate = !!this.expiredDate.value && !!this.expiredDate.value.startDate ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
-        this.selectedContract.contractType = !!this.contractType.value ? this.contractType.value[0].id : null;
+        this.selectedContract.contractType = !!this.contractType.value ? this.contractType.value : null;
         const services = this.saleService.value ? (this.saleService.value.length > 0 ? this.saleService.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.saleService = services;
         const vass = this.vas.value ? (this.vas.value.length > 0 ? this.vas.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.vas = vass;
         const offices = this.officeId.value ? (this.officeId.value.length > 0 ? this.officeId.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.officeId = offices;
-        this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value[0].id : null;
-        this.selectedContract.baseOn = !!this.baseOn.value ? this.baseOn.value[0].id : null;
+        this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value : null;
+        this.selectedContract.baseOn = !!this.baseOn.value ? this.baseOn.value : null;
         this.selectedContract.trialCreditLimited = this.formGroup.controls['trialCreditLimit'].value;
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
         if (this.officeId.value[0].id === 'All') {
@@ -614,10 +603,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (this.saleService.value[0].id === 'All') {
             this.selectedContract.saleService = this.mapServiceId();
         }
-        if (this.vas.value != null && this.vas.value[0].id === 'All') {
+        if (this.vas.value != null && this.vas.value.length > 0 && this.vas.value[0].id === 'All') {
             this.selectedContract.vas = this.mapVas();
         }
-        if (this.contractType.value[0].id === 'Trial' && !this.isUpdate) {
+        if (this.contractType.value === 'Trial' && !this.isUpdate) {
             if (!!this.effectiveDate.value.startDate) {
                 this.trialEffectDate.setValue({
                     startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate())),
@@ -638,7 +627,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.trialCreditDays.setValue(diffDays);
             }
         }
-        if (this.contractType.value[0].id === 'Official') {
+        if (this.contractType.value === 'Official') {
             this.trialEffectDate.setValue(null);
             this.trialCreditDays.setValue(null);
             this.trialExpiredDate.setValue(null);
@@ -660,7 +649,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     activeInactiveContract(id: string) {
-        if (this.contractType.value[0].id === 'Guaranteed'
+        if (this.contractType.value === 'Guaranteed'
             && ((this.formGroup.controls['creditLimit'].value <= 0
                 || !this.formGroup.controls['creditLimit'].value)
                 && this.selectedContract.active === false)) {
@@ -729,8 +718,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     onUpdateEffectiveDate(value: { startDate: any; endDate: any }) {
-        if (!!value.startDate && this.contractType.value[0].id === 'Trial') {
-
+        if (!!value.startDate && this.contractType.value === 'Trial') {
             this.expiredDate.setValue({
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 30)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
@@ -739,28 +727,41 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     selectedService($event: any) {
-        if ($event.id === 'All' || (!!this.saleService.value && this.saleService.value.some(x => x.id === 'All'))) {
-            this.saleService.setValue([]);
-            this.saleService.setValue([<CommonInterface.INg2Select>{ id: $event.id, text: $event.text }]);
+        if ($event.length > 0) {
+            if ($event[$event.length - 1].id === 'All') {
+                this.saleService.setValue([{ id: 'All', text: 'All' }]);
+            } else {
+                const arrNotIncludeAll = $event.filter(x => x.id !== 'All'); //
+                this.saleService.setValue(arrNotIncludeAll);
+            }
         }
     }
 
     selectedVas($event: any) {
-        if ($event.id === 'All' || (!!this.vas.value && this.vas.value.some(x => x.id === 'All'))) {
-            this.vas.setValue([]);
-            this.vas.setValue([<CommonInterface.INg2Select>{ id: $event.id, text: $event.text }]);
+        if ($event.length > 0) {
+            if ($event[$event.length - 1].id === 'All') {
+                this.vas.setValue([{ id: 'All', text: 'All' }]);
+            } else {
+                const arrNotIncludeAll = $event.filter(x => x.id !== 'All'); //
+                this.vas.setValue(arrNotIncludeAll);
+            }
         }
+
     }
 
     selectedOffice($event: any) {
-        if ($event.id === 'All' || (!!this.officeId.value && this.officeId.value.some(x => x.id === 'All'))) {
-            this.officeId.setValue([]);
-            this.officeId.setValue([<CommonInterface.INg2Select>{ id: $event.id, text: $event.text }]);
+        if ($event.length > 0) {
+            if ($event[$event.length - 1].id === 'All') {
+                this.officeId.setValue([{ id: 'All', text: 'All' }]);
+            } else {
+                const arrNotIncludeAll = $event.filter(x => x.id !== 'All'); //
+                this.officeId.setValue(arrNotIncludeAll);
+            }
         }
     }
 
     selectedAgreementType($event: any) {
-        if ($event.id === 'Trial') {
+        if ($event === 'Trial') {
             this.isDisabledExpiredDateField = true;
             if (!!this.effectiveDate.value.startDate) {
                 this.expiredDate.setValue({
