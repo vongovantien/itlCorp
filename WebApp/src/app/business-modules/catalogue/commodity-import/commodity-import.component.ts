@@ -87,7 +87,7 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 	}
 
 
-	async import(element) {
+	import(element) {
 		if (this.data == null) { return; }
 		if (this.totalRows - this.totalValidRows > 0) {
 			this.importAlert.show();
@@ -122,7 +122,7 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 		this.pager.totalItems = 0;
 	}
 
-	async downloadSample() {
+	downloadSample() {
 		this.catalogueRepo.downloadCommodityExcel()
 			.pipe(catchError(this.catchError))
 			.subscribe(

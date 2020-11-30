@@ -86,8 +86,8 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select formControlName="commodityGroup" placeholder="Select group commodity"
-                                    [allowClear]="true" [items]="groups"
-                                    (removed)="commodity.commodityGroupId = null; isSubmited" [active]="groupActive">
+                                    [clearable]="true" [items]="groups" class="custom" bindLabel="text"
+                                    (remove)="commodity.commodityGroupId = null; isSubmited">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (commodityGroup.errors | equalError: 'required')">

@@ -74,9 +74,8 @@
                                         Department <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select formControlName="stageDepartment" placeholder="Select department"
-                                        [allowClear]="true" [items]="listDepartment"
-                                        (removed)="stageManagement.departmentId = null; isSubmited"
-                                        [active]="departmentActive">
+                                        class="custom" bindLabel="text" [clearable]="true" [items]="listDepartment"
+                                        (remove)="stageManagement.departmentId = null; isSubmited">
                                     </ng-select>
                                     <div class="form-control-feedback"
                                         *ngIf="isSubmited && (stageDepartment.errors | equalError: 'required')">

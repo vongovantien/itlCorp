@@ -4,11 +4,11 @@ import { StageManagementComponent } from './stage-management.component';
 import { RouterModule, Routes } from '@angular/router';
 import { StageImportComponent } from '../stage-import/stage-import.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { StageManagementAddPopupComponent } from './components/form-create/form-create-stage-management.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 const routing: Routes = [
@@ -29,7 +29,7 @@ const routing: Routes = [
     imports: [
         SharedModule,
         ModalModule.forRoot(),
-        SelectModule,
+        NgSelectModule,
         NgProgressModule,
         RouterModule.forChild(routing),
         PaginationModule.forRoot(),

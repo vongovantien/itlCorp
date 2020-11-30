@@ -37,7 +37,8 @@
                         [ngClass]="{ 'm-form__group has-danger': isSubmitted && !unitType.valid }">
                         <label class="col-lg-4 col-form-label form-control-label" required> Unit Type </label>
                         <div class="col-lg-8">
-                            <ng-select [items]="unitTypes" placeholder="Select unit type" formControlName="unitType">
+                            <ng-select [items]="unitTypes" placeholder="Select unit type" formControlName="unitType"
+                                class="custom" bindLabel="text">
                             </ng-select>
                         </div>
                     </div>
