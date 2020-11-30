@@ -94,7 +94,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.formCreateSurcharge.isDisabled = true;
 
                     // * wait to currecy list api
-                    this.formCreateSurcharge.form.setValue({
+                    this.formCreateSurcharge.form.patchValue({
                         settlementNo: this.settlementPayment.settlement.settlementNo,
                         requester: this.settlementPayment.settlement.requester,
                         requestDate: { startDate: new Date(this.settlementPayment.settlement.requestDate), endDate: new Date(this.settlementPayment.settlement.requestDate) },
@@ -108,7 +108,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
-
+                    console.log(this.requestSurchargeListComponent.groupShipments)
                     this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT

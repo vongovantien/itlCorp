@@ -5,7 +5,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { environment } from 'src/environments/environment';
 
 @Component({
-    selector: 'app-export-crystal',
+    selector: 'app-export-crystal-pdf',
     templateUrl: './export-crystal.component.html'
 })
 export class ExportCrystalComponent extends PopupBase {
