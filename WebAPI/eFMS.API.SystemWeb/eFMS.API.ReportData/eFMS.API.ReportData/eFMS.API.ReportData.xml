@@ -307,11 +307,19 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportCommissionPROpsReport(eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.String)">
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportCommissionPRReport(eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.String,System.String)">
             <summary>
             Export Commission PR For OPS Report
             </summary>
             <param name="criteria"></param>
+            <param name="currentUserId"></param>
+            <param name="rptType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportIncentiveReport(eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.String)">
+            <summary>
+            Export Incentive Report
+            </summary>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
@@ -465,6 +473,26 @@
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPROpsReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
             <summary>
             Generate Commission Ops Report Excel
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <param name="stream"></param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPRReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
+            <summary>
+            Generate Commission Services Report Excel
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <param name="stream"></param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateIncentiveReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
+            <summary>
+            Generate Incentive Services Report Excel
             </summary>
             <param name="listData"></param>
             <param name="criteria"></param>

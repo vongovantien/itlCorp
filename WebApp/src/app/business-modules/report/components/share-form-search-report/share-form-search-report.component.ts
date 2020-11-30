@@ -13,6 +13,7 @@ import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
 import { ShareModulesInputShipmentPopupComponent } from "src/app/business-modules/share-modules/components";
 import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
+import { FormValidators } from "@validators";
 
 
 @Component({
@@ -161,7 +162,9 @@ export class ShareFormSearchReportComponent extends AppForm {
                 endDate: this.createMoment().endOf('month').toDate(),
             }],
             dateType: [this.dateTypeActive],
-            customer: [null, Validators.required],
+            customer: this.isCommissionIncentive ?  [null, Validators.compose([
+                FormValidators.required,
+            ])] : [],
             carrier: [],
             agent: [],
             service: [this.serviceActive],
@@ -643,6 +646,9 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     searchReport() {
         this.isSubmitted = true;
+        if (this.isCommissionIncentive && this.customer.invalid) {
+            return;
+        }
         if (this.isGeneralReport) {
             this.onGeneralSearch.emit(this.getGeneralSearchBody());
         } else if (this.isCommissionIncentive) {
@@ -715,7 +721,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customer.value,
             service: this.mapObject(this.serviceActive, this.serviceList),
-            currency: "VND",
+            currency: this.typeReportActive[0].id === [this.typeReportList[2]] ? "USD" : "VND",
             jobId: this.mapShipment('JOBID'),
             mawb: this.mapShipment('MBL'),
             hawb: this.mapShipment('HBL'),
@@ -758,9 +764,13 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.resetFormControl(this.agent);
         this.resetFormControl(this.pol);
         this.resetFormControl(this.pod);
-        this.onSearch.emit(<any>{});
-        this.onSearchCom.emit(<any>{});
-        this.onGeneralSearch.emit(<any>{});
+        if (this.isGeneralReport) {
+            this.onGeneralSearch.emit(<any>{});
+        } else if (this.isCommissionIncentive) {
+            this.onSearchCom.emit(<any>{});
+        } else {
+            this.onSearch.emit(<any>{});
+        }
 
         this.dateTypeActive = [this.dateTypeList[0]];
         this.dateType.setValue(this.dateTypeActive);
@@ -813,6 +823,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             endDate: this.createMoment().endOf('month').toDate(),
         });
 
+        this.exchangeRate.setValue(20000);
         this.resetFormShipmentInput();
     }
 

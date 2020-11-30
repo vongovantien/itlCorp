@@ -22,6 +22,7 @@ namespace eFMS.API.Documentation.DL.Models
     public class CommissionDetail
     {
         public DateTime? ServiceDate { get; set; }
+        public string MBLNo { get; set; }
         public string HBLNo { get; set; }
         public string JobId { get; set; }
         public string CustomSheet { get; set; }

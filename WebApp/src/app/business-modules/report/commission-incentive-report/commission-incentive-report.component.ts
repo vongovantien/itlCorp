@@ -5,8 +5,7 @@ import { CommonEnum } from "@enums";
 import { ICrystalReport, ReportInterface } from "@interfaces";
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-import { DocumentationRepo, ExportRepo } from '@repositories';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { ExportRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
 
@@ -40,20 +39,41 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
     console.log(data);
     switch (data.typeReport) {
       case CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_AS:
+        this.previewComPRReport(data);
         break;
       case CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_OPS:
-        console.log('COMMISSION_PR_OPS', data);
         this.previewComPROpsReport(data);
         break;
       case CommonEnum.COMMISSION_INCENTIVE_TYPE.INCENTIVE_RPT:
+        this.previewIncentiveReport(data);
         break;
     }
   }
 
+  previewComPRReport(data: ReportInterface.ICommissionReportCriteria) {
+    this._progressRef.start();
+    const currentUser: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+    this._exportRepo.exportCommissionPRReport(data, currentUser.id, "Services")
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+        )
+        .subscribe(
+            (response: ArrayBuffer) => {
+              if (response.byteLength > 0) {
+                const fileName = "Commission PR.xlsx";
+                this.downLoadFile(response, "application/ms-excel", fileName);
+              } else {
+                this._toastService.warning("No data to download. Please try again.");
+              }
+            },
+        );
+}
+
   previewComPROpsReport(data: ReportInterface.ICommissionReportCriteria) {
         this._progressRef.start();
         const currentUser: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this._exportRepo.exportCommissionPROpsReport(data, currentUser.id)
+        this._exportRepo.exportCommissionPRReport(data, currentUser.id, "OPS")
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -61,7 +81,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
             .subscribe(
                 (response: ArrayBuffer) => {
                   if (response.byteLength > 0) {
-                    const fileName = "Commission PR for OPS Report.xlsx";
+                    const fileName = "Commission OPS VND.xlsx";
                     this.downLoadFile(response, "application/ms-excel", fileName);
                   } else {
                     this._toastService.warning("No data to download. Please try again.");
@@ -69,6 +89,26 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
                 },
             );
   }
+
+  previewIncentiveReport(data: ReportInterface.ICommissionReportCriteria) {
+    this._progressRef.start();
+    const currentUser: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+    this._exportRepo.exportIncentiveReport(data, currentUser.id)
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+        )
+        .subscribe(
+            (response: ArrayBuffer) => {
+              if (response.byteLength > 0) {
+                const fileName = "Incentive.xlsx";
+                this.downLoadFile(response, "application/ms-excel", fileName);
+              } else {
+                this._toastService.warning("No data to download. Please try again.");
+              }
+            },
+        );
+}
 
   onShipmentList(data: any) {
     this.shipmentInput = data;
