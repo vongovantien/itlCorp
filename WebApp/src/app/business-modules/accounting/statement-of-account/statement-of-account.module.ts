@@ -5,7 +5,6 @@ import { StatementOfAccountDetailComponent } from './detail/detail-soa.component
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
 import { Routes, RouterModule } from '@angular/router';
-import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -23,6 +22,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { ShareAccountingModule } from '../share-accouting.module';
 import { StatementOfAccountPaymentMethodComponent } from './components/poup/payment-method/soa-payment-method.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     {
@@ -75,7 +75,7 @@ const COMPONENTS = [
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
-        SelectModule,
+        NgSelectModule,
         NgxDaterangepickerMd,
         TabsModule.forRoot(),
         ModalModule.forRoot(),

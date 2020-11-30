@@ -1,4 +1,4 @@
-import { Component, Input, HostBinding, ElementRef } from '@angular/core';
+import { Component, Input, HostBinding, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { Highlightable, FocusableOption, FocusOrigin } from '@angular/cdk/a11y';
 
 @Component({
@@ -12,7 +12,8 @@ import { Highlightable, FocusableOption, FocusOrigin } from '@angular/cdk/a11y';
         background: lightblue;
         color: #000;
      }`
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class AppCombogridItemComponent implements FocusableOption, Highlightable {

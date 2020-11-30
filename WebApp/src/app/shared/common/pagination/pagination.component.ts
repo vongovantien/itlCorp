@@ -1,10 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 
 
 @Component({
     selector: 'app-pagination',
-    templateUrl: './pagination.component.html'
+    templateUrl: './pagination.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppPaginationComponent extends AppList implements OnInit {
 

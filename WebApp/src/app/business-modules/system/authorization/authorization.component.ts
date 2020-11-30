@@ -161,11 +161,6 @@ export class AuthorizationComponent extends AppList {
             this.authorizationAddPopupComponent.authorizationActive.setValue(true);
             this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.minDate;
 
-            // this.authorizationAddPopupComponent.getUsers();
-            const indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
-            if (indexPIC > -1) {
-                this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
-            }
 
             this.authorizationAddPopupComponent.isShowUpdate = false;
             this.authorizationAddPopupComponent.show();
@@ -199,7 +194,6 @@ export class AuthorizationComponent extends AppList {
                 if (res.id !== 0) {
                     const _authorization = new Authorization(res);
                     this.authorizationAddPopupComponent.action = "update";
-                    this.authorizationAddPopupComponent.activeServices = this.authorizationAddPopupComponent.getCurrentActiveService(_authorization.services);
                     this.authorizationAddPopupComponent.authorization = _authorization;
                     this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.createMoment(!!_authorization.startDate ? new Date(_authorization.startDate) : null);
                     this.authorizationAddPopupComponent.getDetail();

@@ -6,7 +6,6 @@ import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/
 import { OpsCdNoteAddRemainingChargePopupComponent } from '../components/popup/ops-cd-note-add-remaining-charge/ops-cd-note-add-remaining-charge.popup';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { SelectModule } from 'ng2-select';
 
 
 @NgModule({
@@ -20,7 +19,6 @@ import { SelectModule } from 'ng2-select';
         SharedModule,
         ShareBussinessModule,
         ModalModule,
-        SelectModule,
     ],
     exports: [],
     providers: [],

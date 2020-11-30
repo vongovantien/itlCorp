@@ -1,10 +1,11 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { SystemRepo, CatalogueRepo } from '@repositories';
 import { AppForm } from 'src/app/app.form';
 import { formatDate } from '@angular/common';
 import { User } from '@models';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'authorized-approval-form-search',
@@ -26,14 +27,14 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
     authorizedPerson: AbstractControl;
     status: AbstractControl;
 
-    statusList: any[] = [];
-    typeList: any[] = [];
+    statusList: any[] = [
+        { "text": 'Active', "id": true },
+        { "text": 'Inactive', "id": false }
+    ];
+    typeList: any[] = ['Advance', 'Settlement', 'Unlock Shipment'];
 
-    statusActive: any[] = [];
-    personInChargeList: any[] = [];
-    authorizedPersonList: any[] = [];
-    serviceList: any[] = [];
-    users: User[] = [];
+    users: Observable<User[]>;
+
     minDateExpired: any = null;
     minDateEffective: any = null;
 
@@ -47,24 +48,19 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
     }
 
     ngOnInit() {
-        this.initDataInform();
+        this.users = this._systemRepo.getSystemUsers({ active: true });
         this.initForm();
-        this.typeList = [
-            { text: 'Advance', id: 'Advance' },
-            { text: 'Settlement', id: 'Settlement' },
-            { text: 'Unlock Shipment', "id": 'Unlock Shipment' }
-        ];
+
     }
 
     initForm() {
         this.formSearch = this._fb.group({
-
             authorizer: [],
             commissioner: [],
             effectiveDate: [null],
             expirationDate: [null],
             type: [],
-            status: [this.statusActive]
+            status: [this.statusList[0].id]
         });
         this.authorizer = this.formSearch.controls['authorizer'];
         this.commissioner = this.formSearch.controls['commissioner'];
@@ -73,6 +69,7 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
         this.status = this.formSearch.controls['status'];
         this.type = this.formSearch.controls['type'];
         this.minDateEffective = this.minDateExpired = this.minDate;
+
         this.formSearch.get("effectiveDate").valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
@@ -83,24 +80,6 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
             });
     }
 
-    initDataInform() {
-        this.getUsers();
-        this.getStatus();
-    }
-
-    getUsers() {
-        this._systemRepo.getSystemUsers({ active: true })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.users = res;
-                        this.users = this.users.filter(x => x.active === true);
-                    }
-                },
-            );
-    }
-
     onSelectDataFormInfo($event: any, type: string) {
         if (type === 'commissioner') {
             this.commissioner.setValue($event.id);
@@ -109,24 +88,16 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
         }
     }
 
-    getStatus() {
-        this.statusList = [
-            { "text": 'Active', "id": 'active' },
-            { "text": 'Inactive', "id": 'inactive' }
-        ];
-        //Default value: Active
-        this.statusActive = [this.statusList[0]];
-    }
 
     onSubmit() {
         const body: ISearchAuthorizedApproval = {
             all: '',
             authorizer: !!this.authorizer.value ? this.authorizer.value : null,
             commissioner: !!this.commissioner.value ? this.commissioner.value : null,
-            type: !!this.type.value && this.type.value.length > 0 ? (this.type.value[0].id) : null,
+            type: this.type.value,
             effectiveDate: this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
             expirationDate: this.expirationDate.value ? (this.expirationDate.value.startDate !== null ? formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
-            active: this.status.value ? (this.status.value[0].id === 'active' ? true : false) : null,
+            active: this.status.value,
 
         };
         this.onSearch.emit(body);
@@ -138,10 +109,8 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
 
     reset() {
         this.formSearch.reset();
-        this.initDataInform();
         this.onSearch.emit(<any>{});
-        this.statusActive = [this.statusList[0]];
-        this.status.setValue(this.statusActive);
+        this.status.setValue(this.statusList[0].id);
     }
 }
 interface ISearchAuthorizedApproval {

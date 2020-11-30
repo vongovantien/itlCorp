@@ -3,7 +3,6 @@ import { JobManagementComponent } from './job-management.component';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SelectModule } from 'ng2-select';
 
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
@@ -13,6 +12,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
 import { JobManagementFormCreateComponent } from './components/form-create/form-create-job.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 const routing: Routes = [
@@ -39,7 +39,7 @@ const routing: Routes = [
 
 const LIB = [
     NgxDaterangepickerMd,
-    SelectModule,
+    NgSelectModule,
     NgProgressModule,
     PaginationModule.forRoot(),
     TabsModule.forRoot(),

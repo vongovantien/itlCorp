@@ -11,7 +11,6 @@ import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clear
 @Component({
     selector: 'app-custom-clearance-addnew',
     templateUrl: './custom-clearance-addnew.component.html',
-    styleUrls: ['./custom-clearance-addnew.component.scss']
 })
 export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
 
@@ -32,10 +31,8 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = false;
 
-        this.detailComponent.formGroup.controls['serviceType'].setErrors(null);
-        this.detailComponent.formGroup.controls['route'].setErrors(null);
-        if (this.detailComponent.isDisableCargo) {
-            this.detailComponent.formGroup.controls['cargoType'].setErrors(null);
+        if (!this.detailComponent.isDisableCargo && !this.detailComponent.cargoType.value) {
+            return;
         }
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;
@@ -59,10 +56,8 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = true;
 
-        this.detailComponent.formGroup.controls['serviceType'].setErrors(null);
-        this.detailComponent.formGroup.controls['route'].setErrors(null);
-        if (this.detailComponent.isDisableCargo) {
-            this.detailComponent.formGroup.controls['cargoType'].setErrors(null);
+        if (!this.detailComponent.isDisableCargo && !this.detailComponent.cargoType.value) {
+            return;
         }
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;

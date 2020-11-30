@@ -13,14 +13,15 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="form-control-label" for="">Unlock Type</label>
-                                <ng-select formControlName="unlockType" [allowClear]="true" [items]="unlockTypeList">
+                                <ng-select class="custom" formControlName="unlockType" [items]="unlockTypeList">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="">Requester</label>
-                                <ng-select formControlName="requester" [allowClear]="true" [items]="requesterList">
+                                <ng-select class="custom" formControlName="requester" [items]="requesterList | async"
+                                    bindLabel="username" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -40,7 +41,7 @@
                                 <div class="col-lg-12">
                                     <div class="form-group">
                                         <label class="form-control-label" for="">Status</label>
-                                        <ng-select formControlName="unlockStatus" [allowClear]="true"
+                                        <ng-select class="custom" formControlName="unlockStatus"
                                             [items]="unlockStatusList">
                                         </ng-select>
                                     </div>

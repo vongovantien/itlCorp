@@ -57,7 +57,8 @@
                                     <select [(ngModel)]="item.buid" (ngModelChange)="selectedCompany($event,item)"
                                         class="form-control border">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let item of companies" [ngValue]="item.id">{{item.bunameVn}}
+                                        <option *ngFor="let company of companies" [ngValue]="company.id">
+                                            {{company.bunameVn}}
                                         </option>
                                     </select>
                                 </div>

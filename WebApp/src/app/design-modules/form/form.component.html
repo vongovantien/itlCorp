@@ -278,9 +278,9 @@
                             <label class="form-control-label" for="">
                                 Select single with search
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select class="custom" [items]="items" [isOpen]="disabled" (data)="refreshValue($event)"
+                                (change)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -289,9 +289,9 @@
                             <label class="form-control-label" for="">
                                 Disable Select single
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="true"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select class="custom" [items]="items" [isOpen]="true" (data)="refreshValue($event)"
+                                (change)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -333,8 +333,8 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">Multi select</label>
-                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                            <ng-select [multiple]="true" [items]="items" [isOpen]="disabled"
+                                (data)="refreshValue($event)" (change)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select type">
                             </ng-select>
                         </div>
@@ -725,9 +725,9 @@
                             <label class="form-control-label" for="">
                                 select with error <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select class="custom" [items]="items" [isOpen]="disabled" (data)="refreshValue($event)"
+                                (change)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                             <div class="form-control-feedback">
                                 Please enter the detail!

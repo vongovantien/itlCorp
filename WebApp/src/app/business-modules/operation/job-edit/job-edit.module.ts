@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SelectModule } from 'ng2-select';
 import { NgxCurrencyModule } from 'ngx-currency';
 
 
@@ -19,6 +18,7 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { ChargeConstants } from 'src/constants/charge.const';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { DeactivateGuardService } from '@core';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     {
@@ -30,7 +30,7 @@ const routing: Routes = [
 
 const LIB = [
     NgxDaterangepickerMd,
-    SelectModule,
+    NgSelectModule,
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     DragDropModule

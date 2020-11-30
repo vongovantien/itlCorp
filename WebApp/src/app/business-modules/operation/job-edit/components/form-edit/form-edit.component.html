@@ -76,8 +76,8 @@
 					<label class="form-control-label" required>
 						Product Service
 					</label>
-					<ng-select #ps [items]="productServices" placeholder="Please select"
-						(opened)="closeOtherSelects(ps)" formControlName="productService">
+					<ng-select class="custom" [items]="productServices" placeholder="Please select"
+						formControlName="productService" [clearable]="false">
 					</ng-select>
 					<div class="form-control-feedback"
 						*ngIf="(productService.dirty && !productService.valid) || (isSubmitted && !productService.valid)">
@@ -91,7 +91,7 @@
 					<label class="form-control-label" required>
 						Service Mode
 					</label>
-					<ng-select #sm [items]="serviceModes" placeholder="Please select" (opened)="closeOtherSelects(sm)"
+					<ng-select class="custom" [clearable]="false" [items]="serviceModes" placeholder="Please select"
 						formControlName="serviceMode">
 					</ng-select>
 					<div class="form-control-feedback"
@@ -106,8 +106,8 @@
 					<label class="form-control-label" required>
 						Shipment Mode
 					</label>
-					<ng-select #smo [items]="shipmentModes" placeholder="Please select"
-						(opened)="closeOtherSelects(smo)" formControlName="shipmentMode">
+					<ng-select class="custom" [clearable]="false" [items]="shipmentModes" placeholder="Please select"
+						formControlName="shipmentMode">
 					</ng-select>
 					<div class="form-control-feedback"
 						*ngIf="(shipmentMode.dirty && !shipmentMode.valid) || (isSubmitted && !shipmentMode.valid)">
@@ -338,8 +338,8 @@
 					<label class="form-control-label" required>
 						Shipment Type
 					</label>
-					<ng-select #smt [items]="shipmentTypes" placeholder="Package Type" [allowClear]="true"
-						(opened)="closeOtherSelects(smt)" formControlName="shipmentType">
+					<ng-select class="custom" [clearable]="false" [items]="shipmentTypes" placeholder="Package Type"
+						formControlName="shipmentType">
 					</ng-select>
 				</div>
 			</div>
@@ -352,7 +352,7 @@
 				<span class="m--font-bolder m--margin-left-5">by</span>
 				<span class="m--font-success m--margin-left-5">{{ opsTransaction.userCreatedName }}</span>
 			</div>
-			<div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
+			<div class="col-md-8 m--margin-top-10 m--margin-bottom-5">
 				<span class="m--font-bolder">Modified:</span>
 				<span
 					class="m--font-success m--margin-left-5">{{ opsTransaction.datetimeModified | date : "dd/MM/yyyy HH:mm:ss" }}</span>
@@ -420,8 +420,9 @@
 								name="sumPackages" integer placeholder="Enter number" formControlName="sumPackages">
 						</div>
 						<div class="col-md-6">
-							<ng-select #package [items]="packageTypes" placeholder="Package Type" [allowClear]="true"
-								(opened)="closeOtherSelects(package)" formControlName="packageTypeId">
+							<ng-select [items]="packageTypes | async" placeholder="Package Type" class="custom"
+								[clearable]="false" formControlName="packageTypeId" bindValue="id"
+								bindLabel="unitNameEn">
 							</ng-select>
 						</div>
 					</div>
@@ -450,8 +451,8 @@
 					<label class="form-control-label">
 						Commonity Group
 					</label>
-					<ng-select #commodity [items]="commodityGroups" placeholder="Commodity Group" [allowClear]="true"
-						(opened)="closeOtherSelects(commodity)" formControlName="commodityGroupId">
+					<ng-select [items]="commodityGroups | async" placeholder="Commodity Group" class="custom"
+						[clearable]="false" formControlName="commodityGroupId" bindValue="id" bindLabel="groupNameEn">
 					</ng-select>
 				</div>
 			</div>

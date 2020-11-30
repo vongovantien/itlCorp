@@ -67,7 +67,7 @@ export class AuthorizedApprovalListComponent extends AppList {
                             effectiveDate: !!this.formPopup.authorized.effectiveDate ? { startDate: new Date(this.formPopup.authorized.effectiveDate), endDate: new Date(this.formPopup.authorized.effectiveDate) } : null,
                             expirationDate: !!this.formPopup.authorized.expirationDate ? { startDate: new Date(this.formPopup.authorized.expirationDate), endDate: new Date(this.formPopup.authorized.expirationDate) } : null,
                             description: this.formPopup.authorized.description,
-                            type: !!this.formPopup.authorized.type ? [this.formPopup.typeList.find(type => type.id === this.formPopup.authorized.type)] : null,
+                            type: this.formPopup.authorized.type,
                             status: this.formPopup.authorized.active,
                         });
                         this.formPopup.minDateEffective = this.formPopup.minDateExpired = this.minDate;

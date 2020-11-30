@@ -4,8 +4,6 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { StoreModule } from "@ngrx/store";
 import { EffectsModule } from "@ngrx/effects";
 
-import { SelectModule } from "ng2-select";
-
 
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TabsModule } from 'ngx-bootstrap/tabs';
@@ -37,7 +35,6 @@ const COMPONENTS = [
         ReactiveFormsModule,
         DirectiveModule,
         PipeModule,
-        SelectModule,
         TabsModule.forRoot(),
         CollapseModule.forRoot(),
 

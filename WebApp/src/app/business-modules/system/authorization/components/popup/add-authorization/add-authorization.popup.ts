@@ -7,6 +7,7 @@ import { catchError, distinctUntilChanged, map } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { ConfirmPopupComponent } from "@common";
 import { Authorization } from "@models";
+import { Observable } from "rxjs";
 @Component({
     selector: 'add-authorization-popup',
     templateUrl: './add-authorization.popup.html'
@@ -34,12 +35,6 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     authorizationNote: AbstractControl;
     authorizationActive: AbstractControl;
 
-    personInChargeList: any[] = [];
-    personInChargeActive: any[] = [];
-    authorizedPersonList: any[] = [];
-    authorizedPersonActive: any[] = [];
-    serviceList: any[] = [];
-    activeServices: any = [];
 
     minDateExpired: any = null;
     minDateEffective: any = null;
@@ -48,6 +43,9 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     userCreatedName: string;
     datetimeModified: string;
     userModifiedName: string;
+
+    personInChargeList: Observable<any[]>;
+    serviceList: Observable<CommonInterface.IValueDisplay[]>;
 
     constructor(
         private _fb: FormBuilder,
@@ -58,8 +56,8 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this.getService();
-        this.getUsers();
+        this.serviceList = this._catalogueRepo.getListService();
+        this.personInChargeList = this._systemRepo.getSystemUsers({ active: true });
         this.initForm();
     }
 
@@ -98,40 +96,16 @@ export class AuthorizationAddPopupComponent extends PopupBase {
             });
     }
 
-    getService() {
-        this._catalogueRepo.getListService()
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.serviceList = res.map(x => ({ "text": x.displayName, "id": x.value }));
-                    }
-                },
-            );
-    }
-
-    getUsers() {
-        this._systemRepo.getSystemUsers({ active: true })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (data: any) => {
-                    this.personInChargeList = data.map(x => ({ "text": x.username, "id": x.id }));
-                    this.authorizedPersonList = data.map(x => ({ "text": x.username, "id": x.id }));
-                },
-            );
-    }
-
     saveAuthorization() {
         [this.personInCharge].forEach((control: AbstractControl) => this.setError(control));
         this.isSubmited = true;
         if (this.formAuthorization.valid) {
-            const serviceCode = this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizationService.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
             const _authorization: Authorization = {
                 id: this.authorization.id,
-                userId: this.personInChargeActive[0].id,
-                assignTo: this.authorizedPerson.value ? (this.authorizedPerson.value.length > 0 ? this.authorizedPerson.value[0].id : '') : '',
+                userId: this.personInCharge.value,
+                assignTo: this.authorizedPerson.value,
                 name: this.authorizationName.value,
-                services: serviceCode,
+                services: !!this.authorizationService.value ? this.authorizationService.value.toString().replace(/(?:,)/g, ';') : '',
                 description: this.authorizationNote.value,
                 startDate: this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 endDate: this.expirationDate.value ? (this.expirationDate.value.startDate !== null ? formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
@@ -196,21 +170,12 @@ export class AuthorizationAddPopupComponent extends PopupBase {
 
     getDetail() {
         this.isShowUpdate = true;
-        const indexPIC = this.personInChargeList.findIndex(x => x.id === this.authorization.userId);
-        if (indexPIC > -1) {
-            this.personInChargeActive = [this.personInChargeList[indexPIC]];
-        }
-
-        const indexAP = this.authorizedPersonList.findIndex(x => x.id === this.authorization.assignTo);
-        if (indexAP > -1) {
-            this.authorizedPersonActive = [this.authorizedPersonList[indexAP]];
-        }
 
         this.formAuthorization.setValue({
             authorizationName: this.authorization.name,
-            personInCharge: this.personInChargeActive,
-            authorizedPerson: this.authorizedPersonActive,
-            authorizationService: this.activeServices,
+            personInCharge: this.authorization.userId,
+            authorizedPerson: this.authorization.assignTo,
+            authorizationService: !!this.authorization.services ? this.authorization.services.split(";") : [],
             effectiveDate: !!this.authorization.startDate ? { startDate: new Date(this.authorization.startDate) } : null,
             expirationDate: !!this.authorization.endDate ? { startDate: new Date(this.authorization.endDate) } : null,
             authorizationNote: this.authorization.description,
@@ -223,19 +188,6 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         this.userModifiedName = this.authorization.userModifiedName;
     }
 
-    getCurrentActiveService(ChargeService: any) {
-        this.getService();
-        const listService = ChargeService.split(";");
-        const activeServiceList: any = [];
-        listService.forEach(item => {
-            const element = this.serviceList.find(x => x.id === item);
-            if (element !== undefined) {
-                const activeService = element;
-                activeServiceList.push(activeService);
-            }
-        });
-        return activeServiceList;
-    }
 
     closePopup() {
         this.confirmCancelPopup.show();
