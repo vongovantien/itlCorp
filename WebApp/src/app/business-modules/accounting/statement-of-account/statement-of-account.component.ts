@@ -148,4 +148,17 @@ export class StatementOfAccountComponent extends AppList {
                 }
             });
     }
+
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'confirm-billing': {
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/confirm-billing`]);
+                break;
+            }
+            case 'soa': {
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
+                break;
+            }
+        }
+    }
 }

@@ -9,7 +9,7 @@
 <div class="m-content">
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
-            <tab heading="Statement Of Account">
+            <tab heading="Statement Of Account" (selectTab)="onSelectTab('soa')" [active]="true">
                 <div class="tab-pane fade show active" role="tabpanel" id="statement-of-account-tabview-tab">
                     <div class="m-portlet">
                         <div class="m-form">
@@ -116,8 +116,8 @@
                     </div>
                 </div>
             </tab>
-            <tab heading="Confirm Billing">
-                <confirm-billing></confirm-billing>
+            <tab heading="Confirm Billing" (selectTab)="onSelectTab('confirm-billing')">
+
             </tab>
         </tabset>
     </div>

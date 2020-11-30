@@ -66,15 +66,17 @@
                             Service
                         </label>
                         <ng-select [multiple]="true" formControlName="service" [items]="services"
-                            placeholder="Select service" class="custom">
+                            [active]="selectedService" (removed)="onRemoveDataFormInfo($event, 'service')"
+                            (selected)="onSelectDataFormInfo($event, 'service')" placeholder="Select service">
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group">
-                        <label class="form-control-label" for="">Cs Handling</label>
+                        <label class="form-control-label" for="">CS Handling</label>
                         <ng-select [multiple]="true" formControlName="csHandling" [items]="csHandlings"
-                            placeholder="Select cs handling" class="custom">
+                            [active]="selectedCsHandling" (removed)="onRemoveDataFormInfo($event, 'csHandling')"
+                            (selected)="onSelectDataFormInfo($event, 'csHandling')" placeholder="Select cs handling">
                         </ng-select>
                     </div>
                 </div>

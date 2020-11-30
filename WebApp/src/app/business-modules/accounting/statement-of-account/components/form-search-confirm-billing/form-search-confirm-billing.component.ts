@@ -1,13 +1,12 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
-import { AccountingConstants, JobConstants } from '@constants';
+import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Partner, User } from '@models';
-import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
@@ -39,16 +38,29 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
         { field: 'employeeNameVn', label: 'Full Name' }
     ];
 
-    searchOptionList: string[] = ['Debit Note', 'SOA', 'VAT Invoice'];
-    dateTypeList: string[] = ['Confirm Billing Date', 'VAT Invoice Date'];
-    confirmedBillingList: string[] = ['All', 'Yes', 'No'];
+    searchOptionList: any[] = [
+        { id: 'Debit Note', text: 'Debit Note' },
+        { id: 'SOA', text: 'SOA' },
+        { id: 'VAT Invoice', text: 'VAT Invoice' }
+    ];
+    selectedSearchOption: any[] = [this.searchOptionList[0]];
+    dateTypeList: any[] = [
+        { id: 'Confirm Billing Date', text: 'Confirm Billing Date' },
+        { id: 'VAT Invoice Date', text: 'VAT Invoice Date' }
+    ];
+    confirmedBillingList: any[] = [
+        { id: 'All', text: 'All' },
+        { id: 'Yes', text: 'Yes' },
+        { id: 'No', text: 'No' }
+    ];
 
     services: any[] = [];
     selectedService: any[] = [];
     csHandlings: any[] = [];
-    selectedCsHandlings: any[] = [];
+    selectedCsHandling: any[] = [];
 
     dataSearch: any;
+    userLogged: User;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -71,14 +83,14 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
 
     initFormSearch() {
         this.formSearch = this._fb.group({
-            searchOption: [],
+            searchOption: [this.selectedSearchOption],
             referenceNo: [],
             partner: [],
-            dateType: [],
-            issueDate: [{ startDate: new Date(), endDate: new Date() }],
-            confirmedBilling: [],
-            service: [],
-            csHandling: []
+            dateType: [[this.dateTypeList[1]]],
+            issueDate: [], // [{ startDate: new Date(), endDate: new Date() }],
+            confirmedBilling: [[this.confirmedBillingList[0]]],
+            service: [this.selectedService],
+            csHandling: [this.selectedCsHandling]
         });
         this.searchOption = this.formSearch.controls['searchOption'];
         this.referenceNo = this.formSearch.controls['referenceNo'];
@@ -88,6 +100,8 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
         this.confirmedBilling = this.formSearch.controls['confirmedBilling'];
         this.service = this.formSearch.controls['service'];
         this.csHandling = this.formSearch.controls['csHandling'];
+
+        this.searchOption.setValue(this.selectedSearchOption);
     }
 
     getService() {
@@ -96,14 +110,9 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
-                        //
-                        // sort A -> Z theo text services 
                         this.sortIncreaseServices('text', true);
-
                         this.services.unshift({ id: 'All', text: 'All' });
-
                         this.selectedService = [this.services[0]];
                     } else {
                         this.handleError(null, (data) => {
@@ -127,15 +136,12 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-
                         this.csHandlings = this.utility.prepareNg2SelectData(res, 'id', 'username');
-                        //
-                        // sort A -> Z theo text services 
-                        this.sortIncreaseServices('text', true);
-
+                        this.sortIncreaseServices('username', true);
                         this.csHandlings.unshift({ id: 'All', text: 'All' });
-
-                        this.selectedCsHandlings = [this.csHandlings[0]];
+                        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+                        this.selectedCsHandling = [this.csHandlings.filter(stf => stf.id === this.userLogged.id)[0]];
+                        this.csHandling.setValue(this.selectedCsHandling);
                     } else {
                         this.handleError(null, (data) => {
                             this._toastService.error(data.message, data.title);
@@ -146,32 +152,87 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
     }
 
     onSelectDataFormInfo(data: { id: any; }, type: string) {
+        console.log(data);
         switch (type) {
             case 'partner':
                 this.formSearch.controls['partner'].setValue(data.id);
                 break;
             case 'service':
-                this.formSearch.controls['creator'].setValue(data.id);
+                if (data.id === 'All') {
+                    this.selectedService = [];
+                    this.selectedService.push({ id: 'All', text: "All" });
+                } else {
+                    this.selectedService.push(data);
+                    this.detectServiceWithAllOption('service', data);
+                    this.service.setValue(this.selectedService);
+                }
                 break;
             case 'csHandling':
-                this.formSearch.controls['creator'].setValue(data.id);
+                if (data.id === 'All') {
+                    this.selectedCsHandling = [];
+                    this.selectedCsHandling.push({ id: 'All', text: "All" });
+                } else {
+                    this.selectedCsHandling.push(data);
+                    this.detectServiceWithAllOption('csHandling', data);
+                    this.csHandling.setValue(this.selectedCsHandling);
+                }
                 break;
             default:
                 break;
         }
     }
 
+    onRemoveDataFormInfo(data: any, type: string) {
+        if (type === 'service') {
+            this.selectedService.splice(this.selectedService.findIndex((item) => item.id === data.id), 1);
+        }
+        if (type === 'csHandling') {
+            this.selectedCsHandling.splice(this.selectedCsHandling.findIndex((item) => item.id === data.id), 1);
+        }
+        this.detectServiceWithAllOption(type);
+    }
+
+    detectServiceWithAllOption(type: string, data?: any) {
+        if (type === "service") {
+            if (!this.selectedService.every((value) => value.id !== 'All')) {
+                this.selectedService.splice(this.selectedService.findIndex((item) => item.id === 'All'), 1);
+                this.selectedService = [];
+                this.selectedService.push(data);
+            }
+        }
+        if (type === "csHandling") {
+            if (!this.selectedCsHandling.every((value) => value.id !== 'All')) {
+                this.selectedCsHandling.splice(this.selectedCsHandling.findIndex((item) => item.id === 'All'), 1);
+                this.selectedCsHandling = [];
+                this.selectedCsHandling.push(data);
+            }
+        }
+    }
+
+    mapObject(dataSelected: any[], dataList: any[]) {
+        let result = '';
+        if (dataSelected.length > 0) {
+            if (dataSelected[0].id === 'All') {
+                const list = dataList.filter(f => f.id !== 'All');
+                result = list.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+            } else {
+                result = dataSelected.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+            }
+        }
+        return result;
+    }
+
     onSubmit() {
         const criteria: any = {
-            searchOption: this.searchOption.value,
+            searchOption: this.searchOption.value[0].id,
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: this.partner.value,
-            dateType: this.dateType.value,
+            dateType: !!this.dateType.value ? this.dateType.value[0].id : null,
             fromDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
             toDate: this.issueDate.value ? (this.issueDate.value.endDate !== null ? formatDate(this.issueDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
-            confirmedBilling: this.confirmedBilling.value,
-            services: this.service.value,
-            csHandling: this.csHandling.value
+            confirmedBilling: !!this.confirmedBilling.value ? this.confirmedBilling.value[0].id : null,
+            services: this.mapObject(this.selectedService, this.services),
+            csHandling: this.mapObject(this.selectedCsHandling, this.csHandlings)
         };
         console.log(criteria);
         this.onSearch.emit(criteria);
@@ -183,6 +244,28 @@ export class ConfirmBillingFormSearchComponent extends AppForm implements OnInit
 
     reset() {
         this.formSearch.reset();
-        this.issueDate.setValue({ startDate: new Date(), endDate: new Date() });
+        // this.issueDate.setValue({ startDate: new Date(), endDate: new Date() });
+        this.selectedSearchOption = [this.searchOptionList[0]];
+        this.searchOption.setValue(this.selectedSearchOption);
+
+        this.dateType.setValue([this.dateTypeList[1]]);
+
+        this.confirmedBilling.setValue([this.confirmedBillingList[0]]);
+
+        this.selectedService = [this.services[0]];
+        this.service.setValue(this.selectedService);
+
+        this.selectedCsHandling = [this.csHandlings.filter(stf => stf.id === this.userLogged.id)[0]];
+        this.csHandling.setValue(this.selectedCsHandling);
+
+        this.onSearch.emit(<any>{
+            searchOption: this.searchOption.value[0].id,
+            dateType: !!this.dateType.value ? this.dateType.value[0].id : null,
+            fromDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+            toDate: this.issueDate.value ? (this.issueDate.value.endDate !== null ? formatDate(this.issueDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
+            confirmedBilling: !!this.confirmedBilling.value ? this.confirmedBilling.value[0].id : null,
+            services: this.mapObject(this.selectedService, this.services),
+            csHandling: this.mapObject(this.selectedCsHandling, this.csHandlings)
+        });
     }
 }

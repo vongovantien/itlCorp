@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { StatementOfAccountComponent } from './statement-of-account.component';
-import { ConfirmBillingComponent } from './confirm-billing/confirm-billing.component';
 import { StatementOfAccountDetailComponent } from './detail/detail-soa.component';
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
@@ -23,7 +22,11 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { ShareAccountingModule } from '../share-accouting.module';
 import { StatementOfAccountPaymentMethodComponent } from './components/poup/payment-method/soa-payment-method.popup';
+import { ConfirmBillingComponent } from './confirm-billing/confirm-billing.component';
 import { ConfirmBillingFormSearchComponent } from './components/form-search-confirm-billing/form-search-confirm-billing.component';
+import { ConfirmBillingDetailComponent } from './confirm-billing/detail/detail-confirm-billing.component';
+import { ConfirmBillingListChargeComponent } from './components/list-charge-confirm-billing/list-charge-confirm-billing.component';
+import { ConfirmBillingDatePopupComponent } from './components/poup/confirm-billing-date/confirm-billing-date.popup';
 
 const routing: Routes = [
     {
@@ -50,6 +53,18 @@ const routing: Routes = [
                     name: "Edit",
                 }
             },
+            {
+                path: 'confirm-billing', data: { name: 'Confirm Billing' },
+                children: [
+                    {
+                        path: '', component: ConfirmBillingComponent, data: { name: '', title: 'eFMS Confirm Billing' }
+                    },
+                    {
+                        path: ':vatInvoiceId', component: ConfirmBillingDetailComponent, data: { name: 'Detail' },
+                    }
+                ]
+            },
+
         ]
     },
 
@@ -62,7 +77,9 @@ const COMPONENTS = [
     StatementOfAccountSummaryComponent,
     StatementOfAccountFormCreateComponent,
     StatementOfAccountPaymentMethodComponent,
-    ConfirmBillingFormSearchComponent
+    ConfirmBillingFormSearchComponent,
+    ConfirmBillingListChargeComponent,
+    ConfirmBillingDatePopupComponent
 ];
 
 @NgModule({
@@ -72,6 +89,7 @@ const COMPONENTS = [
         StatementOfAccountEditComponent,
         StatementOfAccountDetailComponent,
         ConfirmBillingComponent,
+        ConfirmBillingDetailComponent,
         ...COMPONENTS
     ],
     imports: [
