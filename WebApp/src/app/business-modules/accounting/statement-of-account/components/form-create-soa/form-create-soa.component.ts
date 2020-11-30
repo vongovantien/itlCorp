@@ -162,7 +162,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
                         this.services.unshift({ id: 'All', text: 'All' });
 
-                        this.selectedService = [this.services[0]];
+                        this.selectedService = [this.services[0].id];
                     } else {
                         this.handleError(null, (data) => {
                             this._toastService.error(data.message, data.title);
@@ -277,25 +277,24 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 break;
             case 'service':
                 // * reset selected charges & dataSource.
-                this.selectedCharges = [];
+                this.selectedCharges.length = 0;
                 this.configCharge.dataSource = this.charges;
 
                 if (data.id === 'All') {
-                    this.selectedService = [];
-                    this.selectedService.push({ id: 'All', text: "All" });
+                    this.selectedService.length = 0;
+                    this.selectedService = [...this.selectedService, 'All'];
+                    this.configCharge.dataSource = [...this.charges];
 
-                    this.configCharge.dataSource = this.charges;
                     this.updateDataSearch('serviceTypeId', "");
 
                 } else {
-                    this.selectedService.push(data);
-                    this.detectServiceWithAllOption(data);
+                    this.detectServiceWithAllOption(data.id);
 
                     // ? filter charge when add service
-                    this.configCharge.dataSource = this.filterChargeWithService(this.configCharge.dataSource, this.selectedService.map((service: any) => service.id));
-                    // this.configCharge.dataSource.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
+                    this.configCharge.dataSource = [...this.filterChargeWithService([...this.configCharge.dataSource], this.selectedService)];
                     this.configCharge.dataSource = [...this.configCharge.dataSource, new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' })];
-                    this.updateDataSearch('serviceTypeId', this.selectedService.map((service: any) => service.id));
+
+                    this.updateDataSearch('serviceTypeId', this.selectedService.toString().replace(/(?:,)/g, ';'));
                 }
 
                 break;
@@ -306,7 +305,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 break;
             case 'charge':
                 if (data.id === 'All') {
-                    this.selectedCharges = [];
+                    this.selectedCharges.length = 0;
                     this.selectedCharges.push({ id: 'All', code: 'All', chargeNameEn: 'All' });
                 } else {
                     this.selectedCharges.push(data);
@@ -321,11 +320,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     onRemoveService(data: any) {
-        this.selectedService.splice(this.selectedService.findIndex((item: any) => item.id === data.id), 1);
-        this.detectServiceWithAllOption();
-
         // * filter charge when delete service
-        this.configCharge.dataSource = this.filterChargeWithService(this.configCharge.dataSource, this.selectedService.map((service: any) => service.id));
+        this.configCharge.dataSource = [...this.filterChargeWithService([...this.configCharge.dataSource], this.selectedService)];
 
     }
 
@@ -338,11 +334,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     detectServiceWithAllOption(data?: any) {
-        if (!this.selectedService.every((value: any) => value.id !== 'All')) {
-            this.selectedService.splice(this.selectedService.findIndex((item: any) => item.id === 'All'), 1);
+        if (!this.selectedService.every((value: any) => value !== 'All')) {
+            this.selectedService.splice(this.selectedService.findIndex((item: any) => item === 'All'), 1);
 
-            this.selectedService = [];
-            this.selectedService.push(data);
+            this.selectedService.length = 0;
+            this.selectedService = [...this.selectedService, data];
         }
     }
 
@@ -350,8 +346,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (!this.selectedCharges.every((value: any) => value.id !== 'All')) {
             this.selectedCharges.splice(this.selectedCharges.findIndex((item: any) => item.id === 'All'), 1);
 
-            this.selectedCharges = [];
-            this.selectedCharges.push(data);
+            this.selectedCharges.length = 0;
+            this.selectedCharges = [...this.selectedCharges, data];
         }
     }
 
@@ -361,7 +357,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             return;
         } else {
             const body = {
-                currencyLocal: 'VND', // Todo: get currency local follow location or login info
+                currencyLocal: 'VND',
                 currency: this.selectedCurrency.id,
                 customerID: this.selectedPartner.value || '',
                 dateType: this.selectedDateMode.value,
@@ -372,9 +368,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
-                serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
+                serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0]) : this.mapServiceId('All'),
                 commodityGroupId: !!this.commodity ? this.commodity.id : null,
-                strServices: this.selectedService[0].id === 'All' ? this.services.filter(service => service.id !== 'All').map(service => service.id).toString() : this.selectedService.map(service => service.id).toString(),
+                strServices: this.selectedService[0] === 'All' ? this.services.filter(service => service.id !== 'All').map(service => service.id).toString() : this.selectedService.toString(),
                 jobIds: this.mapShipment("JOBID"),
                 hbls: this.mapShipment("HBL"),
                 mbls: this.mapShipment("MBL"),
@@ -382,6 +378,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 airlineCode: this.airlineCode
             };
             this.dataSearch = new SOASearchCharge(body);
+            console.log(this.dataSearch);
             this.onApply.emit(this.dataSearch);
         }
     }
@@ -402,7 +399,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     filterChargeWithService(charges: any[], keys: any[]) {
         const result: any[] = [];
-        for (const charge of charges) {
+        const ch = [...charges];
+        for (const charge of ch) {
             if (charge.hasOwnProperty('serviceTypeId')) {
                 if (typeof (charge.serviceTypeId) !== 'object') {
                     charge.serviceTypeId = charge.serviceTypeId.split(";").filter((i: string) => Boolean(i));
@@ -425,7 +423,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.services = this.services.filter(service => service.id !== 'All');
                 serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
             } else {
-                serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+                serviceTypeId = this.selectedService.toString().replace(/(?:,)/g, ';');
             }
         } else {
             this.services.shift(); // * remove item with value 'All'
