@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { UserManagementComponent } from './user-management.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -43,7 +42,6 @@ const routing: Routes = [
 @NgModule({
     imports: [
         SharedModule,
-        SelectModule,
         NgProgressModule,
         PaginationModule.forRoot(),
         TabsModule.forRoot(),

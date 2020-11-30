@@ -145,7 +145,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     }
 
                     // * wait to currecy list api
-                    this.formCreateSurcharge.form.setValue({
+                    this.formCreateSurcharge.form.patchValue({
                         settlementNo: this.settlementPayment.settlement.settlementNo,
                         requester: this.settlementPayment.settlement.requester,
                         requestDate: { startDate: new Date(this.settlementPayment.settlement.requestDate), endDate: new Date(this.settlementPayment.settlement.requestDate) },

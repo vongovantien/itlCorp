@@ -207,11 +207,6 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
     checkValidateForm() {
         let valid: boolean = true;
-
-        this.setError(this.formCreateHBLComponent.serviceType);
-        this.setError(this.formCreateHBLComponent.moveType);
-        this.setError(this.formCreateHBLComponent.originBlnumber);
-
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
         }

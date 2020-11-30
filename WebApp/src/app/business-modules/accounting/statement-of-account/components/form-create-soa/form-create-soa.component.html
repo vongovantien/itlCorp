@@ -99,8 +99,9 @@
                         <label class="form-control-label" for="">
                             Services
                         </label>
-                        <ng-select [multiple]="true" (removed)="onRemoveService($event)" [active]="selectedService"
-                            [items]="services" (selected)="onSelectDataFormInfo($event, 'service')">
+                        <ng-select class="custom" [multiple]="true" (remove)="onRemoveService($event)"
+                            [(ngModel)]="selectedService" [items]="services"
+                            (add)="onSelectDataFormInfo($event, 'service')" bindLabel="text" bindValue="id">
                         </ng-select>
                     </div>
                 </div>

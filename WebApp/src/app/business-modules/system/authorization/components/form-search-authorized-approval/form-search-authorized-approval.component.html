@@ -23,7 +23,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly
-                                        [minDate]="minDateEffective" />
+                                        [minDate]="minDateEffective" placeholder="dd/MM/YYYY" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -42,7 +42,7 @@
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectDataFormInfo($event,'commissioner')"
                                     [currentActiveItemId]="{ field: 'id', value: commissioner.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="users"
+                                    [selectedDisplayFields]="['username']" [dataSources]="users | async"
                                     [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
                                     placeholder="Select Commissioner" [height]="200"
                                     (remove)="resetFormControl(commissioner)" size="15">
@@ -56,7 +56,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="expirationDate" readonly
-                                        [minDate]="minDateExpired" />
+                                        [minDate]="minDateExpired" placeholder="dd/MM/YYYY" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -73,15 +73,15 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Type</label>
-                                <ng-select formControlName="type" [allowClear]="true" [items]="typeList">
+                                <ng-select class="custom" formControlName="type" [items]="typeList">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Status</label>
-                                <ng-select formControlName="status" [allowClear]="false" [items]="statusList"
-                                    [active]="statusActive">
+                                <ng-select class="custom" formControlName="status" [items]="statusList" bindValue="id"
+                                    bindLabel="text">
                                 </ng-select>
                             </div>
                         </div>

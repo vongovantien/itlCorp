@@ -99,9 +99,8 @@
                             <label class="form-control-label">
                                 Service Type
                             </label>
-                            <ng-select #sp [items]="serviceTypes" placeholder="Please select"
-                                (selected)="selectedServiceType(sp, 'service-type')" (opened)="closeOtherSelects(sp)"
-                                [allowClear]="true" formControlName="serviceType">
+                            <ng-select [items]="serviceTypes" placeholder="Please select" class="custom"
+                                formControlName="serviceType" (change)="selectedServiceType($event, 'service-type')">
                             </ng-select>
                         </div>
                     </div>
@@ -129,8 +128,8 @@
                             <label class="form-control-label">
                                 Type <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select #tp [items]=" typeClearances" placeholder="Please select"
-                                (opened)="closeOtherSelects(tp)" formControlName="type" [allowClear]="true">
+                            <ng-select [items]="typeClearances" placeholder="Please select" formControlName="type"
+                                class="custom">
                             </ng-select>
                             <div class="form-control-feedback"
                                 *ngIf="(type.dirty && !type.valid) || (isSubmitted && !type.valid)">
@@ -143,8 +142,8 @@
                             <label class="form-control-label" for="">
                                 Route
                             </label>
-                            <ng-select #rt [items]="routeClearances" placeholder="Please select"
-                                (opened)="closeOtherSelects(rt)" formControlName="route" [allowClear]="true">
+                            <ng-select [items]="routeClearances" placeholder="Please select" formControlName="route"
+                                class="custom">
                             </ng-select>
                         </div>
                     </div>
@@ -152,17 +151,16 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && cargoType.invalid  && isDisableCargo === false }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !cargoType.value  && isDisableCargo === false }">
                             <label class="form-control-label" for="">
-                                Cargo Type <span class="m--font-danger"
-                                    *ngIf="isSubmitted && cargoType.invalid && isDisableCargo === false">(*)</span>
+                                Cargo Type <span class="m--font-danger" *ngIf="isDisableCargo === false">(*)</span>
                             </label>
-                            <ng-select #ps [items]="cargoTypes" placeholder="Please select" [disabled]="isDisableCargo"
-                                (opened)="closeOtherSelects(ps)" (selected)="selectedServiceType(ps, 'cargo-type')"
-                                formControlName="cargoType" [allowClear]="true">
+                            <ng-select [items]="cargoTypes" placeholder="Please select" [disabled]="isDisableCargo"
+                                formControlName="cargoType" class="custom"
+                                (change)="selectedServiceType($event, 'cargo-type')">
                             </ng-select>
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && cargoType.invalid && isDisableCargo === false">
+                                *ngIf="isSubmitted && !cargoType.value && isDisableCargo === false">
                                 Cargo Type is required
                             </div>
                         </div>

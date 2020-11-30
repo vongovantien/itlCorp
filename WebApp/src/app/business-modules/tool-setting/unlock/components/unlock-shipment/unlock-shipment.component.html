@@ -13,7 +13,8 @@
                 </div>
                 <div class="col-md-8">
                     <div class="form-group">
-                        <ng-select [items]="options" [(ngModel)]="selectedOption"></ng-select>
+                        <ng-select class="custom" [items]="options" [(ngModel)]="selectedOption" bindLabel="text"
+                            bindValue="id"></ng-select>
                     </div>
                 </div>
 
@@ -58,7 +59,8 @@
                 </div>
                 <div class="col-md-8">
                     <div class="form-group">
-                        <ng-select [items]="services" [(ngModel)]="selectedService" [disabled]="isSelectOption">
+                        <ng-select class="custom" [items]="services" [(ngModel)]="selectedService"
+                            [disabled]="isSelectOption" bindLabel="text" bindValue="id">
                         </ng-select>
                     </div>
                 </div>

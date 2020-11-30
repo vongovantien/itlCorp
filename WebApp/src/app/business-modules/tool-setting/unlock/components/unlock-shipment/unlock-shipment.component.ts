@@ -23,7 +23,7 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
         { id: 2, text: 'MBL' },
         { id: 3, text: 'HBL' },
     ];
-    selectedOption: CommonInterface.INg2Select[] = [this.options[0]];
+    selectedOption: string = this.options[0].id;
 
     services: CommonInterface.INg2Select[] = [
         { id: 'All', text: 'All' },
@@ -35,7 +35,7 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
         { id: CommonEnum.TransactionTypeEnum.SeaLCLExport, text: 'Sea LCL Export' },
         { id: CommonEnum.TransactionTypeEnum.SeaLCLImport, text: 'Sea LCL Import' },
     ];
-    selectedService: CommonInterface.INg2Select[] = [this.services[0]];
+    selectedService: string = this.services[0].id;
 
     isSelectOption: boolean = true;
     isSelectServiceDate: boolean = false;
@@ -64,7 +64,7 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
             this.isSelectOption = true;
             this.isSelectServiceDate = false;
 
-            this.selectedOption = [this.options[0]];
+            this.selectedOption = this.options[0].id;
             this.isDisabled = true;
             this.selectedRange = null;
 
@@ -80,7 +80,7 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
 
             this.isDisabled = null;
             this.keyword = '';
-            this.selectedService = [this.services[0]];
+            this.selectedService = this.services[0].id;
 
 
         } else {
@@ -96,14 +96,14 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
                 return;
             }
             body = {
-                shipmentPropertySearch: this.selectedOption[0].id,
+                shipmentPropertySearch: this.selectedOption,
                 keywords: !!this.keyword ? this.keyword.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
             };
         } else {
             body = {
                 fromDate: !!this.selectedRange && !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
                 toDate: !!this.selectedRange && !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
-                transactionType: this.selectedService[0].id !== 'All' ? this.selectedService[0].id : 0
+                transactionType: this.selectedService !== 'All' ? this.selectedService : 0
             };
         }
 
@@ -148,16 +148,6 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
 
     }
 }
-
-interface IShipmentLock {
-    shipmentPropertySearch: number;
-    keywords: string[];
-    transactionType: number;
-    fromDate: string;
-    toDate: string;
-}
-
-
 export interface IShipmentLockInfo {
     lockedLogs: {
         id: string;

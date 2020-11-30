@@ -1,14 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angular/core";
 import { FormBuilder, FormGroup, AbstractControl, Validators, FormControl } from "@angular/forms";
+import { formatDate } from "@angular/common";
+import { ToastrService } from "ngx-toastr";
 
-import { PopupBase } from "src/app/popup.base";
-import { SystemRepo, OperationRepo } from "src/app/shared/repositories";
-import { User, Stage } from "src/app/shared/models";
+import { PopupBase } from "@app";
+import { SystemRepo, OperationRepo } from "@repositories";
+import { User, Stage } from "@models";
 
 import { takeUntil, catchError, finalize } from "rxjs/operators";
-import { ToastrService } from "ngx-toastr";
-import { formatDate } from "@angular/common";
-import { Observable, BehaviorSubject } from "rxjs";
 
 @Component({
     selector: "detail-stage-popup",
@@ -28,43 +27,17 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     departmentName: AbstractControl;
     mainPersonInCharge: AbstractControl;
     realPersonInCharge: AbstractControl;
+    status: AbstractControl;
 
     deadLineDate: AbstractControl;
 
-    statusStage: Array<any> = [
-        {
-            id: "InSchedule",
-            text: "In Schedule"
-        },
-        {
-            id: "Processing",
-            text: "Processing"
-        },
-        {
-            id: "Done",
-            text: "Done"
-        },
-        {
-            id: "Overdued",
-            text: "Overdued"
-        },
-        {
-            id: "Pending",
-            text: "Pending"
-        },
-        {
-            id: "Deleted",
-            text: "Deleted"
-        }
-    ];
-    statusStageActive: any[] = [this.statusStage[0]];
+    statusStage: string[] = ['InSchedule', 'Processing', 'Done', 'Overdued', 'Pending', 'Deleted'];
 
     systemUsers: User[];
     displayFields: CommonInterface.IComboGridDisplayField[] = [
         { field: 'username', label: 'UserName' },
         { field: 'employeeNameEn', label: 'FullName' },
-    ]
-    // config for combo gird
+    ];
 
     isSummited: boolean = false;
 
@@ -80,34 +53,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
     ngOnChanges() {
         if (!!this.data) {
-            this.statusStage = [
-                {
-                    id: "InSchedule",
-                    text: "In Schedule"
-                },
-                {
-                    id: "Processing",
-                    text: "Processing"
-                },
-                {
-                    id: "Done",
-                    text: "Done"
-                },
-                {
-                    id: "Overdued",
-                    text: "Overdued"
-                },
-                {
-                    id: "Pending",
-                    text: "Pending"
-                },
-                {
-                    id: "Deleted",
-                    text: "Deleted"
-                }
-            ];
-            this.statusStageActive = [this.statusStage[0]];
-
             this.initFormUpdate();
         }
     }
@@ -134,7 +79,9 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 endDate: null
             }],
             mainPersonInCharge: [null, Validators.required],
-            realPersonInCharge: [null]
+            realPersonInCharge: [null],
+            'status': [this.statusStage[0]]
+
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
@@ -144,6 +91,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.deadLineDate = this.form.controls['deadLineDate'];
         this.mainPersonInCharge = this.form.controls['mainPersonInCharge'];
         this.realPersonInCharge = this.form.controls['realPersonInCharge'];
+        this.status = this.form.controls['status'];
     }
 
     initFormUpdate() {
@@ -155,20 +103,11 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             processTime: this.data.processTime,
             deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null,
             mainPersonInCharge: this.data.mainPersonInCharge,
-            realPersonInCharge: this.data.realPersonInCharge
+            realPersonInCharge: this.data.realPersonInCharge,
+            status: this.data.status
         });
-        if (!!this.data.status) {
-            this.statusStageActive = this.statusStage.filter((item: any) => item.id.trim() === this.data.status.trim());
-        } else {
-            this.statusStageActive = [this.statusStage[0]];
-        }
-    }
 
-    selected($event: any): void {
-        this.statusStageActive[0].id = $event.id;
-        this.statusStageActive[0].text = $event.text;
     }
-
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'mainPersonInCharge':
@@ -182,12 +121,11 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         }
     }
     onSubmit(form: FormGroup) {
-        console.log(this.statusStageActive);
         this.isSummited = true;
         if (form.invalid) {
             return;
         }
-        if ((this.statusStageActive[0].id === 'Pending' || this.statusStageActive[0].id === "Deleted") && !form.value.comment) {
+        if ((form.value.status === 'Pending' || form.value.status === "Deleted") && !form.value.comment) {
             return;
         }
 
@@ -203,7 +141,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             comment: form.value.comment,
             description: form.value.description,
             deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
-            status: this.statusStageActive[0].id || this.statusStage[0].id
+            status: form.value.status
         };
         this._operationRepo.updateStageToJob(body).pipe(
             takeUntil(this.ngUnsubscribe),
@@ -219,13 +157,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                     this.hide();
                 }
             },
-            // error
-            (errs: any) => {
-            },
-            // complete
-            () => {
-                this.isSummited = false;
-            }
         );
     }
 
@@ -239,14 +170,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 if (!res) {
                 } else {
                     this.systemUsers = res;
-                    console.log(this.systemUsers);
                 }
             },
-            // error
-            (errs: any) => {
-            },
-            // complete
-            () => { }
         )
     }
 
@@ -261,10 +186,4 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             control.markAsPristine({ onlySelf: true });
         }
     }
-}
-
-
-interface IPersonInCharge {
-    field: string;
-    value: string;
 }

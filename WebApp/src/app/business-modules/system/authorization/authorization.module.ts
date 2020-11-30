@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { AuthorizationFormSearchComponent } from './components/form-search-authorization/form-search-authorization.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
-import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -13,6 +12,8 @@ import { AuthorizationAddPopupComponent } from './components/popup/add-authoriza
 import { AuthorizedApprovalFormSearchComponent } from './components/form-search-authorized-approval/form-search-authorized-approval.component';
 import { AuthorizedApprovalListComponent } from './components/list-authorized-approval/list-authorized-approval';
 import { AuthorizedApprovalPopupComponent } from './components/popup/add-authorized-approval/add-authorized-approval.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
+
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -26,7 +27,7 @@ const routing: Routes = [
 @NgModule({
     imports: [
         SharedModule,
-        SelectModule,
+        NgSelectModule,
         PaginationModule.forRoot(),
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,

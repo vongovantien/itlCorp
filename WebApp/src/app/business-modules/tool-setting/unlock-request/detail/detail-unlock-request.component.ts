@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, NgZone } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { Router, ActivatedRoute, Params } from "@angular/router";
 import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
@@ -10,7 +10,6 @@ import { CommonEnum } from "@enums";
 import { UnlockRequestInputDeniedCommentPopupComponent } from "../components/popup/input-denied-comment/input-denied-comment.popup";
 import { catchError, finalize } from "rxjs/operators";
 import { SetUnlockRequestModel } from "@models";
-import { SelectItem } from "ng2-select";
 import { formatDate } from "@angular/common";
 import { ConfirmPopupComponent } from "@common";
 import { UnlockRequestProcessApproveComponent } from "../components/process-approve-unlock-request/process-approve-unlock-request.component";
@@ -38,12 +37,7 @@ export class UnlockRequestDetailComponent extends AppForm {
 
     unlockRequest: SetUnlockRequestModel;
 
-    unlockTypeList: CommonInterface.INg2Select[] = [
-        { id: 'Shipment', text: 'Shipment' },
-        { id: 'Advance', text: 'Advance' },
-        { id: 'Settlement', text: 'Settlement' },
-        { id: 'Change Service Date', text: 'Change Service Date' }
-    ];
+    unlockTypeList: string[] = ['Shipment', 'Advance', 'Settlement', 'Change Service Date'];
 
     unlockTypeEnum: CommonEnum.UnlockTypeEnum = CommonEnum.UnlockTypeEnum.SHIPMENT;
     isSubmited: boolean = false;
@@ -113,15 +107,15 @@ export class UnlockRequestDetailComponent extends AppForm {
                                 $("#textEditor").froalaEditor("edit.off");
                                 break;
                         }
-                        const indexUnlockType = this.unlockTypeList.findIndex(x => x.id === this.unlockRequest.unlockType);
-                        let _unlockTypeActive = [];
-                        if (indexUnlockType > -1) {
-                            _unlockTypeActive = [this.unlockTypeList[indexUnlockType]];
-                        }
+                        // const indexUnlockType = this.unlockTypeList.findIndex(x => x.id === this.unlockRequest.unlockType);
+                        // let _unlockTypeActive = [];
+                        // if (indexUnlockType > -1) {
+                        //     _unlockTypeActive = [this.unlockTypeList[indexUnlockType]];
+                        // }
                         this.formDetail.setValue({
                             subject: this.unlockRequest.subject,
                             requester: this.unlockRequest.requesterName,
-                            unlockType: _unlockTypeActive,
+                            unlockType: this.unlockRequest.unlockType,
                             serviceDate: !!this.unlockRequest.newServiceDate ? { startDate: new Date(this.unlockRequest.newServiceDate), endDate: new Date(this.unlockRequest.newServiceDate) } : { startDate: new Date(), endDate: new Date() },
                             generalReason: this.unlockRequest.generalReason,
                         });
@@ -140,8 +134,8 @@ export class UnlockRequestDetailComponent extends AppForm {
             );
     }
 
-    selectedUnlockType(e: SelectItem) {
-        this.getUnlockTypeEnum(e.id);
+    selectedUnlockType(e: string) {
+        this.getUnlockTypeEnum(e);
         this.listJobComponent.dataJobs = [];
     }
 
@@ -166,7 +160,6 @@ export class UnlockRequestDetailComponent extends AppForm {
 
     save() {
         this.isSubmited = true;
-        console.log(this.listJobComponent.dataJobs);
         if (this.formDetail.valid) {
             if (!this.listJobComponent.dataJobs.length) {
                 this._toastService.warning("Unlock request don't have any job/advance/settlement in this period, Please check it again!");
@@ -176,7 +169,7 @@ export class UnlockRequestDetailComponent extends AppForm {
                 id: this.unlockRequest.id,
                 subject: this.subject.value,
                 requester: this.unlockRequest.requester,
-                unlockType: this.unlockType.value[0].id,
+                unlockType: this.unlockType.value,
                 newServiceDate: this.unlockTypeEnum === CommonEnum.UnlockTypeEnum.CHANGESERVICEDATE ? (this.serviceDate.value.startDate !== null ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 generalReason: this.generalReason.value,
                 requestDate: this.unlockRequest.requestDate,
@@ -220,7 +213,6 @@ export class UnlockRequestDetailComponent extends AppForm {
 
     sendRequest() {
         this.isSubmited = true;
-        console.log(this.listJobComponent.dataJobs);
         if (this.formDetail.valid) {
             if (!this.listJobComponent.dataJobs.length) {
                 this._toastService.warning("Unlock request don't have any job/advance/settlement in this period, Please check it again!");
@@ -230,7 +222,7 @@ export class UnlockRequestDetailComponent extends AppForm {
                 id: this.unlockRequest.id,
                 subject: this.subject.value,
                 requester: this.unlockRequest.requester,
-                unlockType: this.unlockType.value[0].id,
+                unlockType: this.unlockType.value,
                 newServiceDate: this.unlockTypeEnum === CommonEnum.UnlockTypeEnum.CHANGESERVICEDATE ? (this.serviceDate.value.startDate !== null ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 generalReason: this.generalReason.value,
                 requestDate: this.unlockRequest.requestDate,
@@ -301,7 +293,6 @@ export class UnlockRequestDetailComponent extends AppForm {
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message, 'Approve Is Successfull');
                         this.getDetail(this.unlockRequest.id);
@@ -317,7 +308,6 @@ export class UnlockRequestDetailComponent extends AppForm {
     }
 
     sendDeny(comment: string) {
-        console.log(comment);
         this._progressRef.start();
         this._settingRepo.deniedApproveUnlockRequest(this.unlockRequest.id, comment)
             .pipe(
@@ -326,7 +316,6 @@ export class UnlockRequestDetailComponent extends AppForm {
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message, 'Denie Is Successfull');
                         this.getDetail(this.unlockRequest.id);

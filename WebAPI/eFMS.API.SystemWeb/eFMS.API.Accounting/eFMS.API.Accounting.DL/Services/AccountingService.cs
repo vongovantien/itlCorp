@@ -869,7 +869,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     UserModified = currentUser.UserID,
                                     Title = string.Format(@"Advance {0} has been synced", adv.AdvanceNo),
                                     Description = "",
-                                    ActionLink = string.Format(@"home/accounting/advance-payment/{0}", adv.Id),
+                                    ActionLink = string.Format(@"home/accounting/advance-payment/{0}/approve", adv.Id),
                                     UserIds = currentUser.UserID + "," + adv.UserCreated,
                                 };
 
@@ -982,7 +982,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     UserModified = currentUser.UserID,
                                     Title = string.Format(@"Settlement {0} has been synced", settle.SettlementNo),
                                     Description = "",
-                                    ActionLink = string.Format(@"home/accounting/settlement-payment/{0}", settle.Id),
+                                    ActionLink = string.Format(@"home/accounting/settlement-payment/{0}/approve", settle.Id),
                                     UserIds = currentUser.UserID + "," + settle.UserCreated,
                                 };
 
