@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { SelectModule } from 'ng2-select';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { NgxDaterangepickerMd, LocaleConfig } from 'ngx-daterangepicker-material';
@@ -40,7 +39,6 @@ const config: LocaleConfig = {
         NgxDaterangepickerMd.forRoot(config),
         FroalaEditorModule.forRoot(),
         ReactiveFormsModule,
-        SelectModule,
         ModalModule.forRoot(),
 
     ],
