@@ -32,5 +32,6 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string Stt_Cd_Htt { get; set; }
         public string ChargeType { get; set; }
         public string DebitAccount { get; set; }
+        public string NganhCode { get; set; }
     }
 }
