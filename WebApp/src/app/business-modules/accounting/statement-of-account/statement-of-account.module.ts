@@ -4,7 +4,6 @@ import { StatementOfAccountDetailComponent } from './detail/detail-soa.component
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
 import { Routes, RouterModule } from '@angular/router';
-import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -27,6 +26,7 @@ import { ConfirmBillingFormSearchComponent } from './components/form-search-conf
 import { ConfirmBillingDetailComponent } from './confirm-billing/detail/detail-confirm-billing.component';
 import { ConfirmBillingListChargeComponent } from './components/list-charge-confirm-billing/list-charge-confirm-billing.component';
 import { ConfirmBillingDatePopupComponent } from './components/poup/confirm-billing-date/confirm-billing-date.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     {
@@ -95,7 +95,7 @@ const COMPONENTS = [
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
-        SelectModule,
+        NgSelectModule,
         NgxDaterangepickerMd,
         TabsModule.forRoot(),
         ModalModule.forRoot(),

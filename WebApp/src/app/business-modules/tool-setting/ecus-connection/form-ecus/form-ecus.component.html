@@ -24,7 +24,8 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': isSubmitted && (userId.errors | equalError: 'required') }">
                                     <label required>User Name</label>
-                                    <ng-select [allowClear]="true" [items]="Users" formControlName="userId"
+                                    <ng-select class="custom" [items]="Users | async" formControlName="userId"
+                                        bindLabel="username" bindValue="id"
                                         (removed)="formGroup.controls['userId'].setValue(null)"
                                         placeholder="Select User">
                                     </ng-select>

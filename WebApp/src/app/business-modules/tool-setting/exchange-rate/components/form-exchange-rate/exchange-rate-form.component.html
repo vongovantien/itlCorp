@@ -155,9 +155,10 @@ lasted rate" title="Update New Exchange Rate" (onSubmit)="confirmUpdatePopup.hid
                                     <td>
                                         <span
                                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && item.currencyFromID == null }">
-                                            <ng-select #currencyRateSelect [allowClear]="true" [items]="catCurrencies"
-                                                (selected)="selectedCurrencyToAddRate($event)"
-                                                (removed)="removedCurrency($event)" placeholder="Select currency">
+                                            <ng-select class="custom" [items]="catCurrencies"
+                                                (change)="selectedCurrencyToAddRate($event)" bindLabel="text"
+                                                bindValue="id" (removed)="removedCurrency($event)"
+                                                placeholder="Select currency">
                                             </ng-select>
                                         </span>
                                     </td>

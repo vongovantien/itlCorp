@@ -11,7 +11,6 @@ import { EcusConnection } from '@models';
 
 import { EcusConnectionFormPopupComponent } from './form-ecus/form-ecus.component';
 
-import merge from 'lodash/merge';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -125,11 +124,8 @@ export class EcusConnectionComponent extends AppList implements OnInit {
                             .subscribe(
                                 (res: EcusConnection) => {
                                     if (!!res) {
-                                        const formObject = {
-                                            userId: [this.formEcus.Users.find(i => i.id === res.userId)]
-                                        };
 
-                                        this.formEcus.formGroup.patchValue(merge(res, formObject));
+                                        this.formEcus.formGroup.patchValue(res);
                                         this.formEcus.title = 'Detail/Edit Connection';
 
                                         this.formEcus.datetimeCreated = res.datetimeCreated;

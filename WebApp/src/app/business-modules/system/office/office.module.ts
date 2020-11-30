@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { OfficeComponent } from './office.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
 import { OfficeAddNewComponent } from './addnew/office.addnew.component';
@@ -37,7 +36,6 @@ const routing: Routes = [
 @NgModule({
     imports: [
         SharedModule,
-        SelectModule,
         NgProgressModule,
         PaginationModule.forRoot(),
         TabsModule.forRoot(),

@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Input, EventEmitter, Output } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Crystal } from '../../models/report/crystal.model';
 import { PopupBase } from 'src/app/popup.base';
@@ -6,7 +6,8 @@ import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-report-preview',
-    templateUrl: './report-preview.component.html'
+    templateUrl: './report-preview.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReportPreviewComponent extends PopupBase {
 

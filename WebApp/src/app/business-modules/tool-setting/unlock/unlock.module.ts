@@ -6,9 +6,9 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { UnlockShipmentComponent } from './components/unlock-shipment/unlock-shipment.component';
 import { UnlockAccountingComponent } from './components/unlock-accounting/unlock-accouting.component';
-import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { UnlockHistoryPopupComponent } from './components/unlock-history/unlock-history.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Route[] = [
     { path: '', component: UnlockComponent, data: { name: "" } },
@@ -20,7 +20,7 @@ const routing: Route[] = [
         RouterModule.forChild(routing),
         SharedModule,
         TabsModule.forRoot(),
-        SelectModule,
+        NgSelectModule,
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
     ],

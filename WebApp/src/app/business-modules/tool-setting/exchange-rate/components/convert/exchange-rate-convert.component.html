@@ -39,8 +39,8 @@
                         <label class="form-control-label" for="">
                             Convert from
                         </label>
-                        <ng-select [allowClear]="true" [items]="fromCurrencies"
-                            (selected)="convert.fromCurrency = $event.id"
+                        <ng-select bindValue="id" bindLabel="id" class="custom" [items]="fromCurrencies"
+                            (change)="convert.fromCurrency = $event"
                             (removed)="convert.fromCurrency = null; rate = null" placeholder="Select currency">
                         </ng-select>
                         <div class="form-control-feedback"
@@ -53,9 +53,9 @@
                         <label class="form-control-label" for="">
                             Convert to
                         </label>
-                        <ng-select [allowClear]="true" [items]="toCurrencies"
-                            (selected)="convert.toCurrency = $event.id"
-                            (removed)="convert.toCurrency = null; rate = null" placeholder="Select currency">
+                        <ng-select class="custom" bindValue="id" bindLabel="id" [items]="toCurrencies"
+                            (change)="convert.toCurrency = $event" (removed)="convert.toCurrency = null; rate = null"
+                            placeholder="Select currency">
                         </ng-select>
                         <div class="form-control-feedback"
                             *ngIf="formConvertRate.submitted && this.convert.toCurrency == null">

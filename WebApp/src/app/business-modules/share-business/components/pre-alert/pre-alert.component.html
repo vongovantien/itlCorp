@@ -118,7 +118,8 @@
         <div class="m-portlet__body">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="form-group m-form__group" *ngIf="serviceId === 'AI' || serviceId === 'SFI' || serviceId === 'SLI'">
+                    <div class="form-group m-form__group"
+                        *ngIf="serviceId === 'AI' || serviceId === 'SFI' || serviceId === 'SLI'">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsArrivalNotice else NotArrivalNotice">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -141,7 +142,8 @@
                         </div>
 
                     </div>
-                    <div class="form-group m-form__group" *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE')">
+                    <div class="form-group m-form__group"
+                        *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsManifest else NotManifest">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -179,7 +181,8 @@
                         </div>
                     </div>
 
-                    <div class="form-group m-form__group" *ngIf="!isPreAlert && (serviceId === 'SFE' || serviceId === 'SLE')">
+                    <div class="form-group m-form__group"
+                        *ngIf="!isPreAlert && (serviceId === 'SFE' || serviceId === 'SLE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsSISummary else NotSISummary">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -289,6 +292,6 @@
 
 <!--General Report To PDF-->
 <ng-container *ngIf="dataExportReport">
-    <app-export-crystal [data]="dataExportReport"></app-export-crystal>
+    <app-export-crystal-pdf [data]="dataExportReport"></app-export-crystal-pdf>
 </ng-container>
 <!--General Report To PDF-->

@@ -78,7 +78,8 @@
                                     Office:
                                     <span class="text-danger">*</span>
                                 </label>
-                                <ng-select formControlName="office" [allowClear]="true" [items]="officeList">
+                                <ng-select class="custom" formControlName="office" [items]="officeList" bindValue="id"
+                                    bindLabel="text">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (office.errors | equalError: 'required') || (office.errors | equalError: 'required') && office.dirty">
@@ -91,9 +92,8 @@
                                 <label class="form-control-label">
                                     Department Type:
                                 </label>
-                                <ng-select formControlName="departmentType" [allowClear]="false"
-                                    [items]="departmentTypeList" [active]="departmentTypeActive"
-                                    (selected)="onSelectDataFormInfo($event, 'deptType')">
+                                <ng-select class="custom" formControlName="departmentType" [items]="departmentTypeList"
+                                    bindValue="id" bindLabel="text">
                                 </ng-select>
                             </div>
                         </div>
