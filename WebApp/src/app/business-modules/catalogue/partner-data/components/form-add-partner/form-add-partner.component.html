@@ -77,7 +77,7 @@
                         [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !partnerLocation.valid || !partnerLocation.value)}">
                         <label required class="form-control-label"> Partner Location </label>
                         <ng-select [items]="partnerLocations" name="partnerLocation" formControlName="partnerLocation"
-                            bindLabel="text" class="custom" placeholder="Select partner location">
+                            class="custom" placeholder="Select partner location">
                         </ng-select>
                     </div>
                 </div>
@@ -128,8 +128,7 @@
                     <div class="form-group">
                         <label class="form-control-label"> Partner Mode </label>
                         <ng-select (selected)="selectedPartnerMode($event)" [items]="partnerModes" name="partnerMode"
-                            bindLabel="text" class="custom" formControlName="partnerMode"
-                            placeholder="Select partner mode">
+                            class="custom" formControlName="partnerMode" placeholder="Select partner mode">
                         </ng-select>
                     </div>
                 </div>
@@ -190,7 +189,7 @@
                             <div class="form-group">
                                 <label class="form-control-label"> Credit Payment </label>
                                 <ng-select [items]="creditPayments" name="creditPayment" formControlName="creditPayment"
-                                    class="custom" bindLabel="text"
+                                    class="custom"
                                     [disabled]="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true  ? null : 'disabled'"
                                     placeholder="Select credit payment">
                                 </ng-select>

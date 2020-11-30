@@ -14,11 +14,7 @@ import { CatalogueRepo } from '@repositories';
 
 export class VoucherListComponent extends AppList implements OnInit {
 
-    ngDataTypeChargeDefault = [
-        { id: "Công Nợ", text: "Công Nợ" },
-        { id: "Giải Chi", text: "Giải Chi" },
-        { id: "Loại Khác", text: "Loại Khác" }
-    ];
+    ngDataTypeChargeDefault: Array<string> = ["Công-Nợ", "Giải-Chi", "Loại Khác"];
     isAddNewLine: boolean = false;
 
     value: any = {};
@@ -78,18 +74,6 @@ export class VoucherListComponent extends AppList implements OnInit {
         }
 
 
-    }
-
-    getActiveVoucherType(index) {
-        const voucherType = this.ChargeToAdd.listChargeDefaultAccount[index].type;
-        if (voucherType === null || voucherType === undefined) {
-            return [];
-        } else {
-            // const indexCurrenVoucher = findIndex(this.ngDataTypeChargeDefault, function (o) { return o.text === voucherType; });
-            const indexCurrenVoucher = this.ngDataTypeChargeDefault.findIndex(o => o.text === voucherType);
-            const aciveVoucherType = [this.ngDataTypeChargeDefault[indexCurrenVoucher]];
-            return aciveVoucherType;
-        }
     }
 
     removedTypeDefault(value: any, index: number) {

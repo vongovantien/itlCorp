@@ -34,10 +34,11 @@
                                 </div>
                             </td>
                             <td>
-                                <ng-select (active)="getActiveVoucherType(index)" [clearable]="true"
+                                <ng-select [clearable]="true" class="custom"
+                                    [(ngModel)]="this.ChargeToAdd.listChargeDefaultAccount[index].type"
                                     [items]="ngDataTypeChargeDefault" (data)="refreshValue($event)"
-                                    (selected)="selectedTypeDefault($event,index)"
-                                    (removed)="removedTypeDefault($event,index)" placeholder="Select Type">
+                                    (select)="selectedTypeDefault($event,index)"
+                                    (remove)="removedTypeDefault($event,index)" placeholder="Select Type">
                                 </ng-select>
 
                             </td>

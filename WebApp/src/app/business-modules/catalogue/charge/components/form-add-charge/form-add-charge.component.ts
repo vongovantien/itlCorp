@@ -45,11 +45,7 @@ export class FormAddChargeComponent extends AppForm {
     isSubmitted: boolean = false;
     isShowMappingSelling: boolean = false;
 
-    ngDataType = [
-        { id: "CREDIT", text: "CREDIT" },
-        { id: "DEBIT", text: "DEBIT" },
-        { id: "OBH", text: "OBH" }
-    ];
+    ngDataType: Array<string> = ["CREDIT", "DEBIT", "OBH"];
 
     ngDataService = [
         { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
@@ -93,7 +89,7 @@ export class FormAddChargeComponent extends AppForm {
             type: [null, Validators.required],
             service: [null, Validators.required],
             debitCharge: [],
-            chargeGroup: [],
+            chargeGroup: [null],
             active: [true],
             generateSelling: [true],
             productDept: []
@@ -168,7 +164,7 @@ export class FormAddChargeComponent extends AppForm {
                 this.ngDataChargeGroup = chargeGroup.map(x => ({ text: x.name, id: x.id }));
 
                 if (this.isUpdate === false) {
-                    this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: this.ngDataChargeGroup.find(x => x.text === 'Other').id, text: 'Other' }]);
+                    this.chargeGroup.setValue({ id: this.ngDataChargeGroup.find(x => x.text === 'Other').id, text: 'Other' });
 
                 }
             }
@@ -205,8 +201,8 @@ export class FormAddChargeComponent extends AppForm {
             unitPrice: res.charge.unitPrice,
             currency: { text: this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId).text, id: res.charge.currencyId },
             vat: res.charge.vatrate,
-            type: { id: res.charge.type, text: res.charge.type },
-            service: { id: res.charge.serviceTypeId, text: '' },
+            type: res.charge.type,
+            service: this.activeServices,
             debitCharge: res.charge.debitCharge,
             chargeGroup: { id: res.charge.chargeGroup, text: this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup).text },
             active: res.charge.active,

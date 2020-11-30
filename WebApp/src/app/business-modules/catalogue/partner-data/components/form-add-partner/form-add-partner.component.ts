@@ -111,20 +111,11 @@ export class FormAddPartnerComponent extends AppForm {
         { id: 'Total', text: 'Total Dim' }
     ];
 
-    partnerModes: CommonInterface.INg2Select[] = [
-        { id: 'Internal', text: 'Internal' },
-        { id: 'External', text: 'External' }
-    ];
+    partnerModes: Array<string> = ['Internal', 'External'];
 
-    partnerLocations: CommonInterface.INg2Select[] = [
-        { id: 'Domestic', text: 'Domestic' },
-        { id: 'Oversea', text: 'Oversea' }
-    ];
+    partnerLocations: Array<string> = ['Domestic', 'Oversea'];
 
-    creditPayments: CommonInterface.INg2Select[] = [
-        { id: 'Credit', text: 'Credit' },
-        { id: 'Direct', text: 'Direct' }
-    ];
+    creditPayments: Array<string> = ['Credit', 'Direct'];
 
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
@@ -387,10 +378,9 @@ export class FormAddPartnerComponent extends AppForm {
         this.creditPayment = this.partnerForm.controls['creditPayment'];
 
         if (!this.isUpdate) {
-            this.partnerMode.setValue({ id: this.partnerModes.find(x => x.text === 'External').id, text: 'External' });
-            this.partnerLocation.setValue({ id: this.partnerLocations.find(x => x.text === 'Domestic').id, text: 'Domestic' });
+            this.partnerMode.setValue('External');
+            this.partnerLocation.setValue('Domestic');
             this.isDisabledInternalCode = true;
-
         }
 
         this.activePartner = this.active.value;
@@ -510,10 +500,10 @@ export class FormAddPartnerComponent extends AppForm {
             coLoaderCode: partner.coLoaderCode,
             roundUpMethod: { id: partner.roundUpMethod, text: partner.roundUpMethod },
             applyDim: { id: partner.applyDim, text: partner.applyDim },
-            partnerMode: { id: partner.partnerMode, text: partner.partnerMode },
-            partnerLocation: { id: partner.partnerLocation, text: partner.partnerLocation },
+            partnerMode: partner.partnerMode,
+            partnerLocation: partner.partnerLocation,
             internalCode: partner.internalCode,
-            creditPayment: { id: partner.creditPayment, text: partner.creditPayment }
+            creditPayment: partner.creditPayment
         });
 
     }
@@ -540,7 +530,6 @@ export class FormAddPartnerComponent extends AppForm {
 
     copyShippingAddress() {
         this.countryId.setValue(this.countryShippingId.value);
-        //this.getBillingProvinces(!!this.countryShippingId.value && this.countryShippingId.value.length > 0 ? this.countryShippingId.value[0].id : null, !!this.provinceId.value && this.provinceShippingId.value.length > 0 ? this.provinceId.value[0].id : null);
         this.provinceId.setValue(this.provinceShippingId.value);
         this.zipCode.setValue(this.zipCodeShipping.value);
         this.addressEn.setValue(this.addressShippingEn.value);

@@ -122,8 +122,7 @@
                                 </label>
 
                                 <ng-select #types [clearable]="true" [items]="ngDataType" placeholder="Select Type"
-                                    class="custom" bindLabel="text" (opened)="closeOtherSelects(types)"
-                                    formControlName="type">
+                                    class="custom" (opened)="closeOtherSelects(types)" formControlName="type">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !type.valid">
                                     Type is required !

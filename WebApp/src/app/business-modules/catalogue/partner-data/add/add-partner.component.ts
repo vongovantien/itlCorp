@@ -106,7 +106,7 @@ export class AddPartnerDataComponent extends AppList {
     ngAfterViewInit() {
         this.contractList.isActiveNewContract = false;
         this.formPartnerComponent.isUpdate = false;
-        this.formPartnerComponent.creditPayment.setValue({ id: "Direct", text: "Direct" });
+        this.formPartnerComponent.creditPayment.setValue('Direct');
         this._cd.detectChanges();
     }
 
@@ -286,64 +286,13 @@ export class AddPartnerDataComponent extends AppList {
 
     onSubmit() {
         this.formPartnerComponent.isSubmitted = true;
-        // this.partner.saleMans = this.saleMandetail;
-        // this.partner.saleMans.forEach(element => {
-        //     element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
-        //     element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
-        // });
         this.formPartnerComponent.applyDim.setErrors(null);
         this.formPartnerComponent.roundUpMethod.setErrors(null);
         this.formPartnerComponent.partnerMode.setErrors(null);
-        // this.formPartnerComponent.partnerLocation.setErrors(null);
-
-
-
         if (!this.formPartnerComponent.partnerForm.valid) {
             return;
         }
         this.getFormPartnerData();
-        // if (this.partner.countryId == null || this.partner.provinceId == null
-        //     || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
-        //     return;
-        // }
-
-
-
-
-
-        // if (!this.contracts.length) {
-        //     this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
-        //     return;
-        // }
-        // if (this.formPartnerComponent.partnerForm.valid) {
-        //     if (this.saleMandetail.length === 0) {
-        //         if (this.isShowSaleMan) {
-        //             this.toastr.error('Please add saleman and service for customer!');
-        //             return;
-        //         }
-        //     }
-
-        //     if (this.saleMandetail.length > 0) {
-        //         for (const it of this.saleMandetail) {
-        //             this.services.forEach(item => {
-        //                 if (it.service[0].id === item.id) {
-        //                     it.service = item.id;
-        //                 }
-        //             });
-        //         }
-        //     }
-        // if (this.isShowSaleMan) {
-        //     if (this.contracts.length === 0) {
-        //         this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
-        //     } else {
-        //         this.onCreatePartner();
-        //     }
-        // } else {
-        //     this.onCreatePartner();
-        // }
-
-        //this.onCreatePartner();
-
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
@@ -377,7 +326,7 @@ export class AddPartnerDataComponent extends AppList {
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,
             partnerType: 'Supplier',
-            creditPayment: formBody.creditPayment.id
+            creditPayment: formBody.creditPayment
         };
 
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
