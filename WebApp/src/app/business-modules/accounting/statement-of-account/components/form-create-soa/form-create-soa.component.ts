@@ -378,7 +378,6 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 airlineCode: this.airlineCode
             };
             this.dataSearch = new SOASearchCharge(body);
-            console.log(this.dataSearch);
             this.onApply.emit(this.dataSearch);
         }
     }
