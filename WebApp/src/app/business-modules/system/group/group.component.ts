@@ -34,7 +34,7 @@ export class GroupComponent extends AppList implements OnInit {
     ngOnInit() {
         this.headers = [
             { title: 'Code', field: 'code', sortable: true },
-            { title: 'Name EN', field: 'nameEn', sortable: true },
+            { title: 'Name EN', field: 'chargeNameEn', sortable: true },
             { title: 'Name (Local)', field: 'nameVn', sortable: true },
             { title: 'Name Abbr', field: 'shortName', sortable: true },
             { title: 'Department', field: 'departmentName', sortable: true },
