@@ -175,6 +175,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     @delayTime(1000)
     showReport(): void {
-        throw new Error('Method not implemented.');
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 }
