@@ -1,0 +1,30 @@
+<div class="customer-payment-wrapper m-animate-fade-in">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Customer Payment" [active]="true">
+                    <customer-payment-form-search></customer-payment-form-search>
+                    <tabset class="custom-class-tab">
+                        <tab heading="Payment" [active]="true">
+                            payment
+                        </tab>
+                        <tab heading="Summary">
+                            summary
+
+                        </tab>
+                    </tabset>
+                </tab>
+                <tab heading="Agency Payment">
+                    Agency Paymen
+                </tab>
+                <tab heading="AR Summary">
+                    Summary
+                </tab>
+                <tab heading="Payment History">
+                    History
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

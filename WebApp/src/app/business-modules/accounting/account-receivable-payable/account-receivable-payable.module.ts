@@ -32,6 +32,11 @@ const routing: Routes = [
                 data: { name: 'Account Payment' }
             },
             {
+                path: 'customer-payment', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
+                data: { name: 'Customer Payment' }
+            },
+            // TODO agency module routing.
+            {
                 path: 'payment-import', component: PaymentImportComponent, data: { name: "Import" }
             },
             {
@@ -48,8 +53,8 @@ const routing: Routes = [
 
 @NgModule({
     declarations: [
-        AccountPaymentFormSearchComponent,
         AccountReceivablePayableComponent,
+        AccountPaymentFormSearchComponent,
         AccountPaymentListInvoicePaymentComponent,
         AccountPaymentListOBHPaymentComponent,
         AccountPaymentUpdateExtendDayPopupComponent,
