@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -11,6 +10,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { WarehouseComponent } from './warehouse.component';
 import { WarehouseImportComponent } from './warehouse-import/warehouse-import.component';
 import { FormWarehouseComponent } from './components/form-warehouse.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 const routing: Routes = [
@@ -29,7 +29,7 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         SharedModule,
         NgProgressModule,
-        SelectModule,
+        NgSelectModule,
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
 

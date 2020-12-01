@@ -43,7 +43,7 @@ export class FormCreateUnitPopupComponent extends PopupBase implements OnInit {
             code: [null, Validators.required],
             unitNameEn: ['', Validators.required],
             unitNameVn: ['', Validators.required],
-            unitType: ['', Validators.required],
+            unitType: [null, Validators.required],
             descriptionEn: [],
             descriptionVn: [],
             active: [],
@@ -85,7 +85,7 @@ export class FormCreateUnitPopupComponent extends PopupBase implements OnInit {
                 descriptionEn: formData.descriptionEn,
                 descriptionVn: formData.descriptionVn,
                 active: !!this.isUpdate ? formData.active : true,
-                unitType: formData.unitType[0].id,
+                unitType: formData.unitType.id,
             };
             if (!this.isUpdate) {
                 this._catalogueRepo.addUnit(Object.assign({}, body, { id: 0 }))

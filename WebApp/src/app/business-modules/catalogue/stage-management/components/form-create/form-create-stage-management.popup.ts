@@ -35,7 +35,7 @@ export class StageManagementAddPopupComponent extends PopupBase {
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
-        private _toastService: ToastrService, ) {
+        private _toastService: ToastrService,) {
         super();
     }
 
@@ -64,7 +64,7 @@ export class StageManagementAddPopupComponent extends PopupBase {
                     Validators.minLength(6)
                 ])
             ],
-            stageDepartment: ['',
+            stageDepartment: [null,
                 Validators.compose([
                     Validators.required
                 ])
@@ -101,7 +101,7 @@ export class StageManagementAddPopupComponent extends PopupBase {
                 code: this.stageCode.value,
                 stageNameVn: this.stageNameVn.value,
                 stageNameEn: this.stageNameEn.value,
-                departmentId: this.stageDepartment.value[0].id,
+                departmentId: this.stageDepartment.value.id,
                 descriptionVn: this.stageDescriptionVn.value,
                 descriptionEn: this.stageDescriptionEn.value,
                 userCreated: this.stageManagement.userCreated,
@@ -145,18 +145,12 @@ export class StageManagementAddPopupComponent extends PopupBase {
         }
     }
 
-    getDetail(){
-        console.log(this.stageManagement)
-        let index = this.listDepartment.findIndex(x => x.id == this.stageManagement.departmentId);
-        if (index > -1) {
-            this.departmentActive = [this.listDepartment[index]];
-        }
-        console.log(this.departmentActive)
+    getDetail() {
         this.formStage.setValue({
             stageCode: this.stageManagement.code,
             stageNameEn: this.stageManagement.stageNameEn,
             stageNameVn: this.stageManagement.stageNameVn,
-            stageDepartment: this.departmentActive,
+            stageDepartment: { id: this.stageManagement.departmentId, text: this.listDepartment.find(x => x.id === this.stageManagement.departmentId).text },
             stageActive: this.stageManagement.active,
             stageDescriptionVn: this.stageManagement.descriptionVn,
             stageDescriptionEn: this.stageManagement.descriptionEn

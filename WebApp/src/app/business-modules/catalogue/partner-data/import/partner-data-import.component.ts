@@ -79,7 +79,7 @@ export class PartnerDataImportComponent extends AppPage implements OnInit {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    async import(element) {
+    import(element) {
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
             this.importAlert.show();
