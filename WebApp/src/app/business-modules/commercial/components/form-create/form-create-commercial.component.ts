@@ -52,10 +52,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
-    partnerLocations: CommonInterface.INg2Select[] = [
-        { id: 'Domestic', text: 'Domestic' },
-        { id: 'Oversea', text: 'Oversea' }
-    ];
+    partnerLocations: Array<string> = ['Domestic', 'Oversea'];
 
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;

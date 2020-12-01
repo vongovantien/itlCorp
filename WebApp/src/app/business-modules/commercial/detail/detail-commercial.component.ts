@@ -137,7 +137,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             countryShippingId: partner.countryShippingId,
             provinceId: partner.provinceId,
             provinceShippingId: partner.provinceShippingId,
-            partnerLocation: !!partner.partnerLocation ? [<CommonInterface.INg2Select>{ id: partner.partnerLocation, text: partner.partnerLocation }] : null,
+            partnerLocation: partner.partnerLocation,
             parentId: this.isAddSubPartner ? partner.id : partner.parentId
         });
     }
@@ -209,7 +209,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.public = this.partner.public;
         modelAdd.workPlaceId = this.partner.workPlaceId;
         modelAdd.partnerMode = this.partner.partnerMode;
-        modelAdd.partnerLocation = !!this.formCreate.partnerLocation.value[0].id ? this.formCreate.partnerLocation.value[0].id : this.formCreate.partnerLocation.value;
+        modelAdd.partnerLocation = this.formCreate.partnerLocation.value;
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);

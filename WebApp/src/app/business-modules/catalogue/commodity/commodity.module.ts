@@ -4,7 +4,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { CommodityImportComponent } from '../commodity-import/commodity-import.component';
 import { CommodityGroupImportComponent } from '../commodity-group-import/commodity-group-import.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { CommodityAddPopupComponent } from './components/form-create-commodity/form-create-commodity.popup';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -13,6 +12,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 import { CommodityGroupAddPopupComponent } from './components/form-create-commodity-group/form-create-commodity-group.popup';
 import { CommodityGroupListComponent } from './components/list-commodity-group/list-commodity-group.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     {
@@ -33,7 +33,7 @@ const routing: Routes = [
 @NgModule({
     imports: [
         SharedModule,
-        SelectModule,
+        NgSelectModule,
         NgProgressModule,
         RouterModule.forChild(routing),
         ModalModule.forRoot(),

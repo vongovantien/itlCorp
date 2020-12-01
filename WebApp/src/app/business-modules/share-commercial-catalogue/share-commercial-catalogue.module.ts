@@ -3,7 +3,6 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { DirectiveModule } from "src/app/shared/directives/directive.module";
-import { SelectModule } from "ng2-select";
 
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TabsModule } from 'ngx-bootstrap/tabs';
@@ -16,6 +15,7 @@ import { CommercialContractListComponent } from "../commercial/components/contra
 import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
 import { PartnerRejectPopupComponent } from "./components/partner-reject/partner-reject.popup";
 import { CommercialBranchSubListComponent } from "../commercial/components/branch-sub/commercial-branch-sub-list.component";
+import { NgSelectModule } from "@ng-select/ng-select";
 
 const COMPONENTS = [
     FormContractCommercialPopupComponent,
@@ -37,7 +37,7 @@ const COMPONENTS = [
         ReactiveFormsModule,
         DirectiveModule,
         PipeModule,
-        SelectModule,
+        NgSelectModule,
         TabsModule.forRoot(),
         CollapseModule.forRoot(),
         NgxDaterangepickerMd,
