@@ -10,157 +10,34 @@ export class JobConstants {
     public static readonly Warning: string = "Warning";
 
     public static COMMON_DATA = {
-        FREIGHTTERMS: <CommonInterface.INg2Select[]>[
-            {
-                id: "Collect",
-                text: "Collect"
-            },
-            {
-                id: "Prepaid",
-                text: "Prepaid"
-            }
-        ],
-        SHIPMENTTYPES: <CommonInterface.INg2Select[]>[
-            {
-                id: "Freehand",
-                text: "Freehand"
-            },
-            {
-                id: "Nominated",
-                text: "Nominated"
-            }
-        ],
-        BILLOFLADINGS: <CommonInterface.INg2Select[]>[
-            {
-                id: "Copy",
-                text: "Copy"
-            },
-            {
-                id: "Original",
-                text: "Original"
-            },
-            {
-                id: "Sea Waybill",
-                text: "Sea Waybill"
-            },
-            {
-                id: "Surrendered",
-                text: "Surrendered"
-            }
-        ],
-        SERVICETYPES: <CommonInterface.INg2Select[]>[
-            {
-                id: "FCL/FCL",
-                text: "FCL/FCL"
-            },
-            {
-                id: "LCL/LCL",
-                text: "LCL/LCL"
-            },
-            {
-                id: "FCL/LCL",
-                text: "FCL/LCL"
-            },
-            {
-                id: "CY/CFS",
-                text: "CY/CFS"
-            },
-            {
-                id: "CY/CY",
-                text: "CY/CY"
-            },
-            {
-                id: "CFS/CY",
-                text: "CFS/CY"
-            },
-            {
-                id: "CFS/CFS",
-                text: "CFS/CFS"
-            },
-            {
-                id: "CY/DR",
-                text: "CY/DR"
-            },
-            {
-                id: "DR/CY",
-                text: "DR/CY"
-            },
-            {
-                id: "DR/DR",
-                text: "DR/DR"
-            },
-            {
-                id: "DR/CFS",
-                text: "DR/CFS"
-            },
-            {
-                id: "CFS/DR",
-                text: "CFS/DR"
-            }
-        ],
-        TYPEOFMOVES: <CommonInterface.INg2Select[]>[
-            {
-                id: "FCL/FCL-CY/CY",
-                text: "FCL/FCL-CY/CY"
-            },
-            {
-                id: "LCL/LCL-CY/CY",
-                text: "LCL/LCL-CY/CY"
-            },
-            {
-                id: "LCL/LCL-CFS/CFS",
-                text: "LCL/LCL-CFS/CFS"
-            },
-            {
-                id: "LCL/FCL-CFS/CY",
-                text: "LCL/FCL-CFS/CY"
-            },
-            {
-                id: "FCL/LCL-CY/CFS",
-                text: "FCL/LCL-CY/CFS"
-            }
-        ],
+        FREIGHTTERMS: <string[]>['Collect', 'Prepaid'],
+
+        SHIPMENTTYPES: <string[]>['Freehand', 'Nominated'],
+
+        BILLOFLADINGS: <string[]>['Copy', 'Original', 'Sea Waybill', 'Surrendered'],
+
+        SERVICETYPES: <string[]>['FCL/FCL', 'LCL/LCL', 'FCL/LCL', 'CY/CFS', 'CY/CY', 'CFS/CY', 'CFS/CFS', 'CY/DR', 'DR/CY', 'DR/DR', 'DR/CFS', 'CFS/DR'],
+
+        TYPEOFMOVES: <string[]>['FCL/FCL-CY/CY', 'LCL/LCL-CY/CY', 'LCL/LCL-CFS/CFS', 'LCL/FCL-CFS/CY', 'FCL/LCL-CY/CFS'],
+
         BLNUMBERS: <CommonInterface.INg2Select[]>[
             { id: '0', text: 'Zero (0)' },
             { id: 1, text: 'One (1)' },
             { id: 2, text: 'Two (2)' },
             { id: 3, text: 'Three (3)' }
         ],
-        RCLASS: <CommonInterface.INg2Select[]>[
-            { id: 'M', text: 'M' },
-            { id: 'N', text: 'N' },
-            { id: 'Q', text: 'Q' }
-        ],
-        WT: <CommonInterface.INg2Select[]>[
-            { id: 'PP', text: 'PP' },
-            { id: 'CLL', text: 'CLL' }
-        ],
-        SHIPMENTMODES: <CommonInterface.INg2Select[]>[
-            { id: "Internal", text: "Internal" },
-            { id: "External", text: "External" }
-        ],
-        SERVICEMODES: <CommonInterface.INg2Select[]>[
-            { id: "Export", text: "Export" },
-            { id: "Import", text: "Import" }
-        ],
-        PRODUCTSERVICE: <CommonInterface.INg2Select[]>[
-            { id: "SeaFCL", text: "Sea FCL" },
-            { id: "SeaLCL", text: "Sea LCL" },
-            { id: "Air", text: "Air" },
-            { id: "Sea", text: "Sea" },
-            { id: "Trucking", text: "Trucking" },
-            { id: "Crossborder", text: "Cross border" },
-            { id: "Warehouse", text: "Warehouse" },
-            { id: "Railway", text: "Railway" },
-            { id: "Express", text: "Express" },
-            { id: "BondedWarehouse", text: "Bonded Warehouse" },
-            { id: "Other", text: "Other" },
-        ],
-        ROUTES: <CommonInterface.INg2Select[]>[
-            { id: 'Red', text: 'Red' },
-            { id: 'Green', text: 'Green' },
-            { id: 'Yellow', text: 'Yellow' }
-        ],
+        RCLASS: <string[]>['M', 'N', 'Q'],
+
+        WT: <string[]>['PP', 'CLL'],
+
+        SHIPMENTMODES: <string[]>['Internal', 'External'],
+
+        SERVICEMODES: <string[]>['Export', 'Import'],
+
+        PRODUCTSERVICE: <string[]>['Sea FCL', 'Sea LCL', 'Air', 'Sea', 'Trucking', 'Cross border', 'Warehouse', 'Railway', 'Express', 'Bonded Warehouse', 'Other'],
+
+        ROUTES: <string[]>['Red', 'Green', 'Yellow'],
+
         AIRLIGHTCODEMAPPING: <CommonInterface.INg2Select[]>[
             { id: '235', text: 'TURKISH CARGO' },
             { id: '180', text: 'KOREAN AIR' },
@@ -180,7 +57,7 @@ export class JobConstants {
         COMBOGRID_PARTNER: <CommonInterface.IComboGridDisplayField[]>[
             { field: 'accountNo', label: 'Partner Code' },
             { field: 'shortName', label: 'Name ABBR' },
-            { field: 'partnerNameEn', label: 'Name EN' },      
+            { field: 'partnerNameEn', label: 'Name EN' },
         ],
         COMBOGRID_PORT: <CommonInterface.IComboGridDisplayField[]>[
             { field: 'code', label: 'Port Code' },

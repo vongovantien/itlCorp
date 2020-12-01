@@ -76,10 +76,10 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
         { field: 'bookingNo', label: 'Booking No' },
     ];
 
-    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
-    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
+    serviceTypes: string[] = JobConstants.COMMON_DATA.SERVICETYPES;
+    ladingTypes: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
+    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
+    termTypes: string[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
 
     userLogged: User;
 
