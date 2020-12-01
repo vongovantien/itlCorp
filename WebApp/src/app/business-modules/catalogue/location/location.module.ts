@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 
 import { LocationImportComponent } from '../location-import/location-import.component';
@@ -36,7 +35,6 @@ const routing: Routes = [
 @NgModule({
     imports: [
         SharedModule,
-        SelectModule,
         NgProgressModule,
         RouterModule.forChild(routing),
         ModalModule.forRoot(),
