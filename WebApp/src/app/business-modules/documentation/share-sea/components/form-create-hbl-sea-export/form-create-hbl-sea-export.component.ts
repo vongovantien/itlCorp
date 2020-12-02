@@ -246,7 +246,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     setDefaultForwardingAgent(shipment: CsTransaction) {
         if (!!shipment.creatorOffice) {
-            return `${this.getDescription(shipment.creatorOffice.nameEn, shipment.creatorOffice.addressEn, shipment.creatorOffice.tel, shipment.creatorOffice.fax)}\nEmail: ${shipment.groupEmail}`;
+            return `${this.getDescription(shipment.creatorOffice.nameEn, shipment.creatorOffice.addressEn, shipment.creatorOffice.tel, shipment.creatorOffice.fax)}\n${!!shipment.groupEmail ? 'Email: ' + shipment.groupEmail : ''}`;
         }
     }
 
