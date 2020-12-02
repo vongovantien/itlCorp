@@ -77,10 +77,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
 
-    serviceTypes: string[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
-    ladingTypes: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
-    termTypes: string[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
-    typeOfMoves: string[] = JobConstants.COMMON_DATA.TYPEOFMOVES.map(i => i.id);
+    serviceTypes: string[] = JobConstants.COMMON_DATA.SERVICETYPES;
+    ladingTypes: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
+    termTypes: string[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
+    typeOfMoves: string[] = JobConstants.COMMON_DATA.TYPEOFMOVES;
     originNumbers: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
@@ -246,7 +246,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     setDefaultForwardingAgent(shipment: CsTransaction) {
         if (!!shipment.creatorOffice) {
-            return `${this.getDescription(shipment.creatorOffice.nameEn, shipment.creatorOffice.addressEn, shipment.creatorOffice.tel, shipment.creatorOffice.fax)}\nEmail: ${shipment.groupEmail}`;
+            return `${this.getDescription(shipment.creatorOffice.nameEn, shipment.creatorOffice.addressEn, shipment.creatorOffice.tel, shipment.creatorOffice.fax)}\n${!!shipment.groupEmail ? 'Email: ' + shipment.groupEmail : ''}`;
         }
     }
 

@@ -4,15 +4,14 @@ import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
 
 import { Customer, User } from '@models';
-import { DocumentationRepo, SystemRepo, CatalogueRepo } from '@repositories';
-import { DataService } from '@services';
-import { SystemConstants, JobConstants } from '@constants';
+import { SystemRepo, CatalogueRepo } from '@repositories';
+import { JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
 
 import * as fromOpsStore from './../../../store';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -26,9 +25,9 @@ export class JobManagementFormSearchComponent extends AppForm {
 
     filterTypes: CommonInterface.ICommonTitleValue[];
 
-    productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
-    serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES;
-    shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
+    serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
+    shipmentModes: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
 
     formSearch: FormGroup;
     searchText: AbstractControl;
@@ -174,9 +173,9 @@ export class JobManagementFormSearchComponent extends AppForm {
     expanded() {
         if (!!this.dataSearch) {
             const advanceSearchForm = {
-                productService: this.productServices.find(p => p.id === this.dataSearch.productService) || null,
-                serviceMode: this.serviceModes.find(s => s.id === this.dataSearch.serviceMode) || null,
-                shipmentMode: this.shipmentModes.find(s => s.id === this.dataSearch.shipmentMode) || null,
+                productService: this.productServices.find(p => p === this.dataSearch.productService) || null,
+                serviceMode: this.serviceModes.find(s => s === this.dataSearch.serviceMode) || null,
+                shipmentMode: this.shipmentModes.find(s => s === this.dataSearch.shipmentMode) || null,
                 serviceDate: !!this.dataSearch.serviceDateFrom && !!this.dataSearch.serviceDateTo ? {
                     startDate: new Date(this.dataSearch.serviceDateFrom),
                     endDate: new Date(this.dataSearch.serviceDateTo)

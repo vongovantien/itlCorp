@@ -23,7 +23,7 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
     shippers: any[] = [];
     ports: any[] = [];
 
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
+    termTypes: string[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
     shippingInstruction: CsShippingInstruction;
 
     siRefNo: AbstractControl;

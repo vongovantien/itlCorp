@@ -81,9 +81,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
     termTypes: string[] = ['Collect', 'Prepaid', 'Sea - Air Difference'];
 
-    wts: string[] = JobConstants.COMMON_DATA.WT.map(i => i.id);
+    wts: string[] = JobConstants.COMMON_DATA.WT;
     numberOBLs: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
-    rClasses: string[] = JobConstants.COMMON_DATA.RCLASS.map(i => i.id);
+    rClasses: string[] = JobConstants.COMMON_DATA.RCLASS;
 
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;

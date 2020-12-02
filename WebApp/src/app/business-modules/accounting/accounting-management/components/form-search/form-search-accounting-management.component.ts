@@ -21,7 +21,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
     creators: Observable<User[]>;
 
     filterTypes: string[] = ['All', 'Debit', 'Credit', 'Invoice'];
-    status: string[] = AccountingConstants.STATUS_CD.map(i => i.id);
+    status: string[] = AccountingConstants.STATUS_CD;
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
