@@ -34,7 +34,9 @@
             "@decorators": ["src/app/shared/decorators"],
             "@core": ["src/app/core"],
             "@app": ["src/app"],
-            "@animations": ["src/app/shared/animations"]
+            "@animations": ["src/app/shared/animations"],
+            "@share-modules": ["src/app/business-modules/share-modules"]
+
         }
     }
 }

@@ -60,7 +60,7 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !officeId.valid || !officeId.value)}">
                                 <label required>Office</label>
                                 <div class="pos-rel">
-                                    <ng-select #of [items]="offices" [clearable]="true" class="custom"
+                                    <ng-select [items]="offices" [clearable]="true" class="custom"
                                         formControlName="officeId" [multiple]="true" bindLabel="text"
                                         (change)="selectedOffice($event)" placeholder="Please select">
                                     </ng-select>
@@ -124,7 +124,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
                                 <label required>Agreement Type</label>
-                                <ng-select #ct [items]="contractTypes" (change)="selectedAgreementType($event)"
+                                <ng-select [items]="contractTypes" (change)="selectedAgreementType($event)"
                                     class="custom" formControlName="contractType" placeholder="Please select">
                                 </ng-select>
                             </div>
@@ -134,9 +134,9 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !saleService.valid || !saleService.value)}">
                                 <label required>Sale Service</label>
                                 <div class="pos-rel">
-                                    <ng-select #sv [items]="serviceTypes" (change)="selectedService($event)"
+                                    <ng-select [items]="serviceTypes" (change)="selectedService($event)"
                                         bindLabel="text" class="custom" [disabled]="true" [clearable]="true"
-                                        (opened)="closeOtherSelects(sv)" formControlName="saleService" [multiple]="true"
+                                        formControlName="saleService" [multiple]="true"
                                         placeholder="Please select">
                                     </ng-select>
                                     <combo-grid-icon
@@ -151,8 +151,8 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Payment Method</label>
-                                <ng-select #pm [items]="paymentMethods" [clearable]="true" [disabled]="type === 'Agent'"
-                                    class="custom" (opened)="closeOtherSelects(pm)" formControlName="paymentMethod"
+                                <ng-select [items]="paymentMethods" [clearable]="true" [disabled]="type === 'Agent'"
+                                    class="custom" formControlName="paymentMethod"
                                     placeholder="Please select">
                                 </ng-select>
                             </div>
@@ -160,8 +160,8 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Currency</label>
-                                <ng-select #c [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" (opened)="closeOtherSelects(c)" formControlName="currencyId"
+                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
+                                    class="custom" formControlName="currencyId"
                                     placeholder="Select Currency">
                                 </ng-select>
                             </div>
@@ -170,7 +170,7 @@
                             <div class="form-group">
                                 <label>VAS</label>
                                 <div class="pos-rel">
-                                    <ng-select class="custom" #vas [items]="vaslst" [clearable]="true" bindLabel="text"
+                                    <ng-select class="custom" [items]="vaslst" [clearable]="true" bindLabel="text"
                                         (change)="selectedVas($event)" [multiple]="true" formControlName="vas"
                                         placeholder="Please select">
                                     </ng-select>
@@ -266,9 +266,8 @@
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                         <label>Base On</label>
-                                        <ng-select #bo [items]="basesOn" [clearable]="true" class="custom"
-                                            (opened)="closeOtherSelects(bo)" formControlName="baseOn"
-                                            placeholder="Please select">
+                                        <ng-select [items]="basesOn" [clearable]="true" class="custom"
+                                            formControlName="baseOn" placeholder="Please select">
                                         </ng-select>
                                     </div>
                                 </div>

@@ -1,34 +1,34 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ShareModulesInputShipmentPopupComponent, FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from './components';
+import { ModalModule } from 'ngx-bootstrap/modal/';
 import { PipeModule } from "src/app/shared/pipes/pipe.module";
-import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { DirectiveModule } from "src/app/shared/directives/directive.module";
 
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { CommonComponentModule } from "src/app/shared/common/common.module";
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
-import { FormContractCommercialPopupComponent } from "./components/form-contract-commercial-catalogue.popup";
 import { CommercialContractListComponent } from "../commercial/components/contract/commercial-contract-list.component";
 import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
-import { PartnerRejectPopupComponent } from "./components/partner-reject/partner-reject.popup";
 import { CommercialBranchSubListComponent } from "../commercial/components/branch-sub/commercial-branch-sub-list.component";
 import { NgSelectModule } from "@ng-select/ng-select";
 
 const COMPONENTS = [
+    ShareModulesInputShipmentPopupComponent,
     FormContractCommercialPopupComponent,
     CommercialContractListComponent,
     SalesmanCreditLimitPopupComponent,
     PartnerRejectPopupComponent,
     CommercialBranchSubListComponent
-]
+];
 @NgModule({
     declarations: [
         ...COMPONENTS
     ],
-    imports: [
+    imports: [ 
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
         CommonComponentModule,
@@ -41,14 +41,13 @@ const COMPONENTS = [
         TabsModule.forRoot(),
         CollapseModule.forRoot(),
         NgxDaterangepickerMd,
-
-    ],
+        FormsModule
+     ],
     exports: [
         ...COMPONENTS
     ],
     providers: [],
 })
-
-export class ShareCommercialCatalogueModule {
+export class ShareModulesModule {
 
 }

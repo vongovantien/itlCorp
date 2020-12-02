@@ -92,7 +92,7 @@ export class GeneralReportComponent extends AppList {
 
     exportShipmentOverview() {
         if (this.dataList.length === 0) {
-            this._toastService.warning('Please Apply Report');
+            this._toastService.warning('No Data To View, Please Re-Apply Report');
             return;
         } else {
             this.isClickSubMenu = false;
@@ -113,7 +113,7 @@ export class GeneralReportComponent extends AppList {
 
     exportStandard() {
         if (this.dataList.length === 0) {
-            this._toastService.warning('Please Apply Report');
+            this._toastService.warning('No Data To View, Please Re-Apply Report');
             return;
         } else {
             this.isClickSubMenu = false;

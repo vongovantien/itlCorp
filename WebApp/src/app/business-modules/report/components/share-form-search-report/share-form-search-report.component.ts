@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter } from "@angular/core";
+import { Component, Output, EventEmitter, Input } from "@angular/core";
 import { AppForm } from "src/app/app.form";
 import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
-import { Customer, PortIndex } from "@models";
+import { Customer, PortIndex, Partner } from "@models";
 import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
@@ -13,19 +13,23 @@ import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
 
 @Component({
-    selector: 'sheet-debit-report-form-search',
-    templateUrl: './form-search-sheet-debit-report.component.html'
+    selector: 'share-report-form-search',
+    templateUrl: './share-form-search-report.component.html'
 })
-
-export class SheetDebitReportFormSearchComponent extends AppForm {
+export class ShareFormSearchReportComponent extends AppForm {
     @Output() onSearch: EventEmitter<ReportInterface.ISaleReportCriteria> = new EventEmitter<ReportInterface.ISaleReportCriteria>();
+    @Output() onGeneralSearch: EventEmitter<ReportInterface.ISearchDataCriteria> = new EventEmitter<ReportInterface.ISearchDataCriteria>();
 
+    @Input() isGeneralReport: boolean = false;
+    @Input() isSheetDebitRpt: boolean = false;
     menuPermission: SystemInterface.IUserPermission;
 
     formSearch: FormGroup;
     serviceDate: AbstractControl;
     dateType: AbstractControl;
     customer: AbstractControl;
+    carrier: AbstractControl;
+    agent: AbstractControl;
     service: AbstractControl;
     currency: AbstractControl;
     refNo: AbstractControl;
@@ -38,6 +42,8 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     pol: AbstractControl;
     pod: AbstractControl;
     typeReport: AbstractControl;
+    partnerAccount: AbstractControl;
+    exchangeRate: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'taxCode', label: 'Tax Code' },
@@ -49,17 +55,35 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         { field: 'nameEn', label: 'Port Name' }
     ];
 
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'partnerNameVn', label: 'Partner Name' },
+        { field: 'taxCode', label: 'Tax Code' }
+    ];
+
     customers: Observable<Customer[]>;
+    carriers: Observable<Customer[]>;
+    agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
 
-    dateTypeList: any[] = [];
-    dateTypeActive: any[] = [];
+    dateTypeList: ReportInterface.INg2Select[] = [
+        { id: "ServiceDate", text: "Service Date" },
+        { id: "CreatedDate", text: "Created Date" }
+    ];
+
+    refNoTypeList: ReportInterface.INg2Select[] = [
+        { id: 'JOBID', text: 'JOB JD' },
+        { id: 'HBL', text: 'HBL/HAWB' },
+        { id: 'MBL', text: 'MBL/MAWB' }
+    ];
+
+    staffTypeList: ReportInterface.INg2Select[] = [
+        { id: 'PIC', text: 'Person In Charge' },
+        { id: 'SALESMAN', text: 'Salesman' },
+        { id: 'CREATOR', text: 'Creator' }
+    ];
     serviceList: any[] = [];
     serviceActive: any[] = [];
     currencyList: any[] = [];
-    currencyActive: any[] = [];
-    refNoTypeList: any[] = [];
-    refNoTypeActive: any[] = [];
     officeList: any[] = [];
     officeActive: any[] = [];
     departmentList: any[] = [];
@@ -68,9 +92,22 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     groupActive: any[] = [];
     staffList: any[] = [];
     staffActive: any[] = [];
-    staffTypeList: any[] = [];
-    staffTypeActive: any[] = [];
-    typeReportList: any[] = [];
+
+    typeAccReportList: ReportInterface.INg2Select[] = [
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET, text: 'Accountant P/L Sheet' },
+        { id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS, text: 'Job Profit Analysis' },
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST, text: 'Summary Of Costs Incurred' },
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' }
+    ];
+
+    typeReportList: ReportInterface.INg2Select[] = [
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY, text: 'Monthly Sale Report' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT, text: 'Sale Report By Department' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER, text: 'Sale Report By Quarter' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY, text: 'Summary Sale Report' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION, text: 'Combination Statistic Report' }
+    ];
+
     typeReportActive: any[] = [];
 
     userLogged: any;
@@ -81,6 +118,7 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     staffsInit: any[] = [];
 
     groupSpecial: any[] = [];
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -93,21 +131,14 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     ngOnInit() {
         this.initDataInform();
         this.initFormSearch();
-        /*const partnerGroup = [
-            CommonEnum.PartnerGroupEnum.CUSTOMER,
-            CommonEnum.PartnerGroupEnum.AGENT,
-            CommonEnum.PartnerGroupEnum.CARRIER,
-            CommonEnum.PartnerGroupEnum.CONSIGNEE,
-            CommonEnum.PartnerGroupEnum.SHIPPER,
-            CommonEnum.PartnerGroupEnum.SUPPLIER,
-            CommonEnum.PartnerGroupEnum.PAYMENTOBJECT,
-            CommonEnum.PartnerGroupEnum.SHIPPINGLINE,
-            CommonEnum.PartnerGroupEnum.SUPPLIERMATERIAL,
-            CommonEnum.PartnerGroupEnum.AIRSHIPSUP,
-            CommonEnum.PartnerGroupEnum.PETROLSTATION
-        ];*/
-        // Get All Partner
-        this.customers = this._catalogueRepo.getPartnerByGroups(null, null);
+        if (this.isSheetDebitRpt) { // Partner for Accountant Report
+            // Get All Partner
+            this.customers = this._catalogueRepo.getPartnerByGroups(null, null);
+        } else {
+            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
+            this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
+            this.carriers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
+        }
         this.ports = this._catalogueRepo.getListPort({ placeType: CommonEnum.PlaceTypeEnum.Port });
 
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
@@ -135,30 +166,37 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     }
 
     initFormSearch() {
+        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
                 startDate: this.createMoment().startOf('month').toDate(),
                 endDate: this.createMoment().endOf('month').toDate(),
             }],
-            dateType: [this.dateTypeActive],
+            dateType: [this.dateTypeList[0].id],
             customer: [],
+            carrier: [],
+            agent: [],
             service: [this.serviceActive],
-            currency: [this.currencyActive],
+            currency: ['USD'],
             refNo: [],
-            refNoType: [this.refNoTypeActive],
+            refNoType: [this.refNoTypeList[0].id],
             office: [this.officeActive],
             department: [this.departmentActive],
             group: [this.groupActive],
             staff: [this.staffActive],
-            staffType: [this.staffTypeActive],
+            staffType: staffTypeInit,
             pol: [],
             pod: [],
-            typeReport: [this.typeReportActive]
+            partnerAccount: [],
+            exchangeRate: 20000,
+            typeReport: this.isGeneralReport ? [] : [this.typeReportActive[0].id]
         });
 
         this.serviceDate = this.formSearch.controls['serviceDate'];
         this.dateType = this.formSearch.controls['dateType'];
         this.customer = this.formSearch.controls['customer'];
+        this.carrier = this.formSearch.controls['carrier'];
+        this.agent = this.formSearch.controls['agent'];
         this.service = this.formSearch.controls['service'];
         this.currency = this.formSearch.controls['currency'];
         this.refNo = this.formSearch.controls['refNo'];
@@ -170,22 +208,37 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         this.staffType = this.formSearch.controls['staffType'];
         this.pol = this.formSearch.controls['pol'];
         this.pod = this.formSearch.controls['pod'];
+        this.partnerAccount = this.formSearch.controls['partnerAccount'];
+        this.exchangeRate = this.formSearch.controls['exchangeRate'];
         this.typeReport = this.formSearch.controls['typeReport'];
     }
 
     initDataInform() {
-        this.getDateType();
         this.getService();
         this.getCurrency();
-        this.getRefNoType();
-        this.getStaffType();
-        this.getTypeReport();
+        if (!this.isGeneralReport) {
+            this.getTypeReportList();
+        }
+    }
+
+    getTypeReportList() {
+        if (this.isSheetDebitRpt) {
+            this.typeReportActive = this.typeAccReportList;
+        } else {
+            this.typeReportActive = this.typeReportList;
+        }
     }
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
                 this.customer.setValue(data.id);
+                break;
+            case 'carrier':
+                this.carrier.setValue(data.id);
+                break;
+            case 'agent':
+                this.agent.setValue(data.id);
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
@@ -195,69 +248,53 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                 break;
             case 'service':
                 if (data.id === 'All') {
-                    this.serviceActive = [];
-                    this.serviceActive.push({ id: 'All', text: "All" });
+                    this.serviceActive.length = 0;
+                    this.serviceActive = [...this.serviceActive, 'All'];
                 } else {
-                    this.serviceActive.push(data);
-                    this.detectServiceWithAllOption('service', data);
-                    this.service.setValue(this.serviceActive);
+                    this.detectServiceWithAllOption('service', data.id);
                 }
                 break;
             case 'office':
+                console.log('office')
                 if (data.id === 'All') {
-                    this.officeActive = [];
-                    this.officeActive.push({ id: 'All', text: "All" });
+                    this.officeActive.length = 0;
+                    this.officeActive = [...this.officeActive, 'All'];
                 } else {
-                    this.officeActive.push(data);
-                    this.detectServiceWithAllOption('office', data);
-                    this.office.setValue(this.officeActive);
+                    this.detectServiceWithAllOption('office', data.id);
                 }
                 // Reload deparment
                 this.getDepartment(this.departmentsInit);
                 break;
             case 'department':
                 if (data.id === 'All') {
-                    this.departmentActive = [];
-                    this.departmentActive.push({ id: 'All', text: "All" });
+                    this.departmentActive.length = 0;
+                    this.departmentActive = [...this.departmentActive, 'All'];
                 } else {
-                    this.departmentActive.push(data);
-                    this.detectServiceWithAllOption('department', data);
-                    this.department.setValue(this.departmentActive);
+                    this.detectServiceWithAllOption('department', data.id);
                 }
                 // Reload group
                 this.getGroup(this.groupsInit);
                 break;
             case 'group':
                 if (data.id === 'All') {
-                    this.groupActive = [];
-                    this.groupActive.push({ id: 'All', text: "All" });
+                    this.groupActive.length = 0;
+                    this.groupActive = [...this.groupActive, 'All'];
                 } else {
-                    this.groupActive.push(data);
-                    this.detectServiceWithAllOption('group', data);
-                    this.group.setValue(this.groupActive);
+                    this.detectServiceWithAllOption('group', data.id);
                 }
                 // Reload staff
                 this.getStaff(this.staffsInit);
                 break;
             case 'staff':
                 if (data.id === 'All') {
-                    this.staffActive = [];
-                    this.staffActive.push({ id: 'All', text: "All" });
+                    this.staffActive.length = 0;
+                    this.staffActive = [...this.staffActive, 'All'];
                 } else {
-                    this.staffActive.push(data);
-                    this.detectServiceWithAllOption('staff', data);
-                    this.staff.setValue(this.staffActive);
+                    this.detectServiceWithAllOption('staff', data.id);
                 }
                 break;
-            case 'currency':
-                this.currencyActive = [];
-                this.currencyActive.push(data);
-                this.currency.setValue(this.currencyActive);
-                break;
-            case 'typeReport':
-                this.typeReportActive = [];
-                this.typeReportActive.push(data);
-                this.typeReport.setValue(this.typeReportActive);
+            case 'acPartner':
+                this.partnerAccount.setValue(data.id);
                 break;
             default:
                 break;
@@ -270,6 +307,7 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         }
         if (type === 'office') {
             this.officeActive.splice(this.officeActive.findIndex((item) => item.id === data.id), 1);
+            console.log('clear')
             if (this.officeActive.length === 0) {
                 this.department.setValue([]);
                 this.departmentActive = [];
@@ -282,16 +320,13 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         if (type === 'department') {
             this.departmentActive.splice(this.departmentActive.findIndex((item) => item.id === data.id), 1);
             if (this.departmentActive.length === 0) {
-                this.group.setValue([]);
                 this.groupActive = [];
-                this.staff.setValue([]);
                 this.staffActive = [];
             }
         }
         if (type === 'group') {
             this.groupActive.splice(this.groupActive.findIndex((item) => item.id === data.id), 1);
             if (this.groupActive.length === 0) {
-                this.staff.setValue([]);
                 this.staffActive = [];
             }
         }
@@ -303,51 +338,42 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
 
     detectServiceWithAllOption(type: string, data?: any) {
         if (type === "service") {
-            if (!this.serviceActive.every((value) => value.id !== 'All')) {
-                this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.serviceActive.every((value) => value !== 'All')) {
+                this.serviceActive.splice(this.serviceActive.findIndex((item) => item === 'All'), 1);
                 this.serviceActive = [];
                 this.serviceActive.push(data);
             }
         } else if (type === 'office') {
-            if (!this.officeActive.every((value) => value.id !== 'All')) {
-                this.officeActive.splice(this.officeActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.officeActive.every((value) => value !== 'All')) {
+                this.officeActive.splice(this.officeActive.findIndex((item) => item === 'All'), 1);
                 this.officeActive = [];
                 this.officeActive.push(data);
             }
             // Call back Get Department            
             this.getDepartment(this.departmentsInit);
         } else if (type === 'department') {
-            if (!this.departmentActive.every((value) => value.id !== 'All')) {
-                this.departmentActive.splice(this.departmentActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.departmentActive.every((value) => value !== 'All')) {
+                this.departmentActive.splice(this.departmentActive.findIndex((item) => item === 'All'), 1);
                 this.departmentActive = [];
                 this.departmentActive.push(data);
             }
             // Call back Get Group
             this.getGroup(this.groupsInit);
         } else if (type === 'group') {
-            if (!this.groupActive.every((value) => value.id !== 'All')) {
-                this.groupActive.splice(this.groupActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.groupActive.every((value) => value !== 'All')) {
+                this.groupActive.splice(this.groupActive.findIndex((item) => item === 'All'), 1);
                 this.groupActive = [];
                 this.groupActive.push(data);
             }
             // Call back Get Staff
             this.getStaff(this.staffsInit);
         } else if (type === 'staff') {
-            if (!this.staffActive.every((value) => value.id !== 'All')) {
-                this.staffActive.splice(this.staffActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.staffActive.every((value) => value !== 'All')) {
+                this.staffActive.splice(this.staffActive.findIndex((item) => item === 'All'), 1);
                 this.staffActive = [];
                 this.staffActive.push(data);
             }
         }
-    }
-
-    getDateType() {
-        this.dateTypeList = [
-            { "text": 'Service Date', "id": 'ServiceDate' },
-            { "text": 'Created Date', "id": 'CreatedDate' }
-        ];
-        // Default value: Service Date
-        this.dateTypeActive = [this.dateTypeList[0]];
     }
 
     getService() {
@@ -358,7 +384,7 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                     if (!!res) {
                         this.serviceList = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
                         this.serviceList.unshift({ id: 'All', text: 'All' });
-                        this.serviceActive = [this.serviceList[0]];
+                        this.serviceActive = [this.serviceList[0].id];
                     }
                 },
             );
@@ -371,21 +397,10 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                 (data: any) => {
                     if (!!data) {
                         this.currencyList = data.map((item) => ({ text: item.id, id: item.id }));
-                        // Default value: USD
-                        this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
+                        // Default value: USD .filter((curr) => curr.id === "USD")
                     }
                 },
             );
-    }
-
-    getRefNoType() {
-        this.refNoTypeList = [
-            { text: 'JOB JD', id: 'JOBID' },
-            { text: 'HBL/HAWB', id: 'HBL' },
-            { text: 'MBL/MAWB', id: 'MBL' }
-        ];
-        // Default value: JOB ID
-        this.refNoTypeActive = [this.refNoTypeList[0]];
     }
 
     getDataUserLever() {
@@ -430,18 +445,16 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         this.officeList = data
             .map((item: any) => ({ text: item.officeAbbrName, id: item.officeId }))
             .filter((o, i, arr) => arr.findIndex(t => t.id === o.id) === i); // Distinct office
-
         if (this.officeList.length > 0) {
             this.officeList.unshift({ id: 'All', text: 'All' });
             if (this.menuPermission.list === 'Office'
                 || this.menuPermission.list === 'Company'
                 || this.menuPermission.list === 'All') {
-                this.officeActive = [this.officeList[0]];
+                this.officeActive = [this.officeList[0].id];
             } else {
-                this.officeActive = [this.officeList.filter(off => off.id === this.userLogged.officeId)[0]];
+                this.officeActive = [this.officeList.filter(off => off.id === this.userLogged.officeId)[0].id];
             }
         } else {
-            this.office.setValue([]);
             this.officeActive = [];
         }
 
@@ -451,10 +464,10 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     getDepartment(data: any) {
         let officeSelected = [];
         if (this.officeActive.length > 0) {
-            if (this.officeActive.map(i => i.id).includes('All')) {
+            if (this.officeActive.map(i => i).includes('All')) {
                 officeSelected = this.officeList.map(i => i.id);
             } else {
-                officeSelected = this.officeActive.map(i => i.id);
+                officeSelected = this.officeActive.map(i => i);
             }
             data = data.filter(f => f.departmentId !== null && officeSelected.includes(f.officeId));
         } else {
@@ -471,12 +484,11 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                 || this.menuPermission.list === 'Office'
                 || this.menuPermission.list === 'Company'
                 || this.menuPermission.list === 'All') {
-                this.departmentActive = [this.departmentList[0]];
+                this.departmentActive = [this.departmentList[0].id];
             } else {
-                this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0]];
+                this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0].id];
             }
         } else {
-            this.department.setValue([]);
             this.departmentActive = [];
         }
 
@@ -486,10 +498,10 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     getGroup(data: any) {
         let deparmentSelected = [];
         if (this.departmentActive.length > 0) {
-            if (this.departmentActive.map(i => i.id).includes('All')) {
+            if (this.departmentActive.map(i => i).includes('All')) {
                 deparmentSelected = this.departmentList.map(i => i.id);
             } else {
-                deparmentSelected = this.departmentActive.map(i => i.id);
+                deparmentSelected = this.departmentActive.map(i => i);
             }
             data = data.filter(f => f.groupId !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
         } else {
@@ -507,12 +519,11 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
                 || this.menuPermission.list === 'Office'
                 || this.menuPermission.list === 'Company'
                 || this.menuPermission.list === 'All') {
-                this.groupActive = [this.groupList[0]];
+                this.groupActive = [this.groupList[0].id];
             } else {
-                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0]];
+                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
             }
         } else {
-            this.group.setValue([]);
             this.groupActive = [];
         }
 
@@ -522,18 +533,18 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     getStaff(data: any) {
         if (this.groupActive.length > 0) {
             let groupSelected = [];
-            if (this.groupActive.map(i => i.id).includes('All')) {
+            if (this.groupActive.map(i => i).includes('All')) {
                 groupSelected = this.groupList.map(i => i.id);
             } else {
-                groupSelected = this.groupActive.map(i => i.id);
+                groupSelected = this.groupActive.map(i => i);
             }
 
             let deparmentSelected = [];
             if (this.departmentActive.length > 0) {
-                if (this.departmentActive.map(i => i.id).includes('All')) {
+                if (this.departmentActive.map(i => i).includes('All')) {
                     deparmentSelected = this.departmentList.map(i => i.id);
                 } else {
-                    deparmentSelected = this.departmentActive.map(i => i.id);
+                    deparmentSelected = this.departmentActive.map(i => i);
                 }
             }
 
@@ -551,72 +562,87 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         if (this.staffList.length > 0) {
             this.staffList.unshift({ id: 'All', text: 'All' });
             if (this.menuPermission.list === 'Owner') {
-                this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0]];
+                this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0].id];
             } else {
-                this.staffActive = [this.staffList[0]];
+                this.staffActive = [this.staffList[0].id];
             }
         } else {
-            this.staff.setValue([]);
             this.staffActive = [];
         }
     }
 
-    getStaffType() {
-        this.staffTypeList = [
-            { "text": 'Person In Charge', "id": 'PIC' },
-            { "text": 'Salesman', "id": 'SALESMAN' },
-            { "text": 'Creator', "id": 'CREATOR' }
-        ];
-        // Default value: Salesman
-        this.staffTypeActive = [this.staffTypeList[1]];
-    }
-
-    getTypeReport() {
-        this.typeReportList = [
-            { text: 'Accountant P/L Sheet', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET },
-            { text: 'Job Profit Analysis', id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS },
-            { text: 'Summary Of Costs Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST },
-            { text: 'Summary Of Revenue Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE }
-        ];
-        // Default value: Accountant P/L Sheet
-        this.typeReportActive = [this.typeReportList[0]];
-    }
-
     searchReport() {
-        const body: ReportInterface.ISaleReportCriteria = {
-            serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+        this.isSubmitted = true;
+        if (this.isGeneralReport) {
+            this.onGeneralSearch.emit(this.getGeneralSearchBody());
+        } else {
+            this.onSearch.emit(this.getSaleSearchBody());
+        }
+    }
+
+    getGeneralSearchBody() {
+        const body: ReportInterface.ISearchDataCriteria = {
+            serviceDateFrom: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customer.value,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
-            currency: this.currencyActive[0].id, // ---**
-            jobId: this.refNoType.value[0].id === "JOBID" ? this.refNo.value : null,
-            mawb: this.refNoType.value[0].id === "MBL" ? this.refNo.value : null,
-            hawb: this.refNoType.value[0].id === "HBL" ? this.refNo.value : null,
+            currency: this.currency.value, // ---**
+            jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            mawb: this.refNoType.value === "MBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            hawb: this.refNoType.value === "HBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            officeId: this.mapObject(this.officeActive, this.officeList), // ---*
+            departmentId: this.mapObject(this.department.value, this.departmentList), // ---*
+            groupId: this.mapObject(this.groupActive, this.groupList), // ---*
+            personInCharge: this.staffType.value === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+            salesMan: this.staffType.value === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+            creator: this.staffType.value === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
+            carrierId: this.carrier.value,
+            agentId: this.agent.value,
+            pol: this.pol.value,
+            pod: this.pod.value
+        };
+        console.log('General search:', body);
+        return body;
+    }
+
+    getSaleSearchBody() {
+        const body: ReportInterface.ISaleReportCriteria = {
+            serviceDateFrom: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            customerId: this.customer.value,
+            service: this.mapObject(this.serviceActive, this.serviceList), // ---*
+            currency: this.currency.value, // ---**
+            jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            mawb: this.refNoType.value === "MBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            hawb: this.refNoType.value === "HBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
             officeId: this.mapObject(this.officeActive, this.officeList), // ---*
             departmentId: this.mapObject(this.departmentActive, this.departmentList), // ---*
             groupId: this.mapObject(this.groupActive, this.groupList), // ---*
-            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            carrierId: null,
-            agentId: null,
+            personInCharge: this.staffType.value === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+            salesMan: this.staffType.value === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+            creator: this.staffType.value === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
+            carrierId: this.carrier.value,
+            agentId: this.agent.value,
             pol: this.pol.value,
             pod: this.pod.value,
-            typeReport: this.typeReportActive[0].id
+            typeReport: this.typeReport.value
         };
-        this.onSearch.emit(body);
+        console.log('Sale search:', body);
+        return body;
     }
 
     mapObject(dataSelected: any[], dataList: any[]) {
         let result = '';
         if (dataSelected.length > 0) {
-            if (dataSelected[0].id === 'All') {
+            if (dataSelected[0] === 'All') {
                 const list = dataList.filter(f => f.id !== 'All');
                 result = list.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
             } else {
-                result = dataSelected.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+                result = dataSelected.map((item: any) => item).toString().replace(/(?:,)/g, ';');
             }
         }
         return result;
@@ -625,53 +651,58 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     resetSearch() {
         this.formSearch.reset();
         this.resetFormControl(this.customer);
+        this.resetFormControl(this.carrier);
+        this.resetFormControl(this.agent);
         this.resetFormControl(this.pol);
         this.resetFormControl(this.pod);
-        this.onSearch.emit(<any>{});
+        if (this.isGeneralReport) {
+            this.onGeneralSearch.emit(<any>{});
+        } else {
+            this.onSearch.emit(<any>{});
+        }
 
-        this.dateTypeActive = [this.dateTypeList[0]];
-        this.dateType.setValue(this.dateTypeActive);
+        this.dateType.setValue(this.dateTypeList[0].id);
 
-        this.serviceActive = [this.serviceList[0]];
+        this.serviceActive = [this.serviceList[0].id];
         this.service.setValue(this.serviceActive);
 
-        this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
-        this.currency.setValue(this.currencyActive);
+        this.currency.setValue([this.currencyList.filter((curr) => curr.id === "USD")[0].id]);
 
-        this.refNoTypeActive = [this.refNoTypeList[0]];
-        this.refNoType.setValue(this.refNoTypeActive);
+        this.refNoType.setValue(this.refNoTypeList[0].id);
 
-        this.staffTypeActive = [this.staffTypeList[0]];
-        this.staffType.setValue(this.staffTypeActive);
+        if (this.isGeneralReport) {
+            this.staffType.setValue(this.staffTypeList[0].id);
+        } else {
+            this.staffType.setValue(this.staffTypeList[1].id);
+        }
 
         if (this.menuPermission.list !== 'None') {
-            this.officeActive = [this.officeList.filter((off) => off.id === this.userLogged.officeId)[0]];
+            this.officeActive = [this.officeList.filter((off) => off.id === this.userLogged.officeId)[0].id];
             this.office.setValue(this.officeActive);
 
             if (this.menuPermission.list === 'Office' || this.menuPermission.list === 'Company') {
-                this.departmentActive = [this.departmentList[0]];
+                this.departmentActive = [this.departmentList[0].id];
             } else {
-                this.departmentActive = [this.departmentList.filter((dept) => dept.id === this.userLogged.departmentId)[0]];
+                this.departmentActive = [this.departmentList.filter((dept) => dept.id === this.userLogged.departmentId)[0].id];
             }
             this.department.setValue(this.departmentActive);
 
             if (this.menuPermission.list === 'Department') {
-                this.groupActive = [this.groupList[0]];
+                this.groupActive = [this.groupList[0].id];
             } else {
-                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0]];
+                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
             }
             this.group.setValue(this.groupActive);
 
             if (this.menuPermission.list === 'Group') {
-                this.staffActive = [this.staffList[0]];
+                this.staffActive = [this.staffList[0].id];
             } else {
-                this.staffActive = [this.staffList.filter((stf) => stf.id === this.userLogged.id)[0]];
+                this.staffActive = [this.staffList.filter((stf) => stf.id === this.userLogged.id)[0].id];
             }
             this.staff.setValue(this.staffActive);
         }
 
-        this.typeReportActive = [this.typeReportList[0]];
-        this.typeReport.setValue(this.typeReportActive);
+        this.typeReport.setValue(this.typeReportActive[0].id);
 
         this.serviceDate.setValue({
             startDate: this.createMoment().startOf('month').toDate(),

@@ -13,9 +13,9 @@ import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyActio
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
-import { SalesmanCreditLimitPopupComponent } from '../../commercial/components/popup/salesman-credit-limit.popup';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
 import { ConfirmPopupComponent } from '@common';
+import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -388,7 +388,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(this.selectedContract);
-                                this.removeKeyworkNg2Select();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -473,7 +472,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
 
-                        this.removeKeyworkNg2Select();
                         this.hide();
                     } else {
                         this._toastService.error(res.message);

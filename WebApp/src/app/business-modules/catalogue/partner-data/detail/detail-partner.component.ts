@@ -18,14 +18,13 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { Company } from '@models';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
-import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import _merge from 'lodash/merge';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { PartnerRejectPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/partner-reject/partner-reject.popup';
 import { RoutingConstants } from '@constants';
+import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 
 
 @Component({
