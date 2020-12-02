@@ -127,7 +127,7 @@
                         </div>
                         <div class="col-lg-8">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !saleService.valid || !saleService.value)}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !saleService.value }">
                                 <label required>Sale Service</label>
                                 <div class="pos-rel">
                                     <ng-select #sv [items]="serviceTypes" (change)="selectedService($event)"
