@@ -13,7 +13,7 @@ import { ARCustomerPaymentReceiptPaymentListComponent } from './components/recei
 
 const routing: Routes = [
     {
-        path: '', children: [
+        path: '', data: { name: '' }, children: [
             { path: '', component: ARCustomerPaymentComponent },
             { path: 'receipt/new', component: ARCustomerPaymentCreateReciptComponent },
             { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
