@@ -475,13 +475,14 @@ namespace eFMS.API.Accounting.Controllers
         /// Update Confirm Billing Date for Invoice
         /// </summary>
         /// <param name="ids">List is of Invoice</param>
+        /// <param name="billingDate">Billing Date of Invoice</param>
         /// <returns></returns>
         [HttpPut]
         [Route("UpdateConfirmBillingDate")]
         [Authorize]
-        public IActionResult UpdateConfirmBillingDate(List<Guid> ids)
+        public IActionResult UpdateConfirmBillingDate(List<Guid> ids, DateTime? billingDate)
         {
-            var hs = accountingService.UpdateConfirmBillingDate(ids);
+            var hs = accountingService.UpdateConfirmBillingDate(ids, billingDate);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Update confirm billing date successful!", Data = ids };
             if (!hs.Success)
             {

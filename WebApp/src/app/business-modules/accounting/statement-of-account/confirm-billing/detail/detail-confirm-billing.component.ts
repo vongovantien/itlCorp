@@ -8,11 +8,12 @@ import { RoutingConstants, AccountingConstants } from '@constants';
 import { tap, switchMap, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
-import _merge from 'lodash/merge';
 import { AppForm } from '@app';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { CommonEnum } from '@enums';
 import { ConfirmBillingListChargeComponent } from '../../components/list-charge-confirm-billing/list-charge-confirm-billing.component';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 
 @Component({
     selector: 'detail-confirm-billing',
@@ -39,6 +40,8 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
     paymentTerm: AbstractControl;
     totalAmount: AbstractControl;
     attachDocInfo: AbstractControl;
+    paymentMethod: AbstractControl;
+    currency: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -56,9 +59,6 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
     listCurrency: any[] = [];
     chartOfAccounts: Observable<ChartOfAccounts[]>;
 
-    selectedCurrency: any[] = [];
-    selectedPaymentMethod: any[] = [];
-
     isDisabled: boolean = true;
 
     constructor(
@@ -69,12 +69,14 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
         private _ngProgressService: NgProgress,
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit(): void {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.initForm();
         this._activedRoute.params.pipe(
             tap((param: Params) => {
@@ -109,7 +111,9 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
             status: [],
             paymentTerm: [],
             totalAmount: [],
-            attachDocInfo: []
+            attachDocInfo: [],
+            paymentMethod: [],
+            currency: []
         });
 
         this.partnerId = this.formGroup.controls['partnerId'];
@@ -127,6 +131,8 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
         this.paymentTerm = this.formGroup.controls['paymentTerm'];
         this.totalAmount = this.formGroup.controls['totalAmount'];
         this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
+        this.paymentMethod = this.formGroup.controls['paymentMethod'];
+        this.currency = this.formGroup.controls['currency'];
 
         this.formGroup.disable({ onlySelf: true });
 
@@ -156,8 +162,6 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
                     if (!!res) {
                         this.accountingManagement = new AccAccountingManagementModel(res);
                         this.formGroup.patchValue(this.accountingManagement);
-                        this.selectedPaymentMethod = [this.paymentMethods.filter(item => item.id === this.accountingManagement.paymentMethod)[0]];
-                        this.selectedCurrency = [this.listCurrency.filter(item => item.id === this.accountingManagement.currency)[0]];
 
                         this.listChargeComponent.charges = this.accountingManagement.charges;
                         this.listChargeComponent.totalAmountVnd = this.accountingManagement.charges.reduce((sum, current) => sum + current.amountVnd + current.vatAmountVnd, 0);

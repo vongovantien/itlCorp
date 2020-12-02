@@ -2109,7 +2109,7 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
         
-        public HandleState UpdateConfirmBillingDate(List<Guid> ids)
+        public HandleState UpdateConfirmBillingDate(List<Guid> ids, DateTime? billingDate)
         {
             try
             {
@@ -2121,6 +2121,9 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach(var id in ids)
                         {
                             var accounting = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                            accounting.ConfirmBillingDate = billingDate;
+                            accounting.UserModified = currentUser.UserID;
+                            accounting.DatetimeModified = DateTime.Now;
                             if (accounting != null)
                             {
                                 hs = DataContext.Update(accounting, x => x.Id == accounting.Id, false);

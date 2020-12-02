@@ -116,9 +116,8 @@
                     </div>
                 </div>
             </tab>
-            <tab heading="Confirm Billing" (selectTab)="onSelectTab('confirm-billing')">
-
-            </tab>
+            <tab heading="Confirm Billing" *ngIf="menuSpecialPermission | async | specialPermission:'ConfirmBilling'"
+                (selectTab)="onSelectTab('confirm-billing')"></tab>
         </tabset>
     </div>
 </div>

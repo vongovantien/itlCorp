@@ -15,7 +15,7 @@
                 <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: partner.value}"
                     (itemSelected)="onSelectDataFormInfo($event, 'partner')" [selectedDisplayFields]="['shortName']"
                     [dataSources]="partners | async" [displayFields]="displayFieldsPartner" [height]="150"
-                    (remove)="resetFormControl(partner)" placeholder="Select customer">
+                    (remove)="resetFormControl(partner)" placeholder="Select partner">
                 </app-combo-grid-virtual-scroll>
             </div>
         </div>
@@ -66,8 +66,9 @@
                             Service
                         </label>
                         <ng-select [multiple]="true" formControlName="service" [items]="services"
-                            [active]="selectedService" (removed)="onRemoveDataFormInfo($event, 'service')"
-                            (selected)="onSelectDataFormInfo($event, 'service')" placeholder="Select service">
+                            (remove)="onRemoveDataFormInfo($event, 'service')" [(ngModel)]="selectedService"
+                            (add)="onSelectDataFormInfo($event, 'service')" placeholder="" class="custom"
+                            bindLabel="text" bindValue="id">
                         </ng-select>
                     </div>
                 </div>
@@ -75,8 +76,9 @@
                     <div class="form-group">
                         <label class="form-control-label" for="">CS Handling</label>
                         <ng-select [multiple]="true" formControlName="csHandling" [items]="csHandlings"
-                            [active]="selectedCsHandling" (removed)="onRemoveDataFormInfo($event, 'csHandling')"
-                            (selected)="onSelectDataFormInfo($event, 'csHandling')" placeholder="Select cs handling">
+                            (remove)="onRemoveDataFormInfo($event, 'csHandling')" [(ngModel)]="selectedCsHandling"
+                            (add)="onSelectDataFormInfo($event, 'csHandling')" placeholder="" class="custom"
+                            bindLabel="text" bindValue="id">
                         </ng-select>
                     </div>
                 </div>

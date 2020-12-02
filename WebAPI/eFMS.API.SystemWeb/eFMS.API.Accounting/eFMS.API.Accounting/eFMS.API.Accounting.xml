@@ -93,11 +93,12 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.UpdateConfirmBillingDate(System.Collections.Generic.List{System.Guid})">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.UpdateConfirmBillingDate(System.Collections.Generic.List{System.Guid},System.Nullable{System.DateTime})">
             <summary>
             Update Confirm Billing Date for Invoice
             </summary>
             <param name="ids">List is of Invoice</param>
+            <param name="billingDate">Billing Date of Invoice</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingPaymentController">

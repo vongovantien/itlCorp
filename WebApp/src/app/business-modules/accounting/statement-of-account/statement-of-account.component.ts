@@ -13,6 +13,8 @@ import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { Router } from "@angular/router";
 import { RoutingConstants } from "@constants";
+import { Store } from "@ngrx/store";
+import { IAppState, getMenuUserSpecialPermissionState } from "@store";
 
 @Component({
     selector: "app-statement-of-account",
@@ -34,7 +36,8 @@ export class StatementOfAccountComponent extends AppList {
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,
-        private _router: Router
+        private _router: Router,
+        private _store: Store<IAppState>,
     ) {
         super();
 
@@ -44,6 +47,7 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: "SOA No", field: "soano", sortable: true, width: 90 },
             { title: "Partner", field: "partnerName", sortable: true },

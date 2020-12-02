@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AccountingRepo, SystemRepo } from '@repositories';
+import { AccountingRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
@@ -11,6 +11,8 @@ import { formatDate } from '@angular/common';
 import { Router } from '@angular/router';
 import { ConfirmBillingDatePopupComponent } from '../components/poup/confirm-billing-date/confirm-billing-date.popup';
 import { InfoPopupComponent } from '@common';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 @Component({
     selector: 'confirm-billing',
     templateUrl: './confirm-billing.component.html',
@@ -22,13 +24,15 @@ export class ConfirmBillingComponent extends AppList implements OnInit {
     invoices: any[] = [];
     userLogged: User;
     checkAll = false;
+    invoiceIds: string[] = [];
+
     constructor(
         private _accountingRepo: AccountingRepo,
         private _progressService: NgProgress,
         private _sortService: SortService,
         private _toastService: ToastrService,
-        private _sysRepo: SystemRepo,
-        private _router: Router
+        private _router: Router,
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -37,6 +41,7 @@ export class ConfirmBillingComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Reference No', field: 'invoiceNoReal', sortable: true },
             { title: 'Partner ID', field: 'partnerId', sortable: true },
@@ -118,26 +123,25 @@ export class ConfirmBillingComponent extends AppList implements OnInit {
     }
 
     showConfirmBilling() {
+        this.invoiceIds = []; // Reset
         const objChecked = this.invoices.find(x => x.isSelected);
-        const invoiceIds = [];
         if (!objChecked) {
             this.infoPopup.show();
             return;
         } else {
             this.invoices.forEach(item => {
                 if (item.isSelected) {
-                    invoiceIds.push(item.id);
+                    this.invoiceIds.push(item.id);
                 }
             });
-            this.confirmBillingDatePopup.invoiceIds = invoiceIds;
-            console.log(invoiceIds);
             this.confirmBillingDatePopup.show();
         }
     }
 
     checkAllBilling() {
         if (this.checkAll) {
-            this.invoices.forEach(x => {
+            // Only select invoice have payment status = Unpaid
+            this.invoices.filter(i => i.paymentStatus === "Unpaid").forEach(x => {
                 x.isSelected = true;
             });
         } else {
@@ -149,5 +153,25 @@ export class ConfirmBillingComponent extends AppList implements OnInit {
 
     removeAllChecked() {
         this.checkAll = false;
+    }
+
+    onApplyBillingDate($event) {
+        const _billingDate = $event;
+        this._progressRef.start();
+        this._accountingRepo.UpdateConfirmBillingDate(this.invoiceIds, _billingDate)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getListInvoice();
+                    } else {
+                        this._toastService.warning(res.message, '');
+                    }
+                },
+            );
     }
 }

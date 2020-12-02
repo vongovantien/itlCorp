@@ -60,7 +60,7 @@ const routing: Routes = [
                         path: '', component: ConfirmBillingComponent, data: { name: '', title: 'eFMS Confirm Billing' }
                     },
                     {
-                        path: ':vatInvoiceId', component: ConfirmBillingDetailComponent, data: { name: 'Detail' },
+                        path: ':vatInvoiceId', component: ConfirmBillingDetailComponent, data: { name: 'Detail', title: 'eFMS Detail Billing' },
                     }
                 ]
             },

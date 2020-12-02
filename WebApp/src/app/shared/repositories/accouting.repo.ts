@@ -732,6 +732,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    UpdateConfirmBillingDate(invoiceIds: string[], billingDate: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/UpdateConfirmBillingDate`, invoiceIds, { billingDate: billingDate }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 
