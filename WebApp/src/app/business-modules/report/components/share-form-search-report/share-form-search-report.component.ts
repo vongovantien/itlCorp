@@ -255,7 +255,6 @@ export class ShareFormSearchReportComponent extends AppForm {
                 }
                 break;
             case 'office':
-                console.log('office')
                 if (data.id === 'All') {
                     this.officeActive.length = 0;
                     this.officeActive = [...this.officeActive, 'All'];
@@ -307,7 +306,6 @@ export class ShareFormSearchReportComponent extends AppForm {
         }
         if (type === 'office') {
             this.officeActive.splice(this.officeActive.findIndex((item) => item.id === data.id), 1);
-            console.log('clear')
             if (this.officeActive.length === 0) {
                 this.department.setValue([]);
                 this.departmentActive = [];
