@@ -864,7 +864,7 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle result = new ResultHandle { Status = false, Message = "paymentModels bắt buộc phải có data!", Data = paymentModels };
                 return BadRequest(result);
             }
-
+            
             try
             {
                 // 1. Login
