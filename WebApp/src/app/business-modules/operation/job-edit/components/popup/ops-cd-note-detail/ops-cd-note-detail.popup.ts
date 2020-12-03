@@ -233,7 +233,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
             this.paymentMethodPopupComponent.show();
         } else {
-            this.paymentMethodSelected = '';
+            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
             this.confirmSendToAcc();
         }
     }
