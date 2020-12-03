@@ -852,17 +852,37 @@
             <param name="currency"></param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Documentation.Controllers.ReportLogController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ReportLogController.#ctor(eFMS.API.Documentation.DL.IService.IReportLogService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="service"></param>
+            <param name="localizer"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ReportLogController.AddNew(eFMS.API.Documentation.DL.Models.SysReportLogModel)">
+            <summary>
+            Add Report Log
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.SaleReportController">
             <summary>
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.SaleReportController.#ctor(eFMS.API.Documentation.DL.IService.ISaleReportService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+        <member name="M:eFMS.API.Documentation.Controllers.SaleReportController.#ctor(eFMS.API.Documentation.DL.IService.ISaleReportService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IReportLogService)">
             <summary>
             
             </summary>
             <param name="service"></param>
             <param name="localizer"></param>
+            <param name="rptLogService"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.SaleReportController.QuaterSaleReport(eFMS.API.Documentation.DL.Models.ReportResults.Sales.SaleReportCriteria)">
             <summary>

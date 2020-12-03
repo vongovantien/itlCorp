@@ -64,11 +64,7 @@
                                         formControlName="officeId" [multiple]="true" bindLabel="text"
                                         (change)="selectedOffice($event)" placeholder="Please select">
                                     </ng-select>
-                                    <combo-grid-icon
-                                        *ngIf="!officeId.value || (!!officeId.value && !officeId.value.length)">
-                                    </combo-grid-icon>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -131,7 +127,7 @@
                         </div>
                         <div class="col-lg-8">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !saleService.valid || !saleService.value)}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !saleService.value }">
                                 <label required>Sale Service</label>
                                 <div class="pos-rel">
                                     <ng-select [items]="serviceTypes" (change)="selectedService($event)"
@@ -139,9 +135,6 @@
                                         formControlName="saleService" [multiple]="true"
                                         placeholder="Please select">
                                     </ng-select>
-                                    <combo-grid-icon
-                                        *ngIf="!saleService.value || (!!saleService.value && !saleService.value.length)">
-                                    </combo-grid-icon>
                                 </div>
 
                             </div>
@@ -174,8 +167,6 @@
                                         (change)="selectedVas($event)" [multiple]="true" formControlName="vas"
                                         placeholder="Please select">
                                     </ng-select>
-                                    <combo-grid-icon *ngIf="!vas.value || (!!vas.value && !vas.value.length)">
-                                    </combo-grid-icon>
                                 </div>
                             </div>
                         </div>
