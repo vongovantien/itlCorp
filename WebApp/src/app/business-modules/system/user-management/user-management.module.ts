@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { UserManagementComponent } from './user-management.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -13,8 +12,8 @@ import { FormAddUserComponent } from './components/form-add-user/form-add-user.c
 import { UserDetailsComponent } from './details/user-details.component';
 import { UserManagementImportComponent } from './import/user-management-import.component';
 import { AddRoleUserComponent } from './components/add-role-user/add-role-user.component';
-import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
-import { ShareSystemModule } from '../../share-system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
+import { ShareSystemModule } from '../share-system.module';
 import { UserManagementAddGroupPopupComponent } from './components/popup/add-group/user-management-add-group.popup';
 
 const routing: Routes = [
@@ -43,7 +42,6 @@ const routing: Routes = [
 @NgModule({
     imports: [
         SharedModule,
-        SelectModule,
         NgProgressModule,
         PaginationModule.forRoot(),
         TabsModule.forRoot(),

@@ -25,11 +25,19 @@ import { NgSelectModule } from '@ng-select/ng-select';
 const routing: Routes = [
     {
         path: "",
-        data: { name: "", title: 'eFMS Receivable Payable' },
+        data: { name: "" },
         children: [
             {
                 path: '', component: AccountReceivablePayableComponent,
                 data: { name: 'Account Payment' }
+            },
+            {
+                path: 'customer', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
+                data: { name: 'Customer Payment' }
+            },
+            {
+                path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
+                data: { name: 'Agency Payment' }
             },
             {
                 path: 'payment-import', component: PaymentImportComponent, data: { name: "Import" }
@@ -48,8 +56,8 @@ const routing: Routes = [
 
 @NgModule({
     declarations: [
-        AccountPaymentFormSearchComponent,
         AccountReceivablePayableComponent,
+        AccountPaymentFormSearchComponent,
         AccountPaymentListInvoicePaymentComponent,
         AccountPaymentListOBHPaymentComponent,
         AccountPaymentUpdateExtendDayPopupComponent,

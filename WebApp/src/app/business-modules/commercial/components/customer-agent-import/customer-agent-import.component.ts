@@ -93,7 +93,7 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    async import(element) {
+    import(element) {
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
             this.importAlert.show();
@@ -161,7 +161,7 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "CustomerImportTemplate.xlsx");
+                    this.downLoadFile(res, "application/ms-excel", "CustomerAgentImportTemplate.xlsx");
                 },
             );
     }

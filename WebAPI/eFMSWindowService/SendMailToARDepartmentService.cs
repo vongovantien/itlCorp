@@ -51,7 +51,6 @@ namespace eFMSWindowService
         {
             try
             {
-
                 FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail to AR department is recall at " + DateTime.Now);
                 using (eFMSTestEntities db = new eFMSTestEntities())
                 {
@@ -101,6 +100,20 @@ namespace eFMSWindowService
                                 if (toEmails.Count > 0 && shipments.Count() > 0)
                                 {
                                     var s = SendMailHelper.Send(subject, body, toEmails);
+
+                                    #region --- Ghi Log Send Mail ---
+                                    var logSendMail = new sysSentEmailHistory
+                                    {
+                                        SentUser = SendMailHelper._emailFrom,
+                                        Receivers = string.Join("; ", toEmails),
+                                        Subject = subject,
+                                        Sent = s,
+                                        SentDateTime = DateTime.Now,
+                                        Body = body
+                                    };
+                                    var hsLogSendMail = db.sysSentEmailHistories.Add(logSendMail);
+                                    var hsSc = db.SaveChanges();
+                                    #endregion --- Ghi Log Send Mail ---
                                 }
                             }
                         }
@@ -113,7 +126,6 @@ namespace eFMSWindowService
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }

@@ -254,10 +254,8 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Air Freight</label>
-                                        <ng-select #airFreight [items]="termTypes" [allowClear]="true"
-                                            (opened)="closeOtherSelects(airFreight)" formControlName="freightPayment"
-                                            placeholder="Air freight">
-                                        </ng-select>
+                                        <ng-select class="custom" [items]="termTypes" formControlName="freightPayment"
+                                            placeholder="Air freight"></ng-select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -273,10 +271,9 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Currency</label>
-                                        <ng-select #currency [items]="currencies | async" [allowClear]="true"
-                                            (opened)="closeOtherSelects(currency)" formControlName="currencyId"
-                                            placeholder="Currency">
-                                        </ng-select>
+                                        <ng-select class="custom" [items]="currencies | async"
+                                            formControlName="currencyId" placeholder="VND/USD" bindLabel="id"
+                                            bindValue="id"></ng-select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -292,19 +289,15 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>WT/VAL</label>
-                                        <ng-select #wtsVal [items]="wts" [allowClear]="true"
-                                            (opened)="closeOtherSelects(wtsVal)" formControlName="wtorValpayment"
-                                            placeholder="PP/CLL">
-                                        </ng-select>
+                                        <ng-select class="custom" [items]="wts" formControlName="wtorValpayment"
+                                            placeholder="PP/CLL"></ng-select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Other</label>
-                                        <ng-select #otherWts [items]="wts" [allowClear]="true"
-                                            (opened)="closeOtherSelects(otherWts)" formControlName="otherPayment"
-                                            placeholder="PP/CLL">
-                                        </ng-select>
+                                        <ng-select class="custom" [items]="wts" formControlName="otherPayment"
+                                            placeholder="PP/CLL"></ng-select>
                                     </div>
                                 </div>
                             </div>
@@ -346,10 +339,8 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Number of Origin B/L</label>
-                                <ng-select #obl [items]="numberOBLs" [allowClear]="true"
-                                    (opened)="closeOtherSelects(obl)" formControlName="originBlnumber"
-                                    placeholder="B/L">
-                                </ng-select>
+                                <ng-select class="custom" [items]="numberOBLs" formControlName="originBlnumber"
+                                    placeholder="B/L" bindLabel="text" bindValue="id"></ng-select>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -421,9 +412,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>R.Class</label>
-                                    <ng-select #rclass [items]="rClasses" placeholder="M/N/Q" [allowClear]="true"
-                                        (opened)="closeOtherSelects(rclass)" formControlName="rclass">
-                                    </ng-select>
+                                    <ng-select class="custom" [items]="rClasses" formControlName="rclass"
+                                        placeholder="M/N/Q"></ng-select>
                                 </div>
                             </div>
                         </div>
@@ -627,7 +617,7 @@
 </div>
 
 
-<dim-volume-popup (onUpdate)="onUpdateDIM($event)"></dim-volume-popup>
+<app-dim-volume-popup (onUpdate)="onUpdateDIM($event)"></app-dim-volume-popup>
 
 <air-export-other-charge-popup (onUpdate)="updateOtherCharge($event)"></air-export-other-charge-popup>
 

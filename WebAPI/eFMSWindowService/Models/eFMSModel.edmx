@@ -17,7 +17,7 @@
           <Property Name="Description" Type="nvarchar" MaxLength="4000" />
           <Property Name="BranchID" Type="uniqueidentifier" />
           <Property Name="DeptType" Type="varchar" MaxLength="50" />
-          <Property Name="Email" Type="nvarchar" MaxLength="150" />
+          <Property Name="Email" Type="nvarchar(max)" />
           <Property Name="UserCreated" Type="varchar" MaxLength="50" />
           <Property Name="DatetimeCreated" Type="datetime" />
           <Property Name="UserModified" Type="varchar" MaxLength="50" />
@@ -25,12 +25,29 @@
           <Property Name="Active" Type="bit" />
           <Property Name="InactiveOn" Type="datetime" />
         </EntityType>
+        <EntityType Name="sysSentEmailHistory">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SentUser" Type="varchar" MaxLength="50" />
+          <Property Name="Receivers" Type="varchar" MaxLength="4000" />
+          <Property Name="CCs" Type="varchar" MaxLength="4000" />
+          <Property Name="BCCs" Type="varchar" MaxLength="500" />
+          <Property Name="Subject" Type="nvarchar" MaxLength="4000" />
+          <Property Name="Type" Type="varchar" MaxLength="50" />
+          <Property Name="Sent" Type="bit" />
+          <Property Name="SentDateTime" Type="datetime" />
+          <Property Name="Description" Type="nvarchar" MaxLength="4000" />
+          <Property Name="Body" Type="nvarchar(max)" />
+        </EntityType>
         <Function Name="sp_AutoUpdateExchangeRate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="sp_GetShipmentInThreeDayToSendARDept" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="sp_GetShipmentToAutoLock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="sp_QueryAndUpdateCurrentStatusOfJob" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="eFMSTestModelStoreContainer">
           <EntitySet Name="catDepartment" EntityType="Self.catDepartment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysSentEmailHistory" EntityType="Self.sysSentEmailHistory" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -41,6 +58,7 @@
           <FunctionImport Name="sp_AutoUpdateExchangeRate" />
           <EntitySet Name="catDepartments" EntityType="eFMSTestModel.catDepartment" />
           <FunctionImport Name="sp_GetShipmentInThreeDayToSendARDept" ReturnType="Collection(eFMSTestModel.sp_GetShipmentInThreeDayToSendARDept_Result)" />
+          <EntitySet Name="sysSentEmailHistories" EntityType="eFMSTestModel.sysSentEmailHistory" />
         </EntityContainer>
         <EntityType Name="catDepartment">
           <Key>
@@ -54,7 +72,7 @@
           <Property Name="Description" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
           <Property Name="BranchID" Type="Guid" />
           <Property Name="DeptType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="UserCreated" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="DatetimeCreated" Type="DateTime" Precision="3" />
           <Property Name="UserModified" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -75,6 +93,22 @@
           <Property Type="Guid" Name="OfficeID" Nullable="true" />
           <Property Type="String" Name="OfficeName" Nullable="true" MaxLength="50" />
         </ComplexType>
+        <EntityType Name="sysSentEmailHistory">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SentUser" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Receivers" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="CCs" Type="String" MaxLength="4000" FixedLength="false" Unicode="false" />
+          <Property Name="BCCs" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Subject" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Sent" Type="Boolean" />
+          <Property Name="SentDateTime" Type="DateTime" Precision="3" />
+          <Property Name="Description" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -121,6 +155,23 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="sysSentEmailHistories">
+            <EntityTypeMapping TypeName="eFMSTestModel.sysSentEmailHistory">
+              <MappingFragment StoreEntitySet="sysSentEmailHistory">
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="SentDateTime" ColumnName="SentDateTime" />
+                <ScalarProperty Name="Sent" ColumnName="Sent" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="BCCs" ColumnName="BCCs" />
+                <ScalarProperty Name="CCs" ColumnName="CCs" />
+                <ScalarProperty Name="Receivers" ColumnName="Receivers" />
+                <ScalarProperty Name="SentUser" ColumnName="SentUser" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

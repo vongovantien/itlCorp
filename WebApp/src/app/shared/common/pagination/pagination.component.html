@@ -1,7 +1,7 @@
 <div class="paginging-wrapper">
     <div class="pagination-nav ">
         <div class="row" *ngIf="total > 0">
-            <div class="col-sm-6">
+            <div class="col-sm-6" *ngIf="total > pageSize">
                 <div class="tatable__pager-size">
                     <div class="select-box">
                         <select class="form-control" id="" aria-label="" [(ngModel)]="itemPerPage"

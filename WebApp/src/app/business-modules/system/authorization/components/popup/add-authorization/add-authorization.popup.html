@@ -34,8 +34,8 @@
                                 <label class="form-control-label">
                                     Person In Charge
                                 </label>
-                                <ng-select formControlName="personInCharge" [active]="personInChargeActive || []"
-                                    [allowClear]="true" [disabled]="true" [items]="personInChargeList">
+                                <ng-select class="custom" formControlName="personInCharge" [disabled]="true"
+                                    [items]="personInChargeList | async" bindLabel="username" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -47,8 +47,8 @@
                                 <label class="form-control-label" required>
                                     Authorized Person
                                 </label>
-                                <ng-select formControlName="authorizedPerson" [allowClear]="true"
-                                    [items]="authorizedPersonList">
+                                <ng-select class="custom" formControlName="authorizedPerson" bindLabel="username"
+                                    bindValue="id" [items]="personInChargeList | async">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (authorizedPerson.errors | equalError: 'required')">
@@ -62,8 +62,8 @@
                                 <label class="form-control-label" required>
                                     Service
                                 </label>
-                                <ng-select [active]="activeServices" formControlName="authorizationService"
-                                    [allowClear]="true" [multiple]="true" [items]="serviceList">
+                                <ng-select class="custom" formControlName="authorizationService" [multiple]="true"
+                                    [items]="serviceList | async" bindValue="value" bindLabel="displayName">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (authorizationService.errors | equalError: 'required')">

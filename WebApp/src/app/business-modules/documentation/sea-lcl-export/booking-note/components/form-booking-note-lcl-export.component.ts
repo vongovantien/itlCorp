@@ -44,7 +44,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
+    termTypes: string[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,

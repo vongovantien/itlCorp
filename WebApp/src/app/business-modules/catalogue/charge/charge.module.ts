@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { ChargeComponent } from './charge.component';
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
@@ -18,6 +17,7 @@ import { FormAddChargeComponent } from './components/form-add-charge/form-add-ch
 import { VoucherListComponent } from './components/voucher-list/voucher-list.component';
 import { GenerateSellingChargePopupComponent } from './components/popup/generate-selling-charge/generate-selling-charge.popup';
 import { reducers } from './store';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     {
@@ -49,7 +49,7 @@ const routing: Routes = [
 ];
 @NgModule({
     imports: [
-        SelectModule,
+        NgSelectModule,
         NgProgressModule,
         SharedModule,
         PaginationModule.forRoot(),

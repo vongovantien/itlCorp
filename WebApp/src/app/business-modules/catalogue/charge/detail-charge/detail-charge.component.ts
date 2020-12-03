@@ -27,11 +27,7 @@ export class DetailChargeComponent extends AddChargeComponent {
         { id: "DEBIT", text: "DEBIT" },
         { id: "OBH", text: "OBH" }
     ];
-    ngDataTypeChargeDefault = [
-        { id: "Công-Nợ", text: "Công Nợ" },
-        { id: "Giải-Chi", text: "Giải Chi" },
-        { id: "Loại-Khác", text: "Loại Khác" }
-    ];
+    ngDataTypeChargeDefault: Array<string> = ["Công-Nợ", "Giải-Chi", "Loại Khác"];
 
     activeUnit: any = [];
     activeCurrency: any = [];
@@ -86,7 +82,6 @@ export class DetailChargeComponent extends AddChargeComponent {
 
                 this.voucherList.ChargeToAdd.listChargeDefaultAccount = this.Charge.listChargeDefaultAccount;
                 this.voucherList.isShowUpdate = this.Charge.permission.allowUpdate;
-
                 this.Charge.charge.userCreated = res.charge.userCreated;
                 if (!!this.formAddCharge.debitCharge.value) {
                     this.formAddCharge.generateSelling.setValue(false);

@@ -19,7 +19,6 @@
                 Preview OCL
             </button>
             <div class="dropdown-menu">
-                <a class="dropdown-item pointer">Export excel</a>
                 <a class="dropdown-item pointer" (click)="previewOCL()">Crystal
                     Report</a>
             </div>
@@ -50,7 +49,7 @@
             <div class="col-12">
                 <tabset class="custom-class-tab">
                     <tab heading="Bill Instruction">
-                        <bill-instruction-sea-export [type]="'fcl'"></bill-instruction-sea-export>
+                        <app-form-si-sea-export [type]="'fcl'"></app-form-si-sea-export>
                     </tab>
                     <tab heading="Bill detail">
                         <bill-instruction-housebills-sea-export></bill-instruction-housebills-sea-export>

@@ -1,13 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
+
+import { AppForm } from '@app';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { HouseBill } from '@models';
+import { DataService } from '@services';
+import { RoutingConstants } from '@constants';
 
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
 import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction } from '@share-bussiness';
@@ -15,10 +18,8 @@ import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetail
 import { forkJoin, merge } from 'rxjs';
 import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
-import { DataService } from '@services';
 
 import { catchError, finalize, mergeMap, takeUntil } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -105,34 +106,18 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
         const formData = {
-            mawb: form.mawb,
             customerId: form.customer,
-            saleManId: form.saleManId,
-            shipperId: form.shipperId,
-            consigneeId: form.consigneeId,
             notifyPartyId: form.notifyId,
             notifyPartyDescription: form.notifyDescription,
             hwbno: form.hawb,
-            hbltype: !!form.hbltype && !!form.hbltype.length ? form.hbltype[0].id : null,
+
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             arrivalDate: !!form.arrivalDate && !!form.arrivalDate.startDate ? formatDate(form.arrivalDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            forwardingAgentId: form.forwardingAgentId,
-            pol: form.pol,
-            pod: form.pod,
-            warehouseId: form.warehouseId,
-            route: form.route,
-            flightNo: form.flightNo,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            flightNoOrigin: form.flightNoOrigin,
             flightDateOrigin: !!form.flightDateOrigin && form.flightDateOrigin.startDate !== undefined ? formatDate(form.flightDateOrigin.startDate, 'yyyy-MM-dd', 'en') : null,
             issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            packageType: !!form.packageType && !!form.packageType.length ? form.packageType[0].id : null,
-            freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
-            packageQty: form.packageQty,
+
             grossWeight: form.gw,
-            chargeWeight: form.chargeWeight,
-            poInvoiceNo: form.poinvoiceNo,
-            desOfGoods: form.desOfGoods,
             finalPOD: form.finalPod,
         };
 
@@ -195,10 +180,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
-        this.setError(this.formCreateHBLComponent.freightPayment);
-        this.setError(this.formCreateHBLComponent.packageType);
-        this.setError(this.formCreateHBLComponent.hbltype);
-
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
         }

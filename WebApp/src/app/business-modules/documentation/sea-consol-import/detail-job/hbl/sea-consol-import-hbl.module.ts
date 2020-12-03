@@ -12,6 +12,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { SeaConsolImportHBLComponent } from './sea-consol-import-hbl.component';
 import { SeaConsolImportCreateHBLComponent } from './create/create-hbl-consol-import.component';
 import { SeaConsolImportDetailHBLComponent } from './detail/detail-hbl-consol-import.component';
+import { ShareSeaServiceModule } from '../../../share-sea/share-sea-service.module';
 
 const routing: Routes = [
     {
@@ -45,6 +46,7 @@ const LIB = [
         ShareBussinessModule,
         RouterModule.forChild(routing),
         NgxSpinnerModule,
+        ShareSeaServiceModule,
         ...LIB
 
     ],

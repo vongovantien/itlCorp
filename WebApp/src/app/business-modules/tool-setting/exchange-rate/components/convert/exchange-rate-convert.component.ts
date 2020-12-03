@@ -33,10 +33,15 @@ export class ExchangeRateConvertComponent extends AppForm implements OnInit {
     }
     convertRate(form) {
         this.date = this.convert.selectedRangeDate.startDate;
-        if (form.valid && this.convert.fromCurrency != null && this.convert.toCurrency != null && this.convert.selectedRangeDate.startDate !== null) {
+        if (form.valid
+            && this.convert.fromCurrency != null
+            && this.convert.toCurrency != null
+            && this.convert.selectedRangeDate.startDate !== null) {
             this._catalogueRepo.convertExchangeRate(new Date(this.convert.selectedRangeDate.startDate).toISOString(), this.convert.fromCurrency, this.convert.toCurrency)
                 .subscribe((response) => {
-                    this.rate = response;
+                    if (response) {
+                        this.rate = response;
+                    }
                 });
 
         }

@@ -573,6 +573,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         from pat in pat2.DefaultIfEmpty()
                                         join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                         from sett in sett2.DefaultIfEmpty()
+                                        join p in partners on sett.Payee equals p.Id into payeeGrps
+                                        from payeeGrp in payeeGrps.DefaultIfEmpty()
                                         select new ChargeOfAccountingManagementModel
                                         {
                                             SurchargeId = sur.Id,
@@ -611,7 +613,11 @@ namespace eFMS.API.Accounting.DL.Services
                                             AcctManagementId = sur.AcctManagementId,
                                             RequesterId = sett.Requester,
                                             ChargeType = sur.Type,
-                                            IsFromShipment = sur.IsFromShipment
+                                            IsFromShipment = sur.IsFromShipment,
+                                            PayeeIdSettle = payeeGrp.Id ?? null,
+                                            PayeeNameSettle = payeeGrp.ShortName,
+                                            PayeeAddressSettle = payeeGrp.AddressVn
+
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(query);
             var queryBuySellDocumentation = from sur in surcharges
@@ -627,6 +633,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             from pat in pat2.DefaultIfEmpty()
                                             join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                             from sett in sett2.DefaultIfEmpty()
+                                            join p in partners on sett.Payee equals p.Id into payeeGrps
+                                            from payeeGrp in payeeGrps.DefaultIfEmpty()
                                             select new ChargeOfAccountingManagementModel
                                             {
                                                 SurchargeId = sur.Id,
@@ -665,7 +673,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                 AcctManagementId = sur.AcctManagementId,
                                                 RequesterId = sett.Requester,
                                                 ChargeType = sur.Type,
-                                                IsFromShipment = sur.IsFromShipment
+                                                IsFromShipment = sur.IsFromShipment,
+                                                PayeeIdSettle = payeeGrp.Id ?? null,
+                                                PayeeNameSettle = payeeGrp.ShortName,
+                                                PayeeAddressSettle = payeeGrp.AddressVn
                                             };
             queryBuySellDocumentation = queryBuySellDocumentation.Where(query);
             var mergeBuySell = queryBuySellOperation.Union(queryBuySellDocumentation);
@@ -708,6 +719,8 @@ namespace eFMS.API.Accounting.DL.Services
                                        from obhPat in obhPat2.DefaultIfEmpty()
                                        join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                        from sett in sett2.DefaultIfEmpty()
+                                       join p in partners on sett.Payee equals p.Id into payeeGrps
+                                       from payeeGrp in payeeGrps.DefaultIfEmpty()
                                        select new ChargeOfAccountingManagementModel
                                        {
                                            SurchargeId = sur.Id,
@@ -746,7 +759,10 @@ namespace eFMS.API.Accounting.DL.Services
                                            AcctManagementId = sur.AcctManagementId,
                                            RequesterId = sett.Requester,
                                            ChargeType = sur.Type,
-                                           IsFromShipment = sur.IsFromShipment
+                                           IsFromShipment = sur.IsFromShipment,
+                                           PayeeIdSettle = payeeGrp.Id ?? null,
+                                           PayeeNameSettle = payeeGrp.ShortName,
+                                           PayeeAddressSettle = payeeGrp.AddressVn
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(query);
             var queryObhBuyDocumentation = from sur in surcharges
@@ -764,6 +780,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            from obhPat in obhPat2.DefaultIfEmpty()
                                            join sett in settlements on sur.SettlementCode equals sett.SettlementNo into sett2
                                            from sett in sett2.DefaultIfEmpty()
+                                           join p in partners on sett.Payee equals p.Id into payeeGrps
+                                           from payeeGrp in payeeGrps.DefaultIfEmpty()
                                            select new ChargeOfAccountingManagementModel
                                            {
                                                SurchargeId = sur.Id,
@@ -802,7 +820,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                AcctManagementId = sur.AcctManagementId,
                                                RequesterId = sett.Requester,
                                                ChargeType = sur.Type,
-                                               IsFromShipment = sur.IsFromShipment
+                                               IsFromShipment = sur.IsFromShipment,
+                                               PayeeIdSettle = payeeGrp.Id ?? null,
+                                               PayeeNameSettle = payeeGrp.ShortName,
+                                               PayeeAddressSettle = payeeGrp.AddressVn
                                            };
             queryObhBuyDocumentation = queryObhBuyDocumentation.Where(query);
             var mergeObhBuy = queryObhBuyOperation.Union(queryObhBuyDocumentation);
@@ -875,22 +896,43 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
             {
                 // Group by theo RequesterId
-                chargeGroupByPartner = charges.GroupBy(g => new { SettlementRequesterId = g.RequesterId }).Select(s =>
+                if(charges.Any(x => x.PayeeIdSettle != null))
                 {
-                    List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
-                    return new PartnerOfAcctManagementResult
+                    chargeGroupByPartner = charges.GroupBy(g => new { g.PayeeIdSettle }).Select(s =>
                     {
-                        PartnerId = null,
-                        PartnerName = null,
-                        PartnerAddress = null,
-                        SettlementRequesterId = s.Key.SettlementRequesterId,
-                        SettlementRequester = null, //Tính toán bên dưới
-                        InputRefNo = string.Empty, //Tính toán bên dưới
-                        Charges = s.ToList(),
-                        Service = GetTransactionType(jobNoGrouped)
-                    };
-                }).ToList();
-
+                        List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
+                        return new PartnerOfAcctManagementResult
+                        {
+                            PartnerId = s.Key.PayeeIdSettle,
+                            PartnerName = s.FirstOrDefault()?.PayeeNameSettle,
+                            PartnerAddress = s.FirstOrDefault()?.PayeeAddressSettle,
+                            SettlementRequesterId = null,
+                            SettlementRequester = null, //Tính toán bên dưới
+                            InputRefNo = string.Empty, //Tính toán bên dưới
+                            Charges = s.ToList(),
+                            Service = GetTransactionType(jobNoGrouped)
+                        };
+                    }).ToList();
+                }
+                else
+                {
+                    chargeGroupByPartner = charges.GroupBy(g => new { g.RequesterId }).Select(s =>
+                    {
+                        List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
+                        return new PartnerOfAcctManagementResult
+                        {
+                            PartnerId = null,
+                            PartnerName = null,
+                            PartnerAddress = null,
+                            SettlementRequesterId = s.Key.RequesterId,
+                            SettlementRequester = null, //Tính toán bên dưới
+                            InputRefNo = string.Empty, //Tính toán bên dưới
+                            Charges = s.ToList(),
+                            Service = GetTransactionType(jobNoGrouped)
+                        };
+                    }).ToList();
+                }
+                
             }
             else
             {
@@ -1920,6 +1962,215 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id,false);
+        }
+
+        #region --- CONFIRM BILLING ---
+        private Expression<Func<AccAccountingManagement, bool>> ConfirmBillingExpressionQuery(ConfirmBillingCriteria criteria)
+        {
+            Expression<Func<AccAccountingManagement, bool>> query = q => q.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || q.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE;
+            
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                if (criteria.SearchOption == "Debit Note")
+                {
+                    var acctManagementIds = surchargeRepo.Get(x => criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                    if (acctManagementIds != null)
+                    {
+                        query = query.And(x => acctManagementIds.Contains(x.Id));
+                    }
+                }
+                else if (criteria.SearchOption == "SOA")
+                {
+                    var acctManagementIds = surchargeRepo.Get(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                    if (acctManagementIds != null)
+                    {
+                        query = query.And(x => acctManagementIds.Contains(x.Id));
+                    }
+                }
+                else if (criteria.SearchOption == "VAT Invoice")
+                {
+                    query = query.And(x => criteria.ReferenceNos.Contains(x.InvoiceNoReal));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                query = query.And(x => x.PartnerId == criteria.PartnerId);
+            }
+
+            if (criteria.FromDate != null && criteria.ToDate != null)
+            {
+                if (!string.IsNullOrEmpty(criteria.DateType))
+                {
+                    if (criteria.DateType == "VAT Invoice Date")
+                    {
+                        query = query.And(x => x.Date.Value.Date >= criteria.FromDate.Value.Date && x.Date.Value.Date <= criteria.ToDate.Value.Date);
+                    }
+                    else if (criteria.DateType == "Confirm Billing Date")
+                    {
+                        query = query.And(x => x.ConfirmBillingDate.Value.Date >= criteria.FromDate.Value.Date && x.ConfirmBillingDate.Value.Date <= criteria.ToDate.Value.Date);
+                    }
+                }
+            }
+
+            if (criteria.ConfirmedBilling == "Yes")
+            {
+                query = query.And(x => x.ConfirmBillingDate != null);
+            }
+            else if (criteria.ConfirmedBilling == "No")
+            {
+                query = query.And(x => x.ConfirmBillingDate == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Services))
+            {
+                var acctManagementIds = surchargeRepo.Get(x => criteria.Services.Contains(x.TransactionType)).Select(se => se.AcctManagementId).Distinct().ToList();
+                if (acctManagementIds != null)
+                {
+                    query = query.And(x => acctManagementIds.Contains(x.Id));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CsHandling))
+            {
+                var acctManagementIdOps = (from sur in surchargeRepo.Get(x => x.AcctManagementId != null)
+                                          join ops in opsTransactionRepo.Get(x => criteria.CsHandling.Contains(x.BillingOpsId)) on sur.JobNo equals ops.JobNo
+                                          select sur.AcctManagementId).Distinct().ToList();
+                var acctManagementIdDoc = (from sur in surchargeRepo.Get(x => x.AcctManagementId != null)
+                                          join ops in csTransactionRepo.Get(x => criteria.CsHandling.Contains(x.PersonIncharge)) on sur.JobNo equals ops.JobNo
+                                          select sur.AcctManagementId).Distinct().ToList();
+                if (acctManagementIdOps != null && acctManagementIdDoc == null)
+                {
+                    query = query.And(x => acctManagementIdOps.Contains(x.Id));
+                }
+                else if (acctManagementIdDoc != null && acctManagementIdOps == null)
+                {
+                    query = query.And(x => acctManagementIdDoc.Contains(x.Id));
+                }
+                else if (acctManagementIdOps != null && acctManagementIdDoc != null)
+                {
+                    query = query.And(x => acctManagementIdOps.Contains(x.Id) || acctManagementIdDoc.Contains(x.Id));
+                }
+            }
+            return query;
+        }
+
+        private IQueryable<ConfirmBillingResult> GetDataConfirmBilling(ConfirmBillingCriteria criteria)
+        {
+            var query = ConfirmBillingExpressionQuery(criteria);
+            var partners = partnerRepo.Get();
+            var users = userRepo.Get();
+            var acct = DataContext.Get(query);
+            var data = from acc in acct
+                       join pat in partners on acc.PartnerId equals pat.Id into pat2
+                       from pat in pat2.DefaultIfEmpty()
+                       join user in users on acc.UserCreated equals user.Id into user2
+                       from user in user2.DefaultIfEmpty()
+                       select new ConfirmBillingResult
+                       {
+                           Id = acc.Id,
+                           InvoiceNoReal = acc.InvoiceNoReal,
+                           PartnerId = pat.TaxCode, //Tax Code of Partner
+                           PartnerName = pat.ShortName,
+                           TotalAmount = acc.TotalAmount,
+                           Currency = acc.Currency,
+                           Type = acc.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? "Debit" : (acc.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE ? "OBH" : string.Empty),
+                           Date = acc.Date, //Invoice Date
+                           PaymentTerm = acc.PaymentTerm,
+                           ConfirmBillingDate = acc.ConfirmBillingDate,
+                           DueDate = acc.ConfirmBillingDate != null ? acc.ConfirmBillingDate.Value.AddDays((double)acc.PaymentTerm) : acc.Date.Value.AddDays((double)acc.PaymentTerm),
+                           PaymentStatus = acc.PaymentStatus,
+                           DatetimeModified = acc.DatetimeModified
+                       };
+            return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
+        }
+
+        public List<ConfirmBillingResult> ConfirmBillingPaging(ConfirmBillingCriteria criteria, int page, int size, out int rowsCount)
+        {
+            var data = GetDataConfirmBilling(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+
+            //Phân trang
+            var _totalItem = data.Select(s => s.Id).Count();
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            return data.ToList();
+        }
+        
+        public HandleState UpdateConfirmBillingDate(List<Guid> ids, DateTime? billingDate)
+        {
+            try
+            {
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = new HandleState();
+                        foreach(var id in ids)
+                        {
+                            var accounting = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                            accounting.ConfirmBillingDate = billingDate;
+                            accounting.UserModified = currentUser.UserID;
+                            accounting.DatetimeModified = DateTime.Now;
+                            if (accounting != null)
+                            {
+                                hs = DataContext.Update(accounting, x => x.Id == accounting.Id, false);
+                            }
+                            else
+                            {
+                                return new HandleState((object)"An invoice does not exist in the system. Update confirm billing failed!");
+                            }
+                        }
+                        if (hs.Success)
+                        {
+                            DataContext.SubmitChanges();
+                            trans.Commit();
+                        }
+                        return hs;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+        #endregion --- CONFIRM BILLING ---
+
+        
+        private string GetPayeeIdFromSettlement(string settleCode)
+        {
+            string payeeId = null;
+
+            AcctSettlementPayment settlement = settlementPaymentRepo.Get(x => x.SettlementNo == settleCode).FirstOrDefault();
+            if(settlement != null)
+            {
+                payeeId = settlement.Payee;
+            }
+
+            return payeeId;
         }
     }
 }

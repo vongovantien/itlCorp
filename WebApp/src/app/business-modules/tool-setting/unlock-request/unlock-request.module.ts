@@ -6,7 +6,6 @@ import { ModalModule } from "ngx-bootstrap/modal";
 import { PaginationModule } from "ngx-bootstrap/pagination";
 
 import { SharedModule } from "src/app/shared/shared.module";
-import { SelectModule } from "ng2-select";
 import { NgModule } from "@angular/core";
 import { UnlockRequestFormSearchComponent } from "./components/form-search-unlock-request/form-search-unlock-request.component";
 import { UnlockRequestAddNewComponent } from "./add/add-unlock-request.component";
@@ -18,6 +17,7 @@ import { UnlockRequestInputDeniedCommentPopupComponent } from "./components/popu
 import { UnlockRequestInputSearchJobPopupComponent } from "./components/popup/input-search-job/input-search-job.popup";
 import { UnlockRequestInputSearchSettlementAdvancePopupComponent } from "./components/popup/input-search-settlement-advance/input-search-settlement-advance.popup";
 import { UnlockRequestProcessApproveComponent } from "./components/process-approve-unlock-request/process-approve-unlock-request.component";
+import { NgSelectModule } from "@ng-select/ng-select";
 
 const routing: Route[] = [
     {
@@ -43,7 +43,7 @@ const routing: Route[] = [
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
-        SelectModule,
+        NgSelectModule,
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
         PaginationModule.forRoot(),

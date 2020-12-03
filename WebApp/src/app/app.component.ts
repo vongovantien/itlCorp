@@ -73,7 +73,6 @@ export class AppComponent {
         // * Oauth    
         this.oauthService.events.subscribe(
             (e: OAuthEvent) => {
-                console.log(e);
                 if (e instanceof OAuthInfoEvent) {
                     if (e.type === 'token_expires') {
                         this.oauthService.refreshToken().then(

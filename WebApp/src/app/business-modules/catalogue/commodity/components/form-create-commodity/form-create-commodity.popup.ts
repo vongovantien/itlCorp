@@ -31,7 +31,7 @@ export class CommodityAddPopupComponent extends PopupBase {
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _toastService: ToastrService, ) {
+        private _toastService: ToastrService,) {
         super();
     }
 
@@ -63,7 +63,7 @@ export class CommodityAddPopupComponent extends PopupBase {
                     Validators.minLength(2)
                 ])
             ],
-            commodityGroup: ['',
+            commodityGroup: [null,
                 Validators.compose([
                     Validators.required
                 ])
@@ -95,7 +95,7 @@ export class CommodityAddPopupComponent extends PopupBase {
                 id: this.commodity.id,
                 commodityNameVn: this.commodityNameVn.value,
                 commodityNameEn: this.commodityNameEn.value,
-                commodityGroupId: this.commodityGroup.value[0].id,
+                commodityGroupId: this.commodityGroup.value.id,
                 commodityGroupNameVn: this.commodity.commodityGroupNameVn,
                 commodityGroupNameEn: this.commodity.commodityGroupNameEn,
                 note: this.commodity.note,
@@ -141,18 +141,12 @@ export class CommodityAddPopupComponent extends PopupBase {
     }
 
     getDetail() {
-        console.log(this.commodity)
-        let index = this.groups.findIndex(x => x.id == this.commodity.commodityGroupId);
-        if (index > -1) {
-            this.groupActive = [this.groups[index]];
-        }
-        console.log(this.groupActive)
         this.formCommodity.setValue({
             commodityCode: this.commodity.code,
             commodityNameEn: this.commodity.commodityNameEn,
             commodityNameVn: this.commodity.commodityNameVn,
-            commodityGroup: this.groupActive,
-            commodityActive: this.commodity.active,
+            commodityGroup: { id: this.commodity.commodityGroupId, text: this.groups.find(x => x.id === this.commodity.commodityGroupId).text },
+            commodityActive: this.commodity.active
         });
     }
 

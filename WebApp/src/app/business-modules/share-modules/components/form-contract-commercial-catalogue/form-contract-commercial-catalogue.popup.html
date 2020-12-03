@@ -59,31 +59,19 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !officeId.valid || !officeId.value)}">
                                 <label required>Office</label>
-                                <!-- <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{ field: 'id', value: officeId.value}"
-                                    (itemSelected)="onSelectedDataFormInfo($event,'office')"
-                                    [selectedDisplayFields]="['shortName']" [dataSources]="offices"
-                                    (remove)="resetFormControl('office')"
-                                    [displayFields]="[{field: 'shortName', label: 'Abbr Name'}, { field: 'branchNameEn', label: 'Name EN' }]"
-                                    [height]="200" placeholder="Select Office">
-                                </app-combo-grid-virtual-scroll> -->
                                 <div class="pos-rel">
-                                    <ng-select #of [items]="offices" [allowClear]="true" [active]="activeOffice"
-                                        (opened)="closeOtherSelects(of)" formControlName="officeId" [multiple]="true"
-                                        (selected)="selectedOffice($event)" placeholder="Please select">
+                                    <ng-select [items]="offices" [clearable]="true" class="custom"
+                                        formControlName="officeId" [multiple]="true" bindLabel="text"
+                                        (change)="selectedOffice($event)" placeholder="Please select">
                                     </ng-select>
-                                    <combo-grid-icon
-                                        *ngIf="!officeId.value || (!!officeId.value && !officeId.value.length)">
-                                    </combo-grid-icon>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (contractNo.dirty && !contractNo.valid)  || ( contractType.value[0]?.id === 'Official' && !contractNo.value )} ">
+                                [ngClass]="{'m-form__group has-danger': (contractNo.dirty && !contractNo.valid)  || ( contractType.value === 'Official' && !contractNo.value )} ">
                                 <label>Contract No</label>
                                 <input type="text" class="form-control" formControlName="contractNo">
                                 <div class="form-control-feedback" *ngIf="contractNo.errors | equalError: 'maxlength'">
@@ -132,25 +120,21 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
                                 <label required>Agreement Type</label>
-                                <ng-select #ct [items]="contractTypes" (selected)="selectedAgreementType($event)"
-                                    (opened)="closeOtherSelects(ct)" formControlName="contractType"
-                                    placeholder="Please select">
+                                <ng-select [items]="contractTypes" (change)="selectedAgreementType($event)"
+                                    class="custom" formControlName="contractType" placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-8">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !saleService.valid || !saleService.value)}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !saleService.value }">
                                 <label required>Sale Service</label>
                                 <div class="pos-rel">
-                                    <ng-select #sv [items]="serviceTypes" (selected)="selectedService($event)"
-                                        [disabled]="type === 'Agent'" [allowClear]="true" [active]="activeServices"
-                                        (opened)="closeOtherSelects(sv)" formControlName="saleService" [multiple]="true"
+                                    <ng-select [items]="serviceTypes" (change)="selectedService($event)"
+                                        bindLabel="text" class="custom" [disabled]="true" [clearable]="true"
+                                        formControlName="saleService" [multiple]="true"
                                         placeholder="Please select">
                                     </ng-select>
-                                    <combo-grid-icon
-                                        *ngIf="!saleService.value || (!!saleService.value && !saleService.value.length)">
-                                    </combo-grid-icon>
                                 </div>
 
                             </div>
@@ -160,17 +144,17 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Payment Method</label>
-                                <ng-select #pm [items]="paymentMethods" [allowClear]="true"
-                                    [disabled]="type === 'Agent'" (opened)="closeOtherSelects(pm)"
-                                    formControlName="paymentMethod" placeholder="Please select">
+                                <ng-select [items]="paymentMethods" [clearable]="true" [disabled]="type === 'Agent'"
+                                    class="custom" formControlName="paymentMethod"
+                                    placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Currency</label>
-                                <ng-select #c [items]="listCurrency | async" [allowClear]="true"
-                                    (opened)="closeOtherSelects(c)" formControlName="currencyId"
+                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
+                                    class="custom" formControlName="currencyId"
                                     placeholder="Select Currency">
                                 </ng-select>
                             </div>
@@ -179,22 +163,16 @@
                             <div class="form-group">
                                 <label>VAS</label>
                                 <div class="pos-rel">
-                                    <ng-select #vasl [items]="vaslst" [allowClear]="true" [disabled]="type === 'Agent'"
-                                        (selected)="selectedVas($event)" (opened)="closeOtherSelects(vas)"
-                                        [active]="activeVas" [multiple]="true" formControlName="vas"
+                                    <ng-select class="custom" [items]="vaslst" [clearable]="true" bindLabel="text"
+                                        (change)="selectedVas($event)" [multiple]="true" formControlName="vas"
                                         placeholder="Please select">
                                     </ng-select>
-                                    <combo-grid-icon *ngIf="!vas.value || (!!vas.value && !vas.value.length)">
-                                    </combo-grid-icon>
-
-
                                 </div>
-
                             </div>
                         </div>
                     </div>
                     <ng-container>
-                        <div class="row" *ngIf=" isUpdate ||  (!isUpdate && contractType.value[0].id ==='Official')">
+                        <div class="row" *ngIf=" isUpdate ||  (!isUpdate && contractType.value ==='Official')">
                             <div class="col-lg-12">
                                 <div class="alert-block__heading font-weight-bold collapse-toggle "
                                     data-toggle="collapse" data-target="#data-form-contact">
@@ -267,7 +245,7 @@
                                     </div>
                                 </div>
                             </ng-container>
-                            <ng-container *ngIf=" isUpdate ||  (!isUpdate  && contractType.value[0].id ==='Official')">
+                            <ng-container *ngIf=" isUpdate ||  (!isUpdate  && contractType.value ==='Official')">
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                         <label>Payment Term</label>
@@ -279,9 +257,8 @@
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                         <label>Base On</label>
-                                        <ng-select #bo [items]="basesOn" [allowClear]="true"
-                                            (opened)="closeOtherSelects(bo)" formControlName="baseOn"
-                                            placeholder="Please select">
+                                        <ng-select [items]="basesOn" [clearable]="true" class="custom"
+                                            formControlName="baseOn" placeholder="Please select">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -348,7 +325,7 @@
                                 </div>
                             </ng-container>
                         </div>
-                        <div class="row" *ngIf=" isUpdate || (!isUpdate  && contractType.value[0].id ==='Official')">
+                        <div class="row" *ngIf=" isUpdate || (!isUpdate  && contractType.value ==='Official')">
                             <div class="col-lg-8">
                                 <div class="form-group">
                                     <label>Description</label>
@@ -385,10 +362,6 @@
                             </div>
                         </div>
                     </ng-container>
-
-
-
-
                     <ng-container *ngIf="isUpdate && !isCreateNewCommercial">
                         <div class="row">
                             <div class="col-6">
@@ -409,7 +382,7 @@
             <div class="modal-footer m--align-center">
                 <ng-container *ngIf="openOnPartner === false">
                     <button
-                        *ngIf="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true &&  (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true) || !isUpdate"
+                        *ngIf="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true &&  (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true) || !isUpdate || isCreateNewCommercial"
                         (click)="onSubmit()" class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-save"></i>
@@ -457,16 +430,14 @@
                         </span>
                     </button>
                 </ng-container>
-
-
                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="close()"></app-default-button>
             </div>
         </div>
     </div>
 </div>
 <popup-salesman-credit-limit (onRequest)="onSalesmanCreditRequest($event)">
-
 </popup-salesman-credit-limit>
+
 <partner-reject-popup (onSave)="onSaveReject($event)"></partner-reject-popup>
 
 <confirm-popup [body]="confirmChangeAgreementTypeText" [labelConfirm]="'Yes'"

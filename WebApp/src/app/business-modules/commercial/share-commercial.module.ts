@@ -7,7 +7,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommercialDetailComponent } from './detail/detail-commercial.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareModulesModule } from '../share-modules/share-modules.module';
-import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -16,6 +15,7 @@ import { CustomerAgentImportComponent } from './components/customer-agent-import
 import { ContractImportComponent } from './components/contract/import/contract-import.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CommonModule } from '@angular/common';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
     declarations: [
@@ -36,7 +36,7 @@ import { CommonModule } from '@angular/common';
         ShareModulesModule,
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
-        SelectModule,
+        NgSelectModule,
         TabsModule.forRoot(),
     ],
     exports: [

@@ -9,5 +9,14 @@ namespace eFMS.API.ReportData.Consts
     public static class ResourceConsts
     {
         public const string GROUP_NAME = "GROUP INFORMATION";
+        public const string Export_Excel = "Export Excel";
+
+        //Report Name
+        public const string Standard_Report = "Standard Report";
+        public const string Shipment_Overview = "Shipment Overview";
+        public const string Accountant_PL_Sheet = "Accountant P/L Sheet";
+        public const string Job_Profit_Analysis = "Job Profit Analysis";
+        public const string Summary_Of_Costs_Incurred = "Summary Of Costs Incurred";
+        public const string Summary_Of_Revenue_Incurred = "Summary Of Revenue Incurred";
     }
 }

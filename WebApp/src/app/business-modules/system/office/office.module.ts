@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { OfficeComponent } from './office.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
 import { OfficeAddNewComponent } from './addnew/office.addnew.component';
@@ -10,8 +9,8 @@ import { OfficeFormSearchComponent } from './components/form-search-office/form-
 import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ShareSystemModule } from 'src/app/business-modules/share-system/share-system.module';
-import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
+import { ShareSystemModule } from 'src/app/business-modules/system/share-system.module';
+import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
 import { OfficeFormApproveSettingComponent } from './components/form-approve-setting/form-approve-setting-office.component';
 const routing: Routes = [
     {
@@ -37,7 +36,6 @@ const routing: Routes = [
 @NgModule({
     imports: [
         SharedModule,
-        SelectModule,
         NgProgressModule,
         PaginationModule.forRoot(),
         TabsModule.forRoot(),

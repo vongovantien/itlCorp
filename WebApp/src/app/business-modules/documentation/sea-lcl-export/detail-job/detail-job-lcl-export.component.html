@@ -60,7 +60,7 @@
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')" [active]="selectedTab === 'SHIPMENT'">
 
-                <form-create-sea-export type="SLE">
+                <app-form-create-sea-export type="SLE">
                     <ng-container *ngIf="!!shipmentDetail">
                         <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
                             [userCreated]="shipmentDetail.userNameCreated"
@@ -77,11 +77,10 @@
                                 </div>
                             </ng-container>
                         </date-time-modified>
-
                     </ng-container>
-                </form-create-sea-export>
+                </app-form-create-sea-export>
 
-                <shipment-good-summary-lcl> Shipment Goods Summary </shipment-good-summary-lcl>
+                <app-shipment-good-summary-lcl> Shipment Goods Summary </app-shipment-good-summary-lcl>
 
                 <grant-total-profit></grant-total-profit>
 

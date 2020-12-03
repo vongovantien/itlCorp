@@ -9,7 +9,6 @@ import { CommonEnum } from '@enums';
 import { PortIndex } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 import { finalize } from 'rxjs/operators';
-import { NullVisitor } from '@angular/compiler/src/render3/r3_ast';
 
 @Component({
     selector: 'app-form-port-index',
@@ -56,7 +55,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             portIndexeNameEN: [null, FormValidators.required],
             portIndexeNameLocal: [null, FormValidators.required],
             country: [null, Validators.required],
-            zone: [null, Validators.required],
+            zone: [null],
             mode: [null, Validators.required],
             warehouseId: [],
             active: [true]
@@ -120,10 +119,10 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.portIndex.code = this.code.value;
         this.portIndex.nameEn = this.portIndexeNameEN.value;
         this.portIndex.nameVn = this.portIndexeNameLocal.value;
-        this.portIndex.countryID = this.country.value[0].id;
-        this.portIndex.modeOfTransport = this.mode.value[0].id;
-        this.portIndex.areaID = (this.zone.value !== null && this.zone.value.length > 0) ? this.zone.value[0].id : null;
-        this.portIndex.warehouseId = !!this.warehouseId && !!this.warehouseId.value && !!this.warehouseId.value.length ? this.warehouseId.value[0].id : null;
+        this.portIndex.countryID = this.country.value.id;
+        this.portIndex.modeOfTransport = this.mode.value.id;
+        this.portIndex.areaID = this.zone.value.id;
+        this.portIndex.warehouseId = this.warehouseId.value.id;
     }
 
     onHandleResult(res: CommonInterface.IResult) {
@@ -150,10 +149,10 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
             code: res.code,
             portIndexeNameEN: res.nameEn,
             portIndexeNameLocal: res.nameVn,
-            country: !!objCountry ? [objCountry] : null,//[this.countries.find(x => x.id === res.countryId)] || [],
-            zone: !!objZone && res.areaId != null ? [objZone] : [] || [],
-            mode: !!objMode ? [objMode] || [] : null,
-            warehouseId: !!objWarehouse && !!this.warehouses.length && !!res.warehouseId ? [objWarehouse] : null,
+            country: { id: res.countryId, text: !!objCountry ? objCountry.text : null },
+            zone: { id: res.areaId, text: !!objZone ? objZone.text : null },
+            mode: { id: res.modeOfTransport, text: !!objMode ? objMode.text : null },
+            warehouseId: { id: res.warehouseId, text: !!objWarehouse ? objWarehouse.text : null },
             active: res.active
         });
     }

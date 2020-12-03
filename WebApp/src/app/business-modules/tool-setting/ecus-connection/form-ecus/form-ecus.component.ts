@@ -6,7 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 
 import { EcusConnection } from 'src/app/shared/models/tool-setting/ecus-connection';
 
-import merge from 'lodash/merge';
+import { User } from '@models';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'form-ecus-popup',
@@ -25,7 +26,7 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
     note: AbstractControl;
     active: AbstractControl;
 
-    Users: CommonInterface.INg2Select[] = [];
+    Users: Observable<User[]>;
 
     datetimeCreated: string;
     userCreatedName: string;
@@ -98,17 +99,14 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
     }
 
     getListUsers() {
-        this._systemRepo.getSystemUsers().subscribe((data: any) => {
-            this.Users = this.utility.prepareNg2SelectData(data, 'id', 'username');
-        });
+        this.Users = this._systemRepo.getSystemUsers({ active: true });
     }
 
     onSaveEcus() {
         this.isSubmitted = true;
         const valueForm = this.formGroup.getRawValue();
-        const ecusUserId = !!valueForm.userId && !!valueForm.userId.length ? valueForm.userId[0].id : null;
 
-        const ecus: EcusConnection = new EcusConnection(merge(valueForm, Object.assign({}, { userId: ecusUserId })));
+        const ecus: EcusConnection = new EcusConnection(valueForm);
         if (this.formGroup.invalid) { return; }
         if (!this.isShowUpdate) {
             ecus.id = 0;

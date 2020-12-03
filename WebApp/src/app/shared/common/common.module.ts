@@ -7,7 +7,6 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from './popup';
-import { SelectModule } from 'ng2-select';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DirectiveModule } from '../directives/directive.module';
 import { FormsModule } from '@angular/forms';
@@ -53,7 +52,6 @@ const COMPONENTS = [
         RouterModule,
         CommonModule,
         ModalModule,
-        SelectModule,
         ScrollingModule,
         PaginationModule.forRoot(),
         CollapseModule,

@@ -20,17 +20,11 @@ export * from './import-job-detail/import-job-detail.popup';
 export * from './import-job-detail/components/form-search-import/form-search-import-job-detail.component';
 
 export * from './shipment-good-summary/shipment-good-summary.component';
-export * from './shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 export * from './hbl-good-summary-lcl/hbl-good-summary-lcl.component';
 export * from './hbl-good-summary-fcl/hbl-good-summary-fcl.component';
 export * from './goods-import/goods-import.component';
 
-export * from './form-create-sea-import/form-create-sea-import.component';
 export * from './form-search-sea/form-search-sea.component';
-export * from './form-create-house-bill-import/form-create-house-bill-import.component';
-export * from './form-create-sea-export/form-create-sea-export.component';
-export * from './form-create-house-bill-export/form-create-house-bill-export.component';
-export * from './form-create-air/form-create-air.component';
 
 export * from './stage-management/assign-stage/assign-stage.popup';
 export * from './asignment/asignment.component';
@@ -45,7 +39,6 @@ export * from './hbl/import-detail/import-house-bill-detail.component';
 export * from './hbl/form-search-house-bill/form-search-house-bill.component';
 export * from './hbl/hbl.base';
 
-export * from './dim-volume/dim-volume.popup';
 
 export * from './cd-note-air/add-cd-note/add-cd-note.popup';
 export * from './cd-note-air/add-remaining-charge/add-remaining-charge.popup';
@@ -58,7 +51,6 @@ export * from './manifest/housebill-in-manifest/housebills-in-manifest.component
 export * from './arrival-note-air/arrival-note-air.component';
 export * from './date-time-modified/date-time-modified.component';
 
-export * from './bill-instruction-sea-export/bill-instruction-sea-export.component';
 export * from './bill-instruction-housebills-sea-export/bill-instruction-housebills-sea-export.component';
 export * from './attach-list/attach-list-house-bill.component';
 export * from './input-daily-export/input-daily-export.popup';

@@ -79,8 +79,8 @@ export class CommercialBranchSubListComponent extends AppList {
         catchError(this.catchError),
         finalize(() => this._progressRef.complete())
       ).subscribe(
-        (res: boolean) => {
-          if (res) {
+        (res: CommonInterface.IResult) => {
+          if (res.status) {
             if (this.openOnPartner) {
               this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${partner.id}`]);
             } else {
@@ -91,7 +91,12 @@ export class CommercialBranchSubListComponent extends AppList {
               }
             }
           } else {
-            this.info403Popup.show();
+            if (res.data === 403) {
+              this.info403Popup.show();
+            } else {
+              const partnerType = this.openOnPartner ? "Partner " : partner.partnerType + " ";
+              this._toastService.warning("This " + partnerType + res.message);
+            }
           }
         },
       );

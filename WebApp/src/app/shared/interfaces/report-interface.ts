@@ -1,4 +1,9 @@
 export namespace ReportInterface {
+    export interface INg2Select {
+        id: any;
+        text: any;
+    }
+    
     export interface ISaleReportCriteria {
         serviceDateFrom: string;
         serviceDateTo: string;

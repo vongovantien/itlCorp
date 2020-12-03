@@ -1,11 +1,9 @@
 import { NgModule } from '@angular/core';
 import { StatementOfAccountComponent } from './statement-of-account.component';
-import { AccountReceivePayableComponent } from './account-receive-payable/account-receive-payable.component';
 import { StatementOfAccountDetailComponent } from './detail/detail-soa.component';
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
 import { Routes, RouterModule } from '@angular/router';
-import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -23,12 +21,18 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { ShareAccountingModule } from '../share-accouting.module';
 import { StatementOfAccountPaymentMethodComponent } from './components/poup/payment-method/soa-payment-method.popup';
+import { ConfirmBillingComponent } from './confirm-billing/confirm-billing.component';
+import { ConfirmBillingFormSearchComponent } from './components/form-search-confirm-billing/form-search-confirm-billing.component';
+import { ConfirmBillingDetailComponent } from './confirm-billing/detail/detail-confirm-billing.component';
+import { ConfirmBillingListChargeComponent } from './components/list-charge-confirm-billing/list-charge-confirm-billing.component';
+import { ConfirmBillingDatePopupComponent } from './components/poup/confirm-billing-date/confirm-billing-date.popup';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
 
 const routing: Routes = [
     {
         path: "",
-        data: { name: "", title: 'eFMS Statement Of Account' },
+        data: { name: "" },
         children: [
             {
                 path: "", component: StatementOfAccountComponent,
@@ -50,6 +54,18 @@ const routing: Routes = [
                     name: "Edit",
                 }
             },
+            {
+                path: 'confirm-billing', data: { name: 'Confirm Billing' },
+                children: [
+                    {
+                        path: '', component: ConfirmBillingComponent, data: { name: '', title: 'eFMS Confirm Billing' }
+                    },
+                    {
+                        path: ':vatInvoiceId', component: ConfirmBillingDetailComponent, data: { name: 'Detail', title: 'eFMS Detail Billing' },
+                    }
+                ]
+            },
+
         ]
     },
 
@@ -62,6 +78,9 @@ const COMPONENTS = [
     StatementOfAccountSummaryComponent,
     StatementOfAccountFormCreateComponent,
     StatementOfAccountPaymentMethodComponent,
+    ConfirmBillingFormSearchComponent,
+    ConfirmBillingListChargeComponent,
+    ConfirmBillingDatePopupComponent
 ];
 
 @NgModule({
@@ -70,13 +89,14 @@ const COMPONENTS = [
         StatementOfAccountAddnewComponent,
         StatementOfAccountEditComponent,
         StatementOfAccountDetailComponent,
-        AccountReceivePayableComponent,
+        ConfirmBillingComponent,
+        ConfirmBillingDetailComponent,
         ...COMPONENTS
     ],
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
-        SelectModule,
+        NgSelectModule,
         NgxDaterangepickerMd,
         TabsModule.forRoot(),
         ModalModule.forRoot(),

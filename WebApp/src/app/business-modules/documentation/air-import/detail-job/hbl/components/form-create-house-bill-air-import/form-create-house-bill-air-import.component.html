@@ -85,9 +85,8 @@
                         <div class="col-md-6 pl-0">
                             <div class="form-group">
                                 <label>HAWB Type</label>
-                                <ng-select #hawbType [items]="billTypes" placeholder="Please select" [allowClear]="true"
-                                    (opened)="closeOtherSelects(hawbType)" formControlName="hbltype"
-                                    (selected)="onSelectDataFormInfo($event,'hawb-type')">
+                                <ng-select class="custom" placeholder="Please select" [items]="billTypes"
+                                    formControlName="hbltype" (change)="onSelectDataFormInfo($event,'hawb-type')">
                                 </ng-select>
                             </div>
                         </div>
@@ -244,9 +243,8 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Unit</label>
-                                <ng-select #unit [items]="ngDataUnit" [allowClear]="true"
-                                    (opened)="closeOtherSelects(unit)" formControlName="packageType">
-                                </ng-select>
+                                <ng-select class="custom" placeholder="Please select" [items]="ngDataUnit | async"
+                                    bindLabel="code" bindValue="id" formControlName="packageType"></ng-select>
                             </div>
                         </div>
                     </div>
@@ -275,8 +273,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Payment Term</label>
-                                <ng-select #airFreight [items]="termTypes" [allowClear]="true"
-                                    (opened)="closeOtherSelects(airFreight)" formControlName="freightPayment">
+                                <ng-select class="custom" [items]="termTypes" formControlName="freightPayment">
                                 </ng-select>
                             </div>
                         </div>

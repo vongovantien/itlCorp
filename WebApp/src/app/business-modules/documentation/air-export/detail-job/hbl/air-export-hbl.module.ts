@@ -6,11 +6,12 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 
-import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
@@ -21,7 +22,6 @@ import { AirExportHBLFormCreateComponent } from './components/form-create-house-
 import { AirExportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeparateHouseBillComponent } from './components/form-separate-house-bill/form-separate-house-bill.component';
-import { NgxSpinnerModule } from 'ngx-spinner';
 import { ShareAirExportModule } from '../../share-air-export.module';
 import { InputBookingNotePopupComponent } from './components/input-booking-note/input-booking-note.popup';
 import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
@@ -58,7 +58,7 @@ const LIB = [
     PaginationModule.forRoot(),
     ModalModule.forRoot(),
     TabsModule.forRoot(),
-    SelectModule,
+    NgSelectModule,
     NgxDaterangepickerMd.forRoot(),
     PerfectScrollbarModule,
     FroalaEditorModule.forRoot(),

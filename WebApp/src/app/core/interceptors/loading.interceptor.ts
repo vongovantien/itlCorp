@@ -9,16 +9,23 @@ import { finalize } from 'rxjs/operators';
 export class LoadingInterceptor implements HttpInterceptor {
     private _totalRequests = 0;
 
-    constructor(private _spinner: NgxSpinnerService) {
+    constructor(private readonly _spinner: NgxSpinnerService) {
     }
     intercept(req: HttpRequest<any>, next: HttpHandler) {
+        const hideSpinner = req.headers.get('hideSpinner'); // * Allow API not showing ~Loading~
+        if (hideSpinner !== null) {
+            return next.handle(req);
+        }
         this._totalRequests++;
-        this._spinner.show();
+        if (this._totalRequests > 0) {
+            this._spinner.show();
+        }
         return next.handle(req).pipe(
             finalize(() => {
                 this._totalRequests--;
-                if (this._totalRequests === 0) {
+                if (this._totalRequests <= 0) {
                     this._spinner.hide();
+                    this._totalRequests = 0;
                 }
             })
         );

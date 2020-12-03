@@ -1,15 +1,16 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { User, Currency } from 'src/app/shared/models';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 import { Store } from '@ngrx/store';
 
-import { catchError, map } from 'rxjs/operators';
-import { SystemRepo } from '@repositories';
-import { Observable } from 'rxjs';
-import { SystemConstants } from 'src/constants/system.const';
+import { AppForm } from '@app';
+import { User, Currency, Customer } from '@models';
+import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
 
+import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 @Component({
     selector: 'settle-payment-form-create',
     templateUrl: './form-create-settlement.component.html'
@@ -31,14 +32,18 @@ export class SettlementFormCreateComponent extends AppForm {
     currency: AbstractControl;
     note: AbstractControl;
     statusApproval: AbstractControl;
+    payee: AbstractControl;
 
     currencyList: Currency[];
     methods: CommonInterface.ICommonTitleValue[];
 
+    customers: Observable<Customer[]>;
+
     constructor(
         private _fb: FormBuilder,
         private _store: Store<IAppState>,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo
     ) {
         super();
     }
@@ -51,6 +56,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.getUserLogged();
         this.getCurrency();
         this.getSystemUser();
+        this.getCustomer();
 
     }
 
@@ -64,6 +70,7 @@ export class SettlementFormCreateComponent extends AppForm {
             'currency': [],
             'note': [],
             'statusApproval': ['New'],
+            'payee': []
         });
 
 
@@ -75,6 +82,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.currency = this.form.controls['currency'];
         this.note = this.form.controls['note'];
         this.statusApproval = this.form.controls['statusApproval'];
+        this.payee = this.form.controls['payee'];
 
         this.currency.valueChanges.pipe(
             map((data: any) => data)
@@ -115,5 +123,9 @@ export class SettlementFormCreateComponent extends AppForm {
             { title: 'Cash', value: 'Cash' },
             { title: 'Bank Transfer', value: 'Bank' },
         ];
+    }
+
+    getCustomer() {
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
     }
 }

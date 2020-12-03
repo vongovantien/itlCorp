@@ -6,13 +6,10 @@ import { ActivatedRoute } from '@angular/router';
 
 import { ReportPreviewComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
-import { DataService } from '@services';
-import { CsTransaction } from '@models';
+import { CsTransaction, CsShippingInstruction } from '@models';
 import { SystemConstants } from '@constants';
 
-import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
 import {
-    ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     TransactionActions,
     TransactionGetDetailAction,
@@ -20,59 +17,62 @@ import {
     getTransactionLocked,
     getTransactionDetailCsTransactionState
 } from '@share-bussiness';
+import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
+import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/components/form-si-sea-export/form-si-sea-export.component';
 
-import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, take, pluck, concatMap } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-sea-lcl-export-shipping-instruction',
     templateUrl: './sea-lcl-export-shipping-instruction.component.html'
 })
-export class SeaLclExportShippingInstructionComponent extends AppList {
+export class SeaLclExportShippingInstructionComponent extends AppList implements ICrystalReport {
 
-    @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComponent: ShareBussinessBillInstructionSeaExportComponent;
+    @ViewChild(ShareSeaServiceFormSISeaExportComponent, { static: false }) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     jobId: string;
     houseBills: any[] = [];
-    //
+
     displayPreview: boolean = false;
 
     constructor(private _store: Store<TransactionActions>,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
-        private _dataService: DataService) {
+    ) {
         super();
     }
 
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            if (!!param && param.jobId) {
-                this.jobId = param.jobId;
-                this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-                this.getHouseBills();
-            }
-        });
-
+        this._activedRouter.params
+            .pipe(
+                pluck('jobId'),
+                concatMap((jobId) => {
+                    this.jobId = jobId;
+                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+                    return forkJoin([
+                        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }),
+                        this._documentRepo.getShippingInstruction(jobId)
+                    ]);
+                })
+            ).subscribe(
+                (res) => {
+                    if (!!res) {
+                        if (!!res[0]) {
+                            this.billDetail.housebills = this.houseBills = res[0] || [];
+                        }
+                        this.displayPreview = !!res[1];
+                        this.setDataBillInstructionComponent(res[1]);
+                    }
+                }
+            );
         this.permissionShipments = this._store.select(getTransactionPermission);
         this.isLocked = this._store.select(getTransactionLocked);
-    }
-
-    getHouseBills() {
-        this.isLoading = true;
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-                this.houseBills = res;
-                this.billDetail.housebills = res;
-
-                this.getBillingInstruction(this.jobId);
-            },
-        );
     }
 
     getBillingInstruction(jobId: string) {
@@ -83,12 +83,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-                    if (!!res) {
-                        this.displayPreview = true;
-                    }
-                    else {
-                        this.displayPreview = false;
-                    }
+                    this.displayPreview = !!res;
                     this.setDataBillInstructionComponent(res);
                 },
             );
@@ -105,7 +100,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                             this.billSIComponent.shippingInstruction.refNo = res.jobNo;
                         } else {
                             this.initNewShippingInstruction(res);
-                            this.getGoods();
+                            this.calculateGoodInfo();
                         }
 
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
@@ -159,19 +154,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         });
     }
 
-    getGoods() {
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-                this.houseBills = res;
-                this.calculateGoodInfo();
-            },
-        );
-
-    }
-
     getPackages(lstPackages: any[]): string {
         const t = _groupBy(lstPackages, "package");
         let packages = '';
@@ -190,7 +172,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
 
     initNewShippingInstruction(res: CsTransaction) {
         const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-
         this.billSIComponent.shippingInstruction = new CsShippingInstruction();
         this.billSIComponent.shippingInstruction.refNo = res.jobNo;
         this.billSIComponent.shippingInstruction.bookingNo = res.bookingNo;
@@ -204,6 +185,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         this.billSIComponent.shippingInstruction.loadingDate = res.etd;
         this.billSIComponent.shippingInstruction.voyNo = (!!res.flightVesselName ? res.flightVesselName : '') + " - " + (!!res.voyNo ? res.voyNo : '');
         this.billSIComponent.shippingInstruction.remark = res.mbltype;
+
         this.getExportDefault(res);
     }
 
@@ -244,9 +226,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
 
     saveData(data: CsShippingInstruction) {
-        this._documentRepo.updateShippingInstruction(data).pipe(
-            catchError(this.catchError)
-        )
+        this._documentRepo.updateShippingInstruction(data).pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -288,10 +268,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('This shipment does not have any house bill ');
                     }
@@ -309,18 +286,13 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res != null) {
-
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
-                    }
-                    else {
+                    } else {
                         this._toastService.warning('House bills does not have container ');
                     }
                 },
@@ -337,13 +309,9 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (res != null) {
-
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.showReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -363,15 +331,18 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('This shipment does not have any house bill ');
                     }
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 }
 

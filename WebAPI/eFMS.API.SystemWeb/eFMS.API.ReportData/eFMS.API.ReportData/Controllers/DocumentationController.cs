@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
@@ -14,6 +15,7 @@ using eFMS.API.ReportData.Models.Documentation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -237,9 +239,21 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportShipmentOverview")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ExportShipmentOverview(GeneralReportCriteria criteria )
         {
+            var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataShipmentOverviewUrl);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Shipment_Overview,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportShipmentOverview>>();
             if (dataObjects.Result == null)
@@ -264,9 +278,21 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportStandardGeneralReport")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ExportStandardGeneralReport(GeneralReportCriteria criteria)
         {
+            var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataStandardGeneralReportUrl);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Standard_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<GeneralReportResult>>();
             if (dataObjects.Result == null)
@@ -297,6 +323,16 @@ namespace eFMS.API.ReportData.Controllers
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataAccountingPLSheetUrl, accessToken);
 
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Accountant_PL_Sheet,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingPlSheetExport>>();
             if (dataObjects.Result == null)
             {
@@ -326,7 +362,17 @@ namespace eFMS.API.ReportData.Controllers
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataJobProfitAnalysisUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<JobProfitAnalysisExport>>();
-            
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Job_Profit_Analysis,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
             if (dataObjects.Result == null)
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
@@ -351,6 +397,16 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsIncurredUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Summary_Of_Costs_Incurred,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SummaryOfCostsIncurredModel>>();
             if (dataObjects.Result == null || !dataObjects.Result.Any())
@@ -379,6 +435,16 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfRevenueIncurredUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Summary_Of_Revenue_Incurred,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SummaryOfRevenueModel>();
             if (dataObjects.Result == null || !dataObjects.Result.summaryOfRevenueExportResults.Any())

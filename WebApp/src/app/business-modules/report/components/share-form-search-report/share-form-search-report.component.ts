@@ -74,14 +74,25 @@ export class ShareFormSearchReportComponent extends AppForm {
     ports: Observable<PortIndex[]>;
     partners: Observable<Partner[]>;
 
-    dateTypeList: any[] = [];
-    dateTypeActive: any[] = [];
+    dateTypeList: ReportInterface.INg2Select[] = [
+        { id: "ServiceDate", text: "Service Date" },
+        { id: "CreatedDate", text: "Created Date" }
+    ];
+
+    refNoTypeList: ReportInterface.INg2Select[] = [
+        { id: 'JOBID', text: 'JOB JD' },
+        { id: 'HBL', text: 'HBL/HAWB' },
+        { id: 'MBL', text: 'MBL/MAWB' }
+    ];
+
+    staffTypeList: ReportInterface.INg2Select[] = [
+        { id: 'PIC', text: 'Person In Charge' },
+        { id: 'SALESMAN', text: 'Salesman' },
+        { id: 'CREATOR', text: 'Creator' }
+    ];
     serviceList: any[] = [];
     serviceActive: any[] = [];
     currencyList: any[] = [];
-    currencyActive: any[] = [];
-    refNoTypeList: any[] = [];
-    refNoTypeActive: any[] = [];
     officeList: any[] = [];
     officeActive: any[] = [];
     departmentList: any[] = [];
@@ -90,9 +101,22 @@ export class ShareFormSearchReportComponent extends AppForm {
     groupActive: any[] = [];
     staffList: any[] = [];
     staffActive: any[] = [];
-    staffTypeList: any[] = [];
-    staffTypeActive: any[] = [];
-    typeReportList: any[] = [];
+
+    typeAccReportList: ReportInterface.INg2Select[] = [
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET, text: 'Accountant P/L Sheet' },
+        { id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS, text: 'Job Profit Analysis' },
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST, text: 'Summary Of Costs Incurred' },
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' }
+    ];
+
+    typeReportList: ReportInterface.INg2Select[] = [
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY, text: 'Monthly Sale Report' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT, text: 'Sale Report By Department' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER, text: 'Sale Report By Quarter' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY, text: 'Summary Sale Report' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION, text: 'Combination Statistic Report' }
+    ];
+
     typeReportActive: any[] = [];
 
     userLogged: any;
@@ -156,31 +180,32 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
+        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
                 startDate: this.createMoment().startOf('month').toDate(),
                 endDate: this.createMoment().endOf('month').toDate(),
             }],
-            dateType: [this.dateTypeActive],
+            dateType: [this.dateTypeList[0].id],
             customer: this.isCommissionIncentive ?  [null, Validators.compose([
                 FormValidators.required,
             ])] : [],
             carrier: [],
             agent: [],
             service: [this.serviceActive],
-            currency: [this.currencyActive],
+            currency: ['USD'],
             refNo: [],
-            refNoType: [this.refNoTypeActive],
+            refNoType: [this.refNoTypeList[0].id],
             office: [this.officeActive],
             department: [this.departmentActive],
             group: [this.groupActive],
             staff: [this.staffActive],
-            staffType: [this.staffTypeActive],
+            staffType: staffTypeInit,
             pol: [],
             pod: [],
             partnerAccount: [],
             exchangeRate: 20000,
-            typeReport: [this.typeReportActive]
+            typeReport: this.isGeneralReport ? [] : [this.typeReportActive[0].id]
         });
 
         this.serviceDate = this.formSearch.controls['serviceDate'];
@@ -205,15 +230,27 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initDataInform() {
-        this.getDateType();
         this.getService();
-        if (!this.isCommissionIncentive) {
-            this.getCurrency();
-        }
-        this.getRefNoType();
-        this.getStaffType();
+        this.getCurrency();
         if (!this.isGeneralReport) {
-            this.getTypeReport();
+            this.getTypeReportList();
+        }
+    }
+
+    getTypeReportList() {
+        if (this.isSheetDebitRpt) {
+            this.typeReportActive = this.typeAccReportList;
+        } else {
+            this.typeReportActive = this.typeReportList;
+        }
+    }
+
+    // Check if choose All
+    selectAllDataInForm(data: any){
+        if (data.length === 1) {
+            return data[0].id === 'All';
+        } else {
+            return data.findIndex(x => x.id === 'All') > 0;
         }
     }
 
@@ -236,69 +273,52 @@ export class ShareFormSearchReportComponent extends AppForm {
                 break;
             case 'service':
                 if (data.id === 'All') {
-                    this.serviceActive = [];
-                    this.serviceActive.push({ id: 'All', text: "All" });
+                    this.serviceActive.length = 0;
+                    this.serviceActive = [...this.serviceActive, 'All'];
                 } else {
-                    this.serviceActive.push(data);
-                    this.detectServiceWithAllOption('service', data);
-                    this.service.setValue(this.serviceActive);
+                    this.detectServiceWithAllOption('service', data.id);
                 }
                 break;
             case 'office':
-                if (data.id === 'All') {
-                    this.officeActive = [];
-                    this.officeActive.push({ id: 'All', text: "All" });
+                if (this.selectAllDataInForm(data)) {
+                    this.officeActive.length = 0;
+                    this.officeActive = [...this.officeActive, 'All'];
                 } else {
-                    this.officeActive.push(data);
                     this.detectServiceWithAllOption('office', data);
-                    this.office.setValue(this.officeActive);
                 }
                 // Reload deparment
                 this.getDepartment(this.departmentsInit);
                 break;
             case 'department':
-                if (data.id === 'All') {
-                    this.departmentActive = [];
-                    this.departmentActive.push({ id: 'All', text: "All" });
+                if (this.selectAllDataInForm(data)) {
+                    this.departmentActive.length = 0;
+                    this.departmentActive = [...this.departmentActive, 'All'];
                 } else {
-                    this.departmentActive.push(data);
                     this.detectServiceWithAllOption('department', data);
-                    this.department.setValue(this.departmentActive);
                 }
                 // Reload group
                 this.getGroup(this.groupsInit);
                 break;
             case 'group':
-                if (data.id === 'All') {
-                    this.groupActive = [];
-                    this.groupActive.push({ id: 'All', text: "All" });
+                if (this.selectAllDataInForm(data)) {
+                    this.groupActive.length = 0;
+                    this.groupActive = [...this.groupActive, 'All'];
                 } else {
-                    this.groupActive.push(data);
                     this.detectServiceWithAllOption('group', data);
-                    this.group.setValue(this.groupActive);
                 }
                 // Reload staff
                 this.getStaff(this.staffsInit);
                 break;
             case 'staff':
-                if (data.id === 'All') {
-                    this.staffActive = [];
-                    this.staffActive.push({ id: 'All', text: "All" });
+                if (this.selectAllDataInForm(data)) {
+                    this.staffActive.length = 0;
+                    this.staffActive = [...this.staffActive, 'All'];
                 } else {
-                    this.staffActive.push(data);
                     this.detectServiceWithAllOption('staff', data);
-                    this.staff.setValue(this.staffActive);
                 }
                 break;
-            case 'currency':
-                this.currencyActive = [];
-                this.currencyActive.push(data);
-                this.currency.setValue(this.currencyActive);
-                break;
-            case 'typeReport':
-                this.typeReportActive = [];
-                this.typeReportActive.push(data);
-                this.typeReport.setValue(this.typeReportActive);
+            case 'acPartner':
+                this.partnerAccount.setValue(data.id);
                 break;
             case 'acPartner':
                 this.partnerAccount.setValue(data.id);
@@ -326,16 +346,13 @@ export class ShareFormSearchReportComponent extends AppForm {
         if (type === 'department') {
             this.departmentActive.splice(this.departmentActive.findIndex((item) => item.id === data.id), 1);
             if (this.departmentActive.length === 0) {
-                this.group.setValue([]);
                 this.groupActive = [];
-                this.staff.setValue([]);
                 this.staffActive = [];
             }
         }
         if (type === 'group') {
             this.groupActive.splice(this.groupActive.findIndex((item) => item.id === data.id), 1);
             if (this.groupActive.length === 0) {
-                this.staff.setValue([]);
                 this.staffActive = [];
             }
         }
@@ -345,53 +362,60 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.detectServiceWithAllOption(type);
     }
 
+    detectChangeDataInfo(data: any, type: string) {
+        if (data.length > 0) {
+            this.onSelectDataFormInfo(data, type);
+        } else {
+            this.onRemoveDataFormInfo(data, type);
+        }
+    }
+
     detectServiceWithAllOption(type: string, data?: any) {
         if (type === "service") {
-            if (!this.serviceActive.every((value) => value.id !== 'All')) {
-                this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.serviceActive.every((value) => value !== 'All')) {
+                this.serviceActive.splice(this.serviceActive.findIndex((item) => item === 'All'), 1);
                 this.serviceActive = [];
                 this.serviceActive.push(data);
             }
         } else if (type === 'office') {
-            if (!this.officeActive.every((value) => value.id !== 'All')) {
-                this.officeActive.splice(this.officeActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.officeActive.every((value) => value !== 'All')) {
+                this.officeActive.splice(this.officeActive.findIndex((item) => item === 'All'), 1);
                 this.officeActive = [];
-                this.officeActive.push(data);
+                if (data.length > 0) {
+                    this.officeActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
             // Call back Get Department            
             this.getDepartment(this.departmentsInit);
         } else if (type === 'department') {
-            if (!this.departmentActive.every((value) => value.id !== 'All')) {
-                this.departmentActive.splice(this.departmentActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.departmentActive.every((value) => value !== 'All')) {
+                this.departmentActive.splice(this.departmentActive.findIndex((item) => item === 'All'), 1);
                 this.departmentActive = [];
-                this.departmentActive.push(data);
+                if (data.length > 0) {
+                    this.departmentActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
             // Call back Get Group
             this.getGroup(this.groupsInit);
         } else if (type === 'group') {
-            if (!this.groupActive.every((value) => value.id !== 'All')) {
-                this.groupActive.splice(this.groupActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.groupActive.every((value) => value !== 'All')) {
+                this.groupActive.splice(this.groupActive.findIndex((item) => item === 'All'), 1);
                 this.groupActive = [];
-                this.groupActive.push(data);
+                if (data.length > 0) {
+                    this.groupActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
             // Call back Get Staff
             this.getStaff(this.staffsInit);
         } else if (type === 'staff') {
-            if (!this.staffActive.every((value) => value.id !== 'All')) {
-                this.staffActive.splice(this.staffActive.findIndex((item) => item.id === 'All'), 1);
+            if (!this.staffActive.every((value) => value !== 'All')) {
+                this.staffActive.splice(this.staffActive.findIndex((item) => item === 'All'), 1);
                 this.staffActive = [];
-                this.staffActive.push(data);
+                if (data.length > 0) {
+                    this.staffActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
         }
-    }
-
-    getDateType() {
-        this.dateTypeList = [
-            { "text": 'Service Date', "id": 'ServiceDate' },
-            { "text": 'Created Date', "id": 'CreatedDate' }
-        ];
-        // Default value: Service Date
-        this.dateTypeActive = [this.dateTypeList[0]];
     }
 
     getService() {
@@ -402,7 +426,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                     if (!!res) {
                         this.serviceList = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
                         this.serviceList.unshift({ id: 'All', text: 'All' });
-                        this.serviceActive = [this.serviceList[0]];
+                        this.serviceActive = [this.serviceList[0].id];
                     }
                 },
             );
@@ -415,21 +439,10 @@ export class ShareFormSearchReportComponent extends AppForm {
                 (data: any) => {
                     if (!!data) {
                         this.currencyList = data.map((item) => ({ text: item.id, id: item.id }));
-                        // Default value: USD
-                        this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
+                        // Default value: USD .filter((curr) => curr.id === "USD")
                     }
                 },
             );
-    }
-
-    getRefNoType() {
-        this.refNoTypeList = [
-            { text: 'JOB JD', id: 'JOBID' },
-            { text: 'HBL/HAWB', id: 'HBL' },
-            { text: 'MBL/MAWB', id: 'MBL' }
-        ];
-        // Default value: JOB ID
-        this.refNoTypeActive = [this.refNoTypeList[0]];
     }
 
     getDataUserLever() {
@@ -479,12 +492,11 @@ export class ShareFormSearchReportComponent extends AppForm {
             if (this.menuPermission.list === 'Office'
                 || this.menuPermission.list === 'Company'
                 || this.menuPermission.list === 'All') {
-                this.officeActive = [this.officeList[0]];
+                this.officeActive = [this.officeList[0].id];
             } else {
-                this.officeActive = [this.officeList.filter(off => off.id === this.userLogged.officeId)[0]];
+                this.officeActive = [this.officeList.filter(off => off.id === this.userLogged.officeId)[0].id];
             }
         } else {
-            this.office.setValue([]);
             this.officeActive = [];
         }
 
@@ -494,10 +506,10 @@ export class ShareFormSearchReportComponent extends AppForm {
     getDepartment(data: any) {
         let officeSelected = [];
         if (this.officeActive.length > 0) {
-            if (this.officeActive.map(i => i.id).includes('All')) {
+            if (this.officeActive.map(i => i).includes('All')) {
                 officeSelected = this.officeList.map(i => i.id);
             } else {
-                officeSelected = this.officeActive.map(i => i.id);
+                officeSelected = this.officeActive.map(i => i);
             }
             data = data.filter(f => f.departmentId !== null && officeSelected.includes(f.officeId));
         } else {
@@ -514,12 +526,11 @@ export class ShareFormSearchReportComponent extends AppForm {
                 || this.menuPermission.list === 'Office'
                 || this.menuPermission.list === 'Company'
                 || this.menuPermission.list === 'All') {
-                this.departmentActive = [this.departmentList[0]];
+                this.departmentActive = [this.departmentList[0].id];
             } else {
-                this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0]];
+                this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0].id];
             }
         } else {
-            this.department.setValue([]);
             this.departmentActive = [];
         }
 
@@ -529,10 +540,10 @@ export class ShareFormSearchReportComponent extends AppForm {
     getGroup(data: any) {
         let deparmentSelected = [];
         if (this.departmentActive.length > 0) {
-            if (this.departmentActive.map(i => i.id).includes('All')) {
+            if (this.departmentActive.map(i => i).includes('All')) {
                 deparmentSelected = this.departmentList.map(i => i.id);
             } else {
-                deparmentSelected = this.departmentActive.map(i => i.id);
+                deparmentSelected = this.departmentActive.map(i => i);
             }
             data = data.filter(f => f.groupId !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
         } else {
@@ -550,12 +561,11 @@ export class ShareFormSearchReportComponent extends AppForm {
                 || this.menuPermission.list === 'Office'
                 || this.menuPermission.list === 'Company'
                 || this.menuPermission.list === 'All') {
-                this.groupActive = [this.groupList[0]];
+                this.groupActive = [this.groupList[0].id];
             } else {
-                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0]];
+                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
             }
         } else {
-            this.group.setValue([]);
             this.groupActive = [];
         }
 
@@ -565,18 +575,18 @@ export class ShareFormSearchReportComponent extends AppForm {
     getStaff(data: any) {
         if (this.groupActive.length > 0) {
             let groupSelected = [];
-            if (this.groupActive.map(i => i.id).includes('All')) {
+            if (this.groupActive.map(i => i).includes('All')) {
                 groupSelected = this.groupList.map(i => i.id);
             } else {
-                groupSelected = this.groupActive.map(i => i.id);
+                groupSelected = this.groupActive.map(i => i);
             }
 
             let deparmentSelected = [];
             if (this.departmentActive.length > 0) {
-                if (this.departmentActive.map(i => i.id).includes('All')) {
+                if (this.departmentActive.map(i => i).includes('All')) {
                     deparmentSelected = this.departmentList.map(i => i.id);
                 } else {
-                    deparmentSelected = this.departmentActive.map(i => i.id);
+                    deparmentSelected = this.departmentActive.map(i => i);
                 }
             }
 
@@ -594,54 +604,13 @@ export class ShareFormSearchReportComponent extends AppForm {
         if (this.staffList.length > 0) {
             this.staffList.unshift({ id: 'All', text: 'All' });
             if (this.menuPermission.list === 'Owner') {
-                this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0]];
+                this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0].id];
             } else {
-                this.staffActive = [this.staffList[0]];
+                this.staffActive = [this.staffList[0].id];
             }
         } else {
-            this.staff.setValue([]);
             this.staffActive = [];
         }
-    }
-
-    getStaffType() {
-        this.staffTypeList = [
-            { "text": 'Person In Charge', "id": 'PIC' },
-            { "text": 'Salesman', "id": 'SALESMAN' },
-            { "text": 'Creator', "id": 'CREATOR' }
-        ];
-        // Default value: Salesman, General Report: Person In Charge
-        this.staffTypeActive = this.isGeneralReport ? [this.staffTypeList[0]] : [this.staffTypeList[1]];
-    }
-
-    getTypeReport() {
-        if (this.isCommissionIncentive) { // Commission Incentive Report
-            this.typeReportList = [
-                { text: 'Commission PR for Air/Sea', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_AS },
-                { text: 'Commission PR for OPS', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_OPS },
-                { text: 'Incentive', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.INCENTIVE_RPT }
-            ];
-            // Default value: Commission PR for Air/Sea
-        } else if (this.isSheetDebitRpt) { // Accountant Report
-            this.typeReportList = [
-                { text: 'Accountant P/L Sheet', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET },
-                { text: 'Job Profit Analysis', id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS },
-                { text: 'Summary Of Costs Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST },
-                { text: 'Summary Of Revenue Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE }
-            ];
-            // Default value: Accountant P/L Sheet
-        } else { // Sale Report
-            this.typeReportList = [
-                { text: 'Monthly Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY },
-                { text: 'Sale Report By Department', id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT },
-                { text: 'Sale Report By Quarter', id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER },
-                { text: 'Summary Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY },
-                { text: 'Combination Statistic Report', id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION },
-
-            ];
-            // Default value: Monthly Sale Report
-        }
-        this.typeReportActive = [this.typeReportList[0]];
     }
 
     searchReport() {
@@ -660,22 +629,22 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     getGeneralSearchBody() {
         const body: ReportInterface.ISearchDataCriteria = {
-            serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateFrom: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customer.value,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
-            currency: this.currencyActive[0].id, // ---**
-            jobId: this.refNoType.value[0].id === "JOBID" ? this.refNo.value : null,
-            mawb: this.refNoType.value[0].id === "MBL" ? this.refNo.value : null,
-            hawb: this.refNoType.value[0].id === "HBL" ? this.refNo.value : null,
+            currency: this.currency.value, // ---**
+            jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            mawb: this.refNoType.value === "MBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            hawb: this.refNoType.value === "HBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
             officeId: this.mapObject(this.officeActive, this.officeList), // ---*
-            departmentId: this.mapObject(this.departmentActive, this.departmentList), // ---*
+            departmentId: this.mapObject(this.department.value, this.departmentList), // ---*
             groupId: this.mapObject(this.groupActive, this.groupList), // ---*
-            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            personInCharge: this.staffType.value === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+            salesMan: this.staffType.value === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+            creator: this.staffType.value === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
             carrierId: this.carrier.value,
             agentId: this.agent.value,
             pol: this.pol.value,
@@ -687,27 +656,27 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     getSaleSearchBody() {
         const body: ReportInterface.ISaleReportCriteria = {
-            serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateFrom: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customer.value,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
-            currency: this.currencyActive[0].id, // ---**
-            jobId: this.refNoType.value[0].id === "JOBID" ? this.refNo.value : null,
-            mawb: this.refNoType.value[0].id === "MBL" ? this.refNo.value : null,
-            hawb: this.refNoType.value[0].id === "HBL" ? this.refNo.value : null,
+            currency: this.currency.value, // ---**
+            jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            mawb: this.refNoType.value === "MBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
+            hawb: this.refNoType.value === "HBL" && this.refNo.value !== null ? this.refNo.value.trim() : null,
             officeId: this.mapObject(this.officeActive, this.officeList), // ---*
             departmentId: this.mapObject(this.departmentActive, this.departmentList), // ---*
             groupId: this.mapObject(this.groupActive, this.groupList), // ---*
-            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            personInCharge: this.staffType.value === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+            salesMan: this.staffType.value === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+            creator: this.staffType.value === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
             carrierId: this.carrier.value,
             agentId: this.agent.value,
             pol: this.pol.value,
             pod: this.pod.value,
-            typeReport: this.typeReportActive[0].id
+            typeReport: this.typeReport.value
         };
         console.log('Sale search:', body);
         return body;
@@ -747,11 +716,11 @@ export class ShareFormSearchReportComponent extends AppForm {
     mapObject(dataSelected: any[], dataList: any[]) {
         let result = '';
         if (dataSelected.length > 0) {
-            if (dataSelected[0].id === 'All') {
+            if (dataSelected[0] === 'All') {
                 const list = dataList.filter(f => f.id !== 'All');
                 result = list.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
             } else {
-                result = dataSelected.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+                result = dataSelected.map((item: any) => item).toString().replace(/(?:,)/g, ';');
             }
         }
         return result;
@@ -772,51 +741,32 @@ export class ShareFormSearchReportComponent extends AppForm {
             this.onSearch.emit(<any>{});
         }
 
-        this.dateTypeActive = [this.dateTypeList[0]];
-        this.dateType.setValue(this.dateTypeActive);
+        this.dateType.setValue(this.dateTypeList[0].id);
 
-        this.serviceActive = [this.serviceList[0]];
+        this.serviceActive = [this.serviceList[0].id];
         this.service.setValue(this.serviceActive);
 
         if (!this.isCommissionIncentive) {
-            this.currencyActive = [this.currencyList.filter((curr) => curr.id === "USD")[0]];
-            this.currency.setValue(this.currencyActive);
+            this.currency.setValue([this.currencyList.filter((curr) => curr.id === "USD")[0].id]);
         }
+        
+        this.refNoType.setValue(this.refNoTypeList[0].id);
 
-        this.refNoTypeActive = [this.refNoTypeList[0]];
-        this.refNoType.setValue(this.refNoTypeActive);
-
-        this.staffTypeActive = [this.staffTypeList[0]];
-        this.staffType.setValue(this.staffTypeActive);
+        if (this.isGeneralReport) {
+            this.staffType.setValue(this.staffTypeList[0].id);
+        } else {
+            this.staffType.setValue(this.staffTypeList[1].id);
+        }
 
         if (this.menuPermission.list !== 'None') {
-            this.officeActive = [this.officeList.filter((off) => off.id === this.userLogged.officeId)[0]];
+            this.officeActive = [this.officeList.filter((off) => off.id === this.userLogged.officeId)[0].id];
             this.office.setValue(this.officeActive);
-
-            if (this.menuPermission.list === 'Office' || this.menuPermission.list === 'Company') {
-                this.departmentActive = [this.departmentList[0]];
-            } else {
-                this.departmentActive = [this.departmentList.filter((dept) => dept.id === this.userLogged.departmentId)[0]];
-            }
-            this.department.setValue(this.departmentActive);
-
-            if (this.menuPermission.list === 'Department') {
-                this.groupActive = [this.groupList[0]];
-            } else {
-                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0]];
-            }
-            this.group.setValue(this.groupActive);
-
-            if (this.menuPermission.list === 'Group') {
-                this.staffActive = [this.staffList[0]];
-            } else {
-                this.staffActive = [this.staffList.filter((stf) => stf.id === this.userLogged.id)[0]];
-            }
-            this.staff.setValue(this.staffActive);
+            this.getDepartment(this.departmentsInit);
         }
 
-        this.typeReportActive = [this.typeReportList[0]];
-        this.typeReport.setValue(this.typeReportActive);
+        if (!this.isGeneralReport) {
+            this.typeReport.setValue(this.typeReportActive[0].id);
+        }
 
         this.serviceDate.setValue({
             startDate: this.createMoment().startOf('month').toDate(),

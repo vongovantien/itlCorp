@@ -38,7 +38,7 @@ import { ShareModulesModule } from '../../share-modules/share-modules.module';
 const routing: Routes = [
     {
         path: '', data: {
-            name: "", title: 'eFMS Settlement Payment'
+            name: ""
         },
         children: [
             {
@@ -54,7 +54,7 @@ const routing: Routes = [
             },
             {
                 path: ":id/approve", component: ApporveSettlementPaymentComponent,
-                data: { name: "Approve", path: "Approve" }
+                data: { name: "Approve", path: "Approve", title: 'eFMS Approve Settle' }
             },
         ]
     },

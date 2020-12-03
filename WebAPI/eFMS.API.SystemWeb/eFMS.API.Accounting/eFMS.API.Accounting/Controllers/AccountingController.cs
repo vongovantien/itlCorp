@@ -70,6 +70,13 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetListSettleToSync")]
+        public IActionResult GetListSettleToSync(List<Guid> Ids)
+        {
+            var data = accountingService.GetListSettlementToSyncBravo(Ids);
+            return Ok(data);
+        }
+
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]
         public async Task<IActionResult> GetListInvoicePaymentToSync(List<RequestGuidListModel> request)
@@ -857,7 +864,7 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle result = new ResultHandle { Status = false, Message = "paymentModels bắt buộc phải có data!", Data = paymentModels };
                 return BadRequest(result);
             }
-
+            
             try
             {
                 // 1. Login

@@ -1,35 +1,33 @@
-import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter, ViewContainerRef } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
-import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
+import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter } from '@angular/core';
+import { AppList } from '@app';
 import { Surcharge, Partner } from '@models';
-import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
-import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
-import { SettlementShipmentItemComponent } from '../shipment-item/shipment-item.component';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
-import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
-import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
-
 import { CommonEnum } from '@enums';
-
-import _includes from 'lodash/includes';
-import _cloneDeep from 'lodash/cloneDeep';
-import cloneDeep from 'lodash/cloneDeep';
-import { BehaviorSubject } from 'rxjs';
 import { delayTime } from '@decorators';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
-import { SystemConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+
+import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
+import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
+import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
+import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
+import { SettlementShipmentItemComponent } from '../shipment-item/shipment-item.component';
+import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
+import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
+import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
+
+import cloneDeep from 'lodash/cloneDeep';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
 })
 
-export class SettlementListChargeComponent extends AppList {
+export class SettlementListChargeComponent extends AppList implements ICrystalReport {
     @Output() onChangeType: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild(SettlementExistingChargePopupComponent, { static: true }) existingChargePopup: SettlementExistingChargePopupComponent;
@@ -70,6 +68,7 @@ export class SettlementListChargeComponent extends AppList {
         super();
     }
 
+
     ngOnInit() {
         this.headers = [
             { title: 'JobId - HBL - MBL', field: 'jobId', sortable: true, width: 200 },
@@ -98,10 +97,6 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     showCreateCharge() {
-        // this.formChargePopup.settlementCode = this.settlementCode;
-        // this.stateFormCharge = 'create';
-        // this.formChargePopup.action = 'create';
-        // this.formChargePopup.show();
         this.tableListChargePopup.isSubmitted = false;
         this.tableListChargePopup.isUpdate = false;
         this.tableListChargePopup.formGroup.reset();
@@ -124,33 +119,11 @@ export class SettlementListChargeComponent extends AppList {
                 this.surcharges = [...this.surcharges];
             }
         } else {
-            const chargeWithNoId: Surcharge[] = charges.filter(x => x.id === null || x.id === SystemConstants.EMPTY_GUID);
-            const chargeWithId: Surcharge[] = charges.filter(x => x.id !== null && x.id !== SystemConstants.EMPTY_GUID);
-
-            for (const i of chargeWithId) {
-                const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === i.hblid && item.id === i.id);
-                if (indexChargeUpdating !== -1) {
-                    this.updateSurchargeWithIndex(indexChargeUpdating, i);
-                }
-            }
-            // * Nếu có thêm charge mới
-            if (chargeWithNoId.length) {
-                // * Xóa những charge mới thêm từ trước
-                const chargeWithNoIdCurrent: Surcharge[] = this.surcharges.filter(x => x.id === null || x.id === SystemConstants.EMPTY_GUID);
-                if (chargeWithNoIdCurrent.length) {
-                    this.surcharges = this.surcharges.filter(x => x.id !== null && x.id !== SystemConstants.EMPTY_GUID);
-                }
-                this.surcharges = [...this.surcharges, ...chargeWithNoId];
-            }
-
+            const hblIds: string[] = charges.map(i => i.hblid);
+            this.surcharges = [...this.surcharges].filter(x => !hblIds.includes(x.hblid));
+            this.surcharges = [...this.surcharges, ...charges];
         }
     }
-
-    updateSurchargeWithIndex(index: number, surcharge: Surcharge) {
-        this.surcharges[index] = surcharge;
-        this.surcharges = [...this.surcharges];
-    }
-
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
@@ -206,9 +179,7 @@ export class SettlementListChargeComponent extends AppList {
         data.event.preventDefault();
 
         this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
-        // setTimeout(() => {
-        //     this.paymentManagementPopup.show();
-        // }, 500);
+
         this.showPaymentManagementPopup();
         return false;
     }
@@ -285,10 +256,7 @@ export class SettlementListChargeComponent extends AppList {
         this.showPaymentManagementPopup();
     }
 
-    @delayTime(500)
-    showPaymentManagementPopup() {
-        this.paymentManagementPopup.show();
-    }
+
 
     openCopySurcharge(surcharge: Surcharge) {
         this.formChargePopup.selectedSurcharge = surcharge;
@@ -383,7 +351,6 @@ export class SettlementListChargeComponent extends AppList {
         const surChargeisNotFromShipment = this.surcharges.filter(x => !x.isFromShipment);
         this.surcharges.length = 0;
         this.surcharges = [...surChargeisNotFromShipment, ...surchargeFromShipment];
-        console.log(this.surcharges);
 
     }
 
@@ -446,15 +413,23 @@ export class SettlementListChargeComponent extends AppList {
 
     }
 
+    @delayTime(500)
+    showPaymentManagementPopup() {
+        this.paymentManagementPopup.show();
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
     renderAndShowReport() {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
 
-        setTimeout(() => {
-            this.componentRef.instance.frm.nativeElement.submit();
-            this.componentRef.instance.show();
-        }, 1000);
+        this.showReport();
 
         this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
             (v: any) => {

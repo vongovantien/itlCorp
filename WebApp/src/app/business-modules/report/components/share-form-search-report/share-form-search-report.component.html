@@ -19,8 +19,8 @@
                         <label class="form-control-label">
                             Date Type
                         </label>
-                        <ng-select formControlName="dateType" [allowClear]="false" [items]="dateTypeList"
-                            [active]="dateTypeActive">
+                        <ng-select formControlName="dateType" [clearable]="false" [items]="dateTypeList" class="custom"
+                            bindLabel="text" bindValue="id">
                         </ng-select>
                     </div>
                 </div>
@@ -49,9 +49,9 @@
                         <label class="form-control-label" for="">
                             Service
                         </label>
-                        <ng-select [multiple]='true' formControlName="service"
-                            (removed)="onRemoveDataFormInfo($event, 'service')" [items]="serviceList"
-                            [active]="serviceActive" (selected)="onSelectDataFormInfo($event, 'service')">
+                        <ng-select [multiple]='true' class="custom" formControlName="service"
+                            (remove)="onRemoveDataFormInfo($event, 'service')" [items]="serviceList"
+                            (add)="onSelectDataFormInfo($event, 'service')" [(ngModel)]="serviceActive" bindLabel="text" bindValue="id">
                         </ng-select>
                     </div>
                 </div>
@@ -60,8 +60,8 @@
                         <label class="form-control-label">
                             Currency
                         </label>
-                        <ng-select formControlName="currency" [allowClear]="false" [items]="currencyList"
-                            [active]="currencyActive" (selected)="onSelectDataFormInfo($event, 'currency')">
+                        <ng-select formControlName="currency" class="custom" [clearable]="false" [items]="currencyList"
+                            placeholder="USD" bindLabel="id" bindValue="id">
                         </ng-select>
                     </div>
                     <div class="form-group" *ngIf="isCommissionIncentive">
@@ -87,8 +87,8 @@
                                     formControlName="refNo" autocomplete="nope">
                             </div>
                             <div class="col-lg-5">
-                                <ng-select formControlName="refNoType" [allowClear]="false" [items]="refNoTypeList"
-                                    [active]="refNoTypeActive">
+                                <ng-select formControlName="refNoType" [clearable]="false" [items]="refNoTypeList"
+                                    class="custom" bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -121,10 +121,10 @@
                                 <label class="form-control-label" for="">
                                     Office
                                 </label>
-                                <ng-select [multiple]='true' formControlName="office"
-                                    (removed)="onRemoveDataFormInfo($event, 'office')" [items]="officeList"
-                                    [active]="officeActive" (selected)="onSelectDataFormInfo($event, 'office')"
-                                    [disabled]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
+                                <ng-select [multiple]='true' formControlName="office" class="custom"
+                                    (change)="detectChangeDataInfo($event, 'office')" [items]="officeList" [(ngModel)]="officeActive"
+                                    [disabled]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -133,10 +133,10 @@
                                 <label class="form-control-label" for="">
                                     Department
                                 </label>
-                                <ng-select [multiple]='true' formControlName="department"
-                                    (removed)="onRemoveDataFormInfo($event, 'department')" [items]="departmentList"
-                                    [active]="departmentActive" (selected)="onSelectDataFormInfo($event, 'department')"
-                                    [disabled]="menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
+                                <ng-select [multiple]='true' formControlName="department" class="custom"
+                                    (change)="detectChangeDataInfo($event, 'department')" [items]="departmentList" [(ngModel)]="departmentActive"
+                                    [disabled]="menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -145,10 +145,10 @@
                                 <label class="form-control-label" for="">
                                     Group
                                 </label>
-                                <ng-select [multiple]='true' formControlName="group"
-                                    (removed)="onRemoveDataFormInfo($event, 'group')" [items]="groupList"
-                                    [active]="groupActive" (selected)="onSelectDataFormInfo($event, 'group')"
-                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
+                                <ng-select [multiple]='true' formControlName="group" class="custom"
+                                    (change)="detectChangeDataInfo($event, 'group')" [items]="groupList" [(ngModel)]="groupActive"
+                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -159,10 +159,10 @@
                                 <label class="form-control-label" for="">
                                     Staff Name
                                 </label>
-                                <ng-select [multiple]='true' formControlName="staff"
-                                    (removed)="onRemoveDataFormInfo($event, 'staff')" [items]="staffList"
-                                    [active]="staffActive" (selected)="onSelectDataFormInfo($event, 'staff')"
-                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
+                                <ng-select [multiple]='true' formControlName="staff" class="custom"
+                                    (change)="detectChangeDataInfo($event, 'staff')" [items]="staffList" [(ngModel)]="staffActive"
+                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -171,8 +171,8 @@
                                 <label class="form-control-label" for="">
                                     Type
                                 </label>
-                                <ng-select formControlName="staffType" [allowClear]="false" [items]="staffTypeList"
-                                    [active]="staffTypeActive">
+                                <ng-select formControlName="staffType" [clearable]="false" [items]="staffTypeList"
+                                    class="custom" bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
                         </div>
@@ -255,8 +255,9 @@
                             <label class="form-control-label" for="">
                                 Report Type
                             </label>
-                            <ng-select formControlName="typeReport" [allowClear]="false" [items]="typeReportList"
-                                [active]="typeReportActive" (selected)="onSelectDataFormInfo($event, 'typeReport')">
+                            <ng-select formControlName="typeReport" [clearable]="false" [items]="typeReportActive"
+                                class="custom" (add)="onSelectDataFormInfo($event, 'typeReport')" bindLabel="text"
+                                bindValue="id">
                             </ng-select>
                         </div>
                     </div>

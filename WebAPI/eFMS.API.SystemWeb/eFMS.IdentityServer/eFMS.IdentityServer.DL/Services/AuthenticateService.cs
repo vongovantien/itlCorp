@@ -14,6 +14,8 @@ using Microsoft.Extensions.Options;
 using System.DirectoryServices;
 using System.Net;
 using ITL.NetCore.Common;
+using System.Net.Sockets;
+using Microsoft.AspNetCore.Http;
 
 namespace eFMS.IdentityServer.DL.Services
 {
@@ -23,7 +25,7 @@ namespace eFMS.IdentityServer.DL.Services
         readonly LDAPConfig ldap;
         IContextBase<SysEmployee> employeeRepository;
         public readonly IContextBase<SysUserLevel> userLevelRepository;
-
+        private readonly IHttpContextAccessor _accessor;
 
 
         public AuthenticateService(
@@ -31,13 +33,14 @@ namespace eFMS.IdentityServer.DL.Services
             ISysUserLogService logService,
             IOptions<LDAPConfig> ldapConfig,
             IContextBase<SysUserLevel> userLevelRepo,
-            IContextBase<SysEmployee> employeeRepo) : base(repository, mapper)
+            IContextBase<SysEmployee> employeeRepo,
+            IHttpContextAccessor accessor) : base(repository, mapper)
         {
             userLogService = logService;
             ldap = ldapConfig.Value;
             employeeRepository = employeeRepo;
             userLevelRepository = userLevelRepo;
-
+            _accessor = accessor;
         }
 
         public UserViewModel GetUserById(string id)
@@ -289,13 +292,49 @@ namespace eFMS.IdentityServer.DL.Services
             //modelReturn = new LoginReturnModel { idUser = user.Id, userName = user.Username, email = sysEmployee.Email };
             return hs;
         }
+
+        private string GetLocalIPAddress()
+        {
+            try
+            {
+                //string ipv4 = string.Empty;
+                //var host = Dns.GetHostEntry(Dns.GetHostName());
+                //foreach (var ip in host.AddressList)
+                //{
+                //    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                //    {
+                //        ipv4 = ip.ToString();
+                //    }
+                //}
+                //return ipv4;
+                return _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        private string GetLocalComputerName()
+        {
+            try
+            {
+                var host = Dns.GetHostEntry(Dns.GetHostName());
+                return host.HostName;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
         private void LogUserLogin(SysUser user, Guid? workplaceId)
         {
-            IPHostEntry ipEntry = Dns.GetHostEntry("");
-            string ComputerName = ipEntry.HostName;
+            //IPHostEntry ipEntry = Dns.GetHostEntry("");
+            string ComputerName = GetLocalComputerName();//ipEntry.HostName;
             var userLog = new SysUserLogModel
             {
-                Ip = ipEntry.AddressList[1].ToString(),
+                Ip = GetLocalIPAddress(),//ipEntry.AddressList[1].ToString(),
                 ComputerName = ComputerName,
                 LoggedInOn = DateTime.Now,
                 UserId = user.Id,

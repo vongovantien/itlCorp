@@ -745,9 +745,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 fe.Containers = fe.ContSealNo;
                 var containers = fe.ContSealNo != null ? fe.ContSealNo.Split('\n').Where(x => x.Length > 0) : null;
-                fe.ContSealNo = containers != null ? string.Join(", ", containers) : null;
+                fe.ContSealNo = containers != null ? string.Join(", ", containers.Where(x => !string.IsNullOrEmpty(x))) : null;
                 var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id && x.PackageTypeId != null).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
-                fe.Packages = string.Join(", ", packages);
+                fe.Packages = string.Join(", ", packages.Where(x => !string.IsNullOrEmpty(x)));
             });
             return results;
         }
@@ -1402,8 +1402,8 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
                 housebill.NoPieces = string.Format("{0:n}", data.PackageQty) + " " + _packageType; // Package Qty & Package Type of HBL
-                hbConstainers += " CONTAINER(S) S.T.C:";
-                housebill.Qty = !string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper(); //Ưu tiên Package container >> List of good
+                // hbConstainers += " CONTAINER(S) S.T.C:";
+                housebill.Qty = (!string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper() ) + " CONTAINER(S) S.T.C:"; //Ưu tiên Package container >> List of good
                 housebill.MaskNos = markNo?.ToUpper();
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 var _totalGwCont = conts.Select(s => s.Gw).Sum() ?? 0; //Tổng grossweight trong list cont;

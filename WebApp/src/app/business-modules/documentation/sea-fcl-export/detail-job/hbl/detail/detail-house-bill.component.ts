@@ -4,32 +4,30 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SeaFCLExportCreateHBLComponent } from '../create/create-house-bill.component';
-import { CsTransactionDetail } from 'src/app/shared/models';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransactionDetail } from '@models';
+import { ReportPreviewComponent } from '@common';
+import { ChargeConstants } from '@constants';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
+import { SeaFCLExportCreateHBLComponent } from '../create/create-house-bill.component';
+
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { ChargeConstants } from 'src/constants/charge.const';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 
 @Component({
     selector: 'app-detail-hbl-fcl-export',
     templateUrl: './detail-house-bill.component.html'
 })
 
-export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLComponent implements OnInit, AfterViewInit {
+export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
-
     hblDetail: CsTransactionDetail;
 
-    dataReport: Crystal;
-
-    allowUpdate: boolean = false;
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -52,6 +50,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
             _cd
         );
     }
+
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
@@ -101,9 +100,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
 
     getListContainer() {
         this._store.select<any>(fromShareBussiness.getHBLContainersState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
@@ -158,10 +155,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -179,14 +173,17 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 }

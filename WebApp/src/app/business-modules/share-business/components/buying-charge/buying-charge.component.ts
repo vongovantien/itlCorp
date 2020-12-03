@@ -1188,6 +1188,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         if (!!item.exchangeDate) {
                             item.exchangeDate = item.exchangeDate.startDate;
                         }
+                        if (!!item.invoiceDate) {
+                            item.invoiceDate = item.invoiceDate.startDate;
+                        }
                     });
                     const creditTerm = this._documentRepo.notificationAccountReceivableCreditTerm(this.charges);
                     const paymentTerm = this._documentRepo.notificationReceivablePaymentTerm(this.charges);

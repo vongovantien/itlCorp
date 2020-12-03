@@ -4,32 +4,31 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransactionDetail } from 'src/app/shared/models';
-import { Crystal } from 'src/app/shared/models/report/crystal.model';
-import { ReportPreviewComponent } from 'src/app/shared/common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransactionDetail } from '@models';
+import { ReportPreviewComponent } from '@common';
+import { ChargeConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
 
+import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
+
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 
 @Component({
     selector: 'app-detail-hbl-consol-export',
     templateUrl: './detail-hbl-consol-export.component.html'
 })
 
-export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLComponent implements OnInit, AfterViewInit {
+export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
+
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;
-
     hblDetail: CsTransactionDetail;
 
-    dataReport: Crystal;
-
-    allowUpdate: boolean = false;
     constructor(
         protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
@@ -101,9 +100,7 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
 
     getListContainer() {
         this._store.select<any>(fromShareBussiness.getHBLContainersState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
@@ -125,13 +122,12 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
         modelUpdate.jobId = this.jobId;
         modelUpdate.userCreated = this.hblDetail.userCreated;
 
-
         this.updateHbl(modelUpdate);
     }
 
     updateHbl(body: any) {
         this._progressRef.start();
-        body.transactionType = body.transactionType = ChargeConstants.SFE_CODE;
+        body.transactionType = body.transactionType = ChargeConstants.SCE_CODE;
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
@@ -158,10 +154,7 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -179,15 +172,18 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 
 }

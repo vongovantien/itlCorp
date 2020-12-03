@@ -21,6 +21,7 @@
   "MSG_PARTNER_INTERNAL_REFERENCENO_INVALID": "Internal Reference '{0}' is invalid",
   "MSG_PARTNER_TAXCODE_NOT_NUMBER": "Tax code must be number type and greater than 0!",
   "MSG_PARTNER_TAXCODE_EXISTED": "Tax code '{0}' has been existed!",
+  "MSG_PARTNER_TAXCODE_SPACE": "Tax code '{0}' not allow space!",
   "MSG_PARTNER_TAXCODE_INVALID": "Tax code '{0}' is invalid",
   "MSG_PARTNER_GROUP_EMPTY": "Partner group is not allow empty!",
   "MSG_PARTNER_GROUP_NOT_FOUND": "Partner group {0} is not found!",
@@ -32,6 +33,8 @@
   "MSG_PARTNER_SALEMAN_DEFAULT_OFFICE_NOT_ALLOW_EMPTY": "Office - Sale man Default is not allow empty!",
   "MSG_PARTNER_NAME_EN_EMPTY": "Partner name EN is not allow empty!",
   "MSG_PARTNER_NAME_VN_EMPTY": "Partner name local is not allow empty!",
+  "MSG_PARTNER_LOCATION_EMPTY": "Partner location is not allow empty!",
+  "MSG_PARTNER_INTERNAL_CODE_EMPTY": "Partner internal code is not allow empty when partner mode is Internal!",
   "MSG_PARTNER_SHORT_NAME_EMPTY": "Short name is not allow empty!",
   "MSG_PARTNER_COUNTRY_BILLING_EMPTY": "Country billing is empty. Please check again!",
   "MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND": "Country billing '{0}' is not found!",
@@ -46,7 +49,7 @@
   "MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND": "Billing address local is not allow empty. Please check again!",
   "MSG_PARTNER_AC_REFERENCE_NOT_FOUND": "A/c reference '{0}' is not found!",
 
-  "MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND": "Shipping address is not allow empty. Please check again!",
+  "MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND": "Shipping address en is not allow empty. Please check again!",
   "MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND": "Shipping address local is not allow empty. Please check again!",
   "MSG_PARTNER_WORKPLACE_NOT_FOUND": "Workplace '{0}' is not found!",
   "MSG_PARTNER_TAXCODE_LENGTH": "Tax Code include 8 - 14 characters!",
@@ -75,8 +78,9 @@
   "MSG_CONTRACT_CONTRACT_NO_EXISTED": "Contract No {0} has been existed!|wrong",
   "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID": "Experied Date must be after or equal Effective Date!",
   "MSG_CONTRACT_CONTRACTNO_LENGTH": "Contract No include 3 - 50 characters!",
-
-
+  "MSG_CONTRACT_SALESMAN_EMPTY": "Salesman is not allow empty!",
+  "MSG_CONTRACT_DUPLICATE_SERVICE": "Duplicate service, office, salesman!",
+  "MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT": "Service {0} already exists salesman",
   //-----------end contract
 
   //------------start: place

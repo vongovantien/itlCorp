@@ -23,12 +23,11 @@ export class DepartmentAddNewComponent extends AppForm {
     office: AbstractControl;
     email: AbstractControl;
     status: AbstractControl;
-    officeList: any[] = [];
     departmentType: AbstractControl;
-    departmentTypeList: any[] = [];
-    departmentTypeActive: any[] = [];
 
-    isValidForm: boolean = false;
+    officeList: any[] = [];
+    departmentTypeList: any[] = [];
+
     isSubmited: boolean = false;
 
     constructor(
@@ -77,7 +76,7 @@ export class DepartmentAddNewComponent extends AppForm {
             ],
             email: [],
             status: [],
-            departmentType: [this.departmentTypeActive]
+            departmentType: []
         });
 
         this.departmentCode = this.formAdd.controls['departmentCode'];
@@ -107,10 +106,10 @@ export class DepartmentAddNewComponent extends AppForm {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                branchId: this.office.value[0].id,
-                officeName: this.office.value[0].text,
+                branchId: this.office.value,
+                officeName: '',
                 companyName: '',
-                deptType: this.departmentTypeActive[0].id,
+                deptType: this.departmentType.value,
                 email: this.email.value,
                 userCreated: '',
                 datetimeCreated: '',
@@ -161,21 +160,9 @@ export class DepartmentAddNewComponent extends AppForm {
             .subscribe(
                 (data: any) => {
                     this.departmentTypeList = data.map((item: any) => ({ id: item.value, text: item.displayName }));
-                    this.departmentTypeActive = [this.departmentTypeList[1]];
+                    this.departmentType.setValue(this.departmentTypeList[1].id);
                 },
             );
-    }
-
-    onSelectDataFormInfo(data: any, type: string) {
-        switch (type) {
-            case 'deptType':
-                this.departmentTypeActive = [];
-                this.departmentTypeActive.push(data);
-                this.departmentType.setValue(this.departmentTypeActive);
-                break;
-            default:
-                break;
-        }
     }
 
     back() {

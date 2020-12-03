@@ -11,6 +11,11 @@ namespace eFMS.API.Common
 {
     public class SendMail
     {
+        public const string _emailFrom = "info.fms@itlvn.com"; // "noreply-efms@itlvn.com"
+        private const string _smtpHost = "webmail.itlvn.com"; // "email-smtp.ap-southeast-2.amazonaws.com"
+        private const string _smptUser = "info.fms"; //"AKIA2AI6JMUOVFIQJQXN"
+        private const string _smtpPassword = "ITPr0No1!"; // "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP"
+
         public static bool Send(string subject, string body, List<string> toEmails, List<string> attachments, List<string> emailCCs, List<string> emailBCC = null)
         {
             //string SentUser = "";
@@ -21,7 +26,7 @@ namespace eFMS.API.Common
             string description = "";
             bool result = true;
 
-            MailAddress emailFrom = new MailAddress("info.fms@itlvn.com");
+            MailAddress emailFrom = new MailAddress(_emailFrom);
             MailMessage message = new MailMessage();
 
             message.From = emailFrom;
@@ -74,13 +79,13 @@ namespace eFMS.API.Common
             SmtpClient client = new SmtpClient();
             client.UseDefaultCredentials = false;
 
-            client.Host = "webmail.itlvn.com";
+            client.Host = _smtpHost;
             client.Port = 587;
             client.EnableSsl = true;
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
             client.Credentials =
-                new System.Net.NetworkCredential("info.fms",
-                    "ITPr0No1!");
+                new System.Net.NetworkCredential(_smptUser,
+                    _smtpPassword);
             client.Timeout = 300000;
 
             // send message
@@ -106,8 +111,20 @@ namespace eFMS.API.Common
         {
             List<string> ToEmails = new List<string>() { ToEmail };
             return Send(Subject, Body, ToEmails, Attachments, EmailCCs, emailBCC);
+        }        
+        public static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
-       
+
         private static DateTime GetDateTime()
         {
 

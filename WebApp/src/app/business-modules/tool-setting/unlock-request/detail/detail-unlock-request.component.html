@@ -44,9 +44,8 @@
                                 <label class="form-control-label" for="form-control-label">
                                     Unlock Type
                                 </label>
-                                <ng-select [disabled]="action === 'read'" formControlName="unlockType"
-                                    [allowClear]="false" [items]="unlockTypeList"
-                                    (selected)="selectedUnlockType($event)">
+                                <ng-select [disabled]="action === 'read'" formControlName="unlockType" class="custom"
+                                    [items]="unlockTypeList" (change)="selectedUnlockType($event)">
                                 </ng-select>
                             </div>
                         </div>

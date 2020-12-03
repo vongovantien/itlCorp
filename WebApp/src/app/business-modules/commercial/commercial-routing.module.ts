@@ -9,20 +9,20 @@ const routes: Routes = [
     },
     {
         path: 'agent', loadChildren: () => import('./agent/commercial-agent.module').then(m => m.CommercialAgentModule),
-        data: { name: 'Agent', type: 'Agent' }
+        data: { name: 'Agent', type: 'Agent', title: 'eFMS Agent' }
     },
     {
         path: 'customer', loadChildren: () => import('./customer/commercial-customer.module').then(m => m.CommercialCustomerModule),
-        data: { name: 'Customer', type: 'Customer' }
+        data: { name: 'Customer', type: 'Customer', title: 'eFMS Customer' }
     },
     {
         path: 'incoterm', loadChildren: () => import('./incoterm/commercial-incoterm.module').then(m => m.CommercialIncotermModule),
-        data: { name: 'Incoterm' }
+        data: { name: 'Incoterm', title: 'eFMS Incoterm' }
     },
     {
         path: 'potential-customer',
         loadChildren: () => import('./potential-customer/commercial-potential-customer.module').then(m => m.CommercialPotentialCustomerModule),
-        data: { name: 'Potential Customer' }
+        data: { name: 'Potential Customer', title: 'eFMS Potential' }
     }
 ];
 

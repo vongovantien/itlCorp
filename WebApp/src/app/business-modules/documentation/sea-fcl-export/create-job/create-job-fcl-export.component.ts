@@ -4,23 +4,22 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { ActionsSubject } from '@ngrx/store';
 
-import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransaction } from 'src/app/shared/models';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Container } from 'src/app/shared/models/document/container.model';
+import { AppForm } from '@app';
+import { InfoPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransaction, Container } from '@models';
+import { CommonEnum } from '@enums';
 import {
-    ShareBussinessFormCreateSeaExportComponent,
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBusinessImportJobDetailPopupComponent
-} from 'src/app/business-modules/share-business';
-
-import * as fromShareBussiness from './../../../share-business/store';
-
-import { catchError, takeUntil } from 'rxjs/operators';
+} from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
+import * as fromShareBussiness from './../../../share-business/store';
+import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/components/form-create-sea-export/form-create-sea-export.component';
+
+import { catchError, takeUntil } from 'rxjs/operators';
+import _merge from 'lodash/merge';
 @Component({
     selector: 'app-create-job-fcl-export',
     templateUrl: './create-job-fcl-export.component.html'
@@ -28,7 +27,7 @@ import { RoutingConstants } from '@constants';
 
 export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareBussinessFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareBussinessFormCreateSeaExportComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -77,23 +76,9 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            mawb: form.mawb,
-            voyNo: form.voyNo,
-            notes: form.notes,
             personIncharge: form.personalIncharge,
-            coloader: form.coloader,
-            bookingNo: form.bookingNo,
-            flightVesselName: form.flightVesselName,
-            pono: form.pono,
-
-            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
-            typeOfService: !!form.typeOfService && !!form.typeOfService.length ? form.typeOfService[0].id : null,
-            mbltype: !!form.mbltype && !!form.mbltype.length ? form.mbltype[0].id : null,
-            paymentTerm: !!form.term && !!form.term.length ? form.term[0].id : null,
-
+            paymentTerm: form.term,
             agentId: form.agent,
-            pol: form.pol,
-            pod: form.pod,
             coloaderId: form.coloader,
 
             // * containers summary
@@ -106,7 +91,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
         };
 
-        const fclExportAddModel: CsTransaction = new CsTransaction(formData);
+        const fclExportAddModel: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLExport;
 
         return fclExportAddModel;
@@ -129,12 +114,6 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             this.infoPopup.show();
             return;
         }
-
-        // if (!this.containers.length) {
-        //     this._toastService.warning('Please add container to create new job');
-        //     return;
-        // }
-
         const modelAdd = this.onSubmitData();
         modelAdd.csMawbcontainers = this.containers; // * Update containers model
 
@@ -193,7 +172,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // TODO goto detail.
+
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);

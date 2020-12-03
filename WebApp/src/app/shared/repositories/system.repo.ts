@@ -650,7 +650,7 @@ export class SystemRepo {
     }
 
     getListNotifications(page: number = 1, size: number = 15) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserNotification/Paging`, { page: page, size: size });
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserNotification/Paging`, { page: page, size: size }, { "hideSpinner": "true" });
     }
 
     readMessage(Id: string) {

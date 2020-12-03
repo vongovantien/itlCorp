@@ -1,7 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
-import { PartnerOfAcctManagementResult } from '@models';
 import { Store } from '@ngrx/store';
+
+import { PopupBase } from '@app';
+import { PartnerOfAcctManagementResult } from '@models';
+
 import { IAccountingManagementState, SelectPartner } from '../../../store';
 
 @Component({

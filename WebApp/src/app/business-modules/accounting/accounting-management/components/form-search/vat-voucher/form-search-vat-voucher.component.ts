@@ -43,7 +43,7 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
 
     invoiceStatusList: string[] = ['New', 'Updated Invoice'];
 
-    voucherTypeList: string[] = AccountingConstants.VOUCHER_TYPE.map(i => i.id);
+    voucherTypeList: string[] = AccountingConstants.VOUCHER_TYPE;
     dataSearch: AccAccountingManagementCriteria;
 
     constructor(

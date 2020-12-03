@@ -4,28 +4,24 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
-import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { SystemConstants } from 'src/constants/system.const';
+import { AppForm } from '@app';
+import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { Container, csBookingNote, CsTransactionDetail } from '@models';
+import { SystemConstants, RoutingConstants } from '@constants';
 import {
     ShareBusinessImportHouseBillDetailComponent,
-    ShareBusinessFormCreateHouseBillExportComponent,
     ShareBussinessHBLGoodSummaryLCLComponent,
     getTransactionPermission,
     ShareBusinessAttachListHouseBillComponent
-} from 'src/app/business-modules/share-business';
-
-import { catchError, takeUntil } from 'rxjs/operators';
+} from '@share-bussiness';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
+import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 
+import { catchError, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { csBookingNote } from '@models';
-import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-hbl-lcl-export',
@@ -36,7 +32,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(ShareBusinessFormCreateHouseBillExportComponent, { static: false }) formCreateHBLComponent: ShareBusinessFormCreateHouseBillExportComponent;
+    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent, { static: false }) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
@@ -44,10 +40,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     jobId: string;
 
     containers: Container[] = [];
-
-    selectedHbl: any = {}; // TODO model.
-
-    allowAdd: boolean = false;
+    selectedHbl: CsTransactionDetail;
 
     constructor(
         protected _activedRoute: ActivatedRoute,
@@ -57,7 +50,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
-        private _systemRepo?: SystemRepo
     ) {
         super();
 
@@ -97,8 +89,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                     this.permissionShipments = this._store.select(getTransactionPermission);
-
-                    // this.getBookingNotes();
                 } else {
                     this.gotoList();
                 }
@@ -173,16 +163,16 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             exportReferenceNo: form.exportReferenceNo,
             goodsDeliveryDescription: form.goodsDeliveryDescription,
             forwardingAgentDescription: form.forwardingAgentDescription,
-            purchaseOrderNo: form.purchaseOrderNo || null,
+            purchaseOrderNo: form.purchaseOrderNo,
             shippingMark: form.shippingMark,
             inWord: form.inWord,
             onBoardStatus: form.onBoardStatus,
 
-            serviceType: !!form.serviceType ? form.serviceType[0].id : null,
-            originBlnumber: !!form.originBlnumber ? form.originBlnumber[0].id : null,
-            moveType: !!form.moveType ? form.moveType[0].id : null,
-            freightPayment: !!form.freightPayment ? form.freightPayment[0].id : null,
-            hbltype: !!form.hbltype ? form.hbltype[0].id : null,
+            serviceType: form.serviceType,
+            originBlnumber: form.originBlnumber,
+            moveType: form.moveType,
+            freightPayment: form.freightPayment,
+            hbltype: form.hbltype,
 
             customerId: form.customer,
             saleManId: form.saleMan,
@@ -232,10 +222,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
     checkValidateForm() {
         let valid: boolean = true;
-
-        this.setError(this.formCreateHBLComponent.serviceType);
-        this.setError(this.formCreateHBLComponent.moveType);
-        this.setError(this.formCreateHBLComponent.originBlnumber);
 
         if (!this.formCreateHBLComponent.formCreate.valid) {
             valid = false;
@@ -307,8 +293,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         }
 
         containerDetail = containerDetail += " Only.";
-
-
 
         return containerDetail;
     }

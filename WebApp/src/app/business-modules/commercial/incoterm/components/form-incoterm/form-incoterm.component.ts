@@ -3,7 +3,6 @@ import { AppForm } from 'src/app/app.form';
 import { FormGroup, FormControl, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { ChargeConstants } from '@constants';
 import { DataService } from '@services';
-import { SelectItem } from 'ng2-select';
 
 @Component({
     selector: 'form-incoterm',
@@ -58,7 +57,7 @@ export class CommercialFormIncotermComponent extends AppForm implements OnInit {
         this.code = this.formGroup.controls['code'];
     }
 
-    onSelectService(service: SelectItem) {
+    onSelectService(service: any) {
         console.log(service);
         if (!!service) {
             this._dataService.setData('incotermService', service.id);

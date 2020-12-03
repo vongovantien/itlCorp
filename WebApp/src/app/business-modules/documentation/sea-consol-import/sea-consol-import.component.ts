@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 
 import { DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
-import { AppList } from 'src/app/app.list';
+import { AppList } from '@app';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { CsTransaction, CsTransactionDetail } from '@models';
 import { CommonEnum } from '@enums';
@@ -15,7 +15,6 @@ import { JobConstants, RoutingConstants } from '@constants';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
-import { getTransactionDataSearchState } from './../../share-business/store';
 
 @Component({
     selector: 'app-sea-consol-import',
@@ -27,7 +26,6 @@ export class SeaConsolImportComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
-    headers: CommonInterface.IHeaderTable[];
     headerHouseBills: CommonInterface.IHeaderTable[];
 
     masterbills: CsTransaction[] = [];
@@ -93,7 +91,7 @@ export class SeaConsolImportComponent extends AppList {
 
         this.getShipments();
 
-        this._store.select(getTransactionDataSearchState)
+        this._store.select(fromShare.getTransactionDataSearchState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )

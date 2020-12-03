@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Documentation.DL.Common
+﻿namespace eFMS.API.Documentation.DL.Common
 {
     public static class DocumentConstants
     {
@@ -74,5 +70,13 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static readonly string PARTNER_LOCATION_DOMESTIC = "Domestic";
         public static readonly string PARTNER_LOCATION_OVERSEA = "Oversea";
+
+        public const string Crystal_Preview = "Crystal Preview";
+        //Report Name
+        public const string Monthly_Sale_Report = "Monthly Sale Report";
+        public const string Sale_Report_By_Quater = "Sale Report By Quater";
+        public const string Sale_Report_By_Department = "Sale Report By Department";
+        public const string Summary_Sale_Report = "Summary Sale Report";
+        public const string Combination_Statistic_Report = "Combination Statistic Report";
     }
 }

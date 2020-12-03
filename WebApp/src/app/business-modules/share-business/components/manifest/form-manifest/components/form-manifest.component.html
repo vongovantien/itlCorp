@@ -142,15 +142,15 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (freightCharge.dirty && !freightCharge.valid) || (isSubmitted && !freightCharge.valid) || freightChargeEmpty}">
+                            [ngClass]="{'m-form__group has-danger': (freightCharge.dirty && !freightCharge.valid) || (isSubmitted && !freightCharge.valid)}">
                             <label class="form-control-label" for="">
                                 Freight Charge <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select [items]="freightCharges" (selected)="selectedFreightCharge()"
-                                placeholder="select" formControlName="freightCharge">
+                            <ng-select class="custom" [items]="freightCharges" placeholder="select"
+                                formControlName="freightCharge" [clearable]="false">
                             </ng-select>
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (freightCharge.errors | equalError: 'required') && freightCharge.dirty ||  freightChargeEmpty">
+                                *ngIf="isSubmitted && (freightCharge.errors | equalError: 'required') && freightCharge.dirty">
                                 Freight Charge is required!
                             </div>
                         </div>
@@ -205,7 +205,8 @@
                                 Shipper
                             </label>
                             <div class="form-group shipper-description">
-                            <textarea class="form-control" rows="5" formControlName="shipperDescription"> </textarea>
+                                <textarea class="form-control" rows="5"
+                                    formControlName="shipperDescription"> </textarea>
                             </div>
                         </div>
                     </div>

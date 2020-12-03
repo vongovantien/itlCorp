@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { Store } from '@ngrx/store';
 import { IAppState, getCataloguePortState, GetCataloguePortAction } from '@store';
-import { getTransactionLocked, getTransactionPermission, ShareBusinessDIMVolumePopupComponent, GetShipmentOtherChargeSuccessAction, GetDimensionSuccessAction } from '@share-bussiness';
+import { getTransactionLocked, getTransactionPermission, GetShipmentOtherChargeSuccessAction, GetDimensionSuccessAction } from '@share-bussiness';
 import { FormGroup, AbstractControl, Validators, FormBuilder } from '@angular/forms';
 import { CommonEnum } from '@enums';
 import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { Customer, PortIndex, Currency, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction } from '@models';
+import { Customer, PortIndex, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction, Currency } from '@models';
 import { formatDate, formatCurrency } from '@angular/common';
 import { InfoPopupComponent, ReportPreviewComponent, } from '@common';
 import { ToastrService } from 'ngx-toastr';
@@ -19,8 +19,9 @@ import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { Observable, of, merge } from 'rxjs';
-import { map, tap, takeUntil, catchError, finalize, switchMap, concatMap, distinctUntilChanged } from 'rxjs/operators';
+import { map, takeUntil, catchError, finalize, switchMap, concatMap, distinctUntilChanged } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { ShareAirServiceDIMVolumePopupComponent } from '../../../share-air/components/dim/dim-volume.popup';
 
 @Component({
     selector: 'app-air-export-mawb',
@@ -29,7 +30,7 @@ import isUUID from 'validator/lib/isUUID';
 })
 
 export class AirExportMAWBFormComponent extends AppForm implements OnInit {
-    @ViewChild(ShareBusinessDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareBusinessDIMVolumePopupComponent;
+    @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
     @ViewChild(ShareAirExportOtherChargePopupComponent, { static: false }) otherChargePopup: ShareAirExportOtherChargePopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
@@ -78,19 +79,17 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
     displayFieldWarehouse: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
 
-    termTypes: CommonInterface.INg2Select[] = [
-        ...JobConstants.COMMON_DATA.FREIGHTTERMS,
-        { id: 'Sea - Air Difference', text: 'Sea - Air Difference' }
-    ];
-    wts: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.WT;
+    termTypes: string[] = ['Collect', 'Prepaid', 'Sea - Air Difference'];
+
+    wts: string[] = JobConstants.COMMON_DATA.WT;
     numberOBLs: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
-    rClasses: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.RCLASS;
+    rClasses: string[] = JobConstants.COMMON_DATA.RCLASS;
 
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
-    currencies: Observable<CommonInterface.INg2Select[]>;
+    currencies: Observable<Currency>;
     warehouses: Observable<Warehouse[]>;
 
     dimensionDetails: DIM[] = [];
@@ -142,14 +141,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
         this.ports = this._store.select(getCataloguePortState);
         this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse });
-
-        this.currencies = this._catalogueRepo.getCurrencyBy({ active: true }).pipe(
-            map((currencies: Currency[]) => this.utility.prepareNg2SelectData(currencies, 'id', 'id')),
-            tap((currencies: CommonInterface.INg2Select[]) => {
-                // * Set Default.
-                this.currencyId.setValue([currencies.find(currency => currency.id === 'USD')]);
-            })
-        );
+        this.currencies = this._catalogueRepo.getCurrencyBy({ active: true });
 
         this._activedRoute.params
             .pipe(
@@ -173,8 +165,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 }),
                 map((data: AirwayBill | CsTransaction | any) => {
                     if (data.hasOwnProperty("mblno1")) {
-                        this.isShowUpdate = true;
                         console.log("update csAirwaybill");
+
+                        this.isShowUpdate = true;
                         this.airwaybillId = data.id;
                         this.isUpdate = true;
                         this.otherCharges = data.otherCharges;
@@ -199,14 +192,14 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
                             flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
                             flightNo: data.flightVesselName,
-                            freightPayment: !!data.paymentTerm ? [{ id: data.paymentTerm, text: data.paymentTerm }] : [this.termTypes[1]],
+                            freightPayment: data.paymentTerm,
                             route: data.route,
                             warehouseId: data.warehouseId,
                             issuedBy: data.issuedBy,
                             mblno1: !!data.mawb ? data.mawb.slice(0, 3) : null,
                             mblno2: data.polCode,
                             mblno3: !!data.mawb ? data.mawb.slice(-9) : null,
-                            rclass: [this.rClasses.find(sm => sm.id === 'Q')],
+                            rclass: 'Q',
                             consigneeId: data.agentId,
                             consigneeDescription: this.setDefaultAgentData(data),
                             shipperDescription: this.setDefaultShipperWithOffice(data),
@@ -240,11 +233,11 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     setDefaultWTVal(shipment: CsTransaction) {
         if (shipment.paymentTerm) {
             if (shipment.paymentTerm === 'Prepaid') {
-                return [this.wts[0]];
+                return this.wts[0];
             }
-            return [this.wts[1]];
+            return this.wts[1];
         }
-        return [this.wts[0]];
+        return this.wts[0];
 
     }
 
@@ -268,14 +261,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
             etd: !!data.etd ? { startDate: new Date(data.etd), endDate: new Date(data.etd) } : null,
             flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
-
-            freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
-            originBlnumber: data.originBlnumber !== null ? [(this.numberOBLs || []).find(type => +type.id === data.originBlnumber as any)] : null,
-            wtorValpayment: !!data.wtorValpayment ? [(this.wts || []).find(type => type.id === data.wtorValpayment)] : null,
-            otherPayment: !!data.otherPayment ? [(this.wts || []).find(type => type.id === data.otherPayment)] : null,
-            currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,
             dimensionDetails: [],
-            rclass: !!data.rclass ? [(this.rClasses || []).find(type => type.id === data.rclass)] : null,
+
+
             total: data.total != null ? parseFloat('' + data.total).toFixed(2) : null
 
         };
@@ -349,7 +337,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
             // * Select
             freightPayment: [],
-            currencyId: [],
+            currencyId: ['USD'],
             originBlnumber: [],
             wtorValpayment: [],
             otherPayment: [],
@@ -435,8 +423,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 }
 
                 if (key === 'wtorValpayment') {
-                    if (!!value && !!value.length) {
-                        switch (value[0].id) {
+                    if (!!value) {
+                        switch (value) {
                             case 'PP':
                                 if (!this.wtpp.value) {
                                     this.updateWtWithTotal(this.total.value);
@@ -458,8 +446,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     }
                 }
                 if (key === 'otherPayment') {
-                    if (!!value && !!value.length) {
-                        switch (value[0].id) {
+                    if (!!value) {
+                        switch (value) {
                             case 'PP':
                                 this.updateDueAgentCarrierWithTotalAgent(this.dueAgentCll.value, this.dueCarrierCll.value);
                                 break;
@@ -481,9 +469,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 }
                 if (key === 'freightPayment') {
                     if (!!value) {
-                        if (value[0].id === "Prepaid") {
+                        if (value === "Prepaid") {
                             this.wtorValpayment.setValue([this.wts[0]]);
-                        } else if (value[0].id === "Collect") {
+                        } else if (value === "Collect") {
                             this.wtorValpayment.setValue([this.wts[1]]);
                         } else {
                             this.wtorValpayment.setValue([this.wts[0]]);
@@ -501,24 +489,14 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             issuedDate: !!form.issuedDate && !!form.issuedDate.startDate ? formatDate(form.issuedDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate && !!form.flightDate.startDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            originBlnumber: !!form.originBlnumber && !!form.originBlnumber.length ? +form.originBlnumber[0].id : null,
-            freightPayment: !!form.freightPayment && !!form.freightPayment.length ? form.freightPayment[0].id : null,
-            currencyId: !!form.currencyId && !!form.currencyId.length ? form.currencyId[0].id : null,
-            wtorValpayment: !!form.wtorValpayment && !!form.wtorValpayment.length ? form.wtorValpayment[0].id : null,
-            otherPayment: !!form.otherPayment && !!form.otherPayment.length ? form.otherPayment[0].id : null,
-
             saleManId: form.saleMan,
             shipperId: form.shipper,
             consigneeId: form.consignee,
-            pol: form.pol,
-            pod: form.pod,
             forwardingAgentId: form.forwardingAgent,
-            warehouseId: form.warehouseId,
 
             cbm: this.totalCbm,
             hw: this.totalHW,
             min: form.min,
-            rclass: !!form.rclass && !!form.rclass.length ? form.rclass[0].id : null
         };
 
         const houseBill = new AirwayBill(_merge(form, formData));
@@ -527,13 +505,6 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
-        [
-            this.rclass,
-            this.otherPayment,
-            this.originBlnumber,
-            this.currencyId,
-            this.freightPayment,
-            this.wtorValpayment].forEach((control: AbstractControl) => this.setError(control));
 
         if (!this.formMAWB.valid
             || (!!this.etd.value && !this.etd.value.startDate)
@@ -733,11 +704,11 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
     updateWtWithTotal(totalValue: any) {
         if (!!this.wtorValpayment.value) {
-            if ((this.wtorValpayment.value as CommonInterface.INg2Select[])[0].id === 'PP') {
+            if (this.wtorValpayment.value === 'PP') {
                 this.resetFormControl(this.wtcll);
                 this.wtpp.setValue(totalValue);
             }
-            if ((this.wtorValpayment.value as CommonInterface.INg2Select[])[0].id === 'CLL') {
+            if (this.wtorValpayment.value === 'CLL') {
                 this.resetFormControl(this.wtpp);
                 this.wtcll.setValue(totalValue);
             }
@@ -748,14 +719,14 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
     updateDueAgentCarrierWithTotalAgent(totalAgent: number = null, totalCarrier: number = null) {
         if (!!this.otherPayment.value) {
-            if ((this.otherPayment.value as CommonInterface.INg2Select[])[0].id === 'PP') {
+            if (this.otherPayment.value === 'PP') {
                 this.resetFormControl(this.dueAgentCll);
                 this.resetFormControl(this.dueCarrierCll);
 
                 this.dueAgentPp.setValue(totalAgent);
                 this.dueCarrierPp.setValue(totalCarrier);
             }
-            if ((this.otherPayment.value as CommonInterface.INg2Select[])[0].id === 'CLL') {
+            if (this.otherPayment.value === 'CLL') {
                 this.resetFormControl(this.dueAgentPp);
                 this.resetFormControl(this.dueCarrierPp);
 

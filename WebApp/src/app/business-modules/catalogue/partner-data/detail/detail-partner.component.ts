@@ -18,13 +18,13 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { Company } from '@models';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
-import { PartnerRejectPopupComponent, FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import _merge from 'lodash/merge';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { RoutingConstants } from '@constants';
+import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 
 
 @Component({
@@ -96,7 +96,6 @@ export class PartnerDetailComponent extends AppList {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _cd: ChangeDetectorRef,
-        private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>
     ) {
         super();
@@ -126,6 +125,8 @@ export class PartnerDetailComponent extends AppList {
                         this.back();
                     }
                     this.isAddSubPartner = res.action;
+                } else {
+                    localStorage.removeItem('success_add_sub');
                 }
                 this.getDataCombobox();
                 if (this.isAddSubPartner) {
@@ -367,7 +368,7 @@ export class PartnerDetailComponent extends AppList {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
         if (this.partnerGroupActives.find(x => x.id === "ALL")) {
-            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
+            this.partner.partnerGroup = 'CARRIER;CONSIGNEE;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             this.isShowSaleMan = true;
         }
         this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
@@ -392,7 +393,7 @@ export class PartnerDetailComponent extends AppList {
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
-                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
+                this.partner.partnerGroup = 'CARRIER;CONSIGNEE;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
@@ -408,13 +409,13 @@ export class PartnerDetailComponent extends AppList {
             provinceShippingId: formBody.provinceShippingId,
             parentId: formBody.partnerAccountRef,
 
-            roundUpMethod: formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
-            applyDim: formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
+            roundUpMethod: formBody.roundUpMethod.id,
+            applyDim: formBody.applyDim.id,
             partnerGroup: this.partner.partnerGroup,
-            partnerMode: formBody.partnerMode != null && formBody.partnerMode.length > 0 ? formBody.partnerMode[0].id : null,
-            partnerLocation: formBody.partnerLocation != null && formBody.partnerLocation.length > 0 ? formBody.partnerLocation[0].id : null,
+            partnerMode: formBody.partnerMode.id,
+            partnerLocation: formBody.partnerLocation.id,
             id: this.isAddSubPartner ? null : this.partner.id,
-            creditPayment: formBody.creditPayment != null && formBody.creditPayment.length > 0 ? formBody.creditPayment[0].id : null,
+            creditPayment: formBody.creditPayment.id,
         };
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);
@@ -550,7 +551,8 @@ export class PartnerDetailComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.confirmDeletePartnerPopup.hide();
-                        this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}`]);
+                        localStorage.setItem('success_add_sub', "true");
+                        this.back();
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -568,50 +570,6 @@ export class PartnerDetailComponent extends AppList {
                 (res: any[]) => {
                     this.listContract.contracts = res || [];
                     this.listContract.isActiveNewContract = false;
-                    // console.log(this.listContract.contracts);
-                    // this.listContract.contracts.forEach(element => {
-
-                    //     if (element.saleService.includes(';')) {
-                    //         const arr = element.saleService.split(';');
-                    //         element.saleService = '';
-                    //         arr.forEach(item => {
-                    //             element.saleService += item + '; ';
-                    //         });
-                    //         element.saleServiceName = '';
-                    //         arr.forEach(item => {
-                    //             element.saleServiceName += this.formContractPopup.serviceTypes.find(x => x.id === item).text + "; ";
-                    //         });
-                    //         if (element.saleService.charAt(element.saleService.length - 2) === ';') {
-                    //             element.saleService = element.saleService.substr(0, element.saleService.length - 2);
-                    //         }
-                    //         if (element.saleServiceName.charAt(element.saleServiceName.length - 2) === ';') {
-                    //             element.saleServiceName = element.saleServiceName.substr(0, element.saleServiceName.length - 2);
-                    //         }
-                    //     }
-                    //     else {
-                    //         element.saleServiceName = element.saleService.toLowerCase();
-                    //         const obj = this.formContractPopup.serviceTypes.find(x => x.id === element.saleService);
-
-                    //         element.saleServiceName = !!obj ? obj.text : null;
-                    //     }
-                    //     if (!!element.officeId) {
-                    //         if (element.officeId.includes(';')) {
-                    //             const arrayOffice = element.officeId.split(';');
-                    //             element.officeNameEn = '';
-                    //             arrayOffice.forEach(itemOffice => {
-                    //                 element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
-                    //             });
-                    //             if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
-                    //                 element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
-                    //             }
-                    //         } else {
-                    //             element.officeId = element.officeId.toLowerCase();
-                    //             const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
-
-                    //             element.officeNameEn = !!obj ? obj.text : null;
-                    //         }
-                    //     }
-                    // });
                 }
             );
     }

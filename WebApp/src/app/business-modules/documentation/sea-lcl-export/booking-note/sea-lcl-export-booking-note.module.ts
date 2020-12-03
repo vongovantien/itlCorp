@@ -7,9 +7,9 @@ import { SeaLCLExportBookingNoteCreateComponent } from './create/create-booking-
 import { SeaLCLExportFormBookingNoteComponent } from './components/form-booking-note-lcl-export.component';
 import { NgxDaterangepickerMd, LocaleConfig } from 'ngx-daterangepicker-material';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
-import { SelectModule } from 'ng2-select';
 import { SeaLCLExportBookingNoteFormSearchComponent } from './components/form-search-booking-note/form-search-booking-note.component';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 const routing: Routes = [
     {
@@ -36,7 +36,7 @@ const config: LocaleConfig = {
         RouterModule.forChild(routing),
         NgxDaterangepickerMd.forRoot(config),
         FroalaEditorModule.forRoot(),
-        SelectModule,
+        NgSelectModule,
     ],
     exports: [],
     declarations: [

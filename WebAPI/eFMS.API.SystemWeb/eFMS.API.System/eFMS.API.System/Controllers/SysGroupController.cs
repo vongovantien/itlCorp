@@ -167,7 +167,7 @@ namespace eFMS.API.System.Controllers
             }
 
             var hs = sysGroupService.Delete(x => x.Id == id);
-            var message = HandleError.GetMessage(hs, Crud.Update);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

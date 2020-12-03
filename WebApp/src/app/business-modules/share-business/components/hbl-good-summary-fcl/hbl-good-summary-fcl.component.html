@@ -47,22 +47,27 @@
                             <li
                                 class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
                                 Total Gross Weight (GW):
-                                <span class="m-badge m-badge--primary m-badge--wide">{{grossWeight}} Kgs</span>
+                                <span class="m-badge m-badge--primary m-badge--wide">{{grossWeight | number:'.0-3'}}
+                                    Kgs</span>
                             </li>
                             <li
                                 class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
                                 Total Net Weight:
-                                <span class="m-badge m-badge--primary m-badge--wide">{{netWeight}} Kgs</span>
+                                <span class="m-badge m-badge--primary m-badge--wide">{{netWeight | number:'.0-3'}}
+                                    Kgs</span>
                             </li>
                             <li
                                 class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
                                 Total Chargeable Weight:
-                                <span class="m-badge m-badge--primary m-badge--wide">{{totalChargeWeight}} Kgs</span>
+                                <span
+                                    class="m-badge m-badge--primary m-badge--wide">{{totalChargeWeight | number:'.0-3'}}
+                                    Kgs</span>
                             </li>
                             <li
                                 class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
                                 Total CBM:
-                                <span class="m-badge m-badge--primary m-badge--wide">{{totalCBM}} CBM</span>
+                                <span class="m-badge m-badge--primary m-badge--wide">{{totalCBM | number:'.0-3'}}
+                                    CBM</span>
                             </li>
                             <li
                                 class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
