@@ -44,28 +44,22 @@
                     "configurations": {
                         "design": {},
                         "local": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.local.ts"
-                                }
-                            ]
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.local.ts"
+                            }]
                         },
                         "vi-dev": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/languages/language.en.ts",
-                                    "with": "src/languages/language.vi.ts"
-                                }
-                            ]
+                            "fileReplacements": [{
+                                "replace": "src/languages/language.en.ts",
+                                "with": "src/languages/language.vi.ts"
+                            }]
                         },
                         "test": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.test.ts"
-                                }
-                            ]
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.test.ts"
+                            }]
                         },
                         "test-vi": {
                             "optimization": true,
@@ -82,8 +76,7 @@
                             "i18nFile": "src/src/locale/messages.vi.xlf",
                             "i18nFormat": "xlf",
                             "i18nLocale": "vi",
-                            "fileReplacements": [
-                                {
+                            "fileReplacements": [{
                                     "replace": "src/environments/environment.ts",
                                     "with": "src/environments/environment.test.ts"
                                 },
@@ -109,8 +102,7 @@
                             "i18nFile": "src/src/locale/messages.vi.xlf",
                             "i18nFormat": "xlf",
                             "i18nLocale": "vi",
-                            "fileReplacements": [
-                                {
+                            "fileReplacements": [{
                                     "replace": "src/environments/environment.ts",
                                     "with": "src/environments/environment.staging.ts"
                                 },
@@ -133,21 +125,17 @@
                             "vendorChunk": true,
                             "buildOptimizer": true,
                             "outputPath": "dist/test/eFMS-en/",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.test.ts"
-                                }
-                            ],
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.test.ts"
+                            }],
                             "serviceWorker": false,
-                            "budgets": [
-                                {
-                                    "type": "bundle",
-                                    "name": "vendor",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                }
-                            ]
+                            "budgets": [{
+                                "type": "bundle",
+                                "name": "vendor",
+                                "maximumWarning": "2mb",
+                                "maximumError": "5mb"
+                            }]
                         },
                         "staging-en": {
                             "optimization": true,
@@ -161,37 +149,29 @@
                             "vendorChunk": true,
                             "buildOptimizer": true,
                             "outputPath": "dist/staging/eFMS-en/",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.staging.ts"
-                                }
-                            ],
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.staging.ts"
+                            }],
                             "serviceWorker": false,
-                            "budgets": [
-                                {
-                                    "type": "bundle",
-                                    "name": "vendor",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                }
-                            ]
+                            "budgets": [{
+                                "type": "bundle",
+                                "name": "vendor",
+                                "maximumWarning": "2mb",
+                                "maximumError": "5mb"
+                            }]
                         },
                         "staging-debug": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.staging.ts"
-                                }
-                            ]
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.staging.ts"
+                            }]
                         },
                         "uat-debug": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.uat.ts"
-                                }
-                            ]
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.uat.ts"
+                            }]
                         },
                         "uat-en": {
                             "optimization": true,
@@ -205,21 +185,17 @@
                             "vendorChunk": true,
                             "buildOptimizer": true,
                             "outputPath": "dist/uat/eFMS-en/",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.uat.ts"
-                                }
-                            ],
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.uat.ts"
+                            }],
                             "serviceWorker": false,
-                            "budgets": [
-                                {
-                                    "type": "bundle",
-                                    "name": "vendor",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                }
-                            ]
+                            "budgets": [{
+                                "type": "bundle",
+                                "name": "vendor",
+                                "maximumWarning": "2mb",
+                                "maximumError": "5mb"
+                            }]
                         },
                         "uat-vi": {
                             "optimization": true,
@@ -233,29 +209,23 @@
                             "vendorChunk": true,
                             "buildOptimizer": true,
                             "outputPath": "dist/uat/eFMS-vi/",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.uat.ts"
-                                }
-                            ],
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.uat.ts"
+                            }],
                             "serviceWorker": true,
-                            "budgets": [
-                                {
-                                    "type": "bundle",
-                                    "name": "vendor",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                }
-                            ]
+                            "budgets": [{
+                                "type": "bundle",
+                                "name": "vendor",
+                                "maximumWarning": "2mb",
+                                "maximumError": "5mb"
+                            }]
                         },
                         "prod-en": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
-                                }
-                            ],
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.prod.ts"
+                            }],
                             "baseHref": "/en/",
                             "outputPath": "dist/prod/eFMS-en/",
                             "optimization": true,
@@ -267,13 +237,11 @@
                             "extractLicenses": true,
                             "vendorChunk": true,
                             "buildOptimizer": true,
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                }
-                            ],
+                            "budgets": [{
+                                "type": "initial",
+                                "maximumWarning": "2mb",
+                                "maximumError": "5mb"
+                            }],
                             "serviceWorker": true
                         },
                         "prod-vi": {
@@ -282,8 +250,7 @@
                             "i18nFile": "src/src/locale/messages.vi.xlf",
                             "i18nFormat": "xlf",
                             "i18nLocale": "vi",
-                            "fileReplacements": [
-                                {
+                            "fileReplacements": [{
                                     "replace": "src/environments/environment.ts",
                                     "with": "src/environments/environment.prod.ts"
                                 },
@@ -301,22 +268,18 @@
                             "extractLicenses": true,
                             "vendorChunk": true,
                             "buildOptimizer": true,
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                }
-                            ],
+                            "budgets": [{
+                                "type": "initial",
+                                "maximumWarning": "2mb",
+                                "maximumError": "5mb"
+                            }],
                             "serviceWorker": true
                         },
                         "prod-debug": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
-                                }
-                            ]
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.prod.ts"
+                            }]
                         }
                     }
                 },

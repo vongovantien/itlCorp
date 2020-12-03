@@ -30,6 +30,7 @@ const DebitRatesValues = [
 })
 export class AccountReceivableFormSearchComponent extends AppForm implements OnInit {
 
+    // tslint:disable-next-line:no-any
     @Output() onSearch: EventEmitter<Partial<any>> = new EventEmitter<Partial<any>>();
 
     isSubmitted: boolean = false;
@@ -150,6 +151,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.officalId = this.formSearch.controls["officalId"];
     }
 
+    // tslint:disable-next-line:no-any
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
@@ -165,6 +167,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                 break;
         }
     }
+    // tslint:disable-next-line:no-any
     onSelectBindingInput(item: any, fieldName: string) {
         switch (fieldName) {
             case 'OverDueDays':
@@ -187,6 +190,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
 
     submitSearch() {
+        // tslint:disable-next-line:no-any
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         this.isSubmitted = true;
         if (dataForm.toDebitRate < dataForm.fromDebitRate) {
@@ -202,7 +206,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             agreementExpiredDay: dataForm.agreementExpiredDays,
             salesmanId: dataForm.salesManId,
             officeId: dataForm.officalId,
-        }
+        };
         this.onSearch.emit(body);
     }
 }

@@ -66,10 +66,14 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
             this.selectedTab = 'INVOICE';
             this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
-        } else {
+        } else if (tab === 'receivable') {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`]);
-
+          
+        } else if (tab === 'customer-payment') {
+             //// huy 
+             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer-payment`]);
         }
+
     }
 
     onSelectTabLocation(tabname: string) {
