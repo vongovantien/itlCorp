@@ -1,6 +1,6 @@
 <app-sub-header></app-sub-header>
 <div class="m-content">
-    <general-report-form-search (onSearch)="onSearchGeneralReport($event)"></general-report-form-search>
+    <share-report-form-search [isGeneralReport]="true" (onGeneralSearch)="onSearchGeneralReport($event)"></share-report-form-search>
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="form-actions">

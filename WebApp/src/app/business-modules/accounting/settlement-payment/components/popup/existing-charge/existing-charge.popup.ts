@@ -8,8 +8,8 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { Surcharge } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
-import { ShareAccountingInputShipmentPopupComponent } from 'src/app/business-modules/accounting/components/input-shipment/input-shipment.popup';
 import cloneDeep from 'lodash/cloneDeep';
+import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-modules/share-modules/components';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -18,7 +18,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 export class SettlementExistingChargePopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(ShareAccountingInputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: ShareAccountingInputShipmentPopupComponent;
+    @ViewChild(ShareModulesInputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: ShareModulesInputShipmentPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 

@@ -84,10 +84,6 @@
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':  (hbltype.dirty && !hbltype.valid) || (isSubmitted && !hbltype.valid)}">
                         <label required>HBL Type</label>
-                        <!-- <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
-                            (selected)="onSelectHblType($event)" formControlName="hbltype"
-                            (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
-                        </ng-select> -->
                         <ng-select class="custom" placeholder="Please Select" formControlName="hbltype"
                             (change)="onSelectHblType($event)" [clearable]="false" [items]="ladingTypes"></ng-select>
                     </div>
@@ -176,10 +172,6 @@
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':(freightPayment.dirty && !freightPayment.valid) || (isSubmitted && !freightPayment.valid)}">
                         <label required>Freight Payment </label>
-                        <!-- <ng-select #selectTerm [items]="termTypes" placeholder="Please Select"
-                            formControlName="freightPayment" (opened)="closeOtherSelects(selectTerm)"
-                            (data)="onSelectDataFormInfo($event, 'freightPayment')" [allowClear]="true">
-                        </ng-select> -->
                         <ng-select class="custom" placeholder="Please Select" formControlName="freightPayment"
                             (change)="onSelectDataFormInfo($event, 'freightPayment')" [clearable]="false"
                             [items]="termTypes"></ng-select>
@@ -237,10 +229,6 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Number of Origin B/L</label>
-                                <!-- <ng-select #blNumber [items]="originNumbers" placeholder="Please Select"
-                                    formControlName="originBlnumber" (opened)="closeOtherSelects(blNumber)"
-                                    [allowClear]="true">
-                                </ng-select> -->
                                 <ng-select class="custom" placeholder="Please Select" formControlName="originBlnumber"
                                     [items]="originNumbers" bindLabel="text" bindValue="id"></ng-select>
                             </div>
@@ -294,10 +282,6 @@
                             </div>
                             <div class="form-group">
                                 <label>Type of Move</label>
-                                <!-- <ng-select #moveType [items]="typeOfMoves" placeholder="Please Select"
-                                    formControlName="moveType" (opened)="closeOtherSelects(moveType)"
-                                    [allowClear]="true">
-                                </ng-select> -->
                                 <ng-select class="custom" placeholder="Please Select" formControlName="moveType"
                                     [items]="typeOfMoves"></ng-select>
                             </div>
@@ -309,10 +293,6 @@
                             </div>
                             <div class="form-group">
                                 <label>Type of Service</label>
-                                <!-- <ng-select #serviceType [items]="serviceTypes" placeholder="Please Select"
-                                    formControlName="serviceType" (opened)="closeOtherSelects(serviceType)"
-                                    [allowClear]="true">
-                                </ng-select> -->
                                 <ng-select class="custom" placeholder="Please Select" formControlName="serviceType"
                                     [items]="serviceTypes"></ng-select>
                             </div>

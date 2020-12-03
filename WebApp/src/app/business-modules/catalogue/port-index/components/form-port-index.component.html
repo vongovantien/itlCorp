@@ -61,8 +61,7 @@
                                     Country <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select #cty [clearable]="true" [items]="countries" placeholder="Select country"
-                                    bindLabel="text" class="custom" formControlName="country"
-                                    (opened)="closeOtherSelects(cty)">
+                                    bindLabel="text" class="custom" formControlName="country">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !country.valid">
                                     Country is required
@@ -75,8 +74,7 @@
                                     Zone (Optional)
                                 </label>
                                 <ng-select #z [clearable]="true" [items]="areas" placeholder="Select zone"
-                                    bindLabel="text" class="custom" formControlName="zone"
-                                    (opened)="closeOtherSelects(z)">
+                                    bindLabel="text" class="custom" formControlName="zone">
                                 </ng-select>
                             </div>
                         </div>
@@ -87,8 +85,7 @@
                                     Mode <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select #md [clearable]="true" [items]="modes" placeholder="Select mode"
-                                    bindLabel="text" class="custom" formControlName="mode"
-                                    (opened)="closeOtherSelects(md)">
+                                    bindLabel="text" class="custom" formControlName="mode">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !mode.valid">
                                     Mode is required
@@ -101,8 +98,7 @@
                                     Warehouse Code
                                 </label>
                                 <ng-select #wh [clearable]="true" [items]="warehouses" placeholder="Select warehouse"
-                                    bindLabel="text" class="custom" formControlName="warehouseId"
-                                    (opened)="closeOtherSelects(wh)">
+                                    bindLabel="text" class="custom" formControlName="warehouseId">
                                 </ng-select>
                             </div>
                         </div>
