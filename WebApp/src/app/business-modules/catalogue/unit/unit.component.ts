@@ -18,8 +18,8 @@ import { catchError, finalize } from 'rxjs/operators';
 })
 export class UnitComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePoup: ConfirmPopupComponent;
-    @ViewChild(FormCreateUnitPopupComponent, { static: false }) formUnitPopup: FormCreateUnitPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePoup: ConfirmPopupComponent;
+    @ViewChild(FormCreateUnitPopupComponent) formUnitPopup: FormCreateUnitPopupComponent;
 
     configSearch: CommonInterface.IConfigSearchOption = {
         settingFields: [

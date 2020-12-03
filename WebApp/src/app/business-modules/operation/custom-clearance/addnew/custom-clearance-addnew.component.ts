@@ -14,7 +14,7 @@ import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clear
 })
 export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
 
-    @ViewChild(CustomClearanceFormDetailComponent, { static: false }) detailComponent: CustomClearanceFormDetailComponent;
+    @ViewChild(CustomClearanceFormDetailComponent) detailComponent: CustomClearanceFormDetailComponent;
     customDeclaration: CustomClearance = new CustomClearance();
 
     constructor(private _location: Location,

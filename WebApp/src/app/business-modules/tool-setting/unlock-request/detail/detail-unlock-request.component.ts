@@ -23,10 +23,10 @@ declare var $: any;
 
 export class UnlockRequestDetailComponent extends AppForm {
     @ViewChild(UnlockRequestListJobComponent, { static: true }) listJobComponent: UnlockRequestListJobComponent;
-    @ViewChild(UnlockRequestInputDeniedCommentPopupComponent, { static: false }) inputDeniedCommentPopup: UnlockRequestInputDeniedCommentPopupComponent;
-    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
-    @ViewChild(UnlockRequestProcessApproveComponent, { static: false }) processApprovalComponent: UnlockRequestProcessApproveComponent;
-    @ViewChild('confirmCancelRequestPopup', { static: false }) confirmCancelRequestPopup: ConfirmPopupComponent;
+    @ViewChild(UnlockRequestInputDeniedCommentPopupComponent) inputDeniedCommentPopup: UnlockRequestInputDeniedCommentPopupComponent;
+    @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(UnlockRequestProcessApproveComponent) processApprovalComponent: UnlockRequestProcessApproveComponent;
+    @ViewChild('confirmCancelRequestPopup') confirmCancelRequestPopup: ConfirmPopupComponent;
 
     formDetail: FormGroup;
     subject: AbstractControl;

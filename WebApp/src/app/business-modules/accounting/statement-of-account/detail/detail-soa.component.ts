@@ -19,9 +19,9 @@ import { StatementOfAccountPaymentMethodComponent } from '../components/poup/pay
     animations: [listAnimation]
 })
 export class StatementOfAccountDetailComponent extends AppList {
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmSoaPopup: ConfirmPopupComponent;
-    @ViewChild(StatementOfAccountPaymentMethodComponent, { static: false }) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(ConfirmPopupComponent) confirmSoaPopup: ConfirmPopupComponent;
+    @ViewChild(StatementOfAccountPaymentMethodComponent) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
 

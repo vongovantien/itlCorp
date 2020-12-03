@@ -27,7 +27,7 @@ import { DataService } from '@services';
 
 export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm implements OnInit {
 
-    @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) private bookingNoteContainerRef: InjectViewContainerRefDirective;
     @Input() set type(t: string) { this._type = t; }
 
     get type() { return this._type; }

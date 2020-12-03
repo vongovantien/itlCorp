@@ -22,7 +22,7 @@ import { delayTime } from '@decorators';
 })
 
 export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
 

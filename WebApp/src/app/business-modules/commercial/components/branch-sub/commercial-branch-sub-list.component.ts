@@ -16,9 +16,9 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 })
 
 export class CommercialBranchSubListComponent extends AppList {
-  @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
-  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-  @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+  @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
+  @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+  @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
 
   @Input() parentId: string;
   @Input() partnerType: string;

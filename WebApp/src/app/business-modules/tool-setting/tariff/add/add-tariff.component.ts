@@ -17,7 +17,7 @@ import { RoutingConstants } from '@constants';
 })
 export class TariffAddComponent extends AppList {
 
-    @ViewChild(TariffFormAddComponent, { static: false }) formAddTariffComponent: TariffFormAddComponent;
+    @ViewChild(TariffFormAddComponent) formAddTariffComponent: TariffFormAddComponent;
 
     tariff: TariffAdd = new TariffAdd();
 

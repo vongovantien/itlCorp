@@ -12,8 +12,8 @@ import { SetUnlockRequestJobModel } from "@models";
     templateUrl: './list-job-unlock-request.component.html',
 })
 export class UnlockRequestListJobComponent extends AppList implements OnInit {
-    @ViewChild(UnlockRequestInputSearchJobPopupComponent, { static: false }) inputSearchJobPopup: UnlockRequestInputSearchJobPopupComponent;
-    @ViewChild(UnlockRequestInputSearchSettlementAdvancePopupComponent, { static: false }) inputSearchSettlementAdvancePopup: UnlockRequestInputSearchSettlementAdvancePopupComponent;
+    @ViewChild(UnlockRequestInputSearchJobPopupComponent) inputSearchJobPopup: UnlockRequestInputSearchJobPopupComponent;
+    @ViewChild(UnlockRequestInputSearchSettlementAdvancePopupComponent) inputSearchSettlementAdvancePopup: UnlockRequestInputSearchSettlementAdvancePopupComponent;
     @Input() unlockType: CommonEnum.UnlockTypeEnum;
     @Input() state: string = 'update';
 

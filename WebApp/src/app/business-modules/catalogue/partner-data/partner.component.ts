@@ -39,9 +39,9 @@ enum PartnerDataTab {
     templateUrl: './partner.component.html'
 })
 export class PartnerComponent extends AppList implements OnInit {
-    @ViewChild(PartnerListComponent, { static: false }) allPartnerComponent: PartnerListComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: any;
-    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
+    @ViewChild(PartnerListComponent) allPartnerComponent: PartnerListComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: any;
+    @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
 
     pager: PagerSetting = PAGINGSETTING;
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;

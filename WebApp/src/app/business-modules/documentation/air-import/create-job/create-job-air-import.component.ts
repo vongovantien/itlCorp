@@ -28,8 +28,8 @@ import _merge from 'lodash/merge';
 
 export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareAirServiceFormCreateComponent, { static: false }) formCreateComponent: ShareAirServiceFormCreateComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;

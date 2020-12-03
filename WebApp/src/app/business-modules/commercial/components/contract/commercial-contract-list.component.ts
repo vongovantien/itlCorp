@@ -16,8 +16,8 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
     templateUrl: './commercial-contract-list.component.html',
 })
 export class CommercialContractListComponent extends AppList implements OnInit {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
     @Output() onActiveContract: EventEmitter<any> = new EventEmitter<any>();

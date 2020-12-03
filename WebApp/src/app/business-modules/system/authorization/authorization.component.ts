@@ -22,11 +22,11 @@ enum authorizedTab {
     templateUrl: './authorization.component.html',
 })
 export class AuthorizationComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(AuthorizationAddPopupComponent, { static: false }) authorizationAddPopupComponent: AuthorizationAddPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    @ViewChild(AuthorizedApprovalListComponent, { static: false }) authorizedApprovalList: AuthorizedApprovalListComponent;
-    @ViewChild(AuthorizedApprovalPopupComponent, { static: false }) authorizedApprovalPopupComponent: AuthorizedApprovalPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(AuthorizationAddPopupComponent) authorizationAddPopupComponent: AuthorizationAddPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(AuthorizedApprovalListComponent) authorizedApprovalList: AuthorizedApprovalListComponent;
+    @ViewChild(AuthorizedApprovalPopupComponent) authorizedApprovalPopupComponent: AuthorizedApprovalPopupComponent;
 
 
     headers: CommonInterface.IHeaderTable[];

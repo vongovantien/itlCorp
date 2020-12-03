@@ -22,7 +22,7 @@ import { FormValidators } from '@validators';
     templateUrl: './form-create-hbl-sea-import.component.html'
 })
 export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppForm {
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     formGroup: FormGroup;
     customer: AbstractControl;

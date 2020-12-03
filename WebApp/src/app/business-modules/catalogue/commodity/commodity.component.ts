@@ -25,9 +25,9 @@ enum CommodityTab {
   templateUrl: './commodity.component.html',
 })
 export class CommodityComponent extends AppList {
-  @ViewChild(CommodityAddPopupComponent, { static: false }) commodityAddPopupComponent: CommodityAddPopupComponent;
-  @ViewChild(CommodityGroupAddPopupComponent, { static: false }) commodityGroupAddPopupComponent: CommodityGroupAddPopupComponent;
-  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+  @ViewChild(CommodityAddPopupComponent) commodityAddPopupComponent: CommodityAddPopupComponent;
+  @ViewChild(CommodityGroupAddPopupComponent) commodityGroupAddPopupComponent: CommodityGroupAddPopupComponent;
+  @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
   commodities: Commodity[] = [];
   commodity: Commodity;

@@ -22,9 +22,9 @@ import { CommonEnum } from '@enums';
 })
 
 export class CommercialDetailComponent extends CommercialCreateComponent implements OnInit {
-    @ViewChild(CommercialFormCreateComponent, { static: false }) formCommercialComponent: CommercialFormCreateComponent;
-    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
-    @ViewChild(CommercialBranchSubListComponent, { static: false }) formBranchSubList: CommercialBranchSubListComponent;
+    @ViewChild(CommercialFormCreateComponent) formCommercialComponent: CommercialFormCreateComponent;
+    @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild(CommercialBranchSubListComponent) formBranchSubList: CommercialBranchSubListComponent;
     partnerId: string;
     partner: Partner;
 

@@ -20,7 +20,7 @@ import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-module
 export class StatementOfAccountFormCreateComponent extends AppPage {
     @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(ShareModulesInputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: ShareModulesInputShipmentPopupComponent;
+    @ViewChild(ShareModulesInputShipmentPopupComponent) inputShipmentPopupComponent: ShareModulesInputShipmentPopupComponent;
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',

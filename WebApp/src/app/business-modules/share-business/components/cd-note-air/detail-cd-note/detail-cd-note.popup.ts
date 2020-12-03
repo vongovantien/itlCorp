@@ -20,13 +20,13 @@ import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/
     templateUrl: './detail-cd-note.popup.html'
 })
 export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessCdNoteAddAirPopupComponent, { static: false }) cdNoteEditPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
-    @ViewChild('formPreviewCdNote', { static: false }) formPreviewCdNote: ElementRef;
-    @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
+    @ViewChild(ConfirmPopupComponent) confirmCdNotePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
+    @ViewChild(ShareBussinessCdNoteAddAirPopupComponent) cdNoteEditPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
+    @ViewChild('formPreviewCdNote') formPreviewCdNote: ElementRef;
+    @ViewChild("popupReport") popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(ShareBussinessPaymentMethodPopupComponent, { static: false }) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
+    @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
 
     jobId: string = null;
     cdNote: string = null;

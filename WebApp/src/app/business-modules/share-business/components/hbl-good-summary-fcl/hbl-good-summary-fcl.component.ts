@@ -24,8 +24,8 @@ import { ShareBussinessHBLFCLContainerPopupComponent } from '../hbl-fcl-containe
 
 export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements OnInit {
 
-    @ViewChild(ShareBussinessHBLFCLContainerPopupComponent, { static: false }) containerPopup: ShareBussinessHBLFCLContainerPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmRefresh: ConfirmPopupComponent;
+    @ViewChild(ShareBussinessHBLFCLContainerPopupComponent) containerPopup: ShareBussinessHBLFCLContainerPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmRefresh: ConfirmPopupComponent;
     @Input() type: string = 'import';
 
     packageQty: number = null;

@@ -10,7 +10,7 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
-        "target": "es5", // build for old browser and new => es2015
+        "target": "es2015", // build for old browser and new => es2015
         "typeRoots": ["node_modules/@types"],
         "downlevelIteration": true,
         "lib": ["es2017", "dom"],

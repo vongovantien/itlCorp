@@ -17,7 +17,7 @@ export class TariffListChargeComponent extends AppList {
 
     @Output() chargesChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-    @ViewChild(TariffChargePopupComponent, { static: false }) tariffChargePopup: TariffChargePopupComponent;
+    @ViewChild(TariffChargePopupComponent) tariffChargePopup: TariffChargePopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 

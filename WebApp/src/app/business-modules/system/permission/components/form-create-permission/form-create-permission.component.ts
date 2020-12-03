@@ -12,7 +12,7 @@ import { RoutingConstants } from '@constants';
     templateUrl: './form-create-permission.component.html',
 })
 export class PermissionFormCreateComponent extends PermissionFormSearchComponent {
-    @ViewChild(ConfirmPopupComponent, { static: false }) popupConfirmSave: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) popupConfirmSave: ConfirmPopupComponent;
 
     @Output() onSubmit: EventEmitter<IFormCreatePermission> = new EventEmitter<IFormCreatePermission>();
     formCreate: FormGroup;

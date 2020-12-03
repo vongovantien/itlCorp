@@ -1,11 +1,12 @@
 import { ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
 import { AppPage } from "src/app/app.base";
-import { ViewChild, QueryList, ViewChildren } from "@angular/core";
+import { ViewChild, QueryList, ViewChildren, Directive } from "@angular/core";
 import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
 
+@Directive()
 export abstract class PopupBase extends AppPage {
 
-    @ViewChild("popup", { static: false }) popup: ModalDirective;
+    @ViewChild("popup") popup: ModalDirective;
 
     options: ModalOptions = {
         animated: false,

@@ -30,7 +30,7 @@ enum HBL_TAB {
     templateUrl: './detail-house-bill.component.html',
 })
 export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit, ICrystalReport {
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     hblDetail: any;

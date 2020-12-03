@@ -26,12 +26,12 @@ import _merge from 'lodash/merge';
     styleUrls: ['./add-partner.component.scss']
 })
 export class AddPartnerDataComponent extends AppList {
-    @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
-    @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
-    @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
-    @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
-    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
-    @ViewChild('duplicatePartnerPopup', { static: false }) confirmDuplicatePartner: InfoPopupComponent;
+    @ViewChild(FormAddPartnerComponent) formPartnerComponent: FormAddPartnerComponent;
+    @ViewChild(SalemanPopupComponent) poupSaleman: SalemanPopupComponent;
+    @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(CommercialContractListComponent) contractList: CommercialContractListComponent;
+    @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild('duplicatePartnerPopup') confirmDuplicatePartner: InfoPopupComponent;
 
 
     contracts: Contract[] = [];

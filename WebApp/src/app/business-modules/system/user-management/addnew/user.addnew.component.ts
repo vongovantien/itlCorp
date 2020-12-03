@@ -15,7 +15,7 @@ import { RoutingConstants } from '@constants';
 })
 export class UserAddNewComponent extends AppPage {
 
-    @ViewChild(FormAddUserComponent, { static: false }) formAdd: FormAddUserComponent;
+    @ViewChild(FormAddUserComponent) formAdd: FormAddUserComponent;
 
     constructor(
         private _progressService: NgProgress,

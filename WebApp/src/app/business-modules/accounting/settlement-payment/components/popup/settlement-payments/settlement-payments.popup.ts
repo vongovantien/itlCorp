@@ -14,8 +14,8 @@ import { catchError, finalize, map } from "rxjs/operators";
 })
 
 export class SettlementPaymentsPopupComponent extends PopupBase {
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     dataSearchList: any = null;
     page: number = 1;

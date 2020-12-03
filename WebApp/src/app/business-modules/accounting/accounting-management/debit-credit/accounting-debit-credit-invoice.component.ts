@@ -29,8 +29,8 @@ type TAB = 'CDI' | 'VAT' | 'VOUCHER';
 
 export class AccountingManagementDebitCreditInvoiceComponent extends AppList implements OnInit {
 
-    @ViewChild(AccountingDetailCdNoteComponent, { static: false }) cdNoteDetailPopupComponent: AccountingDetailCdNoteComponent;
-    @ViewChild(AccountingManagementSelectPartnerPopupComponent, { static: false }) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
+    @ViewChild(AccountingDetailCdNoteComponent) cdNoteDetailPopupComponent: AccountingDetailCdNoteComponent;
+    @ViewChild(AccountingManagementSelectPartnerPopupComponent) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
 
     selectedTab: TAB = 'CDI';
     cdNotes: CDNoteViewModel[] = [];

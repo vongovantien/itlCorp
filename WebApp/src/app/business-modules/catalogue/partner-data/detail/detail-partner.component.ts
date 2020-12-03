@@ -33,19 +33,19 @@ import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } fro
     styleUrls: ['./detail-partner.component.scss']
 })
 export class PartnerDetailComponent extends AppList {
-    @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
-    @ViewChild("popupDeleteSaleman", { static: false }) confirmDeleteSalemanPopup: ConfirmPopupComponent;
-    @ViewChild("popupDeleteContract", { static: false }) confirmDeleteContract: ConfirmPopupComponent;
+    @ViewChild(FormAddPartnerComponent) formPartnerComponent: FormAddPartnerComponent;
+    @ViewChild("popupDeleteSaleman") confirmDeleteSalemanPopup: ConfirmPopupComponent;
+    @ViewChild("popupDeleteContract") confirmDeleteContract: ConfirmPopupComponent;
 
-    @ViewChild("popupDeletePartner", { static: false }) confirmDeletePartnerPopup: ConfirmPopupComponent;
-    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
-    @ViewChild('duplicatePartnerPopup', { static: false }) confirmDuplicatePartner: InfoPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
-    @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
-    @ViewChild(PartnerRejectPopupComponent, { static: false }) popupRejectPartner: PartnerRejectPopupComponent;
-    @ViewChild(CommercialContractListComponent, { static: false }) listContract: CommercialContractListComponent;
-    @ViewChild(CommercialBranchSubListComponent, { static: false }) listSubPartner: CommercialBranchSubListComponent;
+    @ViewChild("popupDeletePartner") confirmDeletePartnerPopup: ConfirmPopupComponent;
+    @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild('duplicatePartnerPopup') confirmDuplicatePartner: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(SalemanPopupComponent) poupSaleman: SalemanPopupComponent;
+    @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
+    @ViewChild(CommercialContractListComponent) listContract: CommercialContractListComponent;
+    @ViewChild(CommercialBranchSubListComponent) listSubPartner: CommercialBranchSubListComponent;
 
     public originRoute: string = null;
     contracts: Contract[] = [];

@@ -15,7 +15,7 @@ import { AppList } from 'src/app/app.list';
 })
 export class BillingCustomDeclarationComponent extends AppList implements OnInit {
 
-    @ViewChild(AddMoreModalComponent, { static: false }) poupAddMore: AddMoreModalComponent;
+    @ViewChild(AddMoreModalComponent) poupAddMore: AddMoreModalComponent;
     currentJob: OpsTransaction;
     customClearances: any[];
     importedData: any[];

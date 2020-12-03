@@ -27,7 +27,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
 
-    @ViewChild('inputSearch', { static: false }) inputSearch: ElementRef;
+    @ViewChild('inputSearch') inputSearch: ElementRef;
     @ViewChild('clkSearch', { static: true }) inputPlaceholder: ElementRef;
 
     currentItemSelected: any = null;

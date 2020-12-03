@@ -16,8 +16,8 @@ import { listAnimation } from '@animations';
 })
 
 export class AdvancePaymentListRequestComponent extends AppList {
-    @ViewChild(AdvancePaymentAddRequestPopupComponent, { static: false }) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(AdvancePaymentAddRequestPopupComponent) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     @Input() state: string = 'update';
 

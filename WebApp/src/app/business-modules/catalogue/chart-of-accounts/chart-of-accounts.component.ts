@@ -16,9 +16,9 @@ import { FormCreateChartOfAccountsPopupComponent } from './components/form-creat
 })
 
 export class ChartOfAccountsComponent extends AppList implements OnInit {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(FormCreateChartOfAccountsPopupComponent, { static: false }) formPopup: FormCreateChartOfAccountsPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormCreateChartOfAccountsPopupComponent) formPopup: FormCreateChartOfAccountsPopupComponent;
+    @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
 
     chartOfAccounts: ChartOfAccounts[] = [];
     chart: ChartOfAccounts = new ChartOfAccounts();

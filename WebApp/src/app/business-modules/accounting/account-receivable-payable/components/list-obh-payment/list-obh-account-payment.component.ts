@@ -23,10 +23,10 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class AccountPaymentListOBHPaymentComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
-    @ViewChild(AccountPaymentUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
-    @ViewChild('confirmObhPaymentPopup', { static: false }) confirmObhPaymentPopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) infoNotAllowDelete: InfoPopupComponent;
+    @ViewChild(AccountPaymentUpdateExtendDayPopupComponent) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
+    @ViewChild('confirmObhPaymentPopup') confirmObhPaymentPopup: ConfirmPopupComponent;
     @Output() onUpdateExtendDateOfOBH: EventEmitter<any> = new EventEmitter<any>();
 
     refPaymens: AccountingPaymentModel[] = [];
