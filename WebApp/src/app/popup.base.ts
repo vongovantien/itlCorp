@@ -2,12 +2,10 @@ import { ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
 import { AppPage } from "src/app/app.base";
 import { ViewChild, QueryList, ViewChildren } from "@angular/core";
 import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
-import { SelectComponent } from "ng2-select";
 
 export abstract class PopupBase extends AppPage {
 
     @ViewChild("popup", { static: false }) popup: ModalDirective;
-    @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
 
     options: ModalOptions = {
         animated: false,
@@ -120,26 +118,5 @@ export abstract class PopupBase extends AppPage {
 
     trimInputValue(control: FormControl | AbstractControl, value: string) {
         control.setValue(value != null ? value.trim() : value);
-    }
-
-    closeOtherSelects(element: { optionsOpened: any; }) {
-        if (element.optionsOpened) {
-            const elementsToclose = this.selectElements.filter((el: any) => el !== element && el.optionsOpened);
-            elementsToclose.forEach((e: SelectComponent) => {
-                e.clickedOutside();
-            });
-        }
-    }
-
-    removeKeyworkNg2Select() {
-        const ng2 = this.selectElements.toArray();
-        ng2.forEach(
-            c => {
-                const a: HTMLInputElement = c.element.nativeElement.querySelector('.ui-select-search');
-                if (!!a) {
-                    a.value = '';
-                }
-            }
-        );
     }
 }
