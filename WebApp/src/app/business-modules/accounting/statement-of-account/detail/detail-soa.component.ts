@@ -286,7 +286,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         if (this.soa.type === 'Credit' && this.soa.creditPayment === 'Direct') {
             this.paymentMethodPopupComponent.show();
         } else {
-            this.paymentMethodSelected = '';
+            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
             this.confirmSendToAcc();
         }
     }
