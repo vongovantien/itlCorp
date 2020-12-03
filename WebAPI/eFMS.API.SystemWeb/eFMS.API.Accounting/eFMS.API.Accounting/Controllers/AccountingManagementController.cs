@@ -453,5 +453,43 @@ namespace eFMS.API.Accounting.Controllers
             ChargeAccountingMngtTotalViewModel result = accountingService.CalculateListChargeAccountingMngt(charges);
             return Ok(result);
         }
+
+        /// <summary>
+        /// get and paging the list of Confirm Biling by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ConfirmBillingPaging")]
+        [Authorize]
+        public IActionResult ConfirmBillingPaging(ConfirmBillingCriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = accountingService.ConfirmBillingPaging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Update Confirm Billing Date for Invoice
+        /// </summary>
+        /// <param name="ids">List is of Invoice</param>
+        /// <param name="billingDate">Billing Date of Invoice</param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("UpdateConfirmBillingDate")]
+        [Authorize]
+        public IActionResult UpdateConfirmBillingDate(List<Guid> ids, DateTime? billingDate)
+        {
+            var hs = accountingService.UpdateConfirmBillingDate(ids, billingDate);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Update confirm billing date successful!", Data = ids };
+            if (!hs.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
+                return BadRequest(_result);
+            }
+            return Ok(result);
+        }
     }
 }
