@@ -30,9 +30,9 @@ import _groupBy from 'lodash/groupBy';
 })
 export class SeaFclExportShippingInstructionComponent extends AppList implements ICrystalReport {
 
-    @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(ShareSeaServiceFormSISeaExportComponent, { static: false }) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
+    @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(ShareSeaServiceFormSISeaExportComponent) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
 
     jobId: string;
     houseBills: any[] = [];

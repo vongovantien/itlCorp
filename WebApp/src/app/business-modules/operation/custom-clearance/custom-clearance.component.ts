@@ -21,9 +21,9 @@ import { RoutingConstants } from '@constants';
     templateUrl: './custom-clearance.component.html',
 })
 export class CustomClearanceComponent extends AppList {
-    @ViewChild('confirmConvertPopup', { static: false }) confirmConvertPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDeletePopup', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) canNotAllowActionPopup: Permission403PopupComponent;
+    @ViewChild('confirmConvertPopup') confirmConvertPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDeletePopup') confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
     listCustomDeclaration: CustomDeclaration[] = [];
     searchObject: any = {};
     listPort: any = [];

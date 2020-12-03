@@ -22,7 +22,7 @@ import { RoutingConstants } from "@constants";
 
 export class ShareSystemAddUserComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @Input() object: any = {};
     @Input() type: string = null;
 

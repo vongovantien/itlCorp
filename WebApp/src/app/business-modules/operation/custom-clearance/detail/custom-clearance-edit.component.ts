@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './custom-clearance-edit.component.html',
 })
 export class CustomClearanceEditComponent extends AppPage implements OnInit {
-    @ViewChild(CustomClearanceFormDetailComponent, { static: false }) detailComponent: CustomClearanceFormDetailComponent;
+    @ViewChild(CustomClearanceFormDetailComponent) detailComponent: CustomClearanceFormDetailComponent;
 
     isImported: boolean = false;
     customDeclaration: CustomClearance;

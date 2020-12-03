@@ -31,14 +31,14 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @Output() onChangeType: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild(SettlementExistingChargePopupComponent, { static: true }) existingChargePopup: SettlementExistingChargePopupComponent;
-    @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
-    @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
-    @ViewChild(SettlementFormCopyPopupComponent, { static: false }) copyChargePopup: SettlementFormCopyPopupComponent;
+    @ViewChild(SettlementFormChargePopupComponent) formChargePopup: SettlementFormChargePopupComponent;
+    @ViewChild(SettlementPaymentManagementPopupComponent) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
+    @ViewChild(SettlementFormCopyPopupComponent) copyChargePopup: SettlementFormCopyPopupComponent;
     @ViewChild(SettlementTableListChargePopupComponent, { static: true }) tableListChargePopup: SettlementTableListChargePopupComponent;
-    @ViewChild(SettlementChargeFromShipmentPopupComponent, { static: false }) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(SettlementChargeFromShipmentPopupComponent) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
-    @ViewChild(InjectViewContainerRefDirective, { static: false }) public reportContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>;

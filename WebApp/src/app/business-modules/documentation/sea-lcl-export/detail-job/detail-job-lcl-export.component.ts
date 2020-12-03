@@ -29,15 +29,15 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
-    @ViewChild("confirmCancelPopup", { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild('confirmDeleteJob') confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild("confirmLockShipment") confirmLockPopup: ConfirmPopupComponent;
+    @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
 
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';

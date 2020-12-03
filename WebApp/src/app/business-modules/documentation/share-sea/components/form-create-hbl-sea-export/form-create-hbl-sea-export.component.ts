@@ -28,8 +28,8 @@ import _cloneDeep from 'lodash/cloneDeep';
 })
 export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppForm implements OnInit {
 
-    @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     @Input() isUpdate: boolean = false;
     @Input() set type(t: string) { this._type = t; }

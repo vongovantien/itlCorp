@@ -27,8 +27,8 @@ import cloneDeep from 'lodash/cloneDeep';
 })
 export class ShareBussinessContainerListPopupComponent extends PopupBase implements OnInit {
 
-    @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
-    @ViewChild('confirmDeleteContainerPopup', { static: false }) confirmDeleteContainerPopup: ConfirmPopupComponent;
+    @ViewChild(ShareContainerImportComponent) containerImportPopup: ShareContainerImportComponent;
+    @ViewChild('confirmDeleteContainerPopup') confirmDeleteContainerPopup: ConfirmPopupComponent;
 
     @Input() type: string = 'import';
 

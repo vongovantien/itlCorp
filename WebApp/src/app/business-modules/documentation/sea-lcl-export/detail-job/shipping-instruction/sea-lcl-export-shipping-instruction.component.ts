@@ -31,9 +31,9 @@ import { forkJoin } from 'rxjs';
 })
 export class SeaLclExportShippingInstructionComponent extends AppList implements ICrystalReport {
 
-    @ViewChild(ShareSeaServiceFormSISeaExportComponent, { static: false }) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
-    @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(ShareSeaServiceFormSISeaExportComponent) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
+    @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     jobId: string;
     houseBills: any[] = [];

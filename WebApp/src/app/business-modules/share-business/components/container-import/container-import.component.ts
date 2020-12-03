@@ -13,7 +13,7 @@ import * as fromStore from './../../store';
     templateUrl: './container-import.component.html'
 })
 export class ShareContainerImportComponent extends PopupBase implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
 
     isShowInvalid: boolean = true;
     totalValidRow: number = 0;

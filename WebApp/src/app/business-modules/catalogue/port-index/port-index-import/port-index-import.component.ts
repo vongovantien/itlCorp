@@ -18,7 +18,7 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
     templateUrl: './port-index-import.component.html'
 })
 export class PortIndexImportComponent extends AppPage implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
     isDesc = true;
     sortKey: string;
     data: any[];

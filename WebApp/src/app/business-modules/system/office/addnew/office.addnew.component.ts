@@ -16,7 +16,7 @@ import { RoutingConstants } from '@constants';
 })
 export class OfficeAddNewComponent extends AppPage {
 
-    @ViewChild(OfficeFormAddComponent, { static: false }) formAdd: OfficeFormAddComponent;
+    @ViewChild(OfficeFormAddComponent) formAdd: OfficeFormAddComponent;
 
     constructor(private _progressService: NgProgress,
         private _systemRepo: SystemRepo,

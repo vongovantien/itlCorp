@@ -28,9 +28,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(SalesmanCreditLimitPopupComponent, { static: false }) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
-    @ViewChild(PartnerRejectPopupComponent, { static: false }) popupRejectPartner: PartnerRejectPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
+    @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
+    @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
 
     openOnPartner: boolean = false;
 

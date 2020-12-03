@@ -38,7 +38,7 @@ import _merge from 'lodash/merge';
 export class ShareAirServiceFormCreateComponent extends AppForm implements OnInit {
 
     @Input() type: string = 'import';
-    @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
+    @ViewChild(ShareAirServiceDIMVolumePopupComponent) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
     // @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareBusinessDIMVolumePopupComponent;
 
     formGroup: FormGroup;

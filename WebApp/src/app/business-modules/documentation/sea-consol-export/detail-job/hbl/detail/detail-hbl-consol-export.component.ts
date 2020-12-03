@@ -24,7 +24,7 @@ import isUUID from 'validator/lib/isUUID';
 
 export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
 
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     hblDetail: CsTransactionDetail;

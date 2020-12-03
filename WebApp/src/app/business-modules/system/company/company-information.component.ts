@@ -21,7 +21,7 @@ import { LoadCompanyAction, ICompanyState, getCompanyState } from './store';
 })
 export class ComanyInformationComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 

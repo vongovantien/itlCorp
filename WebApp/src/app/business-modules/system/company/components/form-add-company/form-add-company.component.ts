@@ -12,7 +12,7 @@ declare var $: any;
 })
 export class CompanyInformationFormAddComponent extends AppForm {
 
-    @ViewChild('image', { static: false }) el: ElementRef;
+    @ViewChild('image') el: ElementRef;
 
     formGroup: FormGroup;
     code: AbstractControl;

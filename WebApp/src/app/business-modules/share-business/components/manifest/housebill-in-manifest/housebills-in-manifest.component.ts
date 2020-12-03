@@ -8,7 +8,7 @@ import { ShareBusinessAddHblToManifestComponent } from '../popup/add-hbl-to-mani
 })
 
 export class ShareBusinessHousebillsInManifestComponent extends PopupBase {
-    @ViewChild(ShareBusinessAddHblToManifestComponent, { static: false }) addHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
+    @ViewChild(ShareBusinessAddHblToManifestComponent) addHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
     headers: CommonInterface.IHeaderTable[];
     housebills: any[] = [];
     checkAll = false;

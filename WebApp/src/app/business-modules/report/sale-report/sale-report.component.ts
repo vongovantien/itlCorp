@@ -15,7 +15,7 @@ import { ICrystalReport, ReportInterface } from "@interfaces";
     templateUrl: './sale-report.component.html',
 })
 export class SaleReportComponent extends AppList implements ICrystalReport {
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
 
     constructor(

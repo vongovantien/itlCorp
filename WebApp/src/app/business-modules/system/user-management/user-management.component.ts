@@ -18,7 +18,7 @@ import { RoutingConstants } from '@constants';
     templateUrl: './user-management.component.html'
 })
 export class UserManagementComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     criteria: any = {};
     users: User[] = [];
     selectedUser: User;

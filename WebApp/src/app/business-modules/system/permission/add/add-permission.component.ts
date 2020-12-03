@@ -16,8 +16,8 @@ import { RoutingConstants } from '@constants';
     styleUrls: ['./add-permission.component.scss']
 })
 export class PermissionCreateComponent extends AppForm {
-    @ViewChild(PermissionFormCreateComponent, { static: false }) formCreateComponent: PermissionFormCreateComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(PermissionFormCreateComponent) formCreateComponent: PermissionFormCreateComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
 
     permissionSample: PermissionSample = new PermissionSample();
 

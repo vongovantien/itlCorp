@@ -23,8 +23,8 @@ import { catchError, finalize } from 'rxjs/operators';
 
 export class AppCountryComponent extends AppList implements OnInit {
 
-    @ViewChild(FormCountryPopupComponent, { static: false }) formCountry: FormCountryPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormCountryPopupComponent) formCountry: FormCountryPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     countries: CountryModel[] = [];
     selectedCountry: CountryModel;

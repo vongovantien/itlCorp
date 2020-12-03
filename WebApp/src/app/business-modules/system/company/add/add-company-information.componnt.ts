@@ -14,7 +14,7 @@ import { RoutingConstants } from '@constants';
 })
 export class CompanyInformationAddComponent extends AppPage {
 
-    @ViewChild(CompanyInformationFormAddComponent, { static: false }) formAdd: CompanyInformationFormAddComponent;
+    @ViewChild(CompanyInformationFormAddComponent) formAdd: CompanyInformationFormAddComponent;
 
     constructor(
         protected _systemRepo: SystemRepo,

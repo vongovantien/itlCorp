@@ -40,11 +40,11 @@ enum HBL_TAB {
     templateUrl: './create-hbl-consol-import.component.html',
 })
 export class SeaConsolImportCreateHBLComponent extends AppForm {
-    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent, { static: false }) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) hblGoodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
-    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent) hblGoodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
 

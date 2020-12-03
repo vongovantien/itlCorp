@@ -19,7 +19,7 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './warehouse-import.component.html'
 })
 export class WarehouseImportComponent extends AppPage implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];

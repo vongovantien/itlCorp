@@ -30,7 +30,7 @@ enum HBL_TAB {
 })
 export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHouseBillComponent implements ICrystalReport {
 
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     containers: Container[] = [];
