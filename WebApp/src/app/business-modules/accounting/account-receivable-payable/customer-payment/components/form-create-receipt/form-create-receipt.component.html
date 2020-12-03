@@ -1,3 +1,141 @@
-<form>
-    form
-</form>
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <form [formGroup]="form" class="m-form m-form--state">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="form-control-label">
+                            Customer Name
+                            <span class="m--font-danger">(*)</span>
+                        </label>
+                        <ng-select formControlName="customerName" class="custom"></ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="form-control-label">
+                            Date
+                        </label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange" placeholder="Select request date" [autoApply]="true" formControlName="date"
+                                [attr.disabled]="isDisabled" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                            <span>
+                                <i class="la la-calendar"></i>
+                            </span>
+                            </span>
+                        </div>
+                        <!-- <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange" placeholder="Select date" readonly formControlName="Date"
+                                (remove)="resetFormControl(date)" calendar [allowRemove]="!!date.value && !!date.value.startDate" />
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>
+                            Payment Reference No
+                            <span class="m--font-danger">(*)</span>
+                        </label>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="paymentReferenceNo">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Salesman</label>
+                        <ng-select formControlName="salesMan" class="custom"></ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Agreement
+                            <span class="m--font-danger">(*)</span>    
+                        </label>
+                        <ng-select formControlName="agreement" class="custom"></ng-select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6"></div>
+                <div class="col-lg-6 m--align-right  align-items-center justify-content-between">
+
+                    <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10 ng-star-inserted" type="button">
+                    <span>Applay</span></button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Paid Amount</label>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="paidAmount">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label"> Type </label>
+                        <ng-select formControlName="type" class="custom"></ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Cus Advance Amount</label>
+                        <ng-select formControlName="cusAdvanceAmount" class="custom"></ng-select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Final Paid Amount</label>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="finalPaidAmount">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label"> Balance </label>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="balance">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Currency</label>
+                        <ng-select formControlName="currency" class="custom"></ng-select>
+                        <!-- <select formControlName="currency" class="form-control">
+                        <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}</option>
+                    </select> -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Payment Date</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange" placeholder="Select request date" [autoApply]="true" formControlName="paymentDate"
+                                [attr.disabled]="isDisabled" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                            <span>
+                                <i class="la la-calendar"></i>
+                            </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label"> Exchange Rate </label>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="exchangeRate">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">Bank Acount No</label>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="bankAcountNo">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
