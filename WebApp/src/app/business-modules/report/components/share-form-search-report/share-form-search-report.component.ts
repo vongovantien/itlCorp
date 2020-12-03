@@ -177,7 +177,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             carrier: [],
             agent: [],
             service: [this.serviceActive],
-            currency: ['USD'],
+            currency: [],
             refNo: [],
             refNoType: [this.refNoTypeList[0].id],
             office: [this.officeActive],
@@ -421,6 +421,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                     if (!!data) {
                         this.currencyList = data.map((item) => ({ text: item.id, id: item.id }));
                         // Default value: USD .filter((curr) => curr.id === "USD")
+                        this.currency.setValue(this.currencyList.filter((curr) => curr.id === "USD")[0].id);
                     }
                 },
             );
@@ -689,7 +690,7 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.serviceActive = [this.serviceList[0].id];
         this.service.setValue(this.serviceActive);
 
-        this.currency.setValue([this.currencyList.filter((curr) => curr.id === "USD")[0].id]);
+        this.currency.setValue(this.currencyList.filter((curr) => curr.id === "USD")[0].id);
 
         this.refNoType.setValue(this.refNoTypeList[0].id);
 
