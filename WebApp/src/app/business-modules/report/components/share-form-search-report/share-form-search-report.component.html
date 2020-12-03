@@ -90,8 +90,7 @@
                                     Office
                                 </label>
                                 <ng-select [multiple]='true' formControlName="office" class="custom"
-                                    (remove)="onRemoveDataFormInfo($event, 'office')" (clear)="onRemoveDataFormInfo($event, 'office')" [items]="officeList"
-                                    (add)="onSelectDataFormInfo($event, 'office')" [(ngModel)]="officeActive"
+                                    (change)="detectChangeDataInfo($event, 'office')" [items]="officeList" [(ngModel)]="officeActive"
                                     [disabled]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
@@ -103,8 +102,7 @@
                                     Department
                                 </label>
                                 <ng-select [multiple]='true' formControlName="department" class="custom"
-                                    (remove)="onRemoveDataFormInfo($event, 'department')" (clear)="onRemoveDataFormInfo($event, 'department')" [items]="departmentList"
-                                    [(ngModel)]="departmentActive" (add)="onSelectDataFormInfo($event, 'department')"
+                                    (change)="detectChangeDataInfo($event, 'department')" [items]="departmentList" [(ngModel)]="departmentActive"
                                     [disabled]="menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
@@ -116,8 +114,7 @@
                                     Group
                                 </label>
                                 <ng-select [multiple]='true' formControlName="group" class="custom"
-                                    (remove)="onRemoveDataFormInfo($event, 'group')" (clear)="onRemoveDataFormInfo($event, 'group')" [items]="groupList"
-                                    (add)="onSelectDataFormInfo($event, 'group')" [(ngModel)]="groupActive"
+                                    (change)="detectChangeDataInfo($event, 'group')" [items]="groupList" [(ngModel)]="groupActive"
                                     [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
@@ -131,8 +128,7 @@
                                     Staff Name
                                 </label>
                                 <ng-select [multiple]='true' formControlName="staff" class="custom"
-                                    (remove)="onRemoveDataFormInfo($event, 'staff')" (clear)="onRemoveDataFormInfo($event, 'staff')" [items]="staffList"
-                                    (add)="onSelectDataFormInfo($event, 'staff')" [(ngModel)]="staffActive"
+                                    (change)="detectChangeDataInfo($event, 'staff')" [items]="staffList" [(ngModel)]="staffActive"
                                     [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>

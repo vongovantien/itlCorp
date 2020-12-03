@@ -229,6 +229,15 @@ export class ShareFormSearchReportComponent extends AppForm {
         }
     }
 
+    // Check if choose All
+    selectAllDataInForm(data: any){
+        if (data.length === 1) {
+            return data[0].id === 'All';
+        } else {
+            return data.findIndex(x => x.id === 'All') > 0;
+        }
+    }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
@@ -255,41 +264,41 @@ export class ShareFormSearchReportComponent extends AppForm {
                 }
                 break;
             case 'office':
-                if (data.id === 'All') {
+                if (this.selectAllDataInForm(data)) {
                     this.officeActive.length = 0;
                     this.officeActive = [...this.officeActive, 'All'];
                 } else {
-                    this.detectServiceWithAllOption('office', data.id);
+                    this.detectServiceWithAllOption('office', data);
                 }
                 // Reload deparment
                 this.getDepartment(this.departmentsInit);
                 break;
             case 'department':
-                if (data.id === 'All') {
+                if (this.selectAllDataInForm(data)) {
                     this.departmentActive.length = 0;
                     this.departmentActive = [...this.departmentActive, 'All'];
                 } else {
-                    this.detectServiceWithAllOption('department', data.id);
+                    this.detectServiceWithAllOption('department', data);
                 }
                 // Reload group
                 this.getGroup(this.groupsInit);
                 break;
             case 'group':
-                if (data.id === 'All') {
+                if (this.selectAllDataInForm(data)) {
                     this.groupActive.length = 0;
                     this.groupActive = [...this.groupActive, 'All'];
                 } else {
-                    this.detectServiceWithAllOption('group', data.id);
+                    this.detectServiceWithAllOption('group', data);
                 }
                 // Reload staff
                 this.getStaff(this.staffsInit);
                 break;
             case 'staff':
-                if (data.id === 'All') {
+                if (this.selectAllDataInForm(data)) {
                     this.staffActive.length = 0;
                     this.staffActive = [...this.staffActive, 'All'];
                 } else {
-                    this.detectServiceWithAllOption('staff', data.id);
+                    this.detectServiceWithAllOption('staff', data);
                 }
                 break;
             case 'acPartner':
@@ -334,6 +343,14 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.detectServiceWithAllOption(type);
     }
 
+    detectChangeDataInfo(data: any, type: string) {
+        if (data.length > 0) {
+            this.onSelectDataFormInfo(data, type);
+        } else {
+            this.onRemoveDataFormInfo(data, type);
+        }
+    }
+
     detectServiceWithAllOption(type: string, data?: any) {
         if (type === "service") {
             if (!this.serviceActive.every((value) => value !== 'All')) {
@@ -345,7 +362,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             if (!this.officeActive.every((value) => value !== 'All')) {
                 this.officeActive.splice(this.officeActive.findIndex((item) => item === 'All'), 1);
                 this.officeActive = [];
-                this.officeActive.push(data);
+                if (data.length > 0) {
+                    this.officeActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
             // Call back Get Department            
             this.getDepartment(this.departmentsInit);
@@ -353,7 +372,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             if (!this.departmentActive.every((value) => value !== 'All')) {
                 this.departmentActive.splice(this.departmentActive.findIndex((item) => item === 'All'), 1);
                 this.departmentActive = [];
-                this.departmentActive.push(data);
+                if (data.length > 0) {
+                    this.departmentActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
             // Call back Get Group
             this.getGroup(this.groupsInit);
@@ -361,7 +382,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             if (!this.groupActive.every((value) => value !== 'All')) {
                 this.groupActive.splice(this.groupActive.findIndex((item) => item === 'All'), 1);
                 this.groupActive = [];
-                this.groupActive.push(data);
+                if (data.length > 0) {
+                    this.groupActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
             // Call back Get Staff
             this.getStaff(this.staffsInit);
@@ -369,7 +392,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             if (!this.staffActive.every((value) => value !== 'All')) {
                 this.staffActive.splice(this.staffActive.findIndex((item) => item === 'All'), 1);
                 this.staffActive = [];
-                this.staffActive.push(data);
+                if (data.length > 0) {
+                    this.staffActive = [data.filter(x => x.id !== 'All')[0].id];
+                }
             }
         }
     }
@@ -677,30 +702,12 @@ export class ShareFormSearchReportComponent extends AppForm {
         if (this.menuPermission.list !== 'None') {
             this.officeActive = [this.officeList.filter((off) => off.id === this.userLogged.officeId)[0].id];
             this.office.setValue(this.officeActive);
-
-            if (this.menuPermission.list === 'Office' || this.menuPermission.list === 'Company') {
-                this.departmentActive = [this.departmentList[0].id];
-            } else {
-                this.departmentActive = [this.departmentList.filter((dept) => dept.id === this.userLogged.departmentId)[0].id];
-            }
-            this.department.setValue(this.departmentActive);
-
-            if (this.menuPermission.list === 'Department') {
-                this.groupActive = [this.groupList[0].id];
-            } else {
-                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
-            }
-            this.group.setValue(this.groupActive);
-
-            if (this.menuPermission.list === 'Group') {
-                this.staffActive = [this.staffList[0].id];
-            } else {
-                this.staffActive = [this.staffList.filter((stf) => stf.id === this.userLogged.id)[0].id];
-            }
-            this.staff.setValue(this.staffActive);
+            this.getDepartment(this.departmentsInit);
         }
 
-        this.typeReport.setValue(this.typeReportActive[0].id);
+        if (!this.isGeneralReport) {
+            this.typeReport.setValue(this.typeReportActive[0].id);
+        }
 
         this.serviceDate.setValue({
             startDate: this.createMoment().startOf('month').toDate(),
