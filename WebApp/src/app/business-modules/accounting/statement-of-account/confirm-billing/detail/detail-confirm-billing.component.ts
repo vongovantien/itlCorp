@@ -48,7 +48,7 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
         { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
-    paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD;
+    paymentMethods: string[] = AccountingConstants.PAYMENT_METHOD;
 
     displayFieldsChartAccount: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountCode', label: 'Account Code' },

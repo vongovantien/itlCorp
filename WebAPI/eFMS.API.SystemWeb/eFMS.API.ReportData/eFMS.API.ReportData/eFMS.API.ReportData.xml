@@ -514,6 +514,22 @@
             <param name="resultData"></param>
             <param name="criteria"></param>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPRReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
+            <summary>
+            Bind data to Commission Report
+            </summary>
+            <param name="workSheet"></param>
+            <param name="resultData"></param>
+            <param name="criteria"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataIncentiveReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
+            <summary>
+            Bind data to Incentive Report
+            </summary>
+            <param name="workSheet"></param>
+            <param name="resultData"></param>
+            <param name="criteria"></param>
+        </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>
             A base class for an MVC controller without view support.

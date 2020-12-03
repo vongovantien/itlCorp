@@ -117,6 +117,12 @@ export class ShareFormSearchReportComponent extends AppForm {
         { id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION, text: 'Combination Statistic Report' }
     ];
 
+    typeComReportList: ReportInterface.INg2Select[] = [
+        { text: 'Commission PR for Air/Sea', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_AS },
+        { text: 'Commission PR for OPS', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_OPS },
+        { text: 'Incentive', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.INCENTIVE_RPT }
+    ];
+
     typeReportActive: any[] = [];
 
     userLogged: any;
@@ -240,6 +246,8 @@ export class ShareFormSearchReportComponent extends AppForm {
     getTypeReportList() {
         if (this.isSheetDebitRpt) {
             this.typeReportActive = this.typeAccReportList;
+        } else if(this.isCommissionIncentive) {
+            this.typeReportActive = this.typeComReportList;
         } else {
             this.typeReportActive = this.typeReportList;
         }
@@ -684,22 +692,22 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     getCommissionSearchBody() {
         const body: ReportInterface.ICommissionReportCriteria = {
-            serviceDateFrom: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            serviceDateTo: this.dateType.value[0].id === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateFrom: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateTo: this.dateType.value[0].id === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateFrom: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customer.value,
             service: this.mapObject(this.serviceActive, this.serviceList),
-            currency: this.typeReportActive[0].id === [this.typeReportList[2]] ? "USD" : "VND",
+            currency: this.typeReportActive === [this.typeReportList[2]] ? "USD" : "VND",
             jobId: this.mapShipment('JOBID'),
             mawb: this.mapShipment('MBL'),
             hawb: this.mapShipment('HBL'),
             officeId: this.mapObject(this.officeActive, this.officeList),
             departmentId: this.mapObject(this.departmentActive, this.departmentList),
             groupId: this.mapObject(this.groupActive, this.groupList),
-            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
-            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
-            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
+            personInCharge: this.staffType.value === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+            salesMan: this.staffType.value === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+            creator: this.staffType.value === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
             carrierId: this.carrier.value,
             agentId: this.agent.value,
             pol: this.pol.value,
@@ -707,7 +715,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             customNo: this.mapShipment('CustomNo'),
             beneficiary: this.partnerAccount.value,
             exchangeRate: this.exchangeRate.value,
-            typeReport: this.typeReportActive[0].id
+            typeReport: this.typeReport.value
         };
         console.log('Com search:', body);
         return body;
