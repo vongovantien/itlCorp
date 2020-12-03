@@ -15,9 +15,9 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 const routing: Routes = [
     {
-        path: '', children: [
+        path: '', data: {name: ''}, children: [
             { path: '', component: ARCustomerPaymentComponent },
-            { path: 'receipt/new', component: ARCustomerPaymentCreateReciptComponent },
+            { path: 'receipt/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New'}, },
             { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
         ]
     },
