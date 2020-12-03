@@ -88,10 +88,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     billTypes: string[] = ['Copy', 'Original', 'Surrendered'];
     termTypes: string[] = ['Prepaid', 'Collect', 'Sea - Air Difference'];
-    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
-    wts: string[] = JobConstants.COMMON_DATA.WT.map(i => i.id);
+    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
+    wts: string[] = JobConstants.COMMON_DATA.WT;
     numberOBLs: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
-    rClasses: string[] = JobConstants.COMMON_DATA.RCLASS.map(i => i.id);
+    rClasses: string[] = JobConstants.COMMON_DATA.RCLASS;
 
     selectedIndexDIM: number = -1;
 

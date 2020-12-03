@@ -58,10 +58,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     packageTypeId: AbstractControl;
     shipmentType: AbstractControl;
 
-    productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE.map(i => i.id);
-    serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES.map(i => i.id);
-    shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES.map(i => i.id);
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
+    productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
+    serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
+    shipmentModes: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
 
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;

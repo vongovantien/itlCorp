@@ -50,10 +50,10 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
-        public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
-        public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
+        public virtual DbSet<SysReportLog> SysReportLog { get; set; }
         public virtual DbSet<SysSentEmailHistory> SysSentEmailHistory { get; set; }
+        public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
         public virtual DbSet<SysUserNotification> SysUserNotification { get; set; }
@@ -3224,35 +3224,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified).HasMaxLength(50);
             });
 
-            modelBuilder.Entity<SysNotifications>(entity =>
-            {
-                entity.ToTable("sysNotifications");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Action).HasMaxLength(200);
-
-                entity.Property(e => e.ActionLink).IsUnicode(false);
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Type)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
             modelBuilder.Entity<SysOffice>(entity =>
             {
                 entity.ToTable("sysOffice");
@@ -3367,6 +3338,66 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasConstraintName("FK_sysBranch_sysBU");
             });
 
+            modelBuilder.Entity<SysReportLog>(entity =>
+            {
+                entity.ToTable("sysReportLog");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.ReportName).HasMaxLength(500);
+
+                entity.Property(e => e.Type).HasMaxLength(100);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysSentEmailHistory>(entity =>
+            {
+                entity.ToTable("sysSentEmailHistory");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Bccs)
+                    .HasColumnName("BCCs")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Ccs)
+                    .HasColumnName("CCs")
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Description).HasMaxLength(4000);
+
+                entity.Property(e => e.Receivers)
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SentDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.SentUser)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Subject).HasMaxLength(4000);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<SysSettingFlow>(entity =>
             {
                 entity.ToTable("sysSettingFlow");
@@ -3408,41 +3439,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UserModified);
-            
-            });
-
-            modelBuilder.Entity<SysSentEmailHistory>(entity =>
-            {
-                entity.ToTable("sysSentEmailHistory");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Bccs)
-                    .HasColumnName("BCCs")
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Ccs)
-                    .HasColumnName("CCs")
-                    .HasMaxLength(4000)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Description).HasMaxLength(4000);
-
-                entity.Property(e => e.Receivers)
-                    .HasMaxLength(4000)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.SentDateTime).HasColumnType("datetime");
-
-                entity.Property(e => e.SentUser)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Subject).HasMaxLength(4000);
-
-                entity.Property(e => e.Type)
+                entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });

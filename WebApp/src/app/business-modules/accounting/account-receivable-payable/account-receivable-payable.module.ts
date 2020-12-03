@@ -32,10 +32,13 @@ const routing: Routes = [
                 data: { name: 'Account Payment' }
             },
             {
-                path: 'customer-payment', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
+                path: 'customer', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
                 data: { name: 'Customer Payment' }
             },
-            // TODO agency module routing.
+            {
+                path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
+                data: { name: 'Agency Payment' }
+            },
             {
                 path: 'payment-import', component: PaymentImportComponent, data: { name: "Import" }
             },
