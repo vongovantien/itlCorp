@@ -317,10 +317,10 @@ export class AddPartnerDataComponent extends AppList {
             provinceShippingId: formBody.provinceShippingId,
             parentId: formBody.partnerAccountRef,
 
-            roundUpMethod: formBody.roundUpMethod.id,
-            applyDim: formBody.applyDim.id,
-            partnerMode: formBody.partnerMode.id,
-            partnerLocation: formBody.partnerLocation.id,
+            roundUpMethod: formBody.roundUpMethod ? formBody.roundUpMethod.id : null,
+            applyDim: !!formBody.applyDim ? formBody.applyDim.id : null,
+            partnerMode: !!formBody.partnerMode ? formBody.partnerMode.id : null,
+            partnerLocation: !!formBody.partnerLocation ? formBody.partnerLocation.id : null,
 
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,

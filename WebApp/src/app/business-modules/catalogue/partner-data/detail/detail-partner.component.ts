@@ -409,11 +409,11 @@ export class PartnerDetailComponent extends AppList {
             provinceShippingId: formBody.provinceShippingId,
             parentId: formBody.partnerAccountRef,
 
-            roundUpMethod: formBody.roundUpMethod.id,
-            applyDim: formBody.applyDim.id,
+            roundUpMethod: formBody.roundUpMethod ? formBody.roundUpMethod.id : null,
+            applyDim: !!formBody.applyDim ? formBody.applyDim.id : null,
             partnerGroup: this.partner.partnerGroup,
-            partnerMode: formBody.partnerMode.id,
-            partnerLocation: formBody.partnerLocation.id,
+            partnerMode: !!formBody.partnerMode ? formBody.partnerMode.id : null,
+            partnerLocation: !!formBody.partnerLocation ? formBody.partnerLocation.id : null,
             id: this.isAddSubPartner ? null : this.partner.id,
             creditPayment: formBody.creditPayment.id,
         };
