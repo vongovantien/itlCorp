@@ -18,9 +18,9 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 export class ShareBusinessAsignmentComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(ShareBusinessStageManagementDetailComponent, { static: false }) popupDetail: ShareBusinessStageManagementDetailComponent;
-    @ViewChild(ShareBusinessAssignStagePopupComponent, { static: false }) assignStagePopup: ShareBusinessAssignStagePopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ShareBusinessStageManagementDetailComponent) popupDetail: ShareBusinessStageManagementDetailComponent;
+    @ViewChild(ShareBusinessAssignStagePopupComponent) assignStagePopup: ShareBusinessAssignStagePopupComponent;
     data: any = null;
     jobId: string = '';
     stages: Stage[] = [];

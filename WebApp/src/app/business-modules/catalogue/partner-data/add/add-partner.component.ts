@@ -26,12 +26,12 @@ import _merge from 'lodash/merge';
     styleUrls: ['./add-partner.component.scss']
 })
 export class AddPartnerDataComponent extends AppList {
-    @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
-    @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
-    @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
-    @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
-    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
-    @ViewChild('duplicatePartnerPopup', { static: false }) confirmDuplicatePartner: InfoPopupComponent;
+    @ViewChild(FormAddPartnerComponent) formPartnerComponent: FormAddPartnerComponent;
+    @ViewChild(SalemanPopupComponent) poupSaleman: SalemanPopupComponent;
+    @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(CommercialContractListComponent) contractList: CommercialContractListComponent;
+    @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild('duplicatePartnerPopup') confirmDuplicatePartner: InfoPopupComponent;
 
 
     contracts: Contract[] = [];
@@ -317,10 +317,10 @@ export class AddPartnerDataComponent extends AppList {
             provinceShippingId: formBody.provinceShippingId,
             parentId: formBody.partnerAccountRef,
 
-            roundUpMethod: formBody.roundUpMethod.id,
-            applyDim: formBody.applyDim.id,
-            partnerMode: formBody.partnerMode.id,
-            partnerLocation: formBody.partnerLocation.id,
+            roundUpMethod: formBody.roundUpMethod ? formBody.roundUpMethod.id : null,
+            applyDim: !!formBody.applyDim ? formBody.applyDim.id : null,
+            partnerMode: !!formBody.partnerMode ? formBody.partnerMode.id : null,
+            partnerLocation: !!formBody.partnerLocation ? formBody.partnerLocation.id : null,
 
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,

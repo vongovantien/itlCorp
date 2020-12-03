@@ -18,8 +18,8 @@ import { ExchangeRateConvertComponent } from './components/convert/exchange-rate
 })
 export class ExchangeRateComponent extends AppList implements OnInit {
 
-    @ViewChild(ExchangeRateHistoryPopupComponent, { static: false }) historyPopup: ExchangeRateHistoryPopupComponent;
-    @ViewChild(ExchangeRateConvertComponent, { static: false }) convertPopup: ExchangeRateConvertComponent;
+    @ViewChild(ExchangeRateHistoryPopupComponent) historyPopup: ExchangeRateHistoryPopupComponent;
+    @ViewChild(ExchangeRateConvertComponent) convertPopup: ExchangeRateConvertComponent;
 
     exchangeRates: any[] = [];
     localCurrency = "VND";

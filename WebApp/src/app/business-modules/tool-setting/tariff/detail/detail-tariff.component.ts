@@ -17,7 +17,7 @@ import { RoutingConstants } from '@constants';
 })
 export class TariffDetailComponent extends TariffAddComponent {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     tariffId: string = '';
     tariff: TariffAdd;
     ACTION: CommonType.ACTION_FORM = "UPDATE";

@@ -35,8 +35,8 @@ import _cloneDeep from 'lodash/cloneDeep';
 })
 export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
-    @ViewChild(ShareAirExportOtherChargePopupComponent, { static: false }) otherChargePopup: ShareAirExportOtherChargePopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareAirExportOtherChargePopupComponent) otherChargePopup: ShareAirExportOtherChargePopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     formCreate: FormGroup;
     customerId: AbstractControl;

@@ -31,7 +31,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @Input() service: CommonType.SERVICE_TYPE = 'sea';
     @Input() showSyncOtherCharge: boolean = false; // * show/hide sync other charge in getCharge button.
     @Input() showGetCharge: boolean = true; // * show/hide getCharge button

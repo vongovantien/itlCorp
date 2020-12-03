@@ -28,14 +28,14 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
-    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild('confirmDeleteJob') confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild("confirmLockShipment") confirmLockPopup: ConfirmPopupComponent;
+    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';

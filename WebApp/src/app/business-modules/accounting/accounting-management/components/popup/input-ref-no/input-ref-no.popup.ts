@@ -18,8 +18,8 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from 'src/app/
 
 export class AccountingManagementInputRefNoPopupComponent extends PopupBase implements OnInit {
 
-    @ViewChild(AccountingManagementSelectPartnerPopupComponent, { static: false }) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
-    @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent, { static: false }) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
+    @ViewChild(AccountingManagementSelectPartnerPopupComponent) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
+    @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
 
     @Input() set type(t: string) {
         this._type = t;

@@ -419,7 +419,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             .subscribe(
                 (data: any) => {
                     if (!!data) {
-                        this.currencyList = data.map((item) => ({ text: item.id, id: item.id }));
+                        this.currencyList = data.map((item) => ({ id: item.id }));
                         // Default value: USD .filter((curr) => curr.id === "USD")
                         this.currency.setValue(this.currencyList.filter((curr) => curr.id === "USD")[0].id);
                     }
@@ -627,7 +627,6 @@ export class ShareFormSearchReportComponent extends AppForm {
             pol: this.pol.value,
             pod: this.pod.value
         };
-        console.log('General search:', body);
         return body;
     }
 
@@ -655,7 +654,6 @@ export class ShareFormSearchReportComponent extends AppForm {
             pod: this.pod.value,
             typeReport: this.typeReport.value
         };
-        console.log('Sale search:', body);
         return body;
     }
 

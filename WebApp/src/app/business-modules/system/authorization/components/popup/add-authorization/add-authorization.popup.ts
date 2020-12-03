@@ -15,9 +15,9 @@ import { Observable } from "rxjs";
 
 export class AuthorizationAddPopupComponent extends PopupBase {
     @Output() onRequestAuthorization: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild('confirmUpdatePopup', { static: false }) confirmUpdatePopup: ConfirmPopupComponent;
-    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
-    @ViewChild('confirmChangeStatus', { static: false }) confirmChangeStatusPopup: ConfirmPopupComponent;
+    @ViewChild('confirmUpdatePopup') confirmUpdatePopup: ConfirmPopupComponent;
+    @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild('confirmChangeStatus') confirmChangeStatusPopup: ConfirmPopupComponent;
 
     formAuthorization: FormGroup;
     authorization: Authorization = new Authorization();

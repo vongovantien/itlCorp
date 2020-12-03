@@ -18,7 +18,7 @@ import { getTransactionLocked, getTransactionPermission } from '../../store';
 })
 export class ShareBussinessFilesAttachComponent extends AppForm implements OnInit {
 
-    @ViewChild('confirmDelete', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
 
     jobId: string;
 

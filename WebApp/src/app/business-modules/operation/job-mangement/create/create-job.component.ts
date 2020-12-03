@@ -21,8 +21,8 @@ import _merge from 'lodash/merge';
 })
 export class JobManagementCreateJobComponent extends AppForm {
 
-    @ViewChild(JobManagementFormCreateComponent, { static: false }) formCreateComponent: JobManagementFormCreateComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPoup: InfoPopupComponent;
+    @ViewChild(JobManagementFormCreateComponent) formCreateComponent: JobManagementFormCreateComponent;
+    @ViewChild(InfoPopupComponent) infoPoup: InfoPopupComponent;
 
     constructor(
         private spinner: NgxSpinnerService,

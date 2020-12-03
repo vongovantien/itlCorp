@@ -2,11 +2,12 @@ import { AppPage } from './app.base';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
-import { ViewChildren, QueryList, HostListener, ElementRef } from '@angular/core';
+import { ViewChildren, QueryList, HostListener, ElementRef, Directive } from '@angular/core';
 import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 import { Observable, fromEvent, merge, combineLatest } from 'rxjs';
 import { distinctUntilChanged, share, filter } from 'rxjs/operators';
 
+@Directive()
 export abstract class AppForm extends AppPage {
     @ViewChildren(ComboGridVirtualScrollComponent) comboGrids: QueryList<ComboGridVirtualScrollComponent>;
 

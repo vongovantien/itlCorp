@@ -23,7 +23,7 @@ import { RoutingConstants } from '@constants';
     styleUrls: ['./detail-company-information.component.scss']
 })
 export class CompanyInformationDetailComponent extends AppList {
-    @ViewChild(CompanyInformationFormAddComponent, { static: false }) formAddCompany: CompanyInformationFormAddComponent;
+    @ViewChild(CompanyInformationFormAddComponent) formAddCompany: CompanyInformationFormAddComponent;
     formData: IFormAddCompany = {
         code: 'sss',
         bunameEn: '',

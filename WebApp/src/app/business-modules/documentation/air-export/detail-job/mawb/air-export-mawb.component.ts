@@ -30,10 +30,10 @@ import { ShareAirServiceDIMVolumePopupComponent } from '../../../share-air/compo
 })
 
 export class AirExportMAWBFormComponent extends AppForm implements OnInit {
-    @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
-    @ViewChild(ShareAirExportOtherChargePopupComponent, { static: false }) otherChargePopup: ShareAirExportOtherChargePopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ShareAirServiceDIMVolumePopupComponent) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
+    @ViewChild(ShareAirExportOtherChargePopupComponent) otherChargePopup: ShareAirExportOtherChargePopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     formMAWB: FormGroup;
 

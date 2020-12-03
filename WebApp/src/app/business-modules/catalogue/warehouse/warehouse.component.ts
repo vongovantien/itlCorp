@@ -21,9 +21,9 @@ import { forkJoin, of } from 'rxjs';
 })
 export class WarehouseComponent extends AppList implements OnInit {
 
-    @ViewChild(FormWarehouseComponent, { static: false }) formPopup: FormWarehouseComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) infoPopup: Permission403PopupComponent;
+    @ViewChild(FormWarehouseComponent) formPopup: FormWarehouseComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) infoPopup: Permission403PopupComponent;
 
 
     warehouses: Warehouse[] = [];

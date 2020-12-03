@@ -13,7 +13,7 @@ import { ConfirmPopupComponent } from '@common';
 
 export class ExchangeRateFormComponent extends AppForm implements OnInit {
     @Output() onUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
-    @ViewChild('confirmDeletePopup', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild('confirmDeletePopup') confirmDeletePopup: ConfirmPopupComponent;
 
     exchangeRateNewest: any = {};
     exchangeRateToAdd: any = {

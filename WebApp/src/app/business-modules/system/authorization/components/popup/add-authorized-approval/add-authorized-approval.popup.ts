@@ -20,9 +20,9 @@ import { distinctUntilChanged, map, catchError } from 'rxjs/operators';
 
 export class AuthorizedApprovalPopupComponent extends PopupBase {
     @Output() onRequestAuthorizedApproval: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild('confirmUpdatePopup', { static: false }) confirmUpdatePopup: ConfirmPopupComponent;
-    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
-    @ViewChild('confirmTurnOfPopup', { static: false }) confirmTurnOfPopup: ConfirmPopupComponent;
+    @ViewChild('confirmUpdatePopup') confirmUpdatePopup: ConfirmPopupComponent;
+    @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild('confirmTurnOfPopup') confirmTurnOfPopup: ConfirmPopupComponent;
 
 
     formAuthorizedApproval: FormGroup;

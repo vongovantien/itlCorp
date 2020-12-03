@@ -18,8 +18,8 @@ import { catchError, finalize } from 'rxjs/operators';
 })
 export class CurrencyComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(FormCreateCurrencyPopupComponent, { static: false }) formPopup: FormCreateCurrencyPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormCreateCurrencyPopupComponent) formPopup: FormCreateCurrencyPopupComponent;
 
     currencies: Array<Currency> = [];
 

@@ -35,11 +35,11 @@ import { forkJoin, merge } from 'rxjs';
 export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     @ViewChild(AirExportHBLFormCreateComponent, { static: true }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
-    @ViewChild('confirmSave', { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
-    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild('confirmSave') confirmPopup: ConfirmPopupComponent;
+    @ViewChild('confirmSaveExistedHbl') confirmExistedHbl: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
 
     jobId: string;
     selectedHbl: CsTransactionDetail;

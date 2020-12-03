@@ -24,11 +24,11 @@ import { RoutingConstants } from '@constants';
     templateUrl: './sea-consol-manifest.component.html'
 })
 export class SeaConsolExportManifestComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
 
-    @ViewChild(ShareBusinessFormManifestComponent, { static: false }) formManifest: ShareBusinessFormManifestComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-    @ViewChild(ShareBusinessAddHblToManifestComponent, { static: false }) AddHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
+    @ViewChild(ShareBusinessFormManifestComponent) formManifest: ShareBusinessFormManifestComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(ShareBusinessAddHblToManifestComponent) AddHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
 
     portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.SEA;
     housebills: any[] = [];

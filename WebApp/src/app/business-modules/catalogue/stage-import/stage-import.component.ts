@@ -16,7 +16,7 @@ import { finalize, catchError } from 'rxjs/operators';
     templateUrl: './stage-import.component.html'
 })
 export class StageImportComponent extends AppPage implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];

@@ -21,8 +21,8 @@ import { catchError, finalize } from 'rxjs/operators';
 })
 export class CommercialAgentComponent extends AppList implements OnInit {
 
-    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     agents: Partner[] = [];
     saleMans: Contract[] = [];

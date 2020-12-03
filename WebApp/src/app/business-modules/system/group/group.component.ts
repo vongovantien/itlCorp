@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './group.component.html'
 })
 export class GroupComponent extends AppList implements OnInit {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     headers: CommonInterface.IHeaderTable[];
     titleConfirmDelete = 'Do you want to delete?';
     groups: Group[] = [];

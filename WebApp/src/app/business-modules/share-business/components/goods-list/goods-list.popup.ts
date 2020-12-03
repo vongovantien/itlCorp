@@ -20,8 +20,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContainerListPopupComponent implements OnInit {
 
-    @ViewChild(ShareGoodsImportComponent, { static: false }) goodsImportPopup: ShareGoodsImportComponent;
-    @ViewChild('confirmCancel', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(ShareGoodsImportComponent) goodsImportPopup: ShareGoodsImportComponent;
+    @ViewChild('confirmCancel') confirmCancelPopup: ConfirmPopupComponent;
     @Output() onChange: EventEmitter<Container[]> = new EventEmitter<Container[]>();
 
     constructor(

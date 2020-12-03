@@ -31,7 +31,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 })
 export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     // @ViewChildren('container', { read: ViewContainerRef }) public combogrids: QueryList<ViewContainerRef>;
     @ViewChildren(InjectViewContainerRefDirective, { read: ViewContainerRef }) public combogrids: QueryList<ViewContainerRef>;
 

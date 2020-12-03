@@ -19,8 +19,8 @@ import { ConfirmPopupComponent } from "@common";
 })
 
 export class UnlockRequestAddNewComponent extends AppForm {
-    @ViewChild(UnlockRequestListJobComponent, { static: false }) listJobComponent: UnlockRequestListJobComponent;
-    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(UnlockRequestListJobComponent) listJobComponent: UnlockRequestListJobComponent;
+    @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
     formAdd: FormGroup;
     subject: AbstractControl;
     requester: AbstractControl;

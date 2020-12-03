@@ -18,7 +18,7 @@ import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-module
 
 export class SettlementExistingChargePopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(ShareModulesInputShipmentPopupComponent, { static: false }) inputShipmentPopupComponent: ShareModulesInputShipmentPopupComponent;
+    @ViewChild(ShareModulesInputShipmentPopupComponent) inputShipmentPopupComponent: ShareModulesInputShipmentPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 

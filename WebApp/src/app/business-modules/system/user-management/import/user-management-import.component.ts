@@ -17,7 +17,7 @@ import { catchError, finalize } from 'rxjs/operators';
     templateUrl: './user-management-import.component.html',
 })
 export class UserManagementImportComponent extends AppList {
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
     constructor(
         private pagingService: PagingService,
         private _systemRepo: SystemRepo,
@@ -37,9 +37,9 @@ export class UserManagementImportComponent extends AppList {
     pager: PagerSetting = PAGINGSETTING;
     inProgress: boolean = false;
     headers: CommonInterface.IHeaderTable[];
-    @ViewChild(AppPaginationComponent, { static: false }) child;
-    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(AppPaginationComponent) child;
+    @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     isDesc = true;
     sortKey: string;

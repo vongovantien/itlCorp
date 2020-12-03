@@ -14,7 +14,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 })
 
 export class UserManagementAddGroupPopupComponent extends PopupBase implements OnInit {
-    @ViewChild('combogridGroup', { static: false }) comboGridGroup: ComboGridVirtualScrollComponent;
+    @ViewChild('combogridGroup') comboGridGroup: ComboGridVirtualScrollComponent;
 
     @Input() userId: string;
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();

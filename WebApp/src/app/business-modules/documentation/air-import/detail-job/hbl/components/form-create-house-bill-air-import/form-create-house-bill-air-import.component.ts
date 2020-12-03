@@ -31,7 +31,7 @@ import cloneDeep from 'lodash/cloneDeep';
 })
 export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     formCreate: FormGroup;
     customerId: AbstractControl;

@@ -29,8 +29,8 @@ import { ShareAirServiceFormCreateComponent } from '../../share-air/components/f
 export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
     // @ViewChild(ShareBusinessFormCreateAirComponent, { static: false }) formCreateComponent: ShareBusinessFormCreateAirComponent;
-    @ViewChild(ShareAirServiceFormCreateComponent, { static: false }) formCreateComponent: ShareAirServiceFormCreateComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;

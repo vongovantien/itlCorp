@@ -42,13 +42,13 @@ enum HBL_TAB {
 })
 export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
-    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent, { static: false }) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
-    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
-    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
-    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
+    @ViewChild(ShareBusinessArrivalNoteComponent) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
+    @ViewChild(ShareBusinessDeliveryOrderComponent) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
 
     jobId: string = '';
     shipmentDetail: CsTransaction;

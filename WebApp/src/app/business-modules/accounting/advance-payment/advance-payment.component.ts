@@ -28,15 +28,15 @@ import { catchError, finalize, map } from 'rxjs/operators';
 })
 export class AdvancePaymentComponent extends AppList {
 
-    @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    @ViewChild(UpdatePaymentVoucherPopupComponent, { static: false }) popupUpdateVoucher: UpdatePaymentVoucherPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild('confirmExistedVoucher', { static: false }) confirmExistedVoucher: ConfirmPopupComponent;
-    @ViewChild('confirmRemoveSelectedVoucher', { static: false }) confirmRemoveSelectedVoucher: ConfirmPopupComponent;
-    @ViewChild(AdvancePaymentsPopupComponent, { static: false }) advancePaymentsPopup: AdvancePaymentsPopupComponent;
-    @ViewChild('confirmSyncAdvance', { static: false }) confirmSyncAdvancePopup: ConfirmPopupComponent;
+    @ViewChild(AdvancePaymentFormsearchComponent) formSearch: AdvancePaymentFormsearchComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(UpdatePaymentVoucherPopupComponent) popupUpdateVoucher: UpdatePaymentVoucherPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild('confirmExistedVoucher') confirmExistedVoucher: ConfirmPopupComponent;
+    @ViewChild('confirmRemoveSelectedVoucher') confirmRemoveSelectedVoucher: ConfirmPopupComponent;
+    @ViewChild(AdvancePaymentsPopupComponent) advancePaymentsPopup: AdvancePaymentsPopupComponent;
+    @ViewChild('confirmSyncAdvance') confirmSyncAdvancePopup: ConfirmPopupComponent;
 
 
     headers: CommonInterface.IHeaderTable[];

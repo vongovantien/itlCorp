@@ -19,8 +19,8 @@ import { Observable } from 'rxjs';
 })
 export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     opsTransaction: OpsTransaction = null;
 

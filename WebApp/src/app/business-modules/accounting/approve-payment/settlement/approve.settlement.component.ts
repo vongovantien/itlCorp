@@ -29,12 +29,12 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     @ViewChild(SettlementListChargeComponent, { static: true }) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
 
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
-    @ViewChild('confirmApprovePopup', { static: false }) confirmApprovePopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild('confirmDenyPopup') confirmDenyPopup: ConfirmPopupComponent;
+    @ViewChild('confirmApprovePopup') confirmApprovePopup: ConfirmPopupComponent;
 
-    @ViewChild(InjectViewContainerRefDirective, { static: false }) public reportContainerRef: InjectViewContainerRefDirective;
-    @ViewChild(HistoryDeniedPopupComponent, { static: false }) historyDeniedPopup: HistoryDeniedPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(HistoryDeniedPopupComponent) historyDeniedPopup: HistoryDeniedPopupComponent;
 
     settlementId: string = '';
     settlementCode: string = '';

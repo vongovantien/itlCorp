@@ -6,7 +6,7 @@ import { Store } from "@ngrx/store";
 import { Params, ActivatedRoute } from "@angular/router";
 import { NgxSpinnerService } from "ngx-spinner";
 import { NgProgress } from "@ngx-progressbar/core";
-import { ViewChild } from "@angular/core";
+import { ViewChild, Directive } from "@angular/core";
 import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { ToastrService } from "ngx-toastr";
 import { DocumentationRepo } from "@repositories";
@@ -17,12 +17,13 @@ import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
 
 
+@Directive()
 export abstract class AppShareHBLBase extends AppList implements ICrystalReport {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteHBLPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeleteHBLPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDeleteJob') confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     houseBills: HouseBill[] = [];
 

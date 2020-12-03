@@ -20,7 +20,7 @@ import { catchError, finalize } from 'rxjs/operators';
     templateUrl: './location-import.component.html'
 })
 export class LocationImportComponent extends AppList implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
 
     data: any[];
     pagedItems: any[] = [];

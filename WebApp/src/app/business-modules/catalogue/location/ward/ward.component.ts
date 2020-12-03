@@ -20,8 +20,8 @@ import { catchError, finalize } from 'rxjs/operators';
 
 export class AppWardComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(AddWardPopupComponent, { static: false }) wardPopup: AddWardPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(AddWardPopupComponent) wardPopup: AddWardPopupComponent;
 
     wards: any[] = [];
     selectedWard: any;

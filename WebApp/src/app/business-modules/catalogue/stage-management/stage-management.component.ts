@@ -17,9 +17,9 @@ import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
     templateUrl: './stage-management.component.html',
 })
 export class StageManagementComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) popupConfirm: ConfirmPopupComponent;
-    @ViewChild(StageManagementAddPopupComponent, { static: false }) stageManagementAddPopupComponent: StageManagementAddPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) popupConfirm: ConfirmPopupComponent;
+    @ViewChild(StageManagementAddPopupComponent) stageManagementAddPopupComponent: StageManagementAddPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 

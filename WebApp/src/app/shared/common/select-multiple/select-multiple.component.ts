@@ -7,7 +7,7 @@ import { AppPage } from 'src/app/app.base';
 })
 
 export class AppMultipleSelectComponent extends AppPage {
-    @ViewChild('inputSearch', { static: false }) inputSearch: ElementRef;
+    @ViewChild('inputSearch') inputSearch: ElementRef;
 
     @Output() onChange: EventEmitter<any> = new EventEmitter<any[]>(); // * event will be fired when item was selected
 

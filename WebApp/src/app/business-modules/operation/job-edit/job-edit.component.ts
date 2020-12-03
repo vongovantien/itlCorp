@@ -31,17 +31,17 @@ import { RoutingConstants } from '@constants';
 })
 export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit, ICanComponentDeactivate {
 
-    @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
-    @ViewChild('confirmCancelUpdate', { static: false }) confirmCancelJobPopup: ConfirmPopupComponent;
-    @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild('confirmDelete', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild('confirmLockShipment', { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
-    @ViewChild(ShareBussinessSellingChargeComponent, { static: false }) sellingChargeComponent: ShareBussinessSellingChargeComponent;
-    @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
+    @ViewChild(PlSheetPopupComponent) plSheetPopup: PlSheetPopupComponent;
+    @ViewChild('confirmCancelUpdate') confirmCancelJobPopup: ConfirmPopupComponent;
+    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild('confirmDelete') confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild('confirmLockShipment') confirmLockShipmentPopup: ConfirmPopupComponent;
+    @ViewChild(ShareBussinessSellingChargeComponent) sellingChargeComponent: ShareBussinessSellingChargeComponent;
+    @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
 
-    @ViewChild(JobManagementFormEditComponent, { static: false }) editForm: JobManagementFormEditComponent;
-    @ViewChild('addOpsForm', { static: false }) formOps: NgForm;
-    @ViewChild('notAllowUpdate', { static: false }) infoPoup: InfoPopupComponent;
+    @ViewChild(JobManagementFormEditComponent) editForm: JobManagementFormEditComponent;
+    @ViewChild('addOpsForm') formOps: NgForm;
+    @ViewChild('notAllowUpdate') infoPoup: InfoPopupComponent;
 
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];

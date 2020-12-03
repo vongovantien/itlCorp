@@ -15,7 +15,7 @@ import { RoutingConstants } from '@constants';
     templateUrl: './department.component.html',
 })
 export class DepartmentComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 

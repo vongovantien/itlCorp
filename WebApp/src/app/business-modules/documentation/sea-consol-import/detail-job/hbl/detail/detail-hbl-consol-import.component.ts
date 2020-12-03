@@ -32,8 +32,8 @@ enum HBL_TAB {
 })
 export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLComponent implements ICrystalReport {
 
-    @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     containers: Container[] = [];

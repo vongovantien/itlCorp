@@ -16,9 +16,9 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class CommercialIncotermComponent extends AppList implements OnInit, IPermissionBase {
 
-    @ViewChild("formSearch", { static: false }) formSearch: CommercialFormSearchIncotermComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild("formSearch") formSearch: CommercialFormSearchIncotermComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     incoterms: IncotermModel[];
     selectedIncotermId: string;

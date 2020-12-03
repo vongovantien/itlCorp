@@ -19,8 +19,8 @@ import { catchError, finalize } from 'rxjs/operators';
 
 export class AppDistrictComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(AddDistrictPopupComponent, { static: false }) districtPopup: AddDistrictPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(AddDistrictPopupComponent) districtPopup: AddDistrictPopupComponent;
 
     districts: any[] = [];
     selectedDistrict: any;

@@ -12,7 +12,7 @@ import { SetUnlockRequestApproveModel } from "@models";
 })
 
 export class UnlockRequestProcessApproveComponent extends AppForm implements OnInit {
-    @ViewChild(UnlockRequestInfoDeniedCommentPopupComponent, { static: false }) infoDeniedPopup: UnlockRequestInfoDeniedCommentPopupComponent;
+    @ViewChild(UnlockRequestInfoDeniedCommentPopupComponent) infoDeniedPopup: UnlockRequestInfoDeniedCommentPopupComponent;
     idUnlockRequest: string = '';
     processApprove: SetUnlockRequestApproveModel;
     constructor(

@@ -19,7 +19,7 @@ import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/fo
 })
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     formCreate: FormGroup;
 
     hwbno: AbstractControl;

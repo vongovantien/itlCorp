@@ -18,8 +18,8 @@ import { RoutingConstants } from '@constants';
     templateUrl: './user-details.component.html'
 })
 export class UserDetailsComponent extends AppPage {
-    @ViewChild(FormAddUserComponent, { static: false }) formAdd: FormAddUserComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormAddUserComponent) formAdd: FormAddUserComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     formData: IAddUser = {
         sysEmployeeModel: null,

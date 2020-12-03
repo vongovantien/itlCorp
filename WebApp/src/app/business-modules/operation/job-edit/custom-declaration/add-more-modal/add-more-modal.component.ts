@@ -17,7 +17,7 @@ import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/
 })
 
 export class AddMoreModalComponent extends PopupBase implements OnInit {
-    @ViewChild(SearchMultipleComponent, { static: false }) popupSearchMultiple: SearchMultipleComponent;
+    @ViewChild(SearchMultipleComponent) popupSearchMultiple: SearchMultipleComponent;
     @Input() currentJob: OpsTransaction;
     @Output() isCloseModal = new EventEmitter();
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
