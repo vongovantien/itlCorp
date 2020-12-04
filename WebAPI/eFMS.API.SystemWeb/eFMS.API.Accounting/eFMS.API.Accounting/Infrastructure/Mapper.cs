@@ -34,6 +34,8 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
             CreateMap<AccAccountReceivableModel, AccAccountReceivable>();
             CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
+
+            CreateMap<AcctReceipt, AcctReceiptModel>().ReverseMap();
         }
     }
 }

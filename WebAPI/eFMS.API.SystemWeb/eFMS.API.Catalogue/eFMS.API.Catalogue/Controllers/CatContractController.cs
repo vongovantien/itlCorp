@@ -10,6 +10,7 @@ using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Catalogue.Service.Models;
@@ -580,5 +581,16 @@ namespace eFMS.API.Catalogue.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
+        [HttpPost]
+        [Route("QueryAgreement")]
+        public IActionResult QueryAgreement(CatContractCriteria query)
+        {
+            IQueryable<CatAgreementModel> result = catContractService.QueryAgreement(query);
+            if(result == null)
+            {
+                return Ok(new List<CatAgreementModel>());
+            }
+            return Ok(result);
+        }
     }
 }
