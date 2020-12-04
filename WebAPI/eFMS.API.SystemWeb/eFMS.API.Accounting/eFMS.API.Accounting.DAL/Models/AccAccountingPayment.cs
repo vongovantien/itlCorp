@@ -6,6 +6,7 @@ namespace eFMS.API.Accounting.Service.Models
     public partial class AccAccountingPayment
     {
         public Guid Id { get; set; }
+        public Guid? ReceiptId { get; set; }
         public string RefId { get; set; }
         public string PaymentNo { get; set; }
         public decimal? PaymentAmount { get; set; }
@@ -24,5 +25,7 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? CompanyId { get; set; }
         public decimal? ExchangeRate { get; set; }
         public string PaymentMethod { get; set; }
+        public decimal? ReferenceAmount { get; set; }
+        public string Note { get; set; }
     }
 }

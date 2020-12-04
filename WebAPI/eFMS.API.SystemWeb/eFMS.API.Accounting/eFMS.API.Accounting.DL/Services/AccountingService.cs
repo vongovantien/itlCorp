@@ -297,10 +297,11 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        ReferenceNo = settle.SettlementNo,
                                                                        ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
                                                                        Description0 = settle.Note,
-                                                                       CustomerName = employee.EmployeeNameVn,
-                                                                       CustomerCode = employee.StaffCode,
+                                                                       CustomerName = partner != null ? partner.ShortName : employee.EmployeeNameVn,
+                                                                       CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode,
                                                                        PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
-                                                                       CustomerMode = partner.PartnerMode ?? "Internal"
+                                                                       CustomerMode = partner != null ? partner.PartnerMode : "External",
+                                                                       LocalBranchCode = partner != null ? partner.InternalCode : null
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
