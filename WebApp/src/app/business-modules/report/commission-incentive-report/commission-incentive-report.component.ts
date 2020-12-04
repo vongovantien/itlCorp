@@ -14,7 +14,7 @@ import { SystemConstants } from '@constants';
   templateUrl: './commission-incentive-report.component.html'
 })
 export class CommissionIncentiveReportComponent extends AppList implements ICrystalReport {
-  @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+  @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
   shipmentInput: OperationInteface.IInputShipment;
   numberOfShipment: number = 0;
 
