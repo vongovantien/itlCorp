@@ -50,6 +50,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
+        public virtual DbSet<SysReportLog> SysReportLog { get; set; }
         public virtual DbSet<SysSentEmailHistory> SysSentEmailHistory { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
@@ -3260,6 +3261,31 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasForeignKey(d => d.Buid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_sysBranch_sysBU");
+            });
+
+            modelBuilder.Entity<SysReportLog>(entity =>
+            {
+                entity.ToTable("sysReportLog");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.ReportName).HasMaxLength(500);
+
+                entity.Property(e => e.Type).HasMaxLength(100);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysSentEmailHistory>(entity =>

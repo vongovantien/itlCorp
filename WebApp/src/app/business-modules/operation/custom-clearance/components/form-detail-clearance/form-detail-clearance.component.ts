@@ -50,9 +50,9 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     units: Observable<Unit[]>;
 
     cargoTypes: string[] = ['FCL', 'LCL'];
-    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE.map(i => i.id);
-    typeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES.map(i => i.id);
-    routeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.ROUTES.map(i => i.id);
+    serviceTypes: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
+    typeClearances: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    routeClearances: string[] = JobConstants.COMMON_DATA.ROUTES;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
         { field: 'shortName', label: 'Name Abbr' },

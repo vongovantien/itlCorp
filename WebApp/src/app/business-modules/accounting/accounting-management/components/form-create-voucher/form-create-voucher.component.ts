@@ -44,8 +44,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
-    paymentMethods: string[] = AccountingConstants.PAYMENT_METHOD.map(i => i.id);
-    voucherTypes: string[] = AccountingConstants.VOUCHER_TYPE.map(i => i.id);
+    paymentMethods: string[] = AccountingConstants.PAYMENT_METHOD;
+    voucherTypes: string[] = AccountingConstants.VOUCHER_TYPE;
 
     displayFieldsChartAccount: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountCode', label: 'Account Code' },

@@ -18,11 +18,11 @@ import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/
 })
 export class OpsCDNoteComponent extends AppList {
     @Input() currentJob: OpsTransaction;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(OpsCdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: OpsCdNoteDetailPopupComponent;
-    @ViewChild(OpsCdNoteAddPopupComponent, { static: false }) cdNoteAddPopupComponent: OpsCdNoteAddPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeleteCdNotePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(OpsCdNoteDetailPopupComponent) cdNoteDetailPopupComponent: OpsCdNoteDetailPopupComponent;
+    @ViewChild(OpsCdNoteAddPopupComponent) cdNoteAddPopupComponent: OpsCdNoteAddPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';

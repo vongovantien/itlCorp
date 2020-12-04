@@ -23,6 +23,7 @@ import { StatementOfAccountFormCreateComponent } from './components/form-create-
 import { ShareAccountingModule } from '../share-accouting.module';
 import { StatementOfAccountPaymentMethodComponent } from './components/poup/payment-method/soa-payment-method.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ShareModulesModule } from '../../share-modules/share-modules.module';
 
 const routing: Routes = [
     {
@@ -85,6 +86,7 @@ const COMPONENTS = [
         NgProgressModule,
         ShareAccountingModule,
         BsDropdownModule.forRoot(),
+        ShareModulesModule
     ],
     exports: [],
     providers: [

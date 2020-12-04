@@ -21,9 +21,9 @@ import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
     templateUrl: './port-index.component.html'
 })
 export class PortIndexComponent extends AppList implements OnInit {
-    @ViewChild(FormPortIndexComponent, { static: false }) formPopup: FormPortIndexComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormPortIndexComponent) formPopup: FormPortIndexComponent;
+    @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     portIndexs: Array<PortIndex> = [];
     portIndex: PortIndex = new PortIndex();

@@ -19,9 +19,9 @@ import { StatementOfAccountPaymentMethodComponent } from '../components/poup/pay
     animations: [listAnimation]
 })
 export class StatementOfAccountDetailComponent extends AppList {
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmSoaPopup: ConfirmPopupComponent;
-    @ViewChild(StatementOfAccountPaymentMethodComponent, { static: false }) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(ConfirmPopupComponent) confirmSoaPopup: ConfirmPopupComponent;
+    @ViewChild(StatementOfAccountPaymentMethodComponent) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
 
@@ -286,7 +286,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         if (this.soa.type === 'Credit' && this.soa.creditPayment === 'Direct') {
             this.paymentMethodPopupComponent.show();
         } else {
-            this.paymentMethodSelected = '';
+            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
             this.confirmSendToAcc();
         }
     }

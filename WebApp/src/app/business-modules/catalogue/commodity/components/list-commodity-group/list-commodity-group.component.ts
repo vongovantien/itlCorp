@@ -16,8 +16,8 @@ import { catchError, finalize, map } from "rxjs/operators";
 })
 
 export class CommodityGroupListComponent extends AppList {
-    @ViewChild(CommodityGroupAddPopupComponent, { static: false }) commodityGroupAddPopupComponent: CommodityGroupAddPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(CommodityGroupAddPopupComponent) commodityGroupAddPopupComponent: CommodityGroupAddPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     commodityGroups: CommodityGroup[] = [];
     commodityGroup: CommodityGroup;

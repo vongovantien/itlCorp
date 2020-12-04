@@ -32,9 +32,9 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
 
     private _service: string = 'fcl';
 
-    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
-    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
+    ladingTypes: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
+    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
+    serviceTypes: string[] = JobConstants.COMMON_DATA.SERVICETYPES;
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldsPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;

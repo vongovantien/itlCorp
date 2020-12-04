@@ -17,11 +17,11 @@ import { AbstractControl, FormGroup, FormBuilder } from "@angular/forms";
 export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
-    @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessCdNoteAddRemainingChargeAirPopupComponent, { static: false }) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargeAirPopupComponent;
-    @ViewChild('confirmCloseAddPopup', { static: false }) confirmCloseAddPopup: ConfirmPopupComponent;
-    @ViewChild('validateCDNotePopup', { static: false }) validateCDNotePopup: InfoPopupComponent;
+    @ViewChild('changePartnerPopup') changePartnerPopup: ConfirmPopupComponent;
+    @ViewChild('notExistsChargePopup') notExistsChargePopup: InfoPopupComponent;
+    @ViewChild(ShareBussinessCdNoteAddRemainingChargeAirPopupComponent) addRemainChargePopup: ShareBussinessCdNoteAddRemainingChargeAirPopupComponent;
+    @ViewChild('confirmCloseAddPopup') confirmCloseAddPopup: ConfirmPopupComponent;
+    @ViewChild('validateCDNotePopup') validateCDNotePopup: InfoPopupComponent;
     formCreate: FormGroup;
 
     headers: CommonInterface.IHeaderTable[];

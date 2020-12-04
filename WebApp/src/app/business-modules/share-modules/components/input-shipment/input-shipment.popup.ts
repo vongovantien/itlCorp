@@ -1,4 +1,4 @@
-import { PopupBase } from "src/app/popup.base";
+import { PopupBase } from "@app";
 import { Component, Output, EventEmitter } from "@angular/core";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { catchError, finalize } from "rxjs/operators";
@@ -8,7 +8,7 @@ import { ToastrService } from "ngx-toastr";
     selector: 'input-shipment-popup',
     templateUrl: './input-shipment.popup.html'
 })
-export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
+export class ShareModulesInputShipmentPopupComponent extends PopupBase {
 
     @Output() onInputShipment: EventEmitter<any> = new EventEmitter<any>();
     shipmentTypes = [
@@ -24,7 +24,6 @@ export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService) {
         super();
-
         this.selectedShipmentType = "JOBID";
     }
 
@@ -44,6 +43,7 @@ export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
             const keywords: string[] = this.shipmentSearch.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
             this._documentRepo.GetShipmentNotExist(this.selectedShipmentType, keywords)
                 .pipe(catchError(this.catchError), finalize(() => {
+                    console.log('data ', data)
                     this.onInputShipment.emit(data);
                     this.hide();
                 }))

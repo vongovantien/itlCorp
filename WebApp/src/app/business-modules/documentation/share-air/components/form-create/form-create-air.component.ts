@@ -38,7 +38,7 @@ import _merge from 'lodash/merge';
 export class ShareAirServiceFormCreateComponent extends AppForm implements OnInit {
 
     @Input() type: string = 'import';
-    @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
+    @ViewChild(ShareAirServiceDIMVolumePopupComponent) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
     // @ViewChild(ShareAirServiceDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareBusinessDIMVolumePopupComponent;
 
     formGroup: FormGroup;
@@ -67,9 +67,9 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     //
     airlineInfo: AbstractControl; // Airline Information
 
-    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
+    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
     billTypes: string[] = ['Copy', 'Original', 'Surrendered'];
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS.map(i => i.id);
+    termTypes: string[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;

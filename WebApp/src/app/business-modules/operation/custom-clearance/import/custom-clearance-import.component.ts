@@ -17,7 +17,7 @@ import { InfoPopupComponent } from '@common';
     templateUrl: './custom-clearance-import.component.html',
 })
 export class CustomClearanceImportComponent extends AppPage implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];

@@ -19,8 +19,8 @@ import _merge from 'lodash/merge';
 })
 
 export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements OnInit {
-    @ViewChild(SeaLCLExportFormBookingNoteComponent, { static: false }) formBookingNoteComponent: SeaLCLExportFormBookingNoteComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(SeaLCLExportFormBookingNoteComponent) formBookingNoteComponent: SeaLCLExportFormBookingNoteComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     constructor(
         protected _toastService: ToastrService,

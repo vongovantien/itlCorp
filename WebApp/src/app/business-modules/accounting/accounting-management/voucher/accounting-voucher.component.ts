@@ -25,8 +25,8 @@ import { accountingManagementDataSearchState, accountingManagementListLoadingSta
 
 export class AccountingManagementVoucherComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopupDelete: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) popup403: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopupDelete: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) popup403: Permission403PopupComponent;
 
     vouchers: AccAccountingManagementResult[] = [];
     confirmDeleteVoucherText: string;

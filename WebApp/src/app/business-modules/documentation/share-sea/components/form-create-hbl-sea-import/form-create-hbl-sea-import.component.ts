@@ -22,7 +22,7 @@ import { FormValidators } from '@validators';
     templateUrl: './form-create-hbl-sea-import.component.html'
 })
 export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppForm {
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     formGroup: FormGroup;
     customer: AbstractControl;
@@ -69,8 +69,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
 
     saleMans: any = [];
 
-    serviceTypesString: string[] = JobConstants.COMMON_DATA.SERVICETYPES.map(i => i.id);
-    hbOfladingTypesString: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS.map(i => i.id);
+    serviceTypesString: string[] = JobConstants.COMMON_DATA.SERVICETYPES;
+    hbOfladingTypesString: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
     numberOfOrigins: CommonInterface.ICommonTitleValue[] = [
         { title: 'One(1)', value: 1 },
         { title: 'Two(2)', value: 2 },

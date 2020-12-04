@@ -25,10 +25,10 @@ import isUUID from 'validator/lib/isUUID';
 
 export class SettlementPaymentDetailComponent extends AppPage implements ICrystalReport {
 
-    @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
+    @ViewChild(SettlementListChargeComponent) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(InjectViewContainerRefDirective, { static: false }) public reportContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     settlementId: string = '';
     settlementCode: string = '';

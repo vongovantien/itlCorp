@@ -16,11 +16,11 @@ import { RoutingConstants } from '@constants';
 })
 export class AccountReceivableTabComponent extends AppList implements OnInit {
 
-    @ViewChild(AccountReceivableListTrialOfficialComponent, { static: false }) trialOfficalListComponent: AccountReceivableListTrialOfficialComponent;
-    @ViewChild(AccountReceivableListGuaranteedComponent, { static: false }) guaranteedListComponent: AccountReceivableListGuaranteedComponent;
-    @ViewChild(AccountReceivableListOtherComponent, { static: false }) otherListComponent: AccountReceivableListOtherComponent;
+    @ViewChild(AccountReceivableListTrialOfficialComponent) trialOfficalListComponent: AccountReceivableListTrialOfficialComponent;
+    @ViewChild(AccountReceivableListGuaranteedComponent) guaranteedListComponent: AccountReceivableListGuaranteedComponent;
+    @ViewChild(AccountReceivableListOtherComponent) otherListComponent: AccountReceivableListOtherComponent;
 
-    @ViewChild(AccountReceivableFormSearchComponent, { static: false }) accountReceivableFormComponent: AccountReceivableFormSearchComponent;
+    @ViewChild(AccountReceivableFormSearchComponent) accountReceivableFormComponent: AccountReceivableFormSearchComponent;
 
     selectedSubTab: string = "TRIAL_OFFICIAL";
 

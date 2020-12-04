@@ -24,10 +24,10 @@ import { Router } from '@angular/router';
 })
 export class AccountingManagementCreateVATInvoiceComponent extends AppForm implements OnInit {
 
-    @ViewChild(AccountingManagementFormCreateVATInvoiceComponent, { static: false }) formCreateComponent: AccountingManagementFormCreateVATInvoiceComponent;
-    @ViewChild(AccountingManagementListChargeComponent, { static: false }) listChargeComponent: AccountingManagementListChargeComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(AccountingManagementFormCreateVATInvoiceComponent) formCreateComponent: AccountingManagementFormCreateVATInvoiceComponent;
+    @ViewChild(AccountingManagementListChargeComponent) listChargeComponent: AccountingManagementListChargeComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmCancelPopup: ConfirmPopupComponent;
 
     invalidUpdateExchangeRate: string = 'You can only adjust the exchange rate increase or decrease by 1% compared to the general exchange rate!';
 

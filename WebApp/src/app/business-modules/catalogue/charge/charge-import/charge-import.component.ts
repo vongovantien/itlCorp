@@ -16,7 +16,7 @@ import { finalize, catchError } from 'rxjs/operators';
     templateUrl: './charge-import.component.html'
 })
 export class ChargeImportComponent extends AppPage implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];

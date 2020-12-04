@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { ShareAccountingInputShipmentPopupComponent } from './components/input-shipment/input-shipment.popup';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ShareAccountingManagementSelectRequesterPopupComponent } from './components/select-requester/select-requester.popup';
 import { StoreModule } from '@ngrx/store';
@@ -15,8 +14,8 @@ import { EffectsModule } from '@ngrx/effects';
         StoreModule.forFeature('accounting-management', reducers),
         EffectsModule.forFeature(effects),
     ],
-    exports: [ShareAccountingInputShipmentPopupComponent, ShareAccountingManagementSelectRequesterPopupComponent],
-    declarations: [ShareAccountingInputShipmentPopupComponent, ShareAccountingManagementSelectRequesterPopupComponent],
+    exports: [ShareAccountingManagementSelectRequesterPopupComponent],
+    declarations: [ShareAccountingManagementSelectRequesterPopupComponent],
     providers: [],
 })
 export class ShareAccountingModule { }

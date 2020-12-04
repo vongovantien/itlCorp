@@ -35,8 +35,8 @@ import _cloneDeep from 'lodash/cloneDeep';
 })
 export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
-    @ViewChild(ShareAirExportOtherChargePopupComponent, { static: false }) otherChargePopup: ShareAirExportOtherChargePopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareAirExportOtherChargePopupComponent) otherChargePopup: ShareAirExportOtherChargePopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     formCreate: FormGroup;
     customerId: AbstractControl;
@@ -88,10 +88,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     billTypes: string[] = ['Copy', 'Original', 'Surrendered'];
     termTypes: string[] = ['Prepaid', 'Collect', 'Sea - Air Difference'];
-    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES.map(i => i.id);
-    wts: string[] = JobConstants.COMMON_DATA.WT.map(i => i.id);
+    shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
+    wts: string[] = JobConstants.COMMON_DATA.WT;
     numberOBLs: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
-    rClasses: string[] = JobConstants.COMMON_DATA.RCLASS.map(i => i.id);
+    rClasses: string[] = JobConstants.COMMON_DATA.RCLASS;
 
     selectedIndexDIM: number = -1;
 

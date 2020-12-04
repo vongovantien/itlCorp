@@ -9,7 +9,6 @@ import { CommonEnum } from '@enums';
 import { PortIndex } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 import { finalize } from 'rxjs/operators';
-import { NullVisitor } from '@angular/compiler/src/render3/r3_ast';
 
 @Component({
     selector: 'app-form-port-index',

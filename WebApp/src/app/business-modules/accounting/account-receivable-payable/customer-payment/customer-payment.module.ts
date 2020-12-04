@@ -15,9 +15,9 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 const routing: Routes = [
     {
-        path: '', data: {name: ''}, children: [
+        path: '', data: { name: '' }, children: [
             { path: '', component: ARCustomerPaymentComponent },
-            { path: 'receipt/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New'}, },
+            { path: 'receipt/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' }, },
             { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
         ]
     },
@@ -38,7 +38,7 @@ const routing: Routes = [
     imports: [
         SharedModule,
         RouterModule.forChild(routing),
-        TabsModule, 
+        TabsModule,
         NgSelectModule,
         NgxDaterangepickerMd
     ],

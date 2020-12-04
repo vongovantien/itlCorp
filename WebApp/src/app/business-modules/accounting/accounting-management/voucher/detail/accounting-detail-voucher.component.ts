@@ -24,7 +24,7 @@ import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators'
     templateUrl: './accounting-detail-voucher.component.html',
 })
 export class AccountingManagementDetailVoucherComponent extends AccountingManagementCreateVoucherComponent implements OnInit, ICanComponentDeactivate {
-    @ViewChild('confirmSyncVoucher', { static: false }) confirmVoucherPopup: ConfirmPopupComponent;
+    @ViewChild('confirmSyncVoucher') confirmVoucherPopup: ConfirmPopupComponent;
 
     voucherId: string;
     accountingManagement: AccAccountingManagementModel = new AccAccountingManagementModel();

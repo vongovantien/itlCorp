@@ -30,12 +30,12 @@ import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/bu
 
 export class SeaConsolExportCreateHBLComponent extends AppForm {
 
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent, { static: false }) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
-    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
-    @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
 
     jobId: string;
     containers: Container[] = [];

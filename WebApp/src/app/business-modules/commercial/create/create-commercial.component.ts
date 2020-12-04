@@ -24,12 +24,12 @@ import { RoutingConstants } from '@constants';
 })
 export class CommercialCreateComponent extends AppForm implements OnInit {
 
-    @ViewChild(CommercialFormCreateComponent, { static: false }) formCreate: CommercialFormCreateComponent;
-    @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
-    @ViewChild(CommercialBranchSubListComponent, { static: false }) partnerList: CommercialBranchSubListComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild('taxCodeInfo', { static: false }) infoPopupTaxCode: InfoPopupComponent;
-    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild(CommercialFormCreateComponent) formCreate: CommercialFormCreateComponent;
+    @ViewChild(CommercialContractListComponent) contractList: CommercialContractListComponent;
+    @ViewChild(CommercialBranchSubListComponent) partnerList: CommercialBranchSubListComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild('taxCodeInfo') infoPopupTaxCode: InfoPopupComponent;
+    @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
 
     invalidTaxCode: string;
 

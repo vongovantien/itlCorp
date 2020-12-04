@@ -22,9 +22,9 @@ import { delayTime } from '@decorators';
 
 export class PlSheetPopupComponent extends PopupBase implements ICrystalReport, OnInit {
     @Input() jobId: string;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild('formPL', { static: false }) formPL: ElementRef;
-    @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild('formPL') formPL: ElementRef;
+    @ViewChild("popupReport") popupReport: ModalDirective;
 
     selectedCurrency: Currency;
     currencyList: Currency[];

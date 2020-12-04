@@ -18,7 +18,7 @@ import { RoutingConstants } from '@constants';
     templateUrl: './office.component.html'
 })
 export class OfficeComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     headers: CommonInterface.IHeaderTable[];
     offices: Office[] = [];
     criteria: any = {};

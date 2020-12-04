@@ -15,7 +15,7 @@ import cloneDeep from 'lodash/cloneDeep';
     templateUrl: './accounting-import-vat-invoice.component.html',
 })
 export class AccountingManagementImportVatInvoiceComponent extends AppList implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
 
     totalRows: number = 0;
     totalValidRows: number = 0;

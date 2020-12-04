@@ -17,10 +17,10 @@ import { ActivatedRoute } from '@angular/router';
     templateUrl: './cd-note-list.component.html',
 })
 export class ShareBussinessCdNoteListAirComponent extends AppList {
-    @ViewChild(ShareBussinessCdNoteAddAirPopupComponent, { static: false }) cdNoteAddPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(ShareBussinessCdNoteDetailAirPopupComponent, { static: false }) cdNoteDetailPopupComponent: ShareBussinessCdNoteDetailAirPopupComponent;
+    @ViewChild(ShareBussinessCdNoteAddAirPopupComponent) cdNoteAddPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeleteCdNotePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
+    @ViewChild(ShareBussinessCdNoteDetailAirPopupComponent) cdNoteDetailPopupComponent: ShareBussinessCdNoteDetailAirPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';

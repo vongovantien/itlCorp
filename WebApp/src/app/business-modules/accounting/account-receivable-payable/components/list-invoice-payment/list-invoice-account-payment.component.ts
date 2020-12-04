@@ -24,10 +24,10 @@ import { NgxSpinnerService } from 'ngx-spinner';
     templateUrl: './list-invoice-account-payment.component.html',
 })
 export class AccountPaymentListInvoicePaymentComponent extends AppList implements OnInit {
-    @ViewChild(AccountPaymentUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
-    @ViewChild('confirmInvoicePaymentPopup', { static: false }) confirmInvoicePaymentPopup: ConfirmPopupComponent;
+    @ViewChild(AccountPaymentUpdateExtendDayPopupComponent) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) infoNotAllowDelete: InfoPopupComponent;
+    @ViewChild('confirmInvoicePaymentPopup') confirmInvoicePaymentPopup: ConfirmPopupComponent;
     @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
 
 

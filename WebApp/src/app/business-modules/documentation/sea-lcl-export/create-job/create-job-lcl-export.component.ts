@@ -27,10 +27,10 @@ import _merge from 'lodash/merge';
 
 export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareSeaServiceFormCreateSeaExportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
-    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     containers: Container[] = [];
     isImport: boolean = false;

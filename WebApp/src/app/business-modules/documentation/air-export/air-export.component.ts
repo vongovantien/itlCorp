@@ -23,10 +23,10 @@ import { ShareBussinessInputDailyExportPopupComponent } from '@share-bussiness';
 })
 export class AirExportComponent extends AppList {
 
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    @ViewChild(ShareBussinessInputDailyExportPopupComponent, { static: false }) dailyExportPopup: ShareBussinessInputDailyExportPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(ShareBussinessInputDailyExportPopupComponent) dailyExportPopup: ShareBussinessInputDailyExportPopupComponent;
     headersHBL: CommonInterface.IHeaderTable[];
 
     shipments: CsTransaction[] = [];

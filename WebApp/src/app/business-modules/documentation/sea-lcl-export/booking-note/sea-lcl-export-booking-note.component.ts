@@ -14,7 +14,7 @@ import { RoutingConstants } from '@constants';
 })
 
 export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     criteria: any = {};
     bookingNotes: any = [];

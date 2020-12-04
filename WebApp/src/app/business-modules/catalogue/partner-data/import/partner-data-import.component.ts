@@ -16,7 +16,7 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './partner-data-import.component.html'
 })
 export class PartnerDataImportComponent extends AppPage implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];

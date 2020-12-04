@@ -7,8 +7,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Partner } from '@models';
 import { CatalogueRepo } from '@repositories';
-import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants } from '@constants';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
 
 @Component({
   selector: 'app-commercial-branch-sub-list',
@@ -16,9 +16,9 @@ import { RoutingConstants, SystemConstants } from '@constants';
 })
 
 export class CommercialBranchSubListComponent extends AppList {
-  @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
-  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-  @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+  @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
+  @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+  @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
 
   @Input() parentId: string;
   @Input() partnerType: string;

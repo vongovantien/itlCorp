@@ -10,7 +10,7 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
-        "target": "es5", // build for old browser and new => es2015
+        "target": "es2015", // build for old browser and new => es2015
         "typeRoots": ["node_modules/@types"],
         "downlevelIteration": true,
         "lib": ["es2017", "dom"],
@@ -34,7 +34,9 @@
             "@decorators": ["src/app/shared/decorators"],
             "@core": ["src/app/core"],
             "@app": ["src/app"],
-            "@animations": ["src/app/shared/animations"]
+            "@animations": ["src/app/shared/animations"],
+            "@share-modules": ["src/app/business-modules/share-modules"]
+
         }
     }
 }

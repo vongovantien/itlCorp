@@ -15,7 +15,7 @@ import { RoutingConstants } from '@constants';
 })
 
 export class AddRoleUserComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     companies: Company[] = [];
     listRoles: PermissionSample[] = [];

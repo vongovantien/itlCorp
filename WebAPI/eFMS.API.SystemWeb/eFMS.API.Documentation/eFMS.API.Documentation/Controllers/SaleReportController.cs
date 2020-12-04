@@ -1,9 +1,12 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.ReportResults.Sales;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -21,16 +24,19 @@ namespace eFMS.API.Documentation.Controllers
     {
         readonly ISaleReportService saleReportService;
         readonly IStringLocalizer stringLocalizer;
+        readonly IReportLogService reportLogService;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="service"></param>
         /// <param name="localizer"></param>
-        public SaleReportController(ISaleReportService service, IStringLocalizer<LanguageSub> localizer)
+        /// <param name="rptLogService"></param>
+        public SaleReportController(ISaleReportService service, IStringLocalizer<LanguageSub> localizer, IReportLogService rptLogService)
         {
             saleReportService = service;
             stringLocalizer = localizer;
+            reportLogService = rptLogService;
         }
 
         [HttpPost]
@@ -38,6 +44,17 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult MonthlySalereport(SaleReportCriteria criteria)
         {
             var result = saleReportService.PreviewGetMonthlySaleReport(criteria);
+            
+            #region -- Ghi log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = DocumentConstants.Monthly_Sale_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = DocumentConstants.Crystal_Preview
+            };
+            reportLogService.AddNew(reportLogModel);
+            #endregion -- Ghi log Report --
+
             return Ok(result);
         }
 
@@ -51,6 +68,17 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult QuaterSaleReport(SaleReportCriteria criteria)
         {
             var result = saleReportService.PreviewGetQuaterSaleReport(criteria);
+            
+            #region -- Ghi log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = DocumentConstants.Sale_Report_By_Quater,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = DocumentConstants.Crystal_Preview
+            };
+            reportLogService.AddNew(reportLogModel);
+            #endregion -- Ghi log Report --
+
             return Ok(result);
         }
 
@@ -64,6 +92,17 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult DepartSaleReport(SaleReportCriteria criteria)
         {
             var result = saleReportService.PreviewGetDepartSaleReport(criteria);
+            
+            #region -- Ghi log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = DocumentConstants.Sale_Report_By_Department,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = DocumentConstants.Crystal_Preview
+            };
+            reportLogService.AddNew(reportLogModel);
+            #endregion -- Ghi log Report --
+
             return Ok(result);
         }
 
@@ -72,6 +111,17 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult SummarySaleReport(SaleReportCriteria criteria)
         {
             var result = saleReportService.PreviewSummarySaleReport(criteria);
+            
+            #region -- Ghi log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = DocumentConstants.Summary_Sale_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = DocumentConstants.Crystal_Preview
+            };
+            reportLogService.AddNew(reportLogModel);
+            #endregion -- Ghi log Report --
+
             return Ok(result);
         }
 
@@ -80,6 +130,17 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CombinationSaleReport(SaleReportCriteria criteria)
         {
             var result = saleReportService.PreviewCombinationSaleReport(criteria);
+            
+            #region -- Ghi log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = DocumentConstants.Combination_Statistic_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = DocumentConstants.Crystal_Preview
+            };
+            reportLogService.AddNew(reportLogModel);
+            #endregion -- Ghi log Report --
+
             return Ok(result);
         }
     }

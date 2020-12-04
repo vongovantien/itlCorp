@@ -1,5 +1,7 @@
 import { FormGroup, AbstractControl, FormControl, Validators, ValidationErrors, } from '@angular/forms';
+import { Injectable } from "@angular/core";
 
+@Injectable()
 export class FormValidators extends Validators {
 
     public static comparePort(controls: AbstractControl | FormControl | FormGroup): ValidationErrors | any {

@@ -16,8 +16,8 @@ import { RoutingConstants } from '@constants';
 })
 export class TariffComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permission403Popup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) permission403Popup: Permission403PopupComponent;
 
     tariffs: Tariff[] = [];
     headers: CommonInterface.IHeaderTable[] = [];

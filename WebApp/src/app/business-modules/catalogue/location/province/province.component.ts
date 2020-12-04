@@ -19,8 +19,8 @@ import { catchError, finalize } from 'rxjs/operators';
 
 export class AppProvinceComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(AddProvincePopupComponent, { static: false }) provincePopup: AddProvincePopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(AddProvincePopupComponent) provincePopup: AddProvincePopupComponent;
 
     provinces: any[] = [];
     selectedProvince: any;

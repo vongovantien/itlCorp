@@ -30,12 +30,12 @@ import groupBy from 'lodash/groupBy';
 
 export class SeaLCLExportCreateHBLComponent extends AppForm {
 
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent, { static: false }) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
-    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
-    @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
+    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent) goodSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
 
     jobId: string;
 

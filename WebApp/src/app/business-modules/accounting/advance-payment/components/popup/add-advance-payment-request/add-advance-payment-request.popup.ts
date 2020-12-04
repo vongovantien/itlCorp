@@ -16,9 +16,9 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
-    @ViewChild('exitPopup', { static: false }) exitPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDuplicatePopup', { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild('existedPopup', { static: false }) existedShipmentPopup: ConfirmPopupComponent;
+    @ViewChild('exitPopup') exitPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDuplicatePopup') confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild('existedPopup') existedShipmentPopup: ConfirmPopupComponent;
 
     action: string = 'create';
 
@@ -281,7 +281,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     filterCDByShipment(shipment: OperationInteface.IShipment): CustomDeclaration[] {
-        return this.initCD.filter((item: CustomDeclaration) => {
+        return (this.initCD || []).filter((item: CustomDeclaration) => {
             return (item.jobNo === shipment.jobId);
         });
     }

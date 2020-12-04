@@ -11,6 +11,6 @@
   ],
     "angularCompilerOptions": {
       "allowEmptyCodegenFiles": true,
-      "enableIvy": false    // do not enable Ivymode, it may cause to fail to build in product mode because Ivymode now just beta version
+      "enableIvy": true    // do not enable Ivymode, it may cause to fail to build in product mode because Ivymode now just beta version
     }
 }

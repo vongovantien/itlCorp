@@ -24,7 +24,7 @@ declare var $: any;
     styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfilePageComponent extends AppForm {
-    @ViewChild('image', { static: false }) el: ElementRef;
+    @ViewChild('image') el: ElementRef;
 
     currentUserId: string;
 

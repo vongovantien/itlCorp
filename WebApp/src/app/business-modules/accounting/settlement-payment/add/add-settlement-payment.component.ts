@@ -20,8 +20,8 @@ import { catchError, finalize } from 'rxjs/operators';
 
 export class SettlementPaymentAddNewComponent extends AppPage {
 
-    @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
-    @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
+    @ViewChild(SettlementListChargeComponent) requestSurchargeListComponent: SettlementListChargeComponent;
+    @ViewChild(SettlementFormCreateComponent) formCreateSurcharge: SettlementFormCreateComponent;
 
     constructor(
         private _accountingRepo: AccountingRepo,

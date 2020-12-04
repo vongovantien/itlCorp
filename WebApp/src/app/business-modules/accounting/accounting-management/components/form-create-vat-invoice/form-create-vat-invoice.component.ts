@@ -55,7 +55,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
-    paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD.map(i => i.id);
+    paymentMethods: string[] = AccountingConstants.PAYMENT_METHOD;
 
     displayFieldsChartAccount: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountCode', label: 'Account Code' },

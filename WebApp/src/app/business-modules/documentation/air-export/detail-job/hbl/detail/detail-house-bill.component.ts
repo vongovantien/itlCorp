@@ -24,8 +24,8 @@ import isUUID from 'validator/lib/isUUID';
     templateUrl: './detail-house-bill.component.html',
 })
 export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent implements OnInit, ICrystalReport {
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-    @ViewChild(InputBookingNotePopupComponent, { static: false }) inputBookingNotePopupComponent: InputBookingNotePopupComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(InputBookingNotePopupComponent) inputBookingNotePopupComponent: InputBookingNotePopupComponent;
 
     hblId: string;
     hblDetail: CsTransactionDetail;

@@ -2,14 +2,13 @@ import { AppPage } from './app.base';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
-import { SelectComponent } from 'ng2-select';
-import { ViewChildren, QueryList, HostListener, ElementRef } from '@angular/core';
+import { ViewChildren, QueryList, HostListener, ElementRef, Directive } from '@angular/core';
 import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 import { Observable, fromEvent, merge, combineLatest } from 'rxjs';
 import { distinctUntilChanged, share, filter } from 'rxjs/operators';
 
+@Directive()
 export abstract class AppForm extends AppPage {
-    @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
     @ViewChildren(ComboGridVirtualScrollComponent) comboGrids: QueryList<ComboGridVirtualScrollComponent>;
 
     requestSearch: any = null;
@@ -119,15 +118,6 @@ export abstract class AppForm extends AppPage {
 
     }
 
-    closeOtherSelects(element: { optionsOpened: any; }) {
-        if (element.optionsOpened) {
-            const elementsToclose = this.selectElements.filter((el: any) => el !== element && el.optionsOpened);
-            elementsToclose.forEach((e: SelectComponent) => {
-                e.clickedOutside();
-            });
-        }
-    }
-
     resetKeywordSearchCombogrid() {
         if (this.comboGrids) {
             const arrayCombo = this.comboGrids.toArray();
@@ -139,25 +129,6 @@ export abstract class AppForm extends AppPage {
 
     trimInputValue(control: FormControl | AbstractControl, value: string) {
         control.setValue(value != null ? value.trim() : value);
-    }
-
-    openNg2Select(ng2Select: SelectComponent) {
-        setTimeout(() => {
-            const ng2 = ng2Select.element.nativeElement.querySelector('.ui-select-search');
-            ng2.dispatchEvent(new Event('click'));
-        });
-    }
-
-    removeKeyworkNg2Select() {
-        const ng2 = this.selectElements.toArray();
-        ng2.forEach(
-            c => {
-                const a: HTMLInputElement = c.element.nativeElement.querySelector('.ui-select-search');
-                if (!!a) {
-                    a.value = '';
-                }
-            }
-        );
     }
 
     createShortcut = (shortcuts: string[]): Observable<KeyboardEvent[]> => {

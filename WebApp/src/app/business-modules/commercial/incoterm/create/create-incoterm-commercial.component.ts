@@ -22,10 +22,10 @@ import { RoutingConstants } from '@constants';
 })
 export class CommercialCreateIncotermComponent extends AppForm implements OnInit {
 
-    @ViewChild(CommercialFormIncotermComponent, { static: false }) formCreateComponent: CommercialFormIncotermComponent;
-    @ViewChild('selling', { static: false }) listChargeSelling: CommercialListChargeIncotermComponent;
-    @ViewChild('buying', { static: false }) listChargeBuying: CommercialListChargeIncotermComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(CommercialFormIncotermComponent) formCreateComponent: CommercialFormIncotermComponent;
+    @ViewChild('selling') listChargeSelling: CommercialListChargeIncotermComponent;
+    @ViewChild('buying') listChargeBuying: CommercialListChargeIncotermComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     activeTab: string = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
 

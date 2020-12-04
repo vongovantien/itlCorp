@@ -8,6 +8,8 @@ import { DocumentationRepo } from '@repositories';
 import { CsTransactionDetail } from '@models';
 import { ReportPreviewComponent } from '@common';
 import { ChargeConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
 
 import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
@@ -20,8 +22,9 @@ import isUUID from 'validator/lib/isUUID';
     templateUrl: './detail-hbl-consol-export.component.html'
 })
 
-export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLComponent implements OnInit, AfterViewInit {
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
+
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     hblDetail: CsTransactionDetail;
@@ -119,7 +122,6 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
         modelUpdate.jobId = this.jobId;
         modelUpdate.userCreated = this.hblDetail.userCreated;
 
-
         this.updateHbl(modelUpdate);
     }
 
@@ -152,10 +154,7 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -173,15 +172,18 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.showReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 
 }

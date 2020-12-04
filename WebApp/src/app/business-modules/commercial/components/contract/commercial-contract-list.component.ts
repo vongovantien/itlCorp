@@ -6,18 +6,18 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from '@common';
-import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { SortService } from '@services';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
 
 @Component({
     selector: 'commercial-contract-list',
     templateUrl: './commercial-contract-list.component.html',
 })
 export class CommercialContractListComponent extends AppList implements OnInit {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
     @Output() onActiveContract: EventEmitter<any> = new EventEmitter<any>();

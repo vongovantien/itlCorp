@@ -14,8 +14,8 @@ import { ToastrService } from "ngx-toastr";
 })
 
 export class AdvancePaymentsPopupComponent extends PopupBase {
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     dataSearchList: any = null;
     page: number = 1;

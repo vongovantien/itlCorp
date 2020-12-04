@@ -21,8 +21,8 @@ type TAB = 'INVOICE' | 'OBH';
 })
 export class AccountReceivablePayableComponent extends AppList implements OnInit {
 
-    @ViewChild(AccountPaymentListInvoicePaymentComponent, { static: false }) invoiceListComponent: AccountPaymentListInvoicePaymentComponent;
-    @ViewChild(AccountPaymentListOBHPaymentComponent, { static: false }) obhSOAListComponent: AccountPaymentListOBHPaymentComponent;
+    @ViewChild(AccountPaymentListInvoicePaymentComponent) invoiceListComponent: AccountPaymentListInvoicePaymentComponent;
+    @ViewChild(AccountPaymentListOBHPaymentComponent) obhSOAListComponent: AccountPaymentListOBHPaymentComponent;
 
     selectedTab: TAB | string = "INVOICE";
     selectedTabAR: string = 'payment';

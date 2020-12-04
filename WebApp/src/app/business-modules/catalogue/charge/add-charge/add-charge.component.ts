@@ -22,9 +22,9 @@ import { RoutingConstants } from '@constants';
 })
 export class AddChargeComponent extends AppPage {
 
-    @ViewChild(FormAddChargeComponent, { static: false }) formAddCharge: FormAddChargeComponent;
-    @ViewChild(VoucherListComponent, { static: false }) voucherList: VoucherListComponent;
-    @ViewChild(GenerateSellingChargePopupComponent, { static: false }) popupGenerateSelling: GenerateSellingChargePopupComponent;
+    @ViewChild(FormAddChargeComponent) formAddCharge: FormAddChargeComponent;
+    @ViewChild(VoucherListComponent) voucherList: VoucherListComponent;
+    @ViewChild(GenerateSellingChargePopupComponent) popupGenerateSelling: GenerateSellingChargePopupComponent;
 
     constructor(
         protected router: Router,

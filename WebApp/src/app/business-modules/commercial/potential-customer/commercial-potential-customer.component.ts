@@ -21,10 +21,10 @@ import { of } from 'rxjs';
     templateUrl: './commercial-potential-customer.component.html',
 })
 export class CommercialPotentialCustomerComponent extends AppList implements OnInit, IPermissionBase {
-    @ViewChild(CommercialFormSearchPotentialCustomerComponent, { static: false }) formSearch: CommercialFormSearchPotentialCustomerComponent;
-    @ViewChild(CommercialPotentialCustomerPopupComponent, { static: false }) potentialCustomerPopup: CommercialPotentialCustomerPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(CommercialFormSearchPotentialCustomerComponent) formSearch: CommercialFormSearchPotentialCustomerComponent;
+    @ViewChild(CommercialPotentialCustomerPopupComponent) potentialCustomerPopup: CommercialPotentialCustomerPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     selectedPotentialId: string;
 

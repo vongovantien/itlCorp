@@ -16,7 +16,7 @@ import { SystemConstants } from 'src/constants/system.const';
 })
 
 export class ChartOfAccountsImportComponent extends AppPage implements OnInit {
-    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];

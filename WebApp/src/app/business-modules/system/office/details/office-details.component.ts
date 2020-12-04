@@ -22,7 +22,7 @@ import { RoutingConstants } from '@constants';
     templateUrl: './office-details.component.html'
 })
 export class OfficeDetailsComponent extends AppList {
-    @ViewChild(OfficeFormAddComponent, { static: false }) formAdd: OfficeFormAddComponent;
+    @ViewChild(OfficeFormAddComponent) formAdd: OfficeFormAddComponent;
     previousUrl: string;
     formData: IFormAddOffice = {
         id: '',

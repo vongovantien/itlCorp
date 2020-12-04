@@ -16,9 +16,9 @@ import { RoutingConstants } from '@constants';
     styleUrls: ['./../../../system/permission/add/add-permission.component.scss']
 })
 export class ShareSystemDetailPermissionComponent extends AppPage {
-    @ViewChild(PermissionFormCreateComponent, { static: false }) formCreateComponent: PermissionFormCreateComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild('stickyMenu', { static: false }) menuElement: ElementRef;
+    @ViewChild(PermissionFormCreateComponent) formCreateComponent: PermissionFormCreateComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+    @ViewChild('stickyMenu') menuElement: ElementRef;
 
     permissionId: string = '';
 
