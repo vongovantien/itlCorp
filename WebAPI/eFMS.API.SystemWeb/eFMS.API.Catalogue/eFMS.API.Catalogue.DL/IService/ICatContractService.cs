@@ -37,5 +37,7 @@ namespace eFMS.API.Catalogue.DL.IService
         bool SendMailRejectComment(string partnerId, string contractId, string comment,string partnerType);
         bool SendMailARConfirmed(string partnerId, string contractId, string partnerType);
 
+        IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria);
+
     }
 }
