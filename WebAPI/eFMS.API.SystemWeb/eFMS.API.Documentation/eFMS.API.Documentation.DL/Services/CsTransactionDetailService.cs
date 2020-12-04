@@ -105,6 +105,36 @@ namespace eFMS.API.Documentation.DL.Services
             model.CompanyId = _currentUser.CompanyID;
             model.UserCreated = _currentUser.UserID;
             model.UserModified = model.UserCreated = _currentUser.UserID;
+            var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SaleManId).ToList();
+            string SalesGroupId = string.Empty;
+            string SalesDepartmentId = string.Empty;
+            string SalesOfficeId = string.Empty;
+            string SalesCompanyId = string.Empty;
+            if (dataUserLevels.Select(t=>t.GroupId).Count() >= 1)
+            {
+                var dataGroup = dataUserLevels.Where(x=>x.OfficeId == currentUser.OfficeID).ToList();
+                if (dataGroup.Any()) {
+                    SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                }
+                else
+                {
+                    SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                }
+         
+            }
+
+            model.SalesGroupId = !string.IsNullOrEmpty(SalesGroupId) ? SalesGroupId : null ;
+            model.SalesDepartmentId =  !string.IsNullOrEmpty( SalesDepartmentId) ? SalesDepartmentId : null;
+            model.SalesOfficeId = !string.IsNullOrEmpty(SalesOfficeId) ? SalesOfficeId : null;
+            model.SalesCompanyId = !string.IsNullOrEmpty(SalesCompanyId) ?  SalesCompanyId : null;
+
+
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
 
@@ -210,6 +240,36 @@ namespace eFMS.API.Documentation.DL.Services
                     model.CompanyId = hb.CompanyId;
                     model.UserCreated = hb.UserCreated;
                     model.UserModified = currentUser.UserID;
+                    if(model.SaleManId != hb.SaleManId)
+                    {
+                        var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SaleManId).ToList();
+                        if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+                        {
+                            var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                            if (dataGroup.Any())
+                            {
+                                model.SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                                model.SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                                model.SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                                model.SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                            }
+                            else
+                            {
+                                model.SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                                model.SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                                model.SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                                model.SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        model.SalesGroupId = hb.SalesGroupId;
+                        model.SalesDepartmentId = hb.SalesDepartmentId;
+                        model.SalesOfficeId = hb.SalesOfficeId;
+                        model.SalesCompanyId = hb.SalesCompanyId;
+                    }
+
                     ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
                     int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
