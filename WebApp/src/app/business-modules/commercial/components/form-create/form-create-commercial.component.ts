@@ -60,7 +60,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     partnerId: string = '';
     parentName: string = '';
     //
-    @ViewChild('focusInput', { static: false }) internalReferenceRef: ElementRef;
+    @ViewChild('focusInput') internalReferenceRef: ElementRef;
 
 
     constructor(

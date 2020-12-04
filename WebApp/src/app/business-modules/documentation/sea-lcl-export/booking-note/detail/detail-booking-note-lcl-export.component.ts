@@ -20,8 +20,8 @@ import _merge from 'lodash/merge';
 })
 
 export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingNoteCreateComponent implements OnInit {
-    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     bookingNoteId: string;
     ACTION: CommonType.ACTION_FORM = 'UPDATE';

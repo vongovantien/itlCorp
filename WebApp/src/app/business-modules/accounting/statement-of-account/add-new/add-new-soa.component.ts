@@ -20,8 +20,8 @@ import { RoutingConstants } from '@constants';
 })
 export class StatementOfAccountAddnewComponent extends AppList {
 
-    @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;
-    @ViewChild(StatementOfAccountFormCreateComponent, { static: false }) formCreate: StatementOfAccountFormCreateComponent;
+    @ViewChild(StatementOfAccountAddChargeComponent) addChargePopup: StatementOfAccountAddChargeComponent;
+    @ViewChild(StatementOfAccountFormCreateComponent) formCreate: StatementOfAccountFormCreateComponent;
 
 
     dataSearch: SOASearchCharge = new SOASearchCharge();

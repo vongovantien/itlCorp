@@ -24,10 +24,10 @@ import { catchError } from 'rxjs/operators';
 })
 export class AccountingManagementCreateVoucherComponent extends AppForm implements OnInit {
 
-    @ViewChild(AccountingManagementFormCreateVoucherComponent, { static: false }) formCreateComponent: AccountingManagementFormCreateVoucherComponent;
-    @ViewChild(AccountingManagementListChargeComponent, { static: false }) listChargeComponent: AccountingManagementListChargeComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(AccountingManagementFormCreateVoucherComponent) formCreateComponent: AccountingManagementFormCreateVoucherComponent;
+    @ViewChild(AccountingManagementListChargeComponent) listChargeComponent: AccountingManagementListChargeComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmCancelPopup: ConfirmPopupComponent;
 
     invalidUpdateExchangeRate: string = 'You can only adjust the exchange rate increase or decrease by 1% compared to the general exchange rate!';
 

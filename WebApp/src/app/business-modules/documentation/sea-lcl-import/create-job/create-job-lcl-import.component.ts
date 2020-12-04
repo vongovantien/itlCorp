@@ -23,10 +23,10 @@ import _merge from 'lodash/merge';
 
 export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
 
-    @ViewChild(ShareSeaServiceFormCreateSeaImportComponent, { static: false }) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
-    @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent, { static: false }) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: false }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
+    @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
+    @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ShareBusinessImportJobDetailPopupComponent) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;
     selectedJob: any = {}; // TODO model.

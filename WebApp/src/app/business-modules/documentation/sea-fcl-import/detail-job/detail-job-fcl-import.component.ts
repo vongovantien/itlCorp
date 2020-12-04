@@ -29,14 +29,14 @@ import { delayTime } from '@decorators';
 })
 export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
-    @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild("confirmLockShipment", { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
-    @ViewChild("confirmCancelPopup", { static: false }) confirmCancelPopup: ConfirmPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    @ViewChild("deleteConfirmTemplate") confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild("confirmLockShipment") confirmLockShipmentPopup: ConfirmPopupComponent;
+    @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';

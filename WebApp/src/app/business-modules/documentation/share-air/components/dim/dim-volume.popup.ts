@@ -21,7 +21,7 @@ import { getDimensionVolumesState, getTransactionLocked, IShareBussinessState } 
 })
 
 export class ShareAirServiceDIMVolumePopupComponent extends PopupBase implements OnInit {
-    @ViewChild('confirmDeleteDim', { static: false }) confirmDeleteDIMpopup: ConfirmPopupComponent;
+    @ViewChild('confirmDeleteDim') confirmDeleteDIMpopup: ConfirmPopupComponent;
 
 
     @Output() onUpdate: EventEmitter<DIM[]> = new EventEmitter<DIM[]>();

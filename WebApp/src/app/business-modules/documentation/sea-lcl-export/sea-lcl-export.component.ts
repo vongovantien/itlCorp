@@ -17,9 +17,9 @@ import { JobConstants, RoutingConstants } from '@constants';
     templateUrl: './sea-lcl-export.component.html',
 })
 export class SeaLCLExportComponent extends AppList {
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
 

@@ -22,7 +22,7 @@ import { checkShareSystemUserLevel, IShareSystemState, SystemLoadUserLevelAction
     templateUrl: './detail-group.component.html',
 })
 export class GroupDetailComponent extends AppForm implements OnInit {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     formGroup: FormGroup;
     types: CommonInterface.ICommonTitleValue[] = [

@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class UnlockAccountingComponent extends AppForm implements OnInit {
-    @ViewChild(UnlockHistoryPopupComponent, { static: false }) confirmPopup: UnlockHistoryPopupComponent;
+    @ViewChild(UnlockHistoryPopupComponent) confirmPopup: UnlockHistoryPopupComponent;
 
     types: CommonInterface.ICommonTitleValue[] = [
         { value: 1, title: 'Advance Payment' },

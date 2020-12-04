@@ -15,7 +15,7 @@ import { RoutingConstants } from '@constants';
     templateUrl: './permission.component.html',
 })
 export class PermissionComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent, { static: false }) configmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent) configmDeletePopup: ConfirmPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     permissions: Permission[] = new Array<Permission>();

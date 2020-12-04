@@ -92,7 +92,6 @@ export * from './tool-setting/unlock-request';
 export * from './commercial/charge-incoterm';
 export { Incoterm, IncotermUpdateModel, IncotermModel } from './commercial/incoterm';
 export { CatPotentialCustomer, CatPotentialModel } from './commercial/potential-customer';
-export * from './partner-api';
 
 
 

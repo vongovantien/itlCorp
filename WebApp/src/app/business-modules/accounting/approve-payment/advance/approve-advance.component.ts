@@ -29,10 +29,10 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
 
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
-    @ViewChild('confirmApprovePopup', { static: false }) confirmApprovePopup: ConfirmPopupComponent;
-    @ViewChild(HistoryDeniedPopupComponent, { static: false }) historyDeniedPopup: HistoryDeniedPopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild('confirmDenyPopup') confirmDenyPopup: ConfirmPopupComponent;
+    @ViewChild('confirmApprovePopup') confirmApprovePopup: ConfirmPopupComponent;
+    @ViewChild(HistoryDeniedPopupComponent) historyDeniedPopup: HistoryDeniedPopupComponent;
 
     idAdvPayment: string = '';
     advancePayment: AdvancePayment;

@@ -15,11 +15,11 @@ import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modu
     templateUrl: './ops-cd-note-detail.popup.html'
 })
 export class OpsCdNoteDetailPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-    @ViewChild(OpsCdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent; @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild(ShareBussinessPaymentMethodPopupComponent, { static: false }) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmCdNotePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(OpsCdNoteAddPopupComponent) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent; @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
 
     jobId: string = null;
     cdNote: string = null;
@@ -233,7 +233,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
             this.paymentMethodPopupComponent.show();
         } else {
-            this.paymentMethodSelected = '';
+            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
             this.confirmSendToAcc();
         }
     }

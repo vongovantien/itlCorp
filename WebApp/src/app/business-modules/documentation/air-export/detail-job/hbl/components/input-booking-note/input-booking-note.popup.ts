@@ -16,8 +16,8 @@ import { environment } from "src/environments/environment";
 })
 
 export class InputBookingNotePopupComponent extends PopupBase {
-    @ViewChild('formPreviewBookingNote', { static: false }) formPreviewBookingNote: ElementRef;
-    @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
+    @ViewChild('formPreviewBookingNote') formPreviewBookingNote: ElementRef;
+    @ViewChild("popupReport") popupReport: ModalDirective;
 
     formInputBN: FormGroup;
 

@@ -25,8 +25,8 @@ import { ShareContainerImportComponent } from '../container-import/container-imp
 })
 export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
 
-    @ViewChild(forwardRef(() => ShareContainerImportComponent), { static: false }) private containerImportPopup: ShareContainerImportComponent;
-    @ViewChild('confirmDeleteContainerPopup', { static: false }) confirmDeleteContainerPopup: ConfirmPopupComponent;
+    @ViewChild(forwardRef(() => ShareContainerImportComponent)) private containerImportPopup: ShareContainerImportComponent;
+    @ViewChild('confirmDeleteContainerPopup') confirmDeleteContainerPopup: ConfirmPopupComponent;
 
     @Input() type: string = 'import';
     @Output() onChange: EventEmitter<Container[]> = new EventEmitter<Container[]>();

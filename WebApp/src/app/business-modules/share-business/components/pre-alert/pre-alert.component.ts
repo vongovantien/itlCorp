@@ -21,9 +21,9 @@ import { RoutingConstants, SystemConstants } from '@constants';
     templateUrl: './pre-alert.component.html'
 })
 export class ShareBusinessReAlertComponent extends AppList {
-    @ViewChild(ShareBusinessAddAttachmentPopupComponent, { static: false }) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-    @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup: ExportCrystalComponent;
+    @ViewChild(ShareBusinessAddAttachmentPopupComponent) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(ExportCrystalComponent) exportReportPopup: ExportCrystalComponent;
     files: IShipmentAttachFile[] = [];
     jobId: string;
     hblId: string;

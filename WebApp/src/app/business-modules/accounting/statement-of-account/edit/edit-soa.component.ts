@@ -18,7 +18,7 @@ import { listAnimation } from '@animations';
     animations: [listAnimation]
 })
 export class StatementOfAccountEditComponent extends AppList {
-    @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;
+    @ViewChild(StatementOfAccountAddChargeComponent) addChargePopup: StatementOfAccountAddChargeComponent;
 
     currencyList: any[];
     selectedCurrency: any = null;

@@ -18,7 +18,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 export class CustomerAgentImportComponent extends AppPage implements OnInit {
 
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];

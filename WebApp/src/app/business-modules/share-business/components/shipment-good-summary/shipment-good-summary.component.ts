@@ -21,8 +21,8 @@ import { CsTransaction } from '@models';
 })
 export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
-    @ViewChild(ShareBussinessContainerListPopupComponent, { static: false }) containerPopup: ShareBussinessContainerListPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmRefresh: ConfirmPopupComponent;
+    @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmRefresh: ConfirmPopupComponent;
     @Input() type: string = 'import';
 
     mblid: string = null;

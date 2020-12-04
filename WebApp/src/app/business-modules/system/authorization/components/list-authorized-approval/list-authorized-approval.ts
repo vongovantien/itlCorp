@@ -15,9 +15,9 @@ import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 })
 
 export class AuthorizedApprovalListComponent extends AppList {
-    @ViewChild(AuthorizedApprovalPopupComponent, { static: false }) formPopup: AuthorizedApprovalPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(AuthorizedApprovalPopupComponent) formPopup: AuthorizedApprovalPopupComponent;
+    @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     headersAuthorized: CommonInterface.IHeaderTable[];
     authorizedApprovals: AuthorizedApproval[] = [];

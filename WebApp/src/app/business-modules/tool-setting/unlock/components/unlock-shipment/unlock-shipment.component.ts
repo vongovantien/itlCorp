@@ -16,7 +16,7 @@ import { UnlockHistoryPopupComponent } from '../unlock-history/unlock-history.po
 
 export class UnlockShipmentComponent extends AppForm implements OnInit {
 
-    @ViewChild(UnlockHistoryPopupComponent, { static: false }) confirmPopup: UnlockHistoryPopupComponent;
+    @ViewChild(UnlockHistoryPopupComponent) confirmPopup: UnlockHistoryPopupComponent;
 
     options: CommonInterface.INg2Select[] = [
         { id: 1, text: 'Job ID' },

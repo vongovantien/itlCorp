@@ -19,13 +19,13 @@ import { Store } from '@ngrx/store';
 
 export class FormAddPartnerComponent extends AppForm {
 
-    @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
-    @ViewChild(PartnerOtherChargePopupComponent, { static: false }) otherChargePopup: PartnerOtherChargePopupComponent;
+    @ViewChild(SalemanPopupComponent) poupSaleman: SalemanPopupComponent;
+    @ViewChild(PartnerOtherChargePopupComponent) otherChargePopup: PartnerOtherChargePopupComponent;
 
     @Output() requireSaleman = new EventEmitter<boolean>();
     @Input() isUpdate: boolean = false;
     //
-    @ViewChild('focusInput', { static: false }) internalReferenceRef: ElementRef;
+    @ViewChild('focusInput') internalReferenceRef: ElementRef;
 
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;

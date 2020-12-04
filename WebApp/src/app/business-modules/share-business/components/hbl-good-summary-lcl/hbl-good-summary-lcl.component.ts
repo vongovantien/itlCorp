@@ -22,7 +22,7 @@ import * as fromStore from '../../store';
 
 export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShipmentGoodSummaryComponent implements OnInit {
 
-    @ViewChild(ShareBussinessGoodsListPopupComponent, { static: false }) goodsImportPopup: ShareBussinessGoodsListPopupComponent;
+    @ViewChild(ShareBussinessGoodsListPopupComponent) goodsImportPopup: ShareBussinessGoodsListPopupComponent;
     @Output() onSelectQty: EventEmitter<any> = new EventEmitter<any>();
 
     packageQty: number = null;

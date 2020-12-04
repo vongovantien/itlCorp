@@ -8,7 +8,7 @@ import { ReportPreviewComponent } from '@common';
 })
 
 export class SettlementShipmentItemComponent extends AppList {
-    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     @Output() onCheck: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();

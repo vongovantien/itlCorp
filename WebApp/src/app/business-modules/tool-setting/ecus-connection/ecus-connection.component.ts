@@ -19,9 +19,9 @@ import { finalize } from 'rxjs/operators';
 })
 export class EcusConnectionComponent extends AppList implements OnInit {
 
-    @ViewChild(EcusConnectionFormPopupComponent, { static: false }) formEcus: EcusConnectionFormPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(EcusConnectionFormPopupComponent) formEcus: EcusConnectionFormPopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     EcusConnections: EcusConnection[] = [];
 

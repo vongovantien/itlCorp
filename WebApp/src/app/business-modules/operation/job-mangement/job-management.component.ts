@@ -22,8 +22,8 @@ import { JobConstants } from '@constants';
 })
 export class JobManagementComponent extends AppList implements OnInit {
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent, { static: false }) canNotAllowActionPopup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;

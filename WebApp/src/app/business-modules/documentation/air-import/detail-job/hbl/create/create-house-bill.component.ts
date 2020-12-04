@@ -27,13 +27,13 @@ import { catchError, finalize, mergeMap, takeUntil } from 'rxjs/operators';
     templateUrl: './create-house-bill.component.html',
 })
 export class AirImportCreateHBLComponent extends AppForm implements OnInit {
-    @ViewChild(AirImportHBLFormCreateComponent, { static: false }) formCreateHBLComponent: AirImportHBLFormCreateComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(AirImportHBLFormCreateComponent) formCreateHBLComponent: AirImportHBLFormCreateComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessArrivalNoteAirComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteAirComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
-    @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
-    @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
+    @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild('confirmSaveExistedHbl') confirmExistedHbl: ConfirmPopupComponent;
 
     jobId: string;
     selectedHbl: any = {};

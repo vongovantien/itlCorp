@@ -15,7 +15,7 @@ import { ShareBusinessFormSearchImportJobComponent } from './components/form-sea
 
 export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
 
-    @ViewChild(ShareBusinessFormSearchImportJobComponent, { static: false }) formSearchImportJobComponent: ShareBusinessFormSearchImportJobComponent;
+    @ViewChild(ShareBusinessFormSearchImportJobComponent) formSearchImportJobComponent: ShareBusinessFormSearchImportJobComponent;
     @Output() onImport: EventEmitter<any> = new EventEmitter<any>();
 
     headers: CommonInterface.IHeaderTable[];

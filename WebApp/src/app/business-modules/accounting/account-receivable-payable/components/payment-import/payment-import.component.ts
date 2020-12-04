@@ -15,7 +15,7 @@ import { finalize, catchError } from 'rxjs/operators';
 })
 export class PaymentImportComponent extends AppList implements OnInit {
 
-    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
 
     data: IInvoicePaymentImport[];
     pagedItems: IInvoicePaymentImport[] = [];

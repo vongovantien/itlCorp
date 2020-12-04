@@ -12,7 +12,7 @@ import { SortService } from '@services';
     templateUrl: './detail-cd-note.component.html'
 })
 export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit {
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
     cdnoteDetail: any = null;
     jobId: string = '';
     type: string = 'AIR';

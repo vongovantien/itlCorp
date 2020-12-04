@@ -25,7 +25,7 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
     pager: PagerSetting = PAGINGSETTING;
     isDesc = true;
     sortKey: string;
-    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
+    @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,

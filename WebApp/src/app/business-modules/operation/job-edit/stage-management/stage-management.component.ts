@@ -19,10 +19,10 @@ import { ToastrService } from "ngx-toastr";
 export class OpsModuleStageManagementComponent extends AppList {
 
     data: any = null;
-    @ViewChild(OpsModuleStageManagementAddStagePopupComponent, { static: false }) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
-    @ViewChild(OpsModuleStageManagementDetailComponent, { static: false }) popupDetail: OpsModuleStageManagementDetailComponent;
-    @ViewChild(AssignStagePopupComponent, { static: false }) assignStagePopup: AssignStagePopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(OpsModuleStageManagementAddStagePopupComponent) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
+    @ViewChild(OpsModuleStageManagementDetailComponent) popupDetail: OpsModuleStageManagementDetailComponent;
+    @ViewChild(AssignStagePopupComponent) assignStagePopup: AssignStagePopupComponent;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
 
     stages: Stage[] = [];
     stageAvailable: any[] = [];
