@@ -1623,7 +1623,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         ServiceDate = master.ServiceDate,
                                         PicId = master.PersonIncharge,
                                         SalesmanId = house.SaleManId,
-                                        Service = master.TransactionType
+                                        Service = master.TransactionType,
+                                        ChargeWeight = house.ChargeWeight
                                     };
                 return queryShipment;
             }
@@ -1647,7 +1648,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         ServiceDate = master.ServiceDate,
                                         PicId = master.PersonIncharge,
                                         SalesmanId = house.SaleManId,
-                                        Service = master.TransactionType
+                                        Service = master.TransactionType,
+                                        ChargeWeight = house.ChargeWeight
                                     };
                 return queryShipment;
             }
@@ -3523,7 +3525,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                         var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
-                        cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Selling trước thuế
+                        cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Buying trước thuế
                     }
                 }
             }
@@ -3649,18 +3651,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             // Get header
-            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
-            {
-                forMonth = criteria.ServiceDateFrom?.Month == criteria.ServiceDateTo?.Month ? criteria.ServiceDateFrom?.ToString("MMM.yyyy") :
-                    criteria.ServiceDateFrom?.ToString("MMM") + "-" + criteria.ServiceDateTo?.ToString("MMM.yyyy");
-            }
-            if (criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
-            {
-                forMonth = criteria.CreatedDateFrom?.Month == criteria.ServiceDateTo?.Month ? criteria.CreatedDateFrom?.ToString("MMM.yyyy") :
-                    criteria.CreatedDateFrom?.ToString("MMM") + "-" + criteria.CreatedDateTo?.ToString("MMM.yyyy");
-            }
+            forMonth = string.Join(" - ", commissionData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate?.ToString("MMM")).Distinct());
+            forMonth += " ," + commissionData.Details.FirstOrDefault().ServiceDate?.ToString("yyyy");
             commissionData.ForMonth = forMonth;
-            commissionData.CustomerName = catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
+            commissionData.CustomerName = isOPSReport ? catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.ShortName
+                                                        : catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
             commissionData.ExchangeRate = criteria.ExchangeRate;
             // Partner info
             var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
@@ -3761,7 +3756,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             // Get header
-            var forMonth = string.Join(" - ", commissionData.Details.GroupBy(x => x.ServiceDate?.ToString("MMM")).Select(x => x.Key)) + ", " + list.FirstOrDefault().ServiceDate?.Year;
+            var forMonth = string.Join(" - ", commissionData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate?.ToString("MMM")).Distinct()) + ", " + list.FirstOrDefault().ServiceDate?.Year;
             commissionData.ForMonth = forMonth;
             commissionData.CustomerName = catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
             commissionData.ExchangeRate = criteria.ExchangeRate;

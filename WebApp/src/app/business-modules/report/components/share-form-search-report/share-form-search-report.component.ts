@@ -698,7 +698,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customer.value,
             service: this.mapObject(this.serviceActive, this.serviceList),
-            currency: this.typeReportActive === [this.typeReportList[2]] ? "USD" : "VND",
+            currency: this.typeReport.value === this.typeComReportList[2].id ? "USD" : "VND",
             jobId: this.mapShipment('JOBID'),
             mawb: this.mapShipment('MBL'),
             hawb: this.mapShipment('HBL'),
@@ -714,10 +714,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             pod: this.pod.value,
             customNo: this.mapShipment('CustomNo'),
             beneficiary: this.partnerAccount.value,
-            exchangeRate: this.exchangeRate.value,
+            exchangeRate: this.exchangeRate.value === null ? 0 : this.exchangeRate.value,
             typeReport: this.typeReport.value
         };
-        console.log('Com search:', body);
         return body;
     }
 
@@ -735,6 +734,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     resetSearch() {
+        this.isSubmitted = false;
         this.formSearch.reset();
         this.resetFormControl(this.customer);
         this.resetFormControl(this.carrier);

@@ -3656,7 +3656,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.FreezePanes(13, 2);
 
             int startRow = 13;
-            foreach (var item in resultData.Details)
+            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate);
+            foreach (var item in listDetail)
             {
                 workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("MMM");
                 workSheet.Cells[startRow, 2].Value = resultData.CustomerName;
@@ -3831,10 +3832,10 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(4).Width = 15; //Cột D
             workSheet.Column(5).Width = 10; //Cột E
             workSheet.Column(6).Width = 10; //Cột F
-            workSheet.Column(7).Width = 10; //Cột G
+            workSheet.Column(7).Width = 13; //Cột G
             workSheet.Column(8).Width = 13; //Cột H            
-            workSheet.Column(9).Width = 8; //Cột I
-            workSheet.Column(10).Width = 12; //Cột J
+            workSheet.Column(9).Width = 11; //Cột I
+            workSheet.Column(10).Width = 13; //Cột J
             workSheet.Column(11).Width = 15; //Cột K
             workSheet.Column(12).Width = 15; //Cột L
             workSheet.Column(13).Width = 8; //Cột M
@@ -3842,7 +3843,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(15).Width = 10; //Cột O
             workSheet.Column(16).Width = 12; //Cột P
             workSheet.Column(17).Width = 10; //Cột Q
-            workSheet.Column(18).Width = 10; //Cột R
+            workSheet.Column(18).Width = 13; //Cột R
 
             // Header 0
             workSheet.Cells["A8:R8"].Merge = true;
@@ -3852,7 +3853,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Header 1
             workSheet.Cells["A9:R9"].Merge = true;
             workSheet.Cells["A9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth);
+            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth.ToUpper());
             workSheet.Cells["A9"].Style.Font.SetFromFont(new Font("Calibri", 11, FontStyle.Bold));
 
             // Customer name
@@ -3863,7 +3864,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["M10"].Value = "Ex.rate";
             workSheet.Cells["N10"].Value = criteria.ExchangeRate;
             workSheet.Cells["N10"].Style.Numberformat.Format = numberFormats;
-            workSheet.Row(11).CustomHeight = true;
+            workSheet.Row(9).CustomHeight = true;
             // Set header of table
             for (int cell = 1; cell < 19; cell++)
             {
@@ -3881,7 +3882,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.FreezePanes(13, 2);
 
             int startRow = 13;
-            foreach (var item in resultData.Details)
+            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate);
+            foreach (var item in listDetail)
             {
                 workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("dd-MMM");
                 workSheet.Cells[startRow, 2].Value = item.HBLNo;
@@ -3974,8 +3976,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[startRow + 1, 4].Value = resultData.BeneficiaryName;
             workSheet.Cells[startRow + 2, 1].Value = "Amount:";
             workSheet.Cells[startRow + 2, 4].Formula = amountOfCus;
-            workSheet.Cells[startRow + 2, 4].Style.Numberformat.Format = formatNumber;
-            workSheet.Cells[startRow + 2, 5].Value = "VND";
+            workSheet.Cells[startRow + 2, 4].Style.Numberformat.Format = "#,### \"VND\"";
             workSheet.Cells[startRow + 3, 1].Value = "A/C:";
             workSheet.Cells[startRow + 3, 4].Value = resultData.BankAccountNo;
             workSheet.Cells[startRow + 4, 1].Value = "Via:";
@@ -4025,8 +4026,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1"].Value = "DE NGHI THANH TOAN COMMISSION";
             workSheet.Cells["A1"].Style.Font.SetFromFont(new Font("VNI-Times", 14, FontStyle.Bold));
             workSheet.Cells["A2:E2"].Merge = true;
-            workSheet.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A2"].Value = resultData.ForMonth.ToUpper();
+            workSheet.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A2"].Style.Font.SetFromFont(new Font("VNI-Times", 14, FontStyle.Bold));
 
             for (int i = 2; i < 6; i++)
@@ -4043,7 +4044,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon);
                 if (shipmentGrp.Count() > 0)
                 {
-                    workSheet.Cells[startRow, 1].Value = shipmentGrp.FirstOrDefault().ServiceDate?.ToString("MMM");
+                    var month = shipmentGrp.FirstOrDefault().ServiceDate?.ToString("MMM");
+                    workSheet.Cells[startRow, 1].Value = month;
                     workSheet.Cells[startRow, 1, startRow, 5].Merge = true;
                     startRow++;
                 }
@@ -4071,7 +4073,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[startRow, 5].Formula = _statement;
             workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             startRow++;
-            workSheet.Cells[startRow, 1].Value = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate);
+            workSheet.Cells[startRow, 1].Value = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate.ToString("#,##0"));
             workSheet.Cells[startRow, 1, startRow, 3].Merge = true;
             workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             _statement = string.Format("E{0}*0.1*{1}", startRow - 1, resultData.ExchangeRate);
