@@ -1233,29 +1233,34 @@ namespace eFMS.API.Catalogue.DL.Services
             {
 
                 CatPartner partnerAcRef = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
-                IQueryable<CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerAcRef.ParentId && x.Active == (criteria.Status ?? true));
-
-                var queryContracts = from contract in catContracts
-                            join users in sysUser on contract.SaleManId equals users.Id
-                            join employee in employees on users.EmployeeId equals employee.Id
-                            select new { contract, users, employee };
-
-                if (queryContracts.Count() == 0) {
-
-                    return null;
-                }
-
-                if (queryContracts.Count() > 0)
+                if(partnerAcRef != null)
                 {
-                    results = queryContracts.Select(x => new CatAgreementModel
+                    IQueryable<CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerAcRef.ParentId && x.Active == (criteria.Status ?? true));
+
+                    var queryContracts = from contract in catContracts
+                                         join users in sysUser on contract.SaleManId equals users.Id
+                                         join employee in employees on users.EmployeeId equals employee.Id
+                                         select new { contract, users, employee };
+
+                    if (queryContracts.Count() == 0)
                     {
-                        ID = x.contract.Id,
-                        SaleManName = x.employee.EmployeeNameEn,
-                        ContractNo = x.contract.ContractNo,
-                        ExpiredDate = x.contract.ExpiredDate,
-                        ContractType = x.contract.ContractType,
-                    }).OrderBy(x => x.ExpiredDate);
+
+                        return null;
+                    }
+
+                    if (queryContracts.Count() > 0)
+                    {
+                        results = queryContracts.Select(x => new CatAgreementModel
+                        {
+                            ID = x.contract.Id,
+                            SaleManName = x.employee.EmployeeNameEn,
+                            ContractNo = x.contract.ContractNo,
+                            ExpiredDate = x.contract.ExpiredDate,
+                            ContractType = x.contract.ContractType,
+                        }).OrderBy(x => x.ExpiredDate);
+                    }
                 }
+                
             }
 
             return results;
