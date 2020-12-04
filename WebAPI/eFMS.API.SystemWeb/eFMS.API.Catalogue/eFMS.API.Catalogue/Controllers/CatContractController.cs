@@ -209,7 +209,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                //existed = catContractService.Any(x => x.ContractNo == model.ContractNo && !string.IsNullOrEmpty( model.ContractNo));
                 if (model.ContractType != "Official")
                 {
                     if (!string.IsNullOrEmpty(model.ContractNo))
