@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Documentation.DL.Models
+namespace eFMS.API.ReportData.Models
 {
     public class CommissionExportResult
     {

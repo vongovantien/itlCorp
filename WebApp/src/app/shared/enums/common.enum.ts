@@ -120,6 +120,12 @@ export namespace CommonEnum {
         SR_COMBINATION = 'SR_COMBINATION'
     }
 
+    export enum COMMISSION_INCENTIVE_TYPE {
+        COMMISSION_PR_AS = 'COMMISSION_PR_AS',
+        COMMISSION_PR_OPS = 'COMMISSION_PR_OPS',
+        INCENTIVE_RPT = 'INCENTIVE_RPT'
+    }
+
     export enum SHEET_DEBIT_REPORT_TYPE {
         ACCNT_PL_SHEET = 'ACCNT_PL_SHEET',
         SUMMARY_OF_COST = 'SUMMARY_OF_COST',

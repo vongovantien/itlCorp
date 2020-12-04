@@ -1008,6 +1008,22 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetCommissionReport(eFMS.API.Documentation.DL.Models.Criteria.CommissionReportCriteria,System.String,System.String)">
+            <summary>
+            Query data for commission report
+            </summary>
+            <param name="criteria"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetIncentiveReport(eFMS.API.Documentation.DL.Models.Criteria.CommissionReportCriteria,System.String)">
+            <summary>
+            Query data for incentive report
+            </summary>
+            <param name="criteria"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
             <summary>
             

@@ -25,16 +25,21 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !customer.valid)}">
                         <label class="form-control-label">
                             {{ isSheetDebitRpt ? "Partner": "Customer" }}
                         </label>
+                        <label *ngIf="isCommissionIncentive" required></label>
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: customer.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             [displayFields]="displayFieldsCustomer" [height]="150"
                             (remove)="resetFormControl(customer)">
                         </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !customer.valid">
+                            Please select customer
+                        </div>
                     </div>
                 </div>
             </div>
@@ -51,16 +56,27 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" *ngIf="!isCommissionIncentive">
                         <label class="form-control-label">
                             Currency
                         </label>
                         <ng-select formControlName="currency" class="custom" [clearable]="false" [items]="currencyList" bindLabel="id" bindValue="id">
                         </ng-select>
                     </div>
+                    <div class="form-group" *ngIf="isCommissionIncentive">
+                        <label class="form-control-label" for="">
+                            Beneficiary
+                        </label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acPartner')"
+                            [currentActiveItemId]="{ field: 'id', value: partnerAccount.value}"
+                            [selectedDisplayFields]="['partnerNameVn']" [dataSources]="partners | async"
+                            [displayFields]="displayFieldsPartner" (remove)="resetFormControl(partnerAccount)"
+                            placeholder="Select A/C Ref">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" *ngIf="!isCommissionIncentive">
                         <label class="form-control-label">
                             Ref No
                         </label>
@@ -73,6 +89,22 @@
                                 <ng-select formControlName="refNoType" [clearable]="false" [items]="refNoTypeList"
                                     class="custom" bindLabel="text" bindValue="id">
                                 </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="isCommissionIncentive">
+                        <label class="form-control-label" for="">
+                            Ex.Rate
+                        </label>
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <input type="number" class="form-control" formControlName="exchangeRate"
+                                    autoFormatCurrency numeric>
+                            </div>
+                            <div class="col-lg-5">
+                                <a class="pointer" style="text-decoration: underline;"
+                                    (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
+                                    class="text-warning">{{numberOfShipment}} item</span>
                             </div>
                         </div>
                     </div>
@@ -260,3 +292,5 @@
         <!--end::Form-->
     </div>
 </div>
+
+<input-shipment-popup (onInputShipment)="onShipmentList($event)"></input-shipment-popup>
