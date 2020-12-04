@@ -14,7 +14,7 @@ import { AppList } from 'src/app/app.list';
 })
 export class ARCustomerPaymentComponent extends AppList implements OnInit {
 
-
+    
     trialOfficialList: TrialOfficialOtherModel[] = [];
 
     constructor(
@@ -45,6 +45,7 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
             { title: 'Modifie Date', field: 'modeifiedate', sortable: true },
           
         ];
+        
 
     }
 
