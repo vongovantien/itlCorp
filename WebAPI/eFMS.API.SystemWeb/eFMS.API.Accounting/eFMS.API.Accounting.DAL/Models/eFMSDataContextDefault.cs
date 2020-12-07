@@ -69,7 +69,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -243,6 +243,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.BillingRefNo)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.CurrencyId)
@@ -278,7 +282,11 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ReceiptId).HasColumnName("ReceiptID");
 
-                entity.Property(e => e.ReferenceAmount).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.RefAmount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.RefCurrency)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(10)
@@ -729,9 +737,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.CusAdvanceAmount).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
-
-                entity.Property(e => e.Date).HasColumnType("datetime");
+                entity.Property(e => e.CustomerId)
+                    .HasColumnName("CustomerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
@@ -743,6 +752,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.FinalPaidAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.FromDate).HasColumnType("datetime");
+
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
@@ -753,6 +764,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.PaymentDate).HasColumnType("datetime");
 
+                entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+
                 entity.Property(e => e.PaymentRefNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -762,6 +775,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SyncStatus).HasMaxLength(50);
+
+                entity.Property(e => e.ToDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(30)
@@ -2420,7 +2435,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("SaleManID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
-                
+
                 entity.Property(e => e.SalesCompanyId)
                     .HasColumnName("SalesCompanyID")
                     .HasMaxLength(500)
@@ -2802,6 +2817,26 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.SalemanId)
                     .HasColumnName("SalemanID")
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SalesCompanyId)
+                    .HasColumnName("SalesCompanyID")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SalesDepartmentId)
+                    .HasColumnName("SalesDepartmentID")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SalesGroupId)
+                    .HasColumnName("SalesGroupID")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SalesOfficeId)
+                    .HasColumnName("SalesOfficeID")
+                    .HasMaxLength(500)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ServiceDate).HasColumnType("datetime");
