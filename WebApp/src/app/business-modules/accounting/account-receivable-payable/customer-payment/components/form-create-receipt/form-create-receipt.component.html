@@ -20,6 +20,15 @@
                             Date
                         </label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" ngxDaterangepickerMd [(ngModel)]="selected" class="form-control" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange" placeholder="Select request date" [autoApply]="true" formControlName="date" [attr.disabled]="isDisabled"
+                            />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                            </span>
+                        </div>
+                        <!-- <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange" placeholder="Select request date" [autoApply]="true" formControlName="date"
                                 [attr.disabled]="isDisabled" />
                             <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -27,7 +36,7 @@
                                 <i class="la la-calendar"></i>
                             </span>
                             </span>
-                        </div>
+                        </div> -->
                         <!-- <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange" placeholder="Select date" readonly formControlName="Date"
                                 (remove)="resetFormControl(date)" calendar [allowRemove]="!!date.value && !!date.value.startDate" />
@@ -36,7 +45,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-6">
                     <div class="form-group">
                         <label>
                             Payment Reference No
@@ -45,21 +54,16 @@
                         <input type="text" class="form-control m-input m-input--square" formControlName="paymentReferenceNo">
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label>Salesman</label>
-                        <ng-select formControlName="salesMan" class="custom"></ng-select>
-                    </div>
-                </div>
-                <div class="col-lg-4">
+
+                <div class="col-lg-6">
                     <div class="form-group">
                         <label>Agreement
                             <span class="m--font-danger">(*)</span>    
                         </label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="getAgreements($event)" (remove)="resetFormControl(agreement)" [currentActiveItemId]="{field:'id', value: agreement.value}" [selectedDisplayFields]="['saleManName']" [dataSources]="agreements | async" [displayFields]="displayFieldAgreement"
+                        <app-combo-grid-virtual-scroll (itemSelected)="getAgreements($event, 'data')" (remove)="resetFormControl(agreement)" [currentActiveItemId]="{field:'id', value: agreement.value}" [selectedDisplayFields]="['saleManName']" [dataSources]="agreements" [displayFields]="displayFieldAgreement"
                             placeholder="Select Agreement">
                         </app-combo-grid-virtual-scroll>
-                        <!-- <ng-select formControlName="agreement" class="custom"></ng-select> -->
+                        <!-- <ng-select [items]="agreements" formControlName="agreement" class="custom"></ng-select> -->
                     </div>
                 </div>
             </div>

@@ -7,6 +7,7 @@ import { Currency, Customer, Partner, User } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, IAppState } from '@store';
+import { Moment } from 'moment';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
@@ -19,10 +20,10 @@ import { catAgreement } from 'src/app/shared/models/catalogue/catAgreement.model
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
     @Output() onChangeCurrency: EventEmitter<Currency> = new EventEmitter<Currency>();
     form: FormGroup;
+    selected: { start: Moment, end: Moment };
     customerId: AbstractControl; // load partner
     date: AbstractControl;
     paymentReferenceNo: AbstractControl;
-    salesMan: AbstractControl;
     agreement: AbstractControl;
     paidAmount: AbstractControl;
     methods: CommonInterface.ICommonTitleValue[];
@@ -39,7 +40,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     currencyList: Currency[];
 
     customers: Observable<Partner[]>; /// partner = customer
-    agreements: Observable<catAgreement[]>;
+    agreements: any[] = [];
+    $agreements: Observable<any>;
     username: AbstractControl;
     paymentMethods: string[] = ['Cash', 'Bank Transfer'];
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [   // load display fiels partner
@@ -53,13 +55,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         { field: 'saleManName', label: 'Salesman' },
         { field: 'contractNo', label: 'Contract No' },
         { field: 'contractType', label: 'Contract Type' },
-        // { field: 'saleService', label: 'Service' },
-        // { field: 'trialEffectDate', label: 'Effective Date' },
-        // { field: 'trialExpiredDate', label: 'Expired Date' },
-        // { field: 'active', label: 'Status' },
-        // { field: 'officeNameEn', label: 'Office' },
-        // { field: 'companyNameAbbr', label: 'Company' },
-        // { field: 'arconfirmed', label: 'AR Confirmed' },
 
     ];
     constructor(
@@ -86,7 +81,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             'customerId': [], // khai báo list partner trong form-group
             'date': [{ startDate: new Date(), endDate: new Date() }, Validators.required],
             'paymentReferenceNo': [],
-            'salesMan': [],
             'agreement': [],
             'paidAmount': [],
             'type': [],
@@ -102,7 +96,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.customerId = this.form.controls['customerId']; // partner 
         this.date = this.form.controls['date'];
         this.paymentReferenceNo = this.form.controls['paymentReferenceNo'];
-        this.salesMan = this.form.controls['salesMan'];
         this.agreement = this.form.controls['agreement'];
         this.paidAmount = this.form.controls['paidAmount'];
         this.type = this.form.controls['type'];
@@ -141,10 +134,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         switch (type) {
             case 'partner':
                 this.customerId.setValue((data as Partner).id);
-
                 // 
                 this.getAgreements({ status: true, partnerId: this.customerId.value });
-
                 break;
             default:
                 break;
@@ -162,12 +153,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     // }
 
     getAgreements(body) {
-        this._catalogueRepo.getAgreement(body).pipe(catchError(this.catchError)).subscribe(
-            // tslint:disable-next-line:no-any
-            (data: any) => {
-                this.agreement = this.customerId;
-            }
-        );
+        this._catalogueRepo.getAgreement(body)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                data => {
+                    this.agreements = data;
+                    console.log(data);
+                }
+            );
     }
 
 }
