@@ -54,5 +54,9 @@ namespace eFMS.API.Accounting.Service.Models
         public string Consignee { get; set; }
         public string LockedUser { get; set; }
         public string ShipmentType { get; set; }
+        public string SalesGroupId { get; set; }
+        public string SalesDepartmentId { get; set; }
+        public string SalesOfficeId { get; set; }
+        public string SalesCompanyId { get; set; }
     }
 }

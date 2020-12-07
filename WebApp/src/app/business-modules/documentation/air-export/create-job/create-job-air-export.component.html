@@ -30,8 +30,6 @@
 
 <import-job-detail-popup (onImport)="onImport($event)"> </import-job-detail-popup>
 
-<info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Create Job'"></info-popup>
+<info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'" [title]="'Cannot Create Job'"></info-popup>
 
-<confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
-    (onSubmit)="gotoList()"></confirm-popup>
+<confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?" (onSubmit)="gotoList()"></confirm-popup>

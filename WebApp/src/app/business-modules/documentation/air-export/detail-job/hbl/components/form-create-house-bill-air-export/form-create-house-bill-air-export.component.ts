@@ -113,6 +113,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     dims: DIM[] = []; // * Dimension details.
     otherCharges: CsOtherCharge[] = [];
 
+    // tslint:disable-next-line:no-any
     isLoadingPort: any;
     isSeparate: boolean = false;
     isCollapsed: boolean = false;

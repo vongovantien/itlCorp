@@ -23,6 +23,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
             CreateMap<AccAccountingManagement, AccAccountingManagementModel>();
             CreateMap<ChargeOfAccountingManagementModel, AccountingManagementExport>();
+            
 
             // Map to entity model
             CreateMap<AcctSoaModel, AcctSoa>();
@@ -34,8 +35,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
             CreateMap<AccAccountReceivableModel, AccAccountReceivable>();
             CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
-
-            CreateMap<AcctReceipt, AcctReceiptModel>().ReverseMap();
+            CreateMap<AcctReceiptModel, AcctReceipt>().ReverseMap();
         }
     }
 }

@@ -43,6 +43,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         this._activeRouter
             .queryParams
             .pipe(takeUntil(this.ngUnsubscribe))
+            // tslint:disable-next-line:no-any
             .subscribe((param: { [key: string]: any }) => {
                 if (param.subTab) {
                     this.selectedSubTab = param.subTab.toUpperCase();
@@ -78,6 +79,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         }
     }
 
+    // tslint:disable-next-line:no-any
     setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
@@ -106,6 +108,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
 
     }
 
+    // tslint:disable-next-line:no-any
     setParameterToPagingTab(tab: CommonEnum.TabTypeAccountReceivableEnum, tabComponent: any) {
         this.accountReceivableFormComponent.arType = tab;
 

@@ -451,6 +451,19 @@
             <param name="uploadedFile"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.SaveReceipt(eFMS.API.Accounting.DL.Models.AcctReceiptModel,eFMS.API.Accounting.DL.Models.SaveAction)">
+            <summary>
+            Save Receipt
+            </summary>
+            <param name="receiptModel"></param>
+            <param name="saveAction">
+            0 - Save Draft - Add
+            1 - Save Draft - Update
+            2 - Save Done
+            3 - Save Cancel
+            </param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
             <summary>
             A base class for an MVC controller without view support.
