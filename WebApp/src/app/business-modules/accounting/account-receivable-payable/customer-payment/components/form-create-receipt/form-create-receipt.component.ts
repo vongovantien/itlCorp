@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Data } from '@angular/router';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Currency, Customer, Partner, User } from '@models';
@@ -77,7 +78,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.initFormSettlement();
         this.getCurrency();
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL); // khai báo load part lên display
-
+        // this.agreements = this._catalogueRepo.getAgreement(CommonEnum.Agreement.ALL);
 
     }
     initFormSettlement() {
@@ -142,7 +143,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 this.customerId.setValue((data as Partner).id);
 
                 // 
-                this.getAgreement({ status: true, partnerId: this.customerId.value });
+                this.getAgreements({ status: true, partnerId: this.customerId.value });
 
                 break;
             default:
@@ -150,20 +151,21 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
     }
 
-    onSelectDataAgreementFormInfo(data: any, type: string) {  // lấy data agreement 
-        switch (type) {
-            case 'agreement':
-                this.agreement.setValue((data as catAgreement).id);
-                break;
-            default:
-                break;
-        }
-    }
+    // onSelectDataAgreementFormInfo(data: any, type: string) {  // lấy data agreement 
+    //     switch (type) {
+    //         case 'agreement':
+    //             this.agreement.setValue((data as catAgreement).id);
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }
 
-    getAgreement(body) {
-        this._catalogueRepo.getAgreement(body).subscribe(
-            (data) => {
-                this.agreement = body;
+    getAgreements(body) {
+        this._catalogueRepo.getAgreement(body).pipe(catchError(this.catchError)).subscribe(
+            // tslint:disable-next-line:no-any
+            (data: any) => {
+                this.agreement = this.customerId;
             }
         );
     }

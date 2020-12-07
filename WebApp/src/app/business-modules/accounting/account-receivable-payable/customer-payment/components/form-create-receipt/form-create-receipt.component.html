@@ -56,8 +56,8 @@
                         <label>Agreement
                             <span class="m--font-danger">(*)</span>    
                         </label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataAgreementFormInfo($event, 'agreement')" (remove)="resetFormControl(agreement)" [currentActiveItemId]="{field:'id', value: agreement.value}" [selectedDisplayFields]="['saleManName']" [dataSources]="agreements | async"
-                            [displayFields]="displayFieldAgreement" placeholder="Select Agreement">
+                        <app-combo-grid-virtual-scroll (itemSelected)="getAgreements($event)" (remove)="resetFormControl(agreement)" [currentActiveItemId]="{field:'id', value: agreement.value}" [selectedDisplayFields]="['saleManName']" [dataSources]="agreements | async" [displayFields]="displayFieldAgreement"
+                            placeholder="Select Agreement">
                         </app-combo-grid-virtual-scroll>
                         <!-- <ng-select formControlName="agreement" class="custom"></ng-select> -->
                     </div>
