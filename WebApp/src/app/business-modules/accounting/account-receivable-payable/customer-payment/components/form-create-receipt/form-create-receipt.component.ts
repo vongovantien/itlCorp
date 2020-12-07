@@ -40,7 +40,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     currencyList: Currency[];
 
     customers: Observable<Partner[]>; /// partner = customer
-    agreements: any[] = [];
+    agreements: Observable<catAgreement[]>;
     $agreements: Observable<any>;
     username: AbstractControl;
     paymentMethods: string[] = ['Cash', 'Bank Transfer'];
@@ -67,13 +67,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         super();
     }
     ngOnInit() {
-        // this.initBasicData();
-        // this.getUserLogged();
-        // this._store.dispatch(new GetCatalogueCurrencyAction());
+
         this.initFormSettlement();
         this.getCurrency();
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL); // khai báo load part lên display
-        // this.agreements = this._catalogueRepo.getAgreement(CommonEnum.Agreement.ALL);
 
     }
     initFormSettlement() {
@@ -158,7 +155,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             .subscribe(
                 data => {
                     this.agreements = data;
-                    console.log(data);
+
                 }
             );
     }
