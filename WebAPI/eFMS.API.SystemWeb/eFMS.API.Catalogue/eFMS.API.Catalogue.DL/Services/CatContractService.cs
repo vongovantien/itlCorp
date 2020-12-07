@@ -1222,5 +1222,48 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return result;
         }
+
+        public IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria)
+        {
+            IQueryable<CatAgreementModel> results = null;
+            IQueryable<SysUser> sysUser = sysUserRepository.Get();
+            IQueryable<SysEmployee> employees = sysEmployeeRepository.Get();
+
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+
+                CatPartner partnerAcRef = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
+                if(partnerAcRef != null)
+                {
+                    IQueryable<CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerAcRef.ParentId && x.Active == (criteria.Status ?? true));
+
+                    var queryContracts = from contract in catContracts
+                                         join users in sysUser on contract.SaleManId equals users.Id
+                                         join employee in employees on users.EmployeeId equals employee.Id
+                                         select new { contract, users, employee };
+
+                    if (queryContracts.Count() == 0)
+                    {
+
+                        return null;
+                    }
+
+                    if (queryContracts.Count() > 0)
+                    {
+                        results = queryContracts.Select(x => new CatAgreementModel
+                        {
+                            ID = x.contract.Id,
+                            SaleManName = x.employee.EmployeeNameEn,
+                            ContractNo = x.contract.ContractNo,
+                            ExpiredDate = x.contract.ExpiredDate,
+                            ContractType = x.contract.ContractType,
+                        }).OrderBy(x => x.ExpiredDate);
+                    }
+                }
+                
+            }
+
+            return results;
+        }
     }
 }
