@@ -4,6 +4,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 ﻿using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.Models.Receipt;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Models;
@@ -36,14 +37,14 @@ namespace eFMS.API.Accounting.Controllers
         [Route("Query")]
         public IActionResult Query(AcctReceiptCriteria criteria)
         {
-            IQueryable<AcctReceiptModel> result = acctReceiptService.Query(criteria);
+            IQueryable<AcctReceipt> result = acctReceiptService.Query(criteria);
 
             return Ok(result);
         }
 
         [HttpPost]
         [Route("Paging")]
-        // [Authorize]
+        [Authorize]
         public IActionResult Paging(AcctReceiptCriteria criteria, int page, int size)
         {
             IQueryable<AcctReceiptModel> data = acctReceiptService.Paging(criteria, page, size, out int rowsCount);

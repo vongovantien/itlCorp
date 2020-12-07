@@ -51,9 +51,12 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
-        private IQueryable<AcctReceiptModel> GetQueryBy(AcctReceiptCriteria criteria)
+        private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
         {
-            Expression<Func<AcctReceiptModel, bool>> query = x => ((x.CurrencyId ?? "").IndexOf(criteria.Currency ?? "",StringComparison.OrdinalIgnoreCase) >= 0);
+            Expression<Func<AcctReceipt, bool>> query = (x => 
+            (x.CurrencyId ?? "").IndexOf(criteria.Currency ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "",StringComparison.OrdinalIgnoreCase) >= 0         
+            );
 
             // Tìm theo status
             if (!string.IsNullOrEmpty(criteria.Status))
@@ -105,13 +108,13 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            IQueryable<AcctReceiptModel> dataQuery = Get(query);
+            IQueryable<AcctReceipt> dataQuery = DataContext.Get(query);
             dataQuery = dataQuery?.OrderByDescending(x => x.DatetimeModified);
 
             return dataQuery;
         }
 
-        private IQueryable<AcctReceiptModel> FormatReceipt(IQueryable<AcctReceiptModel> dataQuery)
+        private IQueryable<AcctReceiptModel> FormatReceipt(IQueryable<AcctReceipt> dataQuery)
         {
             List<AcctReceiptModel> list = new List<AcctReceiptModel>();
 
@@ -119,11 +122,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var item in dataQuery)
                 {
+                    AcctReceiptModel d = mapper.Map<AcctReceiptModel>(item);
 
-                    item.UserNameCreated = item.UserCreated == null ? null : sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
-                    item.UserNameModified = item.UserModified == null ? null : sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
-                    item.CustomerName = catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString()).FirstOrDefault().ShortName;
-                    list.Add(item);
+                    d.UserNameCreated = item.UserCreated == null ? null : sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
+                    d.UserNameModified = item.UserModified == null ? null : sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
+                    d.CustomerName = item.CustomerId == null ? null :catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString()).FirstOrDefault().ShortName;
+                    list.Add(d);
                 }
             }
             return list.AsQueryable();
@@ -167,29 +171,30 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AcctReceiptModel> Paging(AcctReceiptCriteria criteria, int page, int size, out int rowsCount)
         {
-            IQueryable<AcctReceiptModel> data = GetQueryBy(criteria);
+            IQueryable<AcctReceipt> data = GetQueryBy(criteria);
 
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
             PermissionRange permissionRangeList = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
 
             data = QueryByPermission(data, permissionRangeList, _user);
+            rowsCount = data.Count();
 
-            IQueryable<AcctReceiptModel> result = FormatReceipt(data);
-            rowsCount = result.Count();
             if (page == 0)
             {
                 page = 1;
                 size = rowsCount;
             }
+            IQueryable<AcctReceiptModel> result = FormatReceipt(data);
+
             return result.Skip((page - 1) * size).Take(size);
         }
 
-        public IQueryable<AcctReceiptModel> Query(AcctReceiptCriteria criteria)
+        public IQueryable<AcctReceipt> Query(AcctReceiptCriteria criteria)
         {
             return GetQueryBy(criteria);
         }
 
-        public IQueryable<AcctReceiptModel> QueryByPermission(IQueryable<AcctReceiptModel> data, PermissionRange range, ICurrentUser currentUser)
+        public IQueryable<AcctReceipt> QueryByPermission(IQueryable<AcctReceipt> data, PermissionRange range, ICurrentUser currentUser)
         {
             switch (range)
             {
