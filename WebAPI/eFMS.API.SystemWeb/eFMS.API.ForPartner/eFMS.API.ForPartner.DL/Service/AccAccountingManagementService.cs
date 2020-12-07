@@ -210,11 +210,11 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
                                 surchargeObh.AcctManagementId = invoiceObh.Id;
-                                surchargeObh.InvoiceNo = invoiceObh.InvoiceNoReal;
-                                surchargeObh.InvoiceDate = invoiceObh.Date;
+                                surchargeObh.InvoiceNo = null; //CR: 07/12/2020
+                                surchargeObh.InvoiceDate = null; //CR: 07/12/2020
                                 surchargeObh.VoucherId = invoiceObh.VoucherId;
                                 surchargeObh.VoucherIddate = invoiceObh.Date;
-                                surchargeObh.SeriesNo = invoiceObh.Serie;
+                                surchargeObh.SeriesNo = null; //CR: 07/12/2020
                                 surchargeObh.FinalExchangeRate = CalculatorExchangeRate(obhCharge.ExchangeRate, surchargeObh.ExchangeDate, surchargeObh.CurrencyId, invoiceObh.Currency); //obhCharge.ExchangeRate;
                                 surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
                                 surchargeObh.DatetimeModified = DateTime.Now;
