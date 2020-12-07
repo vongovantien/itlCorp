@@ -16,7 +16,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Type { get; set; }
         public decimal? CusAdvanceAmount { get; set; }
         public decimal? FinalPaidAmount { get; set; }
-        public string Balance { get; set; }
+        public decimal? Balance { get; set; }
         public string PaymentMethod { get; set; }
         public string CurrencyId { get; set; }
         public DateTime? PaymentDate { get; set; }

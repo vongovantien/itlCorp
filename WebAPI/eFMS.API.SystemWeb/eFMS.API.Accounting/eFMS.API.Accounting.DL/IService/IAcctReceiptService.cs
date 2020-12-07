@@ -18,5 +18,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState Delete(Guid id);
         string GenerateReceiptNo();
         List<ReceiptInvoiceModel> GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria);
+        AcctReceiptModel GetById(Guid id);
+        HandleState SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction);
     }
 }
