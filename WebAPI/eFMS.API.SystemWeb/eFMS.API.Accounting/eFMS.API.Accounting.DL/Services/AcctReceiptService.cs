@@ -73,7 +73,7 @@ namespace eFMS.API.Accounting.DL.Services
             // Tìm theo số phiếu thu/số invoice
             if (string.IsNullOrEmpty(criteria.PaymentType))
             {
-                query = query.And(x => (x.PaymentRefNo ?? "").IndexOf(criteria.RefNo, StringComparison.OrdinalIgnoreCase) >= 0);
+                query = query.And(x => (x.PaymentRefNo ?? "").IndexOf(criteria.RefNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             }
             if (!string.IsNullOrEmpty(criteria.PaymentType) && criteria.PaymentType == "Invoice")
             {
