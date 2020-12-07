@@ -4,10 +4,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <label>Partner</label>
-                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
-                        (remove)="resetFormControl(partnerId)"
-                        [currentActiveItemId]="{field:'id', value: partnerId.value}"
-                        [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')" (remove)="resetFormControl(partnerId)" [currentActiveItemId]="{field:'id', value: partnerId.value}" [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner">
                     </app-combo-grid-virtual-scroll>
                 </div>
@@ -15,8 +12,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <label>Over Due Days</label>
-                            <ng-select [items]="overDueDays" formControlName="overdueDays" class="custom"
-                                (change)="onSelectBindingInput($event, 'OverDueDays')" bindLabel="text" bindValue="id">
+                            <ng-select [items]="overDueDays" formControlName="overdueDays" class="custom" (change)="onSelectBindingInput($event, 'OverDueDays')" bindLabel="text" bindValue="id">
                             </ng-select>
                         </div>
                         <div class="col-lg-3">
@@ -41,33 +37,26 @@
                             <div class="row">
                                 <div class="col-lg-6">
                                     <label>Debit Rate</label>
-                                    <ng-select [items]="debitRates" formControlName="debitRate" class="custom"
-                                        (change)="onSelectBindingInput($event, 'DebitRates')" bindLabel="text"
-                                        bindValue="id">
+                                    <ng-select [items]="debitRates" formControlName="debitRate" class="custom" (change)="onSelectBindingInput($event, 'DebitRates')" bindLabel="text" bindValue="id">
                                     </ng-select>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <label></label>
-                                            <div class="form-group"
-                                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
-                                                <input type="number" min="0" class="form-control"
-                                                    formControlName="fromDebitRate">
+                                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
+                                                <input type="number" min="0" class="form-control" formControlName="fromDebitRate">
                                             </div>
 
                                         </div>
                                         <div class="col-lg-6">
                                             <label></label>
-                                            <div class="form-group"
-                                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
-                                                <input type="number" min="0" class="form-control"
-                                                    formControlName="toDebitRate">
+                                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
+                                                <input type="number" min="0" class="form-control" formControlName="toDebitRate">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-control-feedback text-danger"
-                                        *ngIf="isSubmitted && (fromDebitRate.value > toDebitRate.value)">
+                                    <div class="form-control-feedback text-danger" *ngIf="isSubmitted && (fromDebitRate.value > toDebitRate.value)">
                                         The value of fromDebitRate must be smaller than toDebitRate
                                     </div>
                                 </div>
@@ -75,35 +64,27 @@
                         </div>
                         <div class="col-lg-5">
                             <label>Agreement Status</label>
-                            <ng-select [items]="agreementStatusList" formControlName="agreementStatus" class="custom"
-                                bindLabel="text" bindValue="id">
+                            <ng-select [items]="agreementStatusList" formControlName="agreementStatus" class="custom" bindLabel="text" bindValue="id">
                             </ng-select>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <label>Agreement Expired Days</label>
-                    <ng-select [items]="agreementExpiredDayList" formControlName="agreementExpiredDays" class="custom"
-                        bindLabel="text" bindValue="id">
+                    <ng-select [items]="agreementExpiredDayList" formControlName="agreementExpiredDays" class="custom" bindLabel="text" bindValue="id">
                     </ng-select>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-6">
                     <label>Salesman</label>
-                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesMan')"
-                        (remove)="resetFormControl(salesManId)"
-                        [currentActiveItemId]="{field:'id', value: salesManId.value}"
-                        [selectedDisplayFields]="['username', 'employeeNameEn']" [dataSources]="salemans | async"
+                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesMan')" (remove)="resetFormControl(salesManId)" [currentActiveItemId]="{field:'id', value: salesManId.value}" [selectedDisplayFields]="['username', 'employeeNameEn']" [dataSources]="salemans | async"
                         [displayFields]="displayFieldsSalesMan">
                     </app-combo-grid-virtual-scroll>
                 </div>
                 <div class="col-lg-6">
                     <label>Office</label>
-                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'offical')"
-                        (remove)="resetFormControl(officalId)"
-                        [currentActiveItemId]="{field:'id', value: officalId.value}"
-                        [selectedDisplayFields]="['shortName']" [dataSources]="offices | async"
+                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'offical')" (remove)="resetFormControl(officalId)" [currentActiveItemId]="{field:'id', value: officalId.value}" [selectedDisplayFields]="['shortName']" [dataSources]="offices | async"
                         [displayFields]="displayFieldsOffice">
                         >
                     </app-combo-grid-virtual-scroll>
