@@ -10,6 +10,7 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string ContractNo { get; set; }
         public string ContractType { get; set; }
         public string SaleManName { get; set; }
+        public decimal CusAdvanceAmount { get; set; }
         public DateTime? ExpiredDate { get; set; }
 
     }
