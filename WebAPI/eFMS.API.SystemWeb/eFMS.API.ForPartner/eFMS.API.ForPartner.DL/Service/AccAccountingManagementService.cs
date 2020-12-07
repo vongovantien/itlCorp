@@ -163,13 +163,20 @@ namespace eFMS.API.ForPartner.DL.Service
                 var partner = partnerRepo.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefault();
                 if (partner == null)
                 {
-                    string message = string.Format(@"Không tìm thấy partner {0}. Vui lòng kiểm tra lại Partner Code!", model.PartnerCode);
+                    string message = string.Format(@"Không tìm thấy partner {0}. Vui lòng kiểm tra lại Partner Code", model.PartnerCode);
+                    return new HandleState((object)message);
+                }
+
+                var invoiceDebitByRefNo = DataContext.Get(x => x.ReferenceNo == debitCharges[0].ReferenceNo).FirstOrDefault();
+                if (invoiceDebitByRefNo != null)
+                {
+                    string message = string.Format("Số Reference No {0} đã tồn tại trong hóa đơn {1}. Vui lòng kiểm tra lại", debitCharges[0].ReferenceNo, invoiceDebitByRefNo.InvoiceNoReal);
                     return new HandleState((object)message);
                 }
 
                 var invoiceDebit = ModelInvoiceDebit(model, partner, debitCharges, _currentUser);
                 var invoiceObh = obhCharges.Count > 0 ? ModelInvoiceObh(model, partner, obhCharges, _currentUser) : null;
-
+                
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
