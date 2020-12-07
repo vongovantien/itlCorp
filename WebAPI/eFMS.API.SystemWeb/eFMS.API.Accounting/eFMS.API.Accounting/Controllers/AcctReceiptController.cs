@@ -1,12 +1,16 @@
 ﻿using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.Receipt;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -23,6 +27,25 @@ namespace eFMS.API.Accounting.Controllers
         {
             stringLocalizer = localizer;
             acctReceiptService = acctReceipt;
+        }
+
+        [HttpPost]
+        [Route("Query")]
+        public IActionResult Query(AcctReceiptCriteria criteria)
+        {
+            IQueryable<AcctReceiptModel> result = acctReceiptService.Query(criteria);
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("Paging")]
+        // [Authorize]
+        public IActionResult Paging(AcctReceiptCriteria criteria, int page, int size)
+        {
+            IQueryable<AcctReceiptModel> data = acctReceiptService.Paging(criteria, page, size, out int rowsCount);
+            var result = new ResponsePagingModel<AcctReceiptModel> { Data = null, Page = page, Size = size };
+            return Ok(result);
         }
 
 

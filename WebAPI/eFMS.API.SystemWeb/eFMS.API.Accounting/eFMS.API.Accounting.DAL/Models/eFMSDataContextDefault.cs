@@ -68,7 +68,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -242,6 +242,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.BillingRefNo)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.CurrencyId)
@@ -277,11 +281,11 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ReceiptId).HasColumnName("ReceiptID");
 
+                entity.Property(e => e.RefAmount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.RefCurrency)
                     .HasMaxLength(30)
                     .IsUnicode(false);
-
-                entity.Property(e => e.ReferenceAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(10)
