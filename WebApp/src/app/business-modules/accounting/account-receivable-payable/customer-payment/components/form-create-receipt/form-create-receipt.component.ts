@@ -139,15 +139,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
     }
 
-    // onSelectDataAgreementFormInfo(data: any, type: string) {  // lấy data agreement 
-    //     switch (type) {
-    //         case 'agreement':
-    //             this.agreement.setValue((data as catAgreement).id);
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // }
+
 
     getAgreements(body) {
         this._catalogueRepo.getAgreement(body)

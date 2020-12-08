@@ -1,29 +1,31 @@
 <div class="m-portlet">
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <form class="m-form m-form--state" [formGroup]="formSearch">
+            <form class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-6">
                         <label>Payment Ref No</label>
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <input type="text" class="form-control m-input m-input--square">
+                                    <input type="text" class="form-control m-input m-input--square" [(ngModel)]="reference" name="reference">
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <ng-select [items]="paymentRef" formControlName="paymentRefNo" class="custom">
-                                    </ng-select>
+                                    <select class="form-control" [(ngModel)]="selectedPaymentRefNo" name="payment" (ngModelChange)="onSelectDataFormSearch($event, 'paymentrefno')">
+                                        <option value="null">All</option>
+                                        <option *ngFor="let payment of paymentRefNo" [ngValue]="payment">{{payment.title}}</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <label>Partner</label>
                         <div class="form-group">
-                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')" (remove)="resetFormControl(partnerId)" [currentActiveItemId]="{field:'id', value: partnerId.value}" [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
-                                [displayFields]="displayFieldsPartner" placeholder="Select Partner">
+                            <label> Partner </label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner" (itemSelected)="onSelectDataFormSearch($event, 'partner')" [selectedDisplayFields]="configPartner.selectedDisplayFields" [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
+                                [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -33,21 +35,14 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <!-- <label>Date</label>
-                                    <div class="form-group">
-                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD" readonly formControlName="Date"
-                                                (remove)="resetFormControl(etd)" calendar [allowRemove]="!!etd.value && !!etd.value.startDate" />
-                                        </div>
-                                    </div> -->
-                                    <label class="form-control-label">Date</label>
+                                    <label> Date </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange" placeholder="Select request date" [autoApply]="true" formControlName="Date"
-                                            [attr.disabled]="isDisabled" />
+                                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                            placeholder="From date - to date" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
-                            </span>
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
                                         </span>
                                     </div>
                                 </div>
@@ -55,10 +50,14 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label> Date Type</label>
-                                    <div class="form-group">
+                                    <select class="form-control" [(ngModel)]="selectedDateType" name="datetpye" (ngModelChange)="onSelectDataFormSearch($event, 'datetype')">
+                                        <option value="null">All</option>
+                                        <option *ngFor="let datetpye of dateType" [ngValue]="datetpye">{{datetpye.title}}</option>
+                                    </select>
+                                    <!-- <div class="form-group">
                                         <ng-select [items]="dateType" formControlName="Date" class="custom">
                                         </ng-select>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -67,30 +66,20 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <!-- <label> Currency</label>
-                                    <div class="form-group">
-                                        <ng-select [items]="currencyList" formControlName="selectedCurrency" class="custom">
-                                        </ng-select>
-                                    </div> -->
-
-
-                                    <label class="form-control-label">
-                                        Currency
-                                    </label>
-                                    <select [(ngModel)]="selectedCurrency" class="form-control">  
-                                        <!-- (ngModelChange)="onSelectDataFormInfo($event , 'currency')" -->
-                                        <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}
-                                        </option>
-                                    </select>
+                                    <label>  Currency </label>
+                                    <select class="form-control" [(ngModel)]="selectedCurrency" name="currency" (ngModelChange)="onSelectDataFormSearch($event, 'currency')">
+                                    <option [ngValue]="null">All</option>
+                                    <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
+                                </select>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label> Sync Status</label>
-                                    <div class="form-group">
-                                        <ng-select [items]="syncstatus" formControlName="syncStatus" class="custom">
-                                        </ng-select>
-                                    </div>
+                                    <select class="form-control" [(ngModel)]="selectedSyncStatus" name="status" (ngModelChange)="onSelectDataFormSearch($event, 'syncstatus')">
+                                        <option value="null">All</option>
+                                        <option *ngFor="let status of syncStatus" [ngValue]="status">{{status.title}}</option>
+                                    </select>
 
                                 </div>
                             </div>
@@ -103,9 +92,9 @@
                     <div class="row">
                         <div class="col-lg-6"></div>
                         <div class="col-lg-6 m--align-right c-button-actions">
-                            <app-default-button [buttonSetting]="searchlButtonSetting" (click)="submitSearch()">
+                            <app-default-button [buttonSetting]="searchlButtonSetting" (click)="search()">
                             </app-default-button>
-                            <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()">
+                            <app-default-button [buttonSetting]="resetButtonSetting" (click)="reset()">
                             </app-default-button>
                         </div>
                     </div>

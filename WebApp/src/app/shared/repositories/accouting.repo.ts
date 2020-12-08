@@ -723,6 +723,34 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+    /// Search Customer Payment 
+
+    getListCustomerPayment(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/Paging`, body, {
+                pageNumber: '' + page,
+                pageSize: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt`).pipe(
+                map((data: any) => data)
+            );
+        }
+    }
+    checkAllowDeleteCusPayment(paymentrefno: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${paymentrefno}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    deleteCusPayment(paymentrefno: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/delete`, { paymentrefno: paymentrefno })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }
 
 
