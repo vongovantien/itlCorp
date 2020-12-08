@@ -451,6 +451,13 @@
             <param name="uploadedFile"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetById(System.Guid)">
+            <summary>
+            Get detail receipt
+            </summary>
+            <param name="id">id of receipt</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.SaveReceipt(eFMS.API.Accounting.DL.Models.AcctReceiptModel,eFMS.API.Accounting.DL.Models.SaveAction)">
             <summary>
             Save Receipt

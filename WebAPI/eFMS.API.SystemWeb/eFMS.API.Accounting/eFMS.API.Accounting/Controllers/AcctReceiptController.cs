@@ -70,6 +70,11 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(new ResultHandle { Data = results , Status = results.Count > 0 ? true : false });
         }
 
+        /// <summary>
+        /// Get detail receipt
+        /// </summary>
+        /// <param name="id">id of receipt</param>
+        /// <returns></returns>
         [HttpGet("GetById")]
         [Authorize]
         public IActionResult GetById(Guid id)
@@ -132,11 +137,11 @@ namespace eFMS.API.Accounting.Controllers
             } 
             else if (saveAction == SaveAction.SAVEDONE)
             {
-                result = new ResultHandle { Status = hs.Success, Message = "Save Done Successful", Data = receiptModel };
+                result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
             } 
             else if (saveAction == SaveAction.SAVECANCEL)
             {
-                result = new ResultHandle { Status = hs.Success, Message = "Save Cancel Successful", Data = receiptModel };
+                result = new ResultHandle { Status = hs.Success, Message = "Save Cancel Receipt Successful", Data = receiptModel };
             }
             else
             {
