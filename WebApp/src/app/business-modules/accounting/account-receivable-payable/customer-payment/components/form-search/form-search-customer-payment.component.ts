@@ -2,16 +2,21 @@ import { AppForm } from 'src/app/app.form';
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
-
-import { CatalogueRepo } from '@repositories';
-import { Partner } from '@models';
+// import { getAdvancePaymentSearchParamsState, IAdvancePaymentState } from '../../store/reducers';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { Partner, Currency, SOASearchCharge } from '@models';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
 
-
 import { Observable } from 'rxjs';
 import { Moment } from 'moment';
+
+import { Store } from '@ngrx/store';
+import { catchError, map, takeUntil } from 'rxjs/operators';
+import { DataService } from 'src/app/shared/services/data.service';
+
+
 
 enum OverDueDays {
     All,
@@ -24,9 +29,9 @@ enum OverDueDays {
     selector: 'customer-payment-form-search',
     templateUrl: './form-search-customer-payment.component.html',
 })
-export class ARCustomerPaymentFormSearchComponent  extends AppForm implements OnInit {
+export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnInit {
     // @Output() onSearch:  EventEmitter<Partial<ISearchAccPayment>> = new EventEmitter<Partial<ISearchAccPayment>>();
-
+    @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
     formSearch: FormGroup;
 
     partnerId: AbstractControl;
@@ -36,16 +41,26 @@ export class ARCustomerPaymentFormSearchComponent  extends AppForm implements On
     etd: AbstractControl;
     syncStatus: AbstractControl;
     paymentRefNo: AbstractControl;
- 
+    // userLogged: User;
+    currencies: Currency[] = [];
+    requesters: Currency[] = [];
+    currencyList: any[] = [];
+    selectedCurrency: any = null;
+    dataSearch: SOASearchCharge = new SOASearchCharge();
+
+
     partners: Observable<Partner[]>;
-    selected: {startDate: Moment, endDate: Moment};
+
+
+
+    selected: { startDate: Moment, endDate: Moment };
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'ID' },
         { field: 'shortName', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
-    
+
     paymentRef: string[] = ['Payment ', 'Invoice'];
     dateType: string[] = ['Create Date', 'Paid Date', 'Last Sync'];
     syncstatus: string[] = ['Synced', 'Rejected'];
@@ -60,7 +75,10 @@ export class ARCustomerPaymentFormSearchComponent  extends AppForm implements On
 
     constructor(
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo
+        private _dataService: DataService,
+        private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
+        // private _store: Store<IAdvancePaymentState>,
     ) {
         super();
         this.requestSearch = this.submitSearch;
@@ -70,6 +88,7 @@ export class ARCustomerPaymentFormSearchComponent  extends AppForm implements On
     ngOnInit(): void {
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this.initForm();
+        this.getCurrency();
     }
 
     initForm() {
@@ -81,8 +100,8 @@ export class ARCustomerPaymentFormSearchComponent  extends AppForm implements On
             syncStatus: [[this.syncstatus[1], this.syncstatus[2]]],
             Date: [[this.dateType[1], this.dateType[2], this.dateType[3]]],
             paymentRefNo: [[this.paymentRef[1], this.paymentRef[2]]]
-         //   etd: !!shipment.etd ? { startDate: new Date(shipment.etd), endDate: new Date(shipment.etd) } : null,
-            
+            //   etd: !!shipment.etd ? { startDate: new Date(shipment.etd), endDate: new Date(shipment.etd) } : null,
+
         });
 
         this.partnerId = this.formSearch.controls["partnerId"];
@@ -92,6 +111,61 @@ export class ARCustomerPaymentFormSearchComponent  extends AppForm implements On
         this.syncStatus = this.formSearch.controls["syncStatus"];
         this.paymentRefNo = this.formSearch.controls["paymentRefNo"];
     }
+
+    // getCurrencyAndUsers() {
+    //     combineLatest([
+    //         this._catalogueRepo.getListCurrency(),
+    //         this._systemRepo.getSystemUsers({}),
+    //         this._store.select(getAdvancePaymentSearchParamsState)
+    //     ]).pipe(
+    //         map((cur, param) => ({ ...cur, param }))
+    //     ).subscribe(
+    //         (res) => {
+    //             this.currencies = res[0] || [];
+    //             this.requesters = res[1];
+
+    //             if (Object.keys(res[2]).length === 0 && res[2].constructor === Object) {
+    //                 this.requester.setValue(this.userLogged.id);
+    //                 this.currencyId.setValue(null);
+    //             } else {
+    //                 const requesterTemp = this.requesters.find(e => e.id === res[2].requester);
+    //                 const currencyTemp = !this.currencies.find(e => e.id === res[2].currencyId) ? null
+    //                     : this.currencies.find(e => e.id === res[2].currencyId);
+
+    //                 this.requester.setValue(requesterTemp.id);
+    //                 this.currencyId.setValue(currencyTemp);
+
+    //             }
+    //         }
+    //     );
+    // }
+
+
+    getCurrency() {
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.getCurrencyData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY));
+        } else {
+            this._catalogueRepo.getListCurrency()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataCurrency: any) => {
+                        this.getCurrencyData(dataCurrency);
+                    },
+                );
+        }
+    }
+
+    getCurrencyData(data: any) {
+        this.currencyList = (data).map((item: any) => ({ id: item.id, text: item.id }));
+        this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+        this.updateDataSearch('currency', this.selectedCurrency.id);
+        this.updateDataSearch('currencyLocal', 'VND');
+    }
+    updateDataSearch(key: string, data: any) {
+        this.dataSearch[key] = data;
+        this.onChange.emit({ key: key, data: data });
+    }
+
 
     // tslint:disable-next-line:no-any
     onSelectDataFormInfo(data: any, type: string) {
@@ -105,7 +179,7 @@ export class ARCustomerPaymentFormSearchComponent  extends AppForm implements On
     }
 
     submitSearch() {
-     
+
         // const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         // const status = !!dataForm.paymentStatus ? this.getSearchStatus(dataForm.paymentStatus) : null;
         // const body: ISearchAccPayment = {
