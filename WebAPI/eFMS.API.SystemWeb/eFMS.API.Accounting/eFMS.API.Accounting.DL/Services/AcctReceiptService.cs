@@ -544,6 +544,23 @@ namespace eFMS.API.Accounting.DL.Services
             return hsInvoiceUpdate;
         }
 
+        private HandleState UpdateCusAdvanceOfAgreement(AcctReceiptModel receiptModel)
+        {
+            var hsAgreementUpdate = new HandleState();
+            var totalAdv = receiptModel.Payments.Where(x => x.Type == "ADV").Select(s => s.PaidAmount).Sum();
+            var receiptCusAdvance = receiptModel.CusAdvanceAmount;
+            var agreement = catContractRepository.Get(x => x.Id == receiptModel.AgreementId).FirstOrDefault();
+            if (agreement != null)
+            {
+                var _cusAdv = ((totalAdv - receiptCusAdvance) + agreement.CustomerAdvanceAmount) ?? 0;
+                agreement.CustomerAdvanceAmount = _cusAdv < 0 ? 0 : _cusAdv;
+                agreement.UserModified = currentUser.UserID;
+                agreement.DatetimeModified = DateTime.Now;
+                hsAgreementUpdate = catContractRepository.Update(agreement, x => x.Id == agreement.Id);
+            }
+            return hsAgreementUpdate;
+        }
+
         public HandleState AddDraft(AcctReceiptModel receiptModel)
         {
             try
@@ -678,14 +695,15 @@ namespace eFMS.API.Accounting.DL.Services
                         if (hs.Success)
                         {
                             var paymentsAdd = receiptModel.Payments.Where(x => x.PaymentId == Guid.Empty || x.PaymentId == null).ToList();
+                            var hsPaymentAdd = AddPayments(paymentsAdd, receipt);
                             if (isAddNew == false)
                             {
                                 var paymentsUpdate = receiptModel.Payments.Where(x => x.PaymentId != Guid.Empty && x.PaymentId != null).ToList();
                                 var paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && !paymentsUpdate.Select(se => se.PaymentId).Contains(x.Id)).Select(s => s.Id).ToList();
-                                var hsPaymentAdd = AddPayments(paymentsAdd, receipt);
                                 var hsPaymentUpdate = UpdatePayments(paymentsUpdate, receipt);
                                 var hsPaymentDelete = DeletePayments(paymentsDelete);
                             }
+                            // Cập nhật invoice cho những payment
                             var hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receipt.Id);
 
                             DataContext.SubmitChanges();
@@ -733,11 +751,14 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = DataContext.Update(receipt, x => x.Id == receipt.Id, false);
                         if (hs.Success)
                         {
+                            // Lấy ra ds payment của Receipt
                             var paymentsReceipt = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id).ToList();
                             // Phát sinh những dòng payment âm 
                             var hsAddPaymentNegative = AddPaymentsNegative(paymentsReceipt, receipt);
-
+                            // Cập nhật invoice cho những payment
                             var hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receipt.Id);
+                            // Cập nhật Cus Advance của Agreement
+                            var hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel);
 
                             DataContext.SubmitChanges();
                             trans.Commit();
