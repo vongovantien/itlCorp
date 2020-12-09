@@ -415,7 +415,7 @@ export class PartnerDetailComponent extends AppList {
             partnerMode: !!formBody.partnerMode ? formBody.partnerMode.id : null,
             partnerLocation: !!formBody.partnerLocation ? formBody.partnerLocation.id : null,
             id: this.isAddSubPartner ? null : this.partner.id,
-            creditPayment: formBody.creditPayment.id,
+            creditPayment: !!formBody.creditPayment ? formBody.creditPayment.id : null,
         };
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);
