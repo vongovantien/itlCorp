@@ -27,7 +27,6 @@ const routing: Routes = [
         ]
     },
 
-
 ];
 
 @NgModule({
@@ -43,7 +42,7 @@ const routing: Routes = [
     imports: [
         SharedModule,
         RouterModule.forChild(routing),
-        TabsModule,
+        TabsModule.forRoot(),
         NgSelectModule,
         NgxDaterangepickerMd,
         StoreModule.forFeature('customer-payment', reducers),
