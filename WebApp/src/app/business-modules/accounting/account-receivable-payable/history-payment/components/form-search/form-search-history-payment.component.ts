@@ -20,10 +20,10 @@ enum OverDueDays {
 }
 
 @Component({
-    selector: 'form-search-account-payment',
-    templateUrl: './form-search-account-payment.component.html'
+    selector: 'form-search-history-payment',
+    templateUrl: './form-search-history-payment.component.html'
 })
-export class AccountPaymentFormSearchComponent extends AppForm implements OnInit {
+export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnInit {
 
     @Output() onSearch: EventEmitter<Partial<ISearchAccPayment>> = new EventEmitter<Partial<ISearchAccPayment>>();
 

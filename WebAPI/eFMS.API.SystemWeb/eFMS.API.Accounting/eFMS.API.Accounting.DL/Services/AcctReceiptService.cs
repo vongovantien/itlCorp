@@ -263,9 +263,9 @@ namespace eFMS.API.Accounting.DL.Services
             List<ReceiptInvoiceModel> results = new List<ReceiptInvoiceModel>();
             string agreementService = string.Empty;
             string agreementBaseOn = string.Empty;
-            if (criteria.AgreementID != Guid.Empty)
+            if (!string.IsNullOrEmpty(criteria.AgreementID))
             {
-                CatContract agreement = catContractRepository.Get(x => x.Id == criteria.AgreementID).FirstOrDefault();
+                CatContract agreement = catContractRepository.Get(x => x.Id.ToString() == criteria.AgreementID).FirstOrDefault();
                 if (agreement != null)
                 {
                     agreementService = agreement.SaleService;
@@ -273,8 +273,12 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
+            List<string> partnerChild = catPartnerRepository.Get(x => x.ParentId == criteria.CustomerID).Select(x => x.Id).ToList();
+
             Expression<Func<AccAccountingManagement, bool>> queryInvoice = null;
-            queryInvoice = x => ((x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
+            queryInvoice = x => (
+            (x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
+             && (partnerChild.Contains(x.PartnerId))
              && (x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID || x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
              && ((x.ServiceType ?? "").Contains(agreementService ?? "", StringComparison.OrdinalIgnoreCase)));
 
@@ -306,12 +310,14 @@ namespace eFMS.API.Accounting.DL.Services
                 var queryReceiptInvoice = from invoice in invoices
                                           join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
                                           from grpPartner in grpPartners.DefaultIfEmpty()
+                                          orderby invoice.PaymentStatus
                                           select new { invoice, grpPartner };
 
                 if (queryReceiptInvoice != null)
                 {
                     results = queryReceiptInvoice.Select(x => new ReceiptInvoiceModel
                     {
+
                         InvoiceId = x.invoice.Id.ToString(),
                         InvoiceNo = x.invoice.InvoiceNoReal,
                         Currency = x.invoice.Currency,
@@ -322,8 +328,15 @@ namespace eFMS.API.Accounting.DL.Services
                         PaymentStatus = x.invoice.PaymentStatus,
                         PartnerName = x.grpPartner.ShortName,
                         TaxCode = x.grpPartner.TaxCode,
-                        BillingDate = x.invoice.ConfirmBillingDate
+                        BillingDate = x.invoice.ConfirmBillingDate,
+
                     }).ToList();
+
+                    int index = 1;
+                    foreach (var item in results)
+                    {
+                        item.Index = index++;
+                    }
                 }
             }
 
@@ -787,5 +800,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+
+        public List<ReceiptInvoiceModel> ProcessReceiptInvoice(ProcessReceiptInvoice criteria)
+        {
+            List<ReceiptInvoiceModel> results = new List<ReceiptInvoiceModel>();
+
+
+
+            return results;
+        }
     }
 }

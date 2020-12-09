@@ -23,12 +23,14 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() loading: boolean = false;
     @Input() placeholder: string = '';
     @Input() size: number = 25;
+    @Input() clearable: boolean = true;
 
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
 
     @ViewChild('inputSearch') inputSearch: ElementRef;
     @ViewChild('clkSearch', { static: true }) inputPlaceholder: ElementRef;
+    @ViewChildren(AppCombogridItemComponent) items: QueryList<AppCombogridItemComponent>;
 
     currentItemSelected: any = null;
     CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
@@ -47,7 +49,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     isFocusSearch: boolean = false;
 
-    @ViewChildren(AppCombogridItemComponent) items: QueryList<AppCombogridItemComponent>;
     private keyManager: FocusKeyManager<AppCombogridItemComponent>;
 
     @HostListener('keydown.Enter', ['$event'])
@@ -89,15 +90,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (e.keyCode === DOWN_ARROW) {
             this.keyManager.onKeydown(e);
             this.keyManager.setFirstItemActive();
-
-            // if (!this.CurrentActiveItemIdObj) {
-            //     this.keyManager.setFirstItemActive();
-            // } else {
-            //     const itemIndex = this.ConstDataSources.findIndex(o => o[this.CurrentActiveItemIdObj.field] === this.CurrentActiveItemIdObj.value);
-            //     if (itemIndex !== -1) {
-            //         this.keyManager.setActiveItem(itemIndex);
-            //     }
-            // }
         }
     }
 
@@ -226,14 +218,14 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         } else {
             let dataItem = '';
             this.SelectedDisplayFields.forEach((data: string, index: number) => {
-                if (index === this.selectedDisplayFields.length - 1) {
-                    this.displaySelectedStr += item[data];
-                } else {
-                    if (item[data] && item[data].trim()) {
-                        dataItem += item[data] + ' - ';
+                if (!!item[data]) {
+                    if (index === 0) {
+                        dataItem = item[data];
+                    } else {
+                        dataItem += ' - ' + item[data];
                     }
-                    this.displaySelectedStr = dataItem;
                 }
+                this.displaySelectedStr = dataItem;
             });
         }
     }

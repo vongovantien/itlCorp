@@ -20,5 +20,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<ReceiptInvoiceModel> GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria);
         AcctReceiptModel GetById(Guid id);
         HandleState SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction);
+        List<ReceiptInvoiceModel> ProcessReceiptInvoice(ProcessReceiptInvoice criteria);
     }
 }
