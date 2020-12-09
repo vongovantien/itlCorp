@@ -354,7 +354,9 @@
                                         *ngIf="item.countryShippingError !== null">{{ item.countryShippingError }}</span>
                                 </td>
                                 <td>
-                                    <span> {{item.cityShipping}} </span>
+                                    <span *ngIf="item.cityShippingError === null"> {{item.cityShipping}} </span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.cityShippingError !== null">{{ item.cityShippingError }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.zipCodeShipping }}</span>
