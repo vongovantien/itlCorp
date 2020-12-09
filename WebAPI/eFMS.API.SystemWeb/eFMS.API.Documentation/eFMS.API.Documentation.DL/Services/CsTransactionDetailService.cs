@@ -2143,7 +2143,7 @@ namespace eFMS.API.Documentation.DL.Services
                               {
                                   Mawb = transDetail.Mawb,
                                   Hawb = transDetail.Hwbno,
-                                  FlightNo = transDetail.FlightNo,
+                                  FlightNo = transDetail.FlightNo + (transDetail.FlightDate != null ? "/" + transDetail.FlightDate.Value.ToString("ddMMM").ToUpper() : string.Empty),
                                   PodCode = pod.Code,
                                   ShipperName = shipper.ShortName, //ABBR Name
                                   Pieces = transDetail.PackageQty,
