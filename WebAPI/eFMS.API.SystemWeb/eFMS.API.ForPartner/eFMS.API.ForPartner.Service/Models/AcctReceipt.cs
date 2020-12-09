@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Accounting.Service.Models
+namespace eFMS.API.ForPartner.Service.Models
 {
     public partial class AcctReceipt
     {

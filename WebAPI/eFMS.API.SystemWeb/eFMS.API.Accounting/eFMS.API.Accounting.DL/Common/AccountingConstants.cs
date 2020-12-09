@@ -162,5 +162,12 @@
         public static readonly string ACCOUNTANT_TYPE_DEBIT = "DEBIT";
         public static readonly string ACCOUNTANT_TYPE_CREDIT = "CREDIT";
         public static readonly string ACCOUNTANT_TYPE_INVOICE = "INVOICE";
+
+        public static readonly string AGREEMENT_BASE_ON_INVOICE_DATE = "Invoice Date";
+        public static readonly string AGREEMENT_BASE_ON_CONFIRMED_BILLING = "Confirmed Billing";
+
+        public static readonly string RECEIPT_STATUS_DRAFT = "Draft";
+        public static readonly string RECEIPT_STATUS_DONE = "Done";
+        public static readonly string RECEIPT_STATUS_CANCEL = "Cancel";
     }
 }

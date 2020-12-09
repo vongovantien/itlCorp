@@ -1257,6 +1257,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             ContractNo = x.contract.ContractNo,
                             ExpiredDate = x.contract.ExpiredDate,
                             ContractType = x.contract.ContractType,
+                            CusAdvanceAmount = x.contract.CustomerAdvanceAmount ?? 0
                         }).OrderBy(x => x.ExpiredDate);
                     }
                 }

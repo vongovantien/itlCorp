@@ -9,7 +9,7 @@ export class AdvancePayment {
     requester: string = '';
     requesterName: string = '';
     department: string = '';
-    paymentMethod: string = ''
+    paymentMethod: string = '';
     advanceCurrency: string = '';
     requestDate: string = '';
     deadlinePayment: string = '';

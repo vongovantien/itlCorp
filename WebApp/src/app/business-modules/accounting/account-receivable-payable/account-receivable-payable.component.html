@@ -9,8 +9,7 @@
 
                     <tabset class="custom-class-tab">
                         <tab heading="Invoice Payment" (selectTab)="onSelectTabLocation('INVOICE')">
-                            <list-invoice-account-payment
-                                (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
+                            <list-invoice-account-payment (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
                             </list-invoice-account-payment>
                         </tab>
                         <tab heading="OBH Payment" (selectTab)="onSelectTabLocation('OBH')">

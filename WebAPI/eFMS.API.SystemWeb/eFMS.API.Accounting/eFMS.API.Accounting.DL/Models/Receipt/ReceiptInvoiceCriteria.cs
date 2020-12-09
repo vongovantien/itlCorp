@@ -8,7 +8,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
     {
         public Guid CustomerID { get; set; }
         public Guid AgreementID { get; set; }
-        public DateTime? Date { get; set; }
-        public string ReceiptNo { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
 }

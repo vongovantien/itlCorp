@@ -25,6 +25,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<ChargeOfAccountingManagementModel, AccountingManagementExport>();
             CreateMap<CatContract, CatContractModel>();
 
+
             // Map to entity model
             CreateMap<AcctSoaModel, AcctSoa>();
             CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();

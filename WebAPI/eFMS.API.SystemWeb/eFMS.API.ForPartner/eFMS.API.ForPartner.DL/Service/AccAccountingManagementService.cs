@@ -39,6 +39,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<CatCurrencyExchange> currencyExchangeRepo;
         private readonly IContextBase<SysNotifications> sysNotificationRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
+        private readonly IContextBase<AcctReceipt> receiptRepository;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -60,7 +61,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctSettlementPayment> settlementPayment,
             IContextBase<CatCurrencyExchange> currencyExchange,
             IContextBase<SysNotifications> sysNotifyRepo,
-            IContextBase<SysUserNotification> sysUsernotifyRepo
+            IContextBase<SysUserNotification> sysUsernotifyRepo,
+            IContextBase<AcctReceipt> receiptRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -80,6 +82,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currencyExchangeRepo = currencyExchange;
             sysNotificationRepository = sysNotifyRepo;
             sysUserNotificationRepository = sysUsernotifyRepo;
+            receiptRepository = receiptRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -210,11 +213,11 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
                                 surchargeObh.AcctManagementId = invoiceObh.Id;
-                                surchargeObh.InvoiceNo = invoiceObh.InvoiceNoReal;
-                                surchargeObh.InvoiceDate = invoiceObh.Date;
+                                surchargeObh.InvoiceNo = null; //CR: 07/12/2020
+                                surchargeObh.InvoiceDate = null; //CR: 07/12/2020
                                 surchargeObh.VoucherId = invoiceObh.VoucherId;
                                 surchargeObh.VoucherIddate = invoiceObh.Date;
-                                surchargeObh.SeriesNo = invoiceObh.Serie;
+                                surchargeObh.SeriesNo = null; //CR: 07/12/2020
                                 surchargeObh.FinalExchangeRate = CalculatorExchangeRate(obhCharge.ExchangeRate, surchargeObh.ExchangeDate, surchargeObh.CurrencyId, invoiceObh.Currency); //obhCharge.ExchangeRate;
                                 surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
                                 surchargeObh.DatetimeModified = DateTime.Now;
@@ -1180,7 +1183,72 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectPayment(string id, string reason)
         {
-            return new HandleState();
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var _id = Guid.Empty;
+                    Guid.TryParse(id, out _id);
+                    var receipt = receiptRepository.Get(x => x.Id == _id).FirstOrDefault();
+                    if (receipt == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+
+                    receipt.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                    receipt.UserModified = currentUser.UserID;
+                    receipt.DatetimeModified = DateTime.Now;
+                    receipt.ReasonReject = reason;
+
+                    HandleState hs = receiptRepository.Update(receipt, x => x.Id == receipt.Id, false);
+                    if (hs.Success)
+                    {
+                        HandleState smReceipt = receiptRepository.SubmitChanges();
+                        if (smReceipt.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data Receipt {0}", receipt.PaymentRefNo);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = "", //Cập nhật sau
+                                UserIds = receipt.UserCreated
+                            };
+                            sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = receipt.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            sysUserNotificationRepository.Add(sysUserNotify);
+                        }
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
 
         /// <summary>

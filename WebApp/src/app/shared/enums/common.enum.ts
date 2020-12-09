@@ -6,6 +6,12 @@ export namespace CommonEnum {
         'LENGTH' = "Length",
         'VOLUMN' = "Volumn",
     }
+    export enum Agreement {
+        ALL = 0,
+        SALEMANNAME = 1,
+        CONTRACTNO = 2,
+        CONTRACTTYPE = 3,
+    }
 
     export enum PartnerGroupEnum {
         ALL = 0,

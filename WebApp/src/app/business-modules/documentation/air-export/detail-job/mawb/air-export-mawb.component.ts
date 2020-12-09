@@ -198,7 +198,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             issuedBy: data.issuedBy,
                             mblno1: !!data.mawb ? data.mawb.slice(0, 3) : null,
                             mblno2: data.polCode,
-                            mblno3: !!data.mawb ? data.mawb.slice(-9) : null,
+                            mblno3: !!data.mawb ? data.mawb.slice(-8) : null,
                             rclass: 'Q',
                             consigneeId: data.agentId,
                             consigneeDescription: this.setDefaultAgentData(data),
