@@ -576,6 +576,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list)
         {
             var officeIds = DataContext.Get().Select(t => t.OfficeId).ToArray();
+            var data = list.GroupBy(x => new { x.Office, x.CustomerId }).Where(t => t.Count() > 1).Select(y => y.Key).FirstOrDefault();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.CustomerId))
@@ -781,18 +782,31 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
 
                 }
-                var sale = saleServices.Remove(saleServices.Length - 1);
-                
+                var sale = saleServices.Length > 0 ? saleServices.Remove(saleServices.Length - 1 ) : string.Empty;
                 if (DataContext.Any(x => x.SaleService.Contains(sale) && x.OfficeId != null && listOfficeId.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId != saleManId && x.PartnerId == customerId))// && x.SaleManId == saleManId))
                 {
                     item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
                     item.IsValid = false;
                 }
-
-                if (list.GroupBy(x=> new { x.Office, x.SaleService }).Where(t => t.Count() > 1).Select(y => y.Key).ToList().Count() > 0)
+                if (list.GroupBy(x=> new { x.Office, x.CustomerId }).Where(t => t.Count() > 1).Select(y => y.Key).ToList().Count() > 0)
                 {
-                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
-                    item.IsValid = false;
+                    if(data.CustomerId == item.CustomerId)
+                    {
+                        var dataFind = list.Where(x => x.CustomerId == data.CustomerId).ToList();
+                        string saleService = string.Empty;
+                        foreach (var it in dataFind)
+                        {
+                            saleService += it.SaleService.Trim() + ";";
+                        }
+
+                        var dataDuplicate = saleService.Replace(" ","").Split(";").ToArray();
+                        var dataCheck = dataDuplicate.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList();
+                        if (dataCheck.Any())
+                        {
+                            item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
+                            item.IsValid = false;
+                        }
+                    }
                 }
             });
             return list;
