@@ -70,9 +70,9 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return new vw_catCurrencyExchangeNewest
             {
-                CurrencyFromID = data.CurrencyFromId,
-                Rate = data.Rate,
-                DatetimeCreated = data.DatetimeModified ?? data.DatetimeCreated
+                CurrencyFromID = data != null ? data.CurrencyFromId : null,
+                Rate = data != null ? data.Rate : 0,
+                DatetimeCreated = data != null ? data?.DatetimeModified : null
             };
         }
 
