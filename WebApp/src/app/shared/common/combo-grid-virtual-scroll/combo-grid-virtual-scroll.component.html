@@ -11,10 +11,12 @@
                 (click)="clkSearch.click(); showAngledownIcon = !showAngledownIcon">
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
             </span>
-            <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()"
-                *ngIf="!!displaySelectedStr && !Disabled">
-                <i class="la la-times" aria-hidden="true"></i>
-            </span>
+            <ng-container *ngIf="clearable">
+                <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()"
+                    *ngIf="!!displaySelectedStr && !Disabled">
+                    <i class="la la-times" aria-hidden="true"></i>
+                </span>
+            </ng-container>
         </div>
     </ng-container>
     <ng-container *ngIf="loading">
