@@ -612,17 +612,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                         item.IsValid = false;
                     }
-                    //if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    //{
-                    //    item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
-                    //    item.IsValid = false;
 
-                    //}
-                    //if (!item.EffectDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    //{
-                    //    item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
-                    //    item.IsValid = false;
-                    //}
                     if (string.IsNullOrEmpty(item.CreditLimited) && (item.ContractType == "Trial" || item.ContractType == "Official"))
                     {
                         item.CreditLimitError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CREDIT_LIMIT_EMPTY]);
