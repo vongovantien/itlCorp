@@ -26,6 +26,13 @@
             <param name="action">ADD(0) or UPDATE(1)</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListReceipt(System.Collections.Generic.List{System.Guid})">
+            <summary>
+            Func Test (Get List Receipt)
+            </summary>
+            <param name="Ids"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingManagementController">
             <summary>
             A base class for an MVC controller without view support.

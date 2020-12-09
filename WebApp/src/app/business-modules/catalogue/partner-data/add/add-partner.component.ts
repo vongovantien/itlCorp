@@ -325,7 +325,7 @@ export class AddPartnerDataComponent extends AppList {
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,
             partnerType: 'Supplier',
-            creditPayment: formBody.creditPayment
+            creditPayment: !!formBody.creditPayment ? formBody.creditPayment : null
         };
 
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
