@@ -1,10 +1,9 @@
-
 @import "../vendors/base/roboto.css";
 @import "../vendors/base/iconmoon.css";
 @import "../vendors/base/vendors.css";
-@import '../style-share/ng2-select/prism-okaidia.css';
-@import '../style-share/ng2-select/ng2-select.css';
-@import '~ngx-toastr/toastr.css';
+// @import "../style-share/ng2-select/prism-okaidia.css";
+// @import "../style-share/ng2-select/ng2-select.css";
+// @import "~ngx-toastr/toastr.css";
 //
 //** Default Stylesheets
 //
@@ -13,7 +12,7 @@
 ///////////// DO NOT MODIFY BELOW INCLUDE ORDER ////////////////
 ////////////////////////////////////////////////////////////////
 //== 1: Framework Config
-@import "framework-config";  // demo level framework config override
+@import "framework-config"; // demo level framework config override
 @import "framework/config"; // metronic framework config
 @import "framework/vendors/bootstrap/variables"; // metronic bootstrap override config
 
@@ -39,7 +38,7 @@
 @import "header/_config";
 @import "aside/_config";
 @import "menu-header/_config";
-@import "menu-aside/_config";   
+@import "menu-aside/_config";
 @import "footer/_config";
 
 //== 7: Demo Layout
@@ -67,3 +66,10 @@
 @import "combogrid/_combogrid";
 @import "datatable/_editable";
 @import "~@ng-select/ng-select/themes/default.theme.css";
+
+// Toasr
+// @import "~ngx-toastr/toastr-bs4-alert";
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "~ngx-toastr/toastr-bs4-alert";
