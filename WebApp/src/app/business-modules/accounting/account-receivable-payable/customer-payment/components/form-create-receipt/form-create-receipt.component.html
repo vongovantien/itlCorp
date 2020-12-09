@@ -1,3 +1,74 @@
-<form>
-    form
-</form>
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <form [formGroup]="formSearchInvoice" class="m-form m-form--state">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || customerId.dirty) && !customerId.valid }">
+                        <label for="form-control-label" required>
+                            Customer Name
+                        </label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                            (remove)="resetFormControl(customerId)"
+                            [currentActiveItemId]="{field:'id', value: customerId.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
+                            [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="form-control-label">
+                            Date
+                        </label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" ngxDaterangepickerMd class="form-control"
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                placeholder="Select request date" [autoApply]="true" formControlName="date"
+                                [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label required>
+                            Payment Reference No
+                        </label>
+                        <input type="text" class="form-control m-input m-input--square"
+                            formControlName="paymentReferenceNo">
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !agreement.valid }">
+                        <label required>Agreement
+                        </label>
+                        <app-combo-grid-virtual-scroll #combogridAgreement
+                            (itemSelected)="onSelectDataFormInfo($event, 'agreement')"
+                            (remove)="resetFormControl(agreement)"
+                            [currentActiveItemId]="{field:'id', value: agreement.value}"
+                            [selectedDisplayFields]="['contractType','saleManName','contractNo']"
+                            [dataSources]="agreements" [displayFields]="displayFieldAgreement"
+                            placeholder="Select Agreement" [clearable]="false">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6"></div>
+                <div class="col-lg-6 m--align-right  align-items-center justify-content-between">
+                    <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10 ng-star-inserted"
+                        type="button" (click)="getInvoiceList()">
+                        <span>
+                            <i class="la la-search"></i>
+                            <span>Apply </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

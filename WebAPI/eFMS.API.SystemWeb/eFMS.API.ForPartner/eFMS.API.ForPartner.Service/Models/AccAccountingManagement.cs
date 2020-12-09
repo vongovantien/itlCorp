@@ -47,5 +47,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public DateTime? LastSyncDate { get; set; }
         public string SyncStatus { get; set; }
         public string ReasonReject { get; set; }
+        public DateTime? ConfirmBillingDate { get; set; }
     }
 }

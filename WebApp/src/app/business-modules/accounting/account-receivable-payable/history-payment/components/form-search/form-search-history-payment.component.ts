@@ -20,10 +20,10 @@ enum OverDueDays {
 }
 
 @Component({
-    selector: 'form-search-account-payment',
-    templateUrl: './form-search-account-payment.component.html'
+    selector: 'form-search-history-payment',
+    templateUrl: './form-search-history-payment.component.html'
 })
-export class AccountPaymentFormSearchComponent extends AppForm implements OnInit {
+export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnInit {
 
     @Output() onSearch: EventEmitter<Partial<ISearchAccPayment>> = new EventEmitter<Partial<ISearchAccPayment>>();
 
@@ -90,6 +90,7 @@ export class AccountPaymentFormSearchComponent extends AppForm implements OnInit
         this.paymentStatus = this.formSearch.controls["paymentStatus"];
     }
 
+    // tslint:disable-next-line:no-any
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
@@ -101,9 +102,11 @@ export class AccountPaymentFormSearchComponent extends AppForm implements OnInit
     }
 
     submitSearch() {
+        // tslint:disable-next-line:no-any
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         const status = !!dataForm.paymentStatus ? this.getSearchStatus(dataForm.paymentStatus) : null;
         const body: ISearchAccPayment = {
+            // tslint:disable-next-line:no-any
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
             paymentStatus: status,

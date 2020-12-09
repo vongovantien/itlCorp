@@ -43,7 +43,7 @@ export class JobManagementCreateJobComponent extends AppForm {
             commodityGroupId: form.commodity,
         };
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
-
+        opsTransaction.salemanId = form.salemansId;
         return opsTransaction;
     }
 

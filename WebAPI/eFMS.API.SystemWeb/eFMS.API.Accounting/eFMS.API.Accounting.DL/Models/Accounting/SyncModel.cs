@@ -16,8 +16,8 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string CustomerName { get; set; }
         public string CustomerMode { get; set; }
         public string LocalBranchCode { get; set; }
-        public string CurrencyCode { get; set; }
-        public decimal ExchangeRate { get; set; }
+        public string CurrencyCode0 { get; set; }
+        public decimal ExchangeRate0 { get; set; }
         public string Description0 { get; set; }
         public string DataType { get; set; }
         public List<ChargeSyncModel> Details { get; set; }

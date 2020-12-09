@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
@@ -65,7 +66,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCurrencyExchange> currencyExchangeRepo,
             IContextBase<CatCommodity> commodityRepo,
             ICurrencyExchangeService currencyExchange,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -89,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             currencyExchangeService = currencyExchange;
             commodityRepository = commodityRepo;
             sysOfficeRepo = sysOffice;
+            userlevelRepository = userlevelRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -105,6 +108,35 @@ namespace eFMS.API.Documentation.DL.Services
             model.OfficeId = currentUser.OfficeID;
             model.CompanyId = currentUser.CompanyID;
             var customer = partnerRepository.Get(x => x.Id == model.CustomerId).FirstOrDefault();
+            var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+            string SalesGroupId = string.Empty;
+            string SalesDepartmentId = string.Empty;
+            string SalesOfficeId = string.Empty;
+            string SalesCompanyId = string.Empty;
+            if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+            {
+                var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                if (dataGroup.Any())
+                {
+                    SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                }
+                else
+                {
+                    SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                }
+
+            }
+
+            model.SalesGroupId = !string.IsNullOrEmpty(SalesGroupId) ? SalesGroupId : null;
+            model.SalesDepartmentId = !string.IsNullOrEmpty(SalesDepartmentId) ? SalesDepartmentId : null;
+            model.SalesOfficeId = !string.IsNullOrEmpty(SalesOfficeId) ? SalesOfficeId : null;
+            model.SalesCompanyId = !string.IsNullOrEmpty(SalesCompanyId) ? SalesCompanyId : null;
             //if(customer != null)
             //{
             //    model.SalemanId = customer.SalePersonId;
@@ -997,11 +1029,41 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public HandleState Update(OpsTransactionModel model)
         {
+            var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId,  OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
             if (code == 403) return new HandleState(403);
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
+            if (model.SalemanId != detail.SalemanId)
+            {
+                var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+                if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+                {
+                    var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                    if (dataGroup.Any())
+                    {
+                        model.SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                        model.SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                        model.SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                        model.SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                    }
+                    else
+                    {
+                        model.SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                        model.SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                        model.SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                        model.SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                    }
+                }
+            }
+            else
+            {
+                model.SalesGroupId = detail.SalesGroupId;
+                model.SalesDepartmentId = detail.SalesDepartmentId;
+                model.SalesOfficeId = detail.SalesOfficeId;
+                model.SalesCompanyId = detail.SalesCompanyId;
+            }
             var hs = Update(model, x => x.Id == model.Id);
             if (hs.Success)
             {

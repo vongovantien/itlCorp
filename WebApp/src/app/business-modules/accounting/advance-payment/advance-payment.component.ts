@@ -21,6 +21,7 @@ import { AdvancePaymentFormsearchComponent } from './components/form-search-adva
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
 import { catchError, finalize, map } from 'rxjs/operators';
+import _tets from 'lodash/concat';
 
 @Component({
     selector: 'app-advance-payment',
@@ -53,7 +54,7 @@ export class AdvancePaymentComponent extends AppList {
     paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
 
-    advanceSyncIds: any[] = [];
+    advanceSyncIds: any[] = ['sds  sd     '];
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -72,7 +73,6 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     ngOnInit() {
-
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },

@@ -1224,4 +1224,9 @@ export class CatalogueRepo {
         );
 
     }
+
+    getAgreement(body) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/VI/CatContract/QueryAgreement`, body);
+
+    }
 }

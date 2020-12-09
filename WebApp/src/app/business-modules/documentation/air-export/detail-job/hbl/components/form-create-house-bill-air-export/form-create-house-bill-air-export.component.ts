@@ -113,6 +113,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     dims: DIM[] = []; // * Dimension details.
     otherCharges: CsOtherCharge[] = [];
 
+    // tslint:disable-next-line:no-any
     isLoadingPort: any;
     isSeparate: boolean = false;
     isCollapsed: boolean = false;
@@ -322,7 +323,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             seaAir: [],
             route: [],
             min: [false],
-            asArranged: [false],
+            asArranged: [true],
             showDim: [true],
             // * Combogrid
             customerId: [null, Validators.required],
@@ -692,7 +693,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     onChangeAsArranged() {
         this.formCreate.controls['asArranged'].valueChanges
-            .pipe(takeUntil(this.ngUnsubscribe))
+            .pipe(takeUntil(this.ngUnsubscribe), startWith(this.asArranged.value))
             .subscribe((value: boolean) => {
                 if (value) {
                     this.formCreate.controls['rateCharge'].setValue(null);

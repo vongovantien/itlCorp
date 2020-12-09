@@ -215,10 +215,10 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
             item.Active = false;
-            //if (sysUserLevelService.Any(x=>x.UserId == id))
-            //{
-            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
-            //}
+            if (sysUserLevelService.Any(x => x.UserId == id))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "User has been used! Delete denied !" });
+            }
             var user = sysUserService.Get(x => x.Id == id).FirstOrDefault();
             var employee = sysEmployeeService.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
             if(employee != null)
