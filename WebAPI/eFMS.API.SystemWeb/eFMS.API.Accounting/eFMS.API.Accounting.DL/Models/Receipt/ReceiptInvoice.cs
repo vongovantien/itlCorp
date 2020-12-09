@@ -5,6 +5,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
 {
     public class ReceiptInvoiceModel
     {
+        public int Index { get; set; }
         public Guid? PaymentId { get; set; }
         public string InvoiceId { get; set; }
         public string InvoiceNo { get; set; }

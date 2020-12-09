@@ -28,7 +28,7 @@ const routing: Routes = [
         data: { name: "" },
         children: [
             {
-                path: '', component: AccountReceivablePayableComponent,
+                path: '', component: AccountReceivablePayableComponent, redirectTo: 'customer',
                 data: { name: 'Account Payment' }
             },
             {
