@@ -14,6 +14,7 @@ using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using eFMS.API.ForPartner.Infrastructure.Extensions;
 using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -154,20 +155,20 @@ namespace eFMS.API.ForPartner.Controllers
                 return BadRequest(_result);
             }
 
+            var fieldRequireCharge = GetFieldRequireCharges(model.Charges);
+            if (!string.IsNullOrEmpty(fieldRequireCharge))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Các trường của ds charge: [{0}] không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireCharge), Data = model };
+                return BadRequest(_result);
+            }
+            
             var debit_Obh_Charges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT || x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
             if (debit_Obh_Charges.Count == 0)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để tạo hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
-
-            var checkNotExistsPaymentTermOfCharge = model.Charges.Where(x => x.PaymentTerm == null || x.PaymentTerm < 1).Any();
-            if (checkNotExistsPaymentTermOfCharge)
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "PaymentTerm (bắt buộc > 0) không có dữ liệu. Vui lòng kiểm tra lại!", Data = model };
-                return BadRequest(_result);
-            }
-
+            
             var hs = accountingManagementService.InsertInvoice(model, apiKey, "CreateInvoiceData");
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Tạo mới hóa đơn thành công", Data = model };
@@ -207,20 +208,20 @@ namespace eFMS.API.ForPartner.Controllers
                 return BadRequest(_result);
             }
 
+            var fieldRequireCharge = GetFieldRequireCharges(model.Charges);
+            if (!string.IsNullOrEmpty(fieldRequireCharge))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Các trường của ds phí: [{0}] không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireCharge), Data = model };
+                return BadRequest(_result);
+            }
+
             var debit_Obh_Charges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT || x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
             if (debit_Obh_Charges.Count == 0)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để thay thế hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
-
-            var checkNotExistsPaymentTermOfCharge = model.Charges.Where(x => x.PaymentTerm == null || x.PaymentTerm < 1).Any();
-            if (checkNotExistsPaymentTermOfCharge)
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "PaymentTerm (bắt buộc > 0) không có dữ liệu. Vui lòng kiểm tra lại!", Data = model };
-                return BadRequest(_result);
-            }
-
+            
             #region --- Delete Invoice Old by PreReferenceNo ---
             var invoiceToDelete = new InvoiceInfo
             {
@@ -374,7 +375,42 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "Currency";
             }
+            
             return message;
+        }
+
+        private string GetFieldRequireCharges(List<ChargeInvoice> charges)
+        {
+            string messageCharge = string.Empty;
+            const string comma = ", ";
+            if (charges.Count > 0)
+            {
+                for (var i = 0; i < charges.Count; i++)
+                {
+                    string message = string.Empty;
+                    if (charges[i].ChargeId == null || charges[i].ChargeId == Guid.Empty)
+                    {
+                        message = "ChargeId";
+                    }
+                    if (string.IsNullOrEmpty(charges[i].Currency))
+                    {
+                        message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "Currency";
+                    }
+                    if (string.IsNullOrEmpty(charges[i].ReferenceNo))
+                    {
+                        message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "ReferenceNo";
+                    }
+                    if (charges[i].PaymentTerm == null || charges[i].PaymentTerm < 1)
+                    {
+                        message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "PaymentTerm (bắt buộc > 0)";
+                    }
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        messageCharge += (!string.IsNullOrEmpty(messageCharge) ? comma : string.Empty) + "{ Charge " + (i + 1) + ": " + message + " }";
+                    }
+                }
+            }
+            return messageCharge;
         }
 
         private string GetFieldRequireForUpdateInvoice(InvoiceUpdateInfo model)
@@ -401,6 +437,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "Currency";
             }
+            
             return message;
         }
 
