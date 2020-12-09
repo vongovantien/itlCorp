@@ -576,6 +576,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list)
         {
             var officeIds = DataContext.Get().Select(t => t.OfficeId).ToArray();
+            var data = list.GroupBy(x => new { x.Office, x.CustomerId }).Where(t => t.Count() > 1).Select(y => y.Key).FirstOrDefault();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.CustomerId))
@@ -611,17 +612,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                         item.IsValid = false;
                     }
-                    //if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    //{
-                    //    item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
-                    //    item.IsValid = false;
 
-                    //}
-                    //if (!item.EffectDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
-                    //{
-                    //    item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
-                    //    item.IsValid = false;
-                    //}
                     if (string.IsNullOrEmpty(item.CreditLimited) && (item.ContractType == "Trial" || item.ContractType == "Official"))
                     {
                         item.CreditLimitError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CREDIT_LIMIT_EMPTY]);
@@ -674,7 +665,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_NOT_FOUND]);
                     item.IsValid = false;
                 }
-                var officeArr = item.Office.Replace(" ","").Split(";").ToArray();
+                var officeArr = item.Office.Replace(" ", "").Split(";").ToArray();
 
                 if (string.IsNullOrEmpty(item.Office))
                 {
@@ -737,62 +728,25 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
                     }
                 }
-                string saleManId = sysUserRepository.Get(x => x.Username == item.Salesman).Select(t => t.Id).FirstOrDefault();
-                var listOfficeId = sysOfficeRepository.Get(x => officeArr.Contains(x.Code)).Select(t => t.Id.ToString()).ToList();
-                var saleServiceArr = item.SaleService.Split(";").ToArray();
-                string saleServices = string.Empty;
-                foreach(var it in saleServiceArr)
-                {
-                    if (it.Trim() == "Air Import")
-                    {
-                        saleServices += "AI;";
-                    }
-                    if (it.Trim() == "Air Export")
-                    {
-                        saleServices += "AE;";
-                    }
-                    if (it.Trim() == "Sea FCL Export")
-                    {
-                        saleServices += "SFE;";
-                    }
-                    if (it.Trim() == "Sea LCL Export")
-                    {
-                        saleServices += "SLE;";
-                    }
-                    if (it.Trim() == "Sea FCL Import")
-                    {
-                        saleServices += "SFI;";
-                    }
-                    if (it.Trim() == "Sea LCL Import")
-                    {
-                        saleServices += "SLI;";
-                    }
-                    if (it.Trim() == "Custom Logistic")
-                    {
-                        saleServices += "CL;";
-                    }
-                    if (it.Trim() == "Trucking")
-                    {
-                        saleServices += "IT;";
-                    }
-                    if (it.Trim() == "All")
-                    {
-                        saleServices = "AE;SFE;SLE;SFI;SLI;CL;IT";
-                    }
 
-                }
-                var sale = saleServices.Remove(saleServices.Length - 1);
-                
-                if (DataContext.Any(x => x.SaleService.Contains(sale) && x.OfficeId != null && listOfficeId.Any(y => officeIds.Contains(y.ToLower())) && x.SaleManId != saleManId && x.PartnerId == customerId))// && x.SaleManId == saleManId))
+                if (list.GroupBy(x => new { x.Office, x.CustomerId }).Where(t => t.Count() > 1).Select(y => y.Key).ToList().Count() > 0)
                 {
-                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
-                    item.IsValid = false;
-                }
-
-                if (list.GroupBy(x=> new { x.Office, x.SaleService }).Where(t => t.Count() > 1).Select(y => y.Key).ToList().Count() > 0)
-                {
-                    item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
-                    item.IsValid = false;
+                    if (data.CustomerId == item.CustomerId)
+                    {
+                        var dataFind = list.Where(x => x.CustomerId == data.CustomerId).ToList();
+                        string saleService = string.Empty;
+                        foreach (var it in dataFind)
+                        {
+                            saleService += it.SaleService.Trim() + ";";
+                        }
+                        var dataDuplicate = saleService.Replace(" ", "").Split(";").ToArray();
+                        var dataCheck = dataDuplicate.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList();
+                        if (dataCheck.Any() && !string.IsNullOrEmpty( dataCheck.FirstOrDefault()))
+                        {
+                            item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
+                            item.IsValid = false;
+                        }
+                    }
                 }
             });
             return list;
@@ -1233,7 +1187,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
 
                 CatPartner partnerAcRef = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
-                if(partnerAcRef != null)
+                if (partnerAcRef != null)
                 {
                     IQueryable<CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerAcRef.ParentId && x.Active == (criteria.Status ?? true));
 
@@ -1261,7 +1215,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }).OrderBy(x => x.ExpiredDate);
                     }
                 }
-                
+
             }
 
             return results;

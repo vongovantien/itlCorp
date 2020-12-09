@@ -238,7 +238,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                     this._toastService.error('Contract no has been existed!');
                 } else {
                     this.formContractPopup.isDuplicateContract = false;
-                    this.contracts = [...this.contracts, ...$event];
+                    const data = $event;
+                    this.contracts = [...this.contracts, data];
                 }
             }
         }
