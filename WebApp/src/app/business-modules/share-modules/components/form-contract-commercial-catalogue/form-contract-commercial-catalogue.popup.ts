@@ -73,6 +73,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     activeOffice: any = [];
 
     selectedContract: Contract = new Contract();
+    contract: Contract = new Contract();
 
     idContract: string = SystemConstants.EMPTY_GUID;
     type: string = '';
@@ -97,6 +98,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         { id: "All", text: "All" },
         { id: "AI", text: "Air Import" },
         { id: "AE", text: "Air Export" },
+        { id: "SCE", text: "Sea Consol Export" },
+        { id: "SCI", text: "Sea Consol Import" },
         { id: "SFE", text: "Sea FCL Export" },
         { id: "SLE", text: "Sea LCL Export" },
         { id: "SFI", text: "Sea FCL Import" },
@@ -418,17 +421,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
                 if (this.selectedContract.officeId.includes(';')) {
                     const arrayOffice = this.selectedContract.officeId.split(';');
-                    this.selectedContract.officeNameEn = '';
+                    this.selectedContract.officeNameAbbr = '';
                     arrayOffice.forEach(itemOffice => {
-                        this.selectedContract.officeNameEn += this.offices.find(x => x.id === itemOffice).text + "; ";
+                        this.selectedContract.officeNameAbbr += this.offices.find(x => x.id === itemOffice).text + "; ";
                     });
-                    if (this.selectedContract.officeNameEn.charAt(this.selectedContract.officeNameEn.length - 2) === ';') {
-                        this.selectedContract.officeNameEn = this.selectedContract.officeNameEn.substr(0, this.selectedContract.officeNameEn.length - 2);
+                    if (this.selectedContract.officeNameAbbr.charAt(this.selectedContract.officeNameAbbr.length - 2) === ';') {
+                        this.selectedContract.officeNameAbbr = this.selectedContract.officeNameAbbr.substr(0, this.selectedContract.officeNameAbbr.length - 2);
                     }
                 } else {
                     this.selectedContract.officeId = this.selectedContract.officeId.toLowerCase();
                     const obj = this.offices.find(x => x.id === this.selectedContract.officeId);
-                    this.selectedContract.officeNameEn = !!obj ? obj.text : null;
+                    this.selectedContract.officeNameAbbr = !!obj ? obj.text : null;
                 }
 
                 if (this.selectedContract.saleService.includes(';')) {
@@ -448,13 +451,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
                 this.selectedContract.fileList = this.fileList;
+
                 const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
                 if (!objCheckContract) {
                     this.onRequest.emit(new Contract(this.selectedContract));
                 } else {
+                    this.selectedContract.contractNo = null;
                     this.isDuplicateContract = true;
                     this._toastService.error('Contract no has been existed!');
                 }
+
+
                 if (!this.isDuplicateContract) {
                     this.hide();
                 }

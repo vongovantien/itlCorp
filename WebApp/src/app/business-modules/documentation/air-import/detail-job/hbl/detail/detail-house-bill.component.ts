@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { CsTransactionDetail, HouseBill } from '@models';
 import { ChargeConstants } from '@constants';
@@ -43,6 +43,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
+        protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
@@ -54,6 +55,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             _activedRoute,
             _store,
             _documentationRepo,
+            _catalogueRepo,
             _toastService,
             _actionStoreSubject,
             _router,
@@ -162,7 +164,19 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);
-                            this.updateHbl(modelUpdate);
+                            this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
+                                if (!!res.salemanId) {
+                                    if (res.salemanId !== modelUpdate.saleManId) {
+                                        this._toastService.error('Not found contract information, please check!');
+                                        return;
+                                    }
+                                }
+                                if (!!res.officeNameAbbr) {
+                                    this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
+                                } else {
+                                    this.updateHbl(modelUpdate);
+                                }
+                            });
                         }
                     }
                 );

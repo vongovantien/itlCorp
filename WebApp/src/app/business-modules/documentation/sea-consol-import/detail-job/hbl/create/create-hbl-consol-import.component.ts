@@ -5,7 +5,7 @@ import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { AppForm } from '@app';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { Container, CsTransaction, CsTransactionDetail } from '@models';
@@ -56,6 +56,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
     constructor(
         protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
+        protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
         protected _activedRoute: ActivatedRoute,
         protected _actionStoreSubject: ActionsSubject,
@@ -63,6 +64,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
         protected _store: Store<fromShareBussiness.ITransactionState>,
         protected _cd: ChangeDetectorRef,
         protected _dataService: DataService
+
 
     ) {
         super();
@@ -152,7 +154,20 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
             this.infoPopup.show();
         } else {
             const body = this.onsubmitData();
-            this.createHbl(body);
+            this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
+                if (!!res.salemanId) {
+                    if (res.salemanId !== body.saleManId) {
+                        this._toastService.error('Not found contract information, please check!');
+                        return;
+                    }
+                }
+                if (!!res.officeNameAbbr) {
+                    this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
+                } else {
+                    this.createHbl(body);
+
+                }
+            });
         }
     }
 
