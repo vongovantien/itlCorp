@@ -174,7 +174,9 @@ namespace eFMS.API.Catalogue.Controllers
             string messageDuplicate = string.Empty;
 
             var officeIds = catContractService.Get().Select(t => t.OfficeId).ToArray();
+            var saleServices = catContractService.Get().Select(t => t.SaleService).ToArray();
             var office = model.OfficeId.Split(";").ToArray();
+            var sale = model.SaleService.Split(";").ToArray();
             if (model.Id != Guid.Empty)
             {
                 if (model.ContractType != "Official")
@@ -186,7 +188,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y => officeIds.Contains(y)) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -201,7 +203,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId) && x.SaleManId != model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y => officeIds.Contains(y)) && x.SaleManId != model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -218,14 +220,12 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = "Contract no has been existed!";
                         }
                     }
-
-
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y=> officeIds.Contains(y)) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
 
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => x.SaleService.Contains(model.SaleService) && office.Any(y => officeIds.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -240,12 +240,12 @@ namespace eFMS.API.Catalogue.Controllers
                         }
                     }
 
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y => officeIds.Contains(y)) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
 
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y => officeIds.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
@@ -521,7 +521,7 @@ namespace eFMS.API.Catalogue.Controllers
                     if (DateTime.TryParse(dateEffect, out temp))
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPase = DateTime.Parse(temp.ToString("MM/dd/yyyy"), culture);
+                        dateToPase = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
                     }
                     else
                     {
@@ -537,7 +537,7 @@ namespace eFMS.API.Catalogue.Controllers
                     if (DateTime.TryParse(dateExpired, out temp))
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPaseExpired = DateTime.Parse(temp.ToString("MM/dd/yyyy"), culture);
+                        dateToPaseExpired = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
                     }
                     else
                     {
