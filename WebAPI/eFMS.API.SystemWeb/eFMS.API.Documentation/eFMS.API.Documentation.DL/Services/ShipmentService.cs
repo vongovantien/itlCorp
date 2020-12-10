@@ -342,7 +342,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public LockedLogResultModel GetShipmentToUnLock(ShipmentCriteria criteria)
         {
-            LockedLogResultModel result = null;
+            LockedLogResultModel result = new LockedLogResultModel();
             IQueryable<LockedLogModel> opShipments = null;
             string transactionType = string.Empty;
             opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
@@ -363,7 +363,17 @@ namespace eFMS.API.Documentation.DL.Services
                 });
             if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
             {
-                result = GetLogHistory(opShipments);
+                if (opShipments.Any())
+                {
+                    if (criteria.Keywords != null)
+                    {
+                        result = opShipments.Count() < criteria.Keywords.Count ? result : GetLogHistory(opShipments);
+                    }
+                    else
+                    {
+                        result = GetLogHistory(opShipments);
+                    }
+                }
                 return result;
             }
             if (criteria.TransactionType > 0)
@@ -393,19 +403,18 @@ namespace eFMS.API.Documentation.DL.Services
 
             IQueryable<LockedLogModel> shipments = null;
 
-            if (opShipments != null && csShipments != null)
+            if (opShipments.Any() || csShipments.Any())
             {
                 shipments = opShipments.Union(csShipments);
+                if (criteria.Keywords != null)
+                {
+                    result = shipments.Count() < criteria.Keywords.Count ? result : GetLogHistory(opShipments);
             }
-            else if (csShipments == null && opShipments != null)
+                else
             {
-                shipments = opShipments;
+                    result = GetLogHistory(opShipments);
             }
-            else if (opShipments == null && csShipments != null)
-            {
-                shipments = csShipments;
             }
-            result = GetLogHistory(shipments);
             return result;
         }
 
