@@ -1,5 +1,5 @@
 export class AccountingConstants {
-    public static PAYMENT_METHOD: string[] = <string[]>['Cash', 'Bank Transfer', 'Bank Transfer / Cash'];
+    public static PAYMENT_METHOD: string[] = <string[]>['Cash', 'Bank Transfer', 'Bank Transfer / Cash', 'Other'];
     public static PAYMENT_METHOD_2: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
         { id: 'Cash', text: 'Cash' },
         { id: 'Bank Transfer', text: 'Bank Transfer' },
