@@ -3,26 +3,23 @@ import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
-import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
-import { PaymentType } from './components/form-search/account-payment/form-search-account-payment.component';
 
 import { Router, ActivatedRoute } from '@angular/router';
 import { RoutingConstants } from '@constants';
+import { ARHistoryPaymentListInvoiceComponent } from './components/list-invoice-payment/list-invoice-history-payment.component';
 
 
 type TAB = 'INVOICE' | 'OBH';
 
 
 @Component({
-    selector: 'app-account-receivable-payable',
-    templateUrl: './account-receivable-payable.component.html',
+    selector: 'app-history-payment',
+    templateUrl: './history-payment.component.html',
 
 })
-export class AccountReceivablePayableComponent extends AppList implements OnInit {
+export class ARHistoryPaymentComponent extends AppList implements OnInit {
 
-    @ViewChild(AccountPaymentListInvoicePaymentComponent) invoiceListComponent: AccountPaymentListInvoicePaymentComponent;
-    @ViewChild(AccountPaymentListOBHPaymentComponent) obhSOAListComponent: AccountPaymentListOBHPaymentComponent;
+    @ViewChild(ARHistoryPaymentListInvoiceComponent) invoiceListComponent: ARHistoryPaymentListInvoiceComponent;
 
     selectedTab: TAB | string = "INVOICE";
     selectedTabAR: string = 'payment';
@@ -53,7 +50,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     ngAfterViewInit() {
         this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
         this.invoiceListComponent.dataSearch = this.dataSearch;
-        this.obhSOAListComponent.dataSearch = this.dataSearch;
 
         this.invoiceListComponent.getPagingData();
         this._cd.detectChanges();
@@ -68,32 +64,18 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
             this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
         } else if (tab === 'receivable') {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`]);
-          
+
         } else if (tab === 'customer-payment') {
-             //// huy 
-             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer-payment`]);
+            //// huy 
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer-payment`]);
         }
 
-    }
-
-    onSelectTabLocation(tabname: string) {
-        this.selectedTab = tabname;
-        this.dataSearch.paymentType = this.getPaymentType();
-
-        if (tabname === 'OBH') {
-            this.obhSOAListComponent.dataSearch = this.dataSearch;
-        } else {
-            this.invoiceListComponent.dataSearch = this.dataSearch;
-        }
-        this.requestSearchShipment();
     }
 
     getPaymentType() {
         let paymentType: number;
         if (this.selectedTab === "INVOICE") {
-            paymentType = PaymentType.Invoice;
-        } else {
-            paymentType = PaymentType.OBH;
+            paymentType = 0;
         }
         return paymentType;
     }
@@ -103,9 +85,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.dataSearch.paymentType = this.getPaymentType();
         if (this.dataSearch.paymentType === 0) {
             this.invoiceListComponent.dataSearch = this.dataSearch;
-            this.requestSearchShipment();
-        } else {
-            this.obhSOAListComponent.dataSearch = this.dataSearch;
             this.requestSearchShipment();
         }
     }
@@ -124,10 +103,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                     if (this.selectedTab === "INVOICE") {
                         this.invoiceListComponent.refPaymens = res.data || [];
                         this.invoiceListComponent.totalItems = res.totalItems;
-
-                    } else {
-                        this.obhSOAListComponent.refPaymens = res.data || [];
-                        this.obhSOAListComponent.totalItems = res.totalItems;
                     }
                 },
             );
@@ -137,7 +112,18 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.requestSearchShipment();
     }
 
-    handleUpdateExtendDateOfOBH() {
-        this.requestSearchShipment();
+    onSelectTab(tab: string) {
+        switch (tab) {
+            case 'customer':
+                break;
+            case 'agency':
+                break;
+            case 'summary':
+                break;
+            case 'history':
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -134,7 +134,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             invoiceNoReal: [],
 
             voucherType: [],
-            paymentMethod: [this.paymentMethods[2]],
+            paymentMethod: [this.paymentMethods[3]],
             accountNo: [null, Validators.required],
             totalAmount: [{ value: null, disabled: true }],
             currency: ['VND'],

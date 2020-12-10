@@ -1,0 +1,30 @@
+<div class="acc-receive-payable-wrapper  m-animate-fade-in">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Customer Payment" (selectTab)="onSelectTab('customer')">
+
+                </tab>
+                <tab heading="Agency Payment" (selectTab)="onSelectTab('agency')">
+                    Agency Payment
+                </tab>
+                <tab heading="AR Summary" (selectTab)="onSelectTab('ar')">
+                    Summary
+                </tab>
+                <tab heading="Payment History" (selectTab)="onSelectTab('history')" [active]="true">
+                    <form-search-history-payment (onSearch)="onSearchPayment($event)">
+                    </form-search-history-payment>
+
+                    <tabset class="custom-class-tab">
+                        <tab heading="Invoice Payment">
+                            <list-invoice-history-payment
+                                (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
+                            </list-invoice-history-payment>
+                        </tab>
+                    </tabset>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

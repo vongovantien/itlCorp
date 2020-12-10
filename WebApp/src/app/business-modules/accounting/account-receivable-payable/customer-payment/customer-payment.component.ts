@@ -14,7 +14,7 @@ import { AppList } from 'src/app/app.list';
 })
 export class ARCustomerPaymentComponent extends AppList implements OnInit {
 
-    
+
     trialOfficialList: TrialOfficialOtherModel[] = [];
 
     constructor(
@@ -43,9 +43,9 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
             { title: 'Creator', field: 'creator', sortable: true },
             { title: 'Create Date', field: 'createdate', sortable: true },
             { title: 'Modifie Date', field: 'modeifiedate', sortable: true },
-          
+
         ];
-        
+
 
     }
 
@@ -80,5 +80,21 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
 
             }
         });
+    }
+
+    onSelectTab(tab: string) {
+        switch (tab) {
+            case 'agency':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/agency`]);
+                break;
+            case 'ar':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
+                break;
+            case 'history':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
+                break;
+            default:
+                break;
+        }
     }
 }
