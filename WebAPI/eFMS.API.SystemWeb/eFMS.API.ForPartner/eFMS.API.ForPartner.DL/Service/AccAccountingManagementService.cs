@@ -839,11 +839,11 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 if (adv.StatusApproval == ForPartnerConstants.STATUS_APPROVAL_DONE)
                 {
-                    adv.PaymentTerm = model.PaymentTerm ?? 7; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
+                    adv.PaymentTerm = model.PaymentTerm ?? adv.PaymentTerm; // Mặc định thời hạn thanh toán cho phiếu tạm ứng là 7 ngày
                     if (model.PaymentTerm != null)
                     {
                         DateTime? deadlineDate = null;
-                        deadlineDate = adv.DeadlinePayment.Value.AddDays((double)model.PaymentTerm);
+                        deadlineDate = model.VoucherDate.HasValue ? model.VoucherDate.Value.AddDays((double)adv.PaymentTerm) : adv.RequestDate.Value.AddDays((double)model.PaymentTerm);
                         adv.DeadlinePayment = deadlineDate;
                     }
                     adv.VoucherNo = model.VoucherNo;
