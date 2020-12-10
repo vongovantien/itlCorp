@@ -60,6 +60,7 @@ export class GeneralReportComponent extends AppList {
             this.searchGeneralReport();
         } else {
             this.dataList = [];
+            this.totalItems = 0;
         }
     }
 

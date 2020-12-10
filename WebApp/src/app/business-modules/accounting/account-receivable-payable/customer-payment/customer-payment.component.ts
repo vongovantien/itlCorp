@@ -162,4 +162,20 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
         //         }
         //     });
     }
+
+    onSelectTab(tab: string) {
+        switch (tab) {
+            case 'agency':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/agency`]);
+                break;
+            case 'ar':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
+                break;
+            case 'history':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
+                break;
+            default:
+                break;
+        }
+    }
 }

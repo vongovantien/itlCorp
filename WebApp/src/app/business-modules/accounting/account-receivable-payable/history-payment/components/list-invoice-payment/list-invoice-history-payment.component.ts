@@ -12,19 +12,20 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
-import { AccountPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { PaymentModel, AccountingPaymentModel } from '@models';
 import { RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 
 
 
 @Component({
-    selector: 'list-invoice-account-payment',
-    templateUrl: './list-invoice-account-payment.component.html',
+    selector: 'list-invoice-history-payment',
+    templateUrl: './list-invoice-history-payment.component.html',
 })
-export class AccountPaymentListInvoicePaymentComponent extends AppList implements OnInit {
-    @ViewChild(AccountPaymentUpdateExtendDayPopupComponent) updateExtendDayPopup: AccountPaymentUpdateExtendDayPopupComponent;
+export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnInit {
+
+    @ViewChild(ARHistoryPaymentUpdateExtendDayPopupComponent) updateExtendDayPopup: ARHistoryPaymentUpdateExtendDayPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) infoNotAllowDelete: InfoPopupComponent;
     @ViewChild('confirmInvoicePaymentPopup') confirmInvoicePaymentPopup: ConfirmPopupComponent;
@@ -109,7 +110,7 @@ export class AccountPaymentListInvoicePaymentComponent extends AppList implement
     }
 
     import() {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/payment-import`]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment/import`]);
     }
 
     exportExcel() {

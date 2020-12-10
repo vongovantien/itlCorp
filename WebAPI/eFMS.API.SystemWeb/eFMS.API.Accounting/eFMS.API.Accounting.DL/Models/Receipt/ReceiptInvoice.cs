@@ -5,6 +5,9 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
 {
     public class ReceiptInvoiceModel
     {
+        public int Index { get; set; }
+        public Guid? PaymentId { get; set; }
+        public string InvoiceId { get; set; }
         public string InvoiceNo { get; set; }
         public string SerieNo { get; set; }
         public string Type { get; set; }
@@ -13,12 +16,12 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public decimal UnpaidAmount { get; set; }
         public string Currency { get; set; }
         public decimal? PaidAmount { get; set; }
-        public string InvoiceBalance { get; set; }
+        public decimal? InvoiceBalance { get; set; }
         public decimal? RefAmount { get; set; }
         public string RefCurrency { get; set; }
         public string PaymentStatus { get; set; }
-        public DateTime? BillingDate{ get; set; }
-        public DateTime? InvoiceDate{ get; set; }
-        public DateTime? Note{ get; set; }
+        public DateTime? BillingDate { get; set; }
+        public DateTime? InvoiceDate { get; set; }
+        public string Note { get; set; }
     }
 }

@@ -10,10 +10,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { finalize, catchError } from 'rxjs/operators';
 
 @Component({
-    selector: 'payment-import',
-    templateUrl: './payment-import.component.html'
+    selector: 'app-history-payment-import',
+    templateUrl: './history-import-payment.component.html'
 })
-export class PaymentImportComponent extends AppList implements OnInit {
+export class ARHistoryPaymentImportComponent extends AppList implements OnInit {
 
     @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
 

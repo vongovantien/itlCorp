@@ -21,6 +21,8 @@ export * from './catalogue/saleman.model';
 export * from './catalogue/province.model';
 export * from './catalogue/catContract.model';
 export { ChargeGroup, Charge } from './catalogue/catCharge.model';
+export * from './catalogue/district.model';
+
 
 export { SoaCharge, SOA } from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
@@ -42,6 +44,7 @@ export {
     AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel
 } from './accouting/accounting-receivable.model';
 export * from './accouting/accounting-approve';
+export { ReceiptInvoiceModel, Receipt } from './accouting/receipt.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';

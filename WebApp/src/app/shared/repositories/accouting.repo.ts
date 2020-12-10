@@ -751,6 +751,14 @@ export class AccountingRepo {
                 map((data: any) => data)
             );
     }
+    generateReceiptNo() {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GenerateReceiptNo`);
+    }
+
+    getInvoiceForReceipt(body) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetInvoiceForReceipt`, body);
+
+    }
 }
 
 

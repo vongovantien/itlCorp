@@ -6,8 +6,9 @@ namespace eFMS.API.Accounting.Service.Models
     public partial class AcctReceipt
     {
         public Guid Id { get; set; }
-        public Guid? CustomerId { get; set; }
-        public DateTime? Date { get; set; }
+        public string CustomerId { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
         public string PaymentRefNo { get; set; }
         public string Status { get; set; }
         public Guid? AgreementId { get; set; }
@@ -15,7 +16,8 @@ namespace eFMS.API.Accounting.Service.Models
         public string Type { get; set; }
         public decimal? CusAdvanceAmount { get; set; }
         public decimal? FinalPaidAmount { get; set; }
-        public string Balance { get; set; }
+        public decimal? Balance { get; set; }
+        public string PaymentMethod { get; set; }
         public string CurrencyId { get; set; }
         public DateTime? PaymentDate { get; set; }
         public decimal? ExchangeRate { get; set; }

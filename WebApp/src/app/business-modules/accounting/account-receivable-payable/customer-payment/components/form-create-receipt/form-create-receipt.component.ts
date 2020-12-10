@@ -1,16 +1,21 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Data } from '@angular/router';
-import { SystemConstants } from '@constants';
+import { SystemConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Currency, Customer, Partner, User } from '@models';
+import { Currency, Customer, Partner, User, ReceiptInvoiceModel } from '@models';
 import { Store } from '@ngrx/store';
-import { CatalogueRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, SystemRepo, AccountingRepo } from '@repositories';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, IAppState } from '@store';
 import { Moment } from 'moment';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
+import { formatDate } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
+import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
+import { DataService } from '@services';
+import { ComboGridVirtualScrollComponent } from '@common';
 import { catAgreement } from 'src/app/shared/models/catalogue/catAgreement.model';
 
 @Component({
@@ -18,9 +23,10 @@ import { catAgreement } from 'src/app/shared/models/catalogue/catAgreement.model
     templateUrl: './form-create-receipt.component.html',
 })
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
-    @Output() onChangeCurrency: EventEmitter<Currency> = new EventEmitter<Currency>();
-    form: FormGroup;
-    selected: { start: Moment, end: Moment };
+    @Input() isUpdate: boolean = false;
+    @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
+
+    formSearchInvoice: FormGroup;
     customerId: AbstractControl; // load partner
     date: AbstractControl;
     paymentReferenceNo: AbstractControl;
@@ -40,8 +46,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     currencyList: Currency[];
 
     customers: Observable<Partner[]>; /// partner = customer
-    agreements: Observable<catAgreement[]>;
-    $agreements: Observable<any>;
+    // agreements: Observable<catAgreement[]>;
+    // $agreements: Observable<any>;
     username: AbstractControl;
     paymentMethods: string[] = ['Cash', 'Bank Transfer'];
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [   // load display fiels partner
@@ -49,90 +55,98 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         { field: 'shortName', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
-
     ];
+
+    $customers: Observable<Partner[]>;
+    agreements: IAgreementReceipt[];
+
+
+    //  displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
         { field: 'saleManName', label: 'Salesman' },
         { field: 'contractNo', label: 'Contract No' },
         { field: 'contractType', label: 'Contract Type' },
-
     ];
     constructor(
         private _fb: FormBuilder,
         private _store: Store<IAppState>,
         private _catalogueRepo: CatalogueRepo,
-        private _systemRepo: SystemRepo
+        private _accountingRepo: AccountingRepo,
+        private _systemRepo: SystemRepo,
+        private _toastService: ToastrService,
+        private _dataService: DataService
 
     ) {
         super();
     }
     ngOnInit() {
 
-        this.initFormSettlement();
-        this.getCurrency();
+        // this.initFormSettlement();
+        // this.getCurrency();
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL); // khai báo load part lên display
+        this.initForm();
+
+        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+
+        if (!this.isUpdate) {
+            this.generateReceiptNo();
+        }
 
     }
-    initFormSettlement() {
-        this.form = this._fb.group({
-            'customerId': [], // khai báo list partner trong form-group
-            'date': [{ startDate: new Date(), endDate: new Date() }, Validators.required],
-            'paymentReferenceNo': [],
-            'agreement': [],
-            'paidAmount': [],
-            'type': [],
-            'cusAdvanceAmount': [],
-            'finalPaidAmount': [],
-            'balance': [],
-            'paymentMethod': [this.paymentMethods[1], this.paymentMethods[2]],
-            'currency': [],
-            'paymentDate': [],
-            'exchangeRate': [],
-            'bankAcountNo': [],
+
+    initForm() {
+        this.formSearchInvoice = this._fb.group({
+            customerId: [null, Validators.required],
+            date: [],
+            paymentReferenceNo: [null, Validators.required],
+            agreement: [null]
+            // agreement: [null, Validators.required]
         });
-        this.customerId = this.form.controls['customerId']; // partner 
-        this.date = this.form.controls['date'];
-        this.paymentReferenceNo = this.form.controls['paymentReferenceNo'];
-        this.agreement = this.form.controls['agreement'];
-        this.paidAmount = this.form.controls['paidAmount'];
-        this.type = this.form.controls['type'];
-        this.cusAdvanceAmount = this.form.controls['cusAdvanceAmount'];
-        this.finalPaidAmount = this.form.controls['finalPaidAmount'];
-        this.balance = this.form.controls['balance'];
-        this.paymentMethod = this.form.controls['paymentMethod'];
-        this.currency = this.form.controls['currency'];
-        // this.currency.valueChanges.pipe(
-        //     // tslint:disable-next-line:no-any
-        //     map((data: any) => data)
-        // ).subscribe((value: Currency) => {
-        //     if (!!value) {
-        //         this.onChangeCurrency.emit(value);
-        //     }
-        // });
-        this.paymentDate = this.form.controls['paymentDate'];
-        this.exchangeRate = this.form.controls['exchangeRate'];
-        this.bankAcountNo = this.form.controls['bankAcountNo'];
-    }
-    getCurrency() {
-        this._store.select(getCatalogueCurrencyState)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                // tslint:disable-next-line:no-any
-                (data: any) => {
-                    this.currencyList = data || [];
-                    this.currency.setValue("VND");
-                },
-            );
+        this.customerId = this.formSearchInvoice.controls['customerId'];
+        this.date = this.formSearchInvoice.controls['date'];
+        this.paymentReferenceNo = this.formSearchInvoice.controls['paymentReferenceNo'];
+        this.agreement = this.formSearchInvoice.controls['agreement'];
+
     }
 
+    generateReceiptNo() {
+        this._accountingRepo.generateReceiptNo().subscribe(
+            (data: any) => {
+                if (!!data) {
+                    const { receiptNo } = data;
+                    this.paymentReferenceNo.setValue(receiptNo);
+                }
+            }
+        );
+    }
 
-    // tslint:disable-next-line:no-any
-    onSelectDataFormInfo(data: any, type: string) {  // lấy data partner 
+    onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
                 this.customerId.setValue((data as Partner).id);
-                // 
-                this.getAgreements({ status: true, partnerId: this.customerId.value });
+                this._dataService.setData('customer', data);
+
+                this._catalogueRepo.getAgreement(
+                    <IQueryAgreementCriteria>{
+                        partnerId: this.customerId.value, status: true
+                    }).subscribe(
+                        (d: IAgreementReceipt[]) => {
+                            if (!!d) {
+                                this.agreements = d || [];
+                                if (!!this.agreements.length) {
+                                    this.agreement.setValue(d[0].id);
+
+                                    this.onSelectDataFormInfo(d[0], 'agreement');
+                                } else {
+                                    this.combogrid.displaySelectedStr = '';
+                                }
+                            }
+                        }
+                    );
+                break;
+            case 'agreement':
+                this.agreement.setValue((data as IAgreementReceipt).id);
+                this._dataService.setData('cus-advance', (data as IAgreementReceipt).cusAdvanceAmount);
                 break;
             default:
                 break;
@@ -147,9 +161,48 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             .subscribe(
                 data => {
                     this.agreements = data;
+                })
+    };
 
+    getInvoiceList() {
+        this.isSubmitted = true;
+        if (!this.formSearchInvoice.valid) {
+            return;
+        }
+        const body = {
+            customerId: this.customerId.value,
+            agreementId: this.agreement.value,
+            fromDate: !!this.date.value?.startDate ? formatDate(this.date.value?.startDate, 'yyyy-MM-dd', 'en') : null,
+            toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
+        };
+
+        this._store.dispatch(GetInvoiceList());
+        this._accountingRepo.getInvoiceForReceipt(body)
+            .pipe()
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._store.dispatch(GetInvoiceListSuccess({ invoices: res.data }));
+                        return;
+                    }
+
+                    this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
+                    this._toastService.warning("Not found invoices");
                 }
             );
     }
+}
 
+interface IAgreementReceipt {
+    id: string;
+    contractNo: string;
+    contractType: string;
+    saleManName: string;
+    expiredDate: Date;
+    cusAdvanceAmount: number;
+}
+
+interface IQueryAgreementCriteria {
+    partnerId: string;
+    status: boolean;
 }

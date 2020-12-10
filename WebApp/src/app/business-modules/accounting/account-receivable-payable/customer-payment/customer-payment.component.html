@@ -20,7 +20,7 @@
                                                 </th>
                                             </thead>
                                             <tbody>
-                                                <!-- <ng-container>
+                                                <ng-container>
                                                     <ng-container *ngFor="let item of trialOfficialList; let i = index; trackBy: trackByFn">
                                                     </ng-container>
                                                 </ng-container>
@@ -118,15 +118,13 @@
                         </tab>
                     </tabset>
                 </tab>
-
-
-                <tab heading="Agency Payment">
-                    Agency Paymen
+                <tab heading="Agency Payment" (selectTab)="onSelectTab('agency')">
+                    Agency Payment
                 </tab>
-                <tab heading="AR Summary">
+                <tab heading="AR Summary" (selectTab)="onSelectTab('ar')">
                     Summary
                 </tab>
-                <tab heading="Payment History">
+                <tab heading="Payment History" (selectTab)="onSelectTab('history')">
                     History
                 </tab>
             </tabset>

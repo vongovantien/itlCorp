@@ -11,7 +11,7 @@ import { Group, UserGroup } from '@models';
 
 import { AppForm } from 'src/app/app.form';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 import { PreviousRouteService } from 'src/app/shared/services/previous-route';
 import { RoutingConstants } from '@constants';
 import { checkShareSystemUserLevel, IShareSystemState, SystemLoadUserLevelAction } from '../../../store';
@@ -62,13 +62,12 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     }
 
     ngOnInit() {
-        this.getDepartments();
         this.getUsers();
         this.initForm();
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.groupId = Number(param.id);
-                this.getGroupDetail(this.groupId);
+                this.getDepartments();
                 this.userHeaders = [
                     { title: 'User Name', field: 'userName', sortable: true },
                     { title: 'Full Name', field: 'employeeName', sortable: true },
@@ -166,7 +165,10 @@ export class GroupDetailComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (res: any) => {
-                    this.departments = res;
+                    if (!!res) {
+                        this.departments = res;
+                        this.getGroupDetail(this.groupId);
+                    }
                 },
             );
     }
