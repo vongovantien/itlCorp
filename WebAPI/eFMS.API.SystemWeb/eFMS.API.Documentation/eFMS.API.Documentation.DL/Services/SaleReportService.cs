@@ -188,10 +188,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-            }
-            if(shipmentList.Count() > 0)
-            {
-                return shipmentList.AsQueryable();
+                data = shipmentList.AsQueryable();
             }
             return data;
         }
@@ -346,10 +343,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-            }
-            if (houseBillList.Count() > 0)
-            {
-                return houseBillList.AsQueryable();
+                housebills = houseBillList.AsQueryable();
             }
             return housebills;
         }
