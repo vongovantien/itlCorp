@@ -52,9 +52,9 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
         {
-            Expression<Func<AcctReceipt, bool>> query = (x => 
+            Expression<Func<AcctReceipt, bool>> query = (x =>
             (x.CurrencyId ?? "").IndexOf(criteria.Currency ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "",StringComparison.OrdinalIgnoreCase) >= 0         
+            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
             );
 
             // Tìm theo status
@@ -125,7 +125,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     d.UserNameCreated = item.UserCreated == null ? null : sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
                     d.UserNameModified = item.UserModified == null ? null : sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
-                    d.CustomerName = item.CustomerId == null ? null :catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString()).FirstOrDefault().ShortName;
+                    d.CustomerName = item.CustomerId == null ? null : catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString()).FirstOrDefault().ShortName;
                     list.Add(d);
                 }
             }
@@ -752,7 +752,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
                 if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
-                
+
                 receiptModel.Status = AccountingConstants.RECEIPT_STATUS_CANCEL;
                 receiptModel.GroupId = currentUser.GroupId;
                 receiptModel.DepartmentId = currentUser.DepartmentId;
@@ -800,13 +800,75 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-
-        public List<ReceiptInvoiceModel> ProcessReceiptInvoice(ProcessReceiptInvoice criteria)
+        public ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria)
         {
-            List<ReceiptInvoiceModel> results = new List<ReceiptInvoiceModel>();
+            List<ReceiptInvoiceModel> invoiceList = new List<ReceiptInvoiceModel>();
+            ProcessClearInvoiceModel results = new ProcessClearInvoiceModel();
 
+            if (criteria.List.Count() > 0)
+            {
+                invoiceList = criteria.List.OrderBy(x => x.Index).ToList();
 
+                decimal currentPaidAmount = criteria.PaidAmount;
 
+                foreach (ReceiptInvoiceModel invoice in invoiceList)
+                {
+                    if (criteria.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        invoice.ReceiptExcUnpaidAmount = invoice.UnpaidAmount * criteria.FinalExchangeRate; // số tiền còn lại cần thu của invoice theo tỉ giá phiếu thu
+                        if (currentPaidAmount - invoice.ReceiptExcUnpaidAmount > 0) // Trừ hết số tiền còn lại của invoice
+                        {
+                            invoice.PaidAmount = invoice.UnpaidAmount;
+                            invoice.InvoiceBalance = 0;
+                        }
+                        else
+                        {
+                            invoice.PaidAmount = currentPaidAmount;
+                            invoice.InvoiceBalance = invoice.ReceiptExcUnpaidAmount - invoice.PaidAmount;
+                        }
+                        currentPaidAmount -= (invoice.PaidAmount ?? 0);
+                    }
+                    else
+                    {
+                        invoice.ReceiptExcUnpaidAmount = invoice.UnpaidAmount / criteria.FinalExchangeRate; // số tiền còn lại của invoice theo tỉ giá phiếu thu
+                        if (currentPaidAmount - invoice.ReceiptExcUnpaidAmount > 0) // Trừ hết số tiền còn lại của invoice
+                        {
+                            invoice.PaidAmount = invoice.UnpaidAmount;
+                            invoice.InvoiceBalance = 0;
+
+                        }
+                        else
+                        {
+                            invoice.PaidAmount = currentPaidAmount;
+                            invoice.InvoiceBalance = invoice.ReceiptExcUnpaidAmount - invoice.PaidAmount;
+
+                        }
+                        currentPaidAmount -= (invoice.ReceiptExcUnpaidAmount ?? 0);
+                    }
+
+                }
+
+                results.Invoices = invoiceList;
+                if(currentPaidAmount > 0) // trường hợp thu dư
+                {
+                    CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == criteria.CustomerID)?.FirstOrDefault();
+                    ReceiptInvoiceModel adv = new ReceiptInvoiceModel {
+                        PartnerName = partnerInfo?.ShortName,
+                        Type = "ADV",
+                        PaidAmount = currentPaidAmount,
+                        InvoiceBalance = 0,
+                        TaxCode = partnerInfo?.TaxCode,
+                    };
+                    results.Invoices.Add(adv);
+                }else if(currentPaidAmount < 0) // trường hợp thu thiếu
+                {
+                    results.Balance = currentPaidAmount;
+                }
+                else
+                {
+                    results.Balance = 0;
+                }
+            }
             return results;
         }
     }

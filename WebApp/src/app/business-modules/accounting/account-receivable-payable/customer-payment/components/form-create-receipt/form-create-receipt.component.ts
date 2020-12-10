@@ -111,6 +111,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                     this.onSelectDataFormInfo(d[0], 'agreement');
                                 } else {
                                     this.combogrid.displaySelectedStr = '';
+                                    this.agreement.setValue(null);
                                 }
                             }
                         }

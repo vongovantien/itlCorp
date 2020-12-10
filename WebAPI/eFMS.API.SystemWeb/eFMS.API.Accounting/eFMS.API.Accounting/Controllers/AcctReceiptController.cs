@@ -156,15 +156,15 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        [Authorize]
-        public IActionResult Process(ProcessReceiptInvoice criteria)
+        [HttpPost("ProcessInvoice")]
+        //[Authorize]
+        public IActionResult ProcessInvoice(ProcessReceiptInvoice criteria)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest("invalid data");
             }
-            List<ReceiptInvoiceModel> data = acctReceiptService.ProcessReceiptInvoice(criteria);
+            ProcessClearInvoiceModel data = acctReceiptService.ProcessReceiptInvoice(criteria);
             return Ok(data);
         }
     }

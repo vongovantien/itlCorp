@@ -168,7 +168,7 @@
                                                 </p>
                                             </ng-container>
                                         </td>
-                                        <td>{{invoice.billingDate}}</td>
+                                        <td>{{invoice.billingDate  | date: 'dd/MM/yyyy'}}</td>
                                         <td>{{invoice.invoiceDate | date: 'dd/MM/yyyy'}}</td>
                                         <td>{{invoice.note}}</td>
                                     </tr>

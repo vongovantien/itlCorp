@@ -9,6 +9,8 @@ export class ReceiptInvoiceModel {
     serieNo: string = null;
     invoiceDate: Date = null;
     unpaidAmount: number = null;
+    receiptExcUnpaidAmount: number = null;
+
     type: string = null;
     paymentStatus: string = null;
     partnerName: string = null;

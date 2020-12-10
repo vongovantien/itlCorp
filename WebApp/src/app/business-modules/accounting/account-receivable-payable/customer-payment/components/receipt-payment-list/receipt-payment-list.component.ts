@@ -13,6 +13,7 @@ import { Store } from '@ngrx/store';
 import { catchError, finalize, takeUntil, pluck } from 'rxjs/operators';
 import { Observable, from } from 'rxjs';
 import { customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState } from '../../store/reducers';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -53,7 +54,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         private _store: Store<IAppState>,
         private _fb: FormBuilder,
         private _dataService: DataService,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -91,6 +93,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (res: ReceiptInvoiceModel[]) => {
                     this.invoices = [...res];
+                    this.balance.setValue(null);
                     console.log(this.invoices);
                 });
 
@@ -204,6 +207,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 if (this.paymentDate.value?.startDate) {
                     this.generateExchangeRate(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'), (data as Currency).id);
                 }
+
+                this.balance.setValue(null);
+                this.finalPaidAmount.setValue(null);
+                this.paidAmount.setValue(null);
                 break;
 
             case 'payment-date':
@@ -239,41 +246,44 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     }
 
     processClear() {
-        // if (!this.paidAmount.value) {
-        //     return;
-        // }
-        // let paidAmount = +this.paidAmount.value || 0;
-        // for (const invoice of this.invoices) {
-        //     if (paidAmount - invoice.unpaidAmount > 0) {
-        //         invoice.paidAmount = invoice.unpaidAmount;
-        //         invoice.invoiceBalance = 0;
-        //         paidAmount -= invoice.unpaidAmount;
-        //     } else {
-        //         invoice.paidAmount = paidAmount;
-        //         invoice.invoiceBalance = invoice.unpaidAmount - invoice.paidAmount;
+        const body: IProcessClearInvoiceModel = {
+            currency: this.currency.value,
+            finalExchangeRate: this.exchangeRate.value,
+            paidAmount: this.finalPaidAmount.value,
+            list: this.invoices,
+            customerId: this.customerInfo?.id
+        };
+        if (!body.customerId || !body.list.length) {
+            this._toastService.warning('Missing data to process', 'Warning');
+            return;
+        }
+        this._accountingRepo.processInvoiceReceipt(body)
+            .subscribe(
+                (data: IProcessResultModel) => {
+                    if (data?.invoices?.length) {
+                        this.invoices.length = 0;
+                        this.invoices = data.invoices;
 
-        //         paidAmount -= invoice.unpaidAmount;
-
-        //     }
-        // }
-
-        // // *  Trường hợp thu dư, thiếu, đủ
-        // if (paidAmount > 0) {
-        //     const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
-        //         type: 'ADV',
-        //         paidAmount: paidAmount,
-        //         unpaidAmount: 0,
-        //         invoiceBalance: 0,
-        //         taxCode: this.customerInfo?.taxCode,
-        //         partnerName: this.customerInfo?.shortName
-        //     });
-        //     this.invoices.push(newInvoiceWithAdv);
-        // } else if (paidAmount < 0) {
-        //     this.balance.setValue(paidAmount);
-        // } else {
-        //     this.balance.setValue(0);
-        // }
+                        this.balance.setValue(data.balance);
+                    } else {
+                        console.log(data);
+                    }
+                }
+            );
 
 
     }
+}
+
+interface IProcessClearInvoiceModel {
+    paidAmount: number;
+    currency: string;
+    list: ReceiptInvoiceModel[];
+    finalExchangeRate: number;
+    customerId: string;
+}
+
+interface IProcessResultModel {
+    balance: number;
+    invoices: ReceiptInvoiceModel[];
 }
