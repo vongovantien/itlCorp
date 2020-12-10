@@ -19,45 +19,45 @@ const routes: Routes = [
     {
         path: 'sea-consol-import', loadChildren: () => import('./sea-consol-import/sea-consol-import.module').then(m => m.SeaConsolImportModule),
         data: {
-            name: "Sea Consol Import",
+            name: "Sea Consol Import", title: 'eFMS Sea Consol Import'
         }
     },
     {
         path: 'sea-consol-export', loadChildren: () => import('./sea-consol-export/sea-consol-export.module').then(m => m.SeaConsolExportModule),
         data: {
-            name: "Sea Consol Export",
+            name: "Sea Consol Export", title: 'eFMS Sea Consol Export'
         }
     },
     {
         path: 'air-export', loadChildren: () => import('./air-export/air-export.module').then(m => m.AirExportModule),
         data: {
-            name: 'Air Export',
+            name: 'Air Export', title: 'eFMS Air Export'
         }
     },
     {
         path: 'air-import', loadChildren: () => import('./air-import/air-import.module').then(m => m.AirImportModule),
         data: {
-            name: 'Air Import',
+            name: 'Air Import', title: 'eFMS Air Import'
         }
     },
     {
         path: 'sea-fcl-export', loadChildren: () => import('./sea-fcl-export/sea-fcl-export.module').then(m => m.SeaFCLExportModule),
         data: {
-            name: 'Sea FCL Export',
+            name: 'Sea FCL Export', title: 'eFMS Sea FCL Export',
             path: '/'
         }
     },
     {
         path: 'sea-fcl-import', loadChildren: () => import('./sea-fcl-import/sea-fcl-import.module').then(m => m.SeaFCLImportModule),
         data: {
-            name: 'Sea FCL Import',
+            name: 'Sea FCL Import', title: 'eFMS Sea FCL Import',
             path: '/'
         }
     },
     {
         path: 'sea-lcl-export', loadChildren: () => import('./sea-lcl-export/sea-lcl-export.module').then(m => m.SeaLCLExportModule),
         data: {
-            name: 'Sea LCL Export',
+            name: 'Sea LCL Export', title: 'eFMS Sea LCL Export',
             path: '/'
         }
 
@@ -65,7 +65,7 @@ const routes: Routes = [
     {
         path: 'sea-lcl-import', loadChildren: () => import('./sea-lcl-import/sea-lcl-import.module').then(m => m.SeaLCLImportModule),
         data: {
-            name: 'Sea LCL Import',
+            name: 'Sea LCL Import', title: 'eFMS Sea LCL Import',
             path: '/'
         }
     },

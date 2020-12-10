@@ -1484,7 +1484,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
                         item.IsValid = false;
                     }
-                    else if (list.Count(x => x.TaxCode == taxCode) > 1 && list.Count(x => x.InternalReferenceNo == internalReferenceNo) > 1)
+                    else if (list.Count(x => x.TaxCode == taxCode) > 1)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;

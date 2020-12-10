@@ -365,12 +365,8 @@ export class AddPartnerDataComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    console.log("res check: ", res);
-
                     if (!!res) {
-
                         this.formPartnerComponent.isExistedTaxcode = true;
-
                         if (!!res.internalReferenceNo) {
                             this.deleteMessage = `This Partner is existed, please you check again!`;
                             this.confirmDuplicatePartner.show();
@@ -378,8 +374,6 @@ export class AddPartnerDataComponent extends AppList {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                             this.confirmTaxcode.show();
                         }
-
-
                     } else {
                         this.onSave(body);
                     }

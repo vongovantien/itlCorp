@@ -6,7 +6,7 @@ import { formatDate } from '@angular/common';
 
 import { AppForm } from '@app';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { Container, csBookingNote, CsTransactionDetail } from '@models';
 import { SystemConstants, RoutingConstants } from '@constants';
 import {
@@ -46,6 +46,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
+        protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
@@ -132,8 +133,20 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         }
 
         const modelAdd = this.getDataForm();
+        this._catalogueRepo.getSalemanIdByPartnerId(modelAdd.customerId, this.jobId).subscribe((res: any) => {
+            if (!!res.salemanId) {
+                if (res.salemanId !== modelAdd.saleManId) {
+                    this._toastService.error('Not found contract information, please check!');
+                    return;
+                }
+            }
+            if (!!res.officeNameAbbr) {
+                this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
+            } else {
+                this.createHbl(modelAdd);
 
-        this.createHbl(modelAdd);
+            }
+        });
     }
 
     getDataForm() {
