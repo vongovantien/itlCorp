@@ -17,6 +17,7 @@ import { catchError, map, takeUntil } from 'rxjs/operators';
 import { DataService } from 'src/app/shared/services/data.service';
 import { SortService } from '@services';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { data } from 'jquery';
 
 
 
@@ -120,6 +121,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
                     this._dataService.setData(SystemConstants.CSTORAGE.SYSTEM_USER, dataSystemUser);
                 },
             );
+        // console.log(this.getBasicData());
     }
     onSelectDataFormSearch(data: any, key: string) {
         switch (key.toLowerCase()) {
@@ -186,10 +188,12 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             cpPaymentRefNo: ! !this.selectedPaymentRefNo ? this.selectedPaymentRefNo.name : null,
             cpDateTpe: !!this.selectedDateType ? this.selectedDateType.name : null,
             cpSyncStatus: !!this.selectedSyncStatus ? this.selectedSyncStatus.name : null,
-            cpUserCreate: !!this.currentUser ? this.currentUser.id : null,
+            // cpUserCreate: !!this.currentUser ? this.currentUser.id : null,
             CurrencyLocal: "VND"
         };
         this.onSearch.emit(body);
+        console.log(body);
+
     }
 
     reset() {

@@ -88,6 +88,7 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
         this.page = 1;
         this.dataSearch = data;
         this.getCPs();
+        console.log();
     }
     sortCPsList(sortField: string, order: boolean) {
         this.CPs = this._sortService.sort(this.CPs, sortField, order);
