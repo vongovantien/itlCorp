@@ -1,19 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { RoutingConstants } from '@constants';
-import { TrialOfficialOtherModel, ReceiptInvoiceModel, Currency, Partner } from '@models';
+import { ReceiptInvoiceModel, Currency, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, CatalogueRepo } from '@repositories';
 import { SortService, DataService } from '@services';
-import { catchError, finalize, takeUntil, pluck } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
-import { extend } from 'validator';
-import { Store } from '@ngrx/store';
-import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
-import { customerPaymentReceipListState, customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState } from '../../store/reducers';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { Observable, from } from 'rxjs';
 import { formatDate } from '@angular/common';
+import { AppList } from '@app';
+import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
+
+import { Store } from '@ngrx/store';
+import { catchError, finalize, takeUntil, pluck } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState } from '../../store/reducers';
 
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -208,6 +207,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 break;
 
             case 'payment-date':
+                if (this.currency.value === 'VND') {
+                    this.exchangeRate.setValue(1);
+                    break;
+                }
                 this.generateExchangeRate(formatDate(data?.startDate, 'yyy-MM-dd', 'en'), this.currency.value);
                 break;
             default:
