@@ -162,7 +162,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                                                 : (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
                                                                  && (criteria.PersonInCharge.Contains(x.BillingOpsId) || string.IsNullOrEmpty(criteria.PersonInCharge))
                                                                  && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator)
-                                                                 && (criteria.SalesMan.Contains(x.SalemanId) || !hasSalesman));
+                                                                 && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan)));
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
                 queryOpsTrans = queryOpsTrans.And(x => x.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && x.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date);
@@ -323,8 +323,11 @@ namespace eFMS.API.Documentation.DL.Services
                                                               : queryTranDetail.And(x => !string.IsNullOrEmpty(x.SalesGroupId));
                 }
                 // Search SaleMan
-                queryTranDetail = queryTranDetail == null ? (x => criteria.SalesMan.Contains(x.SaleManId))
+                if (!string.IsNullOrEmpty(criteria.SalesMan))
+                {
+                    queryTranDetail = queryTranDetail == null ? (x => criteria.SalesMan.Contains(x.SaleManId))
                                                           : queryTranDetail.And(x => criteria.SalesMan.Contains(x.SaleManId));
+                }
             }
             var housebills = queryTranDetail == null ? detailRepository.Get() : detailRepository.Get(queryTranDetail);
             var houseBillList = new List<CsTransactionDetail>();

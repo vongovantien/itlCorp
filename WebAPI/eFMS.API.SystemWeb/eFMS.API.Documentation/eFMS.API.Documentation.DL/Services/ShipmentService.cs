@@ -725,10 +725,13 @@ namespace eFMS.API.Documentation.DL.Services
                                                                 : queryTranDetail.And(q => !string.IsNullOrEmpty(q.SalesGroupId));
                 }
                 // Search SaleMan
-                queryTranDetail = (queryTranDetail == null) ?
-                    (q => criteria.SalesMan.Contains(q.SaleManId))
-                    :
-                    queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
+                if (!string.IsNullOrEmpty(criteria.SalesMan))
+                {
+                    queryTranDetail = (queryTranDetail == null) ?
+                        (q => criteria.SalesMan.Contains(q.SaleManId))
+                        :
+                        queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
+                }
             }
             return queryTranDetail;
         }
@@ -800,7 +803,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryOpsTrans = queryOpsTrans.And(q => criteria.PersonInCharge.Contains(q.BillingOpsId));
             }
             // Search SalesMan
-            if (hasSalesman)
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
             {
                 queryOpsTrans = queryOpsTrans.And(q => criteria.SalesMan.Contains(q.SalemanId));
             }
