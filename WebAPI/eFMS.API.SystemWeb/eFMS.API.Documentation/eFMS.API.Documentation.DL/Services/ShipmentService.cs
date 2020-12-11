@@ -765,7 +765,7 @@ namespace eFMS.API.Documentation.DL.Services
                     q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
             }
 
-            queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
+            queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains(TermData.CustomLogistic) || string.IsNullOrEmpty(criteria.Service));
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
@@ -1448,7 +1448,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
             IQueryable<GeneralReportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = GeneralReportOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -1487,7 +1487,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
             IQueryable<GeneralReportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = GeneralReportOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -1746,7 +1746,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = AcctPLSheetDocumentation(criteria);
             IQueryable<AccountingPlSheetExportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = AcctPLSheetOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -1773,7 +1773,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = JobProfitAnalysisDocumetation(criteria);
             IQueryable<JobProfitAnalysisExportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = JobProfitAnalysisOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -2446,7 +2446,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = SummaryOfCostsIncurred(criteria);
             IQueryable<SummaryOfCostsIncurredExportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = SummaryOfCostsIncurredOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -2772,7 +2772,7 @@ namespace eFMS.API.Documentation.DL.Services
             var dataDocumentation = SummaryOfRevenueIncurred(criteria);
             SummaryOfRevenueModel obj = new SummaryOfRevenueModel();
 
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = SummaryOfRevenueIncurredOperation(criteria);
                 var lstDoc = dataDocumentation.summaryOfRevenueExportResults.AsQueryable();
@@ -3237,6 +3237,10 @@ namespace eFMS.API.Documentation.DL.Services
             // Get detail
             if (isOPSReport) // Commission OPS Report
             {
+                if(!string.IsNullOrEmpty(criteria.Service) && !criteria.Service.Contains(TermData.CustomLogistic))
+                {
+                    return null;
+                }
                 var dataShipmentOps = QueryDataOperation(criteria);
                 if (!string.IsNullOrEmpty(criteria.CustomNo))
                 {
@@ -3271,6 +3275,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else // Commission Air/Sea Report
             {
+                if (!string.IsNullOrEmpty(criteria.Service) && criteria.Service == TermData.CustomLogistic)
+                {
+                    return null;
+                }
                 var dataShipment = QueryDataDocumentation(criteria);
                 if (dataShipment.Count() == 0)
                 {
@@ -3302,11 +3310,14 @@ namespace eFMS.API.Documentation.DL.Services
                                                         : catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
             commissionData.ExchangeRate = criteria.ExchangeRate;
             // Partner info
-            var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
-            commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
-            commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
-            commissionData.BankName = beneficiaryInfo?.BankAccountName;
-            commissionData.TaxCode = beneficiaryInfo?.TaxCode;
+            if (!string.IsNullOrEmpty(criteria.Beneficiary))
+            {
+                var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
+                commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
+                commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
+                commissionData.BankName = beneficiaryInfo?.BankAccountName;
+                commissionData.TaxCode = beneficiaryInfo?.TaxCode;
+            }
             // get current user
             var curUser = sysUserLevelRepo.Get(x => x.UserId == userId)?.FirstOrDefault();
             var preparedById = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
@@ -3350,7 +3361,7 @@ namespace eFMS.API.Documentation.DL.Services
             var dataShipment = QueryDataDocumentation(criteria);
             IQueryable<GeneralReportResult> list;
             // Get detail
-            if (criteria.Service.Contains(TermData.CustomLogistic))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataShipmentOps = QueryDataOperation(criteria);
                 IQueryable<GeneralReportResult> data;
@@ -3405,11 +3416,14 @@ namespace eFMS.API.Documentation.DL.Services
             commissionData.CustomerName = catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
             commissionData.ExchangeRate = criteria.ExchangeRate;
             // Partner info
-            var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
-            commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
-            commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
-            commissionData.BankName = beneficiaryInfo?.BankAccountName;
-            commissionData.TaxCode = beneficiaryInfo?.TaxCode;
+            if (!string.IsNullOrEmpty(criteria.Beneficiary))
+            {
+                var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
+                commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
+                commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
+                commissionData.BankName = beneficiaryInfo?.BankAccountName;
+                commissionData.TaxCode = beneficiaryInfo?.TaxCode;
+            }
             // get current user
             var curUser = sysUserLevelRepo.Get(x => x.UserId == userId)?.FirstOrDefault();
             var preparedById = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
