@@ -100,6 +100,10 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
                 keywords: !!this.keyword ? this.keyword.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
             };
         } else {
+            if(!this.selectedRange.startDate && !this.selectedRange.endDate){
+                this._toastService.warning("Please select range of date");
+                return;
+            }
             body = {
                 fromDate: !!this.selectedRange && !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
                 toDate: !!this.selectedRange && !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
@@ -124,7 +128,11 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
                     }
 
                     if (this.lockHistory.length === 0) {
+                        if(!this.shipmentUnlock){
+                            this._toastService.error("Unlock failed, Reference No not found!");
+                        } else {
                         this.onUnlockShipment($event);
+                        }
                     }
                 }
             );

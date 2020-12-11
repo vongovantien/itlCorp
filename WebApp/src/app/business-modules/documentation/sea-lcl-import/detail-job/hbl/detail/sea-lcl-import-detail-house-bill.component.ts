@@ -4,7 +4,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo, ExportRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { Container } from '@models';
 import { ReportPreviewComponent } from '@common';
 import { DataService } from '@services';
@@ -42,6 +42,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     constructor(
         protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
+        protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
         protected _activedRoute: ActivatedRoute,
         protected _actionStoreSubject: ActionsSubject,
@@ -52,7 +53,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         protected _dataService: DataService,
 
     ) {
-        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
+        super(_progressService, _documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
     @delayTime(1000)
@@ -163,7 +164,19 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             c.hblid = this.hblId;
         });
 
-        this.updateHbl(modelUpdate);
+        this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
+            if (!!res.salemanId) {
+                if (res.salemanId !== modelUpdate.saleManId) {
+                    this._toastService.error('Not found contract information, please check!');
+                    return;
+                }
+            }
+            if (!!res.officeNameAbbr) {
+                this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
+            } else {
+                this.updateHbl(modelUpdate);
+            }
+        });
     }
 
     updateHbl(body: any) {
