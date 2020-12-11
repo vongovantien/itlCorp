@@ -48,7 +48,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Paging(AcctReceiptCriteria criteria, int page, int size)
         {
             IQueryable<AcctReceiptModel> data = acctReceiptService.Paging(criteria, page, size, out int rowsCount);
-            var result = new ResponsePagingModel<AcctReceiptModel> { Data = null, Page = page, Size = size };
+            var result = new ResponsePagingModel<AcctReceiptModel> { Data = data, Page = page, Size = size };
             return Ok(result);
         }
 
