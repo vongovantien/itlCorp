@@ -28,7 +28,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     formSearchInvoice: FormGroup;
     customerId: AbstractControl; // load partner
     date: AbstractControl;
-    paymentReferenceNo: AbstractControl;
+    paymentRefNo: AbstractControl;
     agreement: AbstractControl;
 
 
@@ -70,13 +70,13 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.formSearchInvoice = this._fb.group({
             customerId: [null, Validators.required],
             date: [],
-            paymentReferenceNo: [null, Validators.required],
+            paymentRefNo: [null, Validators.required],
             agreement: [null]
             // agreement: [null, Validators.required]
         });
         this.customerId = this.formSearchInvoice.controls['customerId'];
         this.date = this.formSearchInvoice.controls['date'];
-        this.paymentReferenceNo = this.formSearchInvoice.controls['paymentReferenceNo'];
+        this.paymentRefNo = this.formSearchInvoice.controls['paymentRefNo'];
         this.agreement = this.formSearchInvoice.controls['agreement'];
 
     }
@@ -86,7 +86,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             (data: any) => {
                 if (!!data) {
                     const { receiptNo } = data;
-                    this.paymentReferenceNo.setValue(receiptNo);
+                    this.paymentRefNo.setValue(receiptNo);
                 }
             }
         );

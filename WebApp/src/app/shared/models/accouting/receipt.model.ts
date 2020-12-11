@@ -8,19 +8,24 @@ export class ReceiptInvoiceModel {
     currency: string = null;
     serieNo: string = null;
     invoiceDate: Date = null;
-    unpaidAmount: number = null;
-    receiptExcUnpaidAmount: number = null;
-
     type: string = null;
     paymentStatus: string = null;
     partnerName: string = null;
     billingDate: string = null;
-    paidAmount: number = null;
-    invoiceBalance: number = null;
     taxCode: string = null;
     refAmount: number = null;
     refCurrency: string = null;
     note: string = null;
+
+    unpaidAmount: number = null;
+    receiptExcUnpaidAmount: number = null;//*  số tiền cần thu của invoice theo tỷ giá phiếu thu
+
+    paidAmount: number = null;
+    receiptExcPaidAmount: number = null; // * Số tiền thu của invoice theo tỷ giá phiếu thu
+
+    invoiceBalance: number = null;
+    receiptInvoicebalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
+
     // * custom
     isSelected: boolean = false;
 
@@ -38,21 +43,35 @@ export class ReceiptInvoiceModel {
 @Controller()
 export class Receipt {
     @Key
-    id: string;
-    customerName: string;
-    UserNameCreated: string;
-    UserNameModified: string;
-    PaymentRefNo: string;
-    PaidAmount: string;
-    paidDate: string;
-    status: string;
-    currency: string;
-    syncStatus: string;
-    lastSyncDate: Date;
-    description: string;
-    userCreated: string;
-    userModified: string;
-    datetimeCreate: Date;
-    datetimeModified: Date;
+    id: string = null;
+    customerName: string = null;
+    paymentRefNo: string = null;
+    paidAmount: string = null;
+    paidDate: string = null;
+    status: string = null;
+    currencyId: string = null;
+    syncStatus: string = null;
+    lastSyncDate: Date = null;
+    description: string = null;
+    userCreated: string = null;
+    userModified: string = null;
+    datetimeCreate: Date = null;
+    datetimeModified: Date = null;
+
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
+
+export class ReceiptModel extends Receipt {
+    customerName: string = null;
+    payments: ReceiptInvoiceModel[] = [];
+    userNameCreated: string = null;
+    userNameModified: string = null;
 }
 

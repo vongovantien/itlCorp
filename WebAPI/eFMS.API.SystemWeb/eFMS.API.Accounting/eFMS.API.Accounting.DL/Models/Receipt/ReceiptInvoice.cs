@@ -22,9 +22,13 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string Note { get; set; }
 
         public decimal UnpaidAmount { get; set; } // số tiền còn lại của invoice
-        public decimal? ReceiptExcUnpaidAmount { get; set; } // tiền còn lại của invoice -> quy đổi theo tiền tệ của receipt
+        public decimal? ReceiptExcUnpaidAmount { get; set; } // tiền còn lại của invoice -> quy đổi theo exchange của receipt
+
         public decimal? PaidAmount { get; set; } // số tiền thu của invoice
+        public decimal? ReceiptExcPaidAmount { get; set; } // số tiền thu của invoice quy theo exchange của receipt
+
         public decimal? InvoiceBalance { get; set; } // số tiền còn lại của invoice
+        public decimal? ReceiptExcInvoiceBalance { get; set; } // số tiền còn lại của invoice quy theo exchange của receipt.
     }
 
     public class ProcessClearInvoiceModel

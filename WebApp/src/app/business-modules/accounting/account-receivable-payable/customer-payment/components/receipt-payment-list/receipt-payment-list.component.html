@@ -1,188 +1,194 @@
-<div class="m-portlet">
-    <div class="m-portlet__body">
-        <div [formGroup]="form" class="m-form m-form--state">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Paid Amount</label>
-                        <input type="text" class="form-control m-input m-input--square text-success"
-                            formControlName="paidAmount" numeric [decimals]="2" autoFormatCurrency
-                            (ngModelChange)="onSelectDataFormInfo($event,'paid-amount')">
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label"> Type </label>
-                        <ng-select formControlName="type" class="custom" [items]="receiptTypes" [clearable]="false"
-                            [multiple]="true" (change)="onSelectDataFormInfo($event,'type')">
-                        </ng-select>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Cus Advance Amount</label>
-                        <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric
-                            [decimals]="2" autoFormatCurrency>
-                    </div>
+<div class="form-receipt-invoices">
+    <div [formGroup]="form" class="m-form m-form--state">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmount.valid }">
+                    <label class="form-control-label" required>Paid Amount</label>
+                    <input type="text" class="form-control m-input m-input--square text-success"
+                        formControlName="paidAmount" numeric [decimals]="2" autoFormatCurrency
+                        (ngModelChange)="onSelectDataFormInfo($event,'paid-amount')">
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Final Paid Amount</label>
-                        <input type="text" class="form-control m-input m-input--square"
-                            formControlName="finalPaidAmount" currencyMask>
-                    </div>
-                </div>
-                <div class=" col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label"> Balance </label>
-                        <input type="text" class="form-control m-input m-input--square" formControlName="balance"
-                            [value]="balance.value | number: '.0-3'">
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <div class="form-group">
-                        <label class="form-control-label">Payment Method</label>
-                        <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom" name="method"
-                            [clearable]="false"></ng-select>
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <div class="form-group">
-                        <label class="form-control-label">Currency</label>
-                        <ng-select formControlName="currency" class="custom" [items]="$currencyList | async"
-                            bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
-                            [clearable]="false">
-                        </ng-select>
-
-                    </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label"> Type </label>
+                    <ng-select formControlName="type" class="custom" [items]="receiptTypes" [clearable]="false"
+                        [multiple]="true" (change)="onSelectDataFormInfo($event,'type')">
+                    </ng-select>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Payment Date</label>
-                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                name="daterange" placeholder="Select request date" [autoApply]="true"
-                                formControlName="paymentDate" readonly calendar
-                                (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" />
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label"> Exchange Rate </label>
-                        <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
-                            numeric [decimals]="2" autoFormatCurrency>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label">Bank Acount No</label>
-                        <input type="text" class="form-control m-input m-input--square" formControlName="bankAcountNo">
-                    </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label">Cus Advance Amount</label>
+                    <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric [decimals]="2"
+                        autoFormatCurrency>
                 </div>
             </div>
         </div>
-
-        <div class="row m--margin-top-20">
-            <div class="col-lg-12 m--align-left d-flex align-items-center justify-content-between">
-                <div>
-                    <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
-                        (click)="processClear()">
-                        <span>
-                            <i class="la la-refresh"></i>
-                            <span> Process Clear </span>
-                        </span>
-                    </button>
-                    <button class="btn btn-danger m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
-                        (click)="removeInvoiceItem()">
-                        <span>
-                            <i class="la la-trash"></i>
-                            <span> Remove </span>
-                        </span>
-                    </button>
-                    <button class="btn btn-success m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
-                        (click)="insertAdvanceRowData()">
-                        <span>
-                            <i class="la la-plus"></i>
-                            <span> Add Adv </span>
-                        </span>
-                    </button>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label">Final Paid Amount</label>
+                    <input type="text" class="form-control m-input m-input--square" formControlName="finalPaidAmount"
+                        currencyMask>
                 </div>
             </div>
+            <div class=" col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label"> Balance </label>
+                    <input type="text" class="form-control m-input m-input--square" formControlName="balance"
+                        [value]="balance.value | number: '.0-3'">
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="form-group">
+                    <label class="form-control-label">Payment Method</label>
+                    <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom" name="method"
+                        [clearable]="false"></ng-select>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="form-group">
+                    <label class="form-control-label">Currency</label>
+                    <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async"
+                        bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
+                        [clearable]="false">
+                    </ng-select>
 
-            <div class="col-lg-12 m--margin-top-20">
-                <div class="table-wrapper table-scrollable" id="payment-table">
-                    <table class="table table-hover table-brand dataTable table-hover">
-                        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
-                            <th class="m--w-50 first table-actions-col">
-                                <label class="m-checkbox">
-                                    <input type="checkbox" [(ngModel)]="isCheckAll" (change)="onChangeCheckBoxAction()">
-                                    <span></span>
-                                </label>
-                            </th>
-                        </thead>
-                        <tbody>
-                            <ng-container *ngIf="!!invoices.length">
-                                <ng-container *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
-                                    <tr [class.selected-row]="invoice.type === 'ADV'">
-                                        <td class="table-actions-col">
-                                            <div class="table-actions">
-                                                <label class="m-checkbox">
-                                                    <input type="checkbox" (change)="onChangeCheckBoxInvoice()"
-                                                        [value]="invoice" [(ngModel)]="invoice.isSelected"
-                                                        [name]="invoice.invoiceId">
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td class="text-primary">{{invoice.invoiceNo}}</td>
-                                        <td class="text-primary">{{invoice.serieNo}}</td>
-                                        <td>{{invoice.type}}</td>
-                                        <td>{{invoice.partnerName}}</td>
-                                        <td>{{invoice.taxCode}}</td>
-                                        <td class="text-left">{{invoice.unpaidAmount | number: '.0-3'}}
-                                            {{invoice.currency}}</td>
-                                        <td>
-                                            <input type="text" class="form-control" [(ngModel)]="invoice.paidAmount"
-                                                autoFormatCurrency numeric>
-                                        </td>
-                                        <td>{{invoice.invoiceBalance | number: '.0-3'}}</td>
-                                        <td>{{invoice.refAmount}}</td>
-                                        <td>{{invoice.refCurrency}}</td>
-                                        <td>
-                                            <ng-container [ngSwitch]="invoice.paymentStatus">
-                                                <ng-container *ngSwitchCase="'Unpaid'">
-                                                    <span class="text-danger">Unpaid</span>
-                                                </ng-container>
-                                                <p *ngSwitchCase="'Paid A Part'">
-                                                    <span class="text-warning">Paid A Apart</span>
-                                                </p>
-                                                <p *ngSwitchDefault>
-                                                    {{invoice.paymentStatus}}
-                                                </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label">Payment Date</label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                            name="daterange" placeholder="Select request date" [autoApply]="true"
+                            formControlName="paymentDate" readonly calendar
+                            (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" />
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
+                    <label class="form-control-label" required> Exchange Rate </label>
+                    <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
+                        numeric [decimals]="2" autoFormatCurrency>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label">Bank Acount No</label>
+                    <input type="text" class="form-control m-input m-input--square" formControlName="bankAcountNo">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m--margin-top-20">
+        <div class="col-lg-12 m--align-left d-flex align-items-center justify-content-between">
+            <div>
+                <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
+                    (click)="processClear()">
+                    <span>
+                        <i class="la la-refresh"></i>
+                        <span> Process Clear </span>
+                    </span>
+                </button>
+                <button class="btn btn-danger m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
+                    (click)="removeInvoiceItem()">
+                    <span>
+                        <i class="la la-trash"></i>
+                        <span> Remove </span>
+                    </span>
+                </button>
+                <button class="btn btn-success m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
+                    (click)="insertAdvanceRowData()">
+                    <span>
+                        <i class="la la-plus"></i>
+                        <span> Add Adv </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-12 m--margin-top-20">
+            <div class="table-wrapper table-scrollable" id="payment-table">
+                <table class="table table-hover table-brand dataTable table-hover">
+                    <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                        <th class="m--w-50 first table-actions-col">
+                            <label class="m-checkbox">
+                                <input type="checkbox" [(ngModel)]="isCheckAll" (change)="onChangeCheckBoxAction()">
+                                <span></span>
+                            </label>
+                        </th>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="!!invoices.length">
+                            <ng-container *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
+                                <tr [class.selected-row]="invoice.type === 'ADV'">
+                                    <td class="table-actions-col">
+                                        <div class="table-actions">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" (change)="onChangeCheckBoxInvoice($event)"
+                                                    [value]="invoice.isSelected" [(ngModel)]="invoice.isSelected"
+                                                    [name]="invoice.invoiceId">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="text-primary">{{invoice.invoiceNo}}</td>
+                                    <td class="text-primary">{{invoice.serieNo}}</td>
+                                    <td>{{invoice.type}}</td>
+                                    <td>{{invoice.partnerName}}</td>
+                                    <td>{{invoice.taxCode}}</td>
+                                    <td class="text-left">{{invoice.unpaidAmount | number: '.0-3'}}
+                                        {{invoice.currency}}
+                                    </td>
+                                    <td class="text-left">{{invoice.receiptExcUnpaidAmount | number: '.0-3'}}
+                                        {{invoice.currency}}</td>
+                                    <td>
+                                        <input type="text" class="form-control" [(ngModel)]="invoice.paidAmount"
+                                            autoFormatCurrency numeric [digits]="3">
+                                    </td>
+                                    <td class="text-left">{{invoice.receiptExcPaidAmount | number: '.0-3'}}
+                                        {{invoice.currency}}
+                                    </td>
+                                    <td>{{invoice.invoiceBalance | number: '.0-3'}} {{invoice.currency}}</td>
+                                    <td class="text-left">{{invoice.receiptInvoicebalance | number: '.0-3'}}
+                                    </td>
+                                    <td>
+                                        <ng-container [ngSwitch]="invoice.paymentStatus">
+                                            <ng-container *ngSwitchCase="'Unpaid'">
+                                                <span class="text-danger">Unpaid</span>
                                             </ng-container>
-                                        </td>
-                                        <td>{{invoice.billingDate  | date: 'dd/MM/yyyy'}}</td>
-                                        <td>{{invoice.invoiceDate | date: 'dd/MM/yyyy'}}</td>
-                                        <td>{{invoice.note}}</td>
-                                    </tr>
-                                </ng-container>
+                                            <p *ngSwitchCase="'Paid A Part'">
+                                                <span class="text-warning">Paid A Apart</span>
+                                            </p>
+                                            <p *ngSwitchDefault>
+                                                {{invoice.paymentStatus}}
+                                            </p>
+                                        </ng-container>
+                                    </td>
+                                    <td>{{invoice.billingDate  | date: 'dd/MM/yyyy'}}</td>
+                                    <td>{{invoice.invoiceDate | date: 'dd/MM/yyyy'}}</td>
+                                    <td>
+                                        <input type="text" class="form-control" [(ngModel)]="invoice.note">
+                                    </td>
+                                </tr>
                             </ng-container>
-                            <tr app-table-none-record *ngIf="!(isLoading | async) && !invoices.length">
-                            </tr>
-                            <tr app-table-row-loading *ngIf="isLoading | async"></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
-                    (onChange)="updatePagingData($event)"></app-pagination>
+                        </ng-container>
+                        <tr app-table-none-record *ngIf="!(isLoading | async) && !invoices.length">
+                        </tr>
+                        <tr app-table-row-loading *ngIf="isLoading | async"></tr>
+                    </tbody>
+                </table>
             </div>
+            <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                (onChange)="updatePagingData($event)"></app-pagination>
         </div>
     </div>
 </div>
