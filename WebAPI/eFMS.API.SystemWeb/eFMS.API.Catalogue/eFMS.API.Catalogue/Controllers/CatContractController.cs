@@ -188,7 +188,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         }
                     }
-                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && x.OfficeId != null && office.Any(y => x.OfficeId.Contains(y)) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                    if (catContractService.Any(x => sale.Contains(x.SaleService) && office.Contains(x.OfficeId) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
@@ -203,7 +203,7 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         }
                     }
-                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y => officeIds.Contains(y)) && x.SaleManId != model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Contains(x.SaleService) && office.Contains(x.OfficeId) && x.SaleManId != model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
@@ -220,12 +220,12 @@ namespace eFMS.API.Catalogue.Controllers
                             messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         }
                     }
-                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y=> officeIds.Contains(y)) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x =>sale.Contains(x.SaleService) && office.Contains(x.OfficeId) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
 
-                    if (catContractService.Any(x => x.SaleService.Contains(model.SaleService) && office.Any(y => officeIds.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Contains(x.SaleService) && office.Contains(x.OfficeId) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
@@ -240,12 +240,12 @@ namespace eFMS.API.Catalogue.Controllers
                         }
                     }
 
-                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y => officeIds.Contains(y)) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Contains(x.SaleService) && office.Contains(x.OfficeId) && x.SaleManId != model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
 
-                    if (catContractService.Any(x => sale.Any(z => x.SaleService.Contains(z)) && office.Any(y => officeIds.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => sale.Contains(x.SaleService) && office.Contains(x.OfficeId) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
