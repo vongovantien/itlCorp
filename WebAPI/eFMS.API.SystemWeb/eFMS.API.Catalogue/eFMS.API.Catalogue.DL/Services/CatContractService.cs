@@ -127,7 +127,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // truong hop custom logistic
             if (string.IsNullOrEmpty(jobId))
             {
-                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                 if (string.IsNullOrEmpty(data))
                 {
                     string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
@@ -427,6 +427,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         {
                             contract.SaleService += "AE;";
                         }
+                        if (it.Trim() == "Sea Consol Export")
+                        {
+                            contract.SaleService += "SCE;";
+                        }
+                        if (it.Trim() == "Sea Consol Import")
+                        {
+                            contract.SaleService += "SCI;";
+                        }
                         if (it.Trim() == "Sea FCL Export")
                         {
                             contract.SaleService += "SFE;";
@@ -456,7 +464,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             contract.SaleService = "AE;SFE;SLE;SFI;SLI;CL;IT";
                         }
                     }
-                    var vas = item.Vas.Split(";").ToArray();
+                    var vas = item.Vas?.Split(";").ToArray();
                     contract.Vas = string.Empty;
                     foreach (var it in vas)
                     {
@@ -467,6 +475,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         if (it.Trim() == "Air Export")
                         {
                             contract.Vas += "AE;";
+                        }
+                        if (it.Trim() == "Sea Consol Export")
+                        {
+                            contract.Vas += "SCE;";
+                        }
+                        if (it.Trim() == "Sea Consol Import")
+                        {
+                            contract.Vas += "SCI;";
                         }
                         if (it.Trim() == "Sea FCL Export")
                         {
