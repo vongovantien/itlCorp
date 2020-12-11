@@ -127,22 +127,22 @@ namespace eFMS.API.Catalogue.DL.Services
             // truong hop custom logistic
             if (string.IsNullOrEmpty(jobId))
             {
-                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL")).Select(x => x.SaleManId).FirstOrDefault();
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                 if (string.IsNullOrEmpty(data))
                 {
                     string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
-                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL")).Select(x => x.SaleManId).FirstOrDefault();
+                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                     OfficeNameAbbr = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID).Select(t => t.ShortName).FirstOrDefault();
 
                 }
             }
             else
             {
-                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType)).Select(x => x.SaleManId).FirstOrDefault();
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType) && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                 if (string.IsNullOrEmpty(data))
                 {
                     string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
-                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType)).Select(x => x.SaleManId).FirstOrDefault();
+                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType) && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                     OfficeNameAbbr = sysOfficeRepository.Get(x => x.Id == DataShipment.OfficeId).Select(t => t.ShortName).FirstOrDefault();
 
                 }
@@ -199,6 +199,12 @@ namespace eFMS.API.Catalogue.DL.Services
                             break;
                         case "AI":
                             ContractServicesName += "Air Import; ";
+                            break;
+                        case "SCE":
+                            ContractServicesName += "Sea Consol Export; ";
+                            break;
+                        case "SCI":
+                            ContractServicesName += "Sea Consol Import; ";
                             break;
                         case "SFE":
                             ContractServicesName += "Sea FCL Export; ";

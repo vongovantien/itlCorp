@@ -5,17 +5,15 @@ using System.Net;
 using System.Net.Mail;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace eFMSWindowService.Helpers
 {
     public static class SendMailHelper
     {
-        public const string _emailFrom = "info.fms@itlvn.com"; // "noreply-efms@itlvn.com"
-        private const string _smtpHost = "webmail.itlvn.com"; // "email-smtp.ap-southeast-2.amazonaws.com"
-        private const string _smptUser = "info.fms"; //"AKIA2AI6JMUOVFIQJQXN"
-        private const string _smtpPassword = "ITPr0No1!"; // "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP"
+        public const string _emailFrom = "info.fms@itlvn.com"; // "noreply-efms@itlvn.com";
+        private const string _smtpHost = "webmail.itlvn.com"; // "email-smtp.ap-southeast-2.amazonaws.com";
+        private const string _smptUser = "info.fms"; //"AKIA2AI6JMUOVFIQJQXN";
+        private const string _smtpPassword = "ITPr0No1!"; // "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP";
 
         public static bool Send(string subject, string body, List<string> toEmails)
         {

@@ -116,7 +116,7 @@ namespace eFMS.API.Documentation.DL.Services
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TpyeofService = "CL",
+                    TypeOfService = "CL",
                     Shipper = item.Shipper ?? string.Empty,
                     Consignee = item.Consignee ?? string.Empty,
                     LoadingDate = item.ServiceDate
@@ -145,6 +145,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         private IQueryable<OpsTransaction> QueryOpsSaleReport(SaleReportCriteria criteria)
         {
+            var hasSalesman = criteria.SalesMan != null; // Check if Type=Salesman
             Expression<Func<OpsTransaction, bool>> queryOpsTrans = x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
                                                                  && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
                                                                  && (x.Mblno.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
@@ -153,13 +154,15 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (x.Pod == criteria.Pod || criteria.Pod == null)
                                                                  && (x.Pol == criteria.Pol || criteria.Pol == null)
                                                                  && (x.SupplierId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 && (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
-                                                                 && (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
-                                                                 && (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
+                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesOfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                                                : (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesDepartmentId) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                                                : (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesGroupId) || string.IsNullOrEmpty(criteria.GroupId))
+                                                                                : (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
                                                                  && (criteria.PersonInCharge.Contains(x.BillingOpsId) || string.IsNullOrEmpty(criteria.PersonInCharge))
                                                                  && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator)
-                                                                 && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan)))
-                                                                 ;
+                                                                 && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan)));
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
                 queryOpsTrans = queryOpsTrans.And(x => x.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && x.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date);
@@ -169,8 +172,27 @@ namespace eFMS.API.Documentation.DL.Services
                 queryOpsTrans = queryOpsTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date);
             }
             var data = opsRepository.Get(queryOpsTrans);
+            var shipmentList = new List<OpsTransaction>();
+            if (hasSalesman)
+            {
+                foreach (var shipment in data)
+                {
+                    if (string.IsNullOrEmpty(criteria.OfficeId) || shipment.SalesOfficeId.Split(';').Intersect(criteria.OfficeId.Split(';')).Any())
+                    {
+                        if (string.IsNullOrEmpty(criteria.DepartmentId) || shipment.SalesDepartmentId.Split(';').Intersect(criteria.DepartmentId.Split(';')).Any())
+                        {
+                            if (string.IsNullOrEmpty(criteria.GroupId) || shipment.SalesGroupId.Split(';').Intersect(criteria.GroupId.Split(';')).Any())
+                            {
+                                shipmentList.Add(shipment);
+                            }
+                        }
+                    }
+                }
+                data = shipmentList.AsQueryable();
+            }
             return data;
         }
+
         private IQueryable<MonthlySaleReportResult> GetCSSaleReport(SaleReportCriteria criteria)
         {
             IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
@@ -233,7 +255,7 @@ namespace eFMS.API.Documentation.DL.Services
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TpyeofService = item.TypeOfService != null? (item.TypeOfService.Contains("LCL")?"LCL": string.Empty): string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
+                    TypeOfService = item.TypeOfService != null? (item.TypeOfService.Contains("LCL")?"LCL": string.Empty): string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
                     //Shipper = item.ShipperDescription,
                     Shipper = catPartnerRepository.Get(x => x.Id == item.ShipperId).FirstOrDefault()?.PartnerNameEn, //CR: Get Shipper Name En [25-09-2020]
                     //Consignee = item.ConsigneeDescription,
@@ -265,39 +287,83 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<CsTransactionDetail> QueryHouseBills(SaleReportCriteria criteria)
         {
             Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
+            // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
                 queryTranDetail = x => x.CustomerId == criteria.CustomerId;
             }
+            // Search Hawb
             if (!string.IsNullOrEmpty(criteria.Hawb))
             {
                 queryTranDetail = queryTranDetail == null ? (x => x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1)
                                                         : queryTranDetail.And(x => x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1);
             }
-            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
+            if (hasSalesman)
             {
-                queryTranDetail = x => criteria.SalesMan.Contains(x.SaleManId);
+                // Search SalesOffice
+                if (!string.IsNullOrEmpty(criteria.OfficeId))
+                {
+                    queryTranDetail = queryTranDetail == null ? (x => !string.IsNullOrEmpty(x.SalesOfficeId))
+                                                              : queryTranDetail.And(x => !string.IsNullOrEmpty(x.SalesOfficeId));
+                }
+                // Search SalesDepartment
+                if (!string.IsNullOrEmpty(criteria.DepartmentId))
+                {
+                    queryTranDetail = queryTranDetail == null ? (x => !string.IsNullOrEmpty(x.SalesDepartmentId))
+                                                              : queryTranDetail.And(x => !string.IsNullOrEmpty(x.SalesDepartmentId));
+                }
+                // Search SalesGroup
+                if (!string.IsNullOrEmpty(criteria.GroupId))
+                {
+                    queryTranDetail = queryTranDetail == null ? (x => !string.IsNullOrEmpty(x.SalesGroupId))
+                                                              : queryTranDetail.And(x => !string.IsNullOrEmpty(x.SalesGroupId));
+                }
+                // Search SaleMan
+                if (!string.IsNullOrEmpty(criteria.SalesMan))
+                {
+                    queryTranDetail = queryTranDetail == null ? (x => criteria.SalesMan.Contains(x.SaleManId))
+                                                          : queryTranDetail.And(x => criteria.SalesMan.Contains(x.SaleManId));
+                }
             }
             var housebills = queryTranDetail == null ? detailRepository.Get() : detailRepository.Get(queryTranDetail);
+            var houseBillList = new List<CsTransactionDetail>();
+            if (hasSalesman)
+            {
+                foreach (var house in housebills)
+                {
+                    if (string.IsNullOrEmpty(criteria.OfficeId) || house.SalesOfficeId.Split(';').Intersect(criteria.OfficeId.Split(';')).Any())
+                    {
+                        if (string.IsNullOrEmpty(criteria.DepartmentId) || house.SalesDepartmentId.Split(';').Intersect(criteria.DepartmentId.Split(';')).Any())
+                        {
+                            if (string.IsNullOrEmpty(criteria.GroupId) || house.SalesGroupId.Split(';').Intersect(criteria.GroupId.Split(';')).Any())
+                            {
+                                houseBillList.Add(house);
+                            }
+                        }
+                    }
+                }
+                housebills = houseBillList.AsQueryable();
+            }
             return housebills;
         }
 
         private IQueryable<CsTransaction> QueryCsTransaction(SaleReportCriteria criteria)
         {
+            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             Expression<Func<CsTransaction, bool>> queryTrans = x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
                                                                  && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
                                                                  && (x.Mawb.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
                                                                  && (x.JobNo.IndexOf(criteria.JobId, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.JobId))
-                                                                 && (criteria.Service.Contains(x.TransactionType) || string.IsNullOrEmpty(x.TransactionType))
+                                                                 && (criteria.Service.Contains(x.TransactionType) || string.IsNullOrEmpty(criteria.Service))
                                                                  && (x.Pod == criteria.Pod || criteria.Pod == null)
                                                                  && (x.Pol == criteria.Pol || criteria.Pol == null)
                                                                  && (x.ColoaderId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 && (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
-                                                                 && (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
-                                                                 && (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
+                                                                 && !hasSalesman ? (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId)) : true
+                                                                 && !hasSalesman ? (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId)) : true
+                                                                 && !hasSalesman ? (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId)) : true
                                                                  && (criteria.PersonInCharge.Contains(x.PersonIncharge) || string.IsNullOrEmpty(criteria.PersonInCharge))
-                                                                 && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator))
-                                                                 ;
+                                                                 && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator));
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
                 queryTrans = queryTrans.And(x => x.TransactionType.Contains("E") ?

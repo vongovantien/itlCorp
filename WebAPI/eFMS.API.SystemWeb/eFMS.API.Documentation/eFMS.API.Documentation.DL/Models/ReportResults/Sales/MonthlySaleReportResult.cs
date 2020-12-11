@@ -36,7 +36,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults.Sales
         public string KeyContact { get; set; }
         public string MBLNO { get; set; }
         public string Vessel { get; set; }
-        public string TpyeofService { get; set; }
+        public string TypeOfService { get; set; }
         public string Shipper { get; set; }	
         public string Consignee { get; set; }
     }

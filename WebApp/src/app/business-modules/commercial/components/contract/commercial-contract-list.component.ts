@@ -154,6 +154,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         } else {
             if (this.contracts.length > 0) {
                 this.formContractPopup.selectedContract = this.contracts[this.indexlstContract];
+                this.formContractPopup.contract = this.contracts[this.indexlstContract];
                 this.formContractPopup.indexDetailContract = this.indexlstContract;
                 this.formContractPopup.fileList = this.formContractPopup.selectedContract.fileList;
             }
