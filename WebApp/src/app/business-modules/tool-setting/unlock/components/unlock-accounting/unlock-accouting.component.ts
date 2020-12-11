@@ -54,8 +54,11 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                             this.selectedDataAccountingToUnlock = res.lockedLogs;
                         }
                         if (this.lockHistory.length === 0) {
-                            this.onUnlockAccounting($event);
-
+                            if (!this.selectedDataAccountingToUnlock) {
+                                this._toastService.error("Unlock failed, Reference No not found!");
+                            } else {
+                                this.onUnlockAccounting($event);
+                            }
                         }
                     }
                 );
@@ -74,7 +77,11 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                             this.selectedDataAccountingToUnlock = res.lockedLogs;
                         }
                         if (this.lockHistory.length === 0) {
-                            this.onUnlockAccounting($event);
+                            if (!this.selectedDataAccountingToUnlock) {
+                                this._toastService.error("Unlock failed, Reference No not found!");
+                            } else {
+                                this.onUnlockAccounting($event);
+                            }
                         }
                     }
                 );

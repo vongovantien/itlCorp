@@ -4118,7 +4118,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = new LockedLogResultModel();
             var settlesToUnLock = DataContext.Get(x => keyWords.Contains(x.SettlementNo));
-            if (settlesToUnLock == null) return result;
+            if (settlesToUnLock.Count() < keyWords.Count) return result;
             result.LockedLogs = settlesToUnLock.Select(x => new LockedLogModel
             {
                 Id = x.Id,
