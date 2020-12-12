@@ -4119,19 +4119,26 @@ namespace eFMS.API.Accounting.DL.Services
             var result = new LockedLogResultModel();
             var settlesToUnLock = DataContext.Get(x => keyWords.Contains(x.SettlementNo));
             if (settlesToUnLock.Count() < keyWords.Count) return result;
-            result.LockedLogs = settlesToUnLock.Select(x => new LockedLogModel
+            if (settlesToUnLock.Where(x => x.SyncStatus == "Synced").Any())
             {
-                Id = x.Id,
-                SettlementNo = x.SettlementNo,
-                LockedLog = x.LockedLog
-            });
-            if (result.LockedLogs != null)
+                result.Logs = settlesToUnLock.Where(x => x.SyncStatus == "Synced").Select(x => x.SettlementNo).ToList();
+            }
+            else
             {
-                result.Logs = new List<string>();
-                foreach (var item in settlesToUnLock)
+                result.LockedLogs = settlesToUnLock.Select(x => new LockedLogModel
                 {
-                    var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
-                    result.Logs.AddRange(logs);
+                    Id = x.Id,
+                    SettlementNo = x.SettlementNo,
+                    LockedLog = x.LockedLog
+                });
+                if (result.LockedLogs != null)
+                {
+                    result.Logs = new List<string>();
+                    foreach (var item in settlesToUnLock)
+                    {
+                        var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
+                        result.Logs.AddRange(logs);
+                    }
                 }
             }
             return result;

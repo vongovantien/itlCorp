@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { IShipmentLockInfo } from '../unlock-shipment/unlock-shipment.component';
 import { UnlockHistoryPopupComponent } from '../unlock-history/unlock-history.popup';
 import { ToastrService } from 'ngx-toastr';
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'unlock-accounting',
@@ -13,6 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 
 export class UnlockAccountingComponent extends AppForm implements OnInit {
     @ViewChild(UnlockHistoryPopupComponent) confirmPopup: UnlockHistoryPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     types: CommonInterface.ICommonTitleValue[] = [
         { value: 1, title: 'Advance Payment' },
@@ -22,6 +24,7 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
 
     lockHistory: string[] = [];
     selectedDataAccountingToUnlock: any;
+    listPaymentSynced: string = '';
 
     constructor(
         private _accountingRepo: AccountingRepo,
@@ -45,8 +48,13 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                     (res: IShipmentLockInfo) => {
                         if (!!res.logs && !!res.logs.length) {
                             this.lockHistory = (res.logs || []);
-                            this.confirmPopup.show();
-
+                            if (!res.lockedLogs) {
+                                this.listPaymentSynced = "The bellow advance/settlements synced to Accountant system, Please contact to Accountant to check it!<br>"
+                                    + this.lockHistory.map(x => x).join('<br>');
+                                this.infoPopup.show();
+                            } else {
+                                this.confirmPopup.show();
+                            }
                         } else {
                             this.lockHistory = [];
                         }
@@ -55,7 +63,8 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                         }
                         if (this.lockHistory.length === 0) {
                             if (!this.selectedDataAccountingToUnlock) {
-                                this._toastService.error("Unlock failed, Reference No not found!");
+
+                                this._toastService.warning("Unlock failed, Reference No not found!");
                             } else {
                                 this.onUnlockAccounting($event);
                             }
@@ -69,7 +78,13 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                     (res: IShipmentLockInfo) => {
                         if (!!res.logs && !!res.logs.length) {
                             this.lockHistory = (res.logs || []);
-                            this.confirmPopup.show();
+                            if (!res.lockedLogs) {
+                                this.listPaymentSynced = "The bellow advance/settlements synced to Accountant system, Please contact to Accountant to check it!<br>"
+                                    + this.lockHistory.map(x => x).join('<br>');
+                                this.infoPopup.show();
+                            } else {
+                                this.confirmPopup.show();
+                            }
                         } else {
                             this.lockHistory = [];
                         }
