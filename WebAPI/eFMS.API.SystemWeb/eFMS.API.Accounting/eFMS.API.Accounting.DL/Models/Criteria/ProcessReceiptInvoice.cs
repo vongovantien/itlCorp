@@ -7,11 +7,14 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
     public class ProcessReceiptInvoice
     {
         [Required]
+        public string CustomerID { get; set; }
+        [Required]
         public decimal PaidAmount { get; set; }
-        List<ReceiptInvoiceModel> List { get; set; }
+        public List<ReceiptInvoiceModel> List { get; set; }
         [Required]
         public string Currency { get; set; }
         [Required]
         public decimal FinalExchangeRate { get; set; }
+        
     }
 }

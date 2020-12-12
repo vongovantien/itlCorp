@@ -6,13 +6,14 @@ import { AccountingRepo, CatalogueRepo } from '@repositories';
 import { SortService, DataService } from '@services';
 import { formatDate } from '@angular/common';
 import { AppList } from '@app';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 
 import { Store } from '@ngrx/store';
 import { catchError, finalize, takeUntil, pluck } from 'rxjs/operators';
 import { Observable, from } from 'rxjs';
 import { customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState } from '../../store/reducers';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -32,7 +33,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     finalPaidAmount: AbstractControl;
     balance: AbstractControl;
     paymentMethod: AbstractControl;
-    currency: AbstractControl;
+    currencyId: AbstractControl;
     paymentDate: AbstractControl;
     exchangeRate: AbstractControl;
     bankAcountNo: AbstractControl;
@@ -45,6 +46,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     customerInfo: Partner;
 
+    isSubmitted: boolean = false;
+
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
@@ -53,7 +56,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         private _store: Store<IAppState>,
         private _fb: FormBuilder,
         private _dataService: DataService,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -73,10 +77,11 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Taxcode', field: 'taxCode', sortable: true },
             { title: 'Unpaid Amount', field: 'unpaidAmount', sortable: true },
+            { title: 'Unpaid Ex Amount', field: 'receiptExcUnpaidAmount', sortable: true },
             { title: 'Paid Amount', field: 'paidAmount', sortable: true },
+            { title: 'Paid Ex Amount', field: 'receiptExcPaidAmount', sortable: true },
             { title: 'Balance Amount', field: 'invoiceBalance', sortable: true },
-            { title: 'Reference Amount', field: 'refAmout', sortable: true },
-            { title: 'Ref Curr', field: 'refCurr', sortable: true },
+            { title: 'Balance Ex Amount', field: 'receiptInvoicebalance', sortable: true },
             { title: 'Payment Status', field: 'paymentStatus', sortable: true },
             { title: 'Billing Date', field: 'billingDate', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
@@ -91,6 +96,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (res: ReceiptInvoiceModel[]) => {
                     this.invoices = [...res];
+                    this.balance.setValue(null);
+
                     console.log(this.invoices);
                 });
 
@@ -99,36 +106,29 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .pipe(pluck('cus-advance'))
             .subscribe(
                 (data) => {
-                    if (data !== undefined) {
-                        if (!this.cusAdvanceAmount.value) {
-                            this.cusAdvanceAmount.setValue(data);
-                        }
-                    }
+                    data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
                 }
             );
         this._dataService.currentMessage
             .pipe(pluck('customer'))
             .subscribe(
                 (data: Partner) => {
-                    if (data !== undefined) {
-                        this.customerInfo = data;
-                        console.log(this.customerInfo);
-                    }
+                    data !== undefined && (this.customerInfo = data);
                 }
             );
     }
 
     initForm() {
         this.form = this._fb.group({
-            paidAmount: [],
+            paidAmount: [null, Validators.required],
             type: [[this.receiptTypes[0]]],
             cusAdvanceAmount: [],
             finalPaidAmount: [{ value: null, disabled: true }],
             balance: [{ value: null, disabled: true }],
             paymentMethod: [this.paymentMethods[0]],
-            currency: ['VND'],
+            currencyId: ['VND'],
             paymentDate: [{ startDate: new Date(), endDate: new Date() }],
-            exchangeRate: [],
+            exchangeRate: [1, Validators.required],
             bankAcountNo: [],
         });
 
@@ -141,10 +141,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.paymentDate = this.form.controls['paymentDate'];
         this.exchangeRate = this.form.controls['exchangeRate'];
         this.bankAcountNo = this.form.controls['bankAcountNo'];
-        this.currency = this.form.controls['currency'];
+        this.currencyId = this.form.controls['currencyId'];
 
-        // Load tỷ giá
-        this.exchangeRate.setValue(1);
     }
 
     generateExchangeRate(date: string, fromCurrency: string) {
@@ -197,21 +195,30 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 }
                 break;
             case 'currency':
-                if ((data as Currency).id === 'VND') {
+                if ((data as Currency).id === this.getCurrencyInvoice(this.invoices)[0]) {
                     this.exchangeRate.setValue(1);
+                    // this.exchangeRate.disable();
                     break;
+                } else {
+                    // this.exchangeRate.enable();
+                    this.exchangeRate.setValue(null);
+                    if ((data as Currency).id !== 'VND' && this.paymentDate.value?.startDate) {
+                        this.generateExchangeRate(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'), (data as Currency).id);
+                    }
+
                 }
-                if (this.paymentDate.value?.startDate) {
-                    this.generateExchangeRate(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'), (data as Currency).id);
-                }
+
+                this.balance.setValue(null);
+                this.finalPaidAmount.setValue(null);
+                this.paidAmount.setValue(null);
                 break;
 
             case 'payment-date':
-                if (this.currency.value === 'VND') {
+                if (this.currencyId.value === 'VND') {
                     this.exchangeRate.setValue(1);
                     break;
                 }
-                this.generateExchangeRate(formatDate(data?.startDate, 'yyy-MM-dd', 'en'), this.currency.value);
+                this.generateExchangeRate(formatDate(data?.startDate, 'yyy-MM-dd', 'en'), this.currencyId.value);
                 break;
             default:
                 break;
@@ -238,42 +245,60 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.invoices.push(newInvoiceWithAdv);
     }
 
+    getCurrencyInvoice(invoiceList: ReceiptInvoiceModel[]): string[] {
+        if (!invoiceList.length) { return ["VND"] };
+        const currencyList = [...new Set(invoiceList.map(i => i.currency))];
+
+        return currencyList;
+    }
+
     processClear() {
-        // if (!this.paidAmount.value) {
-        //     return;
-        // }
-        // let paidAmount = +this.paidAmount.value || 0;
-        // for (const invoice of this.invoices) {
-        //     if (paidAmount - invoice.unpaidAmount > 0) {
-        //         invoice.paidAmount = invoice.unpaidAmount;
-        //         invoice.invoiceBalance = 0;
-        //         paidAmount -= invoice.unpaidAmount;
-        //     } else {
-        //         invoice.paidAmount = paidAmount;
-        //         invoice.invoiceBalance = invoice.unpaidAmount - invoice.paidAmount;
+        this.isSubmitted = true;
+        if (this.form.invalid) {
+            return;
+        }
+        const body: IProcessClearInvoiceModel = {
+            currency: this.currencyId.value,
+            finalExchangeRate: this.exchangeRate.value,
+            paidAmount: this.finalPaidAmount.value,
+            list: this.invoices.filter(x => x.type !== 'ADV'),
+            customerId: this.customerInfo?.id
+        };
+        if (!body.customerId || !body.list.length || !body.paidAmount) {
+            this._toastService.warning('Missing data to process', 'Warning');
+            return;
+        }
+        if (this.getCurrencyInvoice(body.list).length === 2) {
+            this._toastService.warning('List invoice should only have one currency', 'Warning');
+            return;
+        }
+        this._accountingRepo.processInvoiceReceipt(body)
+            .subscribe(
+                (data: IProcessResultModel) => {
+                    if (data?.invoices?.length) {
+                        this.invoices.length = 0;
+                        this.invoices = data.invoices;
 
-        //         paidAmount -= invoice.unpaidAmount;
-
-        //     }
-        // }
-
-        // // *  Trường hợp thu dư, thiếu, đủ
-        // if (paidAmount > 0) {
-        //     const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
-        //         type: 'ADV',
-        //         paidAmount: paidAmount,
-        //         unpaidAmount: 0,
-        //         invoiceBalance: 0,
-        //         taxCode: this.customerInfo?.taxCode,
-        //         partnerName: this.customerInfo?.shortName
-        //     });
-        //     this.invoices.push(newInvoiceWithAdv);
-        // } else if (paidAmount < 0) {
-        //     this.balance.setValue(paidAmount);
-        // } else {
-        //     this.balance.setValue(0);
-        // }
+                        this.balance.setValue(data.balance);
+                    } else {
+                        console.log(data);
+                    }
+                }
+            );
 
 
     }
+}
+
+interface IProcessClearInvoiceModel {
+    paidAmount: number;
+    currency: string;
+    list: ReceiptInvoiceModel[];
+    finalExchangeRate: number;
+    customerId: string;
+}
+
+interface IProcessResultModel {
+    balance: number;
+    invoices: ReceiptInvoiceModel[];
 }

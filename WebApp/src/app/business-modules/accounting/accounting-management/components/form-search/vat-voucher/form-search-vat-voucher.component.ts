@@ -100,7 +100,7 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
         this.formSearch = this._fb.group({
             referenceNo: [],
             partner: [],
-            issueDate: [{ startDate: new Date(), endDate: new Date() }],
+            issueDate: [{ startDate: new Date(new Date().setDate(new Date().getDate() - 29)), endDate: new Date() }],
             creator: [],
             invoiceStatus: [],
             voucherType: []
