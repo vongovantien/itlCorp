@@ -126,6 +126,6 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getCustomer() {
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
     }
 }

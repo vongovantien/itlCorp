@@ -3,7 +3,6 @@
 @import "../vendors/base/vendors.css";
 // @import "../style-share/ng2-select/prism-okaidia.css";
 @import "../style-share/ng2-select/ng2-select.css";
-// @import "~ngx-toastr/toastr.css";
 //
 //** Default Stylesheets
 //
@@ -68,8 +67,10 @@
 @import "~@ng-select/ng-select/themes/default.theme.css";
 
 // Toasr
+// @import "~ngx-toastr/toastr.css";
+
+@import "~ngx-toastr/toastr-old.css";
+// @import "~bootstrap/scss/functions";
+// @import "~bootstrap/scss/variables";
+// @import "~bootstrap/scss/mixins";
 // @import "~ngx-toastr/toastr-bs4-alert";
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/mixins";
-@import "~ngx-toastr/toastr-bs4-alert";
