@@ -1,0 +1,88 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div [formGroup]="formSearch" class="m-form m-form--state">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Payment Ref No</label>
+                        <input type="text" class="form-control" formControlName="refNo">
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label"></label>
+                        <ng-select [items]="paymentTypes | async" formControlName="paymentType" class="custom" [multiple]="true" [clearable]="false"></ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Date</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate" name="daterange" readonly formControlName="date" [ranges]="ranges" [alwaysShowCalendars]="true"
+                            />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Date Type</label>
+                        <ng-select [items]="dateTypes" formControlName="dateType" class="custom" [multiple]="true" [clearable]="false"></ng-select>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Partner</label>
+                        <!-- <app-combo-grid-virtual-scroll
+                     [currentActiveItemId]="{ field: 'id', value: partner.value}" 
+                     (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                      [selectedDisplayFields]="['shortName']" 
+                      [dataSources]="partners | async" [displayFields]="displayFieldsPartner"
+                      [height]="150" (remove)="resetFormControl(partner)" placeholder="Select Customer">
+                    </app-combo-grid-virtual-scroll> -->
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]=" {  field:'id', value: customerID.value}" (itemSelected)="onSelectDataFormInfo($event, 'partner')" [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async" [displayFields]="displayFilesPartners"
+                            [height]="150" (remove)="resetFormControl(customerID)" placeholder="Select Partner">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Currency</label>
+                        <ng-select [items]="Currencys | async" formControlName="currency" [clearable]="false" [multiple]="true" (change)="onSelectDataFormInfo($event, 'currency')"></ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Sync Status</label>
+                        <ng-select [items]="syncStatuss | async" formControlName="syncStatus" class="custom" [clearable]="false" [multiple]="true"></ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Status</label>
+                        <ng-select [items]="statuss |async" formControlName="status" class="custom" [multiple]="true" [clearable]='false'></ng-select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-lg-6"></div>
+                    <div class="col-lg-6">
+                        <app-default-button [buttonSetting]="searchlButtonSetting" (click)="search()">
+                        </app-default-button>
+                        <app-default-button [buttonSetting]="resetButtonSetting" (click)="reset()">
+                        </app-default-button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

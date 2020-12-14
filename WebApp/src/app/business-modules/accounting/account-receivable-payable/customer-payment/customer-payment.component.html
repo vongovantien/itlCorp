@@ -14,90 +14,77 @@
                                 <div class="col-lg-12 ">
                                     <div class="table-wrapper table-scrollable" id="payment-table">
                                         <table class="table table-hover table-brand dataTable table-hover">
-                                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
-                                                <th class="m--w-50 first table-actions-col">
-                                                    Action
+                                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                                <th class="m--w-50 first">
                                                 </th>
                                             </thead>
                                             <tbody>
-                                                <ng-container>
-                                                    <ng-container *ngFor="let item of trialOfficialList; let i = index; trackBy: trackByFn">
-                                                    </ng-container>
-                                                </ng-container>
-                                                <tr app-table-none-record *ngIf="!trialOfficialList.length">
-                                                </tr>
-                                                <tr app-table-row-loading *ngIf="isLoading === true"></tr> -->
 
-                                                <!-- <tr *ngIf="!isLoading && !CPs.length" app-table-none-record>
-                                                </tr> -->
+                                                <tr *ngIf="!isLoading && !CPs.length" app-table-none-record>
+                                                </tr>
                                                 <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn" [class.invalid-row]="cps.syncStatus === 'Rejected'">
                                                     <td class="table-actions-col">
                                                         <div class="table-actions">
-                                                            <button type="button" class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove" (click)="prepareDeleteCP(cps)" *ngIf="(cps.status === 'Daft')">
+                                                            <button type="button" class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove" (click)="prepareDeleteCP(cps)" *ngIf="(cps.status === 'Daft' || cps.status === '') && cps.status !== 'Daft' && cps.status !== '' && cps.syncStatus !== 'Synced'">
                                                                 <i class="la la-trash"></i>
                                                             </button>
                                                         </div>
                                                     </td>
+
                                                     <td class="text-underline">
-                                                        <a class="pointer" (click)="viewDetail(cps.paymentrefno,'VND')">{{cps.paymentrefno}}</a>
+                                                        <a class="pointer" (click)="viewDetail(cps.paymentRefNo)">{{cps.paymentRefNo}}</a>
+                                                    </td>
+
+                                                    <td>
+                                                        <span>{{cps.customerName}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{cps.customername}}</span>
+                                                        <span>{{cps.paidAmount}}</span>
+                                                    </td>
+
+                                                    <td>
+                                                        <span>{{cps.currencyId}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{cps.paymentamount}}</span>
-                                                    </td>
-                                                    <!-- <td class="text-right">
-                                                        <span>{{cps.creditAmount | number :'.0-2'}}
-                                                            {{cps.currency}}</span>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span>{{cps.debitAmount | number: '.0-2'}}
-                                                            {{cps.currency}}</span>
-                                                    </td> -->
-                                                    <td>
-                                                        <span>{{cps.currency}</span>
+                                                        <span>{{cps.paymentDate}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{cps.paiddate}</span>
+                                                        <span>{{cps.dateTo}}</span>
                                                     </td>
-                                                    <td>
-                                                        <span>{{cps.billingdate}</span>
-                                                    </td>
-                                                    <td [ngSwitch]="cps.syncstatus">
+                                                    <td [ngSwitch]="cps.syncStatus">
                                                         <span *ngSwitchCase="'Synced'" class="text-success">
-                                                            {{cps.syncstatus}}</span>
+                                                            {{cps.syncStatus}}</span>
                                                         <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                            {{cps.syncstatus}}{{cps.reasonReject ? ' - ' + cps.reasonReject : ''}}
+                                                            {{cps.syncStatus}}{{cps.reasonReject ? ' - ' + cps.reasonReject : ''}}
                                                         </span>
                                                         <span *ngSwitchDefault>
-                                                            {{cps.syncstatus}}
+                                                            {{cps.syncStatus}}
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        <span>{{cps.lastsync | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                        <span>{{cps.lastSyncDate | date :'dd/MM/yyyy HH:mm'}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{cps.description}</span>
+                                                        <span>{{cps.description}}</span>
                                                     </td>
 
                                                     <td [ngSwitch]="cps.status">
-                                                        <span *ngSwitchCase="'Daft'" class="text-danger">
+                                                        <span *ngSwitchCase="'Draft'" class="text-danger">
                                                             {{cps.status}}</span>
                                                         <span *ngSwitchCase="'Done'" class="text-success">
                                                             {{cps.status}}</span>
-                                                        <span *ngSwitchCase="'Cancel'" class="text-info">
+                                                        <span *ngSwitchCase="'Cancel'" class="text-gray">
                                                             {{cps.status}}</span>
                                                     </td>
                                                     <td>
-                                                        <span class="text-primary">{{cps.creator}}</span>
+                                                        <span class="text-primary">{{cps.userNameCreated}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{cps.createdate | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                        <span>{{cps.datetimeCreate | date :'dd/MM/yyyy HH:mm'}}</span>
                                                     </td>
 
                                                     <td>
-                                                        <span>{{cps.modeifiedate | date: 'dd/MM/yyyy HH:mm'}}</span>
+                                                        <span>{{cps.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
                                                     </td>
 
                                                 </tr>
@@ -132,3 +119,6 @@
         </div>
     </div>
 </div>
+<confirm-popup (onSubmit)="onConfirmDeleteCP()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>
+
+<permission-403-popup></permission-403-popup>

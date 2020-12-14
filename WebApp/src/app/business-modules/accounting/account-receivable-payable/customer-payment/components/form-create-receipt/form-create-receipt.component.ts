@@ -16,7 +16,6 @@ import { ToastrService } from 'ngx-toastr';
 import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
 import { DataService } from '@services';
 import { ComboGridVirtualScrollComponent } from '@common';
-import { catAgreement } from 'src/app/shared/models/catalogue/catAgreement.model';
 
 @Component({
     selector: 'customer-payment-form-create-receipt',
@@ -31,37 +30,13 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     date: AbstractControl;
     paymentReferenceNo: AbstractControl;
     agreement: AbstractControl;
-    paidAmount: AbstractControl;
-    methods: CommonInterface.ICommonTitleValue[];
-    userLogged: SystemInterface.IClaimUser;
-    type: AbstractControl;
-    cusAdvanceAmount: AbstractControl;
-    finalPaidAmount: AbstractControl;
-    balance: AbstractControl;
-    paymentMethod: AbstractControl;
-    currency: AbstractControl;
-    paymentDate: AbstractControl;
-    exchangeRate: AbstractControl;
-    bankAcountNo: AbstractControl;
-    currencyList: Currency[];
 
-    customers: Observable<Partner[]>; /// partner = customer
-    // agreements: Observable<catAgreement[]>;
-    // $agreements: Observable<any>;
-    username: AbstractControl;
-    paymentMethods: string[] = ['Cash', 'Bank Transfer'];
-    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [   // load display fiels partner
-        { field: 'accountNo', label: 'ID' },
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameVn', label: 'Name Local' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
 
     $customers: Observable<Partner[]>;
     agreements: IAgreementReceipt[];
 
 
-    //  displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
         { field: 'saleManName', label: 'Salesman' },
         { field: 'contractNo', label: 'Contract No' },
@@ -81,9 +56,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     }
     ngOnInit() {
 
-        // this.initFormSettlement();
-        // this.getCurrency();
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL); // khai báo load part lên display
         this.initForm();
 
         this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
@@ -152,17 +124,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 break;
         }
     }
-
-
-
-    getAgreements(body) {
-        this._catalogueRepo.getAgreement(body)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                data => {
-                    this.agreements = data;
-                })
-    };
 
     getInvoiceList() {
         this.isSubmitted = true;

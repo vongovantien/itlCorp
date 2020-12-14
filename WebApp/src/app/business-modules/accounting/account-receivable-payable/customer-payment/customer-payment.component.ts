@@ -1,28 +1,45 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
-import { RoutingConstants } from '@constants';
-import { TrialOfficialOtherModel } from '@models';
-import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo } from '@repositories';
-import { SortService } from '@services';
-import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
+// import { Component, OnInit, ViewChild } from '@angular/core';
+// import { Router } from '@angular/router';
+// import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+// import { RoutingConstants } from '@constants';
+
+// import { NgProgress } from '@ngx-progressbar/core';
+// import { AccountingRepo } from '@repositories';
+// import { SortService } from '@services';
+// import { ToastrService } from 'ngx-toastr';
+// import { catchError, finalize } from 'rxjs/operators';
+// import { AppList } from 'src/app/app.list';
+// import { Receipt } from 'src/app/shared/models/accouting/receipt.model';
+import { Component, ViewChild } from "@angular/core";
+import {
+    ConfirmPopupComponent,
+    InfoPopupComponent,
+    Permission403PopupComponent
+} from "src/app/shared/common/popup";
+import { AccountingRepo } from "src/app/shared/repositories";
+import { catchError, finalize } from "rxjs/operators";
+import { AppList } from "src/app/app.list";
+import { Receipt, User } from "src/app/shared/models";
+import { ToastrService } from "ngx-toastr";
+import { SortService } from "src/app/shared/services";
+import { NgProgress } from "@ngx-progressbar/core";
+import { Router } from "@angular/router";
+import { RoutingConstants, SystemConstants } from "@constants";
+
 
 @Component({
     selector: 'app-customer-payment',
     templateUrl: './customer-payment.component.html',
 })
-export class ARCustomerPaymentComponent extends AppList implements OnInit {
+export class ARCustomerPaymentComponent extends AppList {
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
-
-    CPs: any[] = [];
-    selectedCPs: any = null;
+    headers: CommonInterface.IHeaderTable[];
+    CPs: Receipt[] = [];
+    selectedCPs: Receipt = null;
     messageDelete: string = "";
-
+    userLogged: User;
     // trialOfficialList: TrialOfficialOtherModel[] = [];
 
     constructor(
@@ -35,33 +52,39 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
         super();
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortCPsList;
-        this.requestList = this.getPagingList;
+        this.requestSort = this.sortLocal;
     }
     ngOnInit() {
 
         this.headers = [
-            { title: 'Payment Ref No', field: 'paymentrefno', sortable: true },
-            { title: 'Customer Name', field: 'customername', sortable: true },
-            { title: 'Payment Amount', field: 'paymentamount', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Paid Date', field: 'paiddate', sortable: true },
-            { title: 'Billing Date', field: 'billingdate', sortable: true },
-            { title: 'Sync Status', field: 'syncstatus', sortable: true },
-            { title: 'Last Sync', field: 'lastsync', sortable: true },
+            { title: 'Payment Ref No', field: 'paymentRefNo', sortable: true },
+            { title: 'Customer Name', field: 'customerName', sortable: true },
+            { title: 'Payment Amount', field: 'paidAmount', sortable: true },
+            { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'Paid Date', field: 'paymentDate', sortable: true },
+            { title: 'Billing Date', field: 'billingDate', sortable: true },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
+            { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
             { title: 'Description', field: 'description', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
-            { title: 'Creator', field: 'creator', sortable: true },
-            { title: 'Create Date', field: 'createdate', sortable: true },
-            { title: 'Modifie Date', field: 'modeifiedate', sortable: true },
+            { title: 'Creator', field: 'userNameCreated', sortable: true },
+            { title: 'Create Date', field: 'datetimeCreate', sortable: true },
+            { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
-        this.dataSearch = {
-            CurrencyLocal: "VND"
-        };
+        // this.dataSearch = {
+        //     currency: "VND"
+        // };
+        this.getUserLogged();
         this.getCPs();
 
 
     }
+    getUserLogged() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.dataSearch = { userCreated: this.userLogged.id };
+    }
+
     getCPs() {
         this.isLoading = true;
         this._progressRef.start();
@@ -79,7 +102,9 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
                 })
             )
             .subscribe((res: any) => {
-                this.CPs = (res.data || []).map((item: any) => new (item)); // any
+                console.log(res);
+                this.CPs = (res.data || []).map((item: Receipt) => new Receipt(item));
+                console.log(this.CPs);
                 this.totalItems = res.totalItems || 0;
             });
     }
@@ -88,20 +113,20 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
         this.page = 1;
         this.dataSearch = data;
         this.getCPs();
-        console.log();
+
     }
     sortCPsList(sortField: string, order: boolean) {
         this.CPs = this._sortService.sort(this.CPs, sortField, order);
     }
 
 
-    prepareDeleteCP(cpItem: any) {
+    prepareDeleteCP(cpItem: Receipt) {
         this._accountingRepo
-            .checkAllowDeleteCusPayment(cpItem.paymentrefno)
+            .checkAllowDeleteCusPayment(cpItem.paymentRefNo)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this.selectedCPs = new (cpItem); /// any
-                    this.messageDelete = `Do you want to delete SOA ${cpItem.paymentrefno} ? `;
+                    this.selectedCPs = new Receipt(cpItem);
+                    this.messageDelete = `Do you want to delete Receipt ${cpItem.paymentRefNo} ? `;
                     this.confirmPopup.show();
                 } else {
                     this.permissionPopup.show();
@@ -112,7 +137,7 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
     onConfirmDeleteCP() {
         this._progressRef.start();
         this._accountingRepo
-            .deleteCusPayment(this.selectedCPs.paymentrefno)
+            .deleteCusPayment(this.selectedCPs.paymentRefNo)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -129,25 +154,27 @@ export class ARCustomerPaymentComponent extends AppList implements OnInit {
                 this.onSearchCPs(this.dataSearch);
             });
     }
-
-    getPagingList() {
-        this._progressRef.start();
-        this.isLoading = true;
-
-        this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.isLoading = false;
-                })
-            ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.CPs = (res.data || []).map((item: TrialOfficialOtherModel) => new TrialOfficialOtherModel(item));
-                    this.totalItems = res.totalItems;
-                },
-            );
+    sortLocal(sort: string): void {
+        this.CPs = this._sortService.sort(this.CPs, sort, this.order);
     }
+    // getPagingList() {
+    //     this._progressRef.start();
+    //     this.isLoading = true;
+
+    //     this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+    //         .pipe(
+    //             catchError(this.catchError),
+    //             finalize(() => {
+    //                 this._progressRef.complete();
+    //                 this.isLoading = false;
+    //             })
+    //         ).subscribe(
+    //             (res: CommonInterface.IResponsePaging) => {
+    //                 this.CPs = (res.data || []).map((item: Receipt) => new Receipt(item));
+    //                 this.totalItems = res.totalItems;
+    //             },
+    //         );
+    // }
 
     viewDetail(paymentrefno: string, currency: string) {
         // this._accountingRepo

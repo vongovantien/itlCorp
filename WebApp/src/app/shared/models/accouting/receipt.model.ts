@@ -36,21 +36,32 @@ export class ReceiptInvoiceModel {
 @Controller()
 export class Receipt {
     @Key
-    id: string;
-    customerName: string;
-    UserNameCreated: string;
-    UserNameModified: string;
-    PaymentRefNo: string;
-    PaidAmount: string;
-    paidDate: string;
-    status: string;
-    currency: string;
-    syncStatus: string;
-    lastSyncDate: Date;
-    description: string;
-    userCreated: string;
-    userModified: string;
-    datetimeCreate: Date;
-    datetimeModified: Date;
+    id: string = null;
+    customerName: string = null;
+    userNameCreated: string = null;
+    userNameModified: string = null;
+    paymentRefNo: string = null;
+    paidAmount: string = null;
+    paymentDate: string = null;
+    status: string = null;
+    currencyId: string = null;
+    syncStatus: string = null;
+    lastSyncDate: Date = null;
+    description: string = null;
+    userCreated: string = null;
+    userModified: string = null;
+    datetimeCreate: Date = null;
+    datetimeModified: Date = null;
+    reasonReject: string = null;
+
+
+    constructor(data?: any) {
+        const self = this;
+        for (const key in data) {
+            if (self.hasOwnProperty(key)) {
+                self[key] = data[key];
+            }
+        }
+    }
 }
 

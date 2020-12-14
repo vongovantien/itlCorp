@@ -6,7 +6,6 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':(isSubmitted || customerId.dirty) && !customerId.valid }">
                         <label for="form-control-label" required>
                             Customer Name
-                            <span class="m--font-danger">(*)</span>
                         </label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')" (remove)="resetFormControl(customerId)" [currentActiveItemId]="{field:'id', value: customerId.value}" [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
                             [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false">
@@ -39,13 +38,9 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !agreement.valid }">
                         <label required>Agreement
                         </label>
-                        <<<<<<< HEAD <app-combo-grid-virtual-scroll (itemSelected)="getAgreements($event)" (remove)="resetFormControl(agreement)" [currentActiveItemId]="{field:'id', value: agreement.value}" [selectedDisplayFields]="['saleManName']" [dataSources]="agreements"
-                            [displayFields]="displayFieldAgreement" placeholder="Select Agreement">
-                            =======
-                            <app-combo-grid-virtual-scroll #combogridAgreement (itemSelected)="onSelectDataFormInfo($event, 'agreement')" (remove)="resetFormControl(agreement)" [currentActiveItemId]="{field:'id', value: agreement.value}" [selectedDisplayFields]="['contractType','saleManName','contractNo']"
-                                [dataSources]="agreements" [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false">
-                                >>>>>>> uat/21-10-2020-sprint20
-                            </app-combo-grid-virtual-scroll>
+                        <app-combo-grid-virtual-scroll #combogridAgreement (itemSelected)="onSelectDataFormInfo($event, 'agreement')" (remove)="resetFormControl(agreement)" [currentActiveItemId]="{field:'id', value: agreement.value}" [selectedDisplayFields]="['contractType','saleManName','contractNo']"
+                            [dataSources]="agreements" [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false">
+                        </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
             </div>

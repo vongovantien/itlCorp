@@ -728,8 +728,8 @@ export class AccountingRepo {
     getListCustomerPayment(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/Paging`, body, {
-                pageNumber: '' + page,
-                pageSize: '' + size
+                page: '' + page,
+                size: '' + size
             }).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
@@ -740,8 +740,8 @@ export class AccountingRepo {
             );
         }
     }
-    checkAllowDeleteCusPayment(paymentrefno: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${paymentrefno}`).pipe(
+    checkAllowDeleteCusPayment(PaymentRefNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${PaymentRefNo}`).pipe(
             map((data: any) => data)
         );
     }
