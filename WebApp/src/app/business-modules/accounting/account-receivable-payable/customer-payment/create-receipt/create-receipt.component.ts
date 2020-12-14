@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -108,8 +109,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                         this._toastService.error("Create data fail, Please check again!");
                     }
                 },
-                (err) => {
-                    console.log(err);
+                (res: HttpErrorResponse) => {
+                    if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
+                        this.formCreate.paymentRefNo.setErrors({ existed: true });
+                    }
                 }
             )
     };

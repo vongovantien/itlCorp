@@ -129,7 +129,7 @@
                     <tbody>
                         <ng-container *ngIf="!!invoices.length">
                             <ng-container *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
-                                <tr [class.selected-row]="invoice.type === 'ADV'">
+                                <tr>
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
@@ -155,7 +155,6 @@
                                             autoFormatCurrency numeric [digits]="3">
                                     </td>
                                     <td class="text-left">{{invoice.receiptExcPaidAmount | number: '.0-3'}}
-                                        {{invoice.currency}}
                                     </td>
                                     <td>{{invoice.invoiceBalance | number: '.0-3'}} {{invoice.currency}}</td>
                                     <td class="text-left">{{invoice.receiptInvoicebalance | number: '.0-3'}}

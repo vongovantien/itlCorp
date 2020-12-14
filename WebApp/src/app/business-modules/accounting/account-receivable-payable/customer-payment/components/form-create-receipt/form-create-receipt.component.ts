@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Data } from '@angular/router';
 import { SystemConstants, JobConstants } from '@constants';
@@ -6,10 +6,8 @@ import { CommonEnum } from '@enums';
 import { Currency, Customer, Partner, User, ReceiptInvoiceModel } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo, AccountingRepo } from '@repositories';
-import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, IAppState } from '@store';
-import { Moment } from 'moment';
+import { IAppState } from '@store';
 import { Observable } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -20,6 +18,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;

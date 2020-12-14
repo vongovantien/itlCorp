@@ -100,6 +100,13 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
+            if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+            {
+                string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
+                var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                return BadRequest(_result);
+            }
+
             //Check exists list invoice/adv
             if (receiptModel.Payments.Count == 0)
             {
@@ -166,6 +173,21 @@ namespace eFMS.API.Accounting.Controllers
             }
             ProcessClearInvoiceModel data = acctReceiptService.ProcessReceiptInvoice(criteria);
             return Ok(data);
+        }
+
+        private bool ValidateReceiptNo(Guid Id, string receiptNo)
+        {
+            bool valid = true;
+            if(Id == Guid.Empty)
+            {
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo);
+            }
+            else
+            {
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id);
+            }
+
+            return valid;
         }
     }
 }

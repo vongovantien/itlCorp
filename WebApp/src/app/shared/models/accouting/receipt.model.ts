@@ -47,8 +47,9 @@ export class Receipt {
     customerName: string = null;
     paymentRefNo: string = null;
     paidAmount: string = null;
-    paidDate: string = null;
+    paymentDate: string = null;
     status: string = null;
+    type: string = null;
     currencyId: string = null;
     syncStatus: string = null;
     lastSyncDate: Date = null;
@@ -57,6 +58,10 @@ export class Receipt {
     userModified: string = null;
     datetimeCreate: Date = null;
     datetimeModified: Date = null;
+    fromDate: Date = null;
+    toDate: Date = null;
+    customerId: string = null;
+    agreementId: string = null;
 
     constructor(object?: any) {
         const self = this;
