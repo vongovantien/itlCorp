@@ -311,13 +311,13 @@ namespace eFMS.API.ForPartner.Controllers
                 return new CustomUnauthorizedResult("Hashed string invalid");
             }
             if (!ModelState.IsValid) return BadRequest();
-            // var hs = accountingManagementService.RejectData(model, apiKey);
+            var hs = accountingManagementService.RejectData(model, apiKey);
             ResultHandle result = new ResultHandle { Status = true, Message = "Reject data thành công", Data = model };
-            //if (!hs.Success)
-            //{
-            //    ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Reject data thất bại", hs.Message.ToString()), Data = model };
-            //    return BadRequest(_result);
-            //}
+            if (!hs.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Reject data thất bại", hs.Message.ToString()), Data = model };
+                return BadRequest(_result);
+            }
             return Ok(result);
         }
 
