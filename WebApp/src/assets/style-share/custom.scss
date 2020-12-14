@@ -114,6 +114,10 @@ a {
     background-color: #fbfbfb;
 }
 
+.dropdown.open .dropdown-menu {
+    display: block;
+}
+
 .dropdown {
     &.no-arrow {
         .btn {

@@ -380,6 +380,11 @@ namespace eFMS.API.Accounting.DL.Services
             result.Payments = paymentReceipts;
             result.UserNameCreated = sysUserRepository.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
             result.UserNameModified = sysUserRepository.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+
+            CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
+            result.CustomerName = partnerInfo?.ShortName;
+            result.TaxCode = partnerInfo?.TaxCode;
+
             return result;
         }
 
@@ -437,7 +442,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //_payment.PaymentAmount = payment.PaidAmount;
                 //_payment.Balance = payment.InvoiceBalance;
-                _payment.PaymentAmount = payment.ReceiptExcPaidAmount; 
+                _payment.PaymentAmount = payment.ReceiptExcPaidAmount;
                 _payment.Balance = payment.ReceiptExcInvoiceBalance;
 
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
@@ -827,7 +832,7 @@ namespace eFMS.API.Accounting.DL.Services
                         invoice.ReceiptExcUnpaidAmount = invoice.UnpaidAmount * criteria.FinalExchangeRate; // số tiền còn lại cần thu của invoice theo tỉ giá phiếu thu
                         if (currentPaidAmount - invoice.ReceiptExcUnpaidAmount > 0) // Trừ hết số tiền còn lại của invoice
                         {
-                            if(invoice.Currency != AccountingConstants.CURRENCY_LOCAL)
+                            if (invoice.Currency != AccountingConstants.CURRENCY_LOCAL)
                             {
                                 invoice.PaidAmount = invoice.ReceiptExcUnpaidAmount;
                             }

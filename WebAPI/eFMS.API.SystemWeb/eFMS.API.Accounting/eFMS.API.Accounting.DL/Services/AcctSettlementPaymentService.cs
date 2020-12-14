@@ -319,8 +319,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             var approveSettlePayment = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
             var users = sysUserRepo.Get();
+            IQueryable<CatPartner> partners = catPartnerRepo.Get();
 
             var data = from settlePayment in settlementPayments
+                       join p in partners on settlePayment.Payee equals p.Id into partnerGrps
+                       from partnerGrp in partnerGrps.DefaultIfEmpty()
                        join user in users on settlePayment.Requester equals user.Id into user2
                        from user in user2.DefaultIfEmpty()
                        join aproveSettlement in approveSettlePayment on settlePayment.SettlementNo equals aproveSettlement.SettlementNo into aproveSettlement2
@@ -346,7 +349,8 @@ namespace eFMS.API.Accounting.DL.Services
                            VoucherNo = settlePayment.VoucherNo,
                            LastSyncDate = settlePayment.LastSyncDate,
                            SyncStatus = settlePayment.SyncStatus,
-                           ReasonReject = settlePayment.ReasonReject
+                           ReasonReject = settlePayment.ReasonReject,
+                           PayeeName = partnerGrp.ShortName
                        };
 
             //Sort Array sẽ nhanh hơn
