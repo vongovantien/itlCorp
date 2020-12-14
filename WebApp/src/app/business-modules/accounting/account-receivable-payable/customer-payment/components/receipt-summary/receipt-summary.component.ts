@@ -1,6 +1,5 @@
 import { OnInit, Component } from "@angular/core";
 import { AppList } from "@app";
-import { AppPage } from "src/app/app.base";
 import { DataService } from "@services";
 import { pluck, takeUntil } from "rxjs/operators";
 import { ReceiptInvoiceModel } from "@models";
@@ -12,6 +11,9 @@ import { ReceiptInvoiceModel } from "@models";
 export class ARCustomerPaymentReceiptSummaryComponent extends AppList implements OnInit {
 
     invoices: ReceiptInvoiceModel[] = [];
+    totalDebit: number = 0;
+    totalOBH: number;
+    totalAdv: number;
 
     constructor(
         private _dataService: DataService
@@ -26,20 +28,14 @@ export class ARCustomerPaymentReceiptSummaryComponent extends AppList implements
             { field: '', title: 'Total OBH' },
             { field: '', title: 'Total ADV' },
         ];
-
-        this._dataService.currentMessage
-            .pipe(pluck('invoices-list-change'), takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (invoices: ReceiptInvoiceModel[]) => {
-                    if (invoices !== undefined) {
-                        this.invoices = [...invoices];
-                    }
-                }
-            )
     }
 
-    calculateInfodataInvoice() {
-
+    calculateInfodataInvoice(invoice: ReceiptInvoiceModel[]) {
+        if (invoice.length) {
+            this.totalDebit = invoice.filter(x => x.type === 'DEBIT').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
+            this.totalOBH = invoice.filter(x => x.type === 'OBH').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
+            this.totalAdv = invoice.filter(x => x.type === 'ADV').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
+        }
     }
 }
 
