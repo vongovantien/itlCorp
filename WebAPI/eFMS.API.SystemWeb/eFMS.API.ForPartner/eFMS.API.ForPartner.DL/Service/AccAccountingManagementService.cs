@@ -768,14 +768,10 @@ namespace eFMS.API.ForPartner.DL.Service
             HandleState result = new HandleState();
             try
             {
-                if (string.IsNullOrEmpty(voucherNo))
-                {
-                    return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
-                }
-                AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.VoucherNo == voucherNo)?.FirstOrDefault();
+                var adv = acctAdvanceRepository.Get(x => x.VoucherNo == voucherNo).FirstOrDefault();
                 if (adv == null)
                 {
-                    return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+                    return new HandleState((object)"Không tìm thấy phiếu chi");
                 }
 
                 adv.VoucherNo = null;
@@ -789,7 +785,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 if (!result.Success)
                 {
-                    return new HandleState("Error");
+                    return new HandleState((object)"Error");
                 }
 
                 return result;
@@ -797,7 +793,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             catch (Exception ex)
             {
-                return new HandleState("Error");
+                return new HandleState((object)"Error");
             }
         }
 
@@ -834,7 +830,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.Id == model.AdvanceID)?.FirstOrDefault();
                 if (adv == null)
                 {
-                    return new HandleState("Not found advance  " + model.AdvanceNo);
+                    return new HandleState((object)"Not found advance  " + model.AdvanceNo);
                 }
 
                 if (adv.StatusApproval == ForPartnerConstants.STATUS_APPROVAL_DONE)
@@ -855,7 +851,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     if (!result.Success)
                     {
-                        return new HandleState("Update fail");
+                        return new HandleState((object)"Update fail");
                     }
                 }
 
@@ -863,7 +859,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                return new HandleState((object)ex.Message);
             }
         }
         #endregion ---Advance ---
