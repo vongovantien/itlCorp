@@ -193,7 +193,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                 endDate: this.createMoment().endOf('month').toDate(),
             }],
             dateType: [this.dateTypeList[0].id],
-            customer: this.isCommissionIncentive ?  [null, Validators.compose([
+            customer: this.isCommissionIncentive ? [null, Validators.compose([
                 FormValidators.required,
             ])] : [],
             carrier: [],
@@ -246,7 +246,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     getTypeReportList() {
         if (this.isSheetDebitRpt) {
             this.typeReportActive = this.typeAccReportList;
-        } else if(this.isCommissionIncentive) {
+        } else if (this.isCommissionIncentive) {
             this.typeReportActive = this.typeComReportList;
         } else {
             this.typeReportActive = this.typeReportList;
@@ -254,7 +254,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     // Check if choose All
-    selectAllDataInForm(data: any){
+    selectAllDataInForm(data: any) {
         if (data.length === 1) {
             return data[0].id === 'All';
         } else {
@@ -755,7 +755,7 @@ export class ShareFormSearchReportComponent extends AppForm {
 
         if (!this.isCommissionIncentive) {
             this.currency.setValue(this.currencyList.filter((curr) => curr.id === "USD")[0].id);
-        }       
+        }
 
         this.refNoType.setValue(this.refNoTypeList[0].id);
 
@@ -780,8 +780,11 @@ export class ShareFormSearchReportComponent extends AppForm {
             endDate: this.createMoment().endOf('month').toDate(),
         });
 
-        this.exchangeRate.setValue(20000);
-        this.resetFormShipmentInput();
+        if (this.isCommissionIncentive) {
+            this.resetFormControl(this.partnerAccount);
+            this.exchangeRate.setValue(20000);
+            this.resetFormShipmentInput();
+        }
     }
 
     getAllOffice() {
