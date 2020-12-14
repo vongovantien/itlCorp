@@ -5,7 +5,7 @@ import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { AppForm } from 'src/app/app.form';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { Container, CsTransaction } from '@models';
@@ -59,6 +59,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     constructor(
         protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
+        protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
         protected _activedRoute: ActivatedRoute,
         protected _actionStoreSubject: ActionsSubject,
@@ -166,7 +167,20 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             this.infoPopup.show();
         } else {
             const body = this.onsubmitData();
-            this.createHbl(body);
+            this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
+                if (!!res.salemanId) {
+                    if (res.salemanId !== body.saleManId) {
+                        this._toastService.error('Not found contract information, please check!');
+                        return;
+                    }
+                }
+                if (!!res.officeNameAbbr) {
+                    this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
+                } else {
+                    this.createHbl(body);
+
+                }
+            });
         }
     }
 
@@ -187,6 +201,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
+
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(

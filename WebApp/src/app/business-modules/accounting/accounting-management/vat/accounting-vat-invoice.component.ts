@@ -34,7 +34,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
 
     defaultDataSearch: any = {
         typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.INVOICE,
-        fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        fromIssuedDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
         toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
     };
 

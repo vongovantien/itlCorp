@@ -319,8 +319,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             var approveSettlePayment = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
             var users = sysUserRepo.Get();
+            IQueryable<CatPartner> partners = catPartnerRepo.Get();
 
             var data = from settlePayment in settlementPayments
+                       join p in partners on settlePayment.Payee equals p.Id into partnerGrps
+                       from partnerGrp in partnerGrps.DefaultIfEmpty()
                        join user in users on settlePayment.Requester equals user.Id into user2
                        from user in user2.DefaultIfEmpty()
                        join aproveSettlement in approveSettlePayment on settlePayment.SettlementNo equals aproveSettlement.SettlementNo into aproveSettlement2
@@ -346,7 +349,8 @@ namespace eFMS.API.Accounting.DL.Services
                            VoucherNo = settlePayment.VoucherNo,
                            LastSyncDate = settlePayment.LastSyncDate,
                            SyncStatus = settlePayment.SyncStatus,
-                           ReasonReject = settlePayment.ReasonReject
+                           ReasonReject = settlePayment.ReasonReject,
+                           PayeeName = partnerGrp.ShortName
                        };
 
             //Sort Array sẽ nhanh hơn
@@ -4118,20 +4122,27 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = new LockedLogResultModel();
             var settlesToUnLock = DataContext.Get(x => keyWords.Contains(x.SettlementNo));
-            if (settlesToUnLock == null) return result;
-            result.LockedLogs = settlesToUnLock.Select(x => new LockedLogModel
+            if (settlesToUnLock.Count() < keyWords.Count) return result;
+            if (settlesToUnLock.Where(x => x.SyncStatus == "Synced").Any())
             {
-                Id = x.Id,
-                SettlementNo = x.SettlementNo,
-                LockedLog = x.LockedLog
-            });
-            if (result.LockedLogs != null)
+                result.Logs = settlesToUnLock.Where(x => x.SyncStatus == "Synced").Select(x => x.SettlementNo).ToList();
+            }
+            else
             {
-                result.Logs = new List<string>();
-                foreach (var item in settlesToUnLock)
+                result.LockedLogs = settlesToUnLock.Select(x => new LockedLogModel
                 {
-                    var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
-                    result.Logs.AddRange(logs);
+                    Id = x.Id,
+                    SettlementNo = x.SettlementNo,
+                    LockedLog = x.LockedLog
+                });
+                if (result.LockedLogs != null)
+                {
+                    result.Logs = new List<string>();
+                    foreach (var item in settlesToUnLock)
+                    {
+                        var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
+                        result.Logs.AddRange(logs);
+                    }
                 }
             }
             return result;

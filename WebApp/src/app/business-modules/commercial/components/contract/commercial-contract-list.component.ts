@@ -154,6 +154,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         } else {
             if (this.contracts.length > 0) {
                 this.formContractPopup.selectedContract = this.contracts[this.indexlstContract];
+                this.formContractPopup.contract = this.contracts[this.indexlstContract];
                 this.formContractPopup.indexDetailContract = this.indexlstContract;
                 this.formContractPopup.fileList = this.formContractPopup.selectedContract.fileList;
             }
@@ -223,23 +224,33 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     onRequestContract($event: any) {
         this.contract = $event;
         this.selectedContract = new Contract(this.contract);
+        const data = $event;
         if (!!this.selectedContract && !this.formContractPopup.isCreateNewCommercial) {
             this.getListContract(this.partnerId);
         } else {
-            console.log(this.selectedContract);
+            const checkUpdate = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId) && x.index !== data.index);
             const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
             if (this.indexlstContract !== null) {
                 this.contracts[this.indexlstContract] = this.selectedContract;
-                this.contracts = [...this.contracts];
-                this.formContractPopup.hide();
+                if (!checkUpdate) {
+                    this.contracts = [...this.contracts];
+                    this.formContractPopup.hide();
+                } else {
+                    this._toastService.error('Duplicate service,office,salesman!');
+                }
             } else {
                 if (objCheckContract && objCheckContract != null) {
                     this.formContractPopup.isDuplicateContract = true;
                     this._toastService.error('Contract no has been existed!');
                 } else {
-                    this.formContractPopup.isDuplicateContract = false;
-                    const data = $event;
-                    this.contracts = [...this.contracts, data];
+                    const check = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId));
+                    if (!check) {
+                        this.contracts = [...this.contracts, data];
+                        this.formContractPopup.isDuplicateContract = false;
+                        this.formContractPopup.hide();
+                    } else {
+                        this._toastService.error('Duplicate service,office,salesman!');
+                    }
                 }
             }
         }

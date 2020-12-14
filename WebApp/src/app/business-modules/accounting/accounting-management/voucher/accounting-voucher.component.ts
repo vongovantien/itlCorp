@@ -34,7 +34,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
 
     defaultDataSearch: AccountingInterface.IDefaultSearchAcctMngt = {
         typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.VOUCHER,
-        fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        fromIssuedDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
         toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
     };
 

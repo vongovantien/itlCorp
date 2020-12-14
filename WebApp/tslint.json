@@ -74,7 +74,6 @@
         "no-switch-case-fall-through": true,
         "no-trailing-whitespace": false,
         "no-unnecessary-initializer": true,
-        "no-unused-expression": true,
         "no-unused-variable": true,
         "no-unnecessary-qualifier": true,
         "no-duplicate-imports": true,
@@ -154,9 +153,13 @@
             true,
             {
                 "ignore-rest-args": true,
-                "ignore-params": true
             }
         ],
-        "no-invalid-template-strings": true
+        "no-invalid-template-strings": true,
+        "no-unused-expression": [
+            false,
+            "allow-fast-null-checks",
+            "allow-new"
+        ]
     }
 }

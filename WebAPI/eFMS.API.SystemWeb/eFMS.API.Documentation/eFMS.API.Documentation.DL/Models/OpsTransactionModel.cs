@@ -18,5 +18,6 @@ namespace eFMS.API.Documentation.DL.Models
         public PermissionAllowBase Permission { get; set; }
         public string UserCreatedName { get; set; }
         public string UserModifiedName { get; set; }
+        public string ProductService { get; set; }
     }
 }

@@ -1271,6 +1271,9 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectPayment(string id, string reason)
         {
+            return new HandleState();
+            //Tạm thời comment, khi nào xong phần receipt sẽ mở lại
+            /*
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -1336,7 +1339,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     trans.Dispose();
                 }
-            }
+            }*/
         }
 
         /// <summary>

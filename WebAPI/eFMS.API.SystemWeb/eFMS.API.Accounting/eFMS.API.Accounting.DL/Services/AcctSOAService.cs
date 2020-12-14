@@ -446,7 +446,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào Final Exchange Rate, Exchange Date của charge)
             Expression<Func<ChargeSOAResult, bool>> query = x => model.Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any();
-            var charge = GetChargeShipmentDocAndOperation(query, null);
+            var charge = GetChargeShipmentDocAndOperation(query, null, null);
             //var dataResult = charge.Select(chg => new
             //{
             //    AmountDebit = (GetRateCurrencyExchange(today, chg.Currency, model.Currency) > 0
@@ -613,17 +613,18 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- Get Rate Exchange --
 
         #region -- Get Data Charge Master --
-        private IQueryable<ChargeSOAResult> GetChargeBuySell(Expression<Func<ChargeSOAResult, bool>> query)
+        private IQueryable<ChargeSOAResult> GetChargeBuySell(Expression<Func<ChargeSOAResult, bool>> query, List<string> customNos)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
             var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && (x.Type == AccountingConstants.TYPE_CHARGE_BUY || x.Type == AccountingConstants.TYPE_CHARGE_SELL));
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
-            var creditNote = acctCdnoteRepo.Get();
-            var debitNote = acctCdnoteRepo.Get();
+            var creditNote = acctCdnoteRepo.Get(x => x.Type == "CREDIT");
+            var debitNote = acctCdnoteRepo.Get(x => x.Type == "DEBIT" || x.Type == "INVOICE");
             var charge = catChargeRepo.Get();
-            var customsDeclarations = customsDeclarationRepo.Get();
+            customNos = customNos != null ? customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : new List<string>();
+            var customsDeclarations = customNos.Count > 0 ? customsDeclarationRepo.Get(x => customNos.Where(w => w == x.ClearanceNo).Any()) : customsDeclarationRepo.Get();
             var sysUsers = sysUserRepo.Get();
             //BUY & SELL
             var queryBuySellOperation = from sur in surcharge
@@ -634,8 +635,6 @@ namespace eFMS.API.Accounting.DL.Services
                                         from debitN in debitN2.DefaultIfEmpty()
                                         join chg in charge on sur.ChargeId equals chg.Id into chg2
                                         from chg in chg2.DefaultIfEmpty()
-                                        join cd in customsDeclarations on ops.JobNo equals cd.JobNo into cdGrps
-                                        from cdGrp in cdGrps.DefaultIfEmpty()
                                         join user in sysUsers on ops.BillingOpsId equals user.Id into userGps
                                         from useGrp in userGps.DefaultIfEmpty()
                                         select new ChargeSOAResult
@@ -669,17 +668,22 @@ namespace eFMS.API.Accounting.DL.Services
                                             CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
                                             DatetimeModified = sur.DatetimeModified,
                                             CommodityGroupID = ops.CommodityGroupId,
-
                                             Service = "CL",
                                             CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
                                             TypeCharge = chg.Type,
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
-                                            CustomNo = cdGrp.ClearanceNo,
                                             PIC = useGrp.Username
                                         };
+            var listOperation = queryBuySellOperation.ToList();
+            listOperation.ForEach(fe =>
+            {
+                var customNo = customsDeclarations.Where(x => x.JobNo == fe.JobId).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                fe.CustomNo = customNo;
+            });
+            queryBuySellOperation = listOperation.AsQueryable();
             queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-
+            
             var queryBuySellDocument = from sur in surcharge
                                        join cstd in csTransDe on sur.Hblid equals cstd.Id
                                        join cst in csTrans on cstd.JobId equals cst.Id
@@ -745,17 +749,18 @@ namespace eFMS.API.Accounting.DL.Services
             return queryBuySell;
         }
 
-        private IQueryable<ChargeSOAResult> GetChargeOBHSell(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH)
+        private IQueryable<ChargeSOAResult> GetChargeOBHSell(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH, List<string> customNos)
         {
             //Lấy cả phí chứng từ & phí hiện trường [Change request 14469 (21/09/2020)]
             var surcharge = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
-            var debitNote = acctCdnoteRepo.Get();
+            var debitNote = acctCdnoteRepo.Get(x => x.Type == "DEBIT" || x.Type == "INVOICE");
             var charge = catChargeRepo.Get();
             var partner = catPartnerRepo.Get();
-            var customDeclearation = customsDeclarationRepo.Get();
+            customNos = customNos != null ? customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : new List<string>();
+            var customDeclearation = customNos.Count > 0 ? customsDeclarationRepo.Get(x => customNos.Where(w => w == x.ClearanceNo).Any()) : customsDeclarationRepo.Get();
             var sysUsers = sysUserRepo.Get();
             //OBH Receiver (SELL - Credit)
             var queryObhSellOperation = from sur in surcharge
@@ -766,8 +771,6 @@ namespace eFMS.API.Accounting.DL.Services
                                         from chg in chg2.DefaultIfEmpty()
                                         join pat in partner on sur.PaymentObjectId equals pat.Id into pat2
                                         from pat in pat2.DefaultIfEmpty()
-                                        join cd in customDeclearation on ops.JobNo equals cd.JobNo into cdGrps
-                                        from cdGrp in cdGrps.DefaultIfEmpty()
                                         join user in sysUsers on ops.BillingOpsId equals user.Id into userGps
                                         from useGrp in userGps.DefaultIfEmpty()
                                         select new ChargeSOAResult
@@ -807,10 +810,17 @@ namespace eFMS.API.Accounting.DL.Services
                                             TypeCharge = chg.Type,
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
-                                            CustomNo = cdGrp.ClearanceNo,
                                             PIC = useGrp.Username
                                         };
+            var listOperation = queryObhSellOperation.ToList();
+            listOperation.ForEach(fe =>
+            {
+                var customNo = customDeclearation.Where(x => x.JobNo == fe.JobId).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                fe.CustomNo = customNo;
+            });
+            queryObhSellOperation = listOperation.AsQueryable();
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+
             if (isOBH != null)
             {
                 queryObhSellOperation = queryObhSellOperation.Where(x => x.IsOBH == isOBH);
@@ -879,15 +889,16 @@ namespace eFMS.API.Accounting.DL.Services
             return queryObhSell;
         }
 
-        private IQueryable<ChargeSOAResult> GetChargeOBHBuy(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH)
+        private IQueryable<ChargeSOAResult> GetChargeOBHBuy(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH, List<string> customNos)
         {
             //Lấy cả phí chứng từ & phí hiện trường [Change request 14469 (21/09/2020)] 
             var surcharge = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
-            var custom = customsDeclarationRepo.Get();
-            var creditNote = acctCdnoteRepo.Get();
+            customNos = customNos != null ? customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : new List<string>();
+            var custom = customNos.Count > 0 ? customsDeclarationRepo.Get(x => customNos.Where(w => w == x.ClearanceNo).Any()) : customsDeclarationRepo.Get();
+            var creditNote = acctCdnoteRepo.Get(x => x.Type == "CREDIT");
             var charge = catChargeRepo.Get();
             var sysUsers = sysUserRepo.Get();
             //OBH Payer (BUY - Credit)
@@ -897,8 +908,6 @@ namespace eFMS.API.Accounting.DL.Services
                                        from creditN in creditN2.DefaultIfEmpty()
                                        join chg in charge on sur.ChargeId equals chg.Id into chg2
                                        from chg in chg2.DefaultIfEmpty()
-                                       join cd in custom on ops.JobNo equals cd.JobNo into cdGrps
-                                       from cdGrp in cdGrps.DefaultIfEmpty()
                                        join user in sysUsers on ops.BillingOpsId equals user.Id into userGps
                                        from useGrp in userGps.DefaultIfEmpty()
                                        select new ChargeSOAResult
@@ -937,11 +946,17 @@ namespace eFMS.API.Accounting.DL.Services
                                            ExchangeDate = sur.ExchangeDate,
                                            FinalExchangeRate = sur.FinalExchangeRate,
                                            TypeCharge = chg.Type,
-                                           CustomNo = cdGrp.ClearanceNo,
                                            PIC = useGrp.Username
-
                                        };
+            var listOperation = queryObhBuyOperation.ToList();
+            listOperation.ForEach(fe =>
+            {
+                var customNo = custom.Where(x => x.JobNo == fe.JobId).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                fe.CustomNo = customNo;
+            });
+            queryObhBuyOperation = listOperation.AsQueryable();
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+            
             if (isOBH != null)
             {
                 queryObhBuyOperation = queryObhBuyOperation.Where(x => x.IsOBH == isOBH);
@@ -1023,19 +1038,19 @@ namespace eFMS.API.Accounting.DL.Services
             return clearanceNo;
         }
 
-        public IQueryable<ChargeSOAResult> GetChargeShipmentDocAndOperation(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH)
+        public IQueryable<ChargeSOAResult> GetChargeShipmentDocAndOperation(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH, List<string> customNos)
         {
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
 
             //BUY & SELL
-            var queryBuySell = GetChargeBuySell(query);
+            var queryBuySell = GetChargeBuySell(query, customNos);
 
             //OBH Receiver (SELL - Credit)
-            var queryObhSell = GetChargeOBHSell(query, isOBH);
+            var queryObhSell = GetChargeOBHSell(query, isOBH, customNos);
 
             //OBH Payer (BUY - Credit)
-            var queryObhBuy = GetChargeOBHBuy(query, isOBH);
+            var queryObhBuy = GetChargeOBHBuy(query, isOBH, customNos);
 
             //Merge data
             var dataMerge = queryBuySell.Union(queryObhBuy).Union(queryObhSell);
@@ -1076,7 +1091,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 DatetimeModified = data.DatetimeModified,
                                 CommodityGroupID = data.CommodityGroupID,
                                 Service = data.Service,
-                                CustomNo = GetTopClearanceNoByJobNo(data.JobId),
+                                CustomNo = data.CustomNo,
                                 CDNote = data.CDNote,
                                 FlightNo = data.FlightNo,
                                 ShippmentDate = data.ShippmentDate,
@@ -1175,8 +1190,8 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(chg => criteria.CustomNo.Contains(chg.CustomNo, StringComparer.OrdinalIgnoreCase));
             }
 
-            var charge = GetChargeShipmentDocAndOperation(query, criteria.IsOBH);
-            
+            var charge = GetChargeShipmentDocAndOperation(query, criteria.IsOBH, criteria.CustomNo);
+
             var data = new List<ChargeShipmentModel>();
             foreach (var item in charge)
             {
@@ -1319,7 +1334,7 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(chg => criteria.CommodityGroupID == chg.CommodityGroupID);
             }
 
-            var charge = GetChargeShipmentDocAndOperation(query, criteria.IsOBH);
+            var charge = GetChargeShipmentDocAndOperation(query, criteria.IsOBH, criteria.CustomNo);
 
             /*var data = charge.Select(chg => new ChargeShipmentModel
             {
@@ -1538,9 +1553,9 @@ namespace eFMS.API.Accounting.DL.Services
                          join chg in csShipmentSurchargeRepo.Get() on s.Soano equals (chg.PaySoano ?? chg.Soano) into chg2
                          from chg in chg2.DefaultIfEmpty()
                          where
-                                listCode.Contains(s.Soano, StringComparer.OrdinalIgnoreCase) 
-                             || listCode.Contains(chg.JobNo, StringComparer.OrdinalIgnoreCase) 
-                             || listCode.Contains(chg.Mblno, StringComparer.OrdinalIgnoreCase) 
+                                listCode.Contains(s.Soano, StringComparer.OrdinalIgnoreCase)
+                             || listCode.Contains(chg.JobNo, StringComparer.OrdinalIgnoreCase)
+                             || listCode.Contains(chg.Mblno, StringComparer.OrdinalIgnoreCase)
                              || listCode.Contains(chg.Hblno, StringComparer.OrdinalIgnoreCase)
                          select s.Soano).ToList();
                 soas = soas.Where(x => refNo.Contains(x.Soano));
@@ -1776,7 +1791,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             //Chỉ lấy ra những charge có SOANo == soaNo (Để hạn chế việc join & get data không cần thiết)
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null);
+            var charge = GetChargeShipmentDocAndOperation(query, null, null);
             var chargeShipments = GetListChargeOfSoa(charge, soaNo, currencyLocal);
             var _groupShipments = new List<GroupShipmentModel>();
             _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC })
@@ -1801,7 +1816,7 @@ namespace eFMS.API.Accounting.DL.Services
             data.ServicesNameSoa = DataTypeEx.GetServiceNameOfSoa(data.ServiceTypeId).ToString();
             return data;
         }
-        
+
         #endregion --Details Soa--
 
         #region -- Data Export Details --
@@ -1812,7 +1827,7 @@ namespace eFMS.API.Accounting.DL.Services
             var soa = DataContext.Get(x => x.Soano == soaNo);
 
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null);
+            var charge = GetChargeShipmentDocAndOperation(query, null, null);
             var partner = catPartnerRepo.Get();
             var dataResult = from s in soa
                              join chg in charge on s.Soano equals chg.SOANo into chg2
@@ -1888,7 +1903,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            var charge = GetChargeShipmentDocAndOperation(query, null, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.HBL).AsQueryable();
 
             if (results.Select(x => x.Key).Count() > 0)
@@ -2090,7 +2105,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            var charge = GetChargeShipmentDocAndOperation(query, null, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.JobId).AsQueryable();
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
@@ -2246,7 +2261,7 @@ namespace eFMS.API.Accounting.DL.Services
             SOAOPSModel opssoa = new SOAOPSModel();
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var soa = DataContext.Get(x => x.Soano == soaNo);
-            var charge = GetChargeShipmentDocAndOperation(query, null);
+            var charge = GetChargeShipmentDocAndOperation(query, null, null);
             if (soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
             soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
@@ -2352,7 +2367,7 @@ namespace eFMS.API.Accounting.DL.Services
             var soa = DataContext.Get(x => x.Soano == soaNo);
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var chargeDefaults = chargeDefaultRepo.Get(x => x.Type == "Công Nợ");
-            var charge = GetChargeShipmentDocAndOperation(query, null);
+            var charge = GetChargeShipmentDocAndOperation(query, null, null);
             var partner = catPartnerRepo.Get();
             var dataResult = from s in soa
                              join chg in charge on s.Soano equals chg.SOANo into chg2
@@ -2566,6 +2581,6 @@ namespace eFMS.API.Accounting.DL.Services
             var surchargeIds = csShipmentSurchargeRepo.Get(x => x.PaySoano == soaNo || x.Soano == soaNo).Select(s => s.Id).ToList();
             return surchargeIds;
         }
-        
+
     }
 }

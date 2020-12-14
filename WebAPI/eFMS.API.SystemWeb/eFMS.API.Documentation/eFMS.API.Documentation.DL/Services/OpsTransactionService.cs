@@ -380,7 +380,7 @@ namespace eFMS.API.Documentation.DL.Services
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
                     x.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
-
+                    
                     IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
 
                     x.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;

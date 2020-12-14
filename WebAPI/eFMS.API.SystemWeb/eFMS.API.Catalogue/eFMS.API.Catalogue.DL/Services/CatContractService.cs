@@ -127,22 +127,22 @@ namespace eFMS.API.Catalogue.DL.Services
             // truong hop custom logistic
             if (string.IsNullOrEmpty(jobId))
             {
-                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL")).Select(x => x.SaleManId).FirstOrDefault();
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                 if (string.IsNullOrEmpty(data))
                 {
                     string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
-                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL")).Select(x => x.SaleManId).FirstOrDefault();
+                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                     OfficeNameAbbr = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID).Select(t => t.ShortName).FirstOrDefault();
 
                 }
             }
             else
             {
-                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType)).Select(x => x.SaleManId).FirstOrDefault();
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType) && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                 if (string.IsNullOrEmpty(data))
                 {
                     string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
-                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType)).Select(x => x.SaleManId).FirstOrDefault();
+                    data = DataContract.Where(x => x.PartnerId == IdAcRefPartner && IdAcRefPartner != null && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains(DataShipment.TransactionType) && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                     OfficeNameAbbr = sysOfficeRepository.Get(x => x.Id == DataShipment.OfficeId).Select(t => t.ShortName).FirstOrDefault();
 
                 }
@@ -164,8 +164,6 @@ namespace eFMS.API.Catalogue.DL.Services
             DataContext.SubmitChanges();
             if (hs.Success)
             {
-                //if (entity.IsRequestApproval == true)
-                //{
                 var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                 CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                 model.ContractService = entity.SaleService;
@@ -177,7 +175,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 model.SalesmanId = entity.SaleManId;
                 model.UserCreatedContract = contract.UserCreated;
                 SendMailActiveSuccess(model, string.Empty);
-                //}
                 ClearCache();
                 Get();
             }
@@ -199,6 +196,12 @@ namespace eFMS.API.Catalogue.DL.Services
                             break;
                         case "AI":
                             ContractServicesName += "Air Import; ";
+                            break;
+                        case "SCE":
+                            ContractServicesName += "Sea Consol Export; ";
+                            break;
+                        case "SCI":
+                            ContractServicesName += "Sea Consol Import; ";
                             break;
                         case "SFE":
                             ContractServicesName += "Sea FCL Export; ";
@@ -285,7 +288,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = query.Where(x =>
                            (x.contract.CompanyId == criteria.Company || criteria.Company == Guid.Empty)
-                           //&& (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
                            && (x.contract.Active == criteria.Status || criteria.Status == null)
                            );
             }
@@ -293,7 +295,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = query.Where(x =>
                             (x.contract.CompanyId == criteria.Company || criteria.Company == Guid.Empty)
-                            //|| (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
                             || (x.contract.Active == criteria.Status || criteria.Status == null)
                             || (x.contract.PartnerId == criteria.PartnerId)
                             );
@@ -421,6 +422,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         {
                             contract.SaleService += "AE;";
                         }
+                        if (it.Trim() == "Sea Consol Export")
+                        {
+                            contract.SaleService += "SCE;";
+                        }
+                        if (it.Trim() == "Sea Consol Import")
+                        {
+                            contract.SaleService += "SCI;";
+                        }
                         if (it.Trim() == "Sea FCL Export")
                         {
                             contract.SaleService += "SFE;";
@@ -450,7 +459,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             contract.SaleService = "AE;SFE;SLE;SFI;SLI;CL;IT";
                         }
                     }
-                    var vas = item.Vas.Split(";").ToArray();
+                    var vas = item.Vas?.Split(";").ToArray();
                     contract.Vas = string.Empty;
                     foreach (var it in vas)
                     {
@@ -461,6 +470,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         if (it.Trim() == "Air Export")
                         {
                             contract.Vas += "AE;";
+                        }
+                        if (it.Trim() == "Sea Consol Export")
+                        {
+                            contract.Vas += "SCE;";
+                        }
+                        if (it.Trim() == "Sea Consol Import")
+                        {
+                            contract.Vas += "SCI;";
                         }
                         if (it.Trim() == "Sea FCL Export")
                         {
@@ -488,7 +505,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         if (it.Trim() == "All")
                         {
-                            contract.Vas = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                            contract.Vas = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
                         }
                     }
                     if (!string.IsNullOrEmpty(contract.Vas))
@@ -534,7 +551,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         contract.TrialCreditDays = contract.PaymentTerm;
                     }
                     contract.CreditLimitRate = !string.IsNullOrEmpty(item.CreditLimitedRated) ? Convert.ToInt32(item.CreditLimitedRated) : (int?)null;
-                    contract.Active = item.Status == "Active" ? true : false;
+                    contract.Active = true;
                     contract.PartnerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                     contract.Id = Guid.NewGuid();
                     contracts.Add(contract);

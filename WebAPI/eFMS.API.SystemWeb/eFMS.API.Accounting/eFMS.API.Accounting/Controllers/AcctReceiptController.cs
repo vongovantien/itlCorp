@@ -48,7 +48,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Paging(AcctReceiptCriteria criteria, int page, int size)
         {
             IQueryable<AcctReceiptModel> data = acctReceiptService.Paging(criteria, page, size, out int rowsCount);
-            var result = new ResponsePagingModel<AcctReceiptModel> { Data = null, Page = page, Size = size };
+            var result = new ResponsePagingModel<AcctReceiptModel> { Data = data, Page = page, Size = size };
             return Ok(result);
         }
 
@@ -100,6 +100,13 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
+            if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+            {
+                string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
+                var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                return BadRequest(_result);
+            }
+
             //Check exists list invoice/adv
             if (receiptModel.Payments.Count == 0)
             {
@@ -114,9 +121,9 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            //Check valid data amount: nếu Tổng Paid Amount (không bao gồm ADV) + Balance trên Payment List # Final Paid Amount => Thông báo lỗi
-            var paidAmount = receiptModel.Payments.Select(s => s.PaidAmount + s.InvoiceBalance).Sum();
-            if (paidAmount != receiptModel.FinalPaidAmount)
+            //Check valid data amount: nếu Tổng Paid Amount (không bao gồm ADV) + Balance phiếu thu # Final Paid Amount => Thông báo lỗi
+            var paidAmount = receiptModel.Payments.Where(x => x.Type != "ADV").Select(s => s.PaidAmount + s.InvoiceBalance).Sum();
+            if (paidAmount + receiptModel.Balance != receiptModel.FinalPaidAmount)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!", Data = receiptModel };
                 return BadRequest(_result);
@@ -156,16 +163,31 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        [Authorize]
-        public IActionResult Process(ProcessReceiptInvoice criteria)
+        [HttpPost("ProcessInvoice")]
+        //[Authorize]
+        public IActionResult ProcessInvoice(ProcessReceiptInvoice criteria)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest("invalid data");
             }
-            List<ReceiptInvoiceModel> data = acctReceiptService.ProcessReceiptInvoice(criteria);
+            ProcessClearInvoiceModel data = acctReceiptService.ProcessReceiptInvoice(criteria);
             return Ok(data);
+        }
+
+        private bool ValidateReceiptNo(Guid Id, string receiptNo)
+        {
+            bool valid = true;
+            if(Id == Guid.Empty)
+            {
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo);
+            }
+            else
+            {
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id);
+            }
+
+            return valid;
         }
     }
 }
