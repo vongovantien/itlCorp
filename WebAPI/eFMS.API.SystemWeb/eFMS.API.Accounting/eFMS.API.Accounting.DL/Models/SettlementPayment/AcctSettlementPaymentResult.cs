@@ -9,5 +9,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string PaymentMethodName { get; set; }        
         public string StatusApprovalName { get; set; }
         public string ChargeCurrency { get; set; }
+        public string PayeeName { get; set; }
     }
 }

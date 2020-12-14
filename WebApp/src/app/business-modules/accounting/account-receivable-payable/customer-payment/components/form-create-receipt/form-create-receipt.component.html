@@ -31,14 +31,13 @@
         </div>
         <div class="row">
             <div class="col-lg-6">
-                <div class="form-group">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
                     <label required>
                         Payment Reference No
                     </label>
                     <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo">
                 </div>
             </div>
-
             <div class="col-lg-6">
                 <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !agreement.valid }">
                     <label required>Agreement
