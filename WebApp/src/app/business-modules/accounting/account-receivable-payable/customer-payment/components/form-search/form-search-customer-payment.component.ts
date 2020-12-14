@@ -500,7 +500,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             refNo: [],
             paymentType: [this.paymentTypes[0]],
             customerID: [],
-            date: [{ startDate: new Date, endDate: new Date }],
+            date: [],
             dateType: [this.dateTypes[0]],
             currency: [],
             syncStatus: [this.syncStatuss[0]],

@@ -121,15 +121,20 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="form-control-label">Date</label>
-                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <!-- <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate" name="daterange" readonly formControlName="date" [ranges]="ranges" [alwaysShowCalendars]="true"
-                            />
+                                readonly calendar [allowRemove]="true" />
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
                                     </span>
                             </span>
+                        </div> -->
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" ngxDaterangepickerMd class="form-control" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange" placeholder="Select request date" [autoApply]="true" formControlName="date" [alwaysShowCalendars]="true" [ranges]="ranges"
+                                readonly calendar [allowRemove]="true" />
                         </div>
+
                     </div>
                 </div>
                 <div class="col-lg-3">

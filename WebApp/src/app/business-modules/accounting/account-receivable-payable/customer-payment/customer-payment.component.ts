@@ -40,8 +40,6 @@ export class ARCustomerPaymentComponent extends AppList {
     selectedCPs: Receipt = null;
     messageDelete: string = "";
     userLogged: User;
-    // trialOfficialList: TrialOfficialOtherModel[] = [];
-
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService,
@@ -55,7 +53,6 @@ export class ARCustomerPaymentComponent extends AppList {
         this.requestSort = this.sortLocal;
     }
     ngOnInit() {
-
         this.headers = [
             { title: 'Payment Ref No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
@@ -72,13 +69,8 @@ export class ARCustomerPaymentComponent extends AppList {
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
-        // this.dataSearch = {
-        //     currency: "VND"
-        // };
         this.getUserLogged();
         this.getCPs();
-
-
     }
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
@@ -108,7 +100,6 @@ export class ARCustomerPaymentComponent extends AppList {
                 this.totalItems = res.totalItems || 0;
             });
     }
-
     onSearchCPs(data: any) {
         this.page = 1;
         this.dataSearch = data;
@@ -118,11 +109,9 @@ export class ARCustomerPaymentComponent extends AppList {
     sortCPsList(sortField: string, order: boolean) {
         this.CPs = this._sortService.sort(this.CPs, sortField, order);
     }
-
-
     prepareDeleteCP(cpItem: Receipt) {
         this._accountingRepo
-            .checkAllowDeleteCusPayment(cpItem.paymentRefNo)
+            .checkAllowDeleteCusPayment(cpItem.id)
             .subscribe((value: boolean) => {
                 if (value) {
                     this.selectedCPs = new Receipt(cpItem);
@@ -133,11 +122,10 @@ export class ARCustomerPaymentComponent extends AppList {
                 }
             });
     }
-
     onConfirmDeleteCP() {
         this._progressRef.start();
         this._accountingRepo
-            .deleteCusPayment(this.selectedCPs.paymentRefNo)
+            .deleteCusPayment(this.selectedCPs.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -149,8 +137,7 @@ export class ARCustomerPaymentComponent extends AppList {
                 this._toastService.success(res.message, "", {
                     positionClass: "toast-bottom-right"
                 });
-
-                // * search SOA when success.
+                // * search cps when success.
                 this.onSearchCPs(this.dataSearch);
             });
     }
@@ -176,18 +163,16 @@ export class ARCustomerPaymentComponent extends AppList {
     //         );
     // }
 
-    viewDetail(paymentrefno: string, currency: string) {
-        // this._accountingRepo
-        //     .checkAllowGetDetailSOA(soano)
-        //     .subscribe((value: boolean) => {
-        //         if (value) {
-        //             this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
-        //                 queryParams: { no: soano, currency: currency }
-        //             });
-        //         } else {
-        //             this.permissionPopup.show();
-        //         }
-        //     });
+    viewDetail(id: string) {
+        this._accountingRepo
+            .checkAllowGetDetailCPS(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${id}`]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 
     onSelectTab(tab: string) {
@@ -205,4 +190,8 @@ export class ARCustomerPaymentComponent extends AppList {
                 break;
         }
     }
+}
+export interface IPermissionBase {
+    checkAllDetail(T: any): void;
+    checkAllDelete(T: any): void;
 }

@@ -56,6 +56,7 @@ export class Receipt {
     description: string = null;
     userCreated: string = null;
     userModified: string = null;
+    userNameCreated: string = null;
     datetimeCreate: Date = null;
     datetimeModified: Date = null;
     fromDate: Date = null;

@@ -740,16 +740,22 @@ export class AccountingRepo {
             );
         }
     }
-    checkAllowDeleteCusPayment(PaymentRefNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${PaymentRefNo}`).pipe(
+    checkAllowDeleteCusPayment(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${id}`).pipe(
             map((data: any) => data)
         );
     }
-    deleteCusPayment(paymentrefno: string) {
-        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/delete`, { paymentrefno: paymentrefno })
+    deleteCusPayment(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt`, { id: id })
             .pipe(
                 map((data: any) => data)
             );
+    }
+
+    checkAllowGetDetailCPS(cps: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDetail/${cps}`).pipe(
+            map((data: any) => data)
+        );
     }
     generateReceiptNo() {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GenerateReceiptNo`);
