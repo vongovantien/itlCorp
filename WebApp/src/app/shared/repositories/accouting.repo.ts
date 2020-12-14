@@ -734,10 +734,6 @@ export class AccountingRepo {
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
-        } else {
-            return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt`).pipe(
-                map((data: any) => data)
-            );
         }
     }
     checkAllowDeleteCusPayment(id: string) {

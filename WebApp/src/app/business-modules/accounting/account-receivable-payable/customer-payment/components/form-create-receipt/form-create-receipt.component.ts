@@ -57,7 +57,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
         this.initForm();
 
-        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
 
         if (!this.isUpdate) {
             this.generateReceiptNo();

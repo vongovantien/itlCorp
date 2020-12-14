@@ -1,15 +1,3 @@
-// import { Component, OnInit, ViewChild } from '@angular/core';
-// import { Router } from '@angular/router';
-// import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
-// import { RoutingConstants } from '@constants';
-
-// import { NgProgress } from '@ngx-progressbar/core';
-// import { AccountingRepo } from '@repositories';
-// import { SortService } from '@services';
-// import { ToastrService } from 'ngx-toastr';
-// import { catchError, finalize } from 'rxjs/operators';
-// import { AppList } from 'src/app/app.list';
-// import { Receipt } from 'src/app/shared/models/accouting/receipt.model';
 import { Component, ViewChild } from "@angular/core";
 import {
     ConfirmPopupComponent,
@@ -144,24 +132,6 @@ export class ARCustomerPaymentComponent extends AppList {
     sortLocal(sort: string): void {
         this.CPs = this._sortService.sort(this.CPs, sort, this.order);
     }
-    // getPagingList() {
-    //     this._progressRef.start();
-    //     this.isLoading = true;
-
-    //     this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-    //         .pipe(
-    //             catchError(this.catchError),
-    //             finalize(() => {
-    //                 this._progressRef.complete();
-    //                 this.isLoading = false;
-    //             })
-    //         ).subscribe(
-    //             (res: CommonInterface.IResponsePaging) => {
-    //                 this.CPs = (res.data || []).map((item: Receipt) => new Receipt(item));
-    //                 this.totalItems = res.totalItems;
-    //             },
-    //         );
-    // }
 
     viewDetail(id: string) {
         this._accountingRepo
@@ -190,8 +160,4 @@ export class ARCustomerPaymentComponent extends AppList {
                 break;
         }
     }
-}
-export interface IPermissionBase {
-    checkAllDetail(T: any): void;
-    checkAllDelete(T: any): void;
 }

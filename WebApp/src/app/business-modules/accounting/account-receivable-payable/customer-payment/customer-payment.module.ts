@@ -17,7 +17,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { reducers } from './store/reducers';
 import { effects } from './store/effects';
 import { NgxCurrencyModule } from 'ngx-currency';
-import { FormSComponent } from './components/form-s/form-s.component';
 
 const routing: Routes = [
     {
@@ -39,8 +38,6 @@ const routing: Routes = [
         ARCustomerPaymentFormCreateReceiptComponent,
         ARCustomerPaymentReceiptSummaryComponent,
         ARCustomerPaymentReceiptPaymentListComponent,
-        FormSComponent,
-
     ],
     imports: [
         SharedModule,
