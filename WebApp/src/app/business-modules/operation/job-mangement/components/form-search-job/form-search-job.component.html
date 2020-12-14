@@ -35,7 +35,7 @@
                                     <select class="form-control" formControlName="productService">
                                         <option value="null">Select Product Service</option>
                                         <option *ngFor="let productService of productServices"
-                                            [ngValue]="productService">{{productService.text}}</option>
+                                            [ngValue]="productService">{{productService}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -47,7 +47,7 @@
                                     <select class="form-control" formControlName="serviceMode">
                                         <option value="null">Select Service Mode</option>
                                         <option *ngFor="let serviceMode of serviceModes" [ngValue]="serviceMode">
-                                            {{serviceMode.text}}
+                                            {{serviceMode}}
                                         </option>
                                     </select>
                                 </div>
@@ -60,7 +60,7 @@
                                     <select class="form-control" formControlName="shipmentMode">
                                         <option value="null">Select Service Mode</option>
                                         <option *ngFor="let shipmentMode of shipmentModes" [ngValue]="shipmentMode">
-                                            {{shipmentMode.text}}
+                                            {{shipmentMode}}
                                         </option>
                                     </select>
                                 </div>
