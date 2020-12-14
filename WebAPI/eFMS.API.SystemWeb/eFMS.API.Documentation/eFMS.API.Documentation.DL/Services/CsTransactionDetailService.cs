@@ -1646,8 +1646,8 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.DlvCustoms = data.Dclrcus?.ToUpper(); //DCLR-CUS
                 if (dataPOD != null)
                 {
-                    var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.LastDestination = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                    //var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
+                    housebill.LastDestination = dataPOD?.NameEn;//+ (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport - CR: 15121 Không lấy country
                     housebill.LastDestination = housebill.LastDestination?.ToUpper();
                 }
                 housebill.FlightNo = data.FlightNo?.ToUpper(); //Flight No
