@@ -325,8 +325,8 @@ export class ShareFormSearchReportComponent extends AppForm {
                     this.detectServiceWithAllOption('staff', data);
                 }
                 break;
-            case 'acPartner':
-                this.partnerAccount.setValue(data.id);
+            case 'typeReport':
+                this.typeReport.setValue(data.id);
                 break;
             case 'acPartner':
                 this.partnerAccount.setValue(data.id);
