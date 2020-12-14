@@ -93,7 +93,7 @@ export class UnlockAccountingComponent extends AppForm implements OnInit {
                         }
                         if (this.lockHistory.length === 0) {
                             if (!this.selectedDataAccountingToUnlock) {
-                                this._toastService.error("Unlock failed, Reference No not found!");
+                                this._toastService.warning("Unlock failed, Reference No not found!");
                             } else {
                                 this.onUnlockAccounting($event);
                             }

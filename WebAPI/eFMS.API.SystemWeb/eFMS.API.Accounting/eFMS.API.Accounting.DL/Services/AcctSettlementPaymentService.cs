@@ -4122,7 +4122,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = new LockedLogResultModel();
             var settlesToUnLock = DataContext.Get(x => keyWords.Contains(x.SettlementNo));
-            if (settlesToUnLock.Count() < keyWords.Count) return result;
+            if (settlesToUnLock.Count() < keyWords.Distinct().Count()) return result;
             if (settlesToUnLock.Where(x => x.SyncStatus == "Synced").Any())
             {
                 result.Logs = settlesToUnLock.Where(x => x.SyncStatus == "Synced").Select(x => x.SettlementNo).ToList();
