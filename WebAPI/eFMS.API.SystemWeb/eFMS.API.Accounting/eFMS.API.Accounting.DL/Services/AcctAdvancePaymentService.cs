@@ -2984,7 +2984,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = new LockedLogResultModel();
             var advancesToUnLock = DataContext.Get(x => keyWords.Contains(x.AdvanceNo));
-            if (advancesToUnLock.Count() < keyWords.Count) return result;
+            if (advancesToUnLock.Count() < keyWords.Distinct().Count()) return result;
             if (advancesToUnLock.Where(x => x.SyncStatus == "Synced").Any())
             {
                 result.Logs = advancesToUnLock.Where(x => x.SyncStatus == "Synced").Select(x => x.AdvanceNo).ToList();
