@@ -3975,8 +3975,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[startRow + 1, 1].Value = "Beneficiary:";
             workSheet.Cells[startRow + 1, 4].Value = resultData.BeneficiaryName;
             workSheet.Cells[startRow + 2, 1].Value = "Amount:";
-            workSheet.Cells[startRow + 2, 4].Formula = amountOfCus;
-            workSheet.Cells[startRow + 2, 4].Style.Numberformat.Format = "#,### \"VND\"";
+            workSheet.Cells[startRow + 2, 4].Formula = string.Format("IF({0}=0,0,{0})", amountOfCus);
+            workSheet.Cells[startRow + 2, 4].Style.Numberformat.Format = "_(* #,##0_) \"VND\"";
             workSheet.Cells[startRow + 3, 1].Value = "A/C:";
             workSheet.Cells[startRow + 3, 4].Value = resultData.BankAccountNo;
             workSheet.Cells[startRow + 4, 1].Value = "Via:";
