@@ -12,7 +12,7 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { JobConstants, SystemConstants, RoutingConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 
 
 
