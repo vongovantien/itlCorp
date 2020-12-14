@@ -141,34 +141,6 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        ///// <summary>
-        ///// check existed office and service
-        ///// </summary>
-        ///// <param name="model">object to check</param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("CheckExisted")]
-        //public IActionResult CheckExisted(CatContractModel model)
-        //{
-
-        //    string messageDuplicate = string.Empty;
-        //    bool existed = false;
-        //    if(model.Id != Guid.Empty)
-        //    {
-        //        existed = catContractService.Any(x => x.ContractNo == model.ContractNo);
-        //    }
-        //    else
-        //    {
-
-        //    }
-        //    if (existed)
-        //    {
-        //        return BadRequest(new ResultHandle { Status = false, Message = "Contract no has been existed!" });
-        //    }
-        //    ResultHandle result = new ResultHandle { Data = existed };
-        //    return Ok(result);
-        //}
-
         private string CheckExistedContract(CatContractModel model)
         {
             string messageDuplicate = string.Empty;

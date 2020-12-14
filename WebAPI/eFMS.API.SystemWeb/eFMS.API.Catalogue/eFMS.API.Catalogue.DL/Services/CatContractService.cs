@@ -456,7 +456,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         if (it.Trim() == "All")
                         {
-                            contract.SaleService = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                            contract.SaleService = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
                         }
                     }
                     var vas = item.Vas?.Split(";").ToArray();
