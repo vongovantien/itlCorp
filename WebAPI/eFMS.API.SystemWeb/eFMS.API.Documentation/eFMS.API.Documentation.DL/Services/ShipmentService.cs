@@ -631,12 +631,12 @@ namespace eFMS.API.Documentation.DL.Services
             // Search JobId
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
-                queryTrans = queryTrans.And(q => q.JobNo == criteria.JobId);
+                queryTrans = queryTrans.And(q => criteria.JobId.Contains(q.JobNo));
             }
             // Search Mawb
             if (!string.IsNullOrEmpty(criteria.Mawb))
             {
-                queryTrans = queryTrans.And(q => q.Mawb == criteria.Mawb);
+                queryTrans = queryTrans.And(q => criteria.Mawb.Contains(q.Mawb));
             }
 
             var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
@@ -708,9 +708,9 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.Hawb))
             {
                 queryTranDetail = queryTranDetail == null ?
-                    (q => q.Hwbno == criteria.Hawb)
+                    (q => criteria.Hawb.Contains(q.Hwbno))
                     :
-                    queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
+                    queryTranDetail.And(q => criteria.Hawb.Contains(q.Hwbno));
             }
             var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             if (hasSalesman)
@@ -774,17 +774,17 @@ namespace eFMS.API.Documentation.DL.Services
             // Search JobId
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
-                queryOpsTrans = queryOpsTrans.And(q => q.JobNo == criteria.JobId);
+                queryOpsTrans = queryOpsTrans.And(q => criteria.JobId.Contains(q.JobNo));
             }
             // Search Mawb
             if (!string.IsNullOrEmpty(criteria.Mawb))
             {
-                queryOpsTrans = queryOpsTrans.And(q => q.Mblno == criteria.Mawb);
+                queryOpsTrans = queryOpsTrans.And(q => criteria.Mawb.Contains(q.Mblno));
             }
             // Search Hawb
             if (!string.IsNullOrEmpty(criteria.Hawb))
             {
-                queryOpsTrans = queryOpsTrans.And(q => q.Hwbno == criteria.Hawb);
+                queryOpsTrans = queryOpsTrans.And(q => criteria.Hawb.Contains(q.Hwbno));
             }
 
             var hasSalesman = criteria.SalesMan != null; // Check if Type=Salesman

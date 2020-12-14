@@ -3505,6 +3505,7 @@ namespace eFMS.API.ReportData.FormatExcel
         }
         #endregion
 
+        #region Bind Commission-Incentive Report
         /// <summary>
         /// Set Image and Company Info to Excel
         /// </summary>
@@ -3656,7 +3657,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.FreezePanes(13, 2);
 
             int startRow = 13;
-            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate);
+            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.JobId);
             foreach (var item in listDetail)
             {
                 workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("MMM");
@@ -3766,7 +3767,6 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Row(startRow + 8).Style.Font.Bold = true;
         }
 
-        #region Bind Commission-Incentive Report
         /// <summary>
         /// Bind data to Commission Report
         /// </summary>
@@ -3882,7 +3882,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.FreezePanes(13, 2);
 
             int startRow = 13;
-            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate);
+            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.HBLNo);
             foreach (var item in listDetail)
             {
                 workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("dd-MMM");
@@ -4041,7 +4041,7 @@ namespace eFMS.API.ReportData.FormatExcel
             var startRow = 4;
             foreach (var mon in monthGrp)
             {
-                var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon);
+                var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.JobId);
                 if (shipmentGrp.Count() > 0)
                 {
                     var month = shipmentGrp.FirstOrDefault().ServiceDate?.ToString("MMM");

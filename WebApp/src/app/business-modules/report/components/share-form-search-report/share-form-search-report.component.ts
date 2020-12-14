@@ -875,7 +875,7 @@ export class ShareFormSearchReportComponent extends AppForm {
         let _shipment = '';
         if (this.shipmentInput) {
             if (this.shipmentInput.keyword.length > 0) {
-                const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).join();
+                const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).join(';');
                 if (this.shipmentInput.type === type) {
                     _shipment = _keyword;
                 }

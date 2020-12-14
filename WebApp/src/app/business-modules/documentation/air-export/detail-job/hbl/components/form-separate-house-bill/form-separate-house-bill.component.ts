@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
-import { DocumentationRepo, ExportRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { HouseBill, CsOtherCharge } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -34,6 +34,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
+        protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
@@ -43,6 +44,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             _activedRoute,
             _store,
             _documentationRepo,
+            _catalogueRepo,
             _toastService,
             _actionStoreSubject,
             _router,
