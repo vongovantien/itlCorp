@@ -3509,6 +3509,7 @@ namespace eFMS.API.ReportData.FormatExcel
         }
         #endregion
 
+        #region Bind Commission-Incentive Report
         /// <summary>
         /// Set Image and Company Info to Excel
         /// </summary>
@@ -3660,7 +3661,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.FreezePanes(13, 2);
 
             int startRow = 13;
-            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate);
+            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.JobId);
             foreach (var item in listDetail)
             {
                 workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("MMM");
@@ -3770,7 +3771,6 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Row(startRow + 8).Style.Font.Bold = true;
         }
 
-        #region Bind Commission-Incentive Report
         /// <summary>
         /// Bind data to Commission Report
         /// </summary>
@@ -3886,7 +3886,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.FreezePanes(13, 2);
 
             int startRow = 13;
-            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate);
+            var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.HBLNo);
             foreach (var item in listDetail)
             {
                 workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("dd-MMM");
@@ -3979,8 +3979,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[startRow + 1, 1].Value = "Beneficiary:";
             workSheet.Cells[startRow + 1, 4].Value = resultData.BeneficiaryName;
             workSheet.Cells[startRow + 2, 1].Value = "Amount:";
-            workSheet.Cells[startRow + 2, 4].Formula = amountOfCus;
-            workSheet.Cells[startRow + 2, 4].Style.Numberformat.Format = "#,### \"VND\"";
+            workSheet.Cells[startRow + 2, 4].Formula = string.Format("IF({0}=0,0,{0})", amountOfCus);
+            workSheet.Cells[startRow + 2, 4].Style.Numberformat.Format = "_(* #,##0_) \"VND\"";
             workSheet.Cells[startRow + 3, 1].Value = "A/C:";
             workSheet.Cells[startRow + 3, 4].Value = resultData.BankAccountNo;
             workSheet.Cells[startRow + 4, 1].Value = "Via:";
@@ -4045,7 +4045,7 @@ namespace eFMS.API.ReportData.FormatExcel
             var startRow = 4;
             foreach (var mon in monthGrp)
             {
-                var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon);
+                var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.JobId);
                 if (shipmentGrp.Count() > 0)
                 {
                     var month = shipmentGrp.FirstOrDefault().ServiceDate?.ToString("MMM");

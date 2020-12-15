@@ -54,6 +54,9 @@ export class ShareModulesInputShipmentPopupComponent extends PopupBase {
                         }
                     }
                 );
+        } else {
+            this.onInputShipment.emit(data);
+            this.hide();
         }
     }
 
