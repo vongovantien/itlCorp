@@ -127,7 +127,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // truong hop custom logistic
             if (string.IsNullOrEmpty(jobId))
             {
-                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(DataShipment.OfficeId.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
+                data = DataContract.Where(x => x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains("CL") && x.Active == true).Select(x => x.SaleManId).FirstOrDefault();
                 if (string.IsNullOrEmpty(data))
                 {
                     string IdAcRefPartner = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.ParentId).FirstOrDefault();
@@ -222,7 +222,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             ContractServicesName += "Sea FCL Import; ";
                             break;
                         default:
-                            ContractServicesName = "Air Export; Air Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
                             break;
                     }
                 }
