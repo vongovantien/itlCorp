@@ -26,7 +26,7 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
 
     private _type: string;
-    private _class: string = 'success';
+    private _class: string;
     private _icon: string = 'la la-plus';
 
     menuPermission: Observable<SystemInterface.IUserPermission>;

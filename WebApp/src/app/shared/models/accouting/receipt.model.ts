@@ -56,14 +56,13 @@ export class Receipt {
     description: string = null;
     userCreated: string = null;
     userModified: string = null;
-    userNameCreated: string = null;
-    datetimeCreate: Date = null;
+    datetimeCreated: Date = null;
     datetimeModified: Date = null;
     fromDate: Date = null;
     toDate: Date = null;
     customerId: string = null;
     agreementId: string = null;
-
+    reasonReject: string = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
