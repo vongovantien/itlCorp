@@ -222,7 +222,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             ContractServicesName += "Sea FCL Import; ";
                             break;
                         default:
-                            ContractServicesName = "Air Export; Air Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
                             break;
                     }
                 }
