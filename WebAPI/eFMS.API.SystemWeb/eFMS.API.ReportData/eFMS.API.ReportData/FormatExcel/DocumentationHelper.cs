@@ -615,7 +615,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.ShowGridLines = false;
 
             SetWidthColumnExcelMAWBAirExport(workSheet);
-            workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Arial", 10));
 
             var _mawb1 = airwayBillExport.MawbNo1?.ToUpper(); //3 ký tự đầu của MAWB
             var _mawb3 = airwayBillExport.MawbNo3?.ToUpper(); //9 ký tự cuối của MAWB (Box 3)
@@ -921,7 +921,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelHAWBAirExport(workSheet);
 
-            workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Arial", 10));
 
             var _mawb1 = airwayBillExport.MawbNo1?.Substring(0, 3).ToUpper(); //3 ký tự đầu của MAWB
             var _mawb2 = airwayBillExport.MawbNo3?.ToUpper(); //Các ký tự cuối của MAWB
