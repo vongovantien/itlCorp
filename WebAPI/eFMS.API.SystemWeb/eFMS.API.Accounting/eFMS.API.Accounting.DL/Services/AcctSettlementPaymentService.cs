@@ -2550,6 +2550,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Send Mail Approved
                         sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
+                        //Update Status Payment of Advance Request by Settlement Code [17-11-2020]
+                        acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlementPayment.SettlementNo);
                     }
                     else
                     {
