@@ -1,20 +1,20 @@
-import { Component, Output, EventEmitter, OnInit, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Data } from '@angular/router';
-import { SystemConstants, JobConstants } from '@constants';
-import { CommonEnum } from '@enums';
-import { Currency, Customer, Partner, User, ReceiptInvoiceModel } from '@models';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { formatDate } from '@angular/common';
+import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
+
+import { JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { Partner, } from '@models';
 import { CatalogueRepo, SystemRepo, AccountingRepo } from '@repositories';
 import { IAppState } from '@store';
-import { Observable } from 'rxjs';
-import { AppForm } from 'src/app/app.form';
-import { formatDate } from '@angular/common';
-import { ToastrService } from 'ngx-toastr';
-import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
+import { AppForm } from '@app';
 import { DataService } from '@services';
 import { ComboGridVirtualScrollComponent } from '@common';
 
+import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
+import { Observable } from 'rxjs';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
@@ -24,7 +24,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
 
     formSearchInvoice: FormGroup;
-    customerId: AbstractControl; // load partner
+    customerId: AbstractControl;
     date: AbstractControl;
     paymentRefNo: AbstractControl;
     agreementId: AbstractControl;
@@ -33,13 +33,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     $customers: Observable<Partner[]>;
     agreements: IAgreementReceipt[];
 
-
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
         { field: 'saleManName', label: 'Salesman' },
         { field: 'contractNo', label: 'Contract No' },
         { field: 'contractType', label: 'Contract Type' },
     ];
+    isReadonly = null;
+
     constructor(
         private _fb: FormBuilder,
         private _store: Store<IAppState>,
@@ -66,9 +67,9 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     initForm() {
         this.formSearchInvoice = this._fb.group({
-            customerId: [null, Validators.required],
+            customerId: new FormControl(null, Validators.required),
             date: [],
-            paymentRefNo: [null, Validators.required],
+            paymentRefNo: new FormControl(null, Validators.required),
             agreementId: [null]
             // agreement: [null, Validators.required]
         });

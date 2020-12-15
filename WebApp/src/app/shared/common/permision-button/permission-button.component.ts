@@ -25,7 +25,7 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
 
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
 
-    private _type: string;
+    private _type: string = "add";
     private _class: string;
     private _icon: string = 'la la-plus';
 

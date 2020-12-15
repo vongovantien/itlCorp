@@ -80,7 +80,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const dataForm: any = Object.assign({}, this.formCreate.formSearchInvoice.getRawValue(), this.listInvoice.form.getRawValue());
 
         const formMapValue: any = {
-            formDate: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
+            fromDate: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: !!dataForm.date?.endDate ? formatDate(dataForm.date?.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentDate: !!dataForm.paymentDate?.startDate ? formatDate(dataForm.paymentDate?.startDate, 'yyyy-MM-dd', 'en') : null,
             type: dataForm.type?.length ? dataForm.type.toString() : null,
@@ -111,27 +111,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     onSaveDataReceipt(model: ReceiptModel, actionString: string) {
         model.id = SystemConstants.EMPTY_GUID;
-        if (!actionString) {
-            return;
-        }
-        let action: number;
-        switch (actionString) {
-            case 'draft':
-                action = SaveReceiptActionEnum.DRAFT_CREATE
-                break;
-            case 'update':
-                action = SaveReceiptActionEnum.DRAFT_UPDATE
-                break;
-            case 'done':
-                action = SaveReceiptActionEnum.DONE
-                break;
-            case 'discard':
-                action = SaveReceiptActionEnum.CANCEL
-                break;
-            default:
-                break;
-        }
-        this._accountingRepo.saveReceipt(model, action)
+        this._accountingRepo.saveReceipt(model, SaveReceiptActionEnum.DRAFT_CREATE)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     console.log(res);
