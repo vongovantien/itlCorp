@@ -1033,7 +1033,7 @@ namespace eFMS.API.Catalogue.DL.Services
               "\t  Partner Type  / <i> Loại Partner:</i> " + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
               "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
               "\t  Address / <i> Địa chỉ: </i>" + "<b>" + partner.AddressVn + "</b>" + "</br>" +
-              "\t  Requestor / <i> Người yêu cầu: </i>" + "<b>" + partner.AddressVn + "</b>" + "</br>" +
+              "\t  Requestor / <i> Người yêu cầu: </i>" + "<b>" + EnNameCreatetor + "</b>" + "</br>" +
 
               "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + saleService + "</b>" + "</br>" +
               "\t  Agreement  type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
