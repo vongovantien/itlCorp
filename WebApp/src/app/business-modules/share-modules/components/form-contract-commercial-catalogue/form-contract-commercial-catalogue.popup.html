@@ -132,8 +132,7 @@
                                 <div class="pos-rel">
                                     <ng-select [items]="serviceTypes" (change)="selectedService($event)"
                                         bindLabel="text" class="custom" [disabled]="true" [clearable]="true"
-                                        formControlName="saleService" [multiple]="true"
-                                        placeholder="Please select">
+                                        formControlName="saleService" [multiple]="true" placeholder="Please select">
                                     </ng-select>
                                 </div>
 
@@ -145,8 +144,7 @@
                             <div class="form-group">
                                 <label>Payment Method</label>
                                 <ng-select [items]="paymentMethods" [clearable]="true" [disabled]="type === 'Agent'"
-                                    class="custom" formControlName="paymentMethod"
-                                    placeholder="Please select">
+                                    class="custom" formControlName="paymentMethod" placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
@@ -154,8 +152,7 @@
                             <div class="form-group">
                                 <label>Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" formControlName="currencyId"
-                                    placeholder="Select Currency">
+                                    class="custom" formControlName="currencyId" placeholder="Select Currency">
                                 </ng-select>
                             </div>
                         </div>
@@ -382,7 +379,7 @@
             <div class="modal-footer m--align-center">
                 <ng-container *ngIf="openOnPartner === false">
                     <button
-                        *ngIf="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true &&  (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true) || !isUpdate || isCreateNewCommercial"
+                        *ngIf="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true &&  (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ) || !isUpdate || isCreateNewCommercial || this.selectedContract.active === false"
                         (click)="onSubmit()" class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-save"></i>

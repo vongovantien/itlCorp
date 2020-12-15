@@ -12,7 +12,7 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 
 
 
@@ -61,6 +61,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'HBL', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
+            { title: 'Product Service', field: 'productService', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
             { title: "Cont Q'ty", field: 'sumContainers', sortable: true },
@@ -171,7 +172,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate(['/home/operation/job-edit/', id]);
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, id]);
                     } else {
                         this.canNotAllowActionPopup.show();
                     }
@@ -236,7 +237,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
 
     gotoCreateJob() {
-        this._router.navigate(["home/operation/new"]);
+        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
     }
 
 }

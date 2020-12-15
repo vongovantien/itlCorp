@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.ForPartner.DL.Models
 {
@@ -11,5 +9,10 @@ namespace eFMS.API.ForPartner.DL.Models
         public decimal? PaymentTerm { get; set; }
         public string AdvanceNo { get; set; }
         public Guid AdvanceID { get; set; }
+    }
+
+    public class RemoveVoucherAdvModel
+    {
+        public string VoucherNo { get; set; }
     }
 }

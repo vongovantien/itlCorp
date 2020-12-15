@@ -144,5 +144,8 @@
 
         public static readonly string PARTNER_MODE_INTERNAL = "Internal";
         public static readonly string PARTNER_MODE_EXTERNAL = "External";
+
+        public static readonly string API_KEY_INVALID = "API Key invalid";
+        public static readonly string HASH_INVALID = "Hashed string invalid";
     }
 }

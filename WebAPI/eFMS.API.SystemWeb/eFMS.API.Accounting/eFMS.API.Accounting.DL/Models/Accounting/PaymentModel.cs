@@ -26,6 +26,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
     {
         public string RowId { get; set; }
         public decimal? OriginalAmount { get; set; }
+        public decimal? Amount { get; set; }
         public string Description { get; set; }
         public string ObhPartnerCode { get; set; }
         public string BankAccountNo { get; set; }

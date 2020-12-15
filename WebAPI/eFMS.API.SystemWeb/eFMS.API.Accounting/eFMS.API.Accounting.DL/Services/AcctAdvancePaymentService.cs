@@ -3266,20 +3266,27 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = new LockedLogResultModel();
             var advancesToUnLock = DataContext.Get(x => keyWords.Contains(x.AdvanceNo));
-            if (advancesToUnLock.Count() < keyWords.Count) return result;
-            result.LockedLogs = advancesToUnLock.Select(x => new LockedLogModel
+            if (advancesToUnLock.Count() < keyWords.Distinct().Count()) return result;
+            if (advancesToUnLock.Where(x => x.SyncStatus == "Synced").Any())
             {
-                Id = x.Id,
-                AdvanceNo = x.AdvanceNo,
-                LockedLog = x.LockedLog
-            });
-            if (result.LockedLogs != null)
+                result.Logs = advancesToUnLock.Where(x => x.SyncStatus == "Synced").Select(x => x.AdvanceNo).ToList();
+            }
+            else
             {
-                result.Logs = new List<string>();
-                foreach (var item in advancesToUnLock)
+                result.LockedLogs = advancesToUnLock.Select(x => new LockedLogModel
                 {
-                    var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
-                    result.Logs.AddRange(logs);
+                    Id = x.Id,
+                    AdvanceNo = x.AdvanceNo,
+                    LockedLog = x.LockedLog
+                });
+                if (result.LockedLogs != null)
+                {
+                    result.Logs = new List<string>();
+                    foreach (var item in advancesToUnLock)
+                    {
+                        var logs = item.LockedLog != null ? item.LockedLog.Split(';').Where(x => x.Length > 0).ToList() : new List<string>();
+                        result.Logs.AddRange(logs);
+                    }
                 }
             }
             return result;

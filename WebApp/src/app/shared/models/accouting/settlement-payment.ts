@@ -34,6 +34,7 @@ export class SettlementPayment {
     syncStatus: string = null;
     reasonReject: string = null;
     payee: string = null;
+    payeeName: string = null;
 
     constructor(object?: any) {
         const self = this;

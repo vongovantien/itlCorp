@@ -55,6 +55,9 @@ export class AuthInterceptor implements HttpInterceptor {
                     case 403:
                         window.location.href = '#/403';
                         break;
+                    case 404:
+                        message = "Not found request";
+                        break;
                 }
                 if (error instanceof TimeoutError) {
                     message = "Request time out";
