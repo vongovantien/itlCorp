@@ -177,7 +177,7 @@
                                         <td class="text-left">{{invoice.receiptExcPaidAmount | number: '.0-3'}}
                                         </td>
                                         <td>{{invoice.invoiceBalance | number: '.0-3'}} {{invoice.currency}}</td>
-                                        <td class="text-left">{{invoice.receiptInvoicebalance | number: '.0-3'}}
+                                        <td class="text-left">{{invoice.receiptExcInvoicebalance | number: '.0-3'}}
                                         </td>
                                         <td>
                                             <ng-container [ngSwitch]="invoice.paymentStatus">
