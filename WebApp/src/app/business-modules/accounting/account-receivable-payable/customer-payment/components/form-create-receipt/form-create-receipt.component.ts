@@ -18,7 +18,6 @@ import { ComboGridVirtualScrollComponent } from '@common';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
@@ -28,7 +27,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     customerId: AbstractControl; // load partner
     date: AbstractControl;
     paymentRefNo: AbstractControl;
-    agreement: AbstractControl;
+    agreementId: AbstractControl;
 
 
     $customers: Observable<Partner[]>;
@@ -57,7 +56,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
         this.initForm();
 
-        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
 
         if (!this.isUpdate) {
             this.generateReceiptNo();
@@ -70,13 +69,13 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             customerId: [null, Validators.required],
             date: [],
             paymentRefNo: [null, Validators.required],
-            agreement: [null]
+            agreementId: [null]
             // agreement: [null, Validators.required]
         });
         this.customerId = this.formSearchInvoice.controls['customerId'];
         this.date = this.formSearchInvoice.controls['date'];
         this.paymentRefNo = this.formSearchInvoice.controls['paymentRefNo'];
-        this.agreement = this.formSearchInvoice.controls['agreement'];
+        this.agreementId = this.formSearchInvoice.controls['agreementId'];
 
     }
 
@@ -105,19 +104,19 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                             if (!!d) {
                                 this.agreements = d || [];
                                 if (!!this.agreements.length) {
-                                    this.agreement.setValue(d[0].id);
+                                    this.agreementId.setValue(d[0].id);
 
                                     this.onSelectDataFormInfo(d[0], 'agreement');
                                 } else {
                                     this.combogrid.displaySelectedStr = '';
-                                    this.agreement.setValue(null);
+                                    this.agreementId.setValue(null);
                                 }
                             }
                         }
                     );
                 break;
             case 'agreement':
-                this.agreement.setValue((data as IAgreementReceipt).id);
+                this.agreementId.setValue((data as IAgreementReceipt).id);
                 this._dataService.setData('cus-advance', (data as IAgreementReceipt).cusAdvanceAmount);
                 break;
             default:
@@ -132,7 +131,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
         const body = {
             customerId: this.customerId.value,
-            agreementId: this.agreement.value,
+            agreementId: this.agreementId.value,
             fromDate: !!this.date.value?.startDate ? formatDate(this.date.value?.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
         };

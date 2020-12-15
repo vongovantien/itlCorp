@@ -530,8 +530,14 @@ namespace eFMS.API.Accounting.DL.Services
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                         charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+                        charge.AccountNo = string.Empty;
+                        charge.ContraAccount = string.Empty;
+                        charge.VATAccount = string.Empty;
+                        charge.AtchDocNo = surcharge.InvoiceNo;
+                        charge.AtchDocDate = surcharge.InvoiceDate;
+                        charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
-
+                        
                         charges.Add(charge);
                     }
                     sync.Details = charges;
