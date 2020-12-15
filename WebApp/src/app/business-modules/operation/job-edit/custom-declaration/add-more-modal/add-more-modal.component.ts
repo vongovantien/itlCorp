@@ -2,14 +2,14 @@ import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angu
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, finalize, tap, catchError } from 'rxjs/operators';
+import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, finalize, tap } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { SearchMultipleComponent } from '../components/search-multiple/search-multiple.component';
-import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'app-add-more-modal',
@@ -48,6 +48,12 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         private _operationRepo: OperationRepo) {
         super();
         this.requestSort = this.sortLocal;
+        this.term$.pipe(
+            debounceTime(2000),
+            distinctUntilChanged()
+        ).subscribe((text: string) => {
+            this.getListCleranceNotImported();
+        });
     }
     ngOnInit() {
         this.initForm();
@@ -135,15 +141,14 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                 );
         }
     }
+    
     onSearchAutoComplete(keyword: string) {
         this.term$.next(keyword.trim());
-
-        if (keyword !== null && keyword.length < 2 && keyword.length > 0) {
-            this.strKeySearch = '';
+        if (this.customNo.value === '') {
+            this.getListCleranceNotImported();
+        } else {
             this.popupSearchMultiple.customNoSearch = '';
-            return 0;
         }
-        this.getListCleranceNotImported();
     }
 
     autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
@@ -222,7 +227,9 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
 
     showPopupSearch() {
-        this.customNo.setValue('');
+        if (this.customNo.value !== '') {
+            this.customNo.setValue('');
+        }
         this.popupSearchMultiple.show();
     }
 

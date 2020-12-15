@@ -675,7 +675,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["H2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Row(2).Height = 60;
 
-            workSheet.Cells[4, 1, 100000, 11].Style.Font.Name = "Times New Roman";
+            workSheet.Cells.Style.Font.Name = "Times New Roman";
 
             //Title
             workSheet.Cells["A4:K4"].Merge = true;
@@ -2768,7 +2768,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["I6"].Style.Font.Bold = true;
             workSheet.Cells["J6"].Value = settlementExport.InfoSettlement.SettlementNo;
 
-            workSheet.Cells[8, 1, 100000, 11].Style.Font.SetFromFont(new Font("Times New Roman", 10));
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 10));
 
             //Bôi đen header
             workSheet.Cells["A8:K8"].Style.Font.Bold = true;
