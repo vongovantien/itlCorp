@@ -1,10 +1,31 @@
 <div class="customer-payment-wrapper m-animate-fade-in">
+
     <app-sub-header> </app-sub-header>
+
     <div class="m-content">
-        <div class="m-portlet__body">
-            <customer-payment-form-create-receipt></customer-payment-form-create-receipt>
-            <customer-payment-list-receipt></customer-payment-list-receipt>
-            <customer-payment-receipt-summary></customer-payment-receipt-summary>
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h3>Create Customer Receipt</h3>
+                    <div>
+                        <div class="c-button-actions">
+                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveReceipt()">
+                            </app-default-button>
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                            </app-default-button>
+                        </div>
+                    </div>
+                </div>
+                <customer-payment-form-create-receipt></customer-payment-form-create-receipt>
+
+                <customer-payment-list-receipt></customer-payment-list-receipt>
+
+            </div>
         </div>
     </div>
 </div>
+
+
+<info-popup [body]="invalidFormText"></info-popup>
+
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>

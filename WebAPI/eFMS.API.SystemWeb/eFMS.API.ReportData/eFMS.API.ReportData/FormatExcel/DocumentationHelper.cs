@@ -3054,8 +3054,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["B2:G2"].Merge = true;
             workSheet.Cells["B2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["B2"].Value = "DALY LIST " + issuedDate.Value.ToString("dd MMM yyyy");
+            workSheet.Cells["B2"].Value = "DAILY LIST " + issuedDate.Value.ToString("dd MMM yyyy").ToUpper();
             workSheet.Cells["B2"].Style.Font.Bold = true;
+            workSheet.Cells["B2"].Style.Font.Size = 16;
 
             for (var c = 1; c < 12; c++)
             {
@@ -3095,6 +3096,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 rowStart += 1;
                 no += 1;
             }
+
+            //Set WrapText cho cột Shipper
+            workSheet.Column(6).Style.WrapText = true;
 
             //In đậm & căn giữa value list 
             workSheet.Cells["A5:K" + (5 + housebillDailyExport.Count)].Style.Font.Bold = true;

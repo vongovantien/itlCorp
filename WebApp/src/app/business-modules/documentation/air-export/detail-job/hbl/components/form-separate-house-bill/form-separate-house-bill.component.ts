@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
-import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { HouseBill, CsOtherCharge } from '@models';
 import { SystemConstants } from 'src/constants/system.const';

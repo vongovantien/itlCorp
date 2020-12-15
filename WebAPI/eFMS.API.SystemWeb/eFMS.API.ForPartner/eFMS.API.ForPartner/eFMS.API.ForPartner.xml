@@ -33,11 +33,11 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.RemoveVoucherAdvance(System.String,System.String,System.String)">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.RemoveVoucherAdvance(eFMS.API.ForPartner.DL.Models.RemoveVoucherAdvModel,System.String,System.String)">
             <summary>
             Remove Voucher Advance
             </summary>
-            <param name="voucherNo"></param>
+            <param name="model"></param>
             <param name="apiKey"></param>
             <param name="hash"></param>
             <returns></returns>

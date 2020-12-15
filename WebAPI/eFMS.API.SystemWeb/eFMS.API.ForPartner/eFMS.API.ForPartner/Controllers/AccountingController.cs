@@ -72,11 +72,11 @@ namespace eFMS.API.ForPartner.Controllers
         {
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
-                return new CustomUnauthorizedResult("API Key invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
-                return new CustomUnauthorizedResult("Hashed string invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
 
             var fieldRequireVoucherAdvance = GetFieldRequireForUpdateVoucherAdvance(model);
@@ -89,42 +89,44 @@ namespace eFMS.API.ForPartner.Controllers
             HandleState hs = accountingManagementService.UpdateVoucherAdvance(model, apiKey);
             if (!hs.Success)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message.ToString(), Data = model });
-            }
-
-            string message = HandleError.GetMessage(hs, Crud.Update);
-
-            return Ok(new ResultHandle { Status = true, Message = stringLocalizer[message].Value, Data = model });
+                return BadRequest(new ResultHandle { Status = false, Message = string.Format("{0}. Cập nhật phiếu chi thất bại", hs.Message.ToString()), Data = model });
+            }            
+            return Ok(new ResultHandle { Status = true, Message = "Cập nhật phiếu chi thành công", Data = model });
         }
 
         /// <summary>
         /// Remove Voucher Advance
         /// </summary>
-        /// <param name="voucherNo"></param>
+        /// <param name="model"></param>
         /// <param name="apiKey"></param>
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("RemoveVoucherAdvance")]
-        public IActionResult RemoveVoucherAdvance(string voucherNo, [Required] string apiKey, [Required] string hash)
+        public IActionResult RemoveVoucherAdvance(RemoveVoucherAdvModel model, [Required] string apiKey, [Required] string hash)
         {
+            if (!ModelState.IsValid) return BadRequest();
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
-                return new CustomUnauthorizedResult("API Key invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
-            if (!accountingManagementService.ValidateHashString(voucherNo, apiKey, hash))
+            if (!accountingManagementService.ValidateHashString(model.VoucherNo, apiKey, hash))
             {
-                return new CustomUnauthorizedResult("Hashed string invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
 
-            HandleState hs = accountingManagementService.RemoveVoucherAdvance(voucherNo, apiKey);
-            string message = HandleError.GetMessage(hs, Crud.Update);
+            if (string.IsNullOrEmpty(model.VoucherNo))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "VoucherNo không có dữ liệu", Data = model.VoucherNo });
+            }
 
+            HandleState hs = accountingManagementService.RemoveVoucherAdvance(model.VoucherNo, apiKey);
+            
             if (!hs.Success)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[message].Value, Data = voucherNo });
+                return BadRequest(new ResultHandle { Status = false, Message = string.Format("{0}. Hủy phiếu chi thất bại", hs.Message.ToString()), Data = model.VoucherNo });
             }
 
-            return Ok(new ResultHandle { Status = true, Message = stringLocalizer[message].Value, Data = voucherNo });
+            return Ok(new ResultHandle { Status = true, Message = "Hủy phiếu chi thành công", Data = model.VoucherNo });
         }
 
         /// <summary>
@@ -139,11 +141,11 @@ namespace eFMS.API.ForPartner.Controllers
         {
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
-                return new CustomUnauthorizedResult("API Key invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
-                return new CustomUnauthorizedResult("Hashed string invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
 
             if (!ModelState.IsValid) return BadRequest();
@@ -192,11 +194,11 @@ namespace eFMS.API.ForPartner.Controllers
         {
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
-                return new CustomUnauthorizedResult("API Key invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
-                return new CustomUnauthorizedResult("Hashed string invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
 
             if (!ModelState.IsValid) return BadRequest();
@@ -274,11 +276,11 @@ namespace eFMS.API.ForPartner.Controllers
         {
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
-                return new CustomUnauthorizedResult("API Key invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
-                return new CustomUnauthorizedResult("Hashed string invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
             if (!ModelState.IsValid) return BadRequest();
 
@@ -304,15 +306,15 @@ namespace eFMS.API.ForPartner.Controllers
         {
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
-                return new CustomUnauthorizedResult("API Key invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
-                return new CustomUnauthorizedResult("Hashed string invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
             if (!ModelState.IsValid) return BadRequest();
             var hs = accountingManagementService.RejectData(model, apiKey);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Reject data thành công", Data = model };
+            ResultHandle result = new ResultHandle { Status = true, Message = "Reject data thành công", Data = model };
             if (!hs.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Reject data thất bại", hs.Message.ToString()), Data = model };
@@ -333,11 +335,11 @@ namespace eFMS.API.ForPartner.Controllers
         {
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
-                return new CustomUnauthorizedResult("API Key invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
             if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
             {
-                return new CustomUnauthorizedResult("Hashed string invalid");
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
             if (!ModelState.IsValid) return BadRequest();
             var hs = accountingManagementService.RemoveVoucher(model, apiKey);

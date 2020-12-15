@@ -278,7 +278,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     getCustomNo() {
-        this._operationRepo.getListCustomsDeclaration()
+        this._operationRepo.getListCustomNoAsignPIC()
             .pipe(
                 catchError(this.catchError),
                 map((response: any[]) => response.map((item: CustomDeclaration) => new CustomDeclaration(item))),

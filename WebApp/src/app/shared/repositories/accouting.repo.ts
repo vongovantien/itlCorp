@@ -747,6 +747,18 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetInvoiceForReceipt`, body);
 
     }
+
+    processInvoiceReceipt(model) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/ProcessInvoice`, model);
+    }
+
+    saveReceipt(model: any, action: number) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/SaveReceipt`, model, { saveAction: action });
+    }
+
+    getDetailReceipt(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetById/`, { id: id });
+    }
 }
 
 

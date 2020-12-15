@@ -7,6 +7,7 @@ namespace eFMS.API.Accounting.DL.Models
     public class AcctReceiptModel: AcctReceipt
     {
         public string CustomerName { get; set; }
+        public string TaxCode { get; set; }
         public List<ReceiptInvoiceModel> Payments { get; set; }
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }

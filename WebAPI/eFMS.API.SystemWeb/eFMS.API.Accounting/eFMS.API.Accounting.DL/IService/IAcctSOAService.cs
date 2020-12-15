@@ -39,7 +39,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal);
 
-        IQueryable<ChargeSOAResult> GetChargeShipmentDocAndOperation(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH);
+        IQueryable<ChargeSOAResult> GetChargeShipmentDocAndOperation(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH, List<string> customNos);
 
         ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria);
 

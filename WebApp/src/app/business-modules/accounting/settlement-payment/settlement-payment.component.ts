@@ -82,6 +82,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'chargeCurrency', sortable: true },
             { title: 'Requester', field: 'requester', sortable: true },
+            { title: 'Payee', field: 'payeeName', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
             { title: 'Status Approval', field: 'statusApproval', sortable: true },
             { title: 'Payment method', field: 'paymentMethod', sortable: true },

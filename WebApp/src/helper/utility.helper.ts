@@ -51,10 +51,6 @@ export class UtilityHelper {
                 }
             });
         });
-
-
-
-
         if (propertyNameArray.length <= 0) {
             return;
         }
@@ -65,28 +61,22 @@ export class UtilityHelper {
 
         //remove elements have value by fields = null;
         if (propertyNameArray.length >= lengthFieldFirst) {
-
-
             dupArray = dupArray.filter(e => {
                 return propertyNameArray.reduce((str, ele) => {
                     return str + e[ele];
                 }, "") !== "";
             });
         }
-
-
         let obj = dupArray.reduce((a, e) => {
             a[e[propertyNameArray[0]]] = ++a[e[propertyNameArray[0]]] || 0;
             return a;
         }, {});
 
-        //
         const arrayDup = dupArray.filter((e) => {
             return obj[e[propertyNameArray[0]]] >= 1;
         });
 
         const arrayKeyDup = arrayDup.map(e => e.key);
-
         inputArray.forEach((element) => {
             if (arrayKeyDup.includes(element.key)) {
                 flag = true;
@@ -94,7 +84,6 @@ export class UtilityHelper {
 
             } else {
                 element.duplicate = false;
-
             }
         });
 
@@ -198,7 +187,6 @@ export class UtilityHelper {
         }
         return words_string;
     }
-
     calculateRoundStandard(num: number) {
         if (isNaN(num)) {
             return 0;
@@ -279,6 +267,20 @@ export class UtilityHelper {
         // * Emit only when all specified keys are pressed at the same time.
         return combineLatest(keyCodeEvents$).pipe(
             filter<KeyboardEvent[]>((arr) => arr.every((a) => a.type === 'keydown'))
+        );
+    }
+
+    mergeObject(...objs: any) {
+        return [...objs].reduce((acc, obj) =>
+            Object.keys(obj).reduce((a, k) => {
+                if (acc.hasOwnProperty(k)) {
+                    acc[k] = obj[k];
+                } else {
+                    acc[k] = obj[k];
+                }
+                return acc;
+            }, {}),
+            {}
         );
     }
 
