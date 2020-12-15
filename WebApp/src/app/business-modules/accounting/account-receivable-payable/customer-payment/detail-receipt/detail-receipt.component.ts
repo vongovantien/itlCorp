@@ -4,10 +4,12 @@ import { ToastrService } from 'ngx-toastr';
 import { AccountingRepo } from '@repositories';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ReceiptModel } from '@models';
-import { SystemConstants } from '@constants';
+import { SystemConstants, AccountingConstants } from '@constants';
 import { HttpErrorResponse } from '@angular/common/http';
-import { pluck, switchMap, tap, switchMapTo } from 'rxjs/operators';
+import { pluck, switchMap, tap, switchMapTo, concatMap } from 'rxjs/operators';
 import { ARCustomerPaymentReceiptSummaryComponent } from '../components/receipt-summary/receipt-summary.component';
+import { of } from 'rxjs';
+import { AbstractControl } from '@angular/forms';
 
 @Component({
     selector: 'app-detail-receipt',
@@ -32,16 +34,18 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this._activedRoute.params
             .pipe(
                 pluck('id'),
-                tap((id: string) => { console.log(id); this.receiptId = id }),
+                tap((id: string) => { this.receiptId = id }),
                 switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(this.receiptId))
             )
             .subscribe(
                 (res: ReceiptModel) => {
                     if (!!res) {
-                        this.receiptDetail = res;
-                        this.updateFormCreate(this.receiptDetail);
-                        this.updateListInvoice(this.receiptDetail);
-                        this.updateSummary(this.receiptDetail);
+                        if (res.id === SystemConstants.EMPTY_GUID) {
+                            this.gotoList();
+                            return;
+                        }
+                        this.updateDetailForm(res);
+
                     } else {
                         this.gotoList();
                     }
@@ -53,6 +57,14 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
             );
     }
 
+    updateDetailForm(res: ReceiptModel) {
+        this.receiptDetail = res;
+
+        this.updateFormCreate(this.receiptDetail);
+        this.updateListInvoice(this.receiptDetail);
+        this.updateSummary(this.receiptDetail);
+    }
+
     updateFormCreate(res: ReceiptModel) {
         const formMapping = {
             date: !!res.fromDate && !!res.toDate ? { startDate: new Date(res.fromDate), endDate: new Date(res.toDate) } : null,
@@ -62,6 +74,16 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         };
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
+
+        // TODO 
+        Object.keys(this.formCreate.formSearchInvoice.controls).forEach((c: string) => {
+            this.formCreate.formSearchInvoice.controls[c].disable();
+            this.formCreate.formSearchInvoice.controls[c].markAsPristine();
+            this.formCreate.formSearchInvoice.controls[c].updateValueAndValidity();
+        });
+
+        this.formCreate.isReadonly = true;
+
     }
 
     updateListInvoice(res: ReceiptModel) {
@@ -73,29 +95,68 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
         this.listInvoice.invoices = res.payments || [];
+        (this.listInvoice.customerInfo as any) = { id: res.customerId };
 
+        if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
+            this.listInvoice.form.disable();
+            this.listInvoice.form.updateValueAndValidity();
+
+            this.listInvoice.isReadonly = true;
+        }
     }
 
     updateSummary(res: ReceiptModel) {
-        this.summary.invoices = res.payments;
-        console.log(res.payments);
-        this.summary.calculateInfodataInvoice(res.payments);
+        this.summary.invoices = [...(res.payments || [])];
+        this.summary.calculateInfodataInvoice([...res.payments] || []);
     }
 
+    onSaveDataReceipt(model: ReceiptModel, actionString: string) {
+        model.id = this.receiptDetail.id;
+        model.userCreated = this.receiptDetail.userCreated;
+        model.userModified = this.receiptDetail.userModified;
+        model.datetimeCreated = this.receiptDetail.datetimeCreated;
+        model.datetimeModified = this.receiptDetail.datetimeModified;
+        model.status = this.receiptDetail.status;
+        model.syncStatus = this.receiptDetail.syncStatus;
+        model.lastSyncDate = this.receiptDetail.lastSyncDate;
 
-    onSaveDataReceipt(model: ReceiptModel) {
-        model.id = SystemConstants.EMPTY_GUID;
-
-        const action = SaveReceiptActionEnum.DRAFT_CREATE;
+        if (!actionString) {
+            return;
+        }
+        let action: number;
+        switch (actionString) {
+            case 'draft':
+                action = SaveReceiptActionEnum.DRAFT_CREATE
+                break;
+            case 'update':
+                action = SaveReceiptActionEnum.DRAFT_UPDATE
+                break;
+            case 'done':
+                action = SaveReceiptActionEnum.DONE
+                break;
+            case 'cancel':
+                action = SaveReceiptActionEnum.CANCEL
+                break;
+            default:
+                break;
+        }
         this._accountingRepo.saveReceipt(model, action)
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    console.log(res);
+            .pipe(
+                concatMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                    } else {
-                        this._toastService.error("Create data fail, Please check again!");
+                        return this._accountingRepo.getDetailReceipt(this.receiptId);
                     }
+                    of(res);
+                })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res && res.status === false) {
+                        this._toastService.error(res.message);
+                        return;
+                    }
+                    this.updateDetailForm(res);
                 },
                 (res: HttpErrorResponse) => {
                     if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
@@ -104,5 +165,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 }
             )
     };
+
+    onSyncBravo() { }
 
 }

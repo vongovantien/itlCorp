@@ -349,7 +349,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (receipt == null) return new AcctReceiptModel();
             var result = mapper.Map<AcctReceiptModel>(receipt);
             var paymentReceipts = new List<ReceiptInvoiceModel>();
-            var acctPayments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id).ToList();
+            var acctPayments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id).ToList().OrderBy(x => x.Type == "ADV");
             foreach (var acctPayment in acctPayments)
             {
                 var invoice = acctMngtRepository.Get(x => x.Id.ToString() == acctPayment.RefId).FirstOrDefault();
@@ -357,6 +357,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
 
                 var payment = new ReceiptInvoiceModel();
+             
                 payment.PaymentId = acctPayment.Id;
                 payment.InvoiceId = acctPayment.RefId;
                 payment.InvoiceNo = acctPayment.BillingRefNo;
@@ -374,7 +375,9 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.BillingDate = invoice?.ConfirmBillingDate;
                 payment.InvoiceDate = invoice?.Date;
                 payment.Note = acctPayment.Note;
-
+                payment.ReceiptExcUnpaidAmount = acctPayment.ReceiptExcUnpaidAmount;
+                payment.ReceiptExcPaidAmount = acctPayment.ReceiptExcPaidAmount;
+                payment.ReceiptExcInvoiceBalance = acctPayment.ReceiptExcBalance;
                 paymentReceipts.Add(payment);
             }
             result.Payments = paymentReceipts;
@@ -444,6 +447,9 @@ namespace eFMS.API.Accounting.DL.Services
                 //_payment.Balance = payment.InvoiceBalance;
                 _payment.PaymentAmount = payment.ReceiptExcPaidAmount;
                 _payment.Balance = payment.ReceiptExcInvoiceBalance;
+                _payment.ReceiptExcUnpaidAmount = payment.ReceiptExcUnpaidAmount;
+                _payment.ReceiptExcPaidAmount = payment.ReceiptExcPaidAmount;
+                _payment.ReceiptExcBalance = payment.ReceiptExcInvoiceBalance;
 
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
@@ -480,6 +486,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                     _payment.PaymentAmount = payment.ReceiptExcPaidAmount;
                     _payment.Balance = payment.ReceiptExcInvoiceBalance;
+                    _payment.ReceiptExcUnpaidAmount = payment.ReceiptExcUnpaidAmount;
+                    _payment.ReceiptExcPaidAmount = payment.ReceiptExcPaidAmount;
+                    _payment.ReceiptExcBalance = payment.ReceiptExcInvoiceBalance;
 
                     _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                     _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu

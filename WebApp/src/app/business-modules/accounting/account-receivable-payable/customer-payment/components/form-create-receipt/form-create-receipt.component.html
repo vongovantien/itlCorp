@@ -11,7 +11,8 @@
                         (remove)="resetFormControl(customerId)"
                         [currentActiveItemId]="{field:'id', value: customerId.value}"
                         [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
-                        [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false">
+                        [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
+                        [disabled]="isReadonly">
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
@@ -39,30 +40,33 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !agreement.valid }">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !agreementId.valid }">
                     <label required>Agreement
                     </label>
                     <app-combo-grid-virtual-scroll #combogridAgreement
                         (itemSelected)="onSelectDataFormInfo($event, 'agreement')"
-                        (remove)="resetFormControl(agreement)"
-                        [currentActiveItemId]="{field:'id', value: agreement.value}"
+                        (remove)="resetFormControl(agreementId)"
+                        [currentActiveItemId]="{field:'id', value: agreementId.value}"
                         [selectedDisplayFields]="['contractType','saleManName','contractNo']" [dataSources]="agreements"
-                        [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false">
+                        [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false"
+                        [disabled]="isReadonly">
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-6"></div>
-            <div class="col-lg-6 m--align-right  align-items-center justify-content-between">
-                <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10 ng-star-inserted"
-                    type="button" (click)="getInvoiceList()">
-                    <span>
-                        <i class="la la-search"></i>
-                        <span>Apply </span>
-                    </span>
-                </button>
+        <ng-container *ngIf="!isReadonly">
+            <div class="row">
+                <div class="col-lg-6"></div>
+                <div class="col-lg-6 m--align-right  align-items-center justify-content-between">
+                    <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10 ng-star-inserted"
+                        type="button" (click)="getInvoiceList()">
+                        <span>
+                            <i class="la la-search"></i>
+                            <span>Apply </span>
+                        </span>
+                    </button>
+                </div>
             </div>
-        </div>
+        </ng-container>
     </form>
 </div>

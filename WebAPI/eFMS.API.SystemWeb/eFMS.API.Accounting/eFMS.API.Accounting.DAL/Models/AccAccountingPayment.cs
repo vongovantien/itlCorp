@@ -29,5 +29,8 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? RefAmount { get; set; }
         public string RefCurrency { get; set; }
         public string Note { get; set; }
+        public decimal? ReceiptExcPaidAmount { get; set; }
+        public decimal? ReceiptExcBalance { get; set; }
+        public decimal? ReceiptExcUnpaidAmount { get; set; }
     }
 }
