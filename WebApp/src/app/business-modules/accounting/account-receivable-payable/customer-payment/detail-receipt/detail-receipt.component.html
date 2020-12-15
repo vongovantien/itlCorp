@@ -6,22 +6,84 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
-                    <h3>Create Customer Receipt</h3>
+                    <h3>
+                        {{receiptDetail?.paymentRefNo}}
+                        <span
+                            class="m-badge m-badge--{{receiptDetail?.status === 'Draft' && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
+                            {{!receiptDetail?.syncStatus ? receiptDetail?.status : receiptDetail?.syncStatus}}
+                        </span>
+                    </h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveReceipt()">
-                            </app-default-button>
+                            <ng-container *ngIf="receiptDetail?.status === 'Draft'">
+                                <app-permission-button title="Save Draft" class="primary" [icon]="'la la-check'"
+                                    (onClick)="saveReceipt('update')">
+                                </app-permission-button>
+                                <app-permission-button type="save" title="Done" class="success"
+                                    (onClick)="confirmDoneReceiptPopup.show()">
+                                </app-permission-button>
+                            </ng-container>
+
+                            <ng-container *ngIf="receiptDetail?.status === 'Done'">
+
+                                <app-permission-button title="Discard" class="warning" icon="la la-recycle"
+                                    (onClick)="saveReceipt('discard')">
+                                </app-permission-button>
+
+                                <button class="btn btn-info m-btn--icon m-btn--uppercase"
+                                    (click)="confirmSyncReceiptPopup.show()" title="Sync to accountant system">
+                                    <span>
+                                        <i class="la la-cloud-upload"></i>
+                                        <span>
+                                            Sync to Accountant
+                                        </span>
+                                    </span>
+                                </button>
+                            </ng-container>
 
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                             </app-default-button>
+
                         </div>
                     </div>
                 </div>
                 <customer-payment-form-create-receipt [isUpdate]="true"> </customer-payment-form-create-receipt>
 
-                <customer-payment-list-receipt></customer-payment-list-receipt>
+                <customer-payment-list-receipt>
+                    <ul class="list-group">
+                        <li
+                            class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+                            Sync Status:
+                            <span *ngIf="receiptDetail?.syncStatus !== null"
+                                class="m-badge m-badge--{{(!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
+                                {{receiptDetail?.syncStatus}}
+                            </span>
+                        </li>
+                        <li
+                            class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+                            Reason reject:
+                            <span>{{receiptDetail?.reasonReject}}</span>
+                        </li>
+                        <li
+                            class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+                            Last Sync:
+                            <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy'}}</span>
+                        </li>
+                    </ul>
+                </customer-payment-list-receipt>
 
                 <customer-payment-receipt-summary></customer-payment-receipt-summary>
+
+                <div class="row m--margin-top-20">
+                    <div class="col-md-6">
+                        <span>Created: {{receiptDetail?.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                        <span class="text-success">{{receiptDetail?.userNameCreated}}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span>Modified: {{receiptDetail?.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                        </span> <span class="text-success">{{receiptDetail?.userNameModified}}</span>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -31,4 +93,14 @@
 
 <info-popup [body]="invalidFormText"></info-popup>
 
-<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?"
+    (onSubmit)="confirmCancelPopup.hide();gotoList()"></confirm-popup>
+
+<confirm-popup #confirmSyncReceiptPopup (onSubmit)="confirmSyncReceiptPopup.hide(); onSyncBravo()"
+    [labelConfirm]="'Yes'" body="Are you sure you want to sync data to accountant system ?"
+    iconConfirm="la la-cloud-upload"></confirm-popup>
+
+<confirm-popup #confirmDoneReceiptPopup (onSubmit)="confirmDoneReceiptPopup.hide();saveReceipt('done')"
+    [labelConfirm]="'Yes'" labelCancel="No"
+    body="Noted: After you save the receipt, you can not edit. Are you sure do this action?" iconConfirm="la la-save">
+</confirm-popup>

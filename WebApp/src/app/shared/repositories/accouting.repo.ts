@@ -723,6 +723,7 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+    /// Search Customer Payment 
 
     getListConfirmBilling(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/ConfirmBillingPaging`, body, {
@@ -735,6 +736,35 @@ export class AccountingRepo {
 
     UpdateConfirmBillingDate(invoiceIds: string[], billingDate: string) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/UpdateConfirmBillingDate`, invoiceIds, { billingDate: billingDate }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListCustomerPayment(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/Paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+        }
+    }
+    checkAllowDeleteCusPayment(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    deleteCusPayment(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkAllowGetDetailCPS(cps: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDetail/${cps}`).pipe(
             map((data: any) => data)
         );
     }

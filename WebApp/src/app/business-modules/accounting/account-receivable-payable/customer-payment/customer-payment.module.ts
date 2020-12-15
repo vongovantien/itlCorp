@@ -37,7 +37,7 @@ const routing: Routes = [
         ARCustomerPaymentDetailReceiptComponent,
         ARCustomerPaymentFormCreateReceiptComponent,
         ARCustomerPaymentReceiptSummaryComponent,
-        ARCustomerPaymentReceiptPaymentListComponent
+        ARCustomerPaymentReceiptPaymentListComponent,
     ],
     imports: [
         SharedModule,
@@ -57,7 +57,7 @@ const routing: Routes = [
             suffix: "",
             thousands: ",",
             nullable: true
-        })
+        }),
     ],
     exports: [],
     providers: [],

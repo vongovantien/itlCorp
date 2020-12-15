@@ -1,4 +1,4 @@
-import { OnInit, Component } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy } from "@angular/core";
 import { AppList } from "@app";
 import { DataService } from "@services";
 import { pluck, takeUntil } from "rxjs/operators";
