@@ -30,6 +30,6 @@ DptBonus	Number
 KeyContact	String	50	
 MBLNO	String	255	
 Vessel	String	255	
-TpyeofService	String	50	
+TypeOfService	String	50	
 Shipper	String	255	
 Consignee	String	255	
