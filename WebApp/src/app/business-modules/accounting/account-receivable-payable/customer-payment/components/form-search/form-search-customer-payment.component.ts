@@ -112,7 +112,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     }
     reset() {
         this.resetKeywordSearchCombogrid();
-        this.formSearch.reset();
+        this.formSearch.reset(this.initForm());
         this.resetFormControl(this.customerID);
         this.onReset.emit(<any>{ transactionType: null });
     }

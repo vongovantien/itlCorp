@@ -54,8 +54,8 @@ export class Receipt {
     syncStatus: string = null;
     lastSyncDate: Date = null;
     description: string = null;
-    userCreated: string = null;
-    userModified: string = null;
+    userNameCreated: string = null;
+    userNameModified: string = null;
     datetimeCreated: Date = null;
     datetimeModified: Date = null;
     fromDate: Date = null;
@@ -74,9 +74,9 @@ export class Receipt {
 }
 
 export class ReceiptModel extends Receipt {
-    customerName: string = null;
+    id: string = null;
     payments: ReceiptInvoiceModel[] = [];
-    userNameCreated: string = null;
-    userNameModified: string = null;
+    userCreated: string = null;
+    userModified: string = null;
 }
 

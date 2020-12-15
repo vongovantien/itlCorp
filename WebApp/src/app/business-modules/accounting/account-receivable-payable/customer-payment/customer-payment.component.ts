@@ -6,8 +6,8 @@ import {
 } from "src/app/shared/common/popup";
 import { AccountingRepo } from "src/app/shared/repositories";
 import { catchError, finalize } from "rxjs/operators";
-import { AppList } from "src/app/app.list";
-import { Receipt, User } from "src/app/shared/models";
+import { AppList, IPermissionBase } from "src/app/app.list";
+import { ReceiptModel, User } from "src/app/shared/models";
 import { ToastrService } from "ngx-toastr";
 import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
@@ -19,15 +19,14 @@ import { RoutingConstants, SystemConstants } from "@constants";
     selector: 'app-customer-payment',
     templateUrl: './customer-payment.component.html',
 })
-export class ARCustomerPaymentComponent extends AppList {
+export class ARCustomerPaymentComponent extends AppList implements IPermissionBase {
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     headers: CommonInterface.IHeaderTable[];
-    CPs: Receipt[] = [];
-    selectedCPs: Receipt = null;
+    CPs: ReceiptModel[] = [];
+    selectedCPs: ReceiptModel = null;
     messageDelete: string = "";
-    userLogged: User;
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService,
@@ -39,6 +38,12 @@ export class ARCustomerPaymentComponent extends AppList {
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortCPsList;
         this.requestSort = this.sortLocal;
+    }
+    checkAllowDetail(T: any): void {
+        throw new Error("Method not implemented.");
+    }
+    checkAllowDelete(T: any): void {
+        throw new Error("Method not implemented.");
     }
     ngOnInit() {
         this.headers = [
@@ -57,13 +62,9 @@ export class ARCustomerPaymentComponent extends AppList {
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
-        this.getUserLogged();
         this.getCPs();
     }
-    getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this.dataSearch = { userCreated: this.userLogged.id };
-    }
+
 
     getCPs() {
         this.isLoading = true;
@@ -83,7 +84,7 @@ export class ARCustomerPaymentComponent extends AppList {
             )
             .subscribe((res: any) => {
                 console.log(res);
-                this.CPs = (res.data || []).map((item: Receipt) => new Receipt(item));
+                this.CPs = (res.data || []).map((item: ReceiptModel) => new ReceiptModel(item));
                 console.log(this.CPs);
                 this.totalItems = res.totalItems || 0;
             });
@@ -97,12 +98,12 @@ export class ARCustomerPaymentComponent extends AppList {
     sortCPsList(sortField: string, order: boolean) {
         this.CPs = this._sortService.sort(this.CPs, sortField, order);
     }
-    prepareDeleteCP(cpItem: Receipt) {
+    prepareDeleteCP(cpItem: ReceiptModel) {
         this._accountingRepo
             .checkAllowDeleteCusPayment(cpItem.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this.selectedCPs = new Receipt(cpItem);
+                    this.selectedCPs = new ReceiptModel(cpItem);
                     this.messageDelete = `Do you want to delete Receipt ${cpItem.paymentRefNo} ? `;
                     this.confirmPopup.show();
                 } else {

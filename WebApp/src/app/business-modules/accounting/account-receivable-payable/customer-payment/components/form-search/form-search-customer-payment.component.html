@@ -44,7 +44,6 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="form-control-label">Currency</label>
-                        <!-- <ng-select [items]="Currencys" formControlName="currency" (change)="onSelectDataFormInfo($event, 'currency')"></ng-select> -->
                         <ng-select formControlName="currency" class="custom" [items]="Currencys | async" bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false">
                         </ng-select>
 
@@ -65,8 +64,8 @@
             </div>
             <div class="form-actions">
                 <div class="row ">
-                    <div class="col-lg-9"></div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-6"></div>
+                    <div class="col-lg-6  m--align-right">
                         <app-default-button [buttonSetting]="searchlButtonSetting" (click)="search()">
                         </app-default-button>
                         <app-default-button [buttonSetting]="resetButtonSetting" (click)="reset()">
