@@ -1386,6 +1386,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 var listChargeShipment = csShipmentSurchargeRepo.Get(x => chargeShipment.Contains(x.Id)).ToList();
                                 foreach (var item in listChargeShipment)
                                 {
+                                    // Phí Chứng từ cho phép cập nhật lại số HD, Ngày HD, Số SerieNo, Note.
+                                    var chargeSettlementCurrentToAddCsShipmentSurcharge = model.ShipmentCharge.First(x => x.Id == item.Id);
+                                    if(chargeSettlementCurrentToAddCsShipmentSurcharge != null)
+                                    {
+                                        item.Notes = chargeSettlementCurrentToAddCsShipmentSurcharge.Notes;
+                                        item.SeriesNo = chargeSettlementCurrentToAddCsShipmentSurcharge.SeriesNo;
+                                        item.InvoiceNo = chargeSettlementCurrentToAddCsShipmentSurcharge.InvoiceNo;
+                                        item.InvoiceDate = chargeSettlementCurrentToAddCsShipmentSurcharge.InvoiceDate;
+                                    }
+
                                     item.SettlementCode = settlement.SettlementNo;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;

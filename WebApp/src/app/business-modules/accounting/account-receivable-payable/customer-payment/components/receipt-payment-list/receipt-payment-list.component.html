@@ -6,14 +6,14 @@
                     <label class="form-control-label" required>Paid Amount</label>
                     <input type="text" class="form-control m-input m-input--square text-success"
                         formControlName="paidAmount" numeric [decimals]="2" autoFormatCurrency
-                        (ngModelChange)="onSelectDataFormInfo($event,'paid-amount')">
+                        (ngModelChange)="onSelectDataFormInfo($event,'paid-amount')" [attr.readOnly]="isReadonly">
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label"> Type </label>
                     <ng-select formControlName="type" class="custom" [items]="receiptTypes" [clearable]="false"
-                        [multiple]="true" (change)="onSelectDataFormInfo($event,'type')">
+                        [multiple]="true" (change)="onSelectDataFormInfo($event,'type')" [readonly]="isReadonly">
                     </ng-select>
                 </div>
             </div>
@@ -21,7 +21,7 @@
                 <div class="form-group">
                     <label class="form-control-label">Cus Advance Amount</label>
                     <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric [decimals]="2"
-                        autoFormatCurrency>
+                        autoFormatCurrency [attr.readOnly]="isReadonly">
                 </div>
             </div>
         </div>
@@ -30,21 +30,21 @@
                 <div class="form-group">
                     <label class="form-control-label">Final Paid Amount</label>
                     <input type="text" class="form-control m-input m-input--square" formControlName="finalPaidAmount"
-                        currencyMask>
+                        currencyMask [attr.readOnly]="isReadonly">
                 </div>
             </div>
             <div class=" col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label"> Balance </label>
                     <input type="text" class="form-control m-input m-input--square" formControlName="balance"
-                        [value]="balance.value | number: '.0-3'">
+                        [value]="balance.value | number: '.0-3'" [attr.readOnly]="isReadonly">
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="form-group">
                     <label class="form-control-label">Payment Method</label>
                     <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom" name="method"
-                        [clearable]="false"></ng-select>
+                        [clearable]="false" [readonly]="isReadonly"></ng-select>
                 </div>
             </div>
             <div class="col-lg-2">
@@ -52,7 +52,7 @@
                     <label class="form-control-label">Currency</label>
                     <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async"
                         bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
-                        [clearable]="false">
+                        [clearable]="false" [readonly]="isReadonly">
                     </ng-select>
 
                 </div>
@@ -67,7 +67,7 @@
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select request date" [autoApply]="true"
                             formControlName="paymentDate" readonly calendar
-                            (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" />
+                            (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" [attr.disabled]="isReadonly" />
 
                     </div>
                 </div>
@@ -76,13 +76,14 @@
                 <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
                     <label class="form-control-label" required> Exchange Rate </label>
                     <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
-                        numeric [decimals]="2" autoFormatCurrency>
+                        [attr.readOnly]="isReadonly">
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label">Bank Acount No</label>
-                    <input type="text" class="form-control m-input m-input--square" formControlName="bankAccountNo">
+                    <input type="text" class="form-control m-input m-input--square" formControlName="bankAccountNo"
+                        [attr.readOnly]="isReadonly">
                 </div>
             </div>
         </div>
@@ -90,7 +91,8 @@
             <div class="col-lg-8">
                 <div class="form-group">
                     <label class="form-control-label">Description</label>
-                    <textarea cols="30" rows="5" class="form-control" formControlName="description"></textarea>
+                    <textarea cols="30" rows="5" class="form-control" formControlName="description"
+                        [attr.readOnly]="isReadonly"></textarea>
                 </div>
             </div>
             <div class="col-lg-4">
