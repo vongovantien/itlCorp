@@ -24,7 +24,7 @@ export class ReceiptInvoiceModel {
     receiptExcPaidAmount: number = null; // * Số tiền thu của invoice theo tỷ giá phiếu thu
 
     invoiceBalance: number = null;
-    receiptInvoicebalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
+    receiptExcInvoicebalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
 
     // * custom
     isSelected: boolean = false;

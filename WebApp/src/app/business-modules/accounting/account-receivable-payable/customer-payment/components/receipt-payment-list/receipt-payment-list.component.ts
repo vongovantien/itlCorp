@@ -48,7 +48,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     customerInfo: Partner = null;
 
     isSubmitted: boolean = false;
-    isReadonly: boolean = false;  // * DONE | CANCEL
+    isReadonly: boolean = null;  // * DONE | CANCEL
 
     headerReceiptReadonly: CommonInterface.IHeaderTable[] = [
         { title: 'Billing Ref No', field: 'invoiceNo' },

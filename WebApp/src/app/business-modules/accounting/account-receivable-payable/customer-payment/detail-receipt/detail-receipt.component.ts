@@ -3,13 +3,12 @@ import { ARCustomerPaymentCreateReciptComponent, SaveReceiptActionEnum } from '.
 import { ToastrService } from 'ngx-toastr';
 import { AccountingRepo } from '@repositories';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ReceiptModel } from '@models';
+import { ReceiptModel, ReceiptInvoiceModel } from '@models';
 import { SystemConstants, AccountingConstants } from '@constants';
 import { HttpErrorResponse } from '@angular/common/http';
-import { pluck, switchMap, tap, switchMapTo, concatMap } from 'rxjs/operators';
+import { pluck, switchMap, tap, concatMap } from 'rxjs/operators';
 import { ARCustomerPaymentReceiptSummaryComponent } from '../components/receipt-summary/receipt-summary.component';
 import { of } from 'rxjs';
-import { AbstractControl } from '@angular/forms';
 
 @Component({
     selector: 'app-detail-receipt',
@@ -59,6 +58,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     updateDetailForm(res: ReceiptModel) {
         this.receiptDetail = res;
+        console.log(this.receiptDetail);
 
         this.updateFormCreate(this.receiptDetail);
         this.updateListInvoice(this.receiptDetail);
@@ -74,13 +74,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         };
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
-
-        // TODO 
-        Object.keys(this.formCreate.formSearchInvoice.controls).forEach((c: string) => {
-            this.formCreate.formSearchInvoice.controls[c].disable();
-            this.formCreate.formSearchInvoice.controls[c].markAsPristine();
-            this.formCreate.formSearchInvoice.controls[c].updateValueAndValidity();
-        });
 
         this.formCreate.isReadonly = true;
 
@@ -98,9 +91,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         (this.listInvoice.customerInfo as any) = { id: res.customerId };
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
-            this.listInvoice.form.disable();
-            this.listInvoice.form.updateValueAndValidity();
-
             this.listInvoice.isReadonly = true;
         }
     }
@@ -109,6 +99,20 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.summary.invoices = [...(res.payments || [])];
         this.summary.calculateInfodataInvoice([...res.payments] || []);
     }
+
+    checkValidateBalance(invoices: ReceiptInvoiceModel[], finalPaid: number = 0, balance: number = 0) {
+        let valid: boolean = true;
+        if (this.receiptDetail.status !== AccountingConstants.RECEIPT_STATUS.DRAFT) {
+            return true;
+        }
+        const paidAmount = invoices.filter(x => x.type !== 'ADV').reduce((acc: number, curr: ReceiptInvoiceModel) => acc += (curr.paidAmount + curr.invoiceBalance), 0);
+        if (+paidAmount + balance !== finalPaid) {
+            valid = false;
+        }
+
+        return valid;
+    }
+
 
     onSaveDataReceipt(model: ReceiptModel, actionString: string) {
         model.id = this.receiptDetail.id;
@@ -125,9 +129,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         }
         let action: number;
         switch (actionString) {
-            case 'draft':
-                action = SaveReceiptActionEnum.DRAFT_CREATE
-                break;
             case 'update':
                 action = SaveReceiptActionEnum.DRAFT_UPDATE
                 break;
@@ -140,6 +141,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
             default:
                 break;
         }
+        if (!action) { return; };
         this._accountingRepo.saveReceipt(model, action)
             .pipe(
                 concatMap((res: CommonInterface.IResult) => {
