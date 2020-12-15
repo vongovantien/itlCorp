@@ -1,162 +1,130 @@
-import { AppForm } from 'src/app/app.form';
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
-
-import { CatalogueRepo } from '@repositories';
-import { Partner } from '@models';
-import { SystemConstants } from '@constants';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { AccountingConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
-
-
-
+import { Currency, Customer, Partner, User } from '@models';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { DataService } from '@services';
+import { getCatalogueCurrencyState, IAppState } from '@store';
 import { Observable } from 'rxjs';
-import { Moment } from 'moment';
+import { AppForm } from 'src/app/app.form';
 
-enum OverDueDays {
-    All,
-    Between1_15,
-    Between16_30,
-    Between31_60,
-    Between61_90
-}
 @Component({
     selector: 'customer-payment-form-search',
     templateUrl: './form-search-customer-payment.component.html',
 })
-export class ARCustomerPaymentFormSearchComponent  extends AppForm implements OnInit {
-    // @Output() onSearch:  EventEmitter<Partial<ISearchAccPayment>> = new EventEmitter<Partial<ISearchAccPayment>>();
+export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnInit {
+    @Output() onSearch: EventEmitter<IAcctReceiptCriteria> = new EventEmitter<IAcctReceiptCriteria>();
+    @Output() onReset: EventEmitter<IAcctReceiptCriteria> = new EventEmitter<IAcctReceiptCriteria>();
 
+    customerIDs: Observable<Customer[]>;
+    creators: Observable<User[]>;
+    customerID: AbstractControl;
+    creator: AbstractControl;
+    refNo: AbstractControl;
+    paymentTypes: string[] = AccountingConstants.PAYMENT_TYPE;
+    paymentType: AbstractControl;
+    displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    date: AbstractControl;
+    dateTypes: string[] = AccountingConstants.DATE_TYPE;
+    dateType: AbstractControl;
+    Currencys: Observable<Currency[]>;
+    currency: AbstractControl;
+    syncStatuss = AccountingConstants.SYNC_STATUSS;
+    syncStatus: AbstractControl;
+    statuss = AccountingConstants.STATUS;
+    status: AbstractControl;
     formSearch: FormGroup;
 
-    partnerId: AbstractControl;
-    referenceNo: AbstractControl;
-    issuedDate: AbstractControl;
-    Currency: AbstractControl;
-    etd: AbstractControl;
-    syncStatus: AbstractControl;
-    paymentRefNo: AbstractControl;
- 
-    partners: Observable<Partner[]>;
-    selected: {startDate: Moment, endDate: Moment};
-    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'accountNo', label: 'ID' },
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameVn', label: 'Name Local' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
-    
-    paymentRef: string[] = ['Payment ', 'Invoice'];
-    dateType: string[] = ['Create Date', 'Paid Date', 'Last Sync'];
-    syncstatus: string[] = ['Synced', 'Rejected'];
-    currency: string[] = ['combobox'];
-    // overDueDays: CommonInterface.INg2Select[] = [
-    //     { id: '0', text: 'All' },
-    //     { id: 1, text: '01-15 days' },
-    //     { id: 2, text: '16-30 days' },
-    //     { id: 3, text: '31-60 days' },
-    //     { id: 4, text: '60-90 days' },
-    // ];
 
     constructor(
+        private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo
+        private _store: Store<IAppState>,
+        private _dataService: DataService,
+
+
     ) {
         super();
-        this.requestSearch = this.submitSearch;
-        // this.requestReset = this.resetSearch;
+        this.requestReset = this.requestSearch;
     }
 
-    ngOnInit(): void {
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+    ngOnInit() {
         this.initForm();
+        this.customerIDs = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, null);
+        this.creators = this._systemRepo.getSystemUsers();
+        this.Currencys = this._catalogueRepo.getListCurrency();
     }
-
     initForm() {
         this.formSearch = this._fb.group({
-            referenceNo: [],
-            partnerId: [],
-            etd: [],
-            Currency: [[this.currency[1]]],
-            syncStatus: [[this.syncstatus[1], this.syncstatus[2]]],
-            Date: [[this.dateType[1], this.dateType[2], this.dateType[3]]],
-            paymentRefNo: [[this.paymentRef[1], this.paymentRef[2]]]
-         //   etd: !!shipment.etd ? { startDate: new Date(shipment.etd), endDate: new Date(shipment.etd) } : null,
-            
+            refNo: [],
+            paymentType: [this.paymentTypes[0]],
+            customerID: [],
+            date: [],
+            dateType: [this.dateTypes[0]],
+            currency: [],
+            syncStatus: [this.syncStatuss[0]],
+            status: [this.statuss[0]],
         });
-
-        this.partnerId = this.formSearch.controls["partnerId"];
-        this.issuedDate = this.formSearch.controls["issuedDate"];
-        this.Currency = this.formSearch.controls["Currency"];
-        this.etd = this.formSearch.controls["Date"];
-        this.syncStatus = this.formSearch.controls["syncStatus"];
-        this.paymentRefNo = this.formSearch.controls["paymentRefNo"];
+        this.refNo = this.formSearch.controls['refNo'];
+        this.paymentType = this.formSearch.controls['paymentType'];
+        this.customerID = this.formSearch.controls['customerID'];
+        this.date = this.formSearch.controls['date'];
+        this.dateType = this.formSearch.controls['dateType'];
+        this.currency = this.formSearch.controls['currency'];
+        this.syncStatus = this.formSearch.controls['syncStatus'];
+        this.status = this.formSearch.controls['status'];
     }
-
-    // tslint:disable-next-line:no-any
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
-                this.partnerId.setValue((data as Partner).id);
+                this.customerID.setValue((data as Partner).id);
+                this._dataService.setData('customer', data);
+                break;
+            case 'currency':
+                this.currency.setValue((data as Currency).id);
+                this._dataService.setData('currency', data);
                 break;
             default:
                 break;
+
         }
-    }
-
-    submitSearch() {
-     
-        // const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
-        // const status = !!dataForm.paymentStatus ? this.getSearchStatus(dataForm.paymentStatus) : null;
-        // const body: ISearchAccPayment = {
-        //     referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
-        //     partnerId: dataForm.partnerId,
-        //     paymentStatus: status,
-        //     fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-        //     toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-        //     fromUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.startDate) ? formatDate(dataForm.updatedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-        //     toUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.endDate) ? formatDate(dataForm.updatedDate.endDate, 'yyyy-MM-dd', 'en') : null,
-        //     fromDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
-        //     toDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.endDate) ? formatDate(dataForm.dueDate.endDate, 'yyyy-MM-dd', 'en') : null,
-        //     // paymentType: PaymentType.Invoice
-        // };
-
-        // this.onSearch.emit(body);
-    }
-    getSearchStatus(paymentStatus: []) {
-        let strStatus = null;
-        if (!!paymentStatus) {
-            strStatus = [];
-
-            paymentStatus.forEach(element => {
-                if (element !== 'All') {
-                    strStatus.push(element);
-                } else {
-                    return [];
-                }
-            });
-        }
-        return strStatus;
 
     }
 
-    resetSearch() {
+    search() {
+        const body: IAcctReceiptCriteria = {
+            refNo: this.refNo.value,
+            paymentType: this.paymentType.value !== this.paymentTypes[0] ? this.paymentType.value : null,
+            customerID: this.customerID.value,
+            dateFrom: (!!this.date.value && !!this.date.value.startDate) ? formatDate(this.date.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            dateTo: (!!this.date.value && !!this.date.value.endDate) ? formatDate(this.date.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            dateType: this.dateType.value !== this.dateTypes[0] ? this.dateType.value : null,
+            currency: this.currency.value,
+            syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
+            status: this.status.value !== this.statuss[0] ? this.status.value : null,
+        };
+        this.onSearch.emit(body);
+        console.log(body);
+    }
+    reset() {
+        this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
-        this.initForm();
-        // this.onSearch.emit({ paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
+        this.resetFormControl(this.customerID);
+        this.onReset.emit(<any>{ transactionType: null });
     }
-
-    // selelectedStatus(event: string) {
-    //     const currStatus = this.paymentRefNo.value;
-    //     if (currStatus.filter(x => x === 'Payment').length > 0 && event !== 'Payment') {
-    //         currStatus.splice(0);
-    //         currStatus.push(event);
-    //         this.paymentRefNo.setValue(currStatus);
-
-    //     }
-    //     if (event === 'Payment') {
-    //         this.paymentRefNo.setValue(['Payment']);
-    //     }
-
-    // }
+}
+interface IAcctReceiptCriteria {
+    refNo: string;
+    paymentType: string;
+    customerID: string;
+    dateFrom: string;
+    dateTo: string;
+    dateType: string;
+    currency: string;
+    syncStatus: string;
+    status: string;
 }
