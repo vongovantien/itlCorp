@@ -26,5 +26,11 @@ export class AccountingConstants {
         REJECTED: 'Rejected'
     };
 
+    public static RECEIPT_STATUS = {
+        DRAFT: 'Draft',
+        DONE: 'Done',
+        CANCEL: 'Cancel'
+    };
+
 
 }
