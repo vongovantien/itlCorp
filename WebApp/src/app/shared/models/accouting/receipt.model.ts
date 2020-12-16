@@ -54,8 +54,8 @@ export class Receipt {
     syncStatus: string = null;
     lastSyncDate: Date = null;
     description: string = null;
-    userNameCreated: string = null;
-    userNameModified: string = null;
+    userCreated: string = null;
+    userModified: string = null;
     datetimeCreated: Date = null;
     datetimeModified: Date = null;
     fromDate: Date = null;
@@ -74,9 +74,18 @@ export class Receipt {
 }
 
 export class ReceiptModel extends Receipt {
-    id: string = null;
+    customerName: string = null;
     payments: ReceiptInvoiceModel[] = [];
-    userCreated: string = null;
-    userModified: string = null;
+    userNameCreated: string = null;
+    userNameModified: string = null;
+    constructor(object?: any) {
+        super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
 }
 

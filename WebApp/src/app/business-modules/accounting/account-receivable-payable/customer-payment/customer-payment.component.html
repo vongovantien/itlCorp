@@ -31,14 +31,22 @@
                                                                 <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn" [class.invalid-row]="cps.syncStatus === 'Rejected'">
                                                                     <td class="table-actions-col">
                                                                         <div class="table-actions">
-                                                                            <button type="button" class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove" (click)="prepareDeleteCP(cps)" *ngIf="(cps.status === 'Draft')">
-                                                            <i class="la la-trash"></i>
-                                                            </button>
+                                                                            <button type="button" class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove" (click)="checkAllowDelete(cps)" *ngIf="(cps.status === 'Draft')">
+                                                                            <i class="la la-trash"></i>
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-warning btn-sm  m-btn--icon m-btn--icon-only" title="Cancel" *ngIf="(cps.status === 'Done')">
+                                                                                <i class="la la-ban"></i>
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-dark btn-sm  m-btn--icon m-btn--icon-only" title="Lock" *ngIf="(cps.status === 'Cancel')">
+                                                                                    <i class="la la-lock"></i>
+                                                                             </button>
                                                                         </div>
                                                                     </td>
 
                                                                     <td class="text-underline">
-                                                                        <a class="pointer" (click)="viewDetail(cps.id)">{{cps.paymentRefNo}}</a>
+                                                                        <div *ngIf="cps.status != 'Cancel'; else CancelNo">
+                                                                            <span><a class="pointer" (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}</a></span></div>
+                                                                        <ng-template #CancelNo><span>{{cps.paymentRefNo}}</span></ng-template>
                                                                     </td>
 
                                                                     <td>

@@ -7,7 +7,7 @@ import {
 import { AccountingRepo } from "src/app/shared/repositories";
 import { catchError, finalize } from "rxjs/operators";
 import { AppList, IPermissionBase } from "src/app/app.list";
-import { ReceiptModel, User } from "src/app/shared/models";
+import { Receipt, ReceiptModel, User } from "src/app/shared/models";
 import { ToastrService } from "ngx-toastr";
 import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
@@ -27,6 +27,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     CPs: ReceiptModel[] = [];
     selectedCPs: ReceiptModel = null;
     messageDelete: string = "";
+
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService,
@@ -39,12 +40,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.requestSort = this.sortCPsList;
         this.requestSort = this.sortLocal;
     }
-    checkAllowDetail(T: any): void {
-        throw new Error("Method not implemented.");
-    }
-    checkAllowDelete(T: any): void {
-        throw new Error("Method not implemented.");
-    }
+
+
     ngOnInit() {
         this.headers = [
             { title: 'Payment Ref No', field: 'paymentRefNo', sortable: true },
@@ -58,13 +55,39 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             { title: 'Description', field: 'description', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Creator', field: 'userNameCreated', sortable: true },
-            { title: 'Create Date', field: 'datetimeCreate', sortable: true },
+            { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
         this.getCPs();
     }
 
+    checkAllowDetail(data: ReceiptModel) {
+        this._accountingRepo
+            .checkAllowGetDetailCPS(data.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${data.id}`]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+
+    }
+
+    checkAllowDelete(data: ReceiptModel) {
+        this._accountingRepo
+            .checkAllowDeleteCusPayment(data.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.selectedCPs = new ReceiptModel(data);
+                    this.messageDelete = `Do you want to delete Receipt ${data.paymentRefNo} ? `;
+                    this.confirmPopup.show();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
 
     getCPs() {
         this.isLoading = true;
@@ -83,9 +106,9 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                 })
             )
             .subscribe((res: any) => {
-                console.log(res);
+                // console.log(res);
                 this.CPs = (res.data || []).map((item: ReceiptModel) => new ReceiptModel(item));
-                console.log(this.CPs);
+                // console.log(this.CPs);
                 this.totalItems = res.totalItems || 0;
             });
     }
@@ -98,19 +121,19 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     sortCPsList(sortField: string, order: boolean) {
         this.CPs = this._sortService.sort(this.CPs, sortField, order);
     }
-    prepareDeleteCP(cpItem: ReceiptModel) {
-        this._accountingRepo
-            .checkAllowDeleteCusPayment(cpItem.id)
-            .subscribe((value: boolean) => {
-                if (value) {
-                    this.selectedCPs = new ReceiptModel(cpItem);
-                    this.messageDelete = `Do you want to delete Receipt ${cpItem.paymentRefNo} ? `;
-                    this.confirmPopup.show();
-                } else {
-                    this.permissionPopup.show();
-                }
-            });
-    }
+    // prepareDeleteCP(cpItem: ReceiptModel) {
+    //     this._accountingRepo
+    //         .checkAllowDeleteCusPayment(cpItem.id)
+    //         .subscribe((value: boolean) => {
+    //             if (value) {
+    //                 this.selectedCPs = new ReceiptModel(cpItem);
+    //                 this.messageDelete = `Do you want to delete Receipt ${cpItem.paymentRefNo} ? `;
+    //                 this.confirmPopup.show();
+    //             } else {
+    //                 this.permissionPopup.show();
+    //             }
+    //         });
+    // }
     onConfirmDeleteCP() {
         this._progressRef.start();
         this._accountingRepo
@@ -134,17 +157,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.CPs = this._sortService.sort(this.CPs, sort, this.order);
     }
 
-    viewDetail(id: string) {
-        this._accountingRepo
-            .checkAllowGetDetailCPS(id)
-            .subscribe((value: boolean) => {
-                if (value) {
-                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${id}`]);
-                } else {
-                    this.permissionPopup.show();
-                }
-            });
-    }
+
 
     onSelectTab(tab: string) {
         switch (tab) {
