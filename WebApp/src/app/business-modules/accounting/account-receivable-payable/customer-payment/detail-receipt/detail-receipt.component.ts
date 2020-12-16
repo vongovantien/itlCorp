@@ -99,21 +99,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.summary.invoices = [...(res.payments || [])];
         this.summary.calculateInfodataInvoice([...res.payments] || []);
     }
-
-    checkValidateBalance(invoices: ReceiptInvoiceModel[], finalPaid: number = 0, balance: number = 0) {
-        let valid: boolean = true;
-        if (this.receiptDetail.status !== AccountingConstants.RECEIPT_STATUS.DRAFT) {
-            return true;
-        }
-        const paidAmount = invoices.filter(x => x.type !== 'ADV').reduce((acc: number, curr: ReceiptInvoiceModel) => acc += (curr.paidAmount + curr.invoiceBalance), 0);
-        if (+paidAmount + balance !== finalPaid) {
-            valid = false;
-        }
-
-        return valid;
-    }
-
-
     onSaveDataReceipt(model: ReceiptModel, actionString: string) {
         model.id = this.receiptDetail.id;
         model.userCreated = this.receiptDetail.userCreated;
