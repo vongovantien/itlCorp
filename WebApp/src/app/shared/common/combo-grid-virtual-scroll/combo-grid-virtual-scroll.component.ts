@@ -167,26 +167,32 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     setCurrentActiveItemId(data: any) {
-        if (data.value != null) {
-            this.CurrentActiveItemIdObj = data;
-            if (!!this.ConstDataSources.length) {
-                const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
-                if (itemIndex !== -1) {
-                    this.indexSelected = itemIndex;
-                    this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
-                } else if (!!data.hardValue) {
+        // * Ưu tiên hiển thị hardValue
+        if (data.hardValue) {
+            this.displaySelectedStr = data.hardValue;
+        } else {
+            if (data.value != null) {
+                this.CurrentActiveItemIdObj = data;
+                if (!!this.ConstDataSources.length) {
+                    const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
+                    if (itemIndex !== -1) {
+                        this.indexSelected = itemIndex;
+                        this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
+                    } else if (!!data.hardValue) {
+                        this.displaySelectedStr = data.hardValue;
+                    }
+                }
+
+            } else {
+                this.indexSelected = -1;
+                if (!!data.hardValue) {
                     this.displaySelectedStr = data.hardValue;
+                } else {
+                    this.displaySelectedStr = null;
                 }
             }
-
-        } else {
-            this.indexSelected = -1;
-            if (!!data.hardValue) {
-                this.displaySelectedStr = data.hardValue;
-            } else {
-                this.displaySelectedStr = null;
-            }
         }
+
     }
 
     removeCurrenActiveItem() {
