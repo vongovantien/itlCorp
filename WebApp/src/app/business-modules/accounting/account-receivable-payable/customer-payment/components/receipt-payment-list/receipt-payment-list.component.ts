@@ -56,7 +56,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         { title: 'Type', field: 'type' },
         { title: 'Partner Name', field: 'partnerName' },
         { title: 'Taxcode', field: 'taxCode' },
-        { title: 'Unpaid Amount', field: 'unpaidAmount' },
+        // { title: 'Unpaid Amount', field: 'unpaidAmount' },
         { title: 'Paid Amount', field: 'paidAmount' },
         { title: 'Balance Amount', field: 'invoiceBalance' },
         { title: 'Payment Status', field: 'paymentStatus' },

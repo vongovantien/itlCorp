@@ -151,7 +151,8 @@ namespace eFMS.API.Catalogue.Controllers
             var sale = model.SaleService.Split(";").ToArray();
             var dataContract = catContractService.Get(x=>x.PartnerId == model.PartnerId).ToList();
             var arrayOffice = new HashSet<string>(model.OfficeId.Split(';'));
-            var dataCheck = dataContract.Where(x =>( !string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s)) ) && ( !string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o)) ) && ( x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId )).ToList();
+            var dataCheck = model.Id != Guid.Empty ? dataContract.Where(x =>( !string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s)) ) && ( !string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o)) ) && ( x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId ) && x.Id != model.Id).ToList() :
+            dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId)).ToList();
             if (model.Id != Guid.Empty)
             {
                 if (model.ContractType != "Official")

@@ -177,7 +177,7 @@
                                         <td class="text-left">{{invoice.receiptExcPaidAmount | number: '.0-3'}}
                                         </td>
                                         <td>{{invoice.invoiceBalance | number: '.0-3'}} {{invoice.currency}}</td>
-                                        <td class="text-left">{{invoice.receiptExcInvoicebalance | number: '.0-3'}}
+                                        <td class="text-left">{{invoice.receiptExcInvoiceBalance | number: '.0-3'}}
                                         </td>
                                         <td>
                                             <ng-container [ngSwitch]="invoice.paymentStatus">
@@ -227,13 +227,13 @@
                         <td>{{invoice.type}}</td>
                         <td class="text-info">{{invoice.partnerName}}</td>
                         <td>{{invoice.taxCode}}</td>
-                        <td>
+                        <!-- <td>
                             {{invoice.unpaidAmount | number: '.0-3'}}
-                        </td>
+                        </td> -->
                         <td>
                             {{invoice.paidAmount | number: '.0-3'}}
                         </td>
-                        <td class="text-left">{{invoice.invoiceBalance | number: '.0-3'}}
+                        <td class="text-left">{{invoice.receiptExcInvoiceBalance | number: '.0-3'}}
                         </td>
                         <td>
                             <ng-container [ngSwitch]="invoice.paymentStatus">
