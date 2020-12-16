@@ -1712,7 +1712,8 @@ namespace eFMS.API.Documentation.DL.Services
                     HBLNo = string.Join(";", x.Select(i => i.HBLNo)),
                     Total = x.Sum(y => y.Total),
                     Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
-                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId)) ? "Issued Voucher" : "New"
+                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId)) ? "Issued Voucher" : "New",
+                    VoucherId = x.FirstOrDefault().VoucherId
                 });
             cdNotesGroupByCurrency = GetByStatus(criteria.Status, cdNotesGroupByCurrency);
 
@@ -1767,7 +1768,8 @@ namespace eFMS.API.Documentation.DL.Services
                             HBLNo = charge.HBLNo,
                             Status = charge.Status,
                             SyncStatus = cd.SyncStatus,
-                            LastSyncDate = cd.LastSyncDate
+                            LastSyncDate = cd.LastSyncDate,
+                            VoucherId = charge.VoucherId
                         })?.AsQueryable();
             var results = new List<CDNoteModel>();
             foreach (var item in data)
