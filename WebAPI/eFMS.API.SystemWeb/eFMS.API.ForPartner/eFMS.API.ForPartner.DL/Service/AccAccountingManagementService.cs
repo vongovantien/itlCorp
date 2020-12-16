@@ -32,7 +32,6 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<AcctSettlementPayment> acctSettlementRepo;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepo;
-        private readonly IActionFuncLogService actionFuncLogService;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
         private readonly IContextBase<CatCurrencyExchange> currencyExchangeRepo;
         private readonly IContextBase<SysNotifications> sysNotificationRepository;
@@ -55,7 +54,6 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<AcctSettlementPayment> acctSettlementPayment,
             IContextBase<AcctCdnote> acctCdnote,
-            IActionFuncLogService actionFuncLog,
             IContextBase<AcctSettlementPayment> settlementPayment,
             IContextBase<CatCurrencyExchange> currencyExchange,
             IContextBase<SysNotifications> sysNotifyRepo,
@@ -75,7 +73,6 @@ namespace eFMS.API.ForPartner.DL.Service
             currencyExchangeService = exchangeService;
             acctSettlementRepo = acctSettlementPayment;
             acctCdNoteRepo = acctCdnote;
-            actionFuncLogService = actionFuncLog;
             settlementPaymentRepo = settlementPayment;
             currencyExchangeRepo = currencyExchange;
             sysNotificationRepository = sysNotifyRepo;
