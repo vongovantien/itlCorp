@@ -17,7 +17,7 @@
                         <div class="c-button-actions">
                             <ng-container *ngIf="receiptDetail?.status === 'Draft'">
                                 <app-permission-button title="Save Draft" class="primary" [icon]="'la la-check'"
-                                    (onClick)="saveReceipt('update')">
+                                    (onClick)="submitClick('update')">
                                 </app-permission-button>
                                 <app-permission-button type="save" title="Done" class="success"
                                     (onClick)="confirmDoneReceiptPopup.show()">
@@ -27,7 +27,7 @@
                             <ng-container *ngIf="receiptDetail?.status === 'Done'">
 
                                 <app-permission-button title="Cancel Receipt" type="reject" class="danger"
-                                    icon="la la-times" (onClick)="saveReceipt('cancel')">
+                                    icon="la la-times" (onClick)="submitClick('cancel')">
                                 </app-permission-button>
 
                                 <app-permission-button title="Sync to Accountant" type="sync" class="info"
@@ -95,7 +95,7 @@
     [labelConfirm]="'Yes'" body="Are you sure you want to sync data to accountant system ?"
     iconConfirm="la la-cloud-upload"></confirm-popup>
 
-<confirm-popup #confirmDoneReceiptPopup (onSubmit)="confirmDoneReceiptPopup.hide();saveReceipt('done')"
+<confirm-popup #confirmDoneReceiptPopup (onSubmit)="confirmDoneReceiptPopup.hide();submitClick('done')"
     [labelConfirm]="'Yes'" labelCancel="No"
     body="Noted: After you save the receipt, you can not edit. Are you sure do this action?" iconConfirm="la la-save">
 </confirm-popup>

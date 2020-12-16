@@ -40,6 +40,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         { field: 'contractType', label: 'Contract Type' },
     ];
     isReadonly = null;
+    customerName: string;
 
     constructor(
         private _fb: FormBuilder,
@@ -54,12 +55,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         super();
     }
     ngOnInit() {
-
         this.initForm();
 
-        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-
         if (!this.isUpdate) {
+            this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
             this.generateReceiptNo();
         }
 

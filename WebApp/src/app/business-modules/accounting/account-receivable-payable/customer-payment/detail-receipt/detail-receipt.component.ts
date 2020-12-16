@@ -1,18 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ARCustomerPaymentCreateReciptComponent, SaveReceiptActionEnum } from '../create-receipt/create-receipt.component';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { AccountingRepo } from '@repositories';
-import { Router, ActivatedRoute } from '@angular/router';
-import { ReceiptModel, ReceiptInvoiceModel } from '@models';
+import { ReceiptModel } from '@models';
 import { SystemConstants, AccountingConstants } from '@constants';
-import { HttpErrorResponse } from '@angular/common/http';
-import { pluck, switchMap, tap, concatMap } from 'rxjs/operators';
+
 import { ARCustomerPaymentReceiptSummaryComponent } from '../components/receipt-summary/receipt-summary.component';
+import { ARCustomerPaymentCreateReciptComponent, SaveReceiptActionEnum } from '../create-receipt/create-receipt.component';
+
 import { of } from 'rxjs';
+import { pluck, switchMap, tap, concatMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-detail-receipt',
     templateUrl: './detail-receipt.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCreateReciptComponent implements OnInit {
     @ViewChild(ARCustomerPaymentReceiptSummaryComponent) summary: ARCustomerPaymentReceiptSummaryComponent;
@@ -30,11 +33,17 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     }
 
     ngOnInit() {
+        this.subscriptRouterChangeToGetDetailReceipt();
+
+        this.initSubmitClickSubscription((actionType: string) => this.saveReceipt(actionType));
+    }
+
+    subscriptRouterChangeToGetDetailReceipt() {
         this._activedRoute.params
             .pipe(
                 pluck('id'),
                 tap((id: string) => { this.receiptId = id }),
-                switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(this.receiptId))
+                switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(receiptId))
             )
             .subscribe(
                 (res: ReceiptModel) => {
@@ -44,15 +53,9 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                             return;
                         }
                         this.updateDetailForm(res);
-
-                    } else {
-                        this.gotoList();
-                    }
-
+                    } else this.gotoList();
                 },
-                (err) => {
-                    this.gotoList();
-                }
+                (err) => this.gotoList()
             );
     }
 
@@ -74,7 +77,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         };
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
-
+        this.formCreate.customerName = res.customerName;
         this.formCreate.isReadonly = true;
 
     }
