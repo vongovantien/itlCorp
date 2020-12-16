@@ -1,85 +1,148 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { RoutingConstants } from '@constants';
-import { TrialOfficialOtherModel } from '@models';
-import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo } from '@repositories';
-import { SortService } from '@services';
-import { catchError, finalize } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
+import { Component, ViewChild } from "@angular/core";
+import {
+    ConfirmPopupComponent,
+    InfoPopupComponent,
+    Permission403PopupComponent
+} from "src/app/shared/common/popup";
+import { AccountingRepo } from "src/app/shared/repositories";
+import { catchError, finalize } from "rxjs/operators";
+import { AppList } from "src/app/app.list";
+import { Receipt, User } from "src/app/shared/models";
+import { ToastrService } from "ngx-toastr";
+import { SortService } from "src/app/shared/services";
+import { NgProgress } from "@ngx-progressbar/core";
+import { Router } from "@angular/router";
+import { RoutingConstants, SystemConstants } from "@constants";
+
 
 @Component({
     selector: 'app-customer-payment',
     templateUrl: './customer-payment.component.html',
 })
-export class ARCustomerPaymentComponent extends AppList implements OnInit {
-
-
-    trialOfficialList: TrialOfficialOtherModel[] = [];
-
+export class ARCustomerPaymentComponent extends AppList {
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    headers: CommonInterface.IHeaderTable[];
+    CPs: Receipt[] = [];
+    selectedCPs: Receipt = null;
+    messageDelete: string = "";
+    userLogged: User;
     constructor(
         private _sortService: SortService,
+        private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _router: Router,
         private _accountingRepo: AccountingRepo,
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestSort = this.sortTrialOfficalList;
-        this.requestList = this.getPagingList;
+        this.requestSort = this.sortCPsList;
+        this.requestSort = this.sortLocal;
     }
     ngOnInit() {
-
         this.headers = [
-            { title: 'Payment Ref No', field: 'paymentrefno', sortable: true },
-            { title: 'Customer Name', field: 'customername', sortable: true },
-            { title: 'Payment Amount', field: 'paymentamount', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Billing Date', field: 'billingdate', sortable: true },
-            { title: 'Sync Status', field: 'syncstatus', sortable: true },
-            { title: 'Lost Sync', field: 'lostsync', sortable: true },
+            { title: 'Payment Ref No', field: 'paymentRefNo', sortable: true },
+            { title: 'Customer Name', field: 'customerName', sortable: true },
+            { title: 'Payment Amount', field: 'paidAmount', sortable: true },
+            { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'Paid Date', field: 'paymentDate', sortable: true },
+            { title: 'Billing Date', field: 'billingDate', sortable: true },
+            { title: 'Sync Status', field: 'syncStatus', sortable: true },
+            { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
             { title: 'Description', field: 'description', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
-            { title: 'Creator', field: 'creator', sortable: true },
-            { title: 'Create Date', field: 'createdate', sortable: true },
-            { title: 'Modifie Date', field: 'modeifiedate', sortable: true },
+            { title: 'Creator', field: 'userNameCreated', sortable: true },
+            { title: 'Create Date', field: 'datetimeCreate', sortable: true },
+            { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
-
-
+        this.getUserLogged();
+        this.getCPs();
+    }
+    getUserLogged() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.dataSearch = { userCreated: this.userLogged.id };
     }
 
-    sortTrialOfficalList(sortField: string, order: boolean) {
-        this.trialOfficialList = this._sortService.sort(this.trialOfficialList, sortField, order);
-    }
-
-    getPagingList() {
-        this._progressRef.start();
+    getCPs() {
         this.isLoading = true;
-
-        this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._progressRef.start();
+        this._accountingRepo
+            .getListCustomerPayment(
+                this.page,
+                this.pageSize,
+                Object.assign({}, this.dataSearch)
+            )
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
-                    this._progressRef.complete();
                     this.isLoading = false;
+                    this._progressRef.complete();
                 })
-            ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.trialOfficialList = (res.data || []).map((item: TrialOfficialOtherModel) => new TrialOfficialOtherModel(item));
-                    this.totalItems = res.totalItems;
-                },
-            );
+            )
+            .subscribe((res: any) => {
+                console.log(res);
+                this.CPs = (res.data || []).map((item: Receipt) => new Receipt(item));
+                console.log(this.CPs);
+                this.totalItems = res.totalItems || 0;
+            });
+    }
+    onSearchCPs(data: any) {
+        this.page = 1;
+        this.dataSearch = data;
+        this.getCPs();
+
+    }
+    sortCPsList(sortField: string, order: boolean) {
+        this.CPs = this._sortService.sort(this.CPs, sortField, order);
+    }
+    prepareDeleteCP(cpItem: Receipt) {
+        this._accountingRepo
+            .checkAllowDeleteCusPayment(cpItem.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this.selectedCPs = new Receipt(cpItem);
+                    this.messageDelete = `Do you want to delete Receipt ${cpItem.paymentRefNo} ? `;
+                    this.confirmPopup.show();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+    onConfirmDeleteCP() {
+        this._progressRef.start();
+        this._accountingRepo
+            .deleteCusPayment(this.selectedCPs.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.confirmPopup.hide();
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe((res: any) => {
+                this._toastService.success(res.message, "", {
+                    positionClass: "toast-bottom-right"
+                });
+                // * search cps when success.
+                this.onSearchCPs(this.dataSearch);
+            });
+    }
+    sortLocal(sort: string): void {
+        this.CPs = this._sortService.sort(this.CPs, sort, this.order);
     }
 
-    //
-    viewDetail(agreementId: string) {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
-            queryParams: {
-                agreementId: agreementId,
-
-            }
-        });
+    viewDetail(id: string) {
+        this._accountingRepo
+            .checkAllowGetDetailCPS(id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${id}`]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
     }
 
     onSelectTab(tab: string) {

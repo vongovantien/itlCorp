@@ -1,22 +1,20 @@
-import { Component, Output, EventEmitter, OnInit, Input, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Data } from '@angular/router';
-import { SystemConstants, JobConstants } from '@constants';
-import { CommonEnum } from '@enums';
-import { Currency, Customer, Partner, User, ReceiptInvoiceModel } from '@models';
-import { Store } from '@ngrx/store';
-import { CatalogueRepo, SystemRepo, AccountingRepo } from '@repositories';
-import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, IAppState } from '@store';
-import { Moment } from 'moment';
-import { Observable } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
-import { AppForm } from 'src/app/app.form';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
+import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
-import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
+
+import { JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { Partner, } from '@models';
+import { CatalogueRepo, SystemRepo, AccountingRepo } from '@repositories';
+import { IAppState } from '@store';
+import { AppForm } from '@app';
 import { DataService } from '@services';
 import { ComboGridVirtualScrollComponent } from '@common';
 
+import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
+import { Observable } from 'rxjs';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
@@ -26,15 +24,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
 
     formSearchInvoice: FormGroup;
-    customerId: AbstractControl; // load partner
+    customerId: AbstractControl;
     date: AbstractControl;
     paymentRefNo: AbstractControl;
-    agreement: AbstractControl;
+    agreementId: AbstractControl;
 
 
     $customers: Observable<Partner[]>;
     agreements: IAgreementReceipt[];
-
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
@@ -42,6 +39,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         { field: 'contractNo', label: 'Contract No' },
         { field: 'contractType', label: 'Contract Type' },
     ];
+    isReadonly = null;
+
     constructor(
         private _fb: FormBuilder,
         private _store: Store<IAppState>,
@@ -58,7 +57,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
         this.initForm();
 
-        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
 
         if (!this.isUpdate) {
             this.generateReceiptNo();
@@ -68,16 +67,16 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     initForm() {
         this.formSearchInvoice = this._fb.group({
-            customerId: [null, Validators.required],
+            customerId: new FormControl(null, Validators.required),
             date: [],
-            paymentRefNo: [null, Validators.required],
-            agreement: [null]
+            paymentRefNo: new FormControl(null, Validators.required),
+            agreementId: [null]
             // agreement: [null, Validators.required]
         });
         this.customerId = this.formSearchInvoice.controls['customerId'];
         this.date = this.formSearchInvoice.controls['date'];
         this.paymentRefNo = this.formSearchInvoice.controls['paymentRefNo'];
-        this.agreement = this.formSearchInvoice.controls['agreement'];
+        this.agreementId = this.formSearchInvoice.controls['agreementId'];
 
     }
 
@@ -106,19 +105,19 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                             if (!!d) {
                                 this.agreements = d || [];
                                 if (!!this.agreements.length) {
-                                    this.agreement.setValue(d[0].id);
+                                    this.agreementId.setValue(d[0].id);
 
                                     this.onSelectDataFormInfo(d[0], 'agreement');
                                 } else {
                                     this.combogrid.displaySelectedStr = '';
-                                    this.agreement.setValue(null);
+                                    this.agreementId.setValue(null);
                                 }
                             }
                         }
                     );
                 break;
             case 'agreement':
-                this.agreement.setValue((data as IAgreementReceipt).id);
+                this.agreementId.setValue((data as IAgreementReceipt).id);
                 this._dataService.setData('cus-advance', (data as IAgreementReceipt).cusAdvanceAmount);
                 break;
             default:
@@ -133,7 +132,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
         const body = {
             customerId: this.customerId.value,
-            agreementId: this.agreement.value,
+            agreementId: this.agreementId.value,
             fromDate: !!this.date.value?.startDate ? formatDate(this.date.value?.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
         };

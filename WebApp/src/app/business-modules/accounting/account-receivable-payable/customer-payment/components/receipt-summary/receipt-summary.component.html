@@ -1,4 +1,4 @@
-<div class="m-portlet">
+<div class="m--margin-top-20">
     <div class="m-portlet__head alert-block__heading pointer">
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title">
@@ -16,16 +16,15 @@
                     <thead app-table-header [headers]="headers" [align]="left">
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="!!invoices.length">
+                        <ng-container *ngIf="!!invoices?.length">
                             <tr>
                                 <td>Amount</td>
-                                <td>{{invoices | sum:'paidAmount'}}</td>
-                                <td>{{invoices | sum:'paidAmount'}}</td>
-                                <td>{{invoices | sum:'paidAmount'}}</td>
+                                <td>{{totalDebit | number:'.0-3'}}</td>
+                                <td>{{totalOBH | number:'.0-3'}}</td>
+                                <td>{{totalAdv | number:'.0-3'}}</td>
                             </tr>
                         </ng-container>
-
-                        <tr app-table-none-record *ngIf="!invoices.length"></tr>
+                        <tr app-table-none-record *ngIf="!invoices?.length"></tr>
                     </tbody>
                 </table>
             </div>

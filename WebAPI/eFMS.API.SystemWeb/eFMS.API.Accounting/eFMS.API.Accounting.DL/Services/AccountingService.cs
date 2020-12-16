@@ -530,8 +530,14 @@ namespace eFMS.API.Accounting.DL.Services
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                         charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+                        charge.AccountNo = string.Empty;
+                        charge.ContraAccount = string.Empty;
+                        charge.VATAccount = string.Empty;
+                        charge.AtchDocNo = surcharge.InvoiceNo;
+                        charge.AtchDocDate = surcharge.InvoiceDate;
+                        charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
-
+                        
                         charges.Add(charge);
                     }
                     sync.Details = charges;
@@ -860,63 +866,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 adv.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
                                 AdvanceRepository.Update(adv, x => x.Id == id, false);
-
-                                // Notify
-                                SysNotifications sysNotify = new SysNotifications
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Action = "Detail",
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    IsClosed = false,
-                                    IsRead = false,
-                                    Type = "User",
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                    Title = string.Format(@"Advance {0} has been synced", adv.AdvanceNo),
-                                    Description = "",
-                                    ActionLink = string.Format(@"home/accounting/advance-payment/{0}/approve", adv.Id),
-                                    UserIds = currentUser.UserID + "," + adv.UserCreated,
-                                };
-
-                                sysNotifyRepository.Add(sysNotify, false);
-
-                                SysUserNotification sysUserNotify = new SysUserNotification
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Status = "New",
-                                    NotitficationId = sysNotify.Id,
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    UserId = currentUser.UserID
-                                };
-
-                                sysUserNotifyRepository.Add(sysUserNotify, false);
-                                if (adv.UserCreated != currentUser.UserID)
-                                {
-                                    SysUserNotification sysUserNotifySync = new SysUserNotification
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Status = "New",
-                                        NotitficationId = sysNotify.Id,
-                                        UserCreated = currentUser.UserID,
-                                        UserModified = currentUser.UserID,
-                                        DatetimeCreated = DateTime.Now,
-                                        DatetimeModified = DateTime.Now,
-                                        UserId = adv.UserCreated,
-                                    };
-                                    sysUserNotifyRepository.Add(sysUserNotifySync, false);
-                                }
                             }
-
                         }
                         HandleState hs = AdvanceRepository.SubmitChanges();
                         if (hs.Success)
                         {
-                            sysNotifyRepository.SubmitChanges();
-                            sysUserNotifyRepository.SubmitChanges();
                             trans.Commit();
 
                             data = new List<Guid>();
@@ -974,64 +928,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
                                 SettlementRepository.Update(settle, x => x.Id == id, false);
-                                // Notify
-                                SysNotifications sysNotify = new SysNotifications
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Action = "Detail",
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    IsClosed = false,
-                                    IsRead = false,
-                                    Type = "User",
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                    Title = string.Format(@"Settlement {0} has been synced", settle.SettlementNo),
-                                    Description = "",
-                                    ActionLink = string.Format(@"home/accounting/settlement-payment/{0}/approve", settle.Id),
-                                    UserIds = currentUser.UserID + "," + settle.UserCreated,
-                                };
-
-                                sysNotifyRepository.Add(sysNotify, false);
-
-                                SysUserNotification sysUserNotify = new SysUserNotification
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Status = "New",
-                                    NotitficationId = sysNotify.Id,
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    UserId = currentUser.UserID
-                                };
-
-                                sysUserNotifyRepository.Add(sysUserNotify, false);
-                                if (settle.UserCreated != currentUser.UserID)
-                                {
-                                    SysUserNotification sysUserNotifySync = new SysUserNotification
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Status = "New",
-                                        NotitficationId = sysNotify.Id,
-                                        UserCreated = currentUser.UserID,
-                                        UserModified = currentUser.UserID,
-                                        DatetimeCreated = DateTime.Now,
-                                        DatetimeModified = DateTime.Now,
-                                        UserId = settle.UserCreated,
-                                    };
-                                    sysUserNotifyRepository.Add(sysUserNotifySync, false);
-                                }
                             }
                         }
 
                         result = SettlementRepository.SubmitChanges();
-                        if (result.Success)
-                        {
-                            sysNotifyRepository.SubmitChanges();
-                            sysUserNotifyRepository.SubmitChanges();
-                        }
-
+                      
                         trans.Commit();
                         data = new List<Guid>();
                         return result;
@@ -1084,64 +985,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 voucher.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
                                 DataContext.Update(voucher, x => x.Id == id, false);
-
-                                // Notify
-                                SysNotifications sysNotify = new SysNotifications
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Action = "Detail",
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    IsClosed = false,
-                                    IsRead = false,
-                                    Type = "User",
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                    Title = string.Format(@"Voucher {0} has been synced", voucher.VoucherId),
-                                    Description = "",
-                                    ActionLink = string.Format(@"home/accounting/management/voucher/{0}", voucher.Id),
-                                    UserIds = currentUser.UserID + "," + voucher.UserCreated,
-                                };
-
-                                sysNotifyRepository.Add(sysNotify, false);
-
-                                SysUserNotification sysUserNotify = new SysUserNotification
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Status = "New",
-                                    NotitficationId = sysNotify.Id,
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    UserId = currentUser.UserID,
-                                };
-
-                                sysUserNotifyRepository.Add(sysUserNotify, false);
-                                if (voucher.UserCreated != currentUser.UserID)
-                                {
-                                    SysUserNotification sysUserNotifySync = new SysUserNotification
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Status = "New",
-                                        NotitficationId = sysNotify.Id,
-                                        UserCreated = currentUser.UserID,
-                                        UserModified = currentUser.UserID,
-                                        DatetimeCreated = DateTime.Now,
-                                        DatetimeModified = DateTime.Now,
-                                        UserId = voucher.UserCreated
-                                    };
-                                    sysUserNotifyRepository.Add(sysUserNotifySync, false);
-                                }
                             }
                         }
 
                         result = DataContext.SubmitChanges();
-                        if (result.Success)
-                        {
-                            sysNotifyRepository.SubmitChanges();
-                            sysUserNotifyRepository.SubmitChanges();
-                        }
+                      
                         trans.Commit();
 
                         data = new List<Guid>();
@@ -1180,59 +1028,8 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         cdNote.LastSyncDate = DateTime.Now;
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
-
-                        string description = string.Format(@"CD Note {0} has been synced", cdNote.Code);
-                        // Add Notification
-                        SysNotifications sysNotification = new SysNotifications
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = description,
-                            Description = "",
-                            Type = "User",
-                            UserCreated = currentUser.UserID,
-                            DatetimeCreated = DateTime.Now,
-                            DatetimeModified = DateTime.Now,
-                            UserModified = currentUser.UserID,
-                            Action = "Detail",
-                            ActionLink = GetLinkCdNote(cdNote.Code, cdNote.JobId),
-                            IsClosed = false,
-                            IsRead = false,
-                            UserIds = currentUser.UserID + "," + cdNote.UserCreated,
-                        };
-                        HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
-                        if (hsSysNotification.Success)
-                        {
-                            SysUserNotification userNotifySync = new SysUserNotification
-                            {
-                                Id = Guid.NewGuid(),
-                                DatetimeCreated = DateTime.Now,
-                                DatetimeModified = DateTime.Now,
-                                Status = "New",
-                                NotitficationId = sysNotification.Id,
-                                UserId = currentUser.UserID,
-                                UserCreated = currentUser.UserID,
-                                UserModified = currentUser.UserID,
-                            };
-                            var hsUserSync = sysUserNotifyRepository.Add(userNotifySync, false);
-                            if (cdNote.UserCreated != currentUser.UserID)
-                            {
-                                SysUserNotification userNotifyCreated = new SysUserNotification
-                                {
-                                    Id = Guid.NewGuid(),
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    Status = "New",
-                                    NotitficationId = sysNotification.Id,
-                                    UserId = cdNote.UserCreated,
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                };
-                                var hsUserCreated = sysUserNotifyRepository.Add(userNotifyCreated, false);
-                            }
-                        }
                     }
-                    var smNotify = sysNotifyRepository.SubmitChanges();
-                    var smUserNotify = sysUserNotifyRepository.SubmitChanges();
+                  
                     var sm = cdNoteRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -1264,59 +1061,8 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         soa.LastSyncDate = DateTime.Now;
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
-
-                        string description = string.Format(@"SOA No {0} has been synced", soa.Soano);
-                        // Add Notification
-                        SysNotifications sysNotification = new SysNotifications
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = description,
-                            Description = "",
-                            Type = "User",
-                            UserCreated = currentUser.UserID,
-                            DatetimeCreated = DateTime.Now,
-                            DatetimeModified = DateTime.Now,
-                            UserModified = currentUser.UserID,
-                            Action = "Detail",
-                            ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency=VND", soa.Soano),
-                            IsClosed = false,
-                            IsRead = false,
-                            UserIds = soa.UserCreated + "," + currentUser.UserID,
-                        };
-                        HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
-                        if (hsSysNotification.Success)
-                        {
-                            SysUserNotification userNotifySync = new SysUserNotification
-                            {
-                                Id = Guid.NewGuid(),
-                                DatetimeCreated = DateTime.Now,
-                                DatetimeModified = DateTime.Now,
-                                Status = "New",
-                                NotitficationId = sysNotification.Id,
-                                UserId = currentUser.UserID,
-                                UserCreated = currentUser.UserID,
-                                UserModified = currentUser.UserID,
-                            };
-                            var hsUserSync = sysUserNotifyRepository.Add(userNotifySync, false);
-                            if (soa.UserCreated != currentUser.UserID)
-                            {
-                                SysUserNotification userNotifyCreated = new SysUserNotification
-                                {
-                                    Id = Guid.NewGuid(),
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    Status = "New",
-                                    NotitficationId = sysNotification.Id,
-                                    UserId = soa.UserCreated,
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                };
-                                var hsUserCreated = sysUserNotifyRepository.Add(userNotifyCreated, false);
-                            }
-                        }
                     }
-                    var smNotify = sysNotifyRepository.SubmitChanges();
-                    var smUserNotify = sysUserNotifyRepository.SubmitChanges();
+                   
                     var sm = soaRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -1800,59 +1546,7 @@ namespace eFMS.API.Accounting.DL.Services
                         receipt.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         receipt.LastSyncDate = DateTime.Now;
                         var hsUpdateReceipt = receiptRepository.Update(receipt, x => x.Id == receipt.Id, false);
-
-                        string description = string.Format(@"Receipt {0} has been synced", receipt.PaymentRefNo);
-                        // Add Notification
-                        SysNotifications sysNotification = new SysNotifications
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = description,
-                            Description = "",
-                            Type = "User",
-                            UserCreated = currentUser.UserID,
-                            DatetimeCreated = DateTime.Now,
-                            DatetimeModified = DateTime.Now,
-                            UserModified = currentUser.UserID,
-                            Action = "Detail",
-                            ActionLink = "", //Cập nhật sau
-                            IsClosed = false,
-                            IsRead = false,
-                            UserIds = currentUser.UserID + "," + receipt.UserCreated,
-                        };
-                        HandleState hsSysNotification = sysNotifyRepository.Add(sysNotification, false);
-                        if (hsSysNotification.Success)
-                        {
-                            SysUserNotification userNotifySync = new SysUserNotification
-                            {
-                                Id = Guid.NewGuid(),
-                                DatetimeCreated = DateTime.Now,
-                                DatetimeModified = DateTime.Now,
-                                Status = "New",
-                                NotitficationId = sysNotification.Id,
-                                UserId = currentUser.UserID,
-                                UserCreated = currentUser.UserID,
-                                UserModified = currentUser.UserID,
-                            };
-                            var hsUserSync = sysUserNotifyRepository.Add(userNotifySync, false);
-                            if (receipt.UserCreated != currentUser.UserID)
-                            {
-                                SysUserNotification userNotifyCreated = new SysUserNotification
-                                {
-                                    Id = Guid.NewGuid(),
-                                    DatetimeCreated = DateTime.Now,
-                                    DatetimeModified = DateTime.Now,
-                                    Status = "New",
-                                    NotitficationId = sysNotification.Id,
-                                    UserId = receipt.UserCreated,
-                                    UserCreated = currentUser.UserID,
-                                    UserModified = currentUser.UserID,
-                                };
-                                var hsUserCreated = sysUserNotifyRepository.Add(userNotifyCreated, false);
-                            }
-                        }
                     }
-                    var smNotify = sysNotifyRepository.SubmitChanges();
-                    var smUserNotify = sysUserNotifyRepository.SubmitChanges();
                     var sm = receiptRepository.SubmitChanges();
                     trans.Commit();
                     return sm;

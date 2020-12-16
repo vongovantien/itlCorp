@@ -105,6 +105,7 @@
                                             <td class="text-right">{{settlePayment.amount | number: '.0-3'}}</td>
                                             <td>{{settlePayment.settlementCurrency}}</td>
                                             <td class="text-info">{{settlePayment.requesterName}}</td>
+                                            <td class="text-info">{{settlePayment.payeeName}}</td>
                                             <td>{{settlePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                             <td [ngSwitch]="settlePayment.statusApprovalName">
                                                 <div *ngSwitchCase="'New'" class="text-danger">

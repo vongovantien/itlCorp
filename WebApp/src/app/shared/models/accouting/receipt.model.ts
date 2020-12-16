@@ -24,7 +24,7 @@ export class ReceiptInvoiceModel {
     receiptExcPaidAmount: number = null; // * Số tiền thu của invoice theo tỷ giá phiếu thu
 
     invoiceBalance: number = null;
-    receiptInvoicebalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
+    receiptExcInvoicebalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
 
     // * custom
     isSelected: boolean = false;
@@ -47,17 +47,22 @@ export class Receipt {
     customerName: string = null;
     paymentRefNo: string = null;
     paidAmount: string = null;
-    paidDate: string = null;
+    paymentDate: string = null;
     status: string = null;
+    type: string = null;
     currencyId: string = null;
     syncStatus: string = null;
     lastSyncDate: Date = null;
     description: string = null;
     userCreated: string = null;
     userModified: string = null;
-    datetimeCreate: Date = null;
+    datetimeCreated: Date = null;
     datetimeModified: Date = null;
-
+    fromDate: Date = null;
+    toDate: Date = null;
+    customerId: string = null;
+    agreementId: string = null;
+    reasonReject: string = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

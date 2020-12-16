@@ -615,7 +615,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.View.ShowGridLines = false;
 
             SetWidthColumnExcelMAWBAirExport(workSheet);
-            workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Arial", 10));
 
             var _mawb1 = airwayBillExport.MawbNo1?.ToUpper(); //3 ký tự đầu của MAWB
             var _mawb3 = airwayBillExport.MawbNo3?.ToUpper(); //9 ký tự cuối của MAWB (Box 3)
@@ -921,7 +921,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelHAWBAirExport(workSheet);
 
-            workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Arial", 10));
 
             var _mawb1 = airwayBillExport.MawbNo1?.Substring(0, 3).ToUpper(); //3 ký tự đầu của MAWB
             var _mawb2 = airwayBillExport.MawbNo3?.ToUpper(); //Các ký tự cuối của MAWB
@@ -3055,10 +3055,11 @@ namespace eFMS.API.ReportData.FormatExcel
             
             workSheet.Cells["B2:G2"].Merge = true;
             workSheet.Cells["B2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["B2"].Value = "DALY LIST " + issuedDate.Value.ToString("dd MMM yyyy");
+            workSheet.Cells["B2"].Value = "DAILY LIST " + issuedDate.Value.ToString("dd MMM yyyy").ToUpper();
             workSheet.Cells["B2"].Style.Font.Bold = true;
+            workSheet.Cells["B2"].Style.Font.Size = 16;
 
-            for(var c = 1; c < 12; c++)
+            for (var c = 1; c < 12; c++)
             {
                 //Set header
                 workSheet.Cells[4, c].Value = headerTable[c - 1];
@@ -3096,6 +3097,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 rowStart += 1;
                 no += 1;
             }
+
+            //Set WrapText cho cột Shipper
+            workSheet.Column(6).Style.WrapText = true;
 
             //In đậm & căn giữa value list 
             workSheet.Cells["A5:K" + (5 + housebillDailyExport.Count)].Style.Font.Bold = true;

@@ -15,6 +15,9 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Infrastructure.Extensions;
+using ITL.NetCore.Common;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -26,11 +29,15 @@ namespace eFMS.API.Accounting.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctReceiptService acctReceiptService;
+        private readonly ICurrentUser currentUser;
+
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
+            ICurrentUser curUser,
            IAcctReceiptService acctReceipt)
         {
             stringLocalizer = localizer;
             acctReceiptService = acctReceipt;
+            currentUser = curUser;
         }
 
         [HttpPost]
@@ -83,6 +90,27 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(detail);
         }
 
+        [HttpDelete]
+        [Authorize]
+        public IActionResult Delete(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            if (!acctReceiptService.CheckAllowPermissionAction(id, permissionRange))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            HandleState hs = acctReceiptService.Delete(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
         /// <summary>
         /// Save Receipt
         /// </summary>
@@ -99,6 +127,13 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+            {
+                string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
+                var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                return BadRequest(_result);
+            }
 
             //Check exists list invoice/adv
             if (receiptModel.Payments.Count == 0)
@@ -157,7 +192,6 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPost("ProcessInvoice")]
-        //[Authorize]
         public IActionResult ProcessInvoice(ProcessReceiptInvoice criteria)
         {
             if (!ModelState.IsValid)
@@ -166,6 +200,52 @@ namespace eFMS.API.Accounting.Controllers
             }
             ProcessClearInvoiceModel data = acctReceiptService.ProcessReceiptInvoice(criteria);
             return Ok(data);
+        }
+
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            var charge = acctReceiptService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+
+            return Ok(acctReceiptService.CheckAllowPermissionAction(id, permissionRange));
+        }
+
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            var charge = acctReceiptService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            return Ok(acctReceiptService.CheckAllowPermissionAction(id, permissionRange));
+        }
+
+        private bool ValidateReceiptNo(Guid Id, string receiptNo)
+        {
+            bool valid = true;
+            if(Id == Guid.Empty)
+            {
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo);
+            }
+            else
+            {
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id);
+            }
+
+            return valid;
         }
     }
 }

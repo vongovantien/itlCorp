@@ -36,7 +36,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     currencyId: AbstractControl;
     paymentDate: AbstractControl;
     exchangeRate: AbstractControl;
-    bankAcountNo: AbstractControl;
+    bankAccountNo: AbstractControl;
+    description: AbstractControl;
 
     $currencyList: Observable<Currency[]>;
 
@@ -44,9 +45,25 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     paymentMethods: string[] = ['Cash', 'Bank Transfer'];
     receiptTypes: string[] = ['Debit', 'NetOff Adv'];
 
-    customerInfo: Partner;
+    customerInfo: Partner = null;
 
     isSubmitted: boolean = false;
+    isReadonly: boolean = null;  // * DONE | CANCEL
+
+    headerReceiptReadonly: CommonInterface.IHeaderTable[] = [
+        { title: 'Billing Ref No', field: 'invoiceNo' },
+        { title: 'Series No', field: 'serieNo' },
+        { title: 'Type', field: 'type' },
+        { title: 'Partner Name', field: 'partnerName' },
+        { title: 'Taxcode', field: 'taxCode' },
+        { title: 'Unpaid Amount', field: 'unpaidAmount' },
+        { title: 'Paid Amount', field: 'paidAmount' },
+        { title: 'Balance Amount', field: 'invoiceBalance' },
+        { title: 'Payment Status', field: 'paymentStatus' },
+        { title: 'Billing Date', field: 'billingDate' },
+        { title: 'Invoice Date', field: 'invoiceDate' },
+        { title: 'Note', field: 'note' },
+    ];
 
     constructor(
         private _sortService: SortService,
@@ -129,7 +146,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             currencyId: ['VND'],
             paymentDate: [{ startDate: new Date(), endDate: new Date() }],
             exchangeRate: [1, Validators.required],
-            bankAcountNo: [],
+            bankAccountNo: [],
+            description: [],
         });
 
         this.paidAmount = this.form.controls['paidAmount'];
@@ -140,8 +158,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.paymentMethod = this.form.controls['paymentMethod'];
         this.paymentDate = this.form.controls['paymentDate'];
         this.exchangeRate = this.form.controls['exchangeRate'];
-        this.bankAcountNo = this.form.controls['bankAcountNo'];
+        this.bankAccountNo = this.form.controls['bankAccountNo'];
         this.currencyId = this.form.controls['currencyId'];
+        this.description = this.form.controls['description'];
 
     }
 
@@ -277,7 +296,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 (data: IProcessResultModel) => {
                     if (data?.invoices?.length) {
                         this.invoices.length = 0;
-                        this.invoices = data.invoices;
+                        this.invoices = [...data.invoices];
 
                         this.balance.setValue(data.balance);
                     } else {

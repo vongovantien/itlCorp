@@ -3,19 +3,20 @@ import { formatDate } from '@angular/common';
 import { ReceiptModel, ReceiptInvoiceModel } from '@models';
 import { AppForm } from '@app';
 import { Router } from '@angular/router';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, AccountingConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 import { AccountingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
     DRAFT_UPDATE = 1,
     DONE = 2,
-    DISCARD = 3
+    CANCEL = 3
 }
 
 @Component({
@@ -41,7 +42,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     ngOnInit(): void { }
 
-    saveReceipt() {
+    saveReceipt(type: string) {
+        this.formCreate.isSubmitted = true;
+        this.listInvoice.isSubmitted = true;
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
@@ -49,6 +52,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         if (!this.listInvoice.invoices.length) {
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
+            return;
+        }
+        if (this.listInvoice.invoices.some(x => x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID)) {
+            this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
+
             return;
         }
 
@@ -59,14 +67,21 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const receiptModel: ReceiptModel = this.getDataForm();
         receiptModel.payments = this.listInvoice.invoices;
 
-        this.onSaveDataReceipt(receiptModel);
+        if (receiptModel.payments.some(x => x.type === 'ADV')) {
+            receiptModel.payments.forEach(inv => {
+                inv.receiptExcPaidAmount = inv.paidAmount;
+            });
+        }
+
+        this.onSaveDataReceipt(receiptModel, type);
     }
 
     getDataForm() {
         const dataForm: any = Object.assign({}, this.formCreate.formSearchInvoice.getRawValue(), this.listInvoice.form.getRawValue());
 
         const formMapValue: any = {
-            date: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
+            fromDate: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
+            toDate: !!dataForm.date?.endDate ? formatDate(dataForm.date?.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentDate: !!dataForm.paymentDate?.startDate ? formatDate(dataForm.paymentDate?.startDate, 'yyyy-MM-dd', 'en') : null,
             type: dataForm.type?.length ? dataForm.type.toString() : null,
         };
@@ -94,28 +109,29 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         return valid;
     }
 
-    onSaveDataReceipt(model: ReceiptModel) {
+    onSaveDataReceipt(model: ReceiptModel, actionString: string) {
         model.id = SystemConstants.EMPTY_GUID;
-
-        const action = SaveReceiptActionEnum.DRAFT_CREATE;
-        this._accountingRepo.saveReceipt(model, action)
+        this._accountingRepo.saveReceipt(model, SaveReceiptActionEnum.DRAFT_CREATE)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
-                    } else {
-                        this._toastService.error("Create data fail, Please check again!");
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${res.data.id}`]);
+                        return;
                     }
+                    this._toastService.error("Create data fail, Please check again!");
                 },
-                (err) => {
-                    console.log(err);
+                (res: HttpErrorResponse) => {
+                    if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
+                        this.formCreate.paymentRefNo.setErrors({ existed: true });
+                    }
                 }
             )
     };
 
     gotoList() {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/account-receivable-payable/customer/receipt`]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer`]);
 
     }
 }
