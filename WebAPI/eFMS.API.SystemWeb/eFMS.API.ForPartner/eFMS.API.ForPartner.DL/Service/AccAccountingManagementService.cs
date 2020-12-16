@@ -12,10 +12,8 @@ using Microsoft.AspNetCore.Hosting;
 using eFMS.API.Common.Helpers;
 using Microsoft.Extensions.Options;
 using eFMS.API.Common;
-using Newtonsoft.Json;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
-using eFMS.API.Common.Globals;
 using System.Collections.Generic;
 
 namespace eFMS.API.ForPartner.DL.Service
@@ -132,7 +130,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         #region --- CRUD INVOICE ---
-        public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey, string funcController)
+        public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -142,18 +140,6 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
 
             var hsInsertInvoice = InsertInvoice(model, currentUser);
-            
-            #region -- Ghi Log --
-            var modelLog = new SysActionFuncLogModel
-            {
-                FuncLocal = string.Format(@"InsertInvoice ({0})", funcController),
-                ObjectRequest = JsonConvert.SerializeObject(model),
-                ObjectResponse = JsonConvert.SerializeObject(hsInsertInvoice),
-                Major = "Tạo Hóa Đơn"
-            };
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
-            #endregion
-            
             return hsInsertInvoice;
         }
 
@@ -211,7 +197,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                 var invoiceDebit = debitCharges.Count > 0 ? ModelInvoiceDebit(model, partner, debitCharges, _currentUser) : null;
                 var invoiceObh = obhCharges.Count > 0 ? ModelInvoiceObh(model, partner, obhCharges, _currentUser) : null;
-                
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -361,7 +347,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return new HandleState();
         }
 
-        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey, string funcController)
+        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -371,18 +357,6 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
 
             var hsDeleteInvoice = DeleteInvoice(model, currentUser);
-
-            #region -- Ghi Log --
-            var modelLog = new SysActionFuncLogModel
-            {
-                FuncLocal = string.Format(@"DeleteInvoice ({0})", funcController),
-                ObjectRequest = JsonConvert.SerializeObject(model),
-                ObjectResponse = JsonConvert.SerializeObject(hsDeleteInvoice),
-                Major = "Xóa Hóa Đơn"
-            };
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
-            #endregion
-
             return hsDeleteInvoice;
         }
 
@@ -748,18 +722,6 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
 
             var hsRemoveVoucherAdvance = RemoveVoucherAdvance(voucherNo, currentUser);
-
-            #region -- Ghi Log --
-            var modelLog = new SysActionFuncLogModel
-            {
-                FuncLocal = "RemoveVoucherAdvance",
-                ObjectRequest = JsonConvert.SerializeObject(voucherNo),
-                ObjectResponse = JsonConvert.SerializeObject(hsRemoveVoucherAdvance),
-                Major = "Hủy Phiếu Chi"
-            };
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
-            #endregion
-
             return hsRemoveVoucherAdvance;
         }
 
@@ -807,18 +769,6 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
 
             var hsUpdateVoucherAdvance = UpdateVoucherAdvance(model, currentUser);
-
-            #region -- Ghi Log --
-            var modelLog = new SysActionFuncLogModel
-            {
-                FuncLocal = "UpdateVoucherAdvance",
-                ObjectRequest = JsonConvert.SerializeObject(model),
-                ObjectResponse = JsonConvert.SerializeObject(hsUpdateVoucherAdvance),
-                Major = "Cập nhật thông tin Advance  (Phiếu chi)"
-            };
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
-            #endregion
-
             return hsUpdateVoucherAdvance;
         }
 
@@ -896,21 +846,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     result = RejectPayment(model.ReferenceID, model.Reason);
                     break;
                 default:
-                    result = new HandleState((object)"Không tìm thấy loại reject");
+                    result = new HandleState((object)"Reject type không hợp lệ (Các type hợp lệ: ADVANCE, SETTLEMENT, SOA, CDNOTE, VOUCHER, PAYMENT)");
                     break;
             }
-
-            #region -- Ghi Log --
-            var modelLog = new SysActionFuncLogModel
-            {
-                FuncLocal = "RejectData",
-                ObjectRequest = JsonConvert.SerializeObject(model),
-                ObjectResponse = JsonConvert.SerializeObject(result),
-                Major = "Reject Data " + model.Type?.ToUpper()
-            };
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
-            #endregion
-
             return result;
         }
 
@@ -1370,21 +1308,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     result = DeleteVoucher(model.ReferenceID, model.Reason);
                     break;
                 default:
-                    result = new HandleState((object)"Không tìm thấy loại remove voucher");
+                    result = new HandleState((object)"Type không hợp lệ (Các type hợp lệ: SETTLEMENT, SOA, CDNOTE, VOUCHER)");
                     break;
             }
-
-            #region -- Ghi Log --
-            var modelLog = new SysActionFuncLogModel
-            {
-                FuncLocal = "RemoveVoucher",
-                ObjectRequest = JsonConvert.SerializeObject(model),
-                ObjectResponse = JsonConvert.SerializeObject(result),
-                Major = "Remove Voucher " + model.Type?.ToUpper()
-            };
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
-            #endregion
-
             return result;
         }
 

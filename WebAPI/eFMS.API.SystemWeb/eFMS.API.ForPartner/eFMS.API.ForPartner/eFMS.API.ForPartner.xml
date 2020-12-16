@@ -9,7 +9,7 @@
             Accounting Controller
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.ForPartner.DL.IService.IActionFuncLogService)">
             <summary>
             Accounting Contructor
             </summary>
@@ -23,6 +23,15 @@
             </remarks>
             <returns></returns>
             <response></response>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CheckHash(System.Object,System.String,System.String)">
+            <summary>
+            Check Hash
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
         </member>
         <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.UpdateVoucherAdvance(eFMS.API.ForPartner.DL.Models.VoucherAdvance,System.String,System.String)">
             <summary>
