@@ -77,14 +77,17 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatUnitModel> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
         {
             var data = GetBy(criteria);
-            if(data == null)
+            if (data == null)
             {
                 rowsCount = 0;
                 return data;
             }
             IQueryable<CatUnitModel> returnList = null;
             rowsCount = data.Select(x => x.Id).Count();
-            data = data.OrderByDescending(x => x.DatetimeModified);
+            if (criteria.All == null)
+            {
+                data = data.OrderByDescending(x => x.DatetimeModified);
+            }
             if (pageSize > 1)
             {
                 if (pageNumber < 1)
@@ -103,6 +106,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         private IQueryable<CatUnitModel> GetBy(CatUnitCriteria criteria)
         {
+            ClearCache();
             Expression<Func<CatUnitModel, bool>> query = null;
             if (criteria.All == null)
             {
@@ -121,6 +125,10 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Get().Where(query);
+            if (criteria.All != null && data.Where(x => x.Code == criteria.All).Any())
+            {
+                data = data.OrderByDescending(x => x.Code == criteria.All);
+            }
             return data;
         }
     }
