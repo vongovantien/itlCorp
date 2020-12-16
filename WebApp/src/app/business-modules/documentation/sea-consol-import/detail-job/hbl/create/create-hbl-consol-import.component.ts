@@ -154,20 +154,21 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
             this.infoPopup.show();
         } else {
             const body = this.onsubmitData();
-            this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
-                if (!!res.salemanId) {
-                    if (res.salemanId !== body.saleManId) {
-                        this._toastService.error('Not found contract information, please check!');
-                        return;
-                    }
-                }
-                if (!!res.officeNameAbbr) {
-                    this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-                } else {
-                    this.createHbl(body);
+            // this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
+            //     if (!!res.salemanId) {
+            //         if (res.salemanId !== body.saleManId) {
+            //             this._toastService.error('Not found contract information, please check!');
+            //             return;
+            //         }
+            //     }
+            //     if (!!res.officeNameAbbr) {
+            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
+            //     } else {
 
-                }
-            });
+            //     }
+            // });
+            this.createHbl(body);
+
         }
     }
 

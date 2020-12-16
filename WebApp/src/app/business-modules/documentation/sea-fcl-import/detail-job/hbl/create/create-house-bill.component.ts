@@ -184,45 +184,45 @@ export class CreateHouseBillComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
-            this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
-                if (!!res.salemanId) {
-                    if (res.salemanId !== body.saleManId) {
-                        this._toastService.error('Not found contract information, please check!');
-                        return;
-                    }
+            // this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
+            //     if (!!res.salemanId) {
+            //         if (res.salemanId !== body.saleManId) {
+            //             this._toastService.error('Not found contract information, please check!');
+            //             return;
+            //         }
+            //     }
+            //     if (!!res.officeNameAbbr) {
+            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
+            //     } else {
+            this._progressRef.start();
+            this._documentationRepo.createHousebill(body)
+                .pipe(
+                    mergeMap((res: any) => {
+                        const dateNotice = {
+                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                        const printedDate = {
+                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        this.deliveryComponent.deliveryOrder.hblid = res.data;
+                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
+
+                        return forkJoin([arrival, delivery]);
+                    }),
+
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                ).subscribe((result) => {
+                    this._toastService.success(result[0].message, '');
                 }
-                if (!!res.officeNameAbbr) {
-                    this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-                } else {
-                    this._progressRef.start();
-                    this._documentationRepo.createHousebill(body)
-                        .pipe(
-                            mergeMap((res: any) => {
-                                const dateNotice = {
-                                    arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-                                    arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
-                                };
-                                this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
-                                const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
-                                const printedDate = {
-                                    deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                                };
-                                this.deliveryComponent.deliveryOrder.hblid = res.data;
-                                const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
-
-                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
-
-                                return forkJoin([arrival, delivery]);
-                            }),
-
-                            catchError(this.catchError),
-                            finalize(() => this._progressRef.complete())
-                        ).subscribe((result) => {
-                            this._toastService.success(result[0].message, '');
-                        }
-                        );
-                }
-            });
+                );
+            // }
+            // });
         }
     }
     onsubmitData() {
