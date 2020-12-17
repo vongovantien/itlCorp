@@ -21,8 +21,8 @@ job_build:
         # - npm run build
         # - echo "job_build doing something..."
         - echo "end job_build"
-    only:
-        - uat/fixbug/fix-bug-uat
+    # only:
+    #     - uat/fixbug/fix-bug-uat
     artifacts:
         name: "angular_build"
         paths:
