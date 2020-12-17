@@ -14,7 +14,6 @@
     </div>
 </div>
 <div class="m-content">
-    <!--begin:: m-portlet of search-form-->
     <form-search-user (onSearch)="onSearchUser($event)"></form-search-user>
     <div class="m-portlet">
         <div class="m-form">
@@ -66,35 +65,14 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-nav ">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="tatable__pager-size">
-                                <div class="select-box">
-                                    <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                        (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                        <ng-container
-                                            *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                            <option [ngValue]="item">{{item}} line / screen</option>
-                                        </ng-container>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                            <div class="float-right">
-                                <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
-                                    (pageChanged)="pageChanged($event)" [(ngModel)]="page">
-                                </pagination>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                    (onChange)="updatePagingData($event)"></app-pagination>
 
             </div>
         </div>
 
     </div>
 </div>
+
 <confirm-popup [body]="'Do you want to delete this user ?'" [labelCancel]="'No'" (onSubmit)="onDeleteUser()">
 </confirm-popup>

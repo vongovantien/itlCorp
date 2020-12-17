@@ -47,6 +47,7 @@ export class Receipt {
     customerName: string = null;
     paymentRefNo: string = null;
     paidAmount: string = null;
+    finalPaidAmount: number = null;
     paymentDate: string = null;
     status: string = null;
     type: string = null;

@@ -14,7 +14,7 @@
                 <span>Update date:</span>&nbsp;
                 <span class="m--font-primary"
                     *ngIf="exchangeRateNewest">{{ exchangeRateNewest.datetimeModified | date: 'MMMM dd. yyyy' }}
-                    - {{ exchangeRateNewest.datetimeModified | date: 'h:mm'}}</span>
+                    - {{ exchangeRateNewest.datetimeModified | date: 'HH:mm'}}</span>
             </div>
             <div class="table-wrapper" id="" *ngIf="exchangeRateNewest">
                 <table class="table table-striped table-secondary">
