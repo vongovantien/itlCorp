@@ -974,4 +974,18 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    checkExistSIExport(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction/CheckExistSIExport/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    checkExistManifestExport(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsManifest/CheckExistManifestExport/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
