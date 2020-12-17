@@ -78,5 +78,14 @@ export class ReceiptModel extends Receipt {
     payments: ReceiptInvoiceModel[] = [];
     userNameCreated: string = null;
     userNameModified: string = null;
+    constructor(object?: any) {
+        super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
 }
 

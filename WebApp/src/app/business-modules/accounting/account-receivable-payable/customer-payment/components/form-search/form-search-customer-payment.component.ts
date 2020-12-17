@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AccountingConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Currency, Customer, Partner, User } from '@models';
@@ -63,7 +63,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             refNo: [],
             paymentType: [this.paymentTypes[0]],
             customerID: [],
-            date: [],
+            date: [{ startDate: new Date(), endDate: new Date() }],
             dateType: [this.dateTypes[0]],
             currency: [],
             syncStatus: [this.syncStatuss[0]],
@@ -112,9 +112,18 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     }
     reset() {
         this.resetKeywordSearchCombogrid();
-        this.formSearch.reset();
-        this.resetFormControl(this.customerID);
+        this.refNo.reset();
+        this.paymentType.reset(this.paymentTypes[0]);
+        this.customerID.reset();
+        this.date.reset();
+        this.dateType.reset(this.dateTypes[0]);
+        this.currency.reset();
+        this.syncStatus.reset(this.syncStatuss[0]);
+        this.status.reset(this.statuss[0]);
         this.onReset.emit(<any>{ transactionType: null });
+    }
+    resetFormSearch() {
+
     }
 }
 interface IAcctReceiptCriteria {
