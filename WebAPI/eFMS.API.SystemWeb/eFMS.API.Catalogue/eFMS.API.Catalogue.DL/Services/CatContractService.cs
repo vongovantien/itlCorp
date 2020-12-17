@@ -84,7 +84,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
 
-        public List<CatContractModel> GetBy(string partnerId)
+        public List<CatContractModel> GetBy(string partnerId, bool? all)
         {
             IQueryable<CatContract> data = DataContext.Get().Where(x => x.PartnerId.Trim() == partnerId);
             IQueryable<SysUser> sysUser = sysUserRepository.Get();
@@ -126,6 +126,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 saleman.CreatorGroupId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.DepartmentId == currentUser.GroupId).Select(t => t.GroupId).FirstOrDefault();
                 results.Add(saleman);
             }
+            if (all == true) return results;
 
             string partnerType = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.PartnerType).FirstOrDefault();
             ICurrentUser _user = null;
