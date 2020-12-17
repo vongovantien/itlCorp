@@ -40,7 +40,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         super();
     }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        this.initSubmitClickSubscription(() => { this.saveReceipt('draft') });
+    }
 
     saveReceipt(type: string) {
         this.formCreate.isSubmitted = true;
@@ -75,7 +77,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         this.onSaveDataReceipt(receiptModel, type);
     }
-
     getDataForm() {
         const dataForm: any = Object.assign({}, this.formCreate.formSearchInvoice.getRawValue(), this.listInvoice.form.getRawValue());
 

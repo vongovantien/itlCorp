@@ -64,50 +64,50 @@
             <div class="col-12">
                 <tabset type="tabs" class="custom-class-tab">
                     <tab heading="Job detail" (selectTab)="selectTab('job-edit')">
-                        <div *ngIf="tab === 'job-edit'">
-                            <div class="m-form m-form--state">
-                                <div class="m-portlet">
-                                    <div class="alert-block__heading">
-                                        <h3 class="alert-block__title">Job Information</h3>
-                                    </div>
-                                    <div class="m-portlet__body" id="edit-ops-job-form">
-                                        <job-mangement-form-edit></job-mangement-form-edit>
-                                    </div>
+                        <!-- <div *ngIf="tab === 'job-edit'"> -->
+                        <div class="m-form m-form--state">
+                            <div class="m-portlet">
+                                <div class="alert-block__heading">
+                                    <h3 class="alert-block__title">Job Information</h3>
+                                </div>
+                                <div class="m-portlet__body" id="edit-ops-job-form">
+                                    <job-mangement-form-edit></job-mangement-form-edit>
                                 </div>
                             </div>
-
-                            <div class="m-portlet" style="position: relative;">
-                                <div class="m-portlet__body">
-                                    <tabset class="custom-class-tab">
-                                        <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
-                                            <ng-container
-                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <buying-charge [showGetCharge]="false" service="logistic"
-                                                    *ngIf="selectedTabSurcharge === 'BUY'">
-                                                </buying-charge>
-                                            </ng-container>
-                                        </tab>
-                                        <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
-                                            <ng-container
-                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <selling-charge service="logistic" [showSyncFreight]="false"
-                                                    [showGetCharge]="false" *ngIf="selectedTabSurcharge === 'SELL'">
-                                                </selling-charge>
-                                            </ng-container>
-                                        </tab>
-                                        <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
-                                            <ng-container
-                                                *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <obh-charge service="logistic" *ngIf="selectedTabSurcharge === 'OBH'">
-                                                </obh-charge>
-                                            </ng-container>
-                                        </tab>
-                                    </tabset>
-                                </div>
-                            </div>
-
-                            <hbl-profit-summary></hbl-profit-summary>
                         </div>
+
+                        <div class="m-portlet" style="position: relative;">
+                            <div class="m-portlet__body">
+                                <tabset class="custom-class-tab">
+                                    <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
+                                        <ng-container
+                                            *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                            <buying-charge [showGetCharge]="false" service="logistic"
+                                                *ngIf="selectedTabSurcharge === 'BUY'">
+                                            </buying-charge>
+                                        </ng-container>
+                                    </tab>
+                                    <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
+                                        <ng-container
+                                            *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                            <selling-charge service="logistic" [showSyncFreight]="false"
+                                                [showGetCharge]="false" *ngIf="selectedTabSurcharge === 'SELL'">
+                                            </selling-charge>
+                                        </ng-container>
+                                    </tab>
+                                    <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
+                                        <ng-container
+                                            *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
+                                            <obh-charge service="logistic" *ngIf="selectedTabSurcharge === 'OBH'">
+                                            </obh-charge>
+                                        </ng-container>
+                                    </tab>
+                                </tabset>
+                            </div>
+                        </div>
+
+                        <hbl-profit-summary></hbl-profit-summary>
+                        <!-- </div> -->
                     </tab>
                     <tab heading="Custom declaration" (selectTab)="selectTab('custom-declaration')">
                         <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">

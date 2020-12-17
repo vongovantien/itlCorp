@@ -5,11 +5,11 @@
                 <div class="form-group"
                     [ngClass]="{'m-form__group has-danger':(isSubmitted || customerId.dirty) && !customerId.valid }">
                     <label for="form-control-label" required>
-                        Customer Name
+                        Customer Name {{customerName}} {{customerId.value}}
                     </label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                         (remove)="resetFormControl(customerId)"
-                        [currentActiveItemId]="{field:'id', value: customerId.value}"
+                        [currentActiveItemId]="{field:'id', value: customerId.value, hardValue:customerName}"
                         [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                         [disabled]="isReadonly">
