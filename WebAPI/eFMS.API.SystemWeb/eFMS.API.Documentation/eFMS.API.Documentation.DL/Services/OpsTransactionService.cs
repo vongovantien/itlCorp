@@ -774,10 +774,8 @@ namespace eFMS.API.Documentation.DL.Services
                             return result;
                         }
                         var opsTransaction = GetNewShipmentToConvert(productService, item);
-
-                        int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                        opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob + i);
-                        DataContext.Add(opsTransaction, false);
+                        opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+                        DataContext.Add(opsTransaction);
                         CustomsDeclaration clearance = UpdateInfoConvertClearance(item.Id);
                         clearance.JobNo = opsTransaction.JobNo;
                         customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
