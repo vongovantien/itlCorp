@@ -88,7 +88,9 @@ export class PartnerComponent extends AppList implements OnInit {
         this.tabSelect(this.activeTab);
     }
     resetSearch(event) {
-        this.allPartnerComponent.dataSearch.accountNo = null;
+        const currentTab = this.criteria.partnerGroup;
+        this.criteria = { };
+        this.criteria.partnerGroup = currentTab;
         this.onSearch(event);
     }
     onSearch(event) {
