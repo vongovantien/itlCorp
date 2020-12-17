@@ -149,9 +149,9 @@ namespace eFMS.API.Catalogue.Controllers
             var saleServices = catContractService.Get().Select(t => t.SaleService).ToArray();
             var office = model.OfficeId.Split(";").ToArray();
             var sale = model.SaleService.Split(";").ToArray();
-            var dataContract = catContractService.Get(x=>x.PartnerId == model.PartnerId).ToList();
+            var dataContract = catContractService.Get(x => x.PartnerId == model.PartnerId).ToList();
             var arrayOffice = new HashSet<string>(model.OfficeId.Split(';'));
-            var dataCheck = model.Id != Guid.Empty ? dataContract.Where(x =>( !string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s)) ) && ( !string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o)) ) && ( x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId ) && x.Id != model.Id).ToList() :
+            var dataCheck = model.Id != Guid.Empty ? dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId) && x.Id != model.Id).ToList() :
             dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId)).ToList();
             if (model.Id != Guid.Empty)
             {
@@ -401,7 +401,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult ARConfirmed(string partnerId, string contractId, string partnerType)
         {
-            bool result = catContractService.SendMailARConfirmed(partnerId, contractId , partnerType);
+            bool result = catContractService.SendMailARConfirmed(partnerId, contractId, partnerType);
             return Ok(result);
         }
 
@@ -551,7 +551,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult QueryAgreement(CatContractCriteria query)
         {
             IQueryable<CatAgreementModel> result = catContractService.QueryAgreement(query);
-            if(result == null)
+            if (result == null)
             {
                 return Ok(new List<CatAgreementModel>());
             }

@@ -141,5 +141,16 @@ namespace eFMS.API.Documentation.Controllers
             var result = manifestService.PreviewSeaExportManifestByJobId(jobId);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Check if Job has manifest
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("CheckExistManifestExport/{id}")]
+        public IActionResult CheckExistManifestExport(Guid jobId)
+        {
+            return Ok(manifestService.CheckExistManifestExport(jobId));
+        }
     }
 }

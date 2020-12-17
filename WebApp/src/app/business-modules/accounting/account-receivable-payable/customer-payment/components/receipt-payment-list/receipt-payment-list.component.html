@@ -88,7 +88,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-{{syncInfoTemplate ? 8 : 12}}">
                 <div class="form-group">
                     <label class="form-control-label">Description</label>
                     <textarea cols="30" rows="5" class="form-control" formControlName="description"
@@ -98,7 +98,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label"></label>
-                    <ng-content></ng-content>
+                    <ng-container *ngTemplateOutlet="syncInfoTemplate"></ng-container>
                 </div>
             </div>
         </div>

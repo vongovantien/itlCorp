@@ -278,6 +278,13 @@
             <param name="jobId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.CheckExistManifestExport(System.Guid)">
+            <summary>
+            Check if Job has manifest
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsMawbcontainerController">
             <summary>
             
@@ -470,6 +477,13 @@
             get recently charges
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShippingInstructionController.CheckExistSIExport(System.Guid)">
+            <summary>
+            Check if Exist Sea Export files attach
+            </summary>
+            <param name="jobId"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsTransactionController">

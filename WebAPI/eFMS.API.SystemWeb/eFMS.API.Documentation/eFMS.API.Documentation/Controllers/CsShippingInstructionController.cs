@@ -106,5 +106,16 @@ namespace eFMS.API.Documentation.Controllers
             var result = shippingInstructionService.PreviewSISummaryByJobId(jobId);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Check if Exist Sea Export files attach
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("CheckExistSIExport/{id}")]
+        public IActionResult CheckExistSIExport(Guid jobId)
+        {
+            return Ok(shippingInstructionService.CheckExistSIExport(jobId));
+        }
     }
 }
