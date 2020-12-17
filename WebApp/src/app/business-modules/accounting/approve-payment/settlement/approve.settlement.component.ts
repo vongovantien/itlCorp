@@ -26,8 +26,8 @@ import isUUID from 'validator/lib/isUUID';
 
 export class ApporveSettlementPaymentComponent extends AppPage {
 
-    @ViewChild(SettlementListChargeComponent, { static: true }) requestSurchargeListComponent: SettlementListChargeComponent;
-    @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
+    @ViewChild(SettlementListChargeComponent) requestSurchargeListComponent: SettlementListChargeComponent;
+    @ViewChild(SettlementFormCreateComponent) formCreateSurcharge: SettlementFormCreateComponent;
 
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDenyPopup') confirmDenyPopup: ConfirmPopupComponent;

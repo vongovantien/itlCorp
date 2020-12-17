@@ -164,20 +164,21 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     } else {
                         const houseBill: HouseBill = this.getDataForm();
                         houseBill.jobId = this.jobId;
-                        this._catalogueRepo.getSalemanIdByPartnerId(houseBill.customerId, this.jobId).subscribe((res: any) => {
-                            if (!!res.salemanId) {
-                                if (res.salemanId !== houseBill.saleManId) {
-                                    this._toastService.error('Not found contract information, please check!');
-                                    return;
-                                }
-                            }
-                            if (!!res.officeNameAbbr) {
-                                this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-                            } else {
-                                this.createHbl(houseBill);
+                        // this._catalogueRepo.getSalemanIdByPartnerId(houseBill.customerId, this.jobId).subscribe((res: any) => {
+                        //     if (!!res.salemanId) {
+                        //         if (res.salemanId !== houseBill.saleManId) {
+                        //             this._toastService.error('Not found contract information, please check!');
+                        //             return;
+                        //         }
+                        //     }
+                        //     if (!!res.officeNameAbbr) {
+                        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
+                        //     } else {
 
-                            }
-                        });
+                        //     }
+                        // });
+                        this.createHbl(houseBill);
+
                     }
                 }
             );

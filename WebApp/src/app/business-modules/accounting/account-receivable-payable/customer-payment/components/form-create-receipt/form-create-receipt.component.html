@@ -5,11 +5,11 @@
                 <div class="form-group"
                     [ngClass]="{'m-form__group has-danger':(isSubmitted || customerId.dirty) && !customerId.valid }">
                     <label for="form-control-label" required>
-                        Customer Name
+                        Customer Name {{customerName}} {{customerId.value}}
                     </label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                         (remove)="resetFormControl(customerId)"
-                        [currentActiveItemId]="{field:'id', value: customerId.value}"
+                        [currentActiveItemId]="{field:'id', value: customerId.value, hardValue:customerName}"
                         [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                         [disabled]="isReadonly">
@@ -25,7 +25,8 @@
                         <input type="text" ngxDaterangepickerMd class="form-control"
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                             placeholder="Select request date" [autoApply]="true" formControlName="date"
-                            [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar [allowRemove]="true" />
+                            [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar
+                            [attr.disabled]="isReadonly" />
                     </div>
                 </div>
             </div>
@@ -36,11 +37,12 @@
                     <label required>
                         Payment Reference No
                     </label>
-                    <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo">
+                    <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo"
+                        [attr.disabled]="isReadonly">
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !agreementId.valid }">
+                <div class="form-group">
                     <label required>Agreement
                     </label>
                     <app-combo-grid-virtual-scroll #combogridAgreement

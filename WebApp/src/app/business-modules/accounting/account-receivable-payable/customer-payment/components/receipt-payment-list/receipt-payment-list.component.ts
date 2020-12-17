@@ -48,7 +48,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     customerInfo: Partner = null;
 
     isSubmitted: boolean = false;
-    isReadonly: boolean = false;  // * DONE | CANCEL
+    isReadonly: boolean = null;  // * DONE | CANCEL
 
     headerReceiptReadonly: CommonInterface.IHeaderTable[] = [
         { title: 'Billing Ref No', field: 'invoiceNo' },
@@ -56,7 +56,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         { title: 'Type', field: 'type' },
         { title: 'Partner Name', field: 'partnerName' },
         { title: 'Taxcode', field: 'taxCode' },
-        { title: 'Unpaid Amount', field: 'unpaidAmount' },
+        // { title: 'Unpaid Amount', field: 'unpaidAmount' },
         { title: 'Paid Amount', field: 'paidAmount' },
         { title: 'Balance Amount', field: 'invoiceBalance' },
         { title: 'Payment Status', field: 'paymentStatus' },
