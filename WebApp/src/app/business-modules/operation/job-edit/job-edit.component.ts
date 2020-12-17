@@ -391,6 +391,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     handleCancelForm() {
+        if (this.tab !== 'job-edit') {
+            this.gotoList();
+        }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
         if (isEdited) {
             this.confirmCancelJobPopup.show();

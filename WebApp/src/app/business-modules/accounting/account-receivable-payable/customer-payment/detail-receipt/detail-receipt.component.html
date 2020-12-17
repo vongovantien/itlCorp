@@ -17,7 +17,7 @@
                         <div class="c-button-actions">
                             <ng-container *ngIf="receiptDetail?.status === 'Draft'">
                                 <app-permission-button title="Save Draft" class="primary" [icon]="'la la-check'"
-                                    (onClick)="saveReceipt('update')">
+                                    (onClick)="submitClick('update')">
                                 </app-permission-button>
                                 <app-permission-button type="save" title="Done" class="success"
                                     (onClick)="confirmDoneReceiptPopup.show()">
@@ -26,19 +26,14 @@
 
                             <ng-container *ngIf="receiptDetail?.status === 'Done'">
 
-                                <app-permission-button title="Discard" class="warning" icon="la la-recycle"
-                                    (onClick)="saveReceipt('cancel')">
+                                <app-permission-button title="Cancel Receipt" type="reject" class="danger"
+                                    icon="la la-times" (onClick)="submitClick('cancel')">
                                 </app-permission-button>
 
-                                <button class="btn btn-info m-btn--icon m-btn--uppercase"
-                                    (click)="confirmSyncReceiptPopup.show()" title="Sync to accountant system">
-                                    <span>
-                                        <i class="la la-cloud-upload"></i>
-                                        <span>
-                                            Sync to Accountant
-                                        </span>
-                                    </span>
-                                </button>
+                                <app-permission-button title="Sync to Accountant" type="sync" class="info"
+                                    icon="la la-cloud-upload" (onClick)="confirmSyncReceiptPopup.show()">
+                                </app-permission-button>
+
                             </ng-container>
 
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
@@ -100,7 +95,7 @@
     [labelConfirm]="'Yes'" body="Are you sure you want to sync data to accountant system ?"
     iconConfirm="la la-cloud-upload"></confirm-popup>
 
-<confirm-popup #confirmDoneReceiptPopup (onSubmit)="confirmDoneReceiptPopup.hide();saveReceipt('done')"
+<confirm-popup #confirmDoneReceiptPopup (onSubmit)="confirmDoneReceiptPopup.hide();submitClick('done')"
     [labelConfirm]="'Yes'" labelCancel="No"
     body="Noted: After you save the receipt, you can not edit. Are you sure do this action?" iconConfirm="la la-save">
 </confirm-popup>

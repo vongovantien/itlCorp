@@ -24,7 +24,7 @@ export class ReceiptInvoiceModel {
     receiptExcPaidAmount: number = null; // * Số tiền thu của invoice theo tỷ giá phiếu thu
 
     invoiceBalance: number = null;
-    receiptExcInvoicebalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
+    receiptExcInvoiceBalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
 
     // * custom
     isSelected: boolean = false;
@@ -78,5 +78,14 @@ export class ReceiptModel extends Receipt {
     payments: ReceiptInvoiceModel[] = [];
     userNameCreated: string = null;
     userNameModified: string = null;
+    constructor(object?: any) {
+        super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
 }
 

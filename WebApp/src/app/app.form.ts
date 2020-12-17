@@ -4,8 +4,8 @@ import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.
 import { ButtonType } from './shared/enums/type-button.enum';
 import { ViewChildren, QueryList, HostListener, ElementRef, Directive } from '@angular/core';
 import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
-import { Observable, fromEvent, merge, combineLatest } from 'rxjs';
-import { distinctUntilChanged, share, filter } from 'rxjs/operators';
+import { Observable, fromEvent, merge, combineLatest, Subject } from 'rxjs';
+import { distinctUntilChanged, share, filter, takeUntil } from 'rxjs/operators';
 
 @Directive()
 export abstract class AppForm extends AppPage {
@@ -45,6 +45,10 @@ export abstract class AppForm extends AppPage {
     errorETA: string = 'ETA must be greater than or equal ETD';
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL to HAWB ?<span>`;
     currentFormValue: any;
+
+    form: FormGroup;
+    private $submitClick = new Subject<null>();
+
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();
     }
@@ -52,6 +56,9 @@ export abstract class AppForm extends AppPage {
         super();
     }
 
+    submitClick(data?) {
+        this.$submitClick.next(data);
+    }
     resetFormWithFeilds(form: FormGroup, key: string): void {
         if (form.controls.hasOwnProperty(key)) {
             if (form.controls[key] instanceof AbstractControl || form.controls[key] instanceof FormControl) {
@@ -150,6 +157,14 @@ export abstract class AppForm extends AppPage {
         return combineLatest(keyCodeEvents$).pipe(
             filter<KeyboardEvent[]>((arr) => arr.every((a) => a.type === 'keydown'))
         );
+    }
+
+
+    protected initSubmitClickSubscription(cb: (d?: any) => void) {
+        this.$submitClick
+            .asObservable()
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(cb);
     }
 
 

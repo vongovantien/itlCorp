@@ -74,6 +74,7 @@
                                                         </ng-container>
                                                     </ng-container>
                                                 </td>
+                                                <td class="text-primary">{{cdNote.voucherId}}</td>
                                                 <td [ngSwitch]="cdNote.syncStatus">
                                                     <span *ngSwitchCase="'Synced'" class="text-success">
                                                         {{cdNote.syncStatus}}</span>

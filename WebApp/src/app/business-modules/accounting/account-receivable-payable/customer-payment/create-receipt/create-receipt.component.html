@@ -10,9 +10,9 @@
                     <div>
                         <div class="c-button-actions">
                             <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"
-                                (onClick)="saveReceipt('draft')">
+                                (onClick)="submitClick('draft')">
                             </app-permission-button>
-                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="submitClick()">
                             </app-default-button>
                         </div>
                     </div>

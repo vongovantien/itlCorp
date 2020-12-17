@@ -3,7 +3,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <settle-payment-form-create (onChangeCurrency)="onChangeCurrency($event)">
+                <settle-payment-form-create>
                     <ng-container
                         *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
                         <span

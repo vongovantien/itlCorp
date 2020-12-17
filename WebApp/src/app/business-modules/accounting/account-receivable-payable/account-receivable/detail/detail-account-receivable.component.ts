@@ -38,7 +38,6 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         this._activedRoute.queryParams
             .pipe(
                 takeUntil(this.ngUnsubscribe),
-
                 switchMap((p: Params) => {
                     this.subTab = p.subTab;
                     if (!!p.agreementId) {
