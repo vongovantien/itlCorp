@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -19,7 +19,9 @@ import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 @Component({
     selector: 'obh-charge',
     templateUrl: './obh-charge.component.html',
-    styleUrls: ['./../buying-charge/buying-charge.component.scss']
+    styleUrls: ['./../buying-charge/buying-charge.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 
 export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingChargeComponent {
@@ -35,7 +37,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _accountingRepo: AccountingRepo,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        protected _cd: ChangeDetectorRef
+
 
     ) {
         super(
@@ -47,7 +51,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             _ngProgressService,
             _spinner,
             _accountingRepo,
-            _activedRoute);
+            _activedRoute,
+            _cd);
         this._progressRef = this._ngProgressService.ref();
     }
 
@@ -88,6 +93,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
+                    this._cd.markForCheck();
                 }
             );
     }

@@ -81,7 +81,7 @@ export class PermissionGeneral {
 }
 
 export class PermissionSampleGeneral extends PermissionGeneral {
-    sysPermissionGenerals: [] = [];
+    sysPermissionGenerals: PermissionGeneralItem[] = [];
 
     constructor(data?: any) {
         super();
@@ -93,6 +93,19 @@ export class PermissionSampleGeneral extends PermissionGeneral {
         }
     }
 
+}
+
+export class PermissionGeneralItem {
+    access: boolean;
+    delete: string;
+    detail: string;
+    export: boolean;
+    import: boolean;
+    write: string;
+    list: boolean;
+    menuId: boolean;
+    menuName: string;
+    disabled: boolean;
 }
 
 export class PermissionSampleSpecial extends PermissionGeneral {

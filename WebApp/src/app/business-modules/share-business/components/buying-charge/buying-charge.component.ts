@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ComponentRef } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ComponentRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -28,6 +28,7 @@ import { ActivatedRoute } from '@angular/router';
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
     styleUrls: ['./buying-charge.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
@@ -85,7 +86,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _accountingRepo: AccountingRepo,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        protected _cd: ChangeDetectorRef
 
     ) {
         super();
@@ -112,7 +114,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
-                    this.charges = buyings;
+                    this.charges.length = 0;
+                    this.charges = [...buyings];
+                    this._cd.markForCheck();
                 }
             );
     }
@@ -1039,7 +1043,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         const body: IRecentlyCharge = {
             currentJobId: this.shipment.id,
             personInCharge: this.shipment.personIncharge,
-            transactionType: this.utility.getTransationType(this.shipment.transactionType),
+            transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
             shippingLine: this.shipment.coloaderId,
 
             consigneeId: this.hbl.consigneeId,

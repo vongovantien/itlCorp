@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { tap, switchMap, catchError, finalize } from 'rxjs/operators';
-import { PermissionSample } from 'src/app/shared/models';
+import { PermissionSample, PermissionSampleGeneral, PermissionGeneralItem } from 'src/app/shared/models';
 import { AppPage } from 'src/app/app.base';
 import { ConfirmPopupComponent } from '@common';
 import { PermissionFormCreateComponent } from 'src/app/business-modules/system/permission/components/form-create-permission/form-create-permission.component';
@@ -211,8 +211,6 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                 this.updatePermission(body);
             }
         }
-
-
     }
 
     showConfirm() {
@@ -243,6 +241,34 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
         }
     }
 
+    onChangeQuickSetup(data, type: string, permissionModuleGroup: PermissionSampleGeneral) {
+        console.log(data, permissionModuleGroup);
+        switch (type) {
+            case 'list':
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.list = data));
+                break;
+            case 'detail':
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.detail = data));
+                break;
+            case 'write':
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.write = data));
+                break;
+            case 'delete':
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.delete = data));
+                break;
+            case 'access':
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.access = data));
+                break;
+            case 'import':
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.import = data));
+                break;
+            case 'export':
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.export = data));
+                break;
+            default:
+                break;
+        }
+    }
 
 
 
