@@ -6,7 +6,9 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -35,8 +37,10 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CsTransaction> transactionRepository;
         private readonly IContextBase<OpsTransaction> opsRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IOptions<ApiUrl> ApiUrl;
+
 
 
         public CatContractService(
@@ -54,6 +58,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<OpsTransaction> opsRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
+            IContextBase<SysUserLevel> userlevelRepo,
             ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -70,13 +75,14 @@ namespace eFMS.API.Catalogue.DL.Services
             opsRepository = opsRepo;
             ApiUrl = apiurl;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
-
+            userlevelRepository = userlevelRepo;
         }
 
         public IQueryable<CatContract> GetContracts()
         {
             return DataContext.Get();
         }
+
 
         public List<CatContractModel> GetBy(string partnerId)
         {
@@ -106,13 +112,74 @@ namespace eFMS.API.Catalogue.DL.Services
                         saleman.OfficeNameAbbr += sysOfficeRepository.Get(x => x.Id == new Guid(officeId)).Select(t => t.ShortName).FirstOrDefault() + "; ";
                     }
                 }
+
                 if (saleman.OfficeNameAbbr.Length > 0)
                 {
                     saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 2);
                 }
+
                 saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
+                saleman.CreatorCompanyId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.CompanyId == currentUser.CompanyID).Select(t=>t.CompanyId).FirstOrDefault();
+                saleman.CreatorOfficeId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.OfficeId == currentUser.OfficeID).Select(t => t.OfficeId).FirstOrDefault();
+                saleman.CreatorDepartmentId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.DepartmentId == currentUser.DepartmentId).Select(t => t.DepartmentId).FirstOrDefault();
+                saleman.CreatorGroupId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.DepartmentId == currentUser.GroupId).Select(t => t.GroupId).FirstOrDefault();
                 results.Add(saleman);
+            }
+
+            string partnerType = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.PartnerType).FirstOrDefault();
+            ICurrentUser _user = null;
+            switch (partnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);
+                    break;
+            }
+
+
+            PermissionRange rangeSearch = 0;
+            if (partnerType == "Customer" || partnerType == "Agent")
+            {
+                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            }
+            else
+            {
+                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            }
+            switch (rangeSearch)
+            {
+                case PermissionRange.None:
+                    results = null;
+                    break;
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    results = results.Where(x => x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID).ToList();
+                    break;
+                case PermissionRange.Group:
+                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
+                    results = results.Where(x => (x.CreatorGroupId == currentUser.GroupId && x.CreatorDepartmentId == currentUser.DepartmentId && x.CreatorOfficeId == currentUser.OfficeID && x.CreatorCompanyId == currentUser.CompanyID)
+                        || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID || dataUserLevel.Contains(x.SaleManId)).ToList();
+                    break;
+                case PermissionRange.Department:
+                    var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+                    results = results.Where(x => (x.CreatorDepartmentId == currentUser.DepartmentId && x.CreatorOfficeId == currentUser.OfficeID && x.CreatorCompanyId == currentUser.CompanyID)
+                      || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID || dataUserLevelDepartment.Contains(x.SaleManId)).ToList();
+                    break;
+                case PermissionRange.Office:
+                    results = results.Where(x => (x.CreatorOfficeId == currentUser.OfficeID && x.CreatorCompanyId == currentUser.CompanyID)
+                    || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID).ToList();
+                    break;
+                case PermissionRange.Company:
+                    results = results.Where(x => x.CreatorCompanyId == currentUser.CompanyID
+                    || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID).ToList();
+                    break;
             }
             return results;
         }
@@ -180,6 +247,92 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
+
+        public string CheckExistedContract(CatContractModel model)
+        {
+            string messageDuplicate = string.Empty;
+            var saleServices = DataContext.Get().Select(t => t.SaleService).ToArray();
+            var office = model.OfficeId.Split(";").ToArray();
+            var sale = model.SaleService.Split(";").ToArray();
+            var dataContract = DataContext.Get(x => x.PartnerId == model.PartnerId).ToList();
+            var arrayOffice = new HashSet<string>(model.OfficeId.Split(';'));
+            List<string> Salesman = new List<string>();
+            string SalesmanName = string.Empty;
+            var dataCheck = model.Id != Guid.Empty ? dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId) && x.Id != model.Id).ToList() :
+            dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId)).ToList();
+            if(dataCheck.Count() > 0)
+            {
+                Salesman = dataCheck.Select(t => t.SaleManId).ToList();
+            }
+            SalesmanName = string.Join(", ", sysUserRepository.Get().Where(x => Salesman.Contains(x.Id)).Select(t=>t.Username));
+            if (model.Id != Guid.Empty)
+            {
+                if (model.ContractType != "Official")
+                {
+                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    {
+                        if (DataContext.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                        {
+                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                        }
+                    }
+                    if (dataCheck.Count() > 0)
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], string.Empty, string.Empty, SalesmanName);
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    {
+                        if (DataContext.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                        {
+                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                        }
+                    }
+                    if (dataCheck.Count() > 0)
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], string.Empty, string.Empty, SalesmanName);
+                    }
+                }
+            }
+            else
+            {
+                if (model.ContractType != "Official")
+                {
+                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    {
+                        if (DataContext.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
+                        {
+                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                        }
+                    }
+
+                    if (dataCheck.Count() > 0)
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], string.Empty, string.Empty, SalesmanName);
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    {
+                        if (DataContext.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
+                        {
+                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                        }
+                    }
+
+                    if (dataCheck.Count() > 0)
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], string.Empty, string.Empty, SalesmanName);
+                    }
+
+                }
+            }
+            return messageDuplicate;
+        }
+
 
         private string GetContractServicesName(string ContractService)
         {

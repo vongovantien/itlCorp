@@ -79,7 +79,7 @@
   "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID": "Experied Date must be after or equal Effective Date!",
   "MSG_CONTRACT_CONTRACTNO_LENGTH": "Contract No include 3 - 50 characters!",
   "MSG_CONTRACT_SALESMAN_EMPTY": "Salesman is not allow empty!",
-  "MSG_CONTRACT_DUPLICATE_SERVICE": "Duplicate service, office, salesman!",
+  "MSG_CONTRACT_DUPLICATE_SERVICE": "Duplicate service {0}, office{1} with salesman {2}!",
   "MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT": "Service {0} already exists salesman",
   //-----------end contract
 
