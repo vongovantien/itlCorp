@@ -95,6 +95,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
 
         [HttpGet("GetBy")]
+        [Authorize]
         public IActionResult GetBy(string partnerId)
         {
             var results = catContractService.GetBy(partnerId.Trim());
@@ -125,7 +126,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string messageExisted = CheckExistedContract(model);
+            string messageExisted = catContractService.CheckExistedContract(model);
             if (!string.IsNullOrEmpty(messageExisted))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
@@ -141,86 +142,7 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        private string CheckExistedContract(CatContractModel model)
-        {
-            string messageDuplicate = string.Empty;
-
-            var officeIds = catContractService.Get().Select(t => t.OfficeId).ToArray();
-            var saleServices = catContractService.Get().Select(t => t.SaleService).ToArray();
-            var office = model.OfficeId.Split(";").ToArray();
-            var sale = model.SaleService.Split(";").ToArray();
-            var dataContract = catContractService.Get(x=>x.PartnerId == model.PartnerId).ToList();
-            var arrayOffice = new HashSet<string>(model.OfficeId.Split(';'));
-            var dataCheck = model.Id != Guid.Empty ? dataContract.Where(x =>( !string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s)) ) && ( !string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o)) ) && ( x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId ) && x.Id != model.Id).ToList() :
-            dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId)).ToList();
-            if (model.Id != Guid.Empty)
-            {
-                if (model.ContractType != "Official")
-                {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
-                    {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId && x.Id != model.Id))
-                        {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                        }
-                    }
-                    if (dataCheck.Count() > 0)
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
-                    }
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
-                    {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && x.PartnerId == model.PartnerId))
-                        {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                        }
-                    }
-                    if (dataCheck.Count() > 0)
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
-                    }
-                }
-            }
-            else
-            {
-                if (model.ContractType != "Official")
-                {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
-                    {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
-                        {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                        }
-                    }
-
-                    if (dataCheck.Count() > 0)
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
-                    }
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
-                    {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
-                        {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                        }
-                    }
-
-                    if (dataCheck.Count() > 0)
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
-                    }
-
-                }
-            }
-            return messageDuplicate;
-        }
-
+      
         /// <summary>
         /// update an existed item
         /// </summary>
@@ -233,7 +155,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Put(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string messageExisted = CheckExistedContract(model);
+            string messageExisted = catContractService.CheckExistedContract(model);
             if (!string.IsNullOrEmpty(messageExisted))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageExisted });

@@ -602,5 +602,26 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        /// <summary>
+        /// Check if Job has manifest
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public bool CheckExistManifestExport(Guid jobId)
+        {
+            var isExist = false;
+            var _manifest = DataContext.Get(x => x.JobId == jobId).FirstOrDefault();
+            if (_manifest != null)
+            {
+                var transaction = csTransactionService.GetDetails(jobId);
+                CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
+                var housebills = transactionDetailService.Query(criteria);
+                if (housebills != null)
+                {
+                    isExist = true;
+                }
+            }
+            return isExist;
+        }
     }
 }

@@ -10,16 +10,19 @@
                 </div>
                 <div class="col-lg-3">
                     <div class="form-group">
-                        <label for="form-control-label"></label>
-                        <ng-select [items]="paymentTypes" formControlName="paymentType" class="custom form-group"></ng-select>
+                        <label for="form-control-label">Type</label>
+                        <ng-select [items]="paymentTypes" formControlName="paymentType" class="custom form-group">
+                        </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="form-control-label">Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                            <input type="text" ngxDaterangepickerMd class="form-control" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange" placeholder="Select request date" [autoApply]="true" formControlName="date" [alwaysShowCalendars]="true" [ranges]="ranges"
-                                readonly calendar [allowRemove]="true" />
+                            <input type="text" ngxDaterangepickerMd class="form-control"
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                placeholder="Select request date" [autoApply]="true" formControlName="date"
+                                [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar />
                         </div>
 
                     </div>
@@ -36,15 +39,19 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="form-control-label">Partner</label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]=" {  field:'id', value: customerID.value}" (itemSelected)="onSelectDataFormInfo($event, 'partner')" [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async" [displayFields]="displayFilesPartners"
-                            [height]="150" (remove)="resetFormControl(customerID)" placeholder="Select Partner">
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]=" {  field:'id', value: customerID.value}"
+                            (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async"
+                            [displayFields]="displayFilesPartners" [height]="150"
+                            (remove)="resetFormControl(customerID)" placeholder="Select Partner">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="form-control-label">Currency</label>
-                        <ng-select formControlName="currency" class="custom" [items]="Currencys | async" bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false">
+                        <ng-select formControlName="currency" class="custom" [items]="Currencys | async" bindLabel="id"
+                            bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false">
                         </ng-select>
 
                     </div>

@@ -89,7 +89,6 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Crystal result = new Crystal();
             var instructions = new List<SeaShippingInstruction>();
-            var units = unitRepository.Get();
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
             int totalPackage = 0;
@@ -456,7 +455,6 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = new Crystal();
 
             var instructions = new List<SeaShippingInstruction>();
-            var units = unitRepository.Get();
             var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
             var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
@@ -551,7 +549,6 @@ namespace eFMS.API.Documentation.DL.Services
 
             Crystal result = new Crystal();
             var instructions = new List<SeaShippingInstruction>();
-            var units = unitRepository.Get();
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
@@ -630,7 +627,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
             Crystal result = new Crystal();
             var instructions = new List<SeaShippingInstruction>();
-            var units = unitRepository.Get();
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var housebills = transactionDetailService.Query(criteria);
             if (housebills == null) return result;
@@ -714,7 +710,38 @@ namespace eFMS.API.Documentation.DL.Services
             return Tel;
         }
 
-
+        /// <summary>
+        /// Check if Exist Sea Export files attach
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public bool[] CheckExistSIExport(Guid jobId)
+        {
+            var existList = new bool[3];
+            var result = DataContext.Get(x => x.JobId == jobId).FirstOrDefault();
+            if (result != null)
+            {
+                CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
+                var housebills = transactionDetailService.Query(criteria);
+                if (housebills != null)
+                {
+                    existList[0] = true;
+                    existList[1] = true;
+                    var Conts = containerRepository.Get();
+                    IQueryable<CsMawbcontainer> listConts = null;
+                    listConts = Conts.Where(x => housebills.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString()));
+                    if (!listConts.Any())
+                    {
+                        listConts = Conts.Where(x => housebills.Select(t => t.JobId.ToString()).Contains(x.Mblid.ToString()));
+                    }
+                    if (listConts.Any())
+                    {
+                        existList[2] = true;
+                    }
+                }
+            }
+            return existList;
+        }
 
     }
 }
