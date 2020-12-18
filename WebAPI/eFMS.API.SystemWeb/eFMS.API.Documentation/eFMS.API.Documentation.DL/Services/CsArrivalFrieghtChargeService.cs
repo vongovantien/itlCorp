@@ -291,8 +291,27 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
                 var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
-                var packageUnit = unitRepository.Get(x => x.Id == houserBill.PackageType).FirstOrDefault()?.Code;
-                var packageQty = houserBill.PackageQty?.ToString() ?? string.Empty;
+                //var packageUnit = unitRepository.Get(x => x.Id == houserBill.PackageType).FirstOrDefault()?.Code;
+                //var packageQty = houserBill.PackageQty?.ToString() ?? string.Empty;
+
+                var containers = containerRepository.Get(x => x.Hblid == houserBill.Id);
+                string nopieces = string.Empty;
+                //Group by Package Type [CR: 15147 - 18/12/2020]
+                var grpPkgsType = containers.GroupBy(g => new { g.PackageTypeId }).Select(s => new { PackageTypeId = s.Key.PackageTypeId, PackageQuantitys = s.Select(se => (decimal?)se.PackageQuantity) });
+                foreach (var grp in grpPkgsType)
+                {
+                    var pkgsType = unitRepository.Get(x => x.Id == grp.PackageTypeId)?.FirstOrDefault()?.Code; //Unit Code
+                    var pkgsQty = grp.PackageQuantitys.Sum();
+                    nopieces += pkgsQty + " " + pkgsType + "\r\n";
+                }
+
+                //List Container không có giá trị thì lấy Pkgs Qty, Pkgs Type của Housebill [CR: 15147 - 18/12/2020]
+                if (string.IsNullOrEmpty(nopieces))
+                {
+                    var hblPkgsType = unitRepository.Get(x => x.Id == houserBill.PackageType).FirstOrDefault()?.Code; //Unit Code
+                    var hblPkgsQty = houserBill.PackageQty?.ToString();
+                    nopieces = hblPkgsQty + " " + hblPkgsType;
+                }
 
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
@@ -328,7 +347,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                         charge.Description = houserBill.DesOfGoods;// Description of goods (Description)             
-                        charge.NoPieces = (packageQty != "0" && packageQty != string.Empty) ? packageQty + " " + packageUnit : packageQty;// Package Qty + Package Unit
+                        charge.NoPieces = nopieces;
                         charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
                         charge.CBM = houserBill.Cbm ?? 0; //CBM of container
                         charge.Unit = "KGS"; //Đang gán cứng
@@ -391,7 +410,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                     charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
-                    charge.NoPieces = (packageQty != "0" && packageQty != string.Empty) ? packageQty + " " + packageUnit : packageQty;// Package Qty + Package Unit
+                    charge.NoPieces = nopieces;
                     charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
                     charge.CBM = houserBill.Cbm ?? 0; //CBM of container
                     charge.Unit = "KGS"; //Đang gán cứng
@@ -738,9 +757,26 @@ namespace eFMS.API.Documentation.DL.Services
             string unitOfMeasures = string.Empty;
             foreach (var cont in containers)
             {
-                nopieces = nopieces + cont.PackageTypeId != null ? (cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn) : null;
                 unitOfMeasures = cont.UnitOfMeasureId != null ? (unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn) : null;
             }
+
+            //Group by Package Type [CR: 15147 - 18/12/2020]
+            var grpPkgsType = containers.GroupBy(g => new { g.PackageTypeId }).Select(s => new { PackageTypeId = s.Key.PackageTypeId,  PackageQuantitys = s.Select(se => (decimal?)se.PackageQuantity) });
+            foreach(var grp in grpPkgsType)
+            {
+                var pkgsType = unitRepository.Get(x => x.Id == grp.PackageTypeId)?.FirstOrDefault()?.Code; //Unit Code
+                var pkgsQty = grp.PackageQuantitys.Sum();
+                nopieces += pkgsQty + " " + pkgsType + "\r\n";
+            }
+
+            //List Container không có giá trị thì lấy Pkgs Qty, Pkgs Type của Housebill [CR: 15147 - 18/12/2020]
+            if (string.IsNullOrEmpty(nopieces))
+            {
+                var hblPkgsType = unitRepository.Get(x => x.Id == detail.PackageType).FirstOrDefault()?.Code; //Unit Code
+                var hblPkgsQty = detail.PackageQty?.ToString();
+                nopieces = hblPkgsQty + " " + hblPkgsType;
+            }
+
             var item = new SeaDeliveryCommandResult
             {
                 DONo = detail.DeliveryOrderNo?.ToUpper(),
