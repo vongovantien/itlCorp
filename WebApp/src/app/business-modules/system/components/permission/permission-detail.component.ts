@@ -241,31 +241,13 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
         }
     }
 
-    onChangeQuickSetup(data, type: string, permissionModuleGroup: PermissionSampleGeneral) {
-        console.log(data, permissionModuleGroup);
+    onChangeQuickSetup(data: string | boolean, type: string, permissionModuleGroup: PermissionSampleGeneral) {
         switch (type) {
-            case 'list':
-                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.list = data));
-                break;
-            case 'detail':
-                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.detail = data));
-                break;
-            case 'write':
-                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.write = data));
-                break;
-            case 'delete':
-                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.delete = data));
-                break;
             case 'access':
-                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.access = data));
-                break;
-            case 'import':
-                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.import = data));
-                break;
-            case 'export':
-                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p.export = data));
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access = data as boolean);
                 break;
             default:
+                permissionModuleGroup.sysPermissionGenerals.forEach((p: PermissionGeneralItem) => p.access && (p[type] = data));
                 break;
         }
     }

@@ -11,6 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 import { IAddUser } from '../addnew/user.addnew.component';
 import { catchError, finalize } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
+import { DataService } from '@services';
 
 
 @Component({
@@ -54,7 +55,8 @@ export class UserDetailsComponent extends AppPage {
         private _router: Router,
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _dataService: DataService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -193,5 +195,9 @@ export class UserDetailsComponent extends AppPage {
                     }
                 }
             );
+    }
+
+    selectRoleTab() {
+        this._dataService.setData('user-group', true);
     }
 }
