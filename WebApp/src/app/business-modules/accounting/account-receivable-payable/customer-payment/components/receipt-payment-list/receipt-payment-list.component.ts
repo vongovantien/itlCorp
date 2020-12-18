@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ReceiptInvoiceModel, Currency, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -17,10 +17,13 @@ import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'customer-payment-list-receipt',
-    templateUrl: './receipt-payment-list.component.html'
+    templateUrl: './receipt-payment-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implements OnInit {
+
+    @Input() syncInfoTemplate: TemplateRef<any>
 
     invoices: ReceiptInvoiceModel[] = [];
 
@@ -106,8 +109,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         ];
 
         this.isLoading = this._store.select(customerPaymentReceipLoadingState);
+        this.initSubscriptioontInvoiceList();
+        this.listenCusAdvanceData();
+        this.listenCustomerInfoData();
+    }
 
-        // * subscribe invoice list
+    initSubscriptioontInvoiceList() {
         this._store.select(customerPaymentReceipInvoiceListState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -117,8 +124,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
                     console.log(this.invoices);
                 });
+    }
 
-
+    listenCusAdvanceData() {
         this._dataService.currentMessage
             .pipe(pluck('cus-advance'))
             .subscribe(
@@ -126,6 +134,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
                 }
             );
+    }
+
+    listenCustomerInfoData() {
         this._dataService.currentMessage
             .pipe(pluck('customer'))
             .subscribe(
@@ -216,10 +227,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             case 'currency':
                 if ((data as Currency).id === this.getCurrencyInvoice(this.invoices)[0]) {
                     this.exchangeRate.setValue(1);
-                    // this.exchangeRate.disable();
                     break;
                 } else {
-                    // this.exchangeRate.enable();
                     this.exchangeRate.setValue(null);
                     if ((data as Currency).id !== 'VND' && this.paymentDate.value?.startDate) {
                         this.generateExchangeRate(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'), (data as Currency).id);

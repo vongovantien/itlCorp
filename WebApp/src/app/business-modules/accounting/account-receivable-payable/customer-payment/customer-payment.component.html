@@ -5,113 +5,136 @@
             <tabset class="custom-class-tab">
                 <tab heading="Customer Payment" [active]="true">
                     <customer-payment-form-search (onSearch)="onSearchCPs($event)"></customer-payment-form-search>
+
                     <div class="m-portlet">
                         <div class="m-portlet__body">
-                            <div class="table-wrapper">
-                                <table class="table table-striped table-brand dataTable table-hover">
-                                    <tabset class="custom-class-tab">
-                                        <tab heading="Payment" [active]="true">
-                                            <div class="form-group">
-                                                <div class="col-lg-12">
-                                                    <div class="form-group">
-                                                        <button class="btn btn-success" routerLink="receipt/new">Create Receipt</button>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 ">
-                                                    <div class="table-wrapper table-scrollable" id="payment-table">
-                                                        <table class="table table-hover table-brand dataTable table-hover">
-                                                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                                                <th class="m--w-50 first">
-                                                                </th>
-                                                            </thead>
-                                                            <tbody>
-
-                                                                <tr *ngIf="!isLoading && !CPs.length" app-table-none-record>
-                                                                </tr>
-                                                                <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn" [class.invalid-row]="cps.syncStatus === 'Rejected'">
-                                                                    <td class="table-actions-col">
-                                                                        <div class="table-actions">
-                                                                            <button type="button" class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove" (click)="prepareDeleteCP(cps)" *ngIf="(cps.status === 'Draft')">
-                                                            <i class="la la-trash"></i>
-                                                            </button>
-                                                                        </div>
-                                                                    </td>
-
-                                                                    <td class="text-underline">
-                                                                        <a class="pointer" (click)="viewDetail(cps.id)">{{cps.paymentRefNo}}</a>
-                                                                    </td>
-
-                                                                    <td>
-                                                                        <span>{{cps.customerName}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{cps.paidAmount}}</span>
-                                                                    </td>
-
-                                                                    <td>
-                                                                        <span>{{cps.currencyId}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{cps.paymentDate}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{cps.fromDate}}-{{cps.toDate}}</span>
-
-                                                                    </td>
-                                                                    <td [ngSwitch]="cps.syncStatus">
-                                                                        <span *ngSwitchCase="'Synced'" class="text-success">
-                                                            {{cps.syncStatus}}</span>
-                                                                        <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                            {{cps.syncStatus}}</span>
-                                                                        <span *ngSwitchDefault>
-                                                            {{cps.syncStatus}}
-                                                        </span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{cps.lastSyncDate | date :'dd/MM/yyyy HH:mm'}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{cps.description}}</span>
-                                                                    </td>
-
-                                                                    <td [ngSwitch]="cps.status">
-                                                                        <span *ngSwitchCase="'Draft'" class="text-danger">
-                                                            {{cps.status}}</span>
-                                                                        <span *ngSwitchCase="'Done'" class="text-success">
-                                                            {{cps.status}}</span>
-                                                                        <span *ngSwitchCase="'Cancel'" class="text-gray">
-                                                            {{cps.status}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span class="text-primary">{{cps.userNameCreated}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{cps.datetimeCreate | date :'dd/MM/yyyy HH:mm'}}</span>
-                                                                    </td>
-
-                                                                    <td>
-                                                                        <span>{{cps.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
-                                                                    </td>
-
-                                                                </tr>
-                                                                <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
-                                                                </tr>
-
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize" (onChange)="updatePagingData($event)"></app-pagination>
-                                                </div>
-                                            </div>
-                                        </tab>
-
-                                        <tab heading="Summary">
-                                            summary
-
-                                        </tab>
-                                    </tabset>
-                                </table>
+                            <div class="m--align-right">
+                                <app-permission-button type="add" title="Create Receipt" routerLink="receipt/new">
+                                </app-permission-button>
                             </div>
+                            <tabset class="custom-class-tab">
+                                <tab heading="Payment" [active]="true">
+                                    <div class="row">
+                                        <div class="col-lg-12 ">
+                                            <div class="table-wrapper table-scrollable m--margin-top-20"
+                                                id="payment-table">
+                                                <table class="table table-hover table-brand dataTable table-hover">
+                                                    <thead app-table-header [headers]="headers"
+                                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                                        <th class="first table-actions-col">
+                                                        </th>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngIf="!isLoading && !CPs.length" app-table-none-record>
+                                                        </tr>
+                                                        <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn"
+                                                            [class.invalid-row]="cps.syncStatus === 'Rejected'">
+                                                            <td class="table-actions-col">
+                                                                <div class="table-actions">
+                                                                    <app-permission-button
+                                                                        *ngIf="(cps.status === 'Draft')" type="delete"
+                                                                        (onClick)="checkAllowDelete(cps)">
+                                                                    </app-permission-button>
+                                                                    <button type="button"
+                                                                        class="btn btn-warning btn-sm  m-btn--icon m-btn--icon-only"
+                                                                        title="Cancel" *ngIf="(cps.status === 'Done')">
+                                                                        <i class="la la-ban"></i>
+                                                                    </button>
+                                                                    <button type="button"
+                                                                        class="btn btn-dark btn-sm  m-btn--icon m-btn--icon-only"
+                                                                        title="Lock" *ngIf="(cps.status === 'Cancel')">
+                                                                        <i class="la la-lock"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+
+                                                            <td class="text-underline">
+                                                                <div *ngIf="cps.status != 'Cancel'; else CancelNo">
+                                                                    <span><a class="pointer"
+                                                                            (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}</a></span>
+                                                                </div>
+                                                                <ng-template #CancelNo>
+                                                                    <span>{{cps.paymentRefNo}}</span>
+                                                                </ng-template>
+                                                            </td>
+
+                                                            <td>
+                                                                <span>{{cps.customerName}}</span>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
+                                                            </td>
+
+                                                            <td>
+                                                                <span>{{cps.currencyId}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{cps.paymentDate | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <div
+                                                                    *ngIf="cps.fromDate !=null|| cps.toDate !=null; else DateNo">
+                                                                    <span>{{cps.fromDate | date :'dd/MM/yyyy'}}
+                                                                        -
+                                                                        {{cps.toDate | date :'dd/MM/yyyy'}}</span>
+                                                                </div>
+
+                                                                <ng-template #DateNo></ng-template>
+                                                            </td>
+                                                            <td [ngSwitch]="cps.syncStatus">
+                                                                <span *ngSwitchCase="'Synced'" class="text-success">
+                                                                    {{cps.syncStatus}}</span>
+                                                                <span *ngSwitchCase="'Rejected'" class="text-danger">
+                                                                    {{cps.syncStatus}}</span>
+                                                                <span *ngSwitchDefault>
+                                                                    {{cps.syncStatus}}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{cps.lastSyncDate | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{cps.description}}</span>
+                                                            </td>
+
+                                                            <td [ngSwitch]="cps.status">
+                                                                <span *ngSwitchCase="'Draft'" class="text-danger">
+                                                                    {{cps.status}}</span>
+                                                                <span *ngSwitchCase="'Done'" class="text-success">
+                                                                    {{cps.status}}</span>
+                                                                <span *ngSwitchCase="'Cancel'" class="text-gray">
+                                                                    {{cps.status}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span
+                                                                    class="text-primary">{{cps.userNameCreated}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{cps.datetimeCreated | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                            </td>
+
+                                                            <td>
+                                                                <span>{{cps.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
+                                                            </td>
+
+                                                        </tr>
+                                                        <tr class="loading-wrapper" *ngIf="isLoading"
+                                                            app-table-row-loading>
+                                                        </tr>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <app-pagination [total]="totalItems" [pageNum]="page"
+                                                [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
+                                            </app-pagination>
+                                        </div>
+                                    </div>
+                                </tab>
+                                <tab heading="Summary">
+                                    summary
+                                </tab>
+                            </tabset>
                         </div>
                     </div>
                 </tab>
@@ -125,7 +148,6 @@
                     History
                 </tab>
             </tabset>
-
         </div>
     </div>
 </div>

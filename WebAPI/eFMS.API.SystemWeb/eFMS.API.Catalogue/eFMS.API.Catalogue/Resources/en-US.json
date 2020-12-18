@@ -60,7 +60,7 @@
   "MSG_CONTRACT_PARTNER_ID_EMPTY": "Customer Id is not allow empty!",
   "MSG_CONTRACT_PARTNER_ID_NOT_FOUND": "Customer Id '{0}' is not found!",
   "MSG_CONTRACT_AGREEMENT_TYPE_NOT_FOUND": "Agreement '{0}' is not found!",
-  "MSG_CONTRACTNO_EMPTY": "Agreement/Contract No is not allow empty with agreement type Trial or Official!",
+  "MSG_CONTRACTNO_EMPTY": "Agreement/Contract No is not allow empty with agreement type Official!",
   "MSG_SALE_SERVICE_EMPTY": "Sale service is not allow empty!",
   "MSG_CONTRACT_COMPANY_EMPTY": "Company is not allow empty!",
   "MSG_CONTRACT_COMPANY_NOT_FOUND": "Company '{0} is not found!'",

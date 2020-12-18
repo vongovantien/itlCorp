@@ -187,7 +187,7 @@
                                         </label>
                                         <input type="number" min="0" numeric [decimals]="digitDecimal"
                                             autoFormatCurrency
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditLimit">
                                     </div>
                                 </div>
@@ -196,7 +196,7 @@
                                         <label>Trial Credit Days
                                         </label>
                                         <input type="number" min="0" (change)="onChageTrialCreditDays()"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditDays">
                                     </div>
                                 </div>
@@ -206,7 +206,7 @@
                                         </label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input
-                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true?  null : 'disabled'"
                                                 type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
@@ -227,7 +227,7 @@
                                         </label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input
-                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
                                                 type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
@@ -248,7 +248,7 @@
                                     <div class="form-group">
                                         <label>Payment Term</label>
                                         <input type="number" min="0" numeric [decimals]="digitDecimal"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
                                             autoFormatCurrency class="form-control" formControlName="paymentTerm">
                                     </div>
                                 </div>
@@ -264,7 +264,7 @@
                                     <div class="form-group">
                                         <label>Credit Limit</label>
                                         <input
-                                            [attr.disabled]="((menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ) || !isUpdate ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true || !isUpdate ?  null : 'disabled'"
                                             type="number" class="form-control" formControlName="creditLimit">
                                     </div>
                                 </div>
@@ -272,7 +272,7 @@
                                     <div class="form-group">
                                         <label>Credit Limited Rate</label>
                                         <input min="0"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === true ?  null : 'disabled'"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             type="number" class="form-control" formControlName="creditLimitRate">
                                     </div>
                                 </div>

@@ -52,6 +52,8 @@ export class AddRoleUserComponent extends AppList {
         ];
         this.getDataCombobox();
         this.getCompanies();
+        this.getOffices();
+
         if (!!this.id) {
             this.getPermissionsByUserId();
         }
@@ -70,7 +72,6 @@ export class AddRoleUserComponent extends AppList {
     }
 
     getCompanies() {
-
         this._systemRepo.getListCompaniesByUserId(this.id)
             .pipe(
                 catchError(this.catchError),
@@ -78,7 +79,6 @@ export class AddRoleUserComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     this.companies = res;
-
                 },
             );
     }
@@ -92,7 +92,7 @@ export class AddRoleUserComponent extends AppList {
                 (res: any) => {
                     this.officeData = res;
                     this.listRoles.forEach(item => {
-                            item.offices = res;
+                        item.offices = res;
                     });
                 },
             );
@@ -140,13 +140,11 @@ export class AddRoleUserComponent extends AppList {
     }
 
     selectedRole(item: any, id: string) {
-        console.log(id);
         item.permissionSampleId = id;
         this.checkDupAll();
     }
 
     selectedOffice(item: PermissionSample, id: string) {
-        console.log(id);
         item.officeId = id;
         this.checkDupAll();
     }
@@ -168,10 +166,11 @@ export class AddRoleUserComponent extends AppList {
     addNewLine() {
         const psm = new PermissionSample();
         psm.offices = this.officeData;
+        psm.buid = !!this.companies.length ? this.companies[0].id : null;
+        psm.offices = cloneDeep(this.officeData.filter(x => x.buid === psm.buid));
+        psm.officeId = !!psm.offices.length ? psm.offices[0].id : null;
+
         this.listRoles.push(psm);
-        console.log(this.listRoles);
-        this.getCompanies();
-        this.getOffices();
     }
 
     deleteRole(index: number, id: string) {

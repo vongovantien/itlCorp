@@ -5,7 +5,7 @@
                 <div class="form-group"
                     [ngClass]="{'m-form__group has-danger':(isSubmitted || customerId.dirty) && !customerId.valid }">
                     <label for="form-control-label" required>
-                        Customer Name {{customerName}} {{customerId.value}}
+                        Customer Name
                     </label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                         (remove)="resetFormControl(customerId)"

@@ -25,7 +25,6 @@
                             </ng-container>
 
                             <ng-container *ngIf="receiptDetail?.status === 'Done'">
-
                                 <app-permission-button title="Cancel Receipt" type="reject" class="danger"
                                     icon="la la-times" (onClick)="submitClick('cancel')">
                                 </app-permission-button>
@@ -44,28 +43,7 @@
                 </div>
                 <customer-payment-form-create-receipt [isUpdate]="true"> </customer-payment-form-create-receipt>
 
-                <customer-payment-list-receipt>
-                    <ul class="list-group">
-                        <li
-                            class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-                            Sync Status:
-                            <span *ngIf="receiptDetail?.syncStatus !== null"
-                                class="m-badge m-badge--{{(!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
-                                {{receiptDetail?.syncStatus}}
-                            </span>
-                        </li>
-                        <li
-                            class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-                            Reason reject:
-                            <span>{{receiptDetail?.reasonReject}}</span>
-                        </li>
-                        <li
-                            class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-                            Last Sync:
-                            <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy'}}</span>
-                        </li>
-                    </ul>
-                </customer-payment-list-receipt>
+                <customer-payment-list-receipt [syncInfoTemplate]="syncInfoTemplate"></customer-payment-list-receipt>
 
                 <customer-payment-receipt-summary></customer-payment-receipt-summary>
 
@@ -79,7 +57,6 @@
                         </span> <span class="text-success">{{receiptDetail?.userNameModified}}</span>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -99,3 +76,23 @@
     [labelConfirm]="'Yes'" labelCancel="No"
     body="Noted: After you save the receipt, you can not edit. Are you sure do this action?" iconConfirm="la la-save">
 </confirm-popup>
+
+<ng-template #syncInfoTemplate>
+    <ul class="list-group">
+        <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+            Sync Status:
+            <span *ngIf="receiptDetail?.syncStatus !== null"
+                class="m-badge m-badge--{{(!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
+                {{receiptDetail?.syncStatus}}
+            </span>
+        </li>
+        <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+            Reason reject:
+            <span>{{receiptDetail?.reasonReject}}</span>
+        </li>
+        <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+            Last Sync:
+            <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy'}}</span>
+        </li>
+    </ul>
+</ng-template>

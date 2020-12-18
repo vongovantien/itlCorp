@@ -461,51 +461,54 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     var vas = item.Vas?.Split(";").ToArray();
                     contract.Vas = string.Empty;
-                    foreach (var it in vas)
+                    if (vas != null)
                     {
-                        if (it.Trim() == "Air Import")
+                        foreach (var it in vas)
                         {
-                            contract.Vas += "AI;";
-                        }
-                        if (it.Trim() == "Air Export")
-                        {
-                            contract.Vas += "AE;";
-                        }
-                        if (it.Trim() == "Sea Consol Export")
-                        {
-                            contract.Vas += "SCE;";
-                        }
-                        if (it.Trim() == "Sea Consol Import")
-                        {
-                            contract.Vas += "SCI;";
-                        }
-                        if (it.Trim() == "Sea FCL Export")
-                        {
-                            contract.Vas += "SFE;";
-                        }
-                        if (it.Trim() == "Sea LCL Export")
-                        {
-                            contract.Vas += "SLE;";
-                        }
-                        if (it.Trim() == "Sea FCL Import")
-                        {
-                            contract.Vas += "SFI;";
-                        }
-                        if (it.Trim() == "Sea LCL Import")
-                        {
-                            contract.Vas += "SLI;";
-                        }
-                        if (it.Trim() == "Custom Logistic")
-                        {
-                            contract.Vas += "CL;";
-                        }
-                        if (it.Trim() == "Trucking")
-                        {
-                            contract.Vas += "IT;";
-                        }
-                        if (it.Trim() == "All")
-                        {
-                            contract.Vas = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
+                            if (it.Trim() == "Air Import")
+                            {
+                                contract.Vas += "AI;";
+                            }
+                            if (it.Trim() == "Air Export")
+                            {
+                                contract.Vas += "AE;";
+                            }
+                            if (it.Trim() == "Sea Consol Export")
+                            {
+                                contract.Vas += "SCE;";
+                            }
+                            if (it.Trim() == "Sea Consol Import")
+                            {
+                                contract.Vas += "SCI;";
+                            }
+                            if (it.Trim() == "Sea FCL Export")
+                            {
+                                contract.Vas += "SFE;";
+                            }
+                            if (it.Trim() == "Sea LCL Export")
+                            {
+                                contract.Vas += "SLE;";
+                            }
+                            if (it.Trim() == "Sea FCL Import")
+                            {
+                                contract.Vas += "SFI;";
+                            }
+                            if (it.Trim() == "Sea LCL Import")
+                            {
+                                contract.Vas += "SLI;";
+                            }
+                            if (it.Trim() == "Custom Logistic")
+                            {
+                                contract.Vas += "CL;";
+                            }
+                            if (it.Trim() == "Trucking")
+                            {
+                                contract.Vas += "IT;";
+                            }
+                            if (it.Trim() == "All")
+                            {
+                                contract.Vas = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
+                            }
                         }
                     }
                     if (!string.IsNullOrEmpty(contract.Vas))
@@ -620,22 +623,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.AgreementTypeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_AGREEMENT_TYPE_NOT_FOUND], item.ContractType);
                     item.IsValid = false;
                 }
-
                 else
                 {
-                    if (string.IsNullOrEmpty(item.ContractNo) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    if (string.IsNullOrEmpty(item.ContractNo) && item.ContractType == "Official")
                     {
                         item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACTNO_EMPTY]);
 
                         item.IsValid = false;
                     }
 
-                    if (string.IsNullOrEmpty(item.CreditLimited) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    if (string.IsNullOrEmpty(item.CreditLimited) && item.ContractType == "Official")
                     {
                         item.CreditLimitError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CREDIT_LIMIT_EMPTY]);
                         item.IsValid = false;
                     }
-                    if (string.IsNullOrEmpty(item.PaymentTermTrialDay) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    if (string.IsNullOrEmpty(item.PaymentTermTrialDay) && item.ContractType == "Official")
                     {
                         item.PaymentTermError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PAYMENT_TERM_EMPTY]);
                         item.IsValid = false;
@@ -654,16 +656,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE], item.ContractNo);
                         item.IsValid = false;
                     }
-
-                    // start tạm thời comment, chưa rõ yêu cầu
-
+                    // tạm thời comment, chưa rõ yêu cầu
                     //if (item.ContractNo.Length < 3 || item.ContractNo.Length > 50)
                     //{
                     //    item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACTNO_LENGTH]);
                     //    item.IsValid = false;
                     //}
-
-                    // end 
+                    // 
                 }
 
                 if (string.IsNullOrEmpty(item.SaleService))
@@ -758,7 +757,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         var dataDuplicate = saleService.Replace(" ", "").Split(";").ToArray();
                         var dataCheck = dataDuplicate.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList();
-                        if (dataCheck.Any() && !string.IsNullOrEmpty( dataCheck.FirstOrDefault()))
+                        if (dataCheck.Any() && !string.IsNullOrEmpty(dataCheck.FirstOrDefault()))
                         {
                             item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE], item.SaleService);
                             item.IsValid = false;
@@ -811,6 +810,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string Title = string.Empty;
             string Name = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
+            string urlToSend = string.Empty;
             List<string> lstCc = new List<string>
             {
             };
@@ -845,8 +845,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     "</br>"
                     + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-                ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-                body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+                urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+                body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
                 if (lstTo.Any())
                 {
@@ -880,8 +880,8 @@ namespace eFMS.API.Catalogue.DL.Services
                   "</br>"
                  + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-                ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-                body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+                urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+                body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc.Add(objInfoSalesman?.Email);
                 //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
@@ -911,6 +911,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var contract = DataContext.Get(x => x.Id == new Guid(contractId)).FirstOrDefault();
             string employeeId = sysUserRepository.Get(x => x.Id == contract.SaleManId).Select(t => t.EmployeeId).FirstOrDefault();
             var salesmanObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string urlToSend = string.Empty;
             contract.SaleService = GetContractServicesName(contract.SaleService);
 
             string subject = string.Empty;
@@ -948,8 +949,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         "</br>"
                         + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
 
@@ -988,6 +989,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(contract, x => x.Id == new Guid(contractId), false);
             DataContext.SubmitChanges();
             string url = string.Empty;
+            string urlToSend = string.Empty;
 
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
@@ -1045,8 +1047,8 @@ namespace eFMS.API.Catalogue.DL.Services
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
@@ -1213,12 +1215,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                          join employee in employees on users.EmployeeId equals employee.Id
                                          select new { contract, users, employee };
 
-                    if (queryContracts.Count() == 0)
-                    {
-
-                        return null;
-                    }
-
+                    if (queryContracts.Count() == 0) return null;
                     if (queryContracts.Count() > 0)
                     {
                         results = queryContracts.Select(x => new CatAgreementModel
