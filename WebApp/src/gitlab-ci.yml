@@ -1,0 +1,36 @@
+variables:
+    PROJECT_PATH: "$CI_PROJECT_DIR"
+    APP_OUTPUT_PATH: "$CI_PROJECT_DIR/dist/eFMS-Web"
+
+image: node:12
+
+cache:
+    paths:
+        - node_modules
+        - package-lock.json
+stages:
+    - build
+    # - deploy
+
+job_build:
+    stage: build
+    script:
+        - node --version
+        # - echo "start job_build"
+        # - npm install
+        # - npm run build
+        # - echo "job_build doing something..."
+        - echo "end job_build"
+    # only:
+    #     - uat/fixbug/fix-bug-uat
+    artifacts:
+        name: "angular_build"
+        paths:
+            - $APP_OUTPUT_PATH
+# job_deploy:
+#   stage: deploy
+#   script:
+#     - echo "deploying to iis",
+#     - mkdir $APP_OUTPUT_PATH/test
+#     - cp -R ./dist/init-angular-project $APP_OUTPUT_PATH/test
+#     - echo "done deploy"

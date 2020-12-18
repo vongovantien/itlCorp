@@ -10,6 +10,7 @@ export class SignalRService {
 
     private connectionId: string;
     private hubConnection: HubConnection;
+    private connectionIds: string[] = [];
 
     constructor() { }
 
@@ -30,8 +31,10 @@ export class SignalRService {
                 this.connectionId = connectionId;
                 return this.hubConnection.invoke('GetConnectionIds');
             })
-            .then((connectionIds: any) => {
-                // console.log("ConnectionIds", connectionIds);
+            .then((connectionIds: string[]) => {
+                if (connectionIds) {
+                    this.connectionIds.push(...connectionIds);
+                }
             })
             .catch(err => {
                 console.log('Error while starting connection ' + err)
@@ -48,6 +51,10 @@ export class SignalRService {
 
     getConnectionId() {
         return this.hubConnection.connectionId;
+    }
+
+    getListConnection(): string[] {
+        return this.connectionIds;
     }
 
     listenEvent(eventName: string, cb: (...arrg: any[]) => void) {

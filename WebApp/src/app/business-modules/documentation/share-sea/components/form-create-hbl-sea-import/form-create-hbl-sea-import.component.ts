@@ -120,7 +120,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                     this.jobId = this.shipmentDetail.id;
 
                     const formData = {
-                        mtBill: this.shipmentDetail.mawb,
+                        masterBill: this.shipmentDetail.mawb,
                         servicetype: this.shipmentDetail.typeOfService,
                         documentDate: { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) },
                         supplier: this.shipmentDetail.coloaderId,
@@ -133,7 +133,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                         eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
                         etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
                     };
-
+                    console.log(formData);
                     this.formGroup.patchValue(formData);
                 }
             );

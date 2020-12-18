@@ -145,6 +145,9 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
             this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
             this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
+
+            this.grossWeight = +this.grossWeight.toFixed(3);
+            this.totalCBM = +this.totalCBM.toFixed(3);
         }
 
         if (!!containers.length && !this.selectedPackage || containers.length === 1 && !this.selectedPackage) {
