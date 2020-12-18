@@ -140,6 +140,12 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
         this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
 
+        this.grossWeight = +this.grossWeight.toFixed(3);
+        this.netWeight = +this.netWeight.toFixed(3);
+        this.totalChargeWeight = +this.totalChargeWeight.toFixed(3);
+        this.totalCBM = +this.totalCBM.toFixed(3);
+        this.packageQty = +this.packageQty.toFixed(3);
+
         if (!!containers.length && !this.selectedPackage || containers.length === 1) {
             if (!!containers[0].packageTypeId) {
                 this.selectedPackage = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId).id;
