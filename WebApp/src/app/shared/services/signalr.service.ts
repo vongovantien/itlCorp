@@ -35,7 +35,6 @@ export class SignalRService {
                 if (connectionIds) {
                     this.connectionIds.push(...connectionIds);
                 }
-                console.log("ConnectionIds", this.connectionIds);
             })
             .catch(err => {
                 console.log('Error while starting connection ' + err)
