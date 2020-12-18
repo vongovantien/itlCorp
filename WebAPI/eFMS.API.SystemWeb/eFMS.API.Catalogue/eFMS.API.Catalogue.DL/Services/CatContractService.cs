@@ -78,7 +78,8 @@ namespace eFMS.API.Catalogue.DL.Services
             return DataContext.Get();
         }
 
-        public List<CatContractModel> GetBy(string partnerId)
+
+        public List<CatContractModel> GetBy(string partnerId, bool? all)
         {
             IQueryable<CatContract> data = DataContext.Get().Where(x => x.PartnerId.Trim() == partnerId);
             IQueryable<SysUser> sysUser = sysUserRepository.Get();
@@ -113,6 +114,64 @@ namespace eFMS.API.Catalogue.DL.Services
                 saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
+            }
+            if (all == true) return results;
+
+            string partnerType = catPartnerRepository.Get(x => x.Id == partnerId).Select(t => t.PartnerType).FirstOrDefault();
+            ICurrentUser _user = null;
+            switch (partnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);
+                    break;
+            }
+
+
+            PermissionRange rangeSearch = 0;
+
+
+            if (partnerType == "Customer" || partnerType == "Agent")
+            {
+                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            }
+            else
+            {
+                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            }
+            switch (rangeSearch)
+            {
+                case PermissionRange.None:
+                    results = null;
+                    break;
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    results = results.Where(x => x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID).ToList();
+                    break;
+                case PermissionRange.Group:
+                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
+                    results = results.Where(x => (x.CreatorGroupId == currentUser.GroupId && x.CreatorDepartmentId == currentUser.DepartmentId && x.CreatorOfficeId == currentUser.OfficeID && x.CreatorCompanyId == currentUser.CompanyID)
+                        || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID || dataUserLevel.Contains(x.SaleManId)).ToList();
+                    break;
+                case PermissionRange.Department:
+                    var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+                    results = results.Where(x => (x.CreatorDepartmentId == currentUser.DepartmentId && x.CreatorOfficeId == currentUser.OfficeID && x.CreatorCompanyId == currentUser.CompanyID)
+                      || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID || dataUserLevelDepartment.Contains(x.SaleManId)).ToList();
+                    break;
+                case PermissionRange.Office:
+                    results = results.Where(x => (x.CreatorOfficeId == currentUser.OfficeID && x.CreatorCompanyId == currentUser.CompanyID)
+                    || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID).ToList();
+                    break;
+                case PermissionRange.Company:
+                    results = results.Where(x => x.CreatorCompanyId == currentUser.CompanyID
+                    || x.UserCreated == currentUser.UserID || x.SaleManId == currentUser.UserID).ToList();
+                    break;
             }
             return results;
         }

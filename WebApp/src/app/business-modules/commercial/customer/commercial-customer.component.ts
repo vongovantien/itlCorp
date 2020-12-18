@@ -122,7 +122,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
 
     showSaleman(customerId: string) {
-        this._catalogueRepo.getListContract(customerId)
+        this._catalogueRepo.getListContract(customerId, true)
             .pipe(catchError(this.catchError), finalize(() => {
             })).subscribe(
                 (res: any) => {
