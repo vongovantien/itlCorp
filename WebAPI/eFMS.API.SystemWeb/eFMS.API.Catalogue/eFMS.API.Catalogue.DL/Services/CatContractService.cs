@@ -6,7 +6,9 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -35,6 +37,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CsTransaction> transactionRepository;
         private readonly IContextBase<OpsTransaction> opsRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IOptions<ApiUrl> ApiUrl;
 
@@ -54,6 +57,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<OpsTransaction> opsRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
+            IContextBase<SysUserLevel> userlevelRepo,
             ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -70,6 +74,7 @@ namespace eFMS.API.Catalogue.DL.Services
             opsRepository = opsRepo;
             ApiUrl = apiurl;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
+            userlevelRepository = userlevelRepo;
 
         }
 
