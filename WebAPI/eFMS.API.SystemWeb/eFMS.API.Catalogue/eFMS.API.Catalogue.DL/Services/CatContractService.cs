@@ -456,7 +456,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         if (it.Trim() == "All")
                         {
-                            contract.SaleService = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
+                            contract.SaleService = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT ";
                         }
                     }
                     var vas = item.Vas?.Split(";").ToArray();
@@ -507,7 +507,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                             if (it.Trim() == "All")
                             {
-                                contract.Vas = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
+                                contract.Vas = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT ";
                             }
                         }
                     }
