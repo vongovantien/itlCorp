@@ -61,10 +61,10 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
             return;
         }
 
-        if (!this.checkValidAmountRangeChange()) {
-            this._toastService.warning(this.invalidFormText);
-            return;
-        }
+        // if (!this.checkValidAmountRangeChange()) {
+        //     this._toastService.warning(this.invalidFormText);
+        //     return;
+        // }
 
         const modelAdd: AccAccountingManagementModel = this.onSubmitData();
         modelAdd.type = AccountingConstants.ISSUE_TYPE.VOUCHER;

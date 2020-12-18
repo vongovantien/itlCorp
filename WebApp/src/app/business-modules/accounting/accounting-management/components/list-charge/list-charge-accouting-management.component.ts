@@ -348,6 +348,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         });
     }
 
+    // TODO xác nhận lại với kế toán
     VatAmountChange(amount: number, charge: ChargeOfAccountingManagementModel, type: string = 'amount') {
         if (this.isReadOnly) {
             return;
@@ -385,6 +386,15 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
         }
         return valid;
+    }
+
+    onChangeExcRate(exc: number, charge: ChargeOfAccountingManagementModel) {
+        if (charge.currency === 'VND') {
+            return;
+        }
+        charge.amountVnd = +(charge.orgAmount * exc).toFixed(2);
+        charge.vatAmountVnd = +(charge.orgVatAmount * exc).toFixed(2);
+
     }
 
 }

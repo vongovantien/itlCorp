@@ -143,6 +143,11 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this.totalChargeWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
         this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
 
+        this.grossWeight = +this.grossWeight.toFixed(3);
+        this.netWeight = +this.netWeight.toFixed(3);
+        this.totalChargeWeight = +this.totalChargeWeight.toFixed(3);
+        this.totalCBM = +this.totalCBM.toFixed(3);
+
         // * Container, Package.
         this.containerDetail = '';
 
