@@ -75,7 +75,7 @@
                             <td>{{charge.currency}}</td>
                             <td>
                                 <input type="text" class="form-control" [(ngModel)]="charge.exchangeRate"
-                                    autoFormatCurrency numeric>
+                                    autoFormatCurrency numeric (ngModelChange)="onChangeExcRate($event,charge)">
                             </td>
                             <ng-container *ngIf="type === 'invoice'">
                                 <td>
@@ -93,8 +93,7 @@
                                         [title]="charge.isValidAmount === false ? titleErrorRangeAmount: ''"
                                         [ngClass]="{'m-form__group has-danger': charge.isValidAmount === false}">
                                         <input type="text" class="form-control" [(ngModel)]="charge.amountVnd"
-                                            autoFormatCurrency numeric
-                                            (blur)="VatAmountChange(charge.amountVnd, charge)">
+                                            autoFormatCurrency numeric>
                                     </div>
                                 </td>
                                 <td class="m-form--state m-form">
@@ -102,8 +101,7 @@
                                         [title]="charge.isValidVatAmount === false ? titleErrorRangeAmount: ''"
                                         [ngClass]="{'m-form__group has-danger': charge.isValidVatAmount === false}">
                                         <input type="text" class="form-control" [(ngModel)]="charge.vatAmountVnd"
-                                            autoFormatCurrency numeric
-                                            (blur)="VatAmountChange(charge.vatAmountVnd,charge,'vat')">
+                                            autoFormatCurrency numeric>
                                     </div>
                                 </td>
                                 <td>
