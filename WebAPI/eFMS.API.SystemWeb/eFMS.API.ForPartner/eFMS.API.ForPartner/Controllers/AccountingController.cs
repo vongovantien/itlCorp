@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
@@ -29,15 +28,17 @@ namespace eFMS.API.ForPartner.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccountingManagementService accountingManagementService;
-
+        private readonly IActionFuncLogService actionFuncLogService;
         /// <summary>
         /// Accounting Contructor
         /// </summary>
         public AccountingController(IAccountingManagementService service,
-            IStringLocalizer<LanguageSub> localizer)
+            IStringLocalizer<LanguageSub> localizer,
+            IActionFuncLogService actionFuncLog)
         {
             accountingManagementService = service;
             stringLocalizer = localizer;
+            actionFuncLogService = actionFuncLog;
         }
 
         /// <summary>
@@ -54,6 +55,13 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(accountingManagementService.GenerateHashStringTest(model, apiKey));
         }
 
+        /// <summary>
+        /// Check Hash
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         [HttpPost("CheckHash")]
         public IActionResult CheckHash(object model, [Required] string apiKey, [Required] string hash)
         {
@@ -87,11 +95,19 @@ namespace eFMS.API.ForPartner.Controllers
             }
 
             HandleState hs = accountingManagementService.UpdateVoucherAdvance(model, apiKey);
+            string _message = hs.Success ? "Cập nhật phiếu chi thành công" : string.Format("{0}. Cập nhật phiếu chi thất bại", hs.Message.ToString());
+            var result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            #region -- Ghi Log --
+            string _funcLocal = "UpdateVoucherAdvance";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = "Cập nhật thông tin Advance (Phiếu chi)";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            #endregion -- Ghi Log --
+
             if (!hs.Success)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = string.Format("{0}. Cập nhật phiếu chi thất bại", hs.Message.ToString()), Data = model });
-            }            
-            return Ok(new ResultHandle { Status = true, Message = "Cập nhật phiếu chi thành công", Data = model });
+                return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -120,13 +136,19 @@ namespace eFMS.API.ForPartner.Controllers
             }
 
             HandleState hs = accountingManagementService.RemoveVoucherAdvance(model.VoucherNo, apiKey);
-            
-            if (!hs.Success)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = string.Format("{0}. Hủy phiếu chi thất bại", hs.Message.ToString()), Data = model.VoucherNo });
-            }
+            string _message = hs.Success ? "Hủy phiếu chi thành công" : string.Format("{0}. Hủy phiếu chi thất bại", hs.Message.ToString());
+            var result = new ResultHandle { Status = hs.Success, Message = _message, Data = model.VoucherNo };
 
-            return Ok(new ResultHandle { Status = true, Message = "Hủy phiếu chi thành công", Data = model.VoucherNo });
+            #region -- Ghi Log --
+            string _funcLocal = "RemoveVoucherAdvance";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = "Hủy Phiếu Chi";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            #endregion -- Ghi Log --
+
+            if (!hs.Success)
+                return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -163,22 +185,27 @@ namespace eFMS.API.ForPartner.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Các trường của ds charge: [{0}] không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireCharge), Data = model };
                 return BadRequest(_result);
             }
-            
+
             var debit_Obh_Charges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT || x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
             if (debit_Obh_Charges.Count == 0)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để tạo hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
-            
-            var hs = accountingManagementService.InsertInvoice(model, apiKey, "CreateInvoiceData");
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Tạo mới hóa đơn thành công", Data = model };
+
+            var hs = accountingManagementService.InsertInvoice(model, apiKey);
+            string _message = hs.Success ? "Tạo mới hóa đơn thành công" : string.Format("{0}. Tạo mới hóa đơn thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            #region -- Ghi Log --
+            string _funcLocal = "CreateInvoiceData";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = "Tạo Hóa Đơn";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            #endregion -- Ghi Log --
+
             if (!hs.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Tạo mới hóa đơn thất bại", hs.Message.ToString()), Data = model };
-                return BadRequest(_result);
-            }
+                return BadRequest(result);
             return Ok(result);
         }
 
@@ -223,16 +250,17 @@ namespace eFMS.API.ForPartner.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để thay thế hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return BadRequest(_result);
             }
-            
+
             #region --- Delete Invoice Old by PreReferenceNo ---
             var invoiceToDelete = new InvoiceInfo
             {
                 ReferenceNo = model.PreReferenceNo
             };
-            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey, "ReplaceInvoiceData");
+            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey);
             if (!hsDeleteInvoice.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = string.Format(@"{0}. Xóa hóa đơn cũ thất bại", hsDeleteInvoice.Message.ToString()), Data = model };
+                ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = string.Format("{0}. Xóa hóa đơn cũ thất bại", hsDeleteInvoice.Message.ToString()), Data = model };
+                actionFuncLogService.AddActionFuncLog("DeleteInvoice (ReplaceInvoiceData)", JsonConvert.SerializeObject(model), JsonConvert.SerializeObject(_result), "Xóa Hóa Đơn");
                 return BadRequest(_result);
             }
             #endregion --- Delete Invoice Old by PreReferenceNo ---
@@ -252,15 +280,21 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 fe.ReferenceNo = model.ReferenceNo;
             });
-            var hsInsertInvoice = accountingManagementService.InsertInvoice(invoiceToCreate, apiKey, "ReplaceInvoiceData");
+            var hsInsertInvoice = accountingManagementService.InsertInvoice(invoiceToCreate, apiKey);
             #endregion --- Create New Invoice by ReferenceNo ---
 
-            ResultHandle result = new ResultHandle { Status = hsInsertInvoice.Success, Message = "Thay thế hóa đơn thành công", Data = model };
+            string _message = hsInsertInvoice.Success ? "Thay thế hóa đơn thành công" : string.Format("{0}. Thay thế hóa đơn thất bại", hsInsertInvoice.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hsInsertInvoice.Success, Message = _message, Data = model };
+
+            #region -- Ghi Log --
+            string _funcLocal = "InsertInvoice (ReplaceInvoiceData)";
+            string _objectRequest = JsonConvert.SerializeObject(hsInsertInvoice);
+            string _major = "Tạo Hóa Đơn";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            #endregion -- Ghi Log --
+
             if (!hsInsertInvoice.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = hsInsertInvoice.Success, Message = string.Format(@"{0}. Thay thế hóa đơn thất bại", hsInsertInvoice.Message.ToString()), Data = model };
-                return BadRequest(_result);
-            }
+                return BadRequest(result);
             return Ok(result);
         }
 
@@ -284,13 +318,19 @@ namespace eFMS.API.ForPartner.Controllers
             }
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = accountingManagementService.DeleteInvoice(model, apiKey, "CancellingInvoice");
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Hủy hóa đơn thành công", Data = model };
+            var hs = accountingManagementService.DeleteInvoice(model, apiKey);
+            string _message = hs.Success ? "Hủy hóa đơn thành công" : string.Format("{0}. Hủy hóa đơn thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            #region -- Ghi Log --
+            string _funcLocal = "DeleteInvoice (CancellingInvoice)";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = "Xóa Hóa Đơn";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            #endregion -- Ghi Log --
+
             if (!hs.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Hủy hóa đơn thất bại", hs.Message.ToString()), Data = model };
-                return BadRequest(_result);
-            }
+                return BadRequest(result);
             return Ok(result);
         }
 
@@ -313,13 +353,20 @@ namespace eFMS.API.ForPartner.Controllers
                 return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
             if (!ModelState.IsValid) return BadRequest();
+
             var hs = accountingManagementService.RejectData(model, apiKey);
-            ResultHandle result = new ResultHandle { Status = true, Message = "Reject data thành công", Data = model };
+            string _message = hs.Success ? string.Format("Reject {0} thành công", model.Type?.ToUpper()) : string.Format("{0}. Reject data thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            #region -- Ghi Log --
+            string _funcLocal = "RejectData";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = string.Format("Reject {0}", model.Type?.ToUpper());
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            #endregion -- Ghi Log --
+
             if (!hs.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Reject data thất bại", hs.Message.ToString()), Data = model };
-                return BadRequest(_result);
-            }
+                return BadRequest(result);
             return Ok(result);
         }
 
@@ -342,13 +389,20 @@ namespace eFMS.API.ForPartner.Controllers
                 return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
             if (!ModelState.IsValid) return BadRequest();
+
             var hs = accountingManagementService.RemoveVoucher(model, apiKey);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Remove voucher thành công", Data = model };
+            string _message = hs.Success ? "Remove voucher thành công" : string.Format("{0}. Remove voucher thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            #region -- Ghi Log --
+            string _funcLocal = "RemoveVoucher";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = string.Format("Remove Voucher {0}", model.Type?.ToUpper());
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            #endregion -- Ghi Log --
+
             if (!hs.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = string.Format(@"{0}. Remove voucher thất bại", hs.Message.ToString()), Data = model };
-                return BadRequest(_result);
-            }
+                return BadRequest(result);
             return Ok(result);
         }
 
@@ -377,7 +431,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "Currency";
             }
-            
+
             return message;
         }
 
@@ -439,7 +493,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 message += (!string.IsNullOrEmpty(message) ? comma : string.Empty) + "Currency";
             }
-            
+
             return message;
         }
 

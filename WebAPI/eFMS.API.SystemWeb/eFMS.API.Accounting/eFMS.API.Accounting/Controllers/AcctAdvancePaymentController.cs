@@ -889,6 +889,16 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+
+        [HttpGet]
+        [Route("GetAgreementsData")]
+        [Authorize]
+        public IActionResult GetAgreementsData(string advanceNo)
+        {
+            var data = acctAdvancePaymentService.GetAgreementDatasByAdvanceNo(advanceNo);
+            return Ok(data);
+        }
+
         private void CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
         {
             var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();

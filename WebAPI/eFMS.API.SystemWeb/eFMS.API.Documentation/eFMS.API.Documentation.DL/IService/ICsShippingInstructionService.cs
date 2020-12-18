@@ -18,6 +18,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewFCLShippingInstructionByJobId(Guid jobId);
         Crystal PreviewSISummary(CsShippingInstructionReportModel model);
         Crystal PreviewSISummaryByJobId(Guid jobId);
-
+        bool[] CheckExistSIExport(Guid jobId);
     }
 }

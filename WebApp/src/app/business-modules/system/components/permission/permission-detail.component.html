@@ -86,7 +86,64 @@
                             <ul class="list-group list-module">
                                 <li class="list-group-item"
                                     *ngFor="let permissionModulegroup of  permissionSample.sysPermissionSampleGenerals; let i = index; trackBy: trackByFn">
-                                    <span class="font-15 font-weight-bold">{{permissionModulegroup.moduleName}}</span>
+                                    <div class="row">
+                                        <div class="col d-flex align-items-center m-w-100 justify-content-center">
+                                            <span class="font-15 font-weight-bold">{{permissionModulegroup.moduleName}}
+                                            </span>
+                                        </div>
+                                        <div class="col d-flex align-items-center">Quick Setup</div>
+                                        <div class="col text-center">
+                                            <app-switch
+                                                (toggleChange)="onChangeQuickSetup($event,'access',permissionModulegroup)">
+                                            </app-switch>
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-control" [ngModel]="null"
+                                                (ngModelChange)="onChangeQuickSetup($event,'detail',permissionModulegroup)">
+                                                <option [value]="null">-</option>
+                                                <option *ngFor="let item of levelPermissions" [value]="item">
+                                                    {{item}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-control" [ngModel]="null"
+                                                (ngModelChange)="onChangeQuickSetup($event,'write',permissionModulegroup)">
+                                                <option [value]="null">-</option>
+                                                <option *ngFor="let item of levelPermissions" [value]="item">
+                                                    {{item}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-control" [ngModel]="null"
+                                                (ngModelChange)="onChangeQuickSetup($event,'delete',permissionModulegroup)">
+                                                <option [value]="null">-</option>
+                                                <option *ngFor="let item of levelPermissions" [value]="item">
+                                                    {{item}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-control" [ngModel]="null"
+                                                (ngModelChange)="onChangeQuickSetup($event,'list',permissionModulegroup)">
+                                                <option [value]="null">-</option>
+                                                <option *ngFor="let item of levelPermissions" [value]="item">
+                                                    {{item}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col text-center">
+                                            <app-switch
+                                                (toggleChange)="onChangeQuickSetup($event,'import',permissionModulegroup)">
+                                            </app-switch>
+                                        </div>
+                                        <div class="col text-center">
+                                            <app-switch
+                                                (toggleChange)="onChangeQuickSetup($event,'export',permissionModulegroup)">
+                                            </app-switch>
+                                        </div>
+                                    </div>
                                     <ul class="list-group m--margin-top-10 list-permission">
                                         <li class="list-group-item col"
                                             *ngFor="let permission of permissionModulegroup.sysPermissionGenerals; let j = index; trackBy: trackByFn">
@@ -101,8 +158,7 @@
                                                     </app-switch>
                                                 </div>
                                                 <div class="col ">
-                                                    <select class="form-control" [(ngModel)]="permission.detail"
-                                                        [disabled]="!permission.access">
+                                                    <select class="form-control" [(ngModel)]="permission.detail">
                                                         <option *ngFor="let item of levelPermissions" [value]="item">
                                                             {{item}}
                                                         </option>

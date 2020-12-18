@@ -68,7 +68,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         ];
 
         this.configSearch = {
-            settingFields: this.headers.filter(h => h.field !== 'datetimeModified').map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            settingFields: this.headers.filter(h => h.field !== 'datetimeModified' && h.field !== 'active').map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
         localStorage.removeItem('success_add_sub');

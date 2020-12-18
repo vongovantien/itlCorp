@@ -631,12 +631,12 @@ namespace eFMS.API.Documentation.DL.Services
             // Search JobId
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
-                queryTrans = queryTrans.And(q => q.JobNo == criteria.JobId);
+                queryTrans = queryTrans.And(q => criteria.JobId.Contains(q.JobNo));
             }
             // Search Mawb
             if (!string.IsNullOrEmpty(criteria.Mawb))
             {
-                queryTrans = queryTrans.And(q => q.Mawb == criteria.Mawb);
+                queryTrans = queryTrans.And(q => criteria.Mawb.Contains(q.Mawb));
             }
 
             var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
@@ -708,9 +708,9 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.Hawb))
             {
                 queryTranDetail = queryTranDetail == null ?
-                    (q => q.Hwbno == criteria.Hawb)
+                    (q => criteria.Hawb.Contains(q.Hwbno))
                     :
-                    queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
+                    queryTranDetail.And(q => criteria.Hawb.Contains(q.Hwbno));
             }
             var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             if (hasSalesman)
@@ -765,7 +765,7 @@ namespace eFMS.API.Documentation.DL.Services
                     q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
             }
 
-            queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
+            queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains(TermData.CustomLogistic) || string.IsNullOrEmpty(criteria.Service));
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
@@ -774,17 +774,17 @@ namespace eFMS.API.Documentation.DL.Services
             // Search JobId
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
-                queryOpsTrans = queryOpsTrans.And(q => q.JobNo == criteria.JobId);
+                queryOpsTrans = queryOpsTrans.And(q => criteria.JobId.Contains(q.JobNo));
             }
             // Search Mawb
             if (!string.IsNullOrEmpty(criteria.Mawb))
             {
-                queryOpsTrans = queryOpsTrans.And(q => q.Mblno == criteria.Mawb);
+                queryOpsTrans = queryOpsTrans.And(q => criteria.Mawb.Contains(q.Mblno));
             }
             // Search Hawb
             if (!string.IsNullOrEmpty(criteria.Hawb))
             {
-                queryOpsTrans = queryOpsTrans.And(q => q.Hwbno == criteria.Hawb);
+                queryOpsTrans = queryOpsTrans.And(q => criteria.Hawb.Contains(q.Hwbno));
             }
 
             var hasSalesman = criteria.SalesMan != null; // Check if Type=Salesman
@@ -1285,7 +1285,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyHandling = _totalBuyAmountHandling;
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
-                data.TotalBuy = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalBuyKB;
+                data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
 
@@ -1448,7 +1448,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
             IQueryable<GeneralReportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = GeneralReportOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -1487,7 +1487,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
             IQueryable<GeneralReportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = GeneralReportOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -1623,7 +1623,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         ServiceDate = master.ServiceDate,
                                         PicId = master.PersonIncharge,
                                         SalesmanId = house.SaleManId,
-                                        Service = master.TransactionType
+                                        Service = master.TransactionType,
+                                        ChargeWeight = house.ChargeWeight
                                     };
                 return queryShipment;
             }
@@ -1647,7 +1648,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         ServiceDate = master.ServiceDate,
                                         PicId = master.PersonIncharge,
                                         SalesmanId = house.SaleManId,
-                                        Service = master.TransactionType
+                                        Service = master.TransactionType,
+                                        ChargeWeight = house.ChargeWeight
                                     };
                 return queryShipment;
             }
@@ -1744,7 +1746,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = AcctPLSheetDocumentation(criteria);
             IQueryable<AccountingPlSheetExportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = AcctPLSheetOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -1771,7 +1773,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = JobProfitAnalysisDocumetation(criteria);
             IQueryable<JobProfitAnalysisExportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = JobProfitAnalysisOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -2444,7 +2446,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = SummaryOfCostsIncurred(criteria);
             IQueryable<SummaryOfCostsIncurredExportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = SummaryOfCostsIncurredOperation(criteria);
                 list = dataDocumentation.Union(dataOperation);
@@ -2770,7 +2772,7 @@ namespace eFMS.API.Documentation.DL.Services
             var dataDocumentation = SummaryOfRevenueIncurred(criteria);
             SummaryOfRevenueModel obj = new SummaryOfRevenueModel();
 
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
             {
                 var dataOperation = SummaryOfRevenueIncurredOperation(criteria);
                 var lstDoc = dataDocumentation.summaryOfRevenueExportResults.AsQueryable();
@@ -3059,6 +3061,385 @@ namespace eFMS.API.Documentation.DL.Services
             return queryObhBuyDocument;
         }
 
+        #endregion
+
+        #region -- COMMISSION INCENTIVE REPORT
+        /// <summary>
+        /// Get Department Manager
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="officeId"></param>
+        /// <param name="departmentId"></param>
+        /// <returns></returns>
+        private List<string> GetDeptManager(Guid? companyId, Guid? officeId, int? departmentId)
+        {
+            var managers = sysUserLevelRepo.Get(x => x.GroupId == 11
+                                                    && x.Position == "Manager-Leader"
+                                                    && x.DepartmentId == departmentId
+                                                    && x.DepartmentId != null
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId).Select(s => s.UserId).ToList();
+            return managers;
+        }
+
+        /// <summary>
+        /// Get Accoutant Manager
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="officeId"></param>
+        /// <returns></returns>
+        private List<string> GetAccoutantManager(Guid? companyId, Guid? officeId)
+        {
+            var deptAccountants = departmentRepository.Get(s => s.DeptType == "ACCOUNTANT").Select(s => s.Id).ToList();
+            var accountants = sysUserLevelRepo.Get(x => x.GroupId == 11
+                                                    && x.OfficeId == officeId
+                                                    && x.DepartmentId != null
+                                                    && x.CompanyId == companyId
+                                                    && x.Position == "Manager-Leader")
+                                                    .Where(x => deptAccountants.Contains(x.DepartmentId.Value))
+                                                    .Select(s => s.UserId).ToList();
+            return accountants;
+        }
+
+        /// <summary>
+        /// Get Office Manager
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="officeId"></param>
+        /// <returns></returns>
+        private List<string> GetOfficeManager(Guid? companyId, Guid? officeId)
+        {
+            var officeManager = sysUserLevelRepo.Get(x => x.GroupId == 11
+                                                    && x.DepartmentId == null
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId
+                                                    && x.Position == "Manager-Leader")
+                                                    .Select(s => s.UserId).ToList();
+            return officeManager;
+        }
+
+        /// <summary>
+        /// Get Selling total not include Commission fee
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        private decimal GetSellingRateNoCom(Guid hblid, string currency)
+        {
+            decimal revenue = 0;
+            var chargeComId = catChargeGroupRepo.Get(x => x.Name.ToUpper() == "COM")?.Select(x => x.Id).FirstOrDefault();
+            Expression<Func<CsShipmentSurcharge, bool>> query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE
+                                                                && x.Hblid == hblid
+                                                                && (x.KickBack == false || x.KickBack == null)
+                                                                && x.ChargeGroup != chargeComId;
+            var sellingCharges = surCharge.Get(query);
+            if (sellingCharges != null)
+            {
+                foreach (var charge in sellingCharges)
+                {
+                    if (catChargeRepo.Where(c => c.Id == charge.ChargeId && c.ChargeGroup == chargeComId).Count() == 0)
+                    {
+                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                        var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
+                        revenue += charge.Quantity * charge.UnitPrice * rate ?? 0;
+                    }
+                }
+            }
+            return revenue;
+        }
+
+        /// <summary>
+        /// Get Buying total not include Commission fee
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        private decimal GetBuyingRateNoCom(Guid hblid, string currency)
+        {
+            decimal cost = 0;
+            var chargeComId = catChargeGroupRepo.Get(x => x.Name.ToUpper() == "COM")?.Select(x => x.Id).FirstOrDefault();
+            Expression<Func<CsShipmentSurcharge, bool>> query = x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+                                                                && x.Hblid == hblid
+                                                                && (x.KickBack == false || x.KickBack == null)
+                                                                && x.ChargeGroup != chargeComId;
+            var buyingCharges = surCharge.Get(query);
+            if (buyingCharges != null)
+            {
+                foreach (var charge in buyingCharges)
+                {
+                    if (catChargeRepo.Where(c => c.Id == charge.ChargeId && c.ChargeGroup == chargeComId).Count() == 0)
+                    {
+                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                        var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
+                        cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Buying trước thuế
+                    }
+                }
+            }
+            return cost;
+        }
+
+        /// <summary>
+        /// Get total Commission
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        private decimal GetCommissionAmount(Guid hblid, string currency)
+        {
+            decimal com = 0;
+            var chargeComId = catChargeGroupRepo.Get(x => x.Name == "Com")?.Select(x => x.Id).FirstOrDefault();
+            var charges = surCharge.Get(x => (x.Type == DocumentConstants.CHARGE_BUY_TYPE
+                                           || x.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                                           && x.Hblid == hblid);
+            if (charges != null)
+            {
+                foreach (var charge in charges)
+                {
+                    var chargeHasCom = catChargeRepo.Where(c => c.Id == charge.ChargeId && c.ChargeGroup == chargeComId).Count() > 0;
+                    if (charge.KickBack == true || charge.ChargeGroup == chargeComId || chargeHasCom)
+                    {
+                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                        var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
+                        com += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Selling trước thuế
+                    }
+                }
+            }
+            return com;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobNo"></param>
+        /// <returns></returns>
+        private string GetPortCode(Guid HblId, string service)
+        {
+            var shipment = detailRepository.Get(x => x.Id == HblId)?.FirstOrDefault();
+            if(service == TermData.AirExport || service == TermData.SeaConsolExport || service == TermData.SeaFCLExport || service == TermData.SeaLCLExport)
+            {
+                return catPlaceRepo.Get(x => x.Id == shipment.Pod).Select(x => x.Code)?.FirstOrDefault();
+            }
+            if (service == TermData.AirImport || service == TermData.SeaConsolImport || service == TermData.SeaFCLImport || service == TermData.SeaLCLImport)
+            {
+                return catPlaceRepo.Get(x => x.Id == shipment.Pol).Select(x => x.Code)?.FirstOrDefault();
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Get data Commission Report
+        /// </summary>
+        /// <param name="criteria">data search</param>
+        /// <param name="userId">current user</param>
+        /// <returns></returns>
+        public CommissionExportResult GetCommissionReport(CommissionReportCriteria criteria, string userId, string rptType)
+        {
+            CommissionExportResult commissionData = new CommissionExportResult();
+            var forMonth = string.Empty;
+            var isOPSReport = rptType == "OPS";
+            // Get detail
+            if (isOPSReport) // Commission OPS Report
+            {
+                if(!string.IsNullOrEmpty(criteria.Service) && !criteria.Service.Contains(TermData.CustomLogistic))
+                {
+                    return null;
+                }
+                var dataShipmentOps = QueryDataOperation(criteria);
+                if (!string.IsNullOrEmpty(criteria.CustomNo))
+                {
+                    dataShipmentOps = from ops in dataShipmentOps
+                                      join custom in customsDeclarationRepo.Get() on ops.JobNo equals custom.JobNo
+                                      where criteria.CustomNo.Contains(custom.ClearanceNo)
+                                      select ops;
+                }
+                var data = dataShipmentOps.GroupBy(x => x.JobNo).AsQueryable();
+                if (data.Count() == 0)
+                {
+                    return null;
+                }
+                commissionData.Details = new List<CommissionDetail>();
+                foreach (var item in data)
+                {
+                    commissionData.Details.Add(new CommissionDetail()
+                    {
+                        ServiceDate = item.Select(x => x.ServiceDate).FirstOrDefault(),
+                        JobId = item.Select(x => x.JobNo).FirstOrDefault(),
+                        HBLNo = string.Empty,
+                        MBLNo = string.Empty,
+                        CustomSheet = string.IsNullOrEmpty(criteria.CustomNo) ? string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Select(c => c.ClearanceNo).ToArray())
+                                                                              : string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Where(c => criteria.CustomNo.Contains(c.ClearanceNo)).Select(c => c.ClearanceNo).ToArray()),
+                        ChargeWeight = 0,
+                        PortCode = string.Empty,
+                        BuyingRate = GetBuyingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
+                        SellingRate = GetSellingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
+                        ComAmount = GetCommissionAmount(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency)
+                    });
+                }
+            }
+            else // Commission Air/Sea Report
+            {
+                if (!string.IsNullOrEmpty(criteria.Service) && criteria.Service == TermData.CustomLogistic)
+                {
+                    return null;
+                }
+                var dataShipment = QueryDataDocumentation(criteria);
+                if (dataShipment.Count() == 0)
+                {
+                    return null;
+                }
+                commissionData.Details = new List<CommissionDetail>();
+                foreach (var item in dataShipment)
+                {
+                    commissionData.Details.Add(new CommissionDetail()
+                    {
+                        ServiceDate = item.ServiceDate,
+                        JobId = item.JobId,
+                        HBLNo = item.Hawb,
+                        MBLNo = string.Empty,
+                        CustomSheet = string.Empty,
+                        ChargeWeight = item.ChargeWeight,
+                        PortCode = GetPortCode((Guid)item.HblId, item.Service),
+                        BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
+                        SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
+                        ComAmount = GetCommissionAmount((Guid)item.HblId, criteria.Currency)
+                    });
+                }
+            }
+            // Get header
+            forMonth = string.Join(" - ", commissionData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate?.ToString("MMM")).Distinct());
+            forMonth += " ," + commissionData.Details.FirstOrDefault().ServiceDate?.ToString("yyyy");
+            commissionData.ForMonth = forMonth;
+            commissionData.CustomerName = isOPSReport ? catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.ShortName
+                                                        : catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
+            commissionData.ExchangeRate = criteria.ExchangeRate;
+            // Partner info
+            if (!string.IsNullOrEmpty(criteria.Beneficiary))
+            {
+                var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
+                commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
+                commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
+                commissionData.BankName = beneficiaryInfo?.BankAccountName;
+                commissionData.TaxCode = beneficiaryInfo?.TaxCode;
+            }
+            // get current user
+            var curUser = sysUserLevelRepo.Get(x => x.UserId == userId)?.FirstOrDefault();
+            var preparedById = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
+            commissionData.PreparedBy = sysEmployeeRepo.Get(x => x.Id == preparedById).FirstOrDefault()?.EmployeeNameEn;
+            // Get Department manager
+            var managers = GetDeptManager(curUser?.CompanyId, curUser?.OfficeId, curUser?.DepartmentId)?.FirstOrDefault();
+            string _employeeIdDeptManager = sysUserRepo.Get(x => x.Id == managers).FirstOrDefault()?.EmployeeId;
+            string _managerDept = string.Empty;
+            if (_employeeIdDeptManager != null)
+            {
+                _managerDept = sysEmployeeRepo.Get(x => x.Id == _employeeIdDeptManager).FirstOrDefault()?.EmployeeNameVn;
+            }
+            commissionData.VerifiedBy = _managerDept;
+
+            string _managerName = string.Empty, _accountantName = string.Empty;
+            if (!isOPSReport)
+            {
+                // Get Accountant Manager
+                string _userIdAccountant = GetAccoutantManager(curUser?.CompanyId, curUser?.OfficeId).FirstOrDefault();
+                var _employeeIdAcountant = sysUserRepo.Get(x => x.Id == _userIdAccountant).FirstOrDefault()?.EmployeeId;
+                _accountantName = sysEmployeeRepo.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+                // Get Office Manager
+                string _userIdOfficeManager = GetOfficeManager(curUser?.CompanyId, curUser?.OfficeId).FirstOrDefault();
+                var _employeeIdOfficeManager = sysUserRepo.Get(x => x.Id == _userIdOfficeManager).FirstOrDefault()?.EmployeeId;
+                _managerName = sysEmployeeRepo.Get(x => x.Id == _employeeIdOfficeManager).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+            }
+            commissionData.ApprovedBy = isOPSReport ? string.Empty : _managerName;
+            commissionData.CrossCheckedBy = isOPSReport ? string.Empty : _accountantName;
+            return commissionData;
+        }
+
+        /// <summary>
+        /// Get data Incentive Report
+        /// </summary>
+        /// <param name="criteria">data search</param>
+        /// <param name="userId">current user</param>
+        /// <returns></returns>
+        public CommissionExportResult GetIncentiveReport(CommissionReportCriteria criteria, string userId)
+        {
+            CommissionExportResult commissionData = new CommissionExportResult();
+            var dataShipment = QueryDataDocumentation(criteria);
+            IQueryable<GeneralReportResult> list;
+            // Get detail
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
+            {
+                var dataShipmentOps = QueryDataOperation(criteria);
+                IQueryable<GeneralReportResult> data;
+                if (!string.IsNullOrEmpty(criteria.CustomNo))
+                {
+                    dataShipmentOps = from ops in dataShipmentOps
+                                      join custom in customsDeclarationRepo.Get() on ops.JobNo equals custom.JobNo
+                                      where criteria.CustomNo.Contains(custom.ClearanceNo)
+                                      select ops;
+
+                }
+                data = from ops in dataShipmentOps.GroupBy(x => x.JobNo)
+                       select new GeneralReportResult
+                       {
+                           JobId = ops.Select(x => x.JobNo).FirstOrDefault(),
+                           Mawb = ops.Select(x => x.Mblno).FirstOrDefault(),
+                           HblId = ops.Select(x => x.Hblid).FirstOrDefault(),
+                           Hawb = ops.Select(x => x.Hwbno).FirstOrDefault(),
+                           ServiceDate = ops.Select(x => x.ServiceDate).FirstOrDefault()
+                       };
+                list = data.Union(dataShipment);
+            }
+            else
+            {
+                list = dataShipment;
+            }
+            if (list.Count() == 0)
+            {
+                return null;
+            }
+            commissionData.Details = new List<CommissionDetail>();
+            foreach (var item in list)
+            {
+                commissionData.Details.Add(new CommissionDetail()
+                {
+                    ServiceDate = item.ServiceDate,
+                    JobId = item.JobId,
+                    HBLNo = item.Hawb,
+                    MBLNo = item.Mawb,
+                    CustomSheet = string.Empty,
+                    ChargeWeight = 0,
+                    PortCode = string.Empty,
+                    BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
+                    SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
+                    ComAmount = 0
+                });
+            }
+
+            // Get header
+            var forMonth = string.Join(" - ", commissionData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate?.ToString("MMM")).Distinct()) + ", " + list.FirstOrDefault().ServiceDate?.Year;
+            commissionData.ForMonth = forMonth;
+            commissionData.CustomerName = catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
+            commissionData.ExchangeRate = criteria.ExchangeRate;
+            // Partner info
+            if (!string.IsNullOrEmpty(criteria.Beneficiary))
+            {
+                var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
+                commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
+                commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
+                commissionData.BankName = beneficiaryInfo?.BankAccountName;
+                commissionData.TaxCode = beneficiaryInfo?.TaxCode;
+            }
+            // get current user
+            var curUser = sysUserLevelRepo.Get(x => x.UserId == userId)?.FirstOrDefault();
+            var preparedById = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
+            commissionData.PreparedBy = sysEmployeeRepo.Get(x => x.Id == preparedById).FirstOrDefault()?.EmployeeNameEn;
+            var managers = GetDeptManager(curUser?.CompanyId, curUser?.OfficeId, curUser?.DepartmentId)?.FirstOrDefault();
+            // Get Department manager
+            string _employeeIdDeptManager = sysUserRepo.Get(x => x.Id == managers).FirstOrDefault()?.EmployeeId;
+            string _managerDept = string.Empty;
+            if (_employeeIdDeptManager != null)
+            {
+                _managerDept = sysEmployeeRepo.Get(x => x.Id == _employeeIdDeptManager).FirstOrDefault()?.EmployeeNameVn;
+            }
+            commissionData.VerifiedBy = _managerDept;
+
+            return commissionData;
+        }
         #endregion
 
     }

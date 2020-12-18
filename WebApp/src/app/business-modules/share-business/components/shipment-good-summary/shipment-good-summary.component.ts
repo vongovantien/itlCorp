@@ -60,9 +60,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
             );
 
         this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {

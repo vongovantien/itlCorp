@@ -1583,7 +1583,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (reportType == DocumentConstants.HBLOFLANDING_ITL_KESCO
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP
-                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO)
+                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO
+                || reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {

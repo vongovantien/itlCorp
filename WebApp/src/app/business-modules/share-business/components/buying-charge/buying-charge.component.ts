@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ComponentRef } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ComponentRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -13,8 +13,8 @@ import { ConfirmPopupComponent } from '@common';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from '@enums';
 
-import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, skip, map, shareReplay } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
+import { catchError, takeUntil, finalize, skip, map, shareReplay, mergeMap } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 
@@ -28,6 +28,7 @@ import { ActivatedRoute } from '@angular/router';
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
     styleUrls: ['./buying-charge.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
@@ -85,7 +86,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _accountingRepo: AccountingRepo,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        protected _cd: ChangeDetectorRef
 
     ) {
         super();
@@ -112,7 +114,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
-                    this.charges = buyings;
+                    this.charges.length = 0;
+                    this.charges = [...buyings];
+                    this._cd.markForCheck();
                 }
             );
     }
@@ -1039,7 +1043,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         const body: IRecentlyCharge = {
             currentJobId: this.shipment.id,
             personInCharge: this.shipment.personIncharge,
-            transactionType: this.utility.getTransationType(this.shipment.transactionType),
+            transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
             shippingLine: this.shipment.coloaderId,
 
             consigneeId: this.hbl.consigneeId,
@@ -1185,7 +1189,25 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
         });
 
-        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).pipe(
+            mergeMap((res: CommonInterface.IResult) => {
+                if (!!res) {
+                    this.charges.forEach(item => {
+                        if (!!item.exchangeDate) {
+                            item.exchangeDate = item.exchangeDate.startDate;
+                        }
+                        if (!!item.invoiceDate) {
+                            item.invoiceDate = item.invoiceDate.startDate;
+                        }
+                    });
+                    const creditTerm = this._documentRepo.notificationAccountReceivableCreditTerm(this.charges);
+                    const paymentTerm = this._documentRepo.notificationReceivablePaymentTerm(this.charges);
+                    const expiredAgreement = this._documentRepo.notificationReceivableExpiredAgreement(this.charges);
+
+                    return forkJoin([creditTerm, paymentTerm, expiredAgreement]);
+                }
+            }),
+        ).subscribe();
     }
 
     handleChangeFeeType(event: any, charge: any) {

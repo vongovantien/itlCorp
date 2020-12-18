@@ -44,6 +44,12 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        private readonly IContextBase<CatContract> catContractRepository;
+        private readonly IContextBase<SysSettingFlow> settingFlowRepository;
+        private readonly IContextBase<SysNotifications> notificationRepository;
+        private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
+        private readonly IContextBase<AccAccountReceivable> accAccountReceivableRepository;
+        private readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
 
@@ -67,7 +73,13 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
             ICurrencyExchangeService currencyExchange,
+            IContextBase<CatContract> catContractRepo,
+            IContextBase<SysSettingFlow> sysSettingFlowRepo,
             IStringLocalizer<LanguageSub> localizer,
+            IContextBase<SysNotifications> notificationRepo,
+            IContextBase<SysUserNotification> sysUserNotifyRepo,
+            IContextBase<AccAccountReceivable> accAccountRepo,
+            IContextBase<SysUserLevel> userLevelRepo,
             IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
@@ -90,6 +102,12 @@ namespace eFMS.API.Accounting.DL.Services
             userBaseService = userBase;
             stringLocalizer = localizer;
             sentEmailHistoryRepo = sentEmailHistory;
+            catContractRepository = catContractRepo;
+            settingFlowRepository = sysSettingFlowRepo;
+            notificationRepository = notificationRepo;
+            sysUserNotifyRepository = sysUserNotifyRepo;
+            accAccountReceivableRepository = accAccountRepo;
+            userlevelRepository = userLevelRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -1476,6 +1494,9 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
+                            // to do send notification
+                            var dataToSendNotification = GetAgreementDatasByAdvanceNo(advancePayment.AdvanceNo);
+                            SendNotificationAccountReceivable(dataToSendNotification);
                         }
                         else
                         {
@@ -2205,6 +2226,267 @@ namespace eFMS.API.Accounting.DL.Services
 
             return sendMailResult;
         }
+
+        private string GetTransactionType(string jobNo)
+        {
+            string transactionType = null;
+            if (!string.IsNullOrEmpty(jobNo))
+            {
+                IQueryable<CsTransaction> docTransaction = csTransactionRepo.Get(x => x.JobNo == jobNo);
+                if (docTransaction != null && docTransaction.Count() > 0)
+                {
+                    transactionType = docTransaction?.FirstOrDefault()?.TransactionType;
+                }
+                else
+                {
+                    IQueryable<OpsTransaction> opsTransaction = opsTransactionRepo.Get(x => x.JobNo == jobNo);
+                    if (opsTransaction != null && opsTransaction.Count() > 0)
+                    {
+                        transactionType = "CL";
+                    }
+                    else
+                    {
+                        return string.Empty;
+                    }
+                }
+                return transactionType;
+            }
+            return string.Empty;
+
+        }
+
+        // send notification credit term, payment term, expired date 
+        private bool SendNotificationAccountReceivable(List<CatContractModel> agreements)
+        {
+            try
+            {
+                HandleState resultAddNotificationCredit = new HandleState(false);
+                HandleState resultAddNotificationPayement = new HandleState(false);
+                HandleState resultAddNotificationExpiredDate = new HandleState(false);
+                var lstCustomer = agreements.Select(t => t.Customers.Select(z=>z).ToList()).FirstOrDefault();
+                var dataPartner = catPartnerRepo.Get(x => lstCustomer.Contains(x.Id)).ToList();
+                foreach (var item in agreements)
+                {
+                    // credit rate
+                    if (item.CreditRate >= 120)
+                    {
+                        List<string> descriptions = new List<string>();
+                        foreach (var partner in dataPartner)
+                        {
+                            descriptions.Add(string.Format(@"<b style='color:#3966b6'>" + partner.ShortName + "</b> is over credit limit with "
+                            + item.CreditRate + " Please check it soon ")) ;
+                        }
+                        // Add Notification
+                        resultAddNotificationCredit = AddNotifications(descriptions, agreements.ToList());
+                    }
+
+                    // payment term
+                    if(accAccountReceivableRepository.Any(x => item.OfficeId.Contains(x.Office.ToString()) && item.SaleService.Contains(x.Service) && item.PartnerId == x.PartnerId && x.Over30Day > 0))
+                    {
+                        List<string> descriptions = new List<string>();
+                        foreach (var partner in dataPartner)
+                        {
+                            string type = string.Empty;
+                            if (partner.PartnerType == "Customer")
+                            {
+                                type = "Customer";
+                            }
+                            else if (partner.PartnerType == "Agent")
+                            {
+                                type = "Agent";
+                            }
+                            else
+                            {
+                                type = "Partner Data";
+                            }
+                            descriptions.Add(type + " " + string.Format(@"<b style='color:#3966b6'>" + partner.ShortName + "</b> has debit overdue"
+                            + item.PaymentTerm + " Please check it soon "));
+
+                            //Add Notification
+                            resultAddNotificationPayement = AddNotifications(descriptions, agreements.ToList());
+                        }
+                    }
+
+                    // expired date
+                    if ((item.ContractType == "Official" && item.ExpiredDate > DateTime.Now) || (item.ContractType == "Trial" && item.TrialExpiredDate > DateTime.Now))
+                    {
+                        List<string> descriptions = new List<string>();
+                        foreach (var partner in dataPartner)
+                        {
+                            descriptions.Add( string.Format(@"<b style='color:#3966b6'>" + partner.ShortName + "</b> is over Expired Date with"
+                            + item.ExpiredDate + " Please check it soon "));
+                        }
+                        resultAddNotificationPayement = AddNotifications(descriptions, agreements.ToList());
+                    }
+                }
+                if(resultAddNotificationCredit.Success || resultAddNotificationPayement.Success || resultAddNotificationExpiredDate.Success)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex; 
+            }
+        }
+
+        //Check Agreements Data 
+        public List<CatContractModel> GetAgreementDatasByAdvanceNo(string advanceNo)
+        {
+            try
+            {
+                var list = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo)
+                   .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo })
+                   .Select(se => new AcctAdvanceRequest
+                   {
+                       JobId = se.First().JobId,
+                       Hbl = se.First().Hbl,
+                       Hblid = se.First().Hblid
+                   }).ToList().OrderByDescending(o => o.DatetimeModified);
+
+                var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
+                var lstHouseBill = datamap.Select(t => t.Hblid).Distinct().ToList();
+                List<string> lstJobNo = datamap.Select(t => t.JobId).Distinct().ToList();
+                List<ShipmentTypeModel> lstJob = new List<ShipmentTypeModel>();
+                var listCustomer = csTransactionDetailRepo.Get(x => lstHouseBill.Contains(x.Id)).Select(t => t.CustomerId).ToList();
+                List<string> listPartnerByAc = catPartnerRepo.Get(x => listCustomer.Contains(x.Id)).Select(t => t.ParentId).ToList();
+                List<string> transactionTypes = new List<string>();
+                List<CatContract> agreements = new List<CatContract>();
+
+                if (lstJobNo.Count() > 0)
+                {
+                    foreach (var item in lstJobNo)
+                    {
+                        string type = GetTransactionType(item);
+                        ShipmentTypeModel shipmentTypeModel = new ShipmentTypeModel();
+                        shipmentTypeModel.JobNo = item;
+                        shipmentTypeModel.TransactionType = type;
+                        if (shipmentTypeModel.TransactionType == "CL")
+                        {
+                            var dataOps = opsTransactionRepo.Get(x => x.JobNo == item).FirstOrDefault();
+                            shipmentTypeModel.isCheckedCreditRate = settingFlowRepository.Any(x => x.OfficeId == dataOps.OfficeId && x.CreditLimit == true);
+                            shipmentTypeModel.isCheckedPaymentTerm = settingFlowRepository.Any(x => x.OfficeId == dataOps.OfficeId && x.OverPaymentTerm == true);
+                            shipmentTypeModel.isCheckedExpiredDate = settingFlowRepository.Any(x => x.OfficeId == dataOps.OfficeId && x.ExpiredAgreement == true);
+                        }
+                        else
+                        {
+                            var dataJob = csTransactionRepo.Get(x => x.JobNo == item).FirstOrDefault();
+                            shipmentTypeModel.isCheckedCreditRate = settingFlowRepository.Any(x => x.OfficeId == dataJob.OfficeId && x.CreditLimit == true);
+                            shipmentTypeModel.isCheckedPaymentTerm = settingFlowRepository.Any(x => x.OfficeId == dataJob.OfficeId && x.OverPaymentTerm == true);
+                            shipmentTypeModel.isCheckedExpiredDate = settingFlowRepository.Any(x => x.OfficeId == dataJob.OfficeId && x.ExpiredAgreement == true);
+                        }
+                        lstJob.Add(shipmentTypeModel);
+                    }
+                }
+
+                if (lstJob.Count() > 0)
+                {
+                    foreach (var item in lstJob)
+                    {
+                        if(item.isCheckedCreditRate == true || item.isCheckedPaymentTerm == true || item.isCheckedExpiredDate == true)
+                        {
+                            CatContract agreement = new CatContract();
+                            if (item.TransactionType == "CL")
+                            {
+                                OpsTransaction opsTransaction = new OpsTransaction();
+                                opsTransaction = opsTransactionRepo.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                                var data = catContractRepository.Get(x => x.OfficeId.Contains(opsTransaction.OfficeId.ToString()) && x.SaleService.Contains(item.TransactionType) && listPartnerByAc.Contains(x.PartnerId));
+                                agreements.AddRange(data);
+                            }
+                            else
+                            {
+                                CsTransaction csTransaction = new CsTransaction();
+                                csTransaction = csTransactionRepo.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                                var data = catContractRepository.Get(x => x.OfficeId.Contains(csTransaction.OfficeId.ToString()) && x.SaleService.Contains(item.TransactionType) && listPartnerByAc.Contains(x.PartnerId));
+                                agreements.AddRange(data);
+                            }
+                        }
+                    }
+                }
+                var result  = mapper.Map<List<CatContractModel>>(agreements);
+                result.ForEach(x => x.Customers = listCustomer);
+                //SendNotificationAccountReceivable(result);
+                return result;
+            }
+            catch(Exception ex)
+            {
+                throw ex; 
+            }
+        }
+
+
+        //Send notification credit term
+        private HandleState AddNotifications(List<string> descriptions, List<CatContractModel> dataAgreements)
+        {
+            HandleState hsSysNotification = new HandleState(false);
+            List<SysNotifications> notifications = new List<SysNotifications>();
+            foreach (var description in descriptions)
+            {
+                SysNotifications sysNotification = new SysNotifications
+                {
+                    Id = Guid.NewGuid(),
+                    Title = description,
+                    Description = description,
+                    Type = "User",
+                    UserCreated = currentUser.UserID,
+                    DatetimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now,
+                    UserModified = currentUser.UserID,
+                    Action = "Detail",
+                    ActionLink = string.Empty,
+                    IsClosed = false,
+                    IsRead = false
+                };
+                notifications.Add(sysNotification);
+            }
+            hsSysNotification = notificationRepository.Add(notifications, false);
+            if (hsSysNotification.Success)
+            {
+                List<string> users = GetUserSaleAndDepartmentAR(dataAgreements);
+                List<SysUserNotification> userNotifications = new List<SysUserNotification>();
+                foreach (var item in users)
+                {
+                    foreach(var noti in notifications)
+                    {
+                        SysUserNotification userNotify = new SysUserNotification
+                        {
+                            Id = Guid.NewGuid(),
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            Status = "New",
+                            NotitficationId = noti.Id,
+                            UserId = item,
+                            UserCreated = currentUser.UserID,
+                            UserModified = currentUser.UserID,
+                        };
+                        userNotifications.Add(userNotify);
+                    }
+                   
+                }
+                HandleState hsSysUserNotification = sysUserNotifyRepository.Add(userNotifications, false);
+                notificationRepository.SubmitChanges();
+                sysUserNotifyRepository.SubmitChanges();
+                if (hsSysUserNotification.Success) return hsSysUserNotification;
+            }
+            return new HandleState(false);
+        }
+
+        private List<string> GetUserSaleAndDepartmentAR(List<CatContractModel> contracts)
+        {
+            List<string> users = new List<string>();
+            List<string> usersDepartmentAR = new List<string>();
+            int DepartmentId = catDepartmentRepo.Get(x => x.DeptType == "AR").Select(t => t.Id).FirstOrDefault();
+            usersDepartmentAR = userlevelRepository.Get(x => x.DepartmentId == DepartmentId).Select(t => t.UserId).ToList();
+            users.AddRange(contracts.Select(t => t.SaleManId).ToList());
+            if (usersDepartmentAR != null)
+            {
+                users.AddRange(usersDepartmentAR);
+            }
+            return users;
+        }
+
+
 
         //Send Mail Approved
         private bool SendMailApproved(string advanceNo, DateTime approvedDate)

@@ -69,6 +69,8 @@
 
             public const string GetDataCDNoteExportUrl = "/Documentation/api/v1/en-US/AcctCDNote/ExportOpsCdNote?jobId=";
 
+            public const string GetDataCommissionPRReportUrl = "/Documentation/api/v1/en-US/Shipment/GetCommissionReport?userId=";
+            public const string GetDataIncentiveReportUrl = "/Documentation/api/v1/en-US/Shipment/GetIncentiveReport?userId=";
             public const string AddReportLogUrl = "/Documentation/api/v1/en-US/ReportLog/AddNew";
         }
     }

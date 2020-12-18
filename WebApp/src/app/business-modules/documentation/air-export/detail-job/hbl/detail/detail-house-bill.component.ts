@@ -124,19 +124,20 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);
-                            this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
-                                if (!!res.salemanId) {
-                                    if (res.salemanId !== modelUpdate.saleManId) {
-                                        this._toastService.error('Not found contract information, please check!');
-                                        return;
-                                    }
-                                }
-                                if (!!res.officeNameAbbr) {
-                                    this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
-                                } else {
-                                    this.updateHbl(modelUpdate);
-                                }
-                            });
+                            // this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
+                            //     if (!!res.salemanId) {
+                            //         if (res.salemanId !== modelUpdate.saleManId) {
+                            //             this._toastService.error('Not found contract information, please check!');
+                            //             return;
+                            //         }
+                            //     }
+                            //     if (!!res.officeNameAbbr) {
+                            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
+                            //     } else {
+                            //     }
+                            // });
+                            this.updateHbl(modelUpdate);
+
                         }
                     }
                 );

@@ -725,6 +725,21 @@ export class AccountingRepo {
     }
     /// Search Customer Payment 
 
+    getListConfirmBilling(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/ConfirmBillingPaging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    UpdateConfirmBillingDate(invoiceIds: string[], billingDate: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/UpdateConfirmBillingDate`, invoiceIds, { billingDate: billingDate }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getListCustomerPayment(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/Paging`, body, {
@@ -753,6 +768,7 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
     generateReceiptNo() {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GenerateReceiptNo`);
     }

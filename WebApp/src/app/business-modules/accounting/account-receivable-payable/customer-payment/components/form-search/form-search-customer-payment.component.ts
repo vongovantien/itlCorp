@@ -4,49 +4,45 @@ import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AccountingConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Currency, Customer, Partner, User } from '@models';
-import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { DataService } from '@services';
-import { getCatalogueCurrencyState, IAppState } from '@store';
 import { Observable } from 'rxjs';
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 
 @Component({
     selector: 'customer-payment-form-search',
     templateUrl: './form-search-customer-payment.component.html',
 })
 export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnInit {
-    @Output() onSearch: EventEmitter<IAcctReceiptCriteria> = new EventEmitter<IAcctReceiptCriteria>();
-    @Output() onReset: EventEmitter<IAcctReceiptCriteria> = new EventEmitter<IAcctReceiptCriteria>();
 
-    customerIDs: Observable<Customer[]>;
-    creators: Observable<User[]>;
+    @Output() onSearch: EventEmitter<IAcctReceiptCriteria> = new EventEmitter<IAcctReceiptCriteria>();
+
+    formSearch: FormGroup;
     customerID: AbstractControl;
     creator: AbstractControl;
     refNo: AbstractControl;
-    paymentTypes: string[] = AccountingConstants.PAYMENT_TYPE;
     paymentType: AbstractControl;
-    displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     date: AbstractControl;
-    dateTypes: string[] = AccountingConstants.DATE_TYPE;
     dateType: AbstractControl;
-    Currencys: Observable<Currency[]>;
     currency: AbstractControl;
-    syncStatuss = AccountingConstants.SYNC_STATUSS;
     syncStatus: AbstractControl;
-    statuss = AccountingConstants.STATUS;
     status: AbstractControl;
-    formSearch: FormGroup;
+
+    customerIDs: Observable<Customer[]>;
+    creators: Observable<User[]>;
+    Currencys: Observable<Currency[]>;
+
+    displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+
+    paymentTypes: string[] = AccountingConstants.PAYMENT_TYPE;
+    dateTypes: string[] = AccountingConstants.DATE_TYPE;
+    syncStatuss = AccountingConstants.SYNC_STATUSS;
+    statuss = AccountingConstants.STATUS;
 
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
-        private _store: Store<IAppState>,
-        private _dataService: DataService,
-
-
     ) {
         super();
         this.requestReset = this.requestSearch;
@@ -54,18 +50,20 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
 
     ngOnInit() {
         this.initForm();
+
         this.customerIDs = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, null);
         this.creators = this._systemRepo.getSystemUsers();
         this.Currencys = this._catalogueRepo.getListCurrency();
     }
+
     initForm() {
         this.formSearch = this._fb.group({
             refNo: [],
             paymentType: [this.paymentTypes[0]],
             customerID: [],
-            date: [],
+            date: [{ startDate: new Date(new Date().setDate(new Date().getDate() - 29)), endDate: new Date() }],
             dateType: [this.dateTypes[0]],
-            currency: [],
+            currency: ['VND'],
             syncStatus: [this.syncStatuss[0]],
             status: [this.statuss[0]],
         });
@@ -82,17 +80,13 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         switch (type) {
             case 'partner':
                 this.customerID.setValue((data as Partner).id);
-                this._dataService.setData('customer', data);
                 break;
             case 'currency':
                 this.currency.setValue((data as Currency).id);
-                this._dataService.setData('currency', data);
                 break;
             default:
                 break;
-
         }
-
     }
 
     search() {
@@ -108,14 +102,23 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             status: this.status.value !== this.statuss[0] ? this.status.value : null,
         };
         this.onSearch.emit(body);
-        console.log(body);
     }
+
     reset() {
         this.resetKeywordSearchCombogrid();
-        this.formSearch.reset();
-        this.resetFormControl(this.customerID);
-        this.onReset.emit(<any>{ transactionType: null });
+        this.date.reset({ startDate: new Date(new Date().setDate(new Date().getDate() - 29)), endDate: new Date() });
+
+        this.refNo.reset();
+        this.paymentType.reset(this.paymentTypes[0]);
+        this.customerID.reset();
+        this.dateType.reset(this.dateTypes[0]);
+        this.currency.setValue('VND');
+        this.syncStatus.reset(this.syncStatuss[0]);
+        this.status.reset(this.statuss[0]);
+
+        this.onSearch.emit(<any>{});
     }
+
 }
 interface IAcctReceiptCriteria {
     refNo: string;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -15,16 +15,22 @@ import * as fromStore from './../../store';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'obh-charge',
     templateUrl: './obh-charge.component.html',
-    styleUrls: ['./../buying-charge/buying-charge.component.scss']
+    styleUrls: ['./../buying-charge/buying-charge.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 
 export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingChargeComponent {
+    @ViewChild('accountReceivablePopup', { static: false }) accountReceivablePopup: InfoPopupComponent;
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.OBH;
+
+    messageCreditRate: string = '';
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -35,7 +41,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _accountingRepo: AccountingRepo,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        protected _cd: ChangeDetectorRef
+
 
     ) {
         super(
@@ -47,7 +55,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             _ngProgressService,
             _spinner,
             _accountingRepo,
-            _activedRoute);
+            _activedRoute,
+            _cd);
         this._progressRef = this._ngProgressService.ref();
     }
 
@@ -88,6 +97,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
+                    this._cd.markForCheck();
                 }
             );
     }
@@ -220,28 +230,58 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         if (!this.checkDuplicate()) {
             return;
         }
-
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.OBH);
-
-        this._progressRef.start();
-        this._documentRepo.addShipmentSurcharges(this.charges)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+        this._documentRepo.checkAccountReceivable(this.charges)
+            .pipe(catchError(this.catchError))
             .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+                        if (res.validCreditTerm === false) {
+                            this.messageCreditRate = 'The bellow partners are over Credit limit of ' + res.transactionTypes + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
+                            this.messageCreditRate += 'Những đối tượng bên dưới đã vượt quá hạn công nợ của Dịch Vụ ' + res.transactionTypes + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
+                            if (res.partnerAccountReceivables.length > 0) {
+                                res.partnerAccountReceivables.forEach(item => {
+                                    if (!!item.creditRate) {
+                                        this.messageCreditRate += item.shortName + ' - ' + item.creditRate + '<br>';
+                                    }
+                                });
+                            }
+                            this.accountReceivablePopup.show();
+                        } else if (res.validPaymentTerm === false) {
+                            this.messageCreditRate = 'The bellow partners have debit overdue ' + res.partnerAccountReceivables[0].paymentTerm + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
+                            this.messageCreditRate += 'Những đối tượng bên dưới có công nợ quá hạn ' + res.partnerAccountReceivables[0].paymentTerm + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
+                            if (res.partnerAccountReceivables.length > 0) {
+                                res.partnerAccountReceivables.forEach(item => {
+                                    this.messageCreditRate += item.shortName + ' - ' + item.paymentTerm;
+                                });
+                            }
+                            this.accountReceivablePopup.show();
+                        } else {
+                            this._progressRef.start();
+                            this._documentRepo.addShipmentSurcharges(this.charges)
+                                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                                .subscribe(
+                                    (result: CommonInterface.IResult) => {
+                                        if (result.status) {
+                                            this._toastService.success(result.message);
 
-                        // Tính công nợ
-                        this.calculatorReceivable(this.charges);
+                                            // Tính công nợ
+                                            this.calculatorReceivable(this.charges);
 
-                        this.getProfit();
-                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);
+                                            this.getProfit();
+                                            this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);
 
-                    } else {
-                        this._toastService.error(res.message);
+                                        } else {
+                                            this._toastService.error(result.message);
+                                        }
+                                    }
+                                );
+                        }
                     }
-                }
+                },
             );
+
     }
 
     checkValidate() {

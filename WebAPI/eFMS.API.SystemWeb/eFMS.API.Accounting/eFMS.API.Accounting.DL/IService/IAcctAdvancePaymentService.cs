@@ -91,6 +91,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<AcctAdvanceRequestModel> GetAdvanceRequestByAdvanceNo(string advanceNo);
 
         HandleState UpdatePaymentTerm(Guid Id, decimal days);
+        List<CatContractModel> GetAgreementDatasByAdvanceNo(string advanceNo);
 
     }
 }

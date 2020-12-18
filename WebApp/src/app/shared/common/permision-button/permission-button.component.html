@@ -73,8 +73,8 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchDefault>
-        <button type="button" NoDbClick class="btn btn-{{class}}  m-btn--icon "
-            *ngIf="(menuPermission | async)?.allowAdd === true" (click)="onClicked($event)">
+        <button type="button" NoDbClick class="btn btn-{{class}}  m-btn--icon " *ngIf="(menuPermission | async)?.write"
+            (click)="onClicked($event)">
             <span>
                 <i className="{{icon}}"></i>
                 <span>
