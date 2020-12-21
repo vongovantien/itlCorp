@@ -13,6 +13,8 @@ import { listAnimation } from '@animations';
 import { AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
+import { Store } from '@ngrx/store';
+import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -46,6 +48,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
         private _spinner: NgxSpinnerService,
+        private _store: Store<IAppState>
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -54,6 +57,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },

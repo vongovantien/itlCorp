@@ -72,6 +72,13 @@
             <param name="size"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.RejectCreditNote(eFMS.API.Documentation.DL.Models.RejectCreditNoteModel)">
+            <summary>
+            Reject credit note
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
             <summary>
             

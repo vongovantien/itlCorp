@@ -8,4 +8,9 @@ namespace eFMS.API.Accounting.DL.Models
         public List<Surcharge> Surcharges { get; set; }
     }
 
+    public class RejectSoaModel
+    {
+        public int Id { get; set; }
+        public string Reason { get; set; }
+    }
 }

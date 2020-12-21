@@ -4,9 +4,10 @@
         <div class="modal-content" *ngIf="cdnoteDetail">
             <div class="modal-header">
                 <h5 class="modal-title">Detail
-                    <b><span
-                            class="text-warning">{{cdnoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': cdnoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
-                    No: <b class="text-warning">{{cdnoteDetail.cdNote.code}}</b></h5>
+                    <b><span class="text-warning">{{cdnoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note':
+                            cdnoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                    No: <b class="text-warning">{{cdnoteDetail.cdNote.code}}</b>
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -159,7 +160,7 @@
                                             <span class="m--font-bolder">
                                                 {{labelDetail.volume}}:
                                             </span>
-                                            <span>{{cdnoteDetail.volum}} CBM</span>
+                                            <span>{{cdnoteDetail.volum | number: '.0-3'}} CBM</span>
                                         </div>
                                     </div>
                                 </div>
@@ -272,6 +273,27 @@
                     <!--end::m-portlet -->
                 </div>
                 <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-danger m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
+                    *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && cdnoteDetail.cdNote.type === 'CREDIT' && cdnoteDetail.syncStatus === 'Synced' && (cdnoteDetail.currency !== 'VND' || cdnoteDetail.isExistCurrencyDiffLocal)"
+                    title="Reject">
+                    <span>
+                        <i class="la la-times"></i>
+                        <span>
+                            Reject
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="closePopup()">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Return
+                        </span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>

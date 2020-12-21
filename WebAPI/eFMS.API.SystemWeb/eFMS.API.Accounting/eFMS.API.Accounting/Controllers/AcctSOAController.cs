@@ -393,5 +393,23 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSOAService.PreviewAccountStatementFull(soaNo);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Reject SOA type Credit
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("RejectSoaCredit")]
+        [Authorize]
+        public IActionResult RejectSoaCredit(RejectSoaModel model)
+        {
+            var reject = acctSOAService.RejectSoaCredit(model);
+            if (!reject.Success)
+            {
+                var result = new ResultHandle { Status = reject.Success, Message = string.Format("{0}. Reject SOA thất bại.", reject.Message.ToString()), Data = model };
+                return BadRequest(result);
+            }
+            return Ok(new ResultHandle { Status = reject.Success, Message = "Reject SOA thành công.", Data = model });
+        }
     }
 }

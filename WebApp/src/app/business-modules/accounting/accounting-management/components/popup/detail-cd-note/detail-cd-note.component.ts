@@ -6,6 +6,8 @@ import { ReportPreviewComponent } from '@common';
 import { Crystal } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from '@services';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 
 @Component({
     selector: 'accounting-detail-cd-note',
@@ -37,7 +39,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         syncStatus: 'Sync Status',
         lastSync: 'Last Sync',
         currency: 'Currency',
-        exchangeRate: 'ExchangeRate',
+        exchangeRate: 'Exc Rate',
         reasonReject: 'Reason Reject'
     };
     airLabelDetail: any = {
@@ -80,12 +82,14 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
-        private _sortService: SortService) {
+        private _sortService: SortService,
+        private _store: Store<IAppState>) {
         super();
         this.requestSort = this.sortChargeCdNote;
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
 
     setDefault(refNo: string) {
@@ -218,5 +222,9 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         if (this.cdnoteDetail) {
             this.cdnoteDetail.listSurcharges = this._sortService.sort(this.cdnoteDetail.listSurcharges, sort, this.order);
         }
+    }
+
+    showConfirmed() {
+
     }
 }
