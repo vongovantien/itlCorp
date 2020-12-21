@@ -121,8 +121,8 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.portIndex.nameVn = this.portIndexeNameLocal.value;
         this.portIndex.countryID = this.country.value.id;
         this.portIndex.modeOfTransport = this.mode.value.id;
-        this.portIndex.areaID = this.zone.value.id;
-        this.portIndex.warehouseId = this.warehouseId.value.id;
+        this.portIndex.areaID = !!this.zone.value ? this.zone.value.id : null;
+        this.portIndex.warehouseId = !!this.warehouseId.value ? this.warehouseId.value.id : null;
     }
 
     onHandleResult(res: CommonInterface.IResult) {
