@@ -115,6 +115,10 @@
                                 *ngIf="isSubmited && (email.errors | equalError: 'required') || (email.errors | equalError: 'required') && email.dirty">
                                 Email is required!
                             </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmited && email.errors  | equalError:'pattern'">
+                                Email field invalid!
+                            </div>
                         </div>
                     </div>
                 </div>
