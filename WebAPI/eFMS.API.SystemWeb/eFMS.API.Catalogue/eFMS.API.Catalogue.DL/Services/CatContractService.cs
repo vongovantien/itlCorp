@@ -456,7 +456,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         if (it.Trim() == "All")
                         {
-                            contract.SaleService = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
+                            contract.SaleService = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT ";
                         }
                     }
                     var vas = item.Vas?.Split(";").ToArray();
@@ -507,7 +507,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                             if (it.Trim() == "All")
                             {
-                                contract.Vas = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT";
+                                contract.Vas = "AI;AE;SCE;SCI;SFE;SLE;SFI;SLI;CL;IT ";
                             }
                         }
                     }
@@ -1138,18 +1138,18 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.ApiUrl.Value.Url;
+            string path = ApiUrl.Value.Url;
             try
             {
                 var list = new List<SysImage>();
                 /* Kiểm tra các thư mục có tồn tại */
                 var hs = new HandleState();
-                ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
+                ImageHelper.CreateDirectoryFile(string.Empty, model.PartnerId);
                 List<SysImage> resultUrls = new List<SysImage>();
                 fileName = model.Files.FileName;
                 string objectId = model.PartnerId;
-                await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
-                string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
+                await ImageHelper.SaveFile(fileName, string.Empty, objectId, model.Files);
+                string urlImage = path + "/files/" + objectId + "/" + fileName;
                 var sysImage = new SysImage
                 {
                     Id = Guid.NewGuid(),

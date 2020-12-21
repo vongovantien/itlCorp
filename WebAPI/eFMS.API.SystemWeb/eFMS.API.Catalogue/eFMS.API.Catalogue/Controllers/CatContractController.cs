@@ -294,11 +294,9 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public async Task<IActionResult> UploadFileContract(IFormFile files, [Required]string partnerId, [Required]string contractId)
         {
-            string folderName = Request.Headers["Module"];
             ContractFileUploadModel model = new ContractFileUploadModel
             {
                 Files = files,
-                FolderName = "Catalogue",
                 PartnerId = partnerId,
                 ChildId = contractId
             };

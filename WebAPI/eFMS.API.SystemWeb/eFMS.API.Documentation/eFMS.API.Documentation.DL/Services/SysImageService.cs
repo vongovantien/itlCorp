@@ -109,7 +109,7 @@ namespace eFMS.API.Documentation.DL.Services
                     fileName = file.FileName;
                     string objectId = model.JobId.ToString();
                     await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
-                    string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+                    string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
                     var sysImage = new SysImage
                     {
                         Id = Guid.NewGuid(),
