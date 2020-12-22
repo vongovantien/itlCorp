@@ -787,7 +787,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.ExchangeRate = cdNote.ExchangeRate;
             soaDetails.Note = cdNote.Note;
             soaDetails.ReasonReject = cdNote.ReasonReject;
-            soaDetails.IsExistChgCurrDiffLocalCurr = listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
+            soaDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
             return soaDetails;
         }
 
@@ -1806,7 +1806,7 @@ namespace eFMS.API.Documentation.DL.Services
                 try
                 {
                     var cdNote = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-                    if (cdNote == null) return new HandleState((object)"Không tìm thấy Credit Note");
+                    if (cdNote == null) return new HandleState((object)"Not found Credit Note");
 
                     cdNote.SyncStatus = "Rejected";
                     cdNote.UserModified = currentUser.UserID;

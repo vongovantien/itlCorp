@@ -22,7 +22,7 @@
             </span>
         </button>
         <button class="btn btn-warning m-btn--icon m-btn--uppercase"
-            *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && soa.type === 'Credit' && soa.syncStatus === 'Synced' && (soa.currency !== 'VND' || soa.isExistChgCurrDiffLocalCurr)"
+            *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && soa.type === 'Credit' && soa.syncStatus === 'Synced' && soa.isExistChgCurrDiffLocalCurr"
             title="Reject" (click)="showPopupReason()">
             <span>
                 <i class="la la-times"></i>
@@ -114,8 +114,9 @@
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Create Date:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.datetimeCreated | date: 'dd/MM/yyyy h:mm
-                            a'}}</span>
+                        <span class="m--font-brand m--margin-left-5">
+                            {{soa.datetimeCreated | date: 'dd/MM/yyyy HH:mm:ss'}}
+                        </span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.userNameCreated}}</span>
                     </div>
@@ -123,8 +124,9 @@
                 <div class="row">
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Modified Date:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.datetimeModified | date: 'dd/MM/yyyy h:mm
-                            a'}}</span>
+                        <span class="m--font-brand m--margin-left-5">
+                            {{soa.datetimeModified | date: 'dd/MM/yyyy HH:mm:ss'}}
+                        </span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.userNameModified}}</span>
                     </div>
@@ -140,8 +142,9 @@
                 <div class="row">
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Last Sync:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.lastSyncDate | date: 'dd/MM/yyyy
-                            HH:mm:ss'}}</span>
+                        <span class="m--font-brand m--margin-left-5">
+                            {{soa.lastSyncDate | date: 'dd/MM/yyyy HH:mm:ss'}}
+                        </span>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10" [ngSwitch]="soa.syncStatus">
                         <span class="m--font-bolder">Sync Status:</span>
@@ -155,7 +158,7 @@
                     </div>
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Reason Reject:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.reasonReject}}</span>
+                        <span class="m--font-brand m--margin-left-5 text-danger">{{soa.reasonReject}}</span>
                     </div>
                 </div>
             </div>

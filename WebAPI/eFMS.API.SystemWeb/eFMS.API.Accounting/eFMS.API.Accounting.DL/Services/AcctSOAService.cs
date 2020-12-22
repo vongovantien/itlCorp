@@ -1820,7 +1820,7 @@ namespace eFMS.API.Accounting.DL.Services
             data.AmountCreditUSD = Math.Round(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
             //Thông tin các Service Name của SOA
             data.ServicesNameSoa = DataTypeEx.GetServiceNameOfSoa(data.ServiceTypeId).ToString();
-            data.IsExistChgCurrDiffLocalCurr = chargeShipments.Any(x => x.Currency != AccountingConstants.CURRENCY_LOCAL);
+            data.IsExistChgCurrDiffLocalCurr = soaDetail.Currency != AccountingConstants.CURRENCY_LOCAL || chargeShipments.Any(x => x.Currency != AccountingConstants.CURRENCY_LOCAL);
             return data;
         }
 

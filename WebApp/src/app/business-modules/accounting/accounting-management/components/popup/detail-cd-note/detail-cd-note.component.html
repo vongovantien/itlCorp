@@ -86,7 +86,7 @@
                                     <span class="m--font-bolder">
                                         {{labelDetail.reasonReject}}:
                                     </span>
-                                    <span>{{cdnoteDetail.reasonReject}}</span>
+                                    <span class="text-danger">{{cdnoteDetail.reasonReject}}</span>
                                 </div>
                             </div>
                             <div class="col-xl-8">
@@ -275,8 +275,8 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-warning m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-                    *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && cdnoteDetail.cdNote.type === 'CREDIT' && cdnoteDetail.syncStatus === 'Synced' && (cdnoteDetail.currency !== 'VND' || cdnoteDetail.isExistChgCurrDiffLocalCurr)"
+                <button class="btn btn-warning m-btn--icon m-btn--uppercase" (click)="showPopupReason()"
+                    *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && cdnoteDetail.cdNote.type === 'CREDIT' && cdnoteDetail.syncStatus === 'Synced' && cdnoteDetail.isExistChgCurrDiffLocalCurr"
                     title="Reject">
                     <span>
                         <i class="la la-times"></i>
@@ -301,3 +301,6 @@
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<confirm-popup (onSubmit)="onConfirmed()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<reason-reject-popup (onApply)="onApplyReasonReject($event)"></reason-reject-popup>

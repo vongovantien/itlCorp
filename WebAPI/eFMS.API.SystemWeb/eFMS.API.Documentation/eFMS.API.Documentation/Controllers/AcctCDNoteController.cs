@@ -211,10 +211,10 @@ namespace eFMS.API.Documentation.Controllers
             var reject = cdNoteServices.RejectCreditNote(model);
             if (!reject.Success)
             {
-                var result = new ResultHandle { Status = reject.Success, Message = string.Format("{0}. Reject credit note thất bại.", reject.Message.ToString()), Data = model };
+                var result = new ResultHandle { Status = reject.Success, Message = string.Format("{0}. Reject credit note fail.", reject.Message.ToString()), Data = model };
                 return BadRequest(result);
             }
-            return Ok(new ResultHandle { Status = reject.Success, Message = "Reject credit note thành công.", Data = model });
+            return Ok(new ResultHandle { Status = reject.Success, Message = "Reject credit note successful.", Data = model });
         }
     }
 }

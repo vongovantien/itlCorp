@@ -1,13 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from '@repositories';
-import { catchError } from 'rxjs/operators';
-import { ReportPreviewComponent } from '@common';
+import { catchError, finalize } from 'rxjs/operators';
+import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { Crystal } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'accounting-detail-cd-note',
@@ -15,6 +17,8 @@ import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 })
 export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit {
     @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
     cdnoteDetail: any = null;
     jobId: string = '';
     type: string = 'AIR';
@@ -79,11 +83,15 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     totalDebit: string = '';
     cdNote: string = '';
 
+    confirmMessage: string = '';
+    reasonReject: string = '';
+
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _sortService: SortService,
-        private _store: Store<IAppState>) {
+        private _store: Store<IAppState>,
+        private _spinner: NgxSpinnerService, ) {
         super();
         this.requestSort = this.sortChargeCdNote;
     }
@@ -224,7 +232,44 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         }
     }
 
-    showConfirmed() {
+    showPopupReason() {
+        this.reasonRejectPopupComponent.show();
+    }
 
+    confirmReject() {
+        this.confirmMessage = `Are you sure you want to reject credit note?`;
+        this.confirmPopup.show();
+    }
+
+    onApplyReasonReject($event) {
+        this.reasonReject = $event;
+        this.confirmReject();
+    }
+
+    onConfirmed() {
+        this.confirmPopup.hide();
+        this.rejectCreditNote();
+    }
+
+    rejectCreditNote() {
+        this._spinner.show();
+        this._documentationRepo.RejectCreditNote({ id: this.cdnoteDetail.cdNote.id, reason: this.reasonReject })
+            .pipe(
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success(res.message);
+                        this.getDetailCdNote(this.cdnoteDetail.jobId, this.cdnoteDetail.cdNote.code);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 }
