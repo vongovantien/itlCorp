@@ -12,5 +12,6 @@ namespace eFMS.API.Operation.DL.Models.Criteria
         public DateTime? ToImportDate { get; set; }
         public string Type { get; set; }
         public string PersonHandle { get; set; }
+        public string CustomerNo { get; set; }
     }
 }

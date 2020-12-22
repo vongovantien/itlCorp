@@ -1027,4 +1027,10 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    RejectCreditNote(model: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCdNote/RejectCreditNote`, model).pipe(
+            map((data: any) => data)
+        );
+    }
 }

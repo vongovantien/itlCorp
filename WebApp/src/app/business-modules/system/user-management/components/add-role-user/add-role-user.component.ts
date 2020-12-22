@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { RoutingConstants } from '@constants';
+import { DataService } from '@services';
 @Component({
     selector: 'add-role-user',
     templateUrl: 'add-role-user.component.html'
@@ -34,6 +35,7 @@ export class AddRoleUserComponent extends AppList {
         private _progressService: NgProgress,
         private _router: Router,
         private _activedRouter: ActivatedRoute,
+        private _dataService: DataService
 
     ) {
         super();
@@ -57,6 +59,13 @@ export class AddRoleUserComponent extends AppList {
         if (!!this.id) {
             this.getPermissionsByUserId();
         }
+
+        this._dataService.currentMessage.subscribe(
+            (v) => {
+                this.getCompanies();
+                this.getOffices();
+            }
+        );
     }
 
     getDataCombobox() {

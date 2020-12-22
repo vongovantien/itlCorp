@@ -43,6 +43,7 @@ export class CustomClearance {
     convertTime: Date = null;
     shipper: string;
     consignee: string;
+    accountNo: string;
 
     permission: PermissionShipment = new PermissionShipment();
 }

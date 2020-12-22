@@ -136,7 +136,7 @@ namespace eFMS.API.Operation.DL.Services
             }
             var serviceType = GetServiceType(clearance, out string cargoType);
             var route = clearance.PLUONG != null ? GetRouteType(clearance.PLUONG) : string.Empty;
-            var partnerTaxCode = clearance.MA_DV;
+            //var partnerTaxCode = clearance.MA_DV;
             if (clearance.MA_DV != null)
             {
                 Regex pattern = new Regex("[-_ ]");
@@ -171,7 +171,8 @@ namespace eFMS.API.Operation.DL.Services
                 GroupId = currentUser.GroupId,
                 DepartmentId = currentUser.DepartmentId,
                 OfficeId = currentUser.OfficeID,
-                CompanyId = currentUser.CompanyID
+                CompanyId = currentUser.CompanyID,
+                AccountNo = clearance.MA_DV
             };
             return newItem;
         }
@@ -237,12 +238,13 @@ namespace eFMS.API.Operation.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+            Expression<Func<CustomsDeclaration, bool>> query = x => (criteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(criteria.ClearanceNo))
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                     && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
-                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null);
+                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
+                                                                                    && (x.AccountNo == criteria.CustomerNo || string.IsNullOrEmpty(criteria.CustomerNo));
 
             if (criteria.ImPorted == true)
             {
@@ -311,7 +313,7 @@ namespace eFMS.API.Operation.DL.Services
                 keySearch = String.Empty;
             }
 
-            Func<CustomsDeclarationModel, bool> query = x => (x.PartnerTaxCode == customerNo)
+            Func<CustomsDeclarationModel, bool> query = x => (x.AccountNo == customerNo)
                                 && ((clearanceNoArray != null ? clearanceNoArray.Any(val => x.ClearanceNo.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
                                                                 : (x.ClearanceNo.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase)))
                                      || (x.Hblid != null && x.Hblid.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
@@ -355,7 +357,7 @@ namespace eFMS.API.Operation.DL.Services
             List<CustomsDeclarationModel> results = new List<CustomsDeclarationModel>();
             var countryCache = countryApi.Getcountries().Result;
             var portCache = catPlaceApi.GetPlaces().Result;
-            var customerCache = catPartnerApi.GetPartners().Result;
+            //var customerCache = catPartnerApi.GetPartners().Result;
             var countries = countryCache != null ? countryCache.ToList() : new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
             var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>();
             // var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>();
@@ -367,7 +369,7 @@ namespace eFMS.API.Operation.DL.Services
                 var exCountryCode = item.ExportCountryCode;
                 clearance.ImportCountryName = countries.FirstOrDefault(x => x.Code == imCountryCode)?.NameEn;
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
-                clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.ShortName;
+                clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
                 clearance.UserCreatedName = userRepository.Get(x => x.Id == item.UserCreated).FirstOrDefault()?.Username;
                 clearance.UserModifieddName = userRepository.Get(x => x.Id == item.UserModified).FirstOrDefault()?.Username;
@@ -709,7 +711,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
 
                 //Check empty & exist data for PartnerTaxCode
-                string _partnerTaxCode = item.PartnerTaxCode;
+                string _partnerTaxCode = item.AccountNo;
                 item.PartnerTaxCodeValid = true;
                 if (string.IsNullOrEmpty(_partnerTaxCode))
                 {
@@ -719,7 +721,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var isFound = catPartnerApi.GetPartners().Result.Any(x => x.TaxCode == _partnerTaxCode);
+                    var isFound = catPartnerApi.GetPartners().Result.Any(x => x.AccountNo == _partnerTaxCode);
                     if (!isFound)
                     {
                         item.CustomerName = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -728,7 +730,9 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.CustomerName = catPartnerApi.GetPartners().Result.Where(x => x.TaxCode == _partnerTaxCode).First().PartnerNameEn;
+                        var customer = catPartnerApi.GetPartners().Result.Where(x => x.AccountNo == _partnerTaxCode).First();
+                        item.CustomerName = customer.PartnerNameEn;
+                        item.PartnerTaxCode = customer.TaxCode;
                     }
                 }
 

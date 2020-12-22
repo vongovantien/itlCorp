@@ -1294,7 +1294,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         var groups = item.PartnerGroup.Split(";").Select(x => x.Trim());
                         var group = partnerGroups.Intersect(groups);
-                        if (group == null)
+                        if (group.Count() == 0)
                         {
                             item.PartnerGroupError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_GROUP_NOT_FOUND], item.PartnerGroup);
                             item.IsValid = false;

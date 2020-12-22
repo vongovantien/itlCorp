@@ -24,7 +24,7 @@
                                 Customer <span class="m--font-danger">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
-                                [currentActiveItemId]="{ field: 'taxCode', value: partnerTaxCode.value}"
+                                [currentActiveItemId]="{ field: 'accountNo', value: partnerTaxCode.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                                 [displayFields]="displayFieldsCustomer" placeholder="Please select"
                                 (remove)="resetFormControl(partnerTaxCode)">

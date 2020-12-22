@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="Resources\Files\CustomClearanceImportTemplate.xlsx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>

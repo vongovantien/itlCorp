@@ -840,5 +840,12 @@
             <param name="soaNo">Soa No</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.RejectSoaCredit(eFMS.API.Accounting.DL.Models.RejectSoaModel)">
+            <summary>
+            Reject SOA type Credit
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

@@ -3,9 +3,10 @@
         <div class="modal-content" *ngIf="!!CdNoteDetail">
             <div class="modal-header">
                 <h5 class="modal-title">Detail
-                    <b><span
-                            class="text-warning">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
-                    No: <b class="text-warning">{{CdNoteDetail.cdNote.code}}</b></h5>
+                    <b><span class="text-warning">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note':
+                            CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                    No: <b class="text-warning">{{CdNoteDetail.cdNote.code}}</b>
+                </h5>
                 <button type="button" class="close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -131,7 +132,7 @@
                                             <span class="text-info">{{ CdNoteDetail.currency }}</span>
                                         </div>
                                         <div class="col-md-6">
-                                            <span class="font-weight-bold"> ExchangeRate: </span>
+                                            <span class="font-weight-bold"> Exc Rate: </span>
                                             {{ CdNoteDetail.exchangeRate | number:'1.0-3'}}
                                         </div>
                                     </div>
