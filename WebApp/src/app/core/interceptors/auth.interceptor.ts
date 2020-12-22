@@ -58,11 +58,19 @@ export class AuthInterceptor implements HttpInterceptor {
                     case 404:
                         message = "Not found request";
                         break;
+                    case 200: // * Upload Crystal PDF
+                        message = '';
+                        break;
+                    default:
+                        message = "Something wrong!";
+                        break;
                 }
                 if (error instanceof TimeoutError) {
                     message = "Request time out";
                 }
-                this._toastService.error(message);
+                if (!!message) {
+                    this._toastService.error(message);
+                }
                 return throwError(error);
             })
         );
