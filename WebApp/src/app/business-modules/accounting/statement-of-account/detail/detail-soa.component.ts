@@ -15,6 +15,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -24,6 +25,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(ConfirmPopupComponent) confirmSoaPopup: ConfirmPopupComponent;
     @ViewChild(StatementOfAccountPaymentMethodComponent) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
+    @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
 
@@ -38,6 +40,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     TYPE: string = 'LIST';
     confirmMessage: string = '';
     paymentMethodSelected: string = '';
+    confirmType: string = 'SYNC';
+    reasonReject: string = '';
 
     constructor(
         private _activedRoute: ActivatedRoute,
@@ -283,6 +287,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     showConfirmed() {
+        this.confirmType = "SYNC";
         if (this.soa.type === "All") {
             this._toastService.warning("Not allow send soa with type All");
             return;
@@ -300,8 +305,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         this.confirmSendToAcc();
     }
 
-    onConfirmSoa() {
-        this.confirmSoaPopup.hide();
+    sendSoaToAccountant() {
         const soaSyncIds: AccountingInterface.IRequestIntType[] = [];
         const soaId: AccountingInterface.IRequestIntType = {
             id: this.soa.id,
@@ -323,6 +327,53 @@ export class StatementOfAccountDetailComponent extends AppList {
                         this.getDetailSOA(this.soa.soano, this.soa.currency);
                     } else {
                         this._toastService.error("Send Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
+    onConfirmSoa() {
+        this.confirmSoaPopup.hide();
+        if (this.confirmType === "SYNC") {
+            this.sendSoaToAccountant();
+        }
+        if (this.confirmType === "REJECT") {
+            this.rejectSoa();
+        }
+    }
+
+    showPopupReason() {
+        this.confirmType = "REJECT";
+        this.reasonRejectPopupComponent.show();
+    }
+
+    confirmReject() {
+        this.confirmMessage = `Are you sure you want to reject soa?`;
+        this.confirmSoaPopup.show();
+    }
+
+    onApplyReasonReject($event) {
+        this.reasonReject = $event;
+        this.confirmReject();
+    }
+
+    rejectSoa() {
+        this._spinner.show();
+        this._accoutingRepo.rejectSoaCredit({ id: this.soa.id, reason: this.reasonReject })
+            .pipe(
+                finalize(() => this._spinner.hide()),
+                catchError(this.catchError),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success(res.message);
+                        this.getDetailSOA(this.soa.soano, this.soa.currency);
+                    } else {
+                        this._toastService.error(res.message);
                     }
                 },
                 (error) => {

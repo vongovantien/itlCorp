@@ -275,8 +275,8 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-danger m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-                    *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && cdnoteDetail.cdNote.type === 'CREDIT' && cdnoteDetail.syncStatus === 'Synced' && (cdnoteDetail.currency !== 'VND' || cdnoteDetail.isExistCurrencyDiffLocal)"
+                <button class="btn btn-warning m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
+                    *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && cdnoteDetail.cdNote.type === 'CREDIT' && cdnoteDetail.syncStatus === 'Synced' && (cdnoteDetail.currency !== 'VND' || cdnoteDetail.isExistChgCurrDiffLocalCurr)"
                     title="Reject">
                     <span>
                         <i class="la la-times"></i>

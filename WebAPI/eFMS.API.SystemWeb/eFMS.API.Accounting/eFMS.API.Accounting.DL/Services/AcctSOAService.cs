@@ -1820,7 +1820,7 @@ namespace eFMS.API.Accounting.DL.Services
             data.AmountCreditUSD = Math.Round(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
             //Thông tin các Service Name của SOA
             data.ServicesNameSoa = DataTypeEx.GetServiceNameOfSoa(data.ServiceTypeId).ToString();
-            data.IsExistCurrencyDiffLocal = chargeShipments.Any(x => x.Currency != AccountingConstants.CURRENCY_LOCAL);
+            data.IsExistChgCurrDiffLocalCurr = chargeShipments.Any(x => x.Currency != AccountingConstants.CURRENCY_LOCAL);
             return data;
         }
 
@@ -2597,7 +2597,7 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     var soa = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-                    if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
+                    if (soa == null) return new HandleState((object)"Not found SOA");
 
                     soa.SyncStatus = "Rejected";
                     soa.UserModified = currentUser.UserID;

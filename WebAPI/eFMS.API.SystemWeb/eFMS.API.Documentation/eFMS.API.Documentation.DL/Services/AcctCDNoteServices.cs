@@ -787,7 +787,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.ExchangeRate = cdNote.ExchangeRate;
             soaDetails.Note = cdNote.Note;
             soaDetails.ReasonReject = cdNote.ReasonReject;
-            soaDetails.IsExistCurrencyDiffLocal = listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
+            soaDetails.IsExistChgCurrDiffLocalCurr = listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
             return soaDetails;
         }
 

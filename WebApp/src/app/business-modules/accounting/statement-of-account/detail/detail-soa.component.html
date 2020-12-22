@@ -22,8 +22,8 @@
             </span>
         </button>
         <button class="btn btn-warning m-btn--icon m-btn--uppercase"
-            *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && soa.type === 'Credit' && soa.syncStatus === 'Synced' && (soa.currency !== 'VND' || soa.isExistCurrencyDiffLocal)"
-            title="Reject">
+            *ngIf="(menuSpecialPermission | async | specialPermission:'Reject') && soa.type === 'Credit' && soa.syncStatus === 'Synced' && (soa.currency !== 'VND' || soa.isExistChgCurrDiffLocalCurr)"
+            title="Reject" (click)="showPopupReason()">
             <span>
                 <i class="la la-times"></i>
                 <span>
@@ -364,3 +364,4 @@
 
 <confirm-popup (onSubmit)="onConfirmSoa()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
 <soa-payment-method-popup (onApply)="onApplyPaymentMethod($event)"></soa-payment-method-popup>
+<reason-reject-popup (onApply)="onApplyReasonReject($event)"></reason-reject-popup>

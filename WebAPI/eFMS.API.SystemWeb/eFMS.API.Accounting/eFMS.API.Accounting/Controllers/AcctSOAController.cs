@@ -406,10 +406,10 @@ namespace eFMS.API.Accounting.Controllers
             var reject = acctSOAService.RejectSoaCredit(model);
             if (!reject.Success)
             {
-                var result = new ResultHandle { Status = reject.Success, Message = string.Format("{0}. Reject SOA thất bại.", reject.Message.ToString()), Data = model };
+                var result = new ResultHandle { Status = reject.Success, Message = string.Format("{0}. Reject SOA fail.", reject.Message.ToString()), Data = model };
                 return BadRequest(result);
             }
-            return Ok(new ResultHandle { Status = reject.Success, Message = "Reject SOA thành công.", Data = model });
+            return Ok(new ResultHandle { Status = reject.Success, Message = "Reject SOA successful.", Data = model });
         }
     }
 }
