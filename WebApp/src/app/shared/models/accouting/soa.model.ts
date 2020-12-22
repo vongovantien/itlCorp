@@ -40,7 +40,7 @@ export class SOA {
     syncStatus: string = '';
     reasonReject: string = '';
     creditPayment: string = '';
-
+    isExistChgCurrDiffLocalCurr: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
