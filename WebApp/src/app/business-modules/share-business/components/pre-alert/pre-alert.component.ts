@@ -307,9 +307,7 @@ export class ShareBusinessReAlertComponent extends AppList {
             let timeOut = 3000;
             if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
                 this.listSI.forEach(element => {
-                    if (element) {
-                        timeOut += 2000;
-                    }
+                    timeOut += 2000;
                 });
             }
             setTimeout(() => {
