@@ -4,6 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AppList } from '@app';
 import { DocumentationRepo, ExportRepo } from '@repositories';
@@ -357,6 +358,9 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
                             (res: Crystal) => {
                                 dataStreamCount++;
                                 if (dataStreamCount === streamUploadFile.length) {
+                                    if (res instanceof HttpErrorResponse) {
+                                        return;
+                                    }
                                     setTimeout(() => {
                                         this.sendMail()
                                     }, 1000);
@@ -777,14 +781,14 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
     }
 
     UpdateAttachFileByPathGeneralReport(pathGeneral: string, isChecked: boolean) {
-        const idxOf = this.attachedFile.indexOf(pathGeneral);
+        const idxOf = (this.attachedFile || []).indexOf(pathGeneral);
         if (!isChecked) {
             if (idxOf > -1) {
-                this.attachedFile.splice(idxOf, 1);
+                (this.attachedFile || []).splice(idxOf, 1);
             }
         } else {
             if (idxOf === -1) {
-                this.attachedFile.push(pathGeneral);
+                (this.attachedFile || []).push(pathGeneral);
             }
         }
     }
