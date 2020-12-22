@@ -354,13 +354,7 @@ namespace eFMS.API.Documentation.DL.Services
                 totalfinish = data.Count(x => x.CurrentStatus == TermData.Finish);
                 totalOverdued = data.Count(x => x.CurrentStatus == TermData.Overdue);
             }
-            int totalCanceled = 0;
-            if (criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
-            {
-                int year = DateTime.Now.Year - 2;
-                criteria.ServiceDateFrom = new DateTime(year, 1, 1);
-                criteria.ServiceDateTo = new DateTime(DateTime.Now.Year, 12, 31);
-            }
+            int totalCanceled = 0;            
             totalCanceled = DataContext.Count(x => x.CurrentStatus == TermData.Canceled && x.ServiceDate >= criteria.ServiceDateFrom && x.ServiceDate <= criteria.ServiceDateTo); //data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Canceled));
             if (rowsCount == 0) return null;
             if (size > 1)
@@ -502,13 +496,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
             }
-            if (criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
-            {
-                int year = DateTime.Now.Year -2;
-                DateTime startDay = new DateTime(year, 1, 1);
-                DateTime lastDay = new DateTime(DateTime.Now.Year, 12, 31);
-                datajoin = datajoin.Where(x => x.ServiceDate >= startDay && x.ServiceDate <= lastDay);
-            }
+            
             if (criteria.All == null)
             {
                 datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1

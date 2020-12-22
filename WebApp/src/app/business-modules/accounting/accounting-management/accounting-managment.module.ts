@@ -31,6 +31,7 @@ import { AccountingManagementDetailVoucherComponent } from './voucher/detail/acc
 import { AccountingManagementImportVatInvoiceComponent } from './vat/import/accounting-import-vat-invoice.component';
 import { ShareAccountingModule } from '../share-accouting.module';
 import { DeactivateGuardService } from '@core';
+import { ShareModulesModule } from '../../share-modules/share-modules.module';
 
 const routing: Routes = [
     {
@@ -103,7 +104,8 @@ const maskConfig: Partial<IConfig> = {
             nullable: true
         }),
         NgxMaskModule.forRoot(maskConfig),
-        ShareAccountingModule
+        ShareAccountingModule,
+        ShareModulesModule
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,

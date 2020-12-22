@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ShareModulesInputShipmentPopupComponent, FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from './components';
+import { ShareModulesInputShipmentPopupComponent, FormContractCommercialPopupComponent, PartnerRejectPopupComponent, ShareModulesReasonRejectPopupComponent } from './components';
 import { ModalModule } from 'ngx-bootstrap/modal/';
 import { PipeModule } from "src/app/shared/pipes/pipe.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -22,13 +22,14 @@ const COMPONENTS = [
     CommercialContractListComponent,
     SalesmanCreditLimitPopupComponent,
     PartnerRejectPopupComponent,
-    CommercialBranchSubListComponent
+    CommercialBranchSubListComponent,
+    ShareModulesReasonRejectPopupComponent
 ];
 @NgModule({
     declarations: [
         ...COMPONENTS
     ],
-    imports: [ 
+    imports: [
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
         CommonComponentModule,
@@ -42,7 +43,7 @@ const COMPONENTS = [
         CollapseModule.forRoot(),
         NgxDaterangepickerMd,
         FormsModule
-     ],
+    ],
     exports: [
         ...COMPONENTS
     ],

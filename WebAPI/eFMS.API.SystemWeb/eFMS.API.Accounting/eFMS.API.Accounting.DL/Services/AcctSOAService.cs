@@ -39,6 +39,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCommodity> catCommodityRepo;
         readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
         readonly IContextBase<SysCompany> sysCompanyRepo;
+        readonly IContextBase<SysNotifications> sysNotificationRepository;
+        readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -62,7 +64,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatCommodityGroup> catCommodityGroup,
             ICurrencyExchangeService currencyExchange,
-            IContextBase<SysCompany> sysCompany) : base(repository, mapper)
+            IContextBase<SysCompany> sysCompany,
+            IContextBase<SysNotifications> sysNotifyRepo,
+            IContextBase<SysUserNotification> sysUsernotifyRepo) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -83,6 +87,8 @@ namespace eFMS.API.Accounting.DL.Services
             catCommodityGroupRepo = catCommodityGroup;
             currencyExchangeService = currencyExchange;
             sysCompanyRepo = sysCompany;
+            sysNotificationRepository = sysNotifyRepo;
+            sysUserNotificationRepository = sysUsernotifyRepo;
         }
 
         #region -- Insert & Update SOA
@@ -1814,6 +1820,7 @@ namespace eFMS.API.Accounting.DL.Services
             data.AmountCreditUSD = Math.Round(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
             //Thông tin các Service Name của SOA
             data.ServicesNameSoa = DataTypeEx.GetServiceNameOfSoa(data.ServiceTypeId).ToString();
+            data.IsExistChgCurrDiffLocalCurr = soaDetail.Currency != AccountingConstants.CURRENCY_LOCAL || chargeShipments.Any(x => x.Currency != AccountingConstants.CURRENCY_LOCAL);
             return data;
         }
 
@@ -2582,5 +2589,73 @@ namespace eFMS.API.Accounting.DL.Services
             return surchargeIds;
         }
 
+
+        public HandleState RejectSoaCredit(RejectSoaModel model)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var soa = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                    if (soa == null) return new HandleState((object)"Not found SOA");
+
+                    soa.SyncStatus = "Rejected";
+                    soa.UserModified = currentUser.UserID;
+                    soa.DatetimeModified = DateTime.Now;
+                    soa.ReasonReject = model.Reason;
+
+                    HandleState hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
+                    if (hs.Success)
+                    {
+                        HandleState smSoa = DataContext.SubmitChanges();
+                        if (smSoa.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data SOA {0}", soa.Soano);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = model.Reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency=VND", soa.Soano),
+                                UserIds = soa.UserCreated
+                            };
+                            sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = soa.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            sysUserNotificationRepository.Add(sysUserNotify);
+                        }
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
     }
 }

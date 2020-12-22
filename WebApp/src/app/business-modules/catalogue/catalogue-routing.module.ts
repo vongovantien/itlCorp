@@ -5,7 +5,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'ware-house' },
   { path: 'ware-house', loadChildren: () => import('./warehouse/warehouse.module').then(m => m.WareHouseModule), data: { name: 'Warehouse' } },
   { path: 'port-index', loadChildren: () => import('./port-index/port-index.module').then(m => m.PortIndexModule), data: { name: 'Port' } },
-  { path: 'partner-data', loadChildren: () => import('./partner-data/partner-data.module').then(m => m.PartnerDataModule), data: { name: 'Partner Data' } },
+  { path: 'partner-data', loadChildren: () => import('./partner-data/partner-data.module').then(m => m.PartnerDataModule), data: { name: 'Supplier/Carrier' } },
   { path: 'commodity', loadChildren: () => import('./commodity/commodity.module').then(m => m.CommondityModule), data: { name: 'Commodity' } },
   { path: 'stage-management', loadChildren: () => import('./stage-management/stage-management.module').then(m => m.StateManagementModule), data: { name: 'Stage' } },
   { path: 'unit', loadChildren: () => import('./unit/unit.module').then(m => m.UnitModule), data: { name: 'Unit' } },

@@ -64,6 +64,7 @@ namespace eFMS.API.Accounting.DL.IService
         Crystal PreviewAccountStatementFull(string soaNo);
 
         List<Guid> GetSurchargeIdBySoaId(int soaId);
-        
+
+        HandleState RejectSoaCredit(RejectSoaModel model);
     }
 }
