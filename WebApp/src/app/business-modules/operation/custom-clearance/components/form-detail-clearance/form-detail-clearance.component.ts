@@ -71,6 +71,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     ];
     isConvertJob: boolean = false;
     isDisableCargo: boolean = false;
+    taxCode: string = '';
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -151,7 +152,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     setFormValue() {
         this.formGroup.patchValue({
             clearanceNo: this.customDeclaration.clearanceNo,
-            partnerTaxCode: this.customDeclaration.partnerTaxCode,
+            partnerTaxCode: this.customDeclaration.accountNo,
             clearanceDate: !!this.customDeclaration.clearanceDate ? { startDate: new Date(this.customDeclaration.clearanceDate), endDate: new Date(this.customDeclaration.clearanceDate) } : null,
             hblid: this.customDeclaration.hblid,
             mblid: this.customDeclaration.mblid,
@@ -190,7 +191,8 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
-                this.partnerTaxCode.setValue(data.taxCode);
+                this.partnerTaxCode.setValue(data.accountNo);
+                this.taxCode = data.taxCode;
                 break;
             case 'gateway':
                 this.gateway.setValue(data.code);
@@ -237,7 +239,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         const form = this.formGroup.getRawValue();
         console.log(form);
         this.customDeclaration.clearanceNo = !!form.clearanceNo ? form.clearanceNo.trim() : null;
-        this.customDeclaration.partnerTaxCode = !!form.partnerTaxCode ? form.partnerTaxCode.trim() : null;
+        this.customDeclaration.partnerTaxCode = !!form.partnerTaxCode ? this.taxCode : null;
         this.customDeclaration.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.customDeclaration.hblid = !!form.hblid ? form.hblid.trim() : null;
         this.customDeclaration.mblid = !!form.mblid ? form.mblid.trim() : null;
@@ -259,5 +261,6 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.route = form.route;
         this.customDeclaration.serviceType = form.serviceType;
         this.customDeclaration.type = form.type;
+        this.customDeclaration.accountNo = !!form.partnerTaxCode ? form.partnerTaxCode.trim() : null;
     }
 }
