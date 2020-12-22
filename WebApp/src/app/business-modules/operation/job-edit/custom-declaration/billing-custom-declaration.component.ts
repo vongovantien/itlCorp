@@ -92,7 +92,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.poupAddMore.partnerTaxcode = res.taxCode;
+                        this.poupAddMore.partnerTaxcode = res.accountNo;
                     }
                 }
             );
