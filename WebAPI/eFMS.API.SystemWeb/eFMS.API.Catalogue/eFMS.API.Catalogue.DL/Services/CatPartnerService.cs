@@ -390,7 +390,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<p><img src = '[logoEFMS]' /></p> " + " </div>");
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
-            lstCcCreator.Add(infoCreatetor.Email);
+            lstCcCreator.Add(infoCreatetor?.Email);
             bool resultSenmail = false;
             if ((partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
             {
