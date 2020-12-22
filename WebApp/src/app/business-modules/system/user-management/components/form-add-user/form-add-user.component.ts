@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
 import { UserLevel } from 'src/app/shared/models/system/userlevel';
+import { SystemConstants } from '@constants';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -84,10 +85,10 @@ export class FormAddUserComponent extends AppList {
             usertype: [this.usertypes[0]],
             active: [this.status[0]],
             workingg: [this.working[0]],
-            email: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
+            email: ['', Validators.compose([
+                Validators.required,
+                Validators.pattern(SystemConstants.CPATTERN.EMAIL),
+            ])],
             phone: [],
             description: [],
             ldap: [true],

@@ -2,11 +2,14 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { DataService } from 'src/app/shared/services';
-import { User } from 'src/app/shared/models';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { Customer, User } from 'src/app/shared/models';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { SystemConstants } from 'src/constants/system.const';
 import { catchError, map } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
+import { Observable } from 'rxjs';
+import { JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'custom-clearance-form-search',
@@ -24,17 +27,22 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     importDate: AbstractControl;
     importStatus: AbstractControl;
     type: AbstractControl;
+    customer: AbstractControl;
 
     status: CommonInterface.ICommonTitleValue[];
     types: CommonInterface.ICommonTitleValue[];
 
     users: User[] = [];
     userLogged: User;
-
+    customers: Observable<Customer[]>;
+    
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    
     constructor(
         private _fb: FormBuilder,
         private _dataService: DataService,
-        private _sysRepo: SystemRepo
+        private _sysRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo
     ) {
         super();
     }
@@ -44,6 +52,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
         this.initBasicData();
         this.getUserLogged();
         this.getListUser();
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
     }
 
     initForm() {
@@ -59,6 +68,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
             'importDate': [],
             'importStatus': [],
             'type': [],
+            'customer': []
         });
 
         this.personalHandle = this.formSearch.controls['personalHandle'];
@@ -67,6 +77,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
         this.importDate = this.formSearch.controls['importDate'];
         this.importStatus = this.formSearch.controls['importStatus'];
         this.type = this.formSearch.controls['type'];
+        this.customer = this.formSearch.controls['customer'];
     }
 
     initBasicData() {
@@ -108,14 +119,15 @@ export class CustomClearanceFormSearchComponent extends AppForm {
 
     searchCustomClearance() {
         const body: ISearchCustomClearance = {
-            clearanceNo: this.clearanceNo.value,
+            clearanceNo: !!this.clearanceNo.value ? this.clearanceNo.value.split('\n').map(item=>item.trim()).join(';') : null,
             fromClearanceDate: !!this.clearanceDate.value ? formatDate(this.clearanceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toClearanceDate: !!this.clearanceDate.value ? formatDate(this.clearanceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             imPorted: !!this.importStatus.value ? this.importStatus.value.value : null,
             fromImportDate: !!this.importDate.value ? formatDate(this.importDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toImportDate: !!this.importDate.value ? formatDate(this.importDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             type: !!this.type.value ? this.type.value.value : null,
-            personHandle: this.personalHandle.value.id
+            personHandle: this.personalHandle.value.id,
+            customerNo: this.customer.value,
         };
         this.onSearch.emit(body);
     }
@@ -131,7 +143,18 @@ export class CustomClearanceFormSearchComponent extends AppForm {
         this.type.setValue(null);
         // this.importStatus.setValue(this.status[1]);
         this.importStatus.setValue(null);
+        this.resetFormControl(this.customer);
         this.searchCustomClearance();
+    }
+
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'customer':
+                this.formSearch.controls['customer'].setValue(data.accountNo);
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -144,5 +167,6 @@ interface ISearchCustomClearance {
     toImportDate: string;
     type: string;
     personHandle: string;
+    customerNo: string;
 }
 

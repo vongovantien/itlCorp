@@ -45,6 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CustomsDeclaration> customsDeclarationRepository;
         IContextBase<SysCompany> sysCompanyRepository;
         IContextBase<CatContract> catContractRepo;
+        IContextBase<SysNotifications> sysNotificationRepository;
+        IContextBase<SysUserNotification> sysUserNotificationRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -70,7 +72,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysCompany> sysCompanyRepo,
-            IContextBase<CatContract> catContract
+            IContextBase<CatContract> catContract,
+            IContextBase<SysNotifications> sysNotifyRepo,
+            IContextBase<SysUserNotification> sysUsernotifyRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -96,6 +100,8 @@ namespace eFMS.API.Documentation.DL.Services
             customsDeclarationRepository = customsDeclarationRepo;
             sysCompanyRepository = sysCompanyRepo;
             catContractRepo = catContract;
+            sysNotificationRepository = sysNotifyRepo;
+            sysUserNotificationRepository = sysUsernotifyRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -781,6 +787,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.ExchangeRate = cdNote.ExchangeRate;
             soaDetails.Note = cdNote.Note;
             soaDetails.ReasonReject = cdNote.ReasonReject;
+            soaDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
             return soaDetails;
         }
 
@@ -1790,6 +1797,125 @@ namespace eFMS.API.Documentation.DL.Services
                 results.Add(item);
             }
             return results;
+        }
+
+        public HandleState RejectCreditNote(RejectCreditNoteModel model)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var cdNote = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                    if (cdNote == null) return new HandleState((object)"Not found Credit Note");
+
+                    cdNote.SyncStatus = "Rejected";
+                    cdNote.UserModified = currentUser.UserID;
+                    cdNote.DatetimeModified = DateTime.Now;
+                    cdNote.ReasonReject = model.Reason;
+
+                    HandleState hs = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
+                    if (hs.Success)
+                    {
+                        HandleState smCdNote = DataContext.SubmitChanges();
+                        if (smCdNote.Success)
+                        {
+                            string title = string.Format(@"Accountant Rejected Data CDNote {0}", cdNote.Code);
+                            SysNotifications sysNotify = new SysNotifications
+                            {
+                                Id = Guid.NewGuid(),
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                Type = "User",
+                                Title = title,
+                                IsClosed = false,
+                                IsRead = false,
+                                Description = model.Reason,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                Action = "Detail",
+                                ActionLink = GetLinkCdNote(cdNote.Code, cdNote.JobId),
+                                UserIds = cdNote.UserCreated
+                            };
+                            var hsNotifi = sysNotificationRepository.Add(sysNotify);
+
+                            SysUserNotification sysUserNotify = new SysUserNotification
+                            {
+                                Id = Guid.NewGuid(),
+                                UserId = cdNote.UserCreated,
+                                Status = "New",
+                                NotitficationId = sysNotify.Id,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                            };
+                            var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify);
+                        }
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId)
+        {
+            string _link = string.Empty;
+            if (cdNoteNo.Contains("CL"))
+            {
+                _link = string.Format(@"home/operation/job-management/job-edit/{0}?tab=CDNOTE", jobId.ToString());
+            }
+            else
+            {
+                string prefixService = "home/documentation/";
+                if (cdNoteNo.Contains("IT"))
+                {
+                    prefixService += "inland-trucking";
+                }
+                else if (cdNoteNo.Contains("AE"))
+                {
+                    prefixService += "air-export";
+                }
+                else if (cdNoteNo.Contains("AI"))
+                {
+                    prefixService += "air-import";
+                }
+                else if (cdNoteNo.Contains("SEC"))
+                {
+                    prefixService += "sea-consol-export";
+                }
+                else if (cdNoteNo.Contains("SIC"))
+                {
+                    prefixService += "sea-consol-import";
+                }
+                else if (cdNoteNo.Contains("SEF"))
+                {
+                    prefixService += "sea-fcl-export";
+                }
+                else if (cdNoteNo.Contains("SIF"))
+                {
+                    prefixService += "sea-fcl-import";
+                }
+                else if (cdNoteNo.Contains("SEL"))
+                {
+                    prefixService += "sea-lcl-export";
+                }
+                else if (cdNoteNo.Contains("SIL"))
+                {
+                    prefixService += "sea-lcl-import";
+                }
+                _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
+            }
+            return _link;
         }
     }
 }

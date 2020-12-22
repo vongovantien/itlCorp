@@ -6,83 +6,113 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label">
-                                Person Handle
-                            </label>
-                            <select class="form-control" formControlName="personalHandle">
-                                <option *ngFor="let user of users" [ngValue]="user">{{user.username}}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label">
                                 Clearance No
                             </label>
-                            <input type="text" class="form-control m-input m-input--square"
-                                formControlName="clearanceNo" placeholder="Clearance No">
+                            <textarea rows="5" class="form-control" formControlName="clearanceNo"
+                                placeholder="Clearance No"></textarea>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label">
-                                Clearance Date
-                            </label>
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                    formControlName="clearanceDate" [ranges]="ranges" [alwaysShowCalendars]="true"
-                                    name="daterange" placeholder="From date - to date" readonly />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="form-group">
+                                    <label>Customer</label>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{ field: 'accountNo', value: customer.value}"
+                                        (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
+                                        [displayFields]="displayFieldsCustomer" [height]="150"
+                                        (remove)="resetFormControl(customer)" placeholder="Select Customer">
+                                    </app-combo-grid-virtual-scroll>
+                                </div>
+                            </div>
+                            <div class="col-lg-7">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Person Handle
+                                            </label>
+                                            <select class="form-control" formControlName="personalHandle">
+                                                <option *ngFor="let user of users" [ngValue]="user">{{user.username}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Clearance Date
+                                            </label>
+                                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    ngxDaterangepickerMd
+                                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                    formControlName="clearanceDate" [ranges]="ranges"
+                                                    [alwaysShowCalendars]="true" name="daterange"
+                                                    placeholder="From date - to date" readonly />
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        Import Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-ltr">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            formControlName="importDate" [ranges]="ranges" [maxDate]="maxDate"
+                                            [alwaysShowCalendars]="true" name="daterange"
+                                            placeholder="From date - to date" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Import Status
+                                            </label>
+                                            <select formControlName="importStatus" class="form-control">
+                                                <option [ngValue]="null">All</option>
+                                                <option *ngFor="let item of status" [ngValue]="item">{{item.title}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Type
+                                            </label>
+                                            <select formControlName="type" class="form-control">
+                                                <option [ngValue]="null">All</option>
+                                                <option *ngFor="let type of types" [ngValue]="type">{{type.title}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label">
-                                Import Date
-                            </label>
-                            <div class="m-input-icon m-input-icon--right down daterange-ltr">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" formControlName="importDate"
-                                    [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
-                                    placeholder="From date - to date" readonly />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label">
-                                Import Status
-                            </label>
-                            <select formControlName="importStatus" class="form-control">
-                                <option [ngValue]="null">All</option>
-                                <option *ngFor="let item of status" [ngValue]="item">{{item.title}}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label">
-                                Type
-                            </label>
-                            <select formControlName="type" class="form-control">
-                                <option [ngValue]="null">All</option>
-                                <option *ngFor="let type of types" [ngValue]="type">{{type.title}}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="form-actions">
                     <div class="row">
                         <div class="col-lg-6"></div>

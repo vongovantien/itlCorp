@@ -59,5 +59,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string Note { get; set; }
         public string ReasonReject { get; set; }
         public string CreditPayment { get; set; }
+        public bool IsExistChgCurrDiffLocalCurr { get; set; }
     }
 }

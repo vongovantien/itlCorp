@@ -773,6 +773,12 @@ export class AccountingRepo {
     getDetailReceipt(id: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetById/`, { id: id });
     }
+
+    rejectSoaCredit(model: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/RejectSoaCredit`, model).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 
