@@ -335,7 +335,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
 
-        private void SendMailCreatedSuccess(CatPartner partner)
+        public bool SendMailCreatedSuccess(CatPartner partner)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
             string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
@@ -425,6 +425,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
+            return resultSenmail;
         }
 
         private List<string> ListMailCC()

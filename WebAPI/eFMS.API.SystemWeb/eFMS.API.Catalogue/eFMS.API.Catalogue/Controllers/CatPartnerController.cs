@@ -208,6 +208,21 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// Send Request Approval
+        /// </summary>
+        /// <param name="partnerId">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet("RequestApproval")]
+        [Authorize]
+        public IActionResult RequestApproval(string partnerId)
+        {
+            var data = catPartnerService.Get(x => x.Id == partnerId).FirstOrDefault();
+            bool result = catPartnerService.SendMailCreatedSuccess(data);
+            return Ok(result);
+        }
+
         /// <summary>
         /// add new partner
         /// </summary>
