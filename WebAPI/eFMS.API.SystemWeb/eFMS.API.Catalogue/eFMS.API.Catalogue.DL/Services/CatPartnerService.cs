@@ -335,14 +335,15 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
 
-        private void SendMailCreatedSuccess(CatPartner partner)
+        public bool SendMailCreatedSuccess(CatPartner partner)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
-            string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
+            var infoCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).FirstOrDefault();
             string url = string.Empty;
             List<string> lstToAR = new List<string>();
             List<string> lstToAccountant = new List<string>();
             List<string> lstCc = ListMailCC();
+            List<string> lstCcCreator = new List<string>();
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
@@ -374,22 +375,22 @@ namespace eFMS.API.Catalogue.DL.Services
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
             string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
+            string subject = "eFMS - Partner Approval Request From " + infoCreatetor?.EmployeeNameVn;
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant Team: </br> </br>" +
-                "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" +
-                "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+                "<i> You have a Partner Approval request From " + infoCreatetor?.EmployeeNameVn + " as info bellow: </i> </br>" +
+                "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + infoCreatetor?.EmployeeNameVn + " với thông tin như sau: </i> </br> </br>" +
                 "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
                 "\t  Partner Name  / <i> Tên đối tượng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
                 "\t  Category  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
                 "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
                 "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
-                "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
+                "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + infoCreatetor?.EmployeeNameVn + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "<b> eFMS System, </b>" + "</br>" +
                 "<p><img src = '[logoEFMS]' /></p> " + " </div>");
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
-
+            lstCcCreator.Add(infoCreatetor?.Email);
             bool resultSenmail = false;
             if ((partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
             {
@@ -399,7 +400,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         lstToAccountant = lstCc;
                     }
-                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
+                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, lstCcCreator, lstCc);
                 }
             }
 
@@ -408,7 +409,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstToAccountant.AddRange(lstToAR);
                 if (lstToAccountant.Any())
                 {
-                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
+                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, lstCcCreator, lstCc);
                 }
             }
 
@@ -425,6 +426,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
+            return resultSenmail;
         }
 
         private List<string> ListMailCC()
