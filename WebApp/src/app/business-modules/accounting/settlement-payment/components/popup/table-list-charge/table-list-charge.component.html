@@ -82,7 +82,8 @@
                                                         [selectedDisplayFields]="['chargeNameEn']"
                                                         [dataSources]="listCharges"
                                                         [displayFields]="configChargeDisplayFields" [height]="150"
-                                                        placeholder="Please Select" (remove)="charge.chargeId = null">
+                                                        placeholder="Please Select" (remove)="charge.chargeId = null"
+                                                        [clearable]="false">
                                                     </app-combo-grid-virtual-scroll>
                                                 </div>
                                             </div>
@@ -97,10 +98,10 @@
                                                         <span class="e--combogrid_icon__dropdown">
                                                             <i class="fa fa-angle-down" aria-hidden="true"></i>
                                                         </span>
-                                                        <span class="e--combogrid_icon__clear"
+                                                        <!-- <span class="e--combogrid_icon__clear"
                                                             (click)="charge.paymentObjectId = null; charge.payer = null">
                                                             <i class="la la-times" aria-hidden="true"></i>
-                                                        </span>
+                                                        </span> -->
                                                     </div>
                                                 </ng-container>
                                                 <div *dropdownMenu class="dropdown-menu dropdown-partner__content">

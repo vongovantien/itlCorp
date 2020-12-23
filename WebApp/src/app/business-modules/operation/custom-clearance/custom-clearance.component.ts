@@ -25,9 +25,6 @@ export class CustomClearanceComponent extends AppList {
     @ViewChild('confirmDeletePopup') confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
     listCustomDeclaration: CustomDeclaration[] = [];
-    searchObject: any = {};
-    listPort: any = [];
-    listUnit: any = [];
     menuPermission: SystemInterface.IUserPermission;
     messageConvertError: string = '';
     clearancesToConvert: CustomDeclaration[] = [];
@@ -80,18 +77,6 @@ export class CustomClearanceComponent extends AppList {
             { title: 'Export Country', field: 'exportCountryName', sortable: true },
         ];
         this.getListCustomsDeclaration();
-        this.getListPort();
-        this.getListUnit();
-    }
-
-    getListPort() {
-        this._catalogueRepo.getListPort({ placeType: PlaceTypeEnum.Port })
-            .subscribe((res: any) => { this.listPort = res; });
-    }
-
-    getListUnit() {
-        this._catalogueRepo.getUnit({ unitType: 'Package' })
-            .subscribe((res: any) => { this.listUnit = res; });
     }
 
     onSearchClearance(dataSearch?: any) {

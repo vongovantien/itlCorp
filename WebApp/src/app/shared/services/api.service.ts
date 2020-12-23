@@ -74,33 +74,13 @@ export class ApiService {
         return this._http.put(this.setUrl(url), formData, options);
     }
 
-    putFormData(url: string, files: File[] = [], body?: any, name: string = null, params?: any) {
-        // haven't both files and body.
-        if (files.length <= 0 && Object.keys(body).length === 0 && body.constructor === Object) {
-            return;
-        }
-        // declare formData;
-        const formData = new FormData();
-        // append file
-        for (const file of files) {
-            formData.append(name, file);
-        }
-
-        // set body
-        for (const key in body) {
-            if (Object.prototype.hasOwnProperty.call(body, key)) {
-                formData.set(key, body[key]);
-            }
-        }
-        //
+    postFormData(url: string, formData: any) {
         const options = {
-            params: params,
-            reportProgress: true,
             headers: new HttpHeaders({
-                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
             })
         };
-        return this._http.put(this.setUrl(url), formData, options);
+        return this._http.post(this.setUrl(url), formData, options);
 
     }
 
