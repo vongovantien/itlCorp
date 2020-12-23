@@ -403,7 +403,7 @@ namespace eFMS.API.Operation.Controllers
 
                         ClearanceDateStr = worksheet.Cells[row, 4].Value?.ToString(),
 
-                        PartnerTaxCode = worksheet.Cells[row, 5].Value?.ToString(),
+                        AccountNo = worksheet.Cells[row, 5].Value?.ToString(),
                         CustomerName = worksheet.Cells[row, 6].Value?.ToString(),
                         Mblid = worksheet.Cells[row, 7].Value?.ToString(),
                         Hblid = worksheet.Cells[row, 8].Value?.ToString(),
@@ -427,8 +427,8 @@ namespace eFMS.API.Operation.Controllers
                         UserModified = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
-                         Shipper = worksheet.Cells[row, 22].Value?.ToString(),
-                         Consignee = worksheet.Cells[row, 23].Value?.ToString()
+                        Shipper = worksheet.Cells[row, 22].Value?.ToString(),
+                        Consignee = worksheet.Cells[row, 23].Value?.ToString()
                     };
                     list.Add(stage);
                 }

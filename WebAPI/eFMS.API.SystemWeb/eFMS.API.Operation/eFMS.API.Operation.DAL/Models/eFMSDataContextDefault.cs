@@ -835,6 +835,8 @@ namespace eFMS.API.Operation.Service.Models
             {
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.AccountNo).HasMaxLength(50);
+
                 entity.Property(e => e.CargoType)
                     .HasMaxLength(10)
                     .IsUnicode(false);

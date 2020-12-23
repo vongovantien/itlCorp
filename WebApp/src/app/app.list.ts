@@ -4,8 +4,8 @@ export abstract class AppList extends AppPage {
 
     page: number = 1;
     totalItems: number = 0;
-    numberToShow: number[] = [3, 15, 30, 50];
-    pageSize: number = this.numberToShow[1];
+    numberToShow: number[] = [15, 30, 50, 100];
+    pageSize: number = this.numberToShow[0];
     maxSize: number = 5;
 
     sort: string = null;

@@ -176,7 +176,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
 
     updateHbl(body: any) {
         this._progressRef.start();
-        body.transactionType = ChargeConstants.SCI_CODE;
+        body.transactionType = ChargeConstants.SFI_CODE;
 
         this._documentationRepo.updateHbl(body)
             .pipe(

@@ -214,7 +214,7 @@ export class DocumentationRepo {
     }
 
     previewCDNote(data, isOrigin) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data, {isOrigin: isOrigin}).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data, { isOrigin: isOrigin }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -985,6 +985,12 @@ export class DocumentationRepo {
     checkExistManifestExport(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsManifest/CheckExistManifestExport/${id}`).pipe(
             catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    RejectCreditNote(model: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCdNote/RejectCreditNote`, model).pipe(
             map((data: any) => data)
         );
     }

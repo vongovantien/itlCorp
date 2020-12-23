@@ -138,6 +138,7 @@ export class SystemConstants {
         FORBIDDEN: 403,
         NOT_FOUND: 404,
         EXISTED: 409,
+        OK: 200
     };
 
 }

@@ -6,11 +6,11 @@ export const environment = {
                 ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
                 // ACCOUNTING: "localhost:44368",
                 DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
-                //DOCUMENTATION: "localhost:44366",
+                // DOCUMENTATION: "localhost:44366",
                 CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
                 // CATALOGUE: "localhost:44361",
                 OPERATION: "test.api-efms.itlvn.com/Operation",
-                // OPERATION: "localhost:44365",
+                // OPERATION: "localhost:44365"
                 SYSTEM: "test.api-efms.itlvn.com/System",
                 // SYSTEM: "localhost:44360",
                 SETTING: "test.api-efms.itlvn.com/Setting",
@@ -22,7 +22,7 @@ export const environment = {
                 INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
                 // INDENTITY_SERVER_URL: "https://localhost:44369",
                 // EXPORT_CRYSTAL: "http://localhost:53717/ExportCrystal.aspx",
-                EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
+                EXPORT_CRYSTAL: "test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
                 PARTNER_API: "test.api-efms.itlvn.com/partner"
         },
 

@@ -14,6 +14,8 @@ export * from './inject-view-container-ref.directive';
 export * from './icon-calendar.directive';
 export * from './icon-clear-calendar.directive';
 export * from './load-module.directive';
+export * from './disabled-control.directive';
+
 
 
 
