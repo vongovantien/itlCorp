@@ -542,9 +542,10 @@ namespace eFMS.API.Accounting.Controllers
                     accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP_DiffCurrLocal);
                     accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP_DiffCurrLocal);
 
-                    List<Guid> ids = requests.Where(w =>
-                       !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())
-                    && !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
+                    //List<Guid> ids = requests.Where(w =>
+                    //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())
+                    //&& !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
+                    List<Guid> ids = requests.Select(x => x.Id).ToList();
 
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
@@ -635,7 +636,9 @@ namespace eFMS.API.Accounting.Controllers
                     if (responseAddModel_NVHD.Success == "1"
                         || responseUpdateModel_NVHD.Success == "1"
                         || responseAddModel_NVCP.Success == "1"
-                        || responseUpdateModel_NVCP.Success == "1")
+                        || responseUpdateModel_NVCP.Success == "1" 
+                        || listAdd_NVCP_DiffCurrLocal.Count > 0 
+                        || listUpdate_NVCP_DiffCurrLocal.Count > 0)
                     {
                         HandleState hs = accountingService.SyncListCdNoteToAccountant(ids);
                         string message = HandleError.GetMessage(hs, Crud.Update);
@@ -649,10 +652,6 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     else
                     {
-                        if (listAdd_NVCP_DiffCurrLocal.Count > 0 || listUpdate_NVCP_DiffCurrLocal.Count > 0)
-                        {
-                            return Ok(new ResultHandle { Status = true });
-                        }
                         var result = new ResultHandle { Status = false, Message = responseAddModel_NVHD.Msg + "\n" + responseUpdateModel_NVHD.Msg + "\n" + responseAddModel_NVCP.Msg + "\n" + responseUpdateModel_NVCP.Msg, Data = ids };
                         return BadRequest(result);
                     }
@@ -700,9 +699,10 @@ namespace eFMS.API.Accounting.Controllers
                     accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP_DiffCurrLocal);
                     accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP_DiffCurrLocal);
 
-                    List<int> ids = requests.Where(w => 
-                       !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString()) 
-                    && !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
+                    //List<int> ids = requests.Where(w => 
+                    //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString()) 
+                    //&& !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
+                    List<int> ids = requests.Select(x => x.Id).ToList();
 
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
@@ -793,7 +793,9 @@ namespace eFMS.API.Accounting.Controllers
                     if (responseAddModel_NVHD.Success == "1"
                         || responseUpdateModel_NVHD.Success == "1"
                         || responseAddModel_NVCP.Success == "1"
-                        || responseUpdateModel_NVCP.Success == "1")
+                        || responseUpdateModel_NVCP.Success == "1"
+                        || listAdd_NVCP_DiffCurrLocal.Count > 0
+                        || listUpdate_NVCP_DiffCurrLocal.Count > 0)
                     {
                         HandleState hs = accountingService.SyncListSoaToAccountant(ids);
                         string message = HandleError.GetMessage(hs, Crud.Update);
@@ -807,10 +809,6 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     else
                     {
-                        if (listAdd_NVCP_DiffCurrLocal.Count > 0 || listUpdate_NVCP_DiffCurrLocal.Count > 0)
-                        {
-                            return Ok(new ResultHandle { Status = true });
-                        }
                         var result = new ResultHandle { Status = false, Message = responseAddModel_NVHD.Msg + "\n" + responseUpdateModel_NVHD.Msg + "\n" + responseAddModel_NVCP.Msg + "\n" + responseUpdateModel_NVCP.Msg, Data = ids };
                         return BadRequest(result);
                     }

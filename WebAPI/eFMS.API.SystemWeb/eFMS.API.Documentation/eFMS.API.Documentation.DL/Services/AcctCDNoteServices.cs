@@ -1850,6 +1850,25 @@ namespace eFMS.API.Documentation.DL.Services
                                 UserModified = currentUser.UserID,
                             };
                             var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify);
+
+                            //Update PaySyncedFrom or SyncedFrom equal NULL CDNote Code
+                            var surcharges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == "OBH")
+                                {
+                                    surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? null : surcharge.PaySyncedFrom;
+                                    surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? null : surcharge.SyncedFrom;
+                                }
+                                else
+                                {
+                                    surcharge.SyncedFrom = null;
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = surchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                            var smSurcharge = surchargeRepository.SubmitChanges();
                         }
                         trans.Commit();
                     }

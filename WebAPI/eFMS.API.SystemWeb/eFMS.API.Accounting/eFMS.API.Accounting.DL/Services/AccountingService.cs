@@ -985,9 +985,19 @@ namespace eFMS.API.Accounting.DL.Services
                                 voucher.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
                                 DataContext.Update(voucher, x => x.Id == id, false);
+
+                                //Update SyncedFrom equal VOUCHER by Id of Voucher
+                                var surcharges = SurchargeRepository.Get(x => x.AcctManagementId == voucher.Id);
+                                foreach (var surcharge in surcharges)
+                                {
+                                    surcharge.SyncedFrom = "VOUCHER";
+                                    surcharge.UserModified = currentUser.UserID;
+                                    surcharge.DatetimeModified = DateTime.Now;
+                                    var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                }
                             }
                         }
-
+                        var smSurcharge = SurchargeRepository.SubmitChanges();
                         result = DataContext.SubmitChanges();
                       
                         trans.Commit();
@@ -1028,8 +1038,27 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         cdNote.LastSyncDate = DateTime.Now;
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
+
+                        //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
+                        var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
+                        foreach(var surcharge in surcharges)
+                        {
+                            if (surcharge.Type == "OBH")
+                            {
+                                surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
+                                surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
+                            }
+                            else
+                            {
+                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                surcharge.SyncedFrom = "CDNOTE";
+                            }
+                            surcharge.UserModified = currentUser.UserID;
+                            surcharge.DatetimeModified = DateTime.Now;
+                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                        }
                     }
-                  
+                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -1061,8 +1090,27 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         soa.LastSyncDate = DateTime.Now;
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
+
+                        //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
+                        var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                        foreach(var surcharge in surcharges)
+                        {
+                            if (surcharge.Type == "OBH")
+                            {
+                                surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
+                                surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;
+                            }
+                            else
+                            {
+                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                surcharge.SyncedFrom = "SOA";
+                            }
+                            surcharge.UserModified = currentUser.UserID;
+                            surcharge.DatetimeModified = DateTime.Now;
+                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                        }
                     }
-                   
+                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = soaRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -1562,6 +1610,6 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
-
+        
     }
 }

@@ -2641,7 +2641,26 @@ namespace eFMS.API.Accounting.DL.Services
                                 UserModified = currentUser.UserID,
                             };
                             sysUserNotificationRepository.Add(sysUserNotify);
-                        }
+
+                            //Update PaySyncedFrom or SyncedFrom equal NULL by SOA No
+                            var surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                            foreach(var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == "OBH")
+                                {
+                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? null : surcharge.PaySyncedFrom;
+                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? null : surcharge.SyncedFrom;
+                                }
+                                else
+                                {
+                                    surcharge.SyncedFrom = null;
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                            var smSurcharge = csShipmentSurchargeRepo.SubmitChanges();
+                        }                        
                         trans.Commit();
                     }
                     return hs;
