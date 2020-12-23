@@ -87,19 +87,18 @@ export class PartnerComponent extends AppList implements OnInit {
     ngOnInit() {
         this.tabSelect(this.activeTab);
     }
+    
     resetSearch(event) {
-        const currentTab = this.criteria.partnerGroup;
-        this.criteria = { };
-        this.criteria.partnerGroup = currentTab;
         this.onSearch(event);
     }
+    
     onSearch(event) {
+        const currentTab = this.criteria.partnerGroup;
+        this.criteria = {};
+        this.criteria.partnerGroup = currentTab;
         if (event.field === "All") {
             this.criteria.all = event.searchString;
         } else {
-            const currentTab = this.criteria.partnerGroup;
-            this.criteria = {};
-            this.criteria.partnerGroup = currentTab;
             if (event.field === "id") {
                 this.criteria.accountNo = event.searchString;
             }
