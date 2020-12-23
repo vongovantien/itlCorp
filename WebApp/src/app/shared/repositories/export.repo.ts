@@ -9,6 +9,10 @@ export class ExportRepo {
     constructor(private _api: ApiService) {
     }
 
+    exportCrystalReportPDF(data: any) {
+        return this._api.postFormData(`${environment.HOST.EXPORT_CRYSTAL}`, `crystal=${JSON.stringify(data)}`);
+    }
+
     exportCustomClearance(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/CustomsDeclaration/ExportCustomClearance`, searchObject).pipe(
             catchError((error) => throwError(error)),

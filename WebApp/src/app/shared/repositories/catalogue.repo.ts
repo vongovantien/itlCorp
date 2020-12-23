@@ -321,6 +321,13 @@ export class CatalogueRepo {
             );
     }
 
+    requestApproval(partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/RequestApproval`, { partnerId: partnerId })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
     rejectCommentCommercial(partnerId: string, contractId: string, comment: string, partnerType: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/RejectComment`, { partnerId: partnerId, contractId: contractId, comment: comment, partnerType: partnerType })
             .pipe(

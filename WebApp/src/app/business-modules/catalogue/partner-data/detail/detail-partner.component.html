@@ -26,6 +26,14 @@
                         </span>
                     </span>
                 </button>
+                <button (click)="onRequestApproval()"
+                    *ngIf="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === false && !partner.active && !isAddSubPartner"
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-send"></i>
+                        <span> Request Approval </span>
+                    </span>
+                </button>
                 <button *ngIf="allowUpdate" type="" class="btn btn-brand  m-btn--icon m-btn--uppercase"
                     (click)="onSubmit()">
                     <span>

@@ -638,6 +638,25 @@ export class PartnerDetailComponent extends AppList {
 
     }
 
+    onRequestApproval() {
+        this._progressRef.start();
+        this._catalogueRepo.requestApproval(this.partner.id)
+            .pipe(
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (res === true) {
+                        this._toastService.success('Request Approval Successfully!');
+                    } else {
+                        this._toastService.error('something went wrong!');
+                    }
+                }
+            );
+
+
+    }
+
     gotoList() {
         localStorage.setItem('success_add_sub', "true");
         this.back();
