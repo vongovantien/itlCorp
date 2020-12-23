@@ -1483,15 +1483,6 @@ namespace eFMS.API.Accounting.DL.Services
                             sendMailSuggest = SendMailSuggestApproval(advancePayment.AdvanceNo, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
                         }
 
-                        if (!sendMailSuggest)
-                        {
-                            return new HandleState("Send mail suggest approval failed");
-                        }
-                        if (!sendMailApproved)
-                        {
-                            return new HandleState("Send mail approved approval failed");
-                        }
-
                         var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceApprove.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                         if (checkExistsApproveByAdvanceNo == null) //Insert ApproveAdvance
                         {
@@ -1516,6 +1507,15 @@ namespace eFMS.API.Accounting.DL.Services
                         DataContext.SubmitChanges();
                         trans.Commit();
 
+                        // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
+                        if (!sendMailSuggest)
+                        {
+                            return new HandleState("Send mail suggest approval failed");
+                        }
+                        if (!sendMailApproved)
+                        {
+                            return new HandleState("Send mail approved approval failed");
+                        }
                         return new HandleState();
                     }
                     catch (Exception ex)
@@ -1833,15 +1833,6 @@ namespace eFMS.API.Accounting.DL.Services
                         sendMailSuggest = SendMailSuggestApproval(advancePayment.AdvanceNo, userApproveNext, mailUserApproveNext, mailUsersDeputy);
                     }
 
-                    if (!sendMailSuggest)
-                    {
-                        return new HandleState("Send mail suggest approval failed");
-                    }
-                    if (!sendMailApproved)
-                    {
-                        return new HandleState("Send mail approved approval failed");
-                    }
-
                     advancePayment.UserModified = approve.UserModified = userCurrent;
                     advancePayment.DatetimeModified = approve.DateModified = DateTime.Now;
 
@@ -1851,6 +1842,16 @@ namespace eFMS.API.Accounting.DL.Services
                     acctApproveAdvanceRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
+
+                    // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
+                    if (!sendMailSuggest)
+                    {
+                        return new HandleState("Send mail suggest approval failed");
+                    }
+                    if (!sendMailApproved)
+                    {
+                        return new HandleState("Send mail approved approval failed");
+                    }
                     return new HandleState();
                 }
                 catch (Exception ex)
@@ -2001,13 +2002,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (!isApprover)
                     {
                         return new HandleState("Not allow deny. You are not in the approval process.");
-                    }
-
-                    var sendMailDeny = SendMailDeniedApproval(advancePayment.AdvanceNo, comment, DateTime.Now);
-                    if (!sendMailDeny)
-                    {
-                        return new HandleState("Send mail denied failed");
-                    }
+                    }                   
 
                     advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                     approve.IsDeny = true;
@@ -2021,6 +2016,13 @@ namespace eFMS.API.Accounting.DL.Services
                     acctApproveAdvanceRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
+
+                    // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
+                    var sendMailDeny = SendMailDeniedApproval(advancePayment.AdvanceNo, comment, DateTime.Now);
+                    if (!sendMailDeny)
+                    {
+                        return new HandleState("Send mail denied failed");
+                    }
                     return new HandleState();
                 }
                 catch (Exception ex)
@@ -2067,7 +2069,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             approve.UserModified = userCurrent;
                             approve.DateModified = DateTime.Now;
-                            approve.Comment = "RECALL BY " + userCurrent;
+                            approve.Comment = "RECALL BY " + currentUser.UserName;
                             approve.IsDeny = true;
                             var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
                         }
@@ -2078,9 +2080,8 @@ namespace eFMS.API.Accounting.DL.Services
                         advance.DatetimeModified = DateTime.Now;
                         var hsUpdateAdvancePayment = DataContext.Update(advance, x => x.Id == advance.Id);
                         trans.Commit();
+                        return hsUpdateAdvancePayment;
                     }
-
-                    return new HandleState();
                 }
                 catch (Exception ex)
                 {
@@ -2421,7 +2422,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var item = new DeniedInfoResult();
                 item.No = i;
-                item.NameAndTimeDeny = userBaseService.GetEmployeeByUserId(approve.UserModified)?.EmployeeNameVn + "\r\n" + approve.DateModified?.ToString("dd/MM/yyyy HH:mm");
+                item.NameAndTimeDeny = userBaseService.GetEmployeeByUserId(approve.UserModified)?.EmployeeNameVn + " - " + approve.DateModified?.ToString("dd/MM/yyyy HH:mm:ss");
                 item.LevelApprove = approve.LevelApprove;
                 item.Comment = approve.Comment;
                 data.Add(item);
