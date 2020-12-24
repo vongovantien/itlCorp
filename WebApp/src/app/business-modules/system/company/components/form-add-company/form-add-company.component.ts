@@ -75,6 +75,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
     }
 
     initImageLibary() {
+        let selectImg = null;
         this._zone.run(() => {
             $(this.el.nativeElement).froalaEditor({
                 requestWithCORS: true,
@@ -89,9 +90,13 @@ export class CompanyInformationFormAddComponent extends AppForm {
                 },
                 imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
                 imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/company`,
-
+                imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/DeleteImageCompany`,
+                imageManagerDeleteMethod: 'DELETE',
+                imageManagerDeleteParams: { id: selectImg?.id }
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
+            }).on('froalaEditor.imageManager.beforeDeleteImage', (e: any, editor, image) => {
+                selectImg = image['0'].dataset;
             }).on('froalaEditor.image.error', (e, editor, error, response) => {
                 console.log(error);
                 switch (error.code) {

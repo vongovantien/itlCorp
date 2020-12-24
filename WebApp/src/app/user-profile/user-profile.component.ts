@@ -45,6 +45,7 @@ export class UserProfilePageComponent extends AppForm {
 
     photoUrl: string;
 
+
     constructor(
         private _ngProgressService: NgProgress,
         private _fb: FormBuilder,
@@ -86,7 +87,8 @@ export class UserProfilePageComponent extends AppForm {
     }
 
     initImageLibary() {
-        this._zone.run(() => {
+        let selectImg = null;
+        this._zone.runOutsideAngular(() => {
             $(this.el.nativeElement).froalaEditor({
                 requestWithCORS: true,
                 language: 'vi',
@@ -95,28 +97,35 @@ export class UserProfilePageComponent extends AppForm {
                 imageAllowedTypes: ['jpeg', 'jpg', 'png'],
                 requestHeaders: {
                     Authorization: `Bearer ${localStorage.getItem(SystemConstants.ACCESS_TOKEN)}`,
-                    Module: 'User',
+                    Module: 'User', // thu muc anh chua anh cua user.
                     ObjectId: `${this.currentUserId}`,
                 },
                 imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
                 imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/User?userId=${this.currentUserId}`,
-
+                imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
+                imageManagerDeleteMethod: 'DELETE',
+                imageManagerDeleteParams: { id: selectImg?.id }
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
-            }).on('froalaEditor.image.error', (e, editor, error, response) => {
-                console.log(error);
-                switch (error.code) {
-                    case 5:
-                        this._toastService.error("Size image invalid");
-                        break;
-                    case 6:
-                        this._toastService.error("Image invalid");
-                        break;
-                    default:
-                        this._toastService.error(error.message);
-                        break;
-                }
-            });
+            }).on('froalaEditor.imageManager.beforeDeleteImage', (e: any, editor, image) => {
+                selectImg = image['0'].dataset;
+            })
+                .on('froalaEditor.imageManagerLoadURL.removed', function (e, editor, $img) {
+                    console.log("xoa thanh cong");
+                }).on('froalaEditor.image.error', (e, editor, error, response) => {
+                    console.log(error);
+                    switch (error.code) {
+                        case 5:
+                            this._toastService.error("Size image invalid");
+                            break;
+                        case 6:
+                            this._toastService.error("Image invalid");
+                            break;
+                        default:
+                            this._toastService.error(error.message);
+                            break;
+                    }
+                })
         });
     }
 
@@ -217,7 +226,5 @@ export class UserProfilePageComponent extends AppForm {
                 }
             });
     }
-    click() {
 
-    }
 }

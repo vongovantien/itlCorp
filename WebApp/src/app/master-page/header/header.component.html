@@ -8,13 +8,10 @@
                     </a>
                 </div>
                 <div class="m-stack__item m-stack__item--middle m-brand__tools">
-                    <a href="javascript:;" id="m_aside_left_minimize_toggle"
-                        class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-desktop-inline-block"
-                        (click)="minimize_page_sidebar_desktop()">
+                    <a href="javascript:;" id="m_aside_left_minimize_toggle" class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-desktop-inline-block" (click)="minimize_page_sidebar_desktop()">
                         <span></span>
                     </a>
-                    <a href="javascript:;" id="m_aside_left_offcanvas_toggle" (click)="minimize_page_sidebar_mobile()"
-                        class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
+                    <a href="javascript:;" id="m_aside_left_offcanvas_toggle" (click)="minimize_page_sidebar_mobile()" class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
                         <span></span>
                     </a>
                 </div>
@@ -67,14 +64,11 @@
                                 </span>
                             </a>
                             <div class="dropdown-menu pt-0" style="min-width: 160px">
-                                <div
-                                    class="text-center font-14 font-weight-bold py-3 m-topbar__notifications-head mb-3">
+                                <div class="text-center font-14 font-weight-bold py-3 m-topbar__notifications-head mb-3">
                                     <div>Offices</div>
                                 </div>
                                 <ul class="m-nav">
-                                    <li class="m-nav__item pointer" *ngFor="let office of offices; let i = index"
-                                        (click)="changeOffice(office)"
-                                        [class.m-nav__item--active]="!!selectedOffice && selectedOffice.branchNameEn == office.branchNameEn">
+                                    <li class="m-nav__item pointer" *ngFor="let office of offices; let i = index" (click)="changeOffice(office)" [class.m-nav__item--active]="!!selectedOffice && selectedOffice.branchNameEn == office.branchNameEn">
                                         <a class="m-nav__link" data-toggle="modal" data-target="#change-office-modal">
                                             <span class="m-nav__link-text">
                                                 {{office.shortName}}
@@ -97,13 +91,11 @@
                                 </span>
                             </a>
                             <div class="dropdown-menu pt-0" style="min-width: 160px; ">
-                                <div
-                                    class="text-center font-14 font-weight-bold py-3 m-topbar__notifications-head mb-3">
+                                <div class="text-center font-14 font-weight-bold py-3 m-topbar__notifications-head mb-3">
                                     <div>Department - Group </div>
                                 </div>
                                 <ul class="m-nav">
-                                    <li class="m-nav__item pointer" *ngFor="let item of departmentGroups"
-                                        (click)="changeDepartmentGroup(item)" [class.m-nav__item--active]="!!selectedDepartmentGroup 
+                                    <li class="m-nav__item pointer" *ngFor="let item of departmentGroups" (click)="changeDepartmentGroup(item)" [class.m-nav__item--active]="!!selectedDepartmentGroup 
                                         && selectedDepartmentGroup.departmentId === item.departmentId
                                         && selectedDepartmentGroup.groupId === item.groupId
                                         ">
@@ -125,47 +117,37 @@
                         </li>
                         <li class="m-nav__item m-topbar__notifications">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
-                                <span class="m-nav__link-badge m-badge m-badge--danger"
-                                    *ngIf="!!newMssUnread">{{newMssUnread}}</span>
+                                <span class="m-nav__link-badge m-badge m-badge--danger" *ngIf="!!newMssUnread">{{newMssUnread}}</span>
                                 <span class="m-nav__link-icon">
                                     <i class="la la-bell"></i>
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="width: 340px; padding: 10px; border-radius: 2px; max-height:250px;
                             overflow-y: scroll;" [ngStyle]="{'min-height.px': !!notifications.length ? 100 : 'auto'}">
-                                <div
-                                    class="text-center font-19 font-weight-bold py-3 m-topbar__notifications-head mb-3 d-flex ">
+                                <div class="text-center font-19 font-weight-bold py-3 m-topbar__notifications-head mb-3 d-flex ">
                                     <div> User Notification </div>
-                                    <div class="btn btn-success btn-sm btn-bold btn-font-md font-weight-bold"
-                                        *ngIf="!!newMssUnread"> {{newMssUnread}} new </div>
+                                    <div class="btn btn-success btn-sm btn-bold btn-font-md font-weight-bold" *ngIf="!!newMssUnread"> {{newMssUnread}} new </div>
                                 </div>
                                 <ng-container *ngIf="notifications.length; else noneData">
                                     <div class="m-list-timeline m-list-timeline--skin-light pos-rel">
-                                        <ngx-spinner bdColor="rgba(242,222,223,0.3)" [name]="spinnerNotify"
-                                            [fullScreen]="false" type="ball-spin-clockwise" size="medium">
+                                        <ngx-spinner bdColor="rgba(242,222,223,0.3)" [name]="spinnerNotify" [fullScreen]="false" type="ball-spin-clockwise" size="medium">
                                         </ngx-spinner>
 
                                         <div class="m-list-timeline__items ">
-                                            <div class="m-list-timeline__item pointer"
-                                                [class.m-list-timeline__item--read]="item.status !== 'New'"
-                                                *ngFor="let item of notifications; let i = index; trackBy: i">
-                                                <span
-                                                    class="m-list-timeline__badge -m-list-timeline__badge--state-success">
+                                            <div class="m-list-timeline__item pointer" [class.m-list-timeline__item--read]="item.status !== 'New'" *ngFor="let item of notifications; let i = index; trackBy: i">
+                                                <span class="m-list-timeline__badge -m-list-timeline__badge--state-success">
                                                 </span>
                                                 <div class="m-list-timeline__text">
-                                                    <div class="m-list-timeline__title" [innerHTML]="item.title"
-                                                        (click)="selectNotification(item, $event)">
+                                                    <div class="m-list-timeline__title" [innerHTML]="item.title" (click)="selectNotification(item, $event)">
                                                     </div>
                                                     <div class="text-left m-list-timeline__time ">
                                                         {{item.datetimeCreated | date : 'HH:mm dd/MM'}}
                                                     </div>
-                                                    <i class="la la-trash m--margin-right-5 m-list-timeline__icon collapse-toggle"
-                                                        (click)="deleteNotify(item,i, $event)"></i>
+                                                    <i class="la la-trash m--margin-right-5 m-list-timeline__icon collapse-toggle" (click)="deleteNotify(item,i, $event)"></i>
                                                 </div>
                                             </div>
                                             <ng-container *ngIf="totalItem > notifications.length">
-                                                <div
-                                                    class="text-center text-primary pointer font-13 text-underline py-3 px-3">
+                                                <div class="text-center text-primary pointer font-13 text-underline py-3 px-3">
                                                     <a (click)="loadMoreNotification($event)" title="Load more">Load
                                                         More</a>
                                                 </div>
@@ -185,8 +167,7 @@
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
                                     <li class="m-nav__item">
-                                        <a class="m-nav__link active" href="javascript:void(0)"
-                                            (click)="changeLanguage('en')">
+                                        <a class="m-nav__link active" href="javascript:void(0)" (click)="changeLanguage('en')">
                                             <span class="m-nav__link-icon" *ngIf="english_flag">
                                                 <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
                                                     [src]="english_flag" />
@@ -212,13 +193,12 @@
                         </li>
                         <li class="m-nav__item m-topbar__user-profile">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
-                                <span class="m-topbar__userpic">
+                                <span class="m-topbar__userpic ">
                                     <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
-                                        [src]="currenUser.photo"
+                                        [src]="currenUser.photo"  style="object-fit: cover; width: 50px; height: 40px; "
                                         onerror="src = 'assets/app/media/img/users/user4.jpg'" />
                                 </span>
-                                <span class="m-topbar__username"
-                                    style="color: #3966b6; font-size: 16px; text-transform: capitalize; padding-left: 10px;">
+                                <span class="m-topbar__username" style="color: #3966b6; font-size: 16px; text-transform: capitalize; padding-left: 10px;">
                                     {{!!currenUser ? currenUser.nameEn : null}}
                                 </span>
                             </a>
@@ -228,14 +208,11 @@
                                     <div class="m-list-timeline__item">
                                         <div class="bg-profile d-flex justify-content-around align-items-center p-2">
                                             <div class="popup-account__avatar">
-                                                <img alt="eFMS" class="img-fluid rounded-circle"
-                                                    [src]="currenUser.photo"
-                                                    onerror="src = 'assets/app/media/img/users/user4.jpg'" />
+                                                <img alt="eFMS" class="img-fluid rounded-circle" [src]="currenUser.photo" onerror="src = 'assets/app/media/img/users/user4.jpg'" />
                                             </div>
                                             <div>
                                                 <h5 class="text-white mb-0" style="cursor: pointer;">
-                                                    <span class="m-topbar__username"
-                                                        style="font-size: 14px; text-transform: capitalize;">
+                                                    <span class="m-topbar__username" style="font-size: 14px; text-transform: capitalize;">
                                                         {{!!currenUser ? currenUser.nameEn : null}}
                                                     </span>
                                                 </h5>
@@ -268,16 +245,14 @@
                                     </div>
                                     <div class="m-list-timeline__item border-top">
                                         <div class="p-4 bg-white">
-                                            <button type="button" class="btn btn-outline-info" data-toggle="modal"
-                                                data-target="#logout-modal">Sign Out</button>
+                                            <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#logout-modal">Sign Out</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </li>
                         <li class="m-nav__item m-topbar-logout">
-                            <a class="m-nav__link" href="javascript:void(0)" data-toggle="modal"
-                                data-target="#logout-modal">
+                            <a class="m-nav__link" href="javascript:void(0)" data-toggle="modal" data-target="#logout-modal">
                                 <span class="m-nav__link-icon">
                                     <i class="la la-power-off"></i>
                                 </span>
