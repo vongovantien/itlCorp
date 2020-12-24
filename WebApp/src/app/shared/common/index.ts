@@ -17,7 +17,6 @@ export * from './switch-toggle/switch-toggle.component';
 export * from './table-body/table-body.component';
 export * from './table-cell/table-cell.component';
 export * from './permision-button/permission-button.component';
-export * from './export-crystal/export-crystal.component';
 export * from './combo-grid-icon/combo-grid-icon.component';
 export * from './combo-grid-virtual-scroll/combogrid-item/combo-grid-item.component';
 
