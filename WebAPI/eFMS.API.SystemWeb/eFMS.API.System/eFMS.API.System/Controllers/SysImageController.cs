@@ -2,13 +2,22 @@
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.API.System.Service.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server;
 using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using eFMS.API.Common.Helpers;
+using ITL.NetCore.Common;
+using System.Threading.Tasks;
 
 namespace eFMS.API.System.Controllers
 {
@@ -22,11 +31,14 @@ namespace eFMS.API.System.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IMapper mapper;
 
+
+
         public SysImageUploadController(IStringLocalizer<LanguageSub> localizer, ISysImageService imageService, IMapper mapper)
         {
             this.imageService = imageService;
             this.stringLocalizer = localizer;
             this.mapper = mapper;
+
             //currentUser = currUser; //TODO
         }
 
@@ -63,5 +75,38 @@ namespace eFMS.API.System.Controllers
             return Ok(response);
 
         }
+        [HttpDelete]
+        [Route("Delete")]
+        [Authorize]
+        public async Task<bool> Delete([FromForm]SysImage image)
+        {
+            HandleState img = imageService.Delete(image.Id);
+            string message = HandleError.GetMessage(img, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = img.Success, Message = stringLocalizer[message].Value };
+
+            if (!img.Success)
+            {
+                return false;
+            }
+            var result1 = await ImageHelper.DeleteFile(image.Name, "User","images");
+            return result1;
+        }
+        [HttpDelete]
+        [Route("DeleteImageCompany")]
+        [Authorize]
+        public async Task<bool> DeleteImageCompany([FromForm]SysImage image)
+        {
+            HandleState img = imageService.Delete(image.Id);
+            string message = HandleError.GetMessage(img, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = img.Success, Message = stringLocalizer[message].Value };
+
+            if (!img.Success)
+            {
+                return false;
+            }
+            var result1 = await ImageHelper.DeleteFile(image.Name, "Company", "images");
+            return result1;
+        }
+
     }
 }
