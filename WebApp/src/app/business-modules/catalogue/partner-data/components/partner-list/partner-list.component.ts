@@ -53,11 +53,11 @@ export class PartnerListComponent extends AppList implements OnInit {
         this.headers = [
             { title: 'Partner ID', field: 'accountNo', sortable: true },
             { title: 'Name ABBR', field: 'shortName', sortable: true },
-            { title: 'Billing Address', field: 'addressVn', sortable: true },
             { title: 'Tax Code', field: 'taxCode', sortable: true },
+            { title: 'Creator', field: 'userCreatedName', sortable: true },
+            { title: 'Billing Address', field: 'addressVn', sortable: true },
             { title: 'Tel Address', field: 'tel', sortable: true },
             { title: 'Fax', field: 'fax', sortable: true },
-            { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];

@@ -45,10 +45,9 @@ export class PartnerComponent extends AppList implements OnInit {
 
     pager: PagerSetting = PAGINGSETTING;
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
-    configSearch: any = {
-        settingFields: this.partnerDataSettings.filter(x => x.allowSearch === true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
-        typeSearch: CommonEnum.TypeSearch.outtab
-    };
+    headerSearch: CommonInterface.IHeaderTable[];
+
+    configSearch: any = {};
 
     criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
     partner: Partner;
@@ -75,6 +74,8 @@ export class PartnerComponent extends AppList implements OnInit {
 
     allowDelete: boolean = false;
 
+
+
     constructor(private router: Router,
         private _ngProgressService: NgProgress,
         private _exportRepo: ExportRepo,
@@ -85,13 +86,28 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
+        this.headerSearch = [
+            { title: 'Partner ID', field: 'accountNo', sortable: true },
+            { title: 'Name ABBR', field: 'shortName', sortable: true },
+            { title: 'Salesman', field: 'saleman', sortable: true },
+            { title: 'Tax Code', field: 'taxCode', sortable: true },
+            { title: 'Tel', field: 'tel', sortable: true },
+            { title: 'Fax', field: 'fax', sortable: true },
+            { title: 'Creator', field: 'userCreatedName', sortable: true },
+        ];
+
+        this.configSearch = {
+            settingFields: this.headerSearch.map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            typeSearch: CommonEnum.TypeSearch.outtab
+        };
+
         this.tabSelect(this.activeTab);
     }
-    
+
     resetSearch(event) {
         this.onSearch(event);
     }
-    
+
     onSearch(event) {
         const currentTab = this.criteria.partnerGroup;
         this.criteria = {};
@@ -119,6 +135,9 @@ export class PartnerComponent extends AppList implements OnInit {
             }
             if (event.field === "userCreatedName") {
                 this.criteria.userCreated = event.searchString;
+            }
+            if (event.field === "saleman") {
+                this.criteria.saleman = event.searchString;
             }
         }
 
