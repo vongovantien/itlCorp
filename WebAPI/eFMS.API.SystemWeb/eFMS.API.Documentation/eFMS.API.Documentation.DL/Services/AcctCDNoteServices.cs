@@ -600,12 +600,10 @@ namespace eFMS.API.Documentation.DL.Services
 
             var transaction = cstransRepository.Get(x => x.Id == JobId).FirstOrDefault();
             var opsTransaction = opstransRepository.Get(x => x.Id == JobId).FirstOrDefault();
-            //string warehouseId = null;
             if (transaction != null)
             {
                 pol = places.FirstOrDefault(x => x.Id == transaction.Pol);
                 pod = places.FirstOrDefault(x => x.Id == transaction.Pod);
-                //warehouseId = transaction.WareHouseId ?? null;
             }
             else
             {
@@ -614,13 +612,12 @@ namespace eFMS.API.Documentation.DL.Services
                     pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
                     pod = places.FirstOrDefault(x => x.Id == opsTransaction.Pod);
                 }
-                //warehouseId = opsTransaction.WarehouseId?.ToString();
             }
             if ((transaction == null && opsTransaction == null) || cdNote == null || partner == null)
             {
                 return null;
             }
-            //to continue
+            
             var charges = surchargeRepository.Get(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
@@ -646,6 +643,16 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.UnitCode = unit?.Code;
                 charge.ChargeCode = catCharge?.Code;
                 charge.NameEn = catCharge?.ChargeNameEn;
+
+                if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && charge.CreditNo == cdNote.Code)
+                {
+                    charge.IsSynced = !string.IsNullOrEmpty(charge.PaySyncedFrom) && (charge.PaySyncedFrom.Equals("CDNOTE") || charge.PaySyncedFrom.Equals("SOA") || charge.PaySyncedFrom.Equals("VOUCHER"));
+                }
+                else
+                {
+                    charge.IsSynced = !string.IsNullOrEmpty(charge.SyncedFrom) && (charge.SyncedFrom.Equals("CDNOTE") || charge.SyncedFrom.Equals("SOA") || charge.SyncedFrom.Equals("VOUCHER"));
+                }
+
                 listSurcharges.Add(charge);
                 if (hb != null)
                 {

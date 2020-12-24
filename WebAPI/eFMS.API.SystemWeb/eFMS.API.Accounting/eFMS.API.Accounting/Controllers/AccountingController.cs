@@ -508,6 +508,11 @@ namespace eFMS.API.Accounting.Controllers
             }
         }
 
+        /// <summary>
+        /// Sync list CDNote to Accountant
+        /// </summary>
+        /// <param name="requests"></param>
+        /// <returns></returns>
         [HttpPut("SyncListCdNoteToAccountant")]
         [Authorize]
         public async Task<IActionResult> SyncListCdNoteToAccountant(List<RequestGuidTypeListModel> requests)
@@ -538,9 +543,13 @@ namespace eFMS.API.Accounting.Controllers
 
                     List<SyncCreditModel> listAdd_NVCP_DiffCurrLocal = listAdd_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     List<SyncCreditModel> listUpdate_NVCP_DiffCurrLocal = listUpdate_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
-                    //Credit Note có currency # currency local hoặc trong list charge của Credit Note có tồn tại 1 currency # currency local >> Send mail & Notification đến Department Accountant
-                    accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP_DiffCurrLocal);
-                    accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP_DiffCurrLocal);
+
+                    //Debit Note / Invoice >> Send mail & Notification đến creator, current user & Department Accountant
+                    accountingService.SendMailAndPushNotificationDebitToAccountant(listAdd_NVHD);
+                    accountingService.SendMailAndPushNotificationDebitToAccountant(listUpdate_NVHD);
+                    //Credit Note >> Send mail & Notification đến creator, current user & Department Accountant
+                    accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP);
+                    accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP);
 
                     //List<Guid> ids = requests.Where(w =>
                     //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())
@@ -664,6 +673,11 @@ namespace eFMS.API.Accounting.Controllers
             }
         }
 
+        /// <summary>
+        /// Sync list SOA to Accountant
+        /// </summary>
+        /// <param name="requests"></param>
+        /// <returns></returns>
         [HttpPut("SyncListSoaToAccountant")]
         [Authorize]
         public async Task<IActionResult> SyncListSoaToAccountant(List<RequestIntTypeListModel> requests)
@@ -695,9 +709,13 @@ namespace eFMS.API.Accounting.Controllers
 
                     List<SyncCreditModel> listAdd_NVCP_DiffCurrLocal = listAdd_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     List<SyncCreditModel> listUpdate_NVCP_DiffCurrLocal = listUpdate_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
-                    //SOA(Credit) có currency # currency local hoặc trong list charge của SOA có tồn tại 1 currency # currency local >> Send mail & Notification đến Department Accountant
-                    accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP_DiffCurrLocal);
-                    accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP_DiffCurrLocal);
+                    
+                    //SOA >> Send mail & Notification đến creator, current user & Department Accountant
+                    accountingService.SendMailAndPushNotificationDebitToAccountant(listAdd_NVHD);
+                    accountingService.SendMailAndPushNotificationDebitToAccountant(listUpdate_NVHD);
+                    //SOA >> Send mail & Notification đến creator, current user & Department Accountant
+                    accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP);
+                    accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP);
 
                     //List<int> ids = requests.Where(w => 
                     //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString()) 
@@ -946,6 +964,11 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// Sync list Receipt to Accountant
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPut("SyncListReceiptToAccountant")]
         [Authorize]
         public async Task<IActionResult> SyncListReceiptToAccountant(List<RequestGuidListModel> request)

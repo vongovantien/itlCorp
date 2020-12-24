@@ -679,7 +679,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             TypeCharge = chg.Type,
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
-                                            PIC = useGrp.Username
+                                            PIC = useGrp.Username,
+                                            IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
                                         };
             var listOperation = queryBuySellOperation.ToList();
             listOperation.ForEach(fe =>
@@ -747,7 +748,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            CBM = cstd.Cbm,
                                            PackageContainer = cstd.PackageContainer,
                                            TypeCharge = chg.Type,
-                                           PIC = useGrp.Username
+                                           PIC = useGrp.Username,
+                                           IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
                                        };
             queryBuySellDocument = queryBuySellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -768,7 +770,7 @@ namespace eFMS.API.Accounting.DL.Services
             customNos = customNos != null ? customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : new List<string>();
             var customDeclearation = customNos.Count > 0 ? customsDeclarationRepo.Get(x => customNos.Where(w => w == x.ClearanceNo).Any()) : customsDeclarationRepo.Get();
             var sysUsers = sysUserRepo.Get();
-            //OBH Receiver (SELL - Credit)
+            //OBH Receiver (SELL - Debit)
             var queryObhSellOperation = from sur in surcharge
                                         join ops in opst on sur.Hblid equals ops.Hblid
                                         join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
@@ -816,7 +818,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             TypeCharge = chg.Type,
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
-                                            PIC = useGrp.Username
+                                            PIC = useGrp.Username,
+                                            IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
                                         };
             var listOperation = queryObhSellOperation.ToList();
             listOperation.ForEach(fe =>
@@ -884,7 +887,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            FinalExchangeRate = sur.FinalExchangeRate,
                                            ExchangeDate = sur.ExchangeDate,
                                            TypeCharge = chg.Type,
-                                           PIC = useGrp.Username
+                                           PIC = useGrp.Username,
+                                           IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
                                        };
             queryObhSellDocument = queryObhSellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -952,7 +956,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            ExchangeDate = sur.ExchangeDate,
                                            FinalExchangeRate = sur.FinalExchangeRate,
                                            TypeCharge = chg.Type,
-                                           PIC = useGrp.Username
+                                           PIC = useGrp.Username,
+                                           IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER"))
                                        };
             var listOperation = queryObhBuyOperation.ToList();
             listOperation.ForEach(fe =>
@@ -1022,8 +1027,8 @@ namespace eFMS.API.Accounting.DL.Services
                                           CBM = cstd.Cbm,
                                           PackageContainer = cstd.PackageContainer,
                                           TypeCharge = chg.Type,
-                                          PIC = useGrp.Username
-
+                                          PIC = useGrp.Username,
+                                          IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER"))
                                       };
             queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -1111,7 +1116,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 CBM = data.CBM,
                                 PackageContainer = data.PackageContainer,
                                 TypeCharge = data.TypeCharge,
-                                PIC = data.PIC
+                                PIC = data.PIC,
+                                IsSynced = data.IsSynced
                             };
             queryData = queryData.ToArray().OrderBy(x => x.Service).AsQueryable();
             return queryData;
@@ -1121,9 +1127,10 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- Get List Charges Shipment By Criteria --
         private IQueryable<ChargeShipmentModel> GetChargesShipmentByCriteria(ChargeShipmentCriteria criteria)
         {
+            //Ràng thêm đk: chỉ lấy những charge chưa Sync
             Expression<Func<ChargeSOAResult, bool>> query = chg =>
                     string.IsNullOrEmpty(chg.SOANo)
-                && chg.CustomerID == criteria.CustomerID;
+                && chg.CustomerID == criteria.CustomerID && chg.IsSynced == false;
 
             if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
@@ -1227,6 +1234,7 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.SOANo = item.SOANo;
                 chg.DatetimeModifiedSurcharge = item.DatetimeModified;
                 chg.CDNote = item.CDNote;
+                chg.IsSynced = item.IsSynced;
 
                 data.Add(chg);
             }
@@ -1709,49 +1717,6 @@ namespace eFMS.API.Accounting.DL.Services
 
         private List<ChargeShipmentModel> GetListChargeOfSoa(IQueryable<ChargeSOAResult> charge, string soaNo, string currencyLocal)
         {
-            /*var query = from chg in charge
-                        select new ChargeShipmentModel
-                        {
-                            SOANo = chg.SOANo,
-                            ID = chg.ID,
-                            ChargeCode = chg.ChargeCode,
-                            ChargeName = chg.ChargeName,
-                            JobId = chg.JobId,
-                            HBL = chg.HBL,
-                            MBL = chg.MBL,
-                            CustomNo = chg.CustomNo,
-                            Type = chg.Type,
-                            Debit = chg.Debit,
-                            Credit = chg.Credit,
-                            Currency = chg.Currency,
-                            InvoiceNo = chg.InvoiceNo,
-                            ServiceDate = chg.ServiceDate,
-                            Note = chg.Note,
-                            CurrencyToLocal = currencyLocal,
-                            CurrencyToUSD = AccountingConstants.CURRENCY_USD,
-                            AmountDebitLocal = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, currencyLocal) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, currencyLocal)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, currencyLocal)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                            AmountCreditLocal = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, currencyLocal) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, currencyLocal)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, currencyLocal)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                            AmountDebitUSD = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                            AmountCreditUSD = (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD) > 0
-                            ?
-                                GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, AccountingConstants.CURRENCY_USD)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, AccountingConstants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                        };
-            return query;*/
-
             var data = new List<ChargeShipmentModel>();
             foreach (var item in charge)
             {
@@ -1782,6 +1747,8 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.DatetimeModifiedSurcharge = item.DatetimeModified;
                 chg.CDNote = item.CDNote;
                 chg.PIC = item.PIC;
+                chg.IsSynced = item.IsSynced;
+
                 data.Add(chg);
             }
             return data;
@@ -1860,17 +1827,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  CurrencySOA = s.Currency,
                                  CurrencyCharge = chg.Currency,
                                  FinalExchangeRate = chg.FinalExchangeRate,
-                                 ExchangeDate = chg.ExchangeDate,
-                                 //CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                                 //?
-                                 //    GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                                 //:
-                                 //    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                                 //DebitExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                                 //?
-                                 //    GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                                 //:
-                                 //    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
+                                 ExchangeDate = chg.ExchangeDate
                              };
             List<ExportSOAModel> _result = dataResult.ToList();
             _result.ForEach(fe =>
@@ -2588,7 +2545,6 @@ namespace eFMS.API.Accounting.DL.Services
             var surchargeIds = csShipmentSurchargeRepo.Get(x => x.PaySoano == soaNo || x.Soano == soaNo).Select(s => s.Id).ToList();
             return surchargeIds;
         }
-
 
         public HandleState RejectSoaCredit(RejectSoaModel model)
         {
