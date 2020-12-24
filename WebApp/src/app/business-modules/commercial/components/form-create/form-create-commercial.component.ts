@@ -276,6 +276,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     getACRefName(parentId: string) {
         let isFounded = false;
+        this.parentName = '';
         this.acRefCustomers
             .pipe(catchError(this.catchError), finalize(() => { }))
             .subscribe((x) => {
