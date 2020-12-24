@@ -2200,16 +2200,7 @@ namespace eFMS.API.Accounting.DL.Services
                             //Send Mail Suggest
                             sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
                         }
-
-                        if (!sendMailSuggest)
-                        {
-                            return new HandleState("Send mail suggest approval failed");
-                        }
-                        if (!sendMailApproved)
-                        {
-                            return new HandleState("Send mail approved approval failed");
-                        }
-
+                        
                         var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementApprove.SettlementNo && x.IsDeny == false).FirstOrDefault();
                         if (checkExistsApproveBySettlementNo == null) //Insert ApproveSettlement
                         {
@@ -2234,6 +2225,15 @@ namespace eFMS.API.Accounting.DL.Services
                         DataContext.SubmitChanges();
                         trans.Commit();
 
+                        // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
+                        if (!sendMailSuggest)
+                        {
+                            return new HandleState("Send mail suggest approval failed");
+                        }
+                        if (!sendMailApproved)
+                        {
+                            return new HandleState("Send mail approved approval failed");
+                        }
                         return new HandleState();
                     }
                     catch (Exception ex)
@@ -2558,16 +2558,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //Send Mail Suggest
                         sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userApproveNext, mailUserApproveNext, mailUsersDeputy);
                     }
-
-                    if (!sendMailSuggest)
-                    {
-                        return new HandleState("Send mail suggest approval failed");
-                    }
-                    if (!sendMailApproved)
-                    {
-                        return new HandleState("Send mail approved approval failed");
-                    }
-
+                    
                     settlementPayment.UserModified = approve.UserModified = userCurrent;
                     settlementPayment.DatetimeModified = approve.DateModified = DateTime.Now;
 
@@ -2577,6 +2568,16 @@ namespace eFMS.API.Accounting.DL.Services
                     acctApproveSettlementRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
+
+                    // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
+                    if (!sendMailSuggest)
+                    {
+                        return new HandleState("Send mail suggest approval failed");
+                    }
+                    if (!sendMailApproved)
+                    {
+                        return new HandleState("Send mail approved approval failed");
+                    }
                     return new HandleState();
                 }
                 catch (Exception ex)
@@ -2727,13 +2728,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         return new HandleState("Not allow deny. You are not in the approval process.");
                     }
-
-                    var sendMailDeny = SendMailDeniedApproval(settlementPayment.SettlementNo, comment, DateTime.Now);
-                    if (!sendMailDeny)
-                    {
-                        return new HandleState("Send mail denied failed");
-                    }
-
+                    
                     settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                     approve.IsDeny = true;
                     approve.Comment = comment;
@@ -2746,6 +2741,13 @@ namespace eFMS.API.Accounting.DL.Services
                     acctApproveSettlementRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
+
+                    // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
+                    var sendMailDeny = SendMailDeniedApproval(settlementPayment.SettlementNo, comment, DateTime.Now);
+                    if (!sendMailDeny)
+                    {
+                        return new HandleState("Send mail denied failed");
+                    }
                     return new HandleState();
                 }
                 catch (Exception ex)
@@ -2838,7 +2840,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var item = new DeniedInfoResult();
                 item.No = i;
-                item.NameAndTimeDeny = userBaseService.GetEmployeeByUserId(approve.UserModified)?.EmployeeNameVn + "\r\n" + approve.DateModified?.ToString("dd/MM/yyyy HH:mm");
+                item.NameAndTimeDeny = userBaseService.GetEmployeeByUserId(approve.UserModified)?.EmployeeNameVn + " - " + approve.DateModified?.ToString("dd/MM/yyyy HH:mm:ss");
                 item.LevelApprove = approve.LevelApprove;
                 item.Comment = approve.Comment;
                 data.Add(item);
@@ -4710,13 +4712,13 @@ namespace eFMS.API.Accounting.DL.Services
                         return new HandleState("Not found Settlement Payment");
                     }
                     if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED
-                           || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_NEW)
+                        || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_NEW)
                     {
                         return new HandleState("Settlement payment not yet send the request");
                     }
                     if (settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                            && settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
-                            && settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
+                        && settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                        && settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
                     {
                         return new HandleState("Settlement payment approving");
                     }
@@ -4729,22 +4731,15 @@ namespace eFMS.API.Accounting.DL.Services
                         approve.DateModified = DateTime.Now;
                         approve.Comment = "RECALL BY " + currentUser.UserName;
                         approve.IsDeny = true;
-
-                        HandleState hsUpdateApproveSettlement = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
-                        if (!hsUpdateApproveSettlement.Success)
-                        {
-                            return new HandleState("Cannot Update Approve Settlement");
-                        }
-                        settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
-                        settlement.UserModified = currentUser.UserID;
-                        settlement.DatetimeModified = DateTime.Now;
-
-                        HandleState hsUpdateSettlementPayment = DataContext.Update(settlement, x => x.Id == settlement.Id);
-
-                        trans.Commit();
+                        var hsUpdateApproveSettlement = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);                    
                     }
-
-                    return new HandleState();
+                    
+                    settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
+                    settlement.UserModified = currentUser.UserID;
+                    settlement.DatetimeModified = DateTime.Now;
+                    var hsUpdateSettlementPayment = DataContext.Update(settlement, x => x.Id == settlement.Id);
+                    trans.Commit();
+                    return hsUpdateSettlementPayment;
                 }
                 catch (Exception ex)
                 {
