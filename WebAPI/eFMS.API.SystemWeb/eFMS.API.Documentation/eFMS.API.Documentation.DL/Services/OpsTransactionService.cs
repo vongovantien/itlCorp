@@ -454,14 +454,15 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             if (criteria.RangeSearch == PermissionRange.None) return null;
-            var data = QueryByPermission(criteria.RangeSearch);
-            if (data == null)
-                return null;
+            IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+            if (data == null) return null;
+
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();
             IQueryable<OpsTransaction> datajoin = data.Where(x => x.CurrentStatus != TermData.Canceled);
-            if (criteria.ClearanceNo != null)
+
+            if (!string.IsNullOrEmpty(criteria.ClearanceNo))
             {
-                var listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
+                IQueryable<CustomsDeclaration> listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
                 if(listCustomsDeclaration.Count() > 0)
                 {
                     datajoin = from custom in listCustomsDeclaration
@@ -477,9 +478,9 @@ namespace eFMS.API.Documentation.DL.Services
                     return results.AsQueryable();
                 }
             }
-            if(criteria.CreditDebitInvoice != null)
+            if(!string.IsNullOrEmpty(criteria.CreditDebitInvoice))
             {
-                var listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
+                IQueryable<AcctCdnote> listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
                 if(listDebit.Count() > 0)
                 {
                     datajoin = from acctnote in listDebit
