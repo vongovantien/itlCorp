@@ -1803,9 +1803,9 @@ namespace eFMS.API.Accounting.DL.Services
                         DataContext.Update(vatInvoice, x => x.VoucherId == item.VoucherId, false);
 
                     }
-                    surchargeRepo.SubmitChanges();
-                    DataContext.SubmitChanges();
-                    accountingPaymentRepository.SubmitChanges();
+                    var hs = surchargeRepo.SubmitChanges();
+                    var t = DataContext.SubmitChanges();
+                    var ty = accountingPaymentRepository.SubmitChanges();
 
                     trans.Commit();
 

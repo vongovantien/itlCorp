@@ -272,17 +272,19 @@ namespace eFMS.API.Accounting.DL.Services
                     agreementBaseOn = agreement.BaseOn;
                 }
             }
-
-            List<string> partnerChild = catPartnerRepository.Get(x => x.ParentId == criteria.CustomerID).Select(x => x.Id).ToList();
+            //Các đối tượng con có A/C Ref là đối tượng trừ công nợ
+            List<string> partnerChild = catPartnerRepository.Get(x => x.ParentId == criteria.CustomerID).Select(x => x.Id).ToList(); 
 
             Expression<Func<AccAccountingManagement, bool>> queryInvoice = null;
             queryInvoice = x => (
             (x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
+             && (x.Status == AccountingConstants.ACCOUNTING_INVOICE_STATUS_UPDATED)
              && (partnerChild.Contains(x.PartnerId))
              && (x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID || x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
-             && ((x.ServiceType ?? "").Contains(agreementService ?? "", StringComparison.OrdinalIgnoreCase)));
+             && ((agreementService ?? "").Contains(x.ServiceType ?? "", StringComparison.OrdinalIgnoreCase))
+             );
 
-            // Trường hợp Base On không có giá trị hoặc Base On = 'Invoice Date' thì search theo ngày Invoice Date
+            // Trường hợp Base On của contract không có giá trị hoặc Base On = 'Invoice Date' thì search theo ngày Invoice Date
             if (string.IsNullOrEmpty(agreementBaseOn) || agreementBaseOn == AccountingConstants.AGREEMENT_BASE_ON_INVOICE_DATE)
             {
                 if (criteria.FromDate != null && criteria.ToDate != null)

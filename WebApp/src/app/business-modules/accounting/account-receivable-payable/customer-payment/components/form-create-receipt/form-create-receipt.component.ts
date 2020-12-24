@@ -29,7 +29,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     paymentRefNo: AbstractControl;
     agreementId: AbstractControl;
 
-
     $customers: Observable<Partner[]>;
     agreements: IAgreementReceipt[];
 
@@ -61,7 +60,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
             this.generateReceiptNo();
         }
-
     }
 
     initForm() {
@@ -69,8 +67,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             customerId: new FormControl(null, Validators.required),
             date: [],
             paymentRefNo: new FormControl(null, Validators.required),
-            agreementId: [null]
-            // agreement: [null, Validators.required]
+            agreementId: [null, Validators.required]
         });
         this.customerId = this.formSearchInvoice.controls['customerId'];
         this.date = this.formSearchInvoice.controls['date'];
