@@ -52,8 +52,8 @@
                 </thead>
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
-                        <tr
-                            *ngFor="let charge of charges | filter:keyword: ['chargeCode','chargeName','jobNo','hbl','cdNoteNo']; let i = index; trackBy: trackByFn">
+                        <tr *ngFor="let charge of charges | filter:keyword: ['chargeCode','chargeName','jobNo','hbl','cdNoteNo']; let i = index; trackBy: trackByFn"
+                            [class.synced-row]="charge.isSynced && type !== 'Invoice'">
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
@@ -132,6 +132,9 @@
                             <td>{{charge.unitName}}</td>
                             <td>{{charge.unitPrice | number: '.0-3'}}</td>
                             <td>{{charge.mbl}}</td>
+                            <ng-container *ngIf="type !== 'invoice'">
+                                <td class="text-danger">{{charge.syncedFromBy}}</td>
+                            </ng-container>
                         </tr>
                         <tr class="">
                             <td>
@@ -147,8 +150,8 @@
                             </td>
                             <td></td>
                             <td>
-                                <span
-                                    class="p-1 font-weight-bold">{{charges | sum:'orgVatAmount' | number: '.0-3'}}</span>
+                                <span class="p-1 font-weight-bold">{{charges | sum:'orgVatAmount' | number:
+                                    '.0-3'}}</span>
                             </td>
                             <td></td>
                             <td></td>
@@ -157,9 +160,10 @@
                                 <span class="p-1 font-weight-bold">{{charges | sum:'amountVnd' | number: '.0-3'}}</span>
                             </td>
                             <td class="pl-3">
-                                <span
-                                    class="p-1 font-weight-bold">{{charges | sum:'vatAmountVnd' | number: '.0-3'}}</span>
+                                <span class="p-1 font-weight-bold">{{charges | sum:'vatAmountVnd' | number:
+                                    '.0-3'}}</span>
                             </td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>

@@ -590,9 +590,9 @@ namespace eFMS.API.Documentation.DL.Services
         public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo)
         {
             var places = placeRepository.Get();
-            AcctCDNoteDetailsModel soaDetails = new AcctCDNoteDetailsModel();
+            AcctCDNoteDetailsModel cdNoteDetails = new AcctCDNoteDetailsModel();
             var cdNote = DataContext.Where(x => x.Code == cdNo).FirstOrDefault();
-            if (cdNote == null) return soaDetails;
+            if (cdNote == null) return cdNoteDetails;
             var partner = partnerRepositoty.Get(x => x.Id == cdNote.PartnerId).FirstOrDefault();
 
             CatPlace pol = new CatPlace();
@@ -617,13 +617,13 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            
+
             var charges = surchargeRepository.Get(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
 
-            soaDetails.CreatedDate = ((DateTime)cdNote.DatetimeCreated).ToString("dd'/'MM'/'yyyy");
+            cdNoteDetails.CreatedDate = ((DateTime)cdNote.DatetimeCreated).ToString("dd'/'MM'/'yyyy");
             foreach (var item in charges)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
@@ -644,14 +644,42 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.ChargeCode = catCharge?.Code;
                 charge.NameEn = catCharge?.ChargeNameEn;
 
+                string _syncedFromBy = null;
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && charge.CreditNo == cdNote.Code)
                 {
                     charge.IsSynced = !string.IsNullOrEmpty(charge.PaySyncedFrom) && (charge.PaySyncedFrom.Equals("CDNOTE") || charge.PaySyncedFrom.Equals("SOA") || charge.PaySyncedFrom.Equals("VOUCHER"));
+
+                    if (charge.PaySyncedFrom == "SOA")
+                    {
+                        _syncedFromBy = charge.PaySoano;
+                    }
+                    if (charge.PaySyncedFrom == "CDNOTE")
+                    {
+                        _syncedFromBy = charge.CreditNo;
+                    }
+                    if (charge.PaySyncedFrom == "VOUCHER")
+                    {
+                        _syncedFromBy = charge.VoucherId;
+                    }
                 }
                 else
                 {
                     charge.IsSynced = !string.IsNullOrEmpty(charge.SyncedFrom) && (charge.SyncedFrom.Equals("CDNOTE") || charge.SyncedFrom.Equals("SOA") || charge.SyncedFrom.Equals("VOUCHER"));
-                }
+
+                    if (charge.SyncedFrom == "SOA")
+                    {
+                        _syncedFromBy = (charge.Type == DocumentConstants.CHARGE_BUY_TYPE) ? charge.PaySoano : charge.Soano;
+                    }
+                    if (charge.SyncedFrom == "CDNOTE")
+                    {
+                        _syncedFromBy = (charge.Type == DocumentConstants.CHARGE_BUY_TYPE) ? charge.CreditNo : charge.DebitNo;
+                    }
+                    if (charge.SyncedFrom == "VOUCHER")
+                    {
+                        _syncedFromBy = charge.VoucherId;
+                    }
+                }                                
+                charge.SyncedFromBy = _syncedFromBy;
 
                 listSurcharges.Add(charge);
                 if (hb != null)
@@ -666,19 +694,19 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (transaction != null)
             {
-                soaDetails.MbLadingNo = transaction?.Mawb;
+                cdNoteDetails.MbLadingNo = transaction?.Mawb;
                 hbOfLadingNo = string.Join(", ", HBList.Where(x => !string.IsNullOrEmpty(x.Hwbno)).Select(x => x.Hwbno).Distinct());
-                soaDetails.HbLadingNo = hbOfLadingNo;
+                cdNoteDetails.HbLadingNo = hbOfLadingNo;
             }
             else
             {
-                soaDetails.CBM = opsTransaction.SumCbm;
-                soaDetails.GW = opsTransaction.SumGrossWeight;
-                soaDetails.ServiceDate = opsTransaction.ServiceDate;
-                soaDetails.HbLadingNo = opsTransaction?.Hwbno;
-                soaDetails.MbLadingNo = opsTransaction?.Mblno;
-                soaDetails.SumContainers = opsTransaction?.SumContainers;
-                soaDetails.SumPackages = opsTransaction?.SumPackages;
+                cdNoteDetails.CBM = opsTransaction.SumCbm;
+                cdNoteDetails.GW = opsTransaction.SumGrossWeight;
+                cdNoteDetails.ServiceDate = opsTransaction.ServiceDate;
+                cdNoteDetails.HbLadingNo = opsTransaction?.Hwbno;
+                cdNoteDetails.MbLadingNo = opsTransaction?.Mblno;
+                cdNoteDetails.SumContainers = opsTransaction?.SumContainers;
+                cdNoteDetails.SumPackages = opsTransaction?.SumPackages;
             }
             var hbConstainers = string.Empty;
             var hbPackages = string.Empty;
@@ -748,54 +776,54 @@ namespace eFMS.API.Documentation.DL.Services
             hbConsignees = string.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ConsigneeId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
 
             var countries = countryRepository.Get().ToList();
-            soaDetails.PartnerNameEn = partner?.PartnerNameEn;
-            soaDetails.PartnerShippingAddress = partner?.AddressEn; //Billing Address Name En
-            soaDetails.PartnerTel = partner?.Tel;
-            soaDetails.PartnerTaxcode = partner?.TaxCode;
-            soaDetails.PartnerId = partner?.Id;
-            soaDetails.PartnerFax = partner?.Fax;
-            soaDetails.PartnerPersonalContact = partner.ContactPerson;
-            soaDetails.CreditPayment = partner.CreditPayment;
-            soaDetails.JobId = transaction != null ? transaction.Id : opsTransaction.Id;
-            soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTransaction?.JobNo;
-            soaDetails.Pol = pol?.NameEn;
-            if (soaDetails.Pol != null)
+            cdNoteDetails.PartnerNameEn = partner?.PartnerNameEn;
+            cdNoteDetails.PartnerShippingAddress = partner?.AddressEn; //Billing Address Name En
+            cdNoteDetails.PartnerTel = partner?.Tel;
+            cdNoteDetails.PartnerTaxcode = partner?.TaxCode;
+            cdNoteDetails.PartnerId = partner?.Id;
+            cdNoteDetails.PartnerFax = partner?.Fax;
+            cdNoteDetails.PartnerPersonalContact = partner.ContactPerson;
+            cdNoteDetails.CreditPayment = partner.CreditPayment;
+            cdNoteDetails.JobId = transaction != null ? transaction.Id : opsTransaction.Id;
+            cdNoteDetails.JobNo = transaction != null ? transaction.JobNo : opsTransaction?.JobNo;
+            cdNoteDetails.Pol = pol?.NameEn;
+            if (cdNoteDetails.Pol != null)
             {
-                soaDetails.PolCountry = pol == null ? null : countries.FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
+                cdNoteDetails.PolCountry = pol == null ? null : countries.FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
             }
-            soaDetails.Pod = pod?.NameEn;
-            if (soaDetails.Pod != null)
+            cdNoteDetails.Pod = pod?.NameEn;
+            if (cdNoteDetails.Pod != null)
             {
-                soaDetails.PodCountry = pod == null ? null : countries.FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
+                cdNoteDetails.PodCountry = pod == null ? null : countries.FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
             }
-            soaDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
-            soaDetails.VesselDate = transaction != null ? transaction.FlightDate : null;
-            soaDetails.HbConstainers = hbConstainers; //Container Quantity
-            soaDetails.HbPackages = hbPackages; // Package Quantity
-            soaDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
-            soaDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
-            soaDetails.IsLocked = false;
-            soaDetails.Volum = volum;
-            soaDetails.ListSurcharges = listSurcharges;
-            soaDetails.CDNote = cdNote;
-            soaDetails.ProductService = opsTransaction?.ProductService;
-            soaDetails.ServiceMode = opsTransaction?.ServiceMode;
-            soaDetails.SoaNo = string.Join(", ", charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
-            soaDetails.HbSealNo = sealsContsNo;//SealNo/ContNo
-            soaDetails.HbGrossweight = hbGw;
-            soaDetails.HbShippers = hbShippers; //Shipper
-            soaDetails.HbConsignees = hbConsignees; //Consignee
-            soaDetails.HbChargeWeight = hbCw;
-            soaDetails.FlexId = cdNote.FlexId;
-            soaDetails.Status = cdNote.Status;
-            soaDetails.SyncStatus = cdNote.SyncStatus;
-            soaDetails.LastSyncDate = cdNote.LastSyncDate;
-            soaDetails.Currency = cdNote.CurrencyId;
-            soaDetails.ExchangeRate = cdNote.ExchangeRate;
-            soaDetails.Note = cdNote.Note;
-            soaDetails.ReasonReject = cdNote.ReasonReject;
-            soaDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
-            return soaDetails;
+            cdNoteDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
+            cdNoteDetails.VesselDate = transaction != null ? transaction.FlightDate : null;
+            cdNoteDetails.HbConstainers = hbConstainers; //Container Quantity
+            cdNoteDetails.HbPackages = hbPackages; // Package Quantity
+            cdNoteDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
+            cdNoteDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
+            cdNoteDetails.IsLocked = false;
+            cdNoteDetails.Volum = volum;
+            cdNoteDetails.ListSurcharges = listSurcharges;
+            cdNoteDetails.CDNote = cdNote;
+            cdNoteDetails.ProductService = opsTransaction?.ProductService;
+            cdNoteDetails.ServiceMode = opsTransaction?.ServiceMode;
+            cdNoteDetails.SoaNo = string.Join(", ", charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
+            cdNoteDetails.HbSealNo = sealsContsNo;//SealNo/ContNo
+            cdNoteDetails.HbGrossweight = hbGw;
+            cdNoteDetails.HbShippers = hbShippers; //Shipper
+            cdNoteDetails.HbConsignees = hbConsignees; //Consignee
+            cdNoteDetails.HbChargeWeight = hbCw;
+            cdNoteDetails.FlexId = cdNote.FlexId;
+            cdNoteDetails.Status = cdNote.Status;
+            cdNoteDetails.SyncStatus = cdNote.SyncStatus;
+            cdNoteDetails.LastSyncDate = cdNote.LastSyncDate;
+            cdNoteDetails.Currency = cdNote.CurrencyId;
+            cdNoteDetails.ExchangeRate = cdNote.ExchangeRate;
+            cdNoteDetails.Note = cdNote.Note;
+            cdNoteDetails.ReasonReject = cdNote.ReasonReject;
+            cdNoteDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
+            return cdNoteDetails;
         }
 
         public HandleState DeleteCDNote(Guid idSoA)

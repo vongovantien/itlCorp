@@ -8,7 +8,7 @@ import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
-import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
+import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { listAnimation } from '@animations';
 import { AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -26,6 +26,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ConfirmPopupComponent) confirmSoaPopup: ConfirmPopupComponent;
     @ViewChild(StatementOfAccountPaymentMethodComponent) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
     @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
+    @ViewChild('validateSyncedSOAPopup') validateSyncedPopup: InfoPopupComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
 
@@ -42,6 +43,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     paymentMethodSelected: string = '';
     confirmType: string = 'SYNC';
     reasonReject: string = '';
+    messageValidate: string = '';
 
     constructor(
         private _activedRoute: ActivatedRoute,
@@ -76,6 +78,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
+            { title: 'Synced From', field: 'syncedFromBy', sortable: true },
         ];
         this._activedRoute.queryParams.subscribe((params: any) => {
             if (!!params.no && params.currency) {
@@ -287,17 +290,29 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     showConfirmed() {
-        this.confirmType = "SYNC";
-        if (this.soa.type === "All") {
-            this._toastService.warning("Not allow send soa with type All");
-            return;
-        }
-        if (this.soa.type === 'Credit' && this.soa.creditPayment === 'Direct') {
-            this.paymentMethodPopupComponent.show();
-        } else {
-            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
-            this.confirmSendToAcc();
-        }
+        this._accoutingRepo.checkSoaSynced(this.soa.id)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                        this.validateSyncedPopup.show();
+                    } else {
+                        this.confirmType = "SYNC";
+                        if (this.soa.type === "All") {
+                            this._toastService.warning("Not allow send soa with type All");
+                            return;
+                        }
+                        if (this.soa.type === 'Credit' && this.soa.creditPayment === 'Direct') {
+                            this.paymentMethodPopupComponent.show();
+                        } else {
+                            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
+                            this.confirmSendToAcc();
+                        }
+                    }
+                },
+            );
     }
 
     onApplyPaymentMethod($event) {

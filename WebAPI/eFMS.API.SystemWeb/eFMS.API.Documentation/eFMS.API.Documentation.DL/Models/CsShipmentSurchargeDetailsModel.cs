@@ -22,6 +22,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string PayerShortName { get; set; }
         public Guid? DebitCharge { get; set; }
         public bool IsSynced { get; set; }
-
+        public string SyncedFromBy { get; set; }
     }
 }

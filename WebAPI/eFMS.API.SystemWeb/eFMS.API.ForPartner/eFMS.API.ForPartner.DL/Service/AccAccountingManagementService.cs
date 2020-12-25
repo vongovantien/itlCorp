@@ -304,6 +304,8 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
             invoice.AccountNo = !string.IsNullOrEmpty(debitChargeFirst.AccountNo) ? debitChargeFirst.AccountNo : SetAccountNoForInvoice(partner?.PartnerMode, model.Currency);
             invoice.Description = model.Description;
+            var _serviceTypeCharge = surchargeRepo.Get(x => debitCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
+            invoice.ServiceType = string.Format(";", _serviceTypeCharge);
             return invoice;
         }
 
@@ -336,6 +338,8 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
             invoice.AccountNo = obhCharges[0].AccountNo;
             invoice.Description = model.Description;
+            var _serviceTypeCharge = surchargeRepo.Get(x => obhCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
+            invoice.ServiceType = string.Format(";", _serviceTypeCharge);
             return invoice;
         }
 

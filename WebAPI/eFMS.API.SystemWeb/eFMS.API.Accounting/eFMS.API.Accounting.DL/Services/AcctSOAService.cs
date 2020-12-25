@@ -1263,7 +1263,7 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- Get List More Charges & Add More Charge Shipment By Criteria --
         private IQueryable<ChargeShipmentModel> GetMoreChargesShipmentByCriteria(MoreChargeShipmentCriteria criteria)
         {
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.CustomerID == criteria.CustomerID;
+            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.CustomerID == criteria.CustomerID && chg.IsSynced == false;
 
             if (criteria.InSoa == true)
             {
@@ -1748,6 +1748,40 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.CDNote = item.CDNote;
                 chg.PIC = item.PIC;
                 chg.IsSynced = item.IsSynced;
+                
+                string _syncedFromBy = null;
+                var surcharge = csShipmentSurchargeRepo.Get(x => x.Id == chg.ID).FirstOrDefault();
+                if (chg.Type == AccountingConstants.TYPE_CHARGE_BUY || chg.Type == AccountingConstants.TYPE_CHARGE_SELL || chg.Type == AccountingConstants.TYPE_CHARGE_OBH_SELL)
+                {
+                    if (surcharge.SyncedFrom == "SOA")
+                    {
+                        _syncedFromBy = chg.SOANo;
+                    }
+                    if (surcharge.SyncedFrom == "CDNOTE")
+                    {
+                        _syncedFromBy = chg.CDNote;
+                    }
+                    if (surcharge.SyncedFrom == "VOUCHER")
+                    {
+                        _syncedFromBy = surcharge.VoucherId;
+                    }
+                }
+                else if (chg.Type == AccountingConstants.TYPE_CHARGE_OBH_BUY)
+                {
+                    if (surcharge.PaySyncedFrom == "SOA")
+                    {
+                        _syncedFromBy = chg.SOANo;
+                    }
+                    if (surcharge.PaySyncedFrom == "CDNOTE")
+                    {
+                        _syncedFromBy = chg.CDNote;
+                    }
+                    if (surcharge.PaySyncedFrom == "VOUCHER")
+                    {
+                        _syncedFromBy = surcharge.VoucherId;
+                    }
+                }
+                chg.SyncedFromBy = _syncedFromBy;
 
                 data.Add(chg);
             }

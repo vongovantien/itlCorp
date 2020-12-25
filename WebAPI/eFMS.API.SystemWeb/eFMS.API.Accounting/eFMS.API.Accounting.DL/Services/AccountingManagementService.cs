@@ -616,8 +616,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             IsFromShipment = sur.IsFromShipment,
                                             PayeeIdSettle = payeeGrp.Id ?? null,
                                             PayeeNameSettle = payeeGrp.ShortName,
-                                            PayeeAddressSettle = payeeGrp.AddressVn
-
+                                            PayeeAddressSettle = payeeGrp.AddressVn,
+                                            IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(query);
             var queryBuySellDocumentation = from sur in surcharges
@@ -676,7 +676,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 IsFromShipment = sur.IsFromShipment,
                                                 PayeeIdSettle = payeeGrp.Id ?? null,
                                                 PayeeNameSettle = payeeGrp.ShortName,
-                                                PayeeAddressSettle = payeeGrp.AddressVn
+                                                PayeeAddressSettle = payeeGrp.AddressVn,
+                                                IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
                                             };
             queryBuySellDocumentation = queryBuySellDocumentation.Where(query);
             var mergeBuySell = queryBuySellOperation.Union(queryBuySellDocumentation);
@@ -762,7 +763,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            IsFromShipment = sur.IsFromShipment,
                                            PayeeIdSettle = payeeGrp.Id ?? null,
                                            PayeeNameSettle = payeeGrp.ShortName,
-                                           PayeeAddressSettle = payeeGrp.AddressVn
+                                           PayeeAddressSettle = payeeGrp.AddressVn,
+                                           IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER"))
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(query);
             var queryObhBuyDocumentation = from sur in surcharges
@@ -823,7 +825,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                IsFromShipment = sur.IsFromShipment,
                                                PayeeIdSettle = payeeGrp.Id ?? null,
                                                PayeeNameSettle = payeeGrp.ShortName,
-                                               PayeeAddressSettle = payeeGrp.AddressVn
+                                               PayeeAddressSettle = payeeGrp.AddressVn,
+                                               IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER"))
                                            };
             queryObhBuyDocumentation = queryObhBuyDocumentation.Where(query);
             var mergeObhBuy = queryObhBuyOperation.Union(queryObhBuyDocumentation);
@@ -846,13 +849,53 @@ namespace eFMS.API.Accounting.DL.Services
             var queryObhBuy = GetChargeObhBuyForVoucher(query);
             //Merge data
             var dataMerge = queryBuySell.Union(queryObhBuy);
-            return dataMerge.ToList();
+            var result = dataMerge.ToList();
+
+            result.ForEach(fe => {
+                string _syncedFromBy = null;
+                var surcharge = surchargeRepo.Get(x => x.Id == fe.SurchargeId).FirstOrDefault();
+                if (surcharge != null)
+                {
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL)
+                    {
+                        if (surcharge.SyncedFrom == "SOA")
+                        {
+                            _syncedFromBy = fe.SoaNo;
+                        }
+                        if (surcharge.SyncedFrom == "CDNOTE")
+                        {
+                            _syncedFromBy = fe.CdNoteNo;
+                        }
+                        if (surcharge.SyncedFrom == "VOUCHER")
+                        {
+                            _syncedFromBy = surcharge.VoucherId;
+                        }
+                    }
+                    else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        if (surcharge.PaySyncedFrom == "SOA")
+                        {
+                            _syncedFromBy = fe.SoaNo;
+                        }
+                        if (surcharge.PaySyncedFrom == "CDNOTE")
+                        {
+                            _syncedFromBy = fe.CdNoteNo;
+                        }
+                        if (surcharge.PaySyncedFrom == "VOUCHER")
+                        {
+                            _syncedFromBy = surcharge.VoucherId;
+                        }
+                    }
+                    fe.SyncedFromBy = _syncedFromBy;
+                }
+            });
+            return result;
         }
 
         public List<PartnerOfAcctManagementResult> GetChargeForVoucherByCriteria(PartnerOfAcctManagementCriteria criteria)
         {
-            //Chỉ lấy ra những charge chưa issue Invoice hoặc Voucher
-            Expression<Func<ChargeOfAccountingManagementModel, bool>> query = chg => (chg.AcctManagementId == Guid.Empty || chg.AcctManagementId == null);
+            //Chỉ lấy ra những charge chưa issue Invoice hoặc Voucher và chưa được Sync
+            Expression<Func<ChargeOfAccountingManagementModel, bool>> query = chg => (chg.AcctManagementId == Guid.Empty || chg.AcctManagementId == null) && chg.IsSynced == false;
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
             {

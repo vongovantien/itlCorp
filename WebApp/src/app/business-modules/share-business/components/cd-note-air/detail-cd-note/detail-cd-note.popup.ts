@@ -27,6 +27,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     @ViewChild("popupReport") popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
+    @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
 
     jobId: string = null;
     cdNote: string = null;
@@ -46,6 +47,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     labelDetail: any = {};
     paymentMethodSelected: string = '';
+    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -99,7 +101,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             { title: "Credit Value", field: 'credit', sortable: true },
             { title: "Debit Value", field: 'debit', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
-            { title: 'Exc Rate', field: 'exchangeRate', sortable: true }
+            { title: 'Exc Rate', field: 'exchangeRate', sortable: true },
+            { title: 'Synced From', field: 'syncedFromBy', sortable: true }
         ];
     }
 
@@ -301,12 +304,24 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     showConfirmed() {
-        if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
-            this.paymentMethodPopupComponent.show();
-        } else {
-            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
-            this.confirmSendToAcc();
-        }
+        this._accountantRepo.checkCdNoteSynced(this.CdNoteDetail.cdNote.id)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                        this.validateSyncedPopup.show();
+                    } else {
+                        if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
+                            this.paymentMethodPopupComponent.show();
+                        } else {
+                            this.paymentMethodSelected = 'Other'; // CR 14979: 03-12-2020
+                            this.confirmSendToAcc();
+                        }
+                    }
+                },
+            );
     }
 
     onApplyPaymentMethod($event) {

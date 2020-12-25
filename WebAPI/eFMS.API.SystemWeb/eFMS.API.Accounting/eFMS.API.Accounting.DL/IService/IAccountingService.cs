@@ -28,5 +28,8 @@ namespace eFMS.API.Accounting.DL.IService
         void SendMailAndPushNotificationDebitToAccountant(List<SyncModel> syncModels);
         List<PaymentModel> GetListReceiptToAccountant(List<Guid> ids);
         HandleState SyncListReceiptToAccountant(List<Guid> ids);
+        bool CheckCdNoteSynced(Guid idCdNote);
+        bool CheckSoaSynced(int idSoa);
+        bool CheckVoucherSynced(Guid idVoucher);
     }
 }

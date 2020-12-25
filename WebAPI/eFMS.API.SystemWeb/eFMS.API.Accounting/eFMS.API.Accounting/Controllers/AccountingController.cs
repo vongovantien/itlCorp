@@ -1059,5 +1059,26 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest("Sync fail");
             }
         }
+
+        [HttpGet("CheckCdNoteSynced/{id}")]
+        public IActionResult CheckCdNoteSynced(Guid id)
+        {
+            var result = accountingService.CheckCdNoteSynced(id);
+            return Ok(result);
+        }
+
+        [HttpGet("CheckSoaSynced/{id}")]
+        public IActionResult CheckSoaSynced(int id)
+        {
+            var result = accountingService.CheckSoaSynced(id);
+            return Ok(result);
+        }
+
+        [HttpGet("CheckVoucherSynced/{id}")]
+        public IActionResult CheckVoucherSynced(Guid id)
+        {
+            var result = accountingService.CheckVoucherSynced(id);
+            return Ok(result);
+        }
     }     
 }
