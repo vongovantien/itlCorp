@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { AccAccountingManagementModel, ChargeOfAccountingManagementModel } from '@models';
 import { formatDate } from '@angular/common';
 import { RoutingConstants, AccountingConstants } from '@constants';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ICanComponentDeactivate } from '@core';
 
@@ -25,7 +25,7 @@ import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators'
 })
 export class AccountingManagementDetailVoucherComponent extends AccountingManagementCreateVoucherComponent implements OnInit, ICanComponentDeactivate {
     @ViewChild('confirmSyncVoucher') confirmVoucherPopup: ConfirmPopupComponent;
-
+    @ViewChild('validateSyncedVoucherPopup') validateSyncedPopup: InfoPopupComponent;
     voucherId: string;
     accountingManagement: AccAccountingManagementModel = new AccAccountingManagementModel();
 
@@ -33,6 +33,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
 
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
+    messageValidate: string = '';
 
     constructor(
         protected _router: Router,
@@ -230,11 +231,23 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
     }
 
     confirmSync() {
-        if (this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
-            return;
-        }
-        this.voucherSync = [{ id: this.accountingManagement.id, action: this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD' }];
-        this.confirmVoucherPopup.show();
+        this._accountingRepo.checkVoucherSynced(this.voucherId)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                        this.validateSyncedPopup.show();
+                    } else {
+                        if (this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
+                            return;
+                        }
+                        this.voucherSync = [{ id: this.accountingManagement.id, action: this.accountingManagement.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD' }];
+                        this.confirmVoucherPopup.show();
+                    }
+                },
+            );
     }
 
     onSyncBravo() {
