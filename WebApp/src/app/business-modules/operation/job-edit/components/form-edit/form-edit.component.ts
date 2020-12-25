@@ -9,10 +9,11 @@ import { Store } from '@ngrx/store';
 import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
-import { JobConstants } from '@constants';
+import { JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 
 import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 @Component({
     selector: 'job-mangement-form-edit',
     templateUrl: './form-edit.component.html'
@@ -84,6 +85,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         { field: 'username', label: 'User Name' },
         { field: 'employeeNameEn', label: 'Full Name' }
     ];
+    isJobCopy: boolean = false;
+    userLogged: any;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -114,9 +117,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     setFormValue() {
         this.formEdit.patchValue({
-            jobNo: this.opsTransaction.jobNo,
-            hwbno: this.opsTransaction.hwbno,
-            mblno: this.opsTransaction.mblno,
+            jobNo: this.isJobCopy ? null : this.opsTransaction.jobNo,
+            hwbno: this.isJobCopy ? null : this.opsTransaction.hwbno,
+            mblno: this.isJobCopy ? null : this.opsTransaction.mblno,
             flightVessel: this.opsTransaction.flightVessel,
             purchaseOrderNo: this.opsTransaction.purchaseOrderNo,
             serviceDate: !!this.opsTransaction.serviceDate ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null,
@@ -155,7 +158,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formEdit = this._fb.group({
-            jobNo: [null, Validators.required],
+            jobNo: [null],
             hwbno: [null, Validators.required],
             mblno: [null, Validators.required],
             flightVessel: [],
@@ -282,4 +285,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.containerPopup.show();
     }
 
+    getBillingOpsId() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
+        this.billingOpsId.setValue(this.userLogged.id);
+    }
 }

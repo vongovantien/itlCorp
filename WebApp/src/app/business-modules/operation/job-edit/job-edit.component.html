@@ -2,7 +2,7 @@
     <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
         <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowLock">
             <button type="button" class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10"
-                (click)="lockShipment()">
+                (click)="lockShipment()" [disabled]="isJobCopy">
                 <span>
                     <i class="la la-lock"></i>
                     <span>
@@ -17,12 +17,23 @@
         <i class="fa fa-lock text-danger fa-3x"></i>
     </span>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="onOpePLPrint()">
+        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="onOpePLPrint()" [disabled]="isJobCopy">
             <span>
                 <i class="la la-print"></i>
                 <span>
                     P/L Sheet
+                </span>
+            </span>
+        </button>
+    </div>
+    <div class="c-button-actions">
+        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="confirmDuplicate()" [disabled]="isJobCopy">
+            <span>
+                <i class="la la-search-plus"></i>
+                <span>
+                    Duplicate
                 </span>
             </span>
         </button>
@@ -41,7 +52,7 @@
             </button>
         </div>
         <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
+            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10" [disabled]="isJobCopy"
                 (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete" title="Shipment was deleted">
                 <span>
                     <i class="la la-trash"></i>
@@ -82,7 +93,7 @@
                                     <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <buying-charge [showGetCharge]="false" service="logistic"
+                                            <buying-charge [showGetCharge]="false" service="logistic" [allowSaving]="isJobCopy"
                                                 *ngIf="selectedTabSurcharge === 'BUY'">
                                             </buying-charge>
                                         </ng-container>
@@ -91,14 +102,14 @@
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
-                                                [showGetCharge]="false" *ngIf="selectedTabSurcharge === 'SELL'">
+                                                [showGetCharge]="false" *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="isJobCopy">
                                             </selling-charge>
                                         </ng-container>
                                     </tab>
                                     <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <obh-charge service="logistic" *ngIf="selectedTabSurcharge === 'OBH'">
+                                            <obh-charge service="logistic" *ngIf="selectedTabSurcharge === 'OBH'" [allowSaving]="isJobCopy">
                                             </obh-charge>
                                         </ng-container>
                                     </tab>
@@ -109,15 +120,15 @@
                         <hbl-profit-summary></hbl-profit-summary>
                         <!-- </div> -->
                     </tab>
-                    <tab heading="Custom declaration" (selectTab)="selectTab('custom-declaration')">
+                    <tab heading="Custom declaration" (selectTab)="selectTab('custom-declaration')" [disabled]="isJobCopy">
                         <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
                         </ng-container>
                     </tab>
-                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('cre-debit-note')">
+                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('cre-debit-note')" [disabled]="isJobCopy">
                         <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
                         </ng-container>
                     </tab>
-                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab('stage')">
+                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab('stage')" [disabled]="isJobCopy">
                         <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
                     </tab>
                 </tabset>
@@ -140,6 +151,10 @@
 <info-popup #notAllowDelete [body]="'You are not allow to delete this job'"></info-popup>
 
 <confirm-popup #confirmLockShipment (onSubmit)="onLockShipment()" [body]="'Do you want to lock this shipment ?'"
+    [labelConfirm]="'Yes'"></confirm-popup>
+
+<confirm-popup #duplicateconfirmTemplate (onSubmit)="onSubmitDuplicateConfirm()"
+    [body]="'The system will open the Job Create Screen. Do you want to leave?'" [title]="'Duplicate OPS detail'"
     [labelConfirm]="'Yes'"></confirm-popup>
 
 <ng-template #placeholder>
