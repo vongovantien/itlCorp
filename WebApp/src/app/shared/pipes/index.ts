@@ -9,5 +9,7 @@ export * from './service-name.pipe';
 export * from './special-permission.pipe';
 export * from './sum.pipe';
 export * from './date-ago.pipe';
+export * from './safe.pipe';
+
 
 

@@ -371,6 +371,16 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
             );
     }
 
+    decodeEntities(str) {
+        if (str && typeof str === 'string') {
+            // strip script/html tags
+            str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+            str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+
+        }
+        return str;
+    }
+
     sendMail() {
         this.attachFileUpload();
         const emailContent: EmailContent = {
