@@ -217,7 +217,4 @@ export class UserProfilePageComponent extends AppForm {
                 }
             });
     }
-    click() {
-
-    }
 }
