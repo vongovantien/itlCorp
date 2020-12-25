@@ -36,7 +36,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @Input() service: CommonType.SERVICE_TYPE = 'sea';
     @Input() showSyncOtherCharge: boolean = false; // * show/hide sync other charge in getCharge button.
     @Input() showGetCharge: boolean = true; // * show/hide getCharge button
-    @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
+    @Input() allowSaving: boolean = false; // * not allow to save or add Charges without saving the job
 
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
