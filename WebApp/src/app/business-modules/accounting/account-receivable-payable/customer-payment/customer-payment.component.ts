@@ -42,7 +42,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestList = this.sortCPsList;
+        this.requestList = this.getCPs;
         this.requestSort = this.sortLocal;
     }
 
@@ -63,7 +63,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
-        this.getCPs();
+        this.getCPs(this.dataSearch);
     }
 
     checkAllowDetail(data: ReceiptModel) {
@@ -92,14 +92,14 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             });
     }
 
-    getCPs() {
+    getCPs(dataSearch) {
         this.isLoading = true;
         this._progressRef.start();
         this._accountingRepo
             .getListCustomerPayment(
                 this.page,
                 this.pageSize,
-                Object.assign({}, this.dataSearch)
+                Object.assign({}, dataSearch)
             )
             .pipe(
                 catchError(this.catchError),
@@ -116,7 +116,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     onSearchCPs(data: any) {
         this.page = 1;
         this.dataSearch = data;
-        this.getCPs();
+        this.getCPs(this.dataSearch);
 
     }
     sortCPsList(sortField: string, order: boolean) {

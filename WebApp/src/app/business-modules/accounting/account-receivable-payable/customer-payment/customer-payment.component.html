@@ -4,7 +4,7 @@
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="Customer Payment" [active]="true">
-                    <customer-payment-form-search (onSearch)="onSearchCPs($event)"></customer-payment-form-search>
+                    <customer-payment-form-search></customer-payment-form-search>
 
                     <div class="m-portlet">
                         <div class="m-portlet__body">
@@ -69,7 +69,9 @@
                                                                 <span>{{cps.currencyId}}</span>
                                                             </td>
                                                             <td>
-                                                                <span>{{cps.paymentDate | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                                <span>
+                                                                    {{cps.paymentDate | date :'dd/MM/yyyy HH:mm'}}
+                                                                </span>
                                                             </td>
                                                             <td>
                                                                 <div
@@ -91,7 +93,8 @@
                                                                 </span>
                                                             </td>
                                                             <td>
-                                                                <span>{{cps.lastSyncDate | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                                <span>{{cps.lastSyncDate | date :'dd/MM/yyyy HH:mm' }}
+                                                                </span>
                                                             </td>
                                                             <td>
                                                                 <span>{{cps.description}}</span>
@@ -110,11 +113,15 @@
                                                                     class="text-primary">{{cps.userNameCreated}}</span>
                                                             </td>
                                                             <td>
-                                                                <span>{{cps.datetimeCreated | date :'dd/MM/yyyy HH:mm'}}</span>
+                                                                <span>
+                                                                    {{cps.datetimeCreated | date :'dd/MM/yyyy HH:mm'}}
+                                                                </span>
                                                             </td>
 
                                                             <td>
-                                                                <span>{{cps.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
+                                                                <span>
+                                                                    {{cps.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                                                </span>
                                                             </td>
 
                                                         </tr>
@@ -151,6 +158,7 @@
         </div>
     </div>
 </div>
+
 <confirm-popup (onSubmit)="onConfirmDeleteCP()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>
 
 <permission-403-popup></permission-403-popup>
