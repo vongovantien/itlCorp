@@ -1774,6 +1774,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
+            ClearCache();
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)

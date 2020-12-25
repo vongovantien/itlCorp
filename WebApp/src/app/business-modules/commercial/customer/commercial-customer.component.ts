@@ -51,10 +51,10 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     ngOnInit(): void {
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
+            { title: 'Salesman', field: 'username', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
-            { title: 'Salesman', field: 'username', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'CreateDate', field: 'createDate', sortable: true }
         ];
