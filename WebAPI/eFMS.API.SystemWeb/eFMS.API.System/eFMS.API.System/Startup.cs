@@ -15,7 +15,7 @@ using eFMS.API.Common.Globals;
 using StackExchange.Redis;
 using eFMS.API.System.Infrastructure.Hubs;
 using eFMS.API.System.Infrastructure.Extensions;
-using System.IO;
+
 
 namespace eFMS.API.System
 {
