@@ -95,8 +95,12 @@ export class CompanyInformationFormAddComponent extends AppForm {
                 imageManagerDeleteParams: { id: selectImg?.id }
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
-            }).on('froalaEditor.imageManager.beforeDeleteImage', (e: any, editor, image) => {
-                selectImg = image['0'].dataset;
+            }).on('froalaEditor.imageManager.imageDeleted', (e, editor, data) => {
+                if (e.error) {
+                    this._toastService.error("Xóa thất bại");
+                } else
+                    this._toastService.success("Xóa thành công");
+
             }).on('froalaEditor.image.error', (e, editor, error, response) => {
                 console.log(error);
                 switch (error.code) {
