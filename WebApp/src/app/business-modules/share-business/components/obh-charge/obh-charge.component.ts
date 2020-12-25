@@ -27,7 +27,7 @@ import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingChargeComponent {
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.OBH;
-    @Input() allowSaving: boolean = false; // * not allow to save or add Charges without saving the job
+    @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,

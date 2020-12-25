@@ -32,7 +32,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
     @Input() showSyncStandard: boolean = true;
-    @Input() allowSaving: boolean = false; // * not allow to save or add Charges without saving the job
+    @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
 
