@@ -779,6 +779,18 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    checkCdNoteSynced(id: any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/CheckCdNoteSynced/${id}`);
+    }
+
+    checkSoaSynced(id: any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/CheckSoaSynced/${id}`);
+    }
+
+    checkVoucherSynced(id: any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/CheckVoucherSynced/${id}`);
+    }
 }
 
 

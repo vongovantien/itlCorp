@@ -11,10 +11,8 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -155,48 +153,25 @@ namespace eFMS.API.System.DL.Services
         public IQueryable<SysAuthorizedApprovalModel> Query(SysAuthorizedApprovalCriteria criteria)
         {
             Expression<Func<SysAuthorizedApproval, bool>> query = null;
-            if (!string.IsNullOrEmpty(criteria.All))
+            query = x =>
+                     (x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                     && (x.Authorizer ?? "").IndexOf(criteria.Authorizer ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                     && (x.Commissioner ?? "").IndexOf(criteria.Commissioner ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            if (criteria.EffectiveDate != null)
             {
-                query = x =>
-                       x.Type.IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                   || x.Authorizer.IndexOf(criteria.Authorizer ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                   || x.Commissioner.IndexOf(criteria.Commissioner ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
-                if (criteria.EffectiveDate != null)
-                {
-                    query = query.Or(x => x.EffectiveDate.HasValue ? x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date : true);
-                }
-                if (criteria.ExpirationDate != null)
-                {
-                    query = query.Or(x => x.ExpirationDate.HasValue ? x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date : true);
-                }
-
-                if (criteria.Active != null)
-                {
-                    query = query.Or(x => x.Active == criteria.Active);
-                }
-
+                query = query.And(x => x.EffectiveDate.HasValue ? x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date : true);
             }
-            else
+            if (criteria.ExpirationDate != null)
             {
-                query = x =>
-                     x.Type.IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                     && x.Authorizer.IndexOf(criteria.Authorizer ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                     && x.Commissioner.IndexOf(criteria.Commissioner ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
-                if (criteria.EffectiveDate != null)
-                {
-                    query = query.And(x => x.EffectiveDate.HasValue ? x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date : true);
-                }
-                if (criteria.ExpirationDate != null)
-                {
-                    query = query.And(x => x.ExpirationDate.HasValue ? x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date : true);
-                }
-
-                if (criteria.Active != null)
-                {
-                    query = query.And(x => x.Active == criteria.Active);
-                }
-
+                query = query.And(x => x.ExpirationDate.HasValue ? x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date : true);
             }
+
+            if (criteria.Active != null)
+            {
+                query = query.And(x => x.Active == criteria.Active);
+            }
+
             var authorizeds = DataContext.Get(query);
             var users = userRepository.Get();
             var data = from author in authorizeds

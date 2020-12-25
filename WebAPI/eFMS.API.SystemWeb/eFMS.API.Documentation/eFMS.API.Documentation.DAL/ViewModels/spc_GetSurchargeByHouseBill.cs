@@ -73,7 +73,8 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
         public Guid? CompanyId { get; set; }
-
+        public string PaySyncedFrom { get; set; }
+        public string SyncedFrom { get; set; }
 
     }
 }

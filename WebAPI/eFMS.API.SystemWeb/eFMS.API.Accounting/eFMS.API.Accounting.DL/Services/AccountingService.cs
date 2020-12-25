@@ -47,6 +47,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatDepartment> departmentRepo;
         private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
         private readonly IContextBase<AcctReceipt> receiptRepository;
+        private readonly IUserBaseService userBaseService;
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -87,6 +88,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysUserLevel> sysUserLevel,
             IContextBase<AcctReceipt> receiptRepo,
+            IUserBaseService userBase,
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
         {
@@ -117,6 +119,7 @@ namespace eFMS.API.Accounting.DL.Services
             departmentRepo = catDepartment;
             sysUserLevelRepo = sysUserLevel;
             receiptRepository = receiptRepo;
+            userBaseService = userBase;
             // ---
 
             users = UserRepository.Get();
@@ -985,9 +988,19 @@ namespace eFMS.API.Accounting.DL.Services
                                 voucher.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
                                 DataContext.Update(voucher, x => x.Id == id, false);
+
+                                //Update SyncedFrom equal VOUCHER by Id of Voucher
+                                var surcharges = SurchargeRepository.Get(x => x.AcctManagementId == voucher.Id);
+                                foreach (var surcharge in surcharges)
+                                {
+                                    surcharge.SyncedFrom = "VOUCHER";
+                                    surcharge.UserModified = currentUser.UserID;
+                                    surcharge.DatetimeModified = DateTime.Now;
+                                    var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                }
                             }
                         }
-
+                        var smSurcharge = SurchargeRepository.SubmitChanges();
                         result = DataContext.SubmitChanges();
                       
                         trans.Commit();
@@ -1028,8 +1041,27 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         cdNote.LastSyncDate = DateTime.Now;
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
+
+                        //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
+                        var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
+                        foreach(var surcharge in surcharges)
+                        {
+                            if (surcharge.Type == "OBH")
+                            {
+                                surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
+                                surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
+                            }
+                            else
+                            {
+                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                surcharge.SyncedFrom = "CDNOTE";
+                            }
+                            surcharge.UserModified = currentUser.UserID;
+                            surcharge.DatetimeModified = DateTime.Now;
+                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                        }
                     }
-                  
+                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -1061,8 +1093,27 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         soa.LastSyncDate = DateTime.Now;
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
+
+                        //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
+                        var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                        foreach(var surcharge in surcharges)
+                        {
+                            if (surcharge.Type == "OBH")
+                            {
+                                surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
+                                surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;
+                            }
+                            else
+                            {
+                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                surcharge.SyncedFrom = "SOA";
+                            }
+                            surcharge.UserModified = currentUser.UserID;
+                            surcharge.DatetimeModified = DateTime.Now;
+                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                        }
                     }
-                   
+                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = soaRepository.SubmitChanges();
                     trans.Commit();
                     return sm;
@@ -1306,6 +1357,11 @@ namespace eFMS.API.Accounting.DL.Services
                     string serviceName = string.Empty;
                     string amountCurr = string.Empty;
                     string urlFunc = string.Empty;
+                    string catagory = string.Empty;
+                    List<string> emails = new List<string>();
+                    var employeeIdCurrentUser = userBaseService.GetEmployeeIdOfUser(currentUser.UserID);
+                    var emailCurrentUser = userBaseService.GetEmployeeByEmployeeId(employeeIdCurrentUser)?.Email;
+                    emails.Add(emailCurrentUser);
 
                     int decRound = 0;
                     if (syncCreditModel.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)
@@ -1327,6 +1383,15 @@ namespace eFMS.API.Accounting.DL.Services
                         var amountStr = string.Format("{0:n" + decRound + "}", Math.Abs(amount ?? 0));
                         amountCurr = (amount < 0 ? "(" + amountStr + ")" : amountStr) + " " + soa.Currency;
                         urlFunc = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency=VND", soa.Soano);
+
+                        catagory = "SOA_CREDIT";
+
+                        var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(soa.UserCreated);
+                        var emailCreator = userBaseService.GetEmployeeByEmployeeId(employeeIdCreator)?.Email;
+                        if (!string.IsNullOrEmpty(emailCreator))
+                        {
+                            emails.Add(emailCreator);
+                        }
                     }
                     if (type == "CDNOTE")
                     {
@@ -1341,25 +1406,140 @@ namespace eFMS.API.Accounting.DL.Services
                         var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.CreditNo == creditNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
                         urlFunc = GetLinkCdNote(creditNote.Code, creditNote.JobId);
+
+                        catagory = "CDNOTE_CREDIT";
+                        var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(creditNote.UserCreated);
+                        var emailCreator = userBaseService.GetEmployeeByEmployeeId(employeeIdCreator)?.Email;
+                        if (!string.IsNullOrEmpty(emailCreator))
+                        {
+                            emails.Add(emailCreator);
+                        }
                     }
 
                     //Send Mail
-                    SendEmailToAccountant(type, creatorEnName, refNo, partnerEn, taxCode, serviceName, amountCurr, urlFunc, syncCreditModel.PaymentMethod);
+                    SendEmailToAccountant(catagory, creatorEnName, refNo, partnerEn, taxCode, serviceName, amountCurr, urlFunc, syncCreditModel.PaymentMethod, emails);
+                    //Push Notification
+                    PushNotificationToAccountant(catagory, creatorEnName, refNo, serviceName, amountCurr, urlFunc);
+                }
+            }
+        }
+
+        public void SendMailAndPushNotificationDebitToAccountant(List<SyncModel> syncModels)
+        {
+            if (syncModels.Count > 0)
+            {
+                foreach (var syncModel in syncModels)
+                {
+                    string type = syncModel.DataType;
+                    string creatorEnName = string.Empty;
+                    string refNo = string.Empty;
+                    string partnerEn = string.Empty;
+                    string taxCode = string.Empty;
+                    string serviceName = string.Empty;
+                    string amountCurr = string.Empty;
+                    string urlFunc = string.Empty;
+                    string catagory = string.Empty;
+                    List<string> emails = new List<string>();
+                    var employeeIdCurrentUser = userBaseService.GetEmployeeIdOfUser(currentUser.UserID);
+                    var emailCurrentUser = userBaseService.GetEmployeeByEmployeeId(employeeIdCurrentUser)?.Email;
+                    emails.Add(emailCurrentUser);
+
+                    int decRound = 0;
+                    if (syncModel.CurrencyCode0 != AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        decRound = 2;
+                    }
+
+                    if (type == "SOA")
+                    {
+                        var soa = soaRepository.Get(x => x.Id == int.Parse(syncModel.Stt)).FirstOrDefault();
+                        var employeeId = UserRepository.Get(x => x.Id == soa.UserCreated).FirstOrDefault()?.EmployeeId;
+                        creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                        refNo = soa.Soano;
+                        var partner = PartnerRepository.Get(x => x.Id == soa.Customer).FirstOrDefault();
+                        partnerEn = partner?.PartnerNameEn;
+                        taxCode = partner?.TaxCode;
+                        serviceName = DataTypeEx.GetServiceNameOfSoa(soa.ServiceTypeId).ToString();
+                        var amount = soa.DebitAmount - soa.CreditAmount;
+                        var amountStr = string.Format("{0:n" + decRound + "}", Math.Abs(amount ?? 0));
+                        amountCurr = (amount < 0 ? "(" + amountStr + ")" : amountStr) + " " + soa.Currency;
+                        urlFunc = string.Format(@"home/accounting/statement-of-account/detail?no={0}&currency=VND", soa.Soano);
+
+                        catagory = "SOA_DEBIT";
+                        var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(soa.UserCreated);
+                        var emailCreator = userBaseService.GetEmployeeByEmployeeId(employeeIdCreator)?.Email;
+                        if (!string.IsNullOrEmpty(emailCreator))
+                        {
+                            emails.Add(emailCreator);
+                        }
+                    }
+                    if (type == "CDNOTE")
+                    {
+                        var debitNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncModel.Stt)).FirstOrDefault();
+                        var employeeId = UserRepository.Get(x => x.Id == debitNote.UserCreated).FirstOrDefault()?.EmployeeId;
+                        creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                        refNo = debitNote.Code;
+                        var partner = PartnerRepository.Get(x => x.Id == debitNote.PartnerId).FirstOrDefault();
+                        partnerEn = partner?.PartnerNameEn;
+                        taxCode = partner?.TaxCode;
+                        serviceName = GetServiceNameOfCdNote(debitNote.Code);
+                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.CreditNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
+                        amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
+                        urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId);
+
+                        catagory = "CDNOTE_" + debitNote.Type;
+                        var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(debitNote.UserCreated);
+                        var emailCreator = userBaseService.GetEmployeeByEmployeeId(employeeIdCreator)?.Email;
+                        if (!string.IsNullOrEmpty(emailCreator))
+                        {
+                            emails.Add(emailCreator);
+                        }
+                    }
+
+                    //Send Mail
+                    SendEmailToAccountant(type, creatorEnName, refNo, partnerEn, taxCode, serviceName, amountCurr, urlFunc, "Bank Transfer / Cash", emails);
                     //Push Notification
                     PushNotificationToAccountant(type, creatorEnName, refNo, serviceName, amountCurr, urlFunc);
                 }
             }
         }
 
-        private void SendEmailToAccountant(string type, string creatorEnName, string refNo, string partnerEn, string taxCode, string serviceName, string amountCurr, string urlFunc, string paymentMethod)
+        private void SendEmailToAccountant(string catagory, string creatorEnName, string refNo, string partnerEn, string taxCode, string serviceName, string amountCurr, string urlFunc, string paymentMethod, List<string> emailCcs)
         {
-            string _type = type == "CDNOTE" ? "Credit Note" : "SOA";
-            string subject = string.Format(@"eFMS - Voucher Request - {0} {1}", _type, refNo);
+            string _type1 = string.Empty;
+            string _type2 = string.Empty;
+            if (catagory == "SOA_DEBIT")
+            {
+                _type1 = "VAT Invoice";
+                _type2 = "SOA";
+            }
+            else if (catagory == "SOA_CREDIT")
+            {
+                _type1 = "Voucher";
+                _type2 = "SOA";
+            }
+            else if (catagory == "CDNOTE_DEBIT")
+            {
+                _type1 = "VAT Invoice";
+                _type2 = "Debit Note";
+            }
+            else if (catagory == "CDNOTE_CREDIT")
+            {
+                _type1 = "Voucher";
+                _type2 = "Credit Note";
+            }
+            else if (catagory == "CDNOTE_INVOICE")
+            {
+                _type1 = "VAT Invoice";
+                _type2 = "Invoice";
+            }
+            
+            string subject = string.Format(@"eFMS - {0} Request - {1} {2}", _type1, _type2, refNo);
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
                                             "<p><i>Dear Accountant Team,</i></p>" +
                                             "<p>" +
                                                 "<div>You received a <b>[SOA_CreditNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div>" +
-                                                "<div><i>Bạn có nhận một đề nghị thanh toán chi phí bằng <b>[SOA_CreditNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div>" +
+                                                "<div><i>Bạn có nhận một đề nghị thanh toán bằng <b>[SOA_CDNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div>" +
                                             "</p>" +
                                             "<ul>" +
                                                 "<li>Ref No/ <i>Số tham chiếu</i>: <b><i>[RefNo]</i></b></li>" +
@@ -1375,7 +1555,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             "</p>" +
                                             "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p>" +
                                          "</div>");
-            body = body.Replace("[SOA_CreditNote]", _type);
+            body = body.Replace("[SOA_CDNote]", _type2);
             body = body.Replace("[CreatorEnName]", creatorEnName);
             body = body.Replace("[RefNo]", refNo);
             body = body.Replace("[PartnerEn]", partnerEn);
@@ -1394,8 +1574,8 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> toEmails = emails;
             List<string> attachments = null;
 
-            List<string> emailCCs = new List<string> { };
-            List<string> emailBCCs = new List<string> { "alex.phuong@itlvn.com" };
+            List<string> emailCCs = emailCcs;
+            List<string> emailBCCs = new List<string> { "alex.phuong@itlvn.com", "andy.hoa@itlvn.com" };
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs, emailBCCs);
 
             #region --- Ghi Log Send Mail ---
@@ -1415,7 +1595,7 @@ namespace eFMS.API.Accounting.DL.Services
             #endregion --- Ghi Log Send Mail ---
         }
 
-        private void PushNotificationToAccountant(string type, string creatorEnName, string refNo, string serviceName, string amountCurr, string urlFunc)
+        private void PushNotificationToAccountant(string catagory, string creatorEnName, string refNo, string serviceName, string amountCurr, string urlFunc)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -1425,9 +1605,36 @@ namespace eFMS.API.Accounting.DL.Services
                     // Danh sách user Id của group thuộc department Accountant (Không lấy manager của department Acct)
                     var idUserGroupAccts = sysUserLevelRepo.Get(x => x.GroupId != AccountingConstants.SpecialGroup && x.DepartmentId == idAccountantDept).Select(s => s.UserId);
 
-                    string _type = type == "CDNOTE" ? "Credit Note" : "SOA";
-                    string title = string.Format(@"Voucher Request - {0}: {1}", _type, refNo);
-                    string description = string.Format(@"You received a <b>{0}</b> from <b>{1}</b>. Ref No <b>{2}</b> of <b>{3}</b> with Amount <b>{4}</b>", _type, creatorEnName, refNo, serviceName, amountCurr);
+                    string _type1 = string.Empty;
+                    string _type2 = string.Empty;
+                    if (catagory == "SOA_DEBIT")
+                    {
+                        _type1 = "VAT Invoice";
+                        _type2 = "SOA";
+                    }
+                    else if (catagory == "SOA_CREDIT")
+                    {
+                        _type1 = "Voucher";
+                        _type2 = "SOA";
+                    }
+                    else if (catagory == "CDNOTE_DEBIT")
+                    {
+                        _type1 = "VAT Invoice";
+                        _type2 = "Debit Note";
+                    }
+                    else if (catagory == "CDNOTE_CREDIT")
+                    {
+                        _type1 = "Voucher";
+                        _type2 = "Credit Note";
+                    }
+                    else if (catagory == "CDNOTE_INVOICE")
+                    {
+                        _type1 = "VAT Invoice";
+                        _type2 = "Invoice";
+                    }
+
+                    string title = string.Format(@"{0} Request - {1}: {2}", _type1, _type2, refNo);
+                    string description = string.Format(@"You received a <b>{0}</b> from <b>{1}</b>. Ref No <b>{2}</b> of <b>{3}</b> with Amount <b>{4}</b>", _type2, creatorEnName, refNo, serviceName, amountCurr);
 
                     // Add Notification
                     SysNotifications sysNotification = new SysNotifications
@@ -1562,6 +1769,56 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+        
+        public bool CheckCdNoteSynced(Guid idCdNote)
+        {
+            var cdNote = cdNoteRepository.Get(x => x.Id == idCdNote).FirstOrDefault();
+            if (cdNote != null)
+            {
+                var surchargeCreditObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySyncedFrom));
+                var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.DebitNo == cdNote.Code && !string.IsNullOrEmpty(x.SyncedFrom));
+                var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.SyncedFrom));
+                var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.DebitNo == cdNote.Code && !string.IsNullOrEmpty(x.SyncedFrom));
+                if (surchargeCreditObhs.Any() || surchargeDebitObhs.Any() || surchargeCredits.Any() || surchargeDebits.Any())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
+        public bool CheckSoaSynced(int idSoa)
+        {
+            var soa = soaRepository.Get(x => x.Id == idSoa).FirstOrDefault();
+            if (soa != null)
+            {
+                var surchargeCreditObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PaySoano == soa.Soano && !string.IsNullOrEmpty(x.PaySyncedFrom));
+                var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.Soano == soa.Soano && !string.IsNullOrEmpty(x.SyncedFrom));
+                var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaySoano == soa.Soano && !string.IsNullOrEmpty(x.SyncedFrom));
+                var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.Soano == soa.Soano && !string.IsNullOrEmpty(x.SyncedFrom));
+                if (surchargeCreditObhs.Any() || surchargeDebitObhs.Any() || surchargeCredits.Any() || surchargeDebits.Any())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool CheckVoucherSynced(Guid idVoucher)
+        {
+            var voucher = DataContext.Get(x => x.Id == idVoucher).FirstOrDefault();
+            if (voucher != null)
+            {
+                //Voucher không issue cho phí Obh Partner (OBH-Debit)
+                var surchargeCreditObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.AcctManagementId == voucher.Id && !string.IsNullOrEmpty(x.PaySyncedFrom));
+                var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.AcctManagementId == voucher.Id && !string.IsNullOrEmpty(x.SyncedFrom));
+                var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.AcctManagementId == voucher.Id && !string.IsNullOrEmpty(x.SyncedFrom));
+                if (surchargeCreditObhs.Any() || surchargeCredits.Any() || surchargeDebits.Any())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

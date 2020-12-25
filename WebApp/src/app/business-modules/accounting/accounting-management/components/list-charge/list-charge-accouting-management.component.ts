@@ -51,6 +51,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 { title: 'Unit', field: 'unitName', sortable: true },
                 { title: 'Unit Price', field: 'unitPrice', sortable: true },
                 { title: 'MBL', field: 'mbl', sortable: true },
+                { title: 'Synced From', field: 'syncedFromBy', sortable: true },
             ];
         }
     }

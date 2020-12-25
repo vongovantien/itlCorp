@@ -158,7 +158,7 @@ namespace eFMS.API.Documentation.DL.Common
                         && model.CompanyId == currentUser.CompanyID)
                         || authorizeUserIds.Contains(model.PersonInCharge)
                         || model.SalemanIds.Contains(currentUser.UserID)
-                        || model.Groups.Any(x => model.SalemanIds.Contains(x))
+                        || model.Departments.Any(x => model.SalemanIds.Contains(x))
                         )
                     {
                         code = 200;
