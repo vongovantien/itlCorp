@@ -510,7 +510,7 @@ namespace eFMS.API.ReportData
             worksheet.Cells[1, 2].Value = "Name EN";
             worksheet.Cells[1, 3].Value = "Name VN";
             worksheet.Cells[1, 4].Value = "Commodity Group";
-            worksheet.Cells[1, 5].Value = "Inactive";
+            worksheet.Cells[1, 5].Value = "Status";
             worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
             worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             for (int i = 0; i < listItems.Count; i++)
@@ -521,7 +521,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 3].Value = item.CommodityNameVn;
                 worksheet.Cells[i + 2, 4].Value = item.CommodityGroupNameEn;
                 string inactivechar = "";
-                if (item.Inactive == true)
+                if (item.Active == true)
                 {
                     inactivechar = "Active";
                 }

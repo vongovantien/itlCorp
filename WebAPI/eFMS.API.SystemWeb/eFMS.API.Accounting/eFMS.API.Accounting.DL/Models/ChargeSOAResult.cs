@@ -56,21 +56,12 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? FinalExchangeRate { get; set; }
 
         public DateTime? ExchangeDate { get; set; }
-
         public decimal? CBM { get; set; }
-
         public string PackageContainer { get; set; }
-
         public string TypeCharge { get; set; }
         public decimal? VATAmount { get; set; }
         public decimal? NetAmount { get; set; }
-
         public string PIC { get; set; }
-
-
-
-
-
-
+        public bool IsSynced { get; set; }
     }
 }

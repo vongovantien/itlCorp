@@ -166,6 +166,26 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// add duplicate job
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("InsertDuplicateJob")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.Add)]
+        public IActionResult InsertDuplicateJob(OpsTransactionModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var existedMessage = transactionService.CheckExist(model);
+            if (existedMessage != null)
+            {
+                return Ok(new ResultHandle { Status = false, Message = existedMessage });
+            }
+            var hs = transactionService.ImportDuplicateJob(model);
+            return Ok(hs);
+        }
+
+        /// <summary>
         /// delete an existed item
         /// </summary>
         /// <param name="id">id of item that want to delete</param>

@@ -2,7 +2,7 @@
     <app-sub-header>
         <div class="c-button-actions">
             <ng-container *ngIf="!!shipmentDetail && !shipmentDetail.isLocked">
-                <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
+                <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()" [disabled]="ACTION === 'COPY'"
                     *ngIf="!!shipmentDetail && shipmentDetail.permission.allowLock">
                 </app-default-button>
             </ng-container>

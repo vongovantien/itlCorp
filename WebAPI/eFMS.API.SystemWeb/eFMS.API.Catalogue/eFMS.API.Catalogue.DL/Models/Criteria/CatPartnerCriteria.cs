@@ -24,5 +24,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public bool? Active { get; set; }
         public string AccountNo { get; set; }
         public string CoLoaderCode { get; set; }
+        public string Saleman { get; set; }
     }
 }
