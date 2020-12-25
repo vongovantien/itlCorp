@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { SystemRepo, CatalogueRepo } from '@repositories';
+import { SystemRepo } from '@repositories';
 import { AppForm } from 'src/app/app.form';
 import { formatDate } from '@angular/common';
 import { User } from '@models';
@@ -41,7 +41,6 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
-        private _catalogueRepo: CatalogueRepo,
     ) {
         super();
         this.requestSearch = this.onSubmit;
