@@ -1497,9 +1497,9 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     //Send Mail
-                    SendEmailToAccountant(type, creatorEnName, refNo, partnerEn, taxCode, serviceName, amountCurr, urlFunc, "Bank Transfer / Cash", emails);
+                    SendEmailToAccountant(catagory, creatorEnName, refNo, partnerEn, taxCode, serviceName, amountCurr, urlFunc, "Bank Transfer / Cash", emails);
                     //Push Notification
-                    PushNotificationToAccountant(type, creatorEnName, refNo, serviceName, amountCurr, urlFunc);
+                    PushNotificationToAccountant(catagory, creatorEnName, refNo, serviceName, amountCurr, urlFunc);
                 }
             }
         }
@@ -1538,7 +1538,7 @@ namespace eFMS.API.Accounting.DL.Services
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
                                             "<p><i>Dear Accountant Team,</i></p>" +
                                             "<p>" +
-                                                "<div>You received a <b>[SOA_CreditNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div>" +
+                                                "<div>You received a <b>[SOA_CDNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div>" +
                                                 "<div><i>Bạn có nhận một đề nghị thanh toán bằng <b>[SOA_CDNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div>" +
                                             "</p>" +
                                             "<ul>" +
