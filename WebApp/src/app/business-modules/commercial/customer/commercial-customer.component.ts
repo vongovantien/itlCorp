@@ -32,6 +32,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     headerSalemans: CommonInterface.IHeaderTable[];
 
+    headerSearch: CommonInterface.IHeaderTable[];
 
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
@@ -61,15 +62,24 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.headers = [
             { title: 'Partner ID', field: 'accountNo', sortable: true },
             { title: 'Name ABBR', field: 'shortName', sortable: true },
-            { title: 'Billing Address', field: 'addressVn', sortable: true },
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
+            { title: 'Billing Address', field: 'addressVn', sortable: true },
+
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
 
+        this.headerSearch = [
+            { title: 'Partner ID', field: 'accountNo', sortable: true },
+            { title: 'Name ABBR', field: 'shortName', sortable: true },
+            { title: 'Tax Code', field: 'taxCode', sortable: true },
+            { title: 'Creator', field: 'userCreatedName', sortable: true },
+            { title: 'Salesman', field: 'Saleman', sortable: true },
+        ];
+
         this.configSearch = {
-            settingFields: this.headers.filter(h => h.field !== 'datetimeModified' && h.field !== 'active').map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            settingFields: this.headerSearch.map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
         localStorage.removeItem('success_add_sub');

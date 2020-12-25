@@ -29,11 +29,11 @@
                         </td>
                         <td>{{partner.accountNo}}</td>
                         <td>{{partner.shortName}}</td>
-                        <td>{{partner.addressVn}}</td>
                         <td>{{partner.taxCode}}</td>
+                        <td>{{partner.userCreatedName}}</td>
+                        <td>{{partner.addressVn}}</td>
                         <td>{{partner.tel}}</td>
                         <td>{{partner.fax}}</td>
-                        <td>{{partner.userCreatedName}}</td>
                         <td>{{partner.datetimeModified | date:'dd/MM/yyyy' }}</td>
                         <td [ngClass]="partner.active ? 'text-success' : 'text-danger'">
                             {{partner.active ? 'Active' : 'Inactive'}}</td>
