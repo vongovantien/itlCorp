@@ -59,7 +59,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     isCancelFormPopupSuccess: boolean = false;
     selectedTabSurcharge: string = 'BUY';
     action: any = {};
-    isJobCopy: boolean = false;
 
     constructor(
         private _spinner: NgxSpinnerService,
@@ -91,7 +90,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 if (!!params) {
                     this.jobId = params.id;
                     if (!!params.action) {
-                        this.isJobCopy = params.action.toUpperCase() === 'COPY';
+                        this.isDuplicate = params.action.toUpperCase() === 'COPY';
                     }
                     this.getShipmentDetails(params.id);
                 }
@@ -213,7 +212,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         }
 
         this.onSubmitData();
-        if (this.isJobCopy) {
+        if (this.isDuplicate) {
             this.insertDuplicateJob();
         } else {
             this.updateShipment();
@@ -299,7 +298,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this._toastService.success(res.message);
                         this.jobId = res.data.id;
                         this.isDuplicate = true;
-                        this.isJobCopy = false;
                         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
                             queryParams: Object.assign({}, { tab: 'job-edit' })
                         });
@@ -309,7 +307,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 }
             );
     }
-    
+
     lockShipment() {
         this.confirmLockShipmentPopup.show();
     }
@@ -369,11 +367,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.opsTransaction.hblid }));
 
-                            this.editForm.isJobCopy = this.isJobCopy;
+                            this.editForm.isJobCopy = this.isDuplicate;
                             this.editForm.setFormValue();
                         }
 
-                        if (this.isJobCopy) {
+                        if (this.isDuplicate) {
                             this.editForm.getBillingOpsId();
                             this.headerComponent.resetBreadcrumb("Create Job");
                         }

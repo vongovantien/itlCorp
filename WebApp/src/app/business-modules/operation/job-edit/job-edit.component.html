@@ -2,7 +2,7 @@
     <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
         <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowLock">
             <button type="button" class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10"
-                (click)="lockShipment()" [disabled]="isJobCopy">
+                (click)="lockShipment()" [disabled]="isDuplicate">
                 <span>
                     <i class="la la-lock"></i>
                     <span>
@@ -18,7 +18,7 @@
     </span>
     <div class="c-button-actions">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="onOpePLPrint()" [disabled]="isJobCopy">
+            (click)="onOpePLPrint()" [disabled]="isDuplicate">
             <span>
                 <i class="la la-print"></i>
                 <span>
@@ -29,7 +29,7 @@
     </div>
     <div class="c-button-actions">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="confirmDuplicate()" [disabled]="isJobCopy">
+            (click)="confirmDuplicate()" [disabled]="isDuplicate">
             <span>
                 <i class="la la-search-plus"></i>
                 <span>
@@ -52,8 +52,9 @@
             </button>
         </div>
         <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10" [disabled]="isJobCopy"
-                (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete" title="Shipment was deleted">
+            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
+                [disabled]="isDuplicate" (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete"
+                title="Shipment was deleted">
                 <span>
                     <i class="la la-trash"></i>
                     <span>
@@ -93,8 +94,8 @@
                                     <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <buying-charge [showGetCharge]="false" service="logistic" [allowSaving]="isJobCopy"
-                                                *ngIf="selectedTabSurcharge === 'BUY'">
+                                            <buying-charge [showGetCharge]="false" service="logistic"
+                                                [allowSaving]="!isDuplicate" *ngIf="selectedTabSurcharge === 'BUY'">
                                             </buying-charge>
                                         </ng-container>
                                     </tab>
@@ -102,14 +103,16 @@
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
-                                                [showGetCharge]="false" *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="isJobCopy">
+                                                [showGetCharge]="false" *ngIf="selectedTabSurcharge === 'SELL'"
+                                                [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>
                                     </tab>
                                     <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <obh-charge service="logistic" *ngIf="selectedTabSurcharge === 'OBH'" [allowSaving]="isJobCopy">
+                                            <obh-charge service="logistic" *ngIf="selectedTabSurcharge === 'OBH'"
+                                                [allowSaving]="!isDuplicate">
                                             </obh-charge>
                                         </ng-container>
                                     </tab>
@@ -120,15 +123,18 @@
                         <hbl-profit-summary></hbl-profit-summary>
                         <!-- </div> -->
                     </tab>
-                    <tab heading="Custom declaration" (selectTab)="selectTab('custom-declaration')" [disabled]="isJobCopy">
+                    <tab heading="Custom declaration" (selectTab)="selectTab('custom-declaration')"
+                        [disabled]="isDuplicate">
                         <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
                         </ng-container>
                     </tab>
-                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('cre-debit-note')" [disabled]="isJobCopy">
+                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('cre-debit-note')"
+                        [disabled]="isDuplicate">
                         <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
                         </ng-container>
                     </tab>
-                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab('stage')" [disabled]="isJobCopy">
+                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab('stage')"
+                        [disabled]="isDuplicate">
                         <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
                     </tab>
                 </tabset>

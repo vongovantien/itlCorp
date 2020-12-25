@@ -358,7 +358,7 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
                             (res: Crystal) => {
                                 dataStreamCount++;
                                 if (dataStreamCount === streamUploadFile.length) {
-                                    if (res instanceof HttpErrorResponse) {
+                                    if (res instanceof HttpErrorResponse && res.status === SystemConstants.HTTP_CODE.NOT_FOUND) {
                                         return;
                                     }
                                     setTimeout(() => {
