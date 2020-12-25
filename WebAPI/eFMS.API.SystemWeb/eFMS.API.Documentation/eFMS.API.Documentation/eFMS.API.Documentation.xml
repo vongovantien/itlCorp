@@ -865,6 +865,13 @@
             <param name="model">object to update</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.InsertDuplicateJob(eFMS.API.Documentation.DL.Models.OpsTransactionModel)">
+            <summary>
+            add duplicate job
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Delete(System.Guid)">
             <summary>
             delete an existed item

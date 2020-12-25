@@ -44,5 +44,6 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? CompanyId { get; set; }
         public string Shipper { get; set; }
         public string Consignee { get; set; }
+        public string AccountNo { get; set; }
     }
 }

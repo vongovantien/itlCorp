@@ -4,6 +4,20 @@
         <name>eFMS.API.Accounting</name>
     </assembly>
     <members>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListCdNoteToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidTypeListModel})">
+            <summary>
+            Sync list CDNote to Accountant
+            </summary>
+            <param name="requests"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListSoaToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestIntTypeListModel})">
+            <summary>
+            Sync list SOA to Accountant
+            </summary>
+            <param name="requests"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListCdNoteDebit(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidTypeListModel})">
             <summary>
             Func Test (Get List Debit Note)
@@ -31,6 +45,13 @@
             Func Test (Get List Receipt)
             </summary>
             <param name="Ids"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListReceiptToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidListModel})">
+            <summary>
+            Sync list Receipt to Accountant
+            </summary>
+            <param name="request"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingManagementController">

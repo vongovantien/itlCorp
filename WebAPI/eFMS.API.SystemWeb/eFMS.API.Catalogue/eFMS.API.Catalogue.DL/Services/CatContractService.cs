@@ -104,17 +104,23 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.CompanyNameEn = company.BunameEn;
                     saleman.CompanyNameVn = company.BunameVn;
                 }
-                var officeIds = saleman.OfficeId.Split(";").ToList();
-                if (officeIds.Count() > 0)
+                var officeIds = saleman.OfficeId?.Split(";").ToList();
+                if(officeIds != null)
                 {
-                    foreach (var officeId in officeIds)
+                    if (officeIds.Count() > 0)
                     {
-                        saleman.OfficeNameAbbr += sysOfficeRepository.Get(x => x.Id == new Guid(officeId)).Select(t => t.ShortName).FirstOrDefault() + "; ";
+                        foreach (var officeId in officeIds)
+                        {
+                            saleman.OfficeNameAbbr += sysOfficeRepository.Get(x => x.Id == new Guid(officeId)).Select(t => t.ShortName).FirstOrDefault() + "; ";
+                        }
                     }
                 }
-                if (saleman.OfficeNameAbbr.Length > 0)
+                if(saleman.OfficeNameAbbr != null)
                 {
-                    saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 2);
+                    if (saleman.OfficeNameAbbr.Length > 0)
+                    {
+                        saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 2);
+                    }
                 }
                 saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;

@@ -410,12 +410,12 @@ namespace eFMS.API.Documentation.DL.Services
                 shipments = opShipments.Union(csShipments);
                 if (criteria.Keywords != null)
                 {
-                    result = shipments.Count() < criteria.Keywords.Count ? result : GetLogHistory(opShipments);
-            }
+                    result = shipments.Count() < criteria.Keywords.Count ? result : GetLogHistory(shipments);
+                }
                 else
-            {
-                    result = GetLogHistory(opShipments);
-            }
+                {
+                    result = GetLogHistory(shipments);
+                }
             }
             return result;
         }

@@ -1,4 +1,4 @@
-import { Component, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -31,6 +31,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     TYPE: any = CommonEnum.SurchargeTypeEnum.OBH;
 
     messageCreditRate: string = '';
+
+    @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,

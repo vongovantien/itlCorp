@@ -206,7 +206,7 @@
                                     </td>
                                 </tr>
                                 <tr class="collapse-toggle-row tgroup">
-                                    <td colspan="13">
+                                    <td colspan="14">
                                         <div class='row'>
                                             <div class="col-5">Shipment:
                                                 <span class='text-info'>
@@ -228,7 +228,8 @@
                                     </td>
                                 </tr>
                                 <tr class="child"
-                                    *ngFor="let charge of groupShipment.chargeShipments; let j = index; trackBy: trackByFn">
+                                    *ngFor="let charge of groupShipment.chargeShipments; let j = index; trackBy: trackByFn"
+                                    [class.synced-row]="charge.isSynced">
                                     <td>
                                         <span>{{charge.chargeCode}}</span>
                                     </td>
@@ -269,6 +270,9 @@
                                     <td>
                                         <span>{{charge.note}}</span>
                                     </td>
+                                    <td>
+                                        <span class="text-danger">{{charge.syncedFromBy}}</span>
+                                    </td>
                                 </tr>
                                 <tr class="loading-wrapper" *ngIf="isLoading">
                                     <td colspan="100">
@@ -289,8 +293,8 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr
-                                *ngFor="let charge of soa.chargeShipments  | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn">
+                            <tr *ngFor="let charge of soa.chargeShipments  | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn"
+                                [class.synced-row]="charge.isSynced">
                                 <td>
                                     <span>{{charge.chargeCode}}</span>
                                 </td>
@@ -331,6 +335,9 @@
                                 <td>
                                     <span>{{charge.note}}</span>
                                 </td>
+                                <td>
+                                    <span class="text-danger">{{charge.syncedFromBy}}</span>
+                                </td>
                             </tr>
                             <tr class="loading-wrapper" *ngIf="isLoading">
                                 <td colspan="100">
@@ -368,3 +375,6 @@
 <confirm-popup (onSubmit)="onConfirmSoa()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
 <soa-payment-method-popup (onApply)="onApplyPaymentMethod($event)"></soa-payment-method-popup>
 <reason-reject-popup (onApply)="onApplyReasonReject($event)"></reason-reject-popup>
+
+<info-popup #validateSyncedSOAPopup [body]="messageValidate" [title]="'Alert'">
+</info-popup>

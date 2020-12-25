@@ -1810,6 +1810,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaySyncedFrom)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")
                     .HasMaxLength(50)
@@ -1852,6 +1856,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SyncedFrom)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -2564,6 +2572,10 @@ namespace eFMS.API.Documentation.Service.Models
             modelBuilder.Entity<CustomsDeclaration>(entity =>
             {
                 entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.AccountNo)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.CargoType)
                     .HasMaxLength(10)

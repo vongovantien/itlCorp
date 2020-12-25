@@ -95,6 +95,13 @@ export class DocumentationRepo {
         );
     }
 
+    insertDuplicateShipment(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/InsertDuplicateJob`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     getDetailShipment(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction?id=${id}`).pipe(
             catchError((error) => throwError(error)),

@@ -111,7 +111,7 @@ namespace eFMS.API.System.Controllers
             }
 
             var hs = userPermissionService.Add(list);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
+            var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {

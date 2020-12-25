@@ -885,6 +885,10 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaySyncedFrom)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")
                     .HasMaxLength(50)
@@ -927,6 +931,10 @@ namespace eFMS.API.ForPartner.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SyncedFrom)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
