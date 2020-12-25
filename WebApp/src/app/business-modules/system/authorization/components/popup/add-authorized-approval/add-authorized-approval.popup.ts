@@ -40,7 +40,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     users: Observable<User[]>;
 
 
-    typeList: any[] = ['Advance', 'Settlement', 'Unlock Shipment'];
+    typeList: string[] = ['Advance', 'Settlement', 'Unlock Shipment'];
 
     minDateExpired: any = null;
     minDateEffective: any = null;
@@ -63,7 +63,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
             commissioner: [null, Validators.required],
             effectiveDate: [null],
             expirationDate: [null],
-            type: [this.typeList[0]],
+            type: [null, Validators.required],
             status: [true],
             description: []
         });
@@ -94,7 +94,6 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     }
 
     saveAuthorizedAprroval() {
-        [this.type].forEach((control: AbstractControl) => this.setError(control));
         this.isSubmitted = true;
         if (this.formAuthorizedApproval.valid) {
             const body: IAuthorizedArroval = {

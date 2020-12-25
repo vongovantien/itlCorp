@@ -9,10 +9,9 @@
                                 <label>Authorizer</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, null)"
                                     [currentActiveItemId]="{ field: 'id', value: authorizer.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="users"
+                                    [selectedDisplayFields]="['username']" [dataSources]="users | async"
                                     [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
-                                    placeholder="Select Authorizer" [height]="200"
-                                    (remove)="resetFormControl(authorizer)" size="15">
+                                    placeholder="" [height]="200" (remove)="resetFormControl(authorizer)" size="15">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -23,7 +22,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly
-                                        [minDate]="minDateEffective" placeholder="dd/MM/YYYY" />
+                                        [minDate]="minDateEffective" placeholder="" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -44,8 +43,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: commissioner.value}"
                                     [selectedDisplayFields]="['username']" [dataSources]="users | async"
                                     [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
-                                    placeholder="Select Commissioner" [height]="200"
-                                    (remove)="resetFormControl(commissioner)" size="15">
+                                    placeholder="" [height]="200" (remove)="resetFormControl(commissioner)" size="15">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -56,7 +54,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" [autoApply]="true" formControlName="expirationDate" readonly
-                                        [minDate]="minDateExpired" placeholder="dd/MM/YYYY" />
+                                        [minDate]="minDateExpired" placeholder="" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
