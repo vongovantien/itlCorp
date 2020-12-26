@@ -373,10 +373,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             );
     }
 
-    onSubmitUploadFilePDF(e) {
-        return true;
-    }
-
     sendMail() {
         this.attachFileUpload();
         const emailContent: EmailContent = {
