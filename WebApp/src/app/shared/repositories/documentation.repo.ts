@@ -994,4 +994,9 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    getASTransactionInfo(hblNo: string, mblNo: string, serviceName: string, serviceMode: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/GetLinkASInfomation/`,
+            { hblNo: hblNo, mblNo: mblNo, serviceName: serviceName, serviceMode: serviceMode });
+    }
 }

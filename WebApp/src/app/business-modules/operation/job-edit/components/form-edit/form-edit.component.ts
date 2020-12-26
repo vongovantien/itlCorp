@@ -4,7 +4,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { AppForm } from '@app';
 import { ShareBussinessContainerListPopupComponent, IShareBussinessState } from '@share-bussiness';
 import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit } from '@models';
-import { CatalogueRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
 import { CommonEnum } from '@enums';
@@ -13,6 +13,8 @@ import { JobConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 
 import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 @Component({
     selector: 'job-mangement-form-edit',
     templateUrl: './form-edit.component.html'
@@ -20,7 +22,8 @@ import { Observable } from 'rxjs';
 export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
+    @ViewChild('comfirmServiceInfo') infoServicePopup: InfoPopupComponent;
 
     opsTransaction: OpsTransaction = null;
 
@@ -72,6 +75,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     commodityGroups: Observable<CommodityGroup[]>;
     packageTypes: Observable<Unit[]>;
 
+    shipmentNo: string = null;
+    shipmentNoti: string = '';
+
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
@@ -87,8 +93,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
-        private _systemRepo: SystemRepo) {
+        private _systemRepo: SystemRepo,
+        private _toaster: ToastrService) {
         super();
     }
 
@@ -282,4 +290,40 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.containerPopup.show();
     }
 
+    getASInfoToLink() {
+        if (!this.hwbno.value && !this.mblno.value) {
+            this._toaster.warning("HBL No/MBL No is empty. Please complete first!");
+            return;
+        }
+
+        if (!this.productService.value || !this.serviceMode.value
+            || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
+            this._toaster.warning("Service's not valid to link. Please select another!");
+        } else {
+            console.log('Transaction', this.opsTransaction)
+            if (this.hwbno.value !== this.opsTransaction.hwbno || this.productService.value !== this.opsTransaction.productService
+                || this.serviceMode.value !== this.opsTransaction.serviceMode) {
+                this._documentRepo.getASTransactionInfo(this.hwbno.value, this.mblno.value, this.productService.value, this.serviceMode.value)
+                    .pipe(catchError(this.catchError))
+                    .subscribe((res: any) => {
+                        if (!!res) {
+                            this.shipmentNo = res.jobNo;
+                            if (res.jobNo !== '') {
+                                this.shipmentNoti = "The valid shipment was linked to this job:<br>" + res.jobNo;
+                            } else {
+                                this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
+                            }
+                            this.infoServicePopup.show();
+                        }
+                    });
+            } else {
+                if (!this.opsTransaction.serviceNo) {
+                    this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
+                } else {
+                    this.shipmentNoti = "The valid shipment was linked to this job:<br>" + this.opsTransaction.serviceNo;
+                }
+                this.infoServicePopup.show();
+            }
+        }
+    }
 }

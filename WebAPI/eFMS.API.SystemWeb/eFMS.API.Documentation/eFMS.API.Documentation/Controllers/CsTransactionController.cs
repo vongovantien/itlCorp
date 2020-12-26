@@ -149,6 +149,21 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get Air/Sea job no and hblId
+        /// </summary>
+        /// <param name="hblNo">hbl no's ops</param>
+        /// <param name="mblNo">MBL No's ops</param>
+        /// <param name="serviceName">product service</param>
+        /// <param name="serviceMode">service mode</param>
+        /// <returns></returns>
+        [HttpGet("GetLinkASInfomation")]
+        [Authorize]
+        public IActionResult GetLinkASInfomation(string hblNo, string mblNo, string serviceName, string serviceMode)
+        {
+            var data = csTransactionService.GetLinkASInfomation(hblNo, mblNo, serviceName, serviceMode);
+            return Ok(data);
+        }
         #region -- INSERT & UPDATE
         /// <summary>
         /// add new transaction

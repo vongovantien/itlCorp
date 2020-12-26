@@ -799,6 +799,82 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return result;
         }
+
+        /// <summary>
+        /// Get air/sea information when link from ops
+        /// </summary>
+        /// <param name="hblNo">HBL No's ops</param>
+        /// <param name="mblNo">MBL No's ops</param>
+        /// <param name="serviceName">product service</param>
+        /// <param name="serviceMode">service mode</param>
+        /// <returns></returns>
+        public object GetLinkASInfomation(string hblNo, string mblNo, string serviceName, string serviceMode)
+        {
+            var jobNo = string.Empty;
+            var id = string.Empty;
+            var shipmentType = GetServiceType(serviceName, serviceMode);
+            var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo).FirstOrDefault();
+            if (houseDetail != null)
+            {
+                jobNo = transactionRepository.Get(x => x.Id == houseDetail.JobId && x.TransactionType == shipmentType).Select(x => x.JobNo).FirstOrDefault();
+                if (jobNo != null)
+                {
+                    id = houseDetail.Id.ToString();
+                }
+                else
+                {
+                    jobNo = string.Empty;
+                }
+            }
+            else
+            {
+                var shipmentDetail = string.IsNullOrEmpty(mblNo) ? null : transactionRepository.Get(x => x.Mawb == mblNo && x.TransactionType == shipmentType).FirstOrDefault();
+                if (shipmentDetail != null)
+                {
+                    jobNo = shipmentDetail.JobNo;
+                }
+            }
+            return new { jobNo, id };
+        }
+
+        private string GetServiceType(string serviceName, string serviceMode)
+        {
+            var type = string.Empty;
+            switch (serviceName)
+            {
+                case "Sea FCL":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.SeaFCLImport;
+                    }
+                    else
+                    {
+                        type = TermData.SeaFCLExport;
+                    }
+                    break;
+                case "Sea LCL":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.SeaLCLImport;
+                    }
+                    else
+                    {
+                        type = TermData.SeaLCLExport;
+                    }
+                    break;
+                case "Air":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.AirImport;
+                    }
+                    else
+                    {
+                        type = TermData.AirExport;
+                    }
+                    break;
+            }
+            return type;
+        }
         #endregion -- DETAILS --
 
         #region -- LIST & PAGING --       

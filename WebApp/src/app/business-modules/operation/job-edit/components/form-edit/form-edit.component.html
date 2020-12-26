@@ -103,9 +103,17 @@
 			<div class="col-lg-4">
 				<div class="form-group"
 					[ngClass]="{'m-form__group has-danger': (shipmentMode.dirty && !shipmentMode.valid) || (isSubmitted && !shipmentMode.valid)}">
-					<label class="form-control-label" required>
-						Shipment Mode
-					</label>
+					<div class="row">
+							<div class="col-lg-8">
+								<label class="form-control-label" required>
+									Shipment Mode
+								</label>
+							</div>
+							<div class="col-lg-4" *ngIf="shipmentMode.value === 'Internal'">
+								<span><a class="pointer" style="text-decoration: underline;"
+										(click)="getASInfoToLink()">Link Air/Sea</a></span>
+							</div>
+					</div>
 					<ng-select class="custom" [clearable]="false" [items]="shipmentModes" placeholder="Please select"
 						formControlName="shipmentMode">
 					</ng-select>
@@ -488,5 +496,7 @@
 </form>
 
 <container-list-popup></container-list-popup>
-<info-popup [body]="" [title]="'Notification'" [label]="'Ok'">
+<info-popup #comfirmCusAgreement [body]="" [title]="'Notification'" [label]="'Ok'">
+</info-popup>
+<info-popup #comfirmServiceInfo [body]="shipmentNoti" [title]="'Notification'" [label]="'Ok'">
 </info-popup>

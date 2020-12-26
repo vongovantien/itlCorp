@@ -24,6 +24,8 @@ export class JobManagementCreateJobComponent extends AppForm {
     @ViewChild(JobManagementFormCreateComponent) formCreateComponent: JobManagementFormCreateComponent;
     @ViewChild(InfoPopupComponent) infoPoup: InfoPopupComponent;
 
+    isSaveLink: boolean = false;
+
     constructor(
         private spinner: NgxSpinnerService,
         private _toaster: ToastrService,
@@ -44,6 +46,10 @@ export class JobManagementCreateJobComponent extends AppForm {
         };
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
         opsTransaction.salemanId = form.salemansId;
+
+        if (form.shipmentMode === 'Internal' && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
+            this.isSaveLink = true;
+        }
         return opsTransaction;
     }
 
@@ -68,20 +74,44 @@ export class JobManagementCreateJobComponent extends AppForm {
     }
 
     saveJob(model: OpsTransaction) {
-        this._documentRepo.addOPSJob(model).pipe(
-            takeUntil(this.ngUnsubscribe),
-            catchError(this.catchError),
-            finalize(() => { this.spinner.hide(); })
-        ).subscribe(
-            (res: CommonInterface.IResult) => {
-                if (!res.status) {
-                    this._toaster.error(res.message);
-                } else {
-                    this._toaster.success(res.message);
-                    this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+        if (this.isSaveLink) {
+            this._documentRepo.getASTransactionInfo(model.hwbno, model.mblno, model.productService, model.serviceMode)
+                .subscribe((res: any) => {
+                    if (!!res) {
+                        model.serviceNo = res.jobNo === '' ? null : res.jobNo;
+                        model.serviceHblId = res.jobNo === '' ? null : res.id;
+                        this._documentRepo.addOPSJob(model).pipe(
+                            takeUntil(this.ngUnsubscribe),
+                            catchError(this.catchError),
+                            finalize(() => { this.spinner.hide(); })
+                        ).subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (!res.status) {
+                                    this._toaster.error(res.message);
+                                } else {
+                                    this._toaster.success(res.message);
+                                    this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+                                }
+                            }
+                        );
+                    }
+                });
+        } else {
+            this._documentRepo.addOPSJob(model).pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError),
+                finalize(() => { this.spinner.hide(); })
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this._toaster.error(res.message);
+                    } else {
+                        this._toaster.success(res.message);
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+                    }
                 }
-            }
-        );
+            );
+        }
     }
 
     gotoList() {

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { CatalogueRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { CommodityGroup, Customer, PortIndex, User } from '@models';
 import { IShareBussinessState } from '@share-bussiness';
 import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
@@ -12,6 +12,8 @@ import { AppForm } from '@app';
 
 import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -19,7 +21,8 @@ import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/fo
 })
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
+    @ViewChild('comfirmServiceInfo') infoServicePopup: InfoPopupComponent;
     formCreate: FormGroup;
 
     hwbno: AbstractControl;
@@ -53,6 +56,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     users: Observable<User[]>;
     salesmans: Observable<User[]>;
 
+    shipmentNo: string = null;
+    shipmentNoti: string = '';
+
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
         { field: 'nameEn', label: 'Port Name' },
@@ -75,8 +81,10 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
+        protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
-        private _fb: FormBuilder
+        private _fb: FormBuilder,
+        private _toaster: ToastrService
     ) {
         super();
     }
@@ -180,4 +188,28 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
 
     }
 
+    getASInfoToLink() {
+        if (!this.hwbno.value && !this.mblno.value) {
+            this._toaster.warning("HBL No/MBL No is empty. Please complete first!");
+            return;
+        }
+        if (!this.productService.value || !this.serviceMode.value
+            || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
+            this._toaster.warning("Service's not valid to link. Please select another!");
+        } else {
+            this._documentRepo.getASTransactionInfo(this.hwbno.value, this.mblno.value, this.productService.value, this.serviceMode.value)
+                .pipe(catchError(this.catchError))
+                .subscribe((res: any) => {
+                    if (!!res) {
+                        this.shipmentNo = res.jobNo;
+                        if (res.jobNo !== '') {
+                            this.shipmentNoti = "The valid shipment was linked to this job:<br>" + res.jobNo;
+                        } else {
+                            this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
+                        }
+                        this.infoServicePopup.show();
+                    }
+                });
+        }
+    }
 }
