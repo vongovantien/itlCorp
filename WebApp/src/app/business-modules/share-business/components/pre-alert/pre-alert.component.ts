@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router, Params, ActivatedRoute } from '@angular/router';
@@ -6,8 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { AppList } from '@app';
-import { DocumentationRepo, ExportRepo } from '@repositories';
+import { AppForm } from '@app';
+import { DocumentationRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ChargeConstants } from '@constants';
 import { Crystal, EmailContent } from '@models';
@@ -19,19 +19,24 @@ import { getTransactionLocked, TransactionGetDetailAction } from '@share-bussine
 
 
 import { combineLatest, forkJoin, of, from, Observable } from 'rxjs';
-import { catchError, finalize, map, take, switchMap, mergeMap, delay } from 'rxjs/operators';
+import { catchError, finalize, map, take, switchMap, mergeMap, delay, takeUntil } from 'rxjs/operators';
 
 import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-attachment.popup';
+import { environment } from 'src/environments/environment';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
 })
-export class ShareBusinessReAlertComponent extends AppList implements ICrystalReport {
-    form: FormGroup;
+export class ShareBusinessReAlertComponent extends AppForm implements ICrystalReport {
 
     @ViewChild(ShareBusinessAddAttachmentPopupComponent) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
     @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild('formReportPDF', { static: true }) formRp: ElementRef;
 
+    srcReportPDF: any = `${environment.HOST.EXPORT_CRYSTAL}`;
+    valuePDF: any = null;
+
+    form: FormGroup;
     files: IShipmentAttachFile[] = [];
     jobId: string;
     hblId: string;
@@ -45,7 +50,6 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
     subject: AbstractControl;
     body: AbstractControl;
 
-    dataReport: Crystal = null;
     attachedFile: string[] = [];
 
     sendMailButtonName: string = '';
@@ -74,6 +78,10 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
     hblRptName: string = '';
     listSI: string[] = [];
 
+    headers: any[] = [
+        { title: 'Attach File', field: 'name' }
+    ];
+
     constructor(
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
@@ -81,7 +89,6 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
         private _store: Store<IAppState>,
         private _activedRouter: ActivatedRoute,
         private _fb: FormBuilder,
-        private _exportRepo: ExportRepo,
         private _router: Router) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -93,7 +100,8 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
             this._activedRouter.data,
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
-            take(1)
+            take(1),
+            takeUntil(this.ngUnsubscribe)
         ).subscribe(
             (params: Params) => {
                 if (params.jobId) {
@@ -113,12 +121,8 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
                 }
             }
         );
-        this.headers = [
-            { title: 'Attach File', field: 'name' }
-        ];
 
         this.initForm();
-
     }
 
     initForm() {
@@ -339,12 +343,10 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
 
     uploadFileStream(streamUploadFile: Observable<any>[]) {
         let dataStreamCount = 0;
-
         forkJoin([...streamUploadFile])
             .pipe(
                 catchError(err => of(err)),
                 switchMap((res: Crystal[]) => {
-                    this.attachedFile = res.map(i => i.pathReportGenerate);
                     return from(res).pipe(
                         mergeMap((item) => of(item).pipe(delay(1000))),
                     ).pipe(catchError((err, caught) => of(err)))
@@ -352,23 +354,27 @@ export class ShareBusinessReAlertComponent extends AppList implements ICrystalRe
             )
             .subscribe(
                 (res) => {
-                    this._exportRepo.exportCrystalReportPDF(res)
-                        .pipe(catchError((err, caught) => of(err)))
-                        .subscribe(
-                            (res: Crystal) => {
-                                dataStreamCount++;
-                                if (dataStreamCount === streamUploadFile.length) {
-                                    if (res instanceof HttpErrorResponse) {
-                                        return;
-                                    }
-                                    setTimeout(() => {
-                                        this.sendMail()
-                                    }, 1000);
-                                }
-                            },
-                        );
+                    this.valuePDF = JSON.stringify(res);
+                    setTimeout(() => {
+                        this.formRp.nativeElement.submit();
+                        this.attachedFile.push(res.pathReportGenerate);
+                    });
+                    dataStreamCount++;
+
+                    if (dataStreamCount === streamUploadFile.length) {
+                        if (res instanceof HttpErrorResponse && res.status === SystemConstants.HTTP_CODE.NOT_FOUND) {
+                            return;
+                        }
+                        setTimeout(() => {
+                            this.sendMail()
+                        }, 3000);
+                    }
                 },
             );
+    }
+
+    onSubmitUploadFilePDF(e) {
+        return true;
     }
 
     sendMail() {

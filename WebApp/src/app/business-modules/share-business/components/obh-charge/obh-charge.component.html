@@ -21,7 +21,7 @@
             <div class="col-md-8" *ngIf="(isLocked | async) === false">
                 <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                     <div class="m--align-right c-button-actions">
-                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="!allowSaving">
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="allowSaving">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
@@ -29,7 +29,8 @@
                                 <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
                             </div>
                         </div>
-                        <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveOBHSurCharge()" [disabled]="allowSaving">
+                        <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveOBHSurCharge()"
+                            [disabled]="!allowSaving">
                         </app-default-button>
                     </div>
                 </ng-container>
@@ -50,7 +51,7 @@
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async).allowUpdateCharge">
-                                    <div class="table-actions" *ngIf="!allowSaving">
+                                    <div class="table-actions" *ngIf="allowSaving">
                                         <button (click)="duplicate(i,'OBH')"
                                             class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
                                             title="Duplicate"><i class="la la-copy"></i>
@@ -492,7 +493,7 @@
                     </tr>
                     <tr *ngIf="(isLocked | async) === false">
                         <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
-                            <td colspan=1 class="fixed-side" *ngIf="!allowSaving">
+                            <td colspan=1 class="fixed-side" *ngIf="allowSaving">
                                 <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
                                     (click)="addCharge('OBH')">
                                     <i class="fa fa-plus-circle fa-2x"></i>

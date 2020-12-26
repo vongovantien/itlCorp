@@ -160,8 +160,7 @@
                             {{service.serviceType | serviceName}}
                         </div>
                         <div class="col-lg-3">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockDate}">
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockDate}">
                                 <select [(ngModel)]="service.lockDate" class="form-control">
                                     <option [value]="null" disabled>Please select</option>
                                     <option *ngFor="let date of dates" [value]="date">
@@ -172,8 +171,7 @@
                         </div>
 
                         <div class="col-lg-3">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockAfterUnlocking}">
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockAfterUnlocking}">
                                 <select [(ngModel)]="service.lockAfterUnlocking" class="form-control">
                                     <option *ngFor="let date of dates" [value]="date">
                                         {{date}}
