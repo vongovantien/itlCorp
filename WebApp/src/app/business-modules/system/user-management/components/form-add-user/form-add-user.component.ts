@@ -28,6 +28,7 @@ export class FormAddUserComponent extends AppList {
     phone: AbstractControl;
     description: AbstractControl;
     ldap: AbstractControl;
+    personalId: AbstractControl;
     userLevels: UserLevel[] = [];
     headersuslv: CommonInterface.IHeaderTable[];
     //
@@ -95,9 +96,7 @@ export class FormAddUserComponent extends AppList {
             //
             creditLimit: [],
             creditRate: [],
-
-
-
+            personalId: []
         });
 
         this.staffcode = this.formGroup.controls['staffcode'];
@@ -115,6 +114,7 @@ export class FormAddUserComponent extends AppList {
         //
         this.creditLimit = this.formGroup.controls['creditLimit'];
         this.creditRate = this.formGroup.controls['creditRate'];
+        this.personalId = this.formGroup.controls['personalId'];
 
     }
 
