@@ -220,15 +220,15 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     setCurrentActiveItem(item: any) {
         this.displaySelectedStr = '';
         if (this.SelectedDisplayFields.length === 1) {
-            this.displaySelectedStr += item[this.SelectedDisplayFields[0]];
+            this.displaySelectedStr += (!item[this.SelectedDisplayFields[0]] ? '' : item[this.SelectedDisplayFields[0]]);
         } else {
             let dataItem = '';
             this.SelectedDisplayFields.forEach((data: string, index: number) => {
                 if (!!item[data]) {
                     if (index === 0) {
-                        dataItem = item[data];
+                        dataItem = (item[data] === null ? '' : item[data]);
                     } else {
-                        dataItem += ' - ' + item[data];
+                        dataItem += ' - ' + (item[data] === null ? '' : item[data]);
                     }
                 }
                 this.displaySelectedStr = dataItem;

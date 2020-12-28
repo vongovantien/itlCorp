@@ -565,8 +565,8 @@ export class CatalogueRepo {
         );
     }
 
-    getSubListPartner(id: string, partnerType: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetSubListPartnerByID/${id}/${partnerType}`).pipe(
+    getSubListPartner(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetSubListPartnerByID/${id}`).pipe(
             map((data: any) => data)
         );
     }

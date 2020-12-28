@@ -1826,11 +1826,10 @@ namespace eFMS.API.Catalogue.DL.Services
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public List<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType)
+        public List<CatPartnerViewModel> GetSubListPartnerByID(string id)
         {
             if (id == null) return null;
-            var currPartnerId = Get(x => x.Id == id).FirstOrDefault()?.AccountNo;
-            var data = Get(x => x.ParentId == id && x.AccountNo != currPartnerId && x.PartnerType == partnerType);
+            var data = DataContext.Get(x => x.ParentId == id && x.Id != id);
             if (data == null) return null;
             var results = new List<CatPartnerViewModel>();
             foreach (var partner in data)

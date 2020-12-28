@@ -587,13 +587,12 @@ namespace eFMS.API.Catalogue.Controllers
         /// get the list of partners
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="partnerType"></param>
-        /// <returns></returns>
+        /// <returns>List branch sub of partner</returns>
         [HttpGet]
-        [Route("GetSubListPartnerByID/{id}/{partnerType}")]
-        public IActionResult GetSubListPartnerByID(string id, string partnerType)
+        [Route("GetSubListPartnerByID/{id}")]
+        public IActionResult GetSubListPartnerByID(string id)
         {
-            var results = catPartnerService.GetSubListPartnerByID(id.Trim(), partnerType.Trim());
+            var results = catPartnerService.GetSubListPartnerByID(id.Trim());
             return Ok(results);
         }
     }

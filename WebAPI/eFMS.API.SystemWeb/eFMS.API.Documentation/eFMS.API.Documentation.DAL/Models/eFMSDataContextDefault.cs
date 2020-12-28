@@ -2796,8 +2796,14 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ServiceDate).HasColumnType("datetime");
 
+                entity.Property(e => e.ServiceHblId).HasColumnName("ServiceHblID");
+
                 entity.Property(e => e.ServiceMode)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceNo)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ShipmentMode)

@@ -56,15 +56,14 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
-        protected _documenRepo: DocumentationRepo,
+        protected _documentRepo: DocumentationRepo,
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
 
     ) {
-        super(_toastService, _documenRepo, _router, _store);
+        super(_toastService, _documentRepo, _router, _store);
 
         this._progressRef = this._ngProgressService.ref();
     }
@@ -140,7 +139,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     previewShipmentCoverPage() {
-        this._documenRepo.previewShipmentCoverPage(this.jobId)
+        this._documentRepo.previewShipmentCoverPage(this.jobId)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -187,7 +186,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     duplicateJob(body: any) {
-        this._documenRepo.importCSTransaction(body)
+        this._documentRepo.importCSTransaction(body)
             .pipe(
                 catchError(this.catchError),
             )
@@ -210,7 +209,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     saveJob(body: any) {
         this._progressRef.start();
-        this._documenRepo.updateCSTransaction(body)
+        this._documentRepo.updateCSTransaction(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -251,7 +250,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     previewPLsheet(currency: string) {
         const hblid = "00000000-0000-0000-0000-000000000000";
-        this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
+        this._documentRepo.previewSIFPLsheet(this.jobId, hblid, currency)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -274,7 +273,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             .pipe(
                 concatMap((isAllowDelete: boolean) => {
                     if (isAllowDelete) {
-                        return this._documenRepo.checkMasterBillAllowToDelete(this.jobId);
+                        return this._documentRepo.checkMasterBillAllowToDelete(this.jobId);
                     }
                     return of(403);
                 }),
@@ -340,7 +339,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this.confirmLockPopup.hide();
 
         this._progressRef.start();
-        this._documenRepo.LockCsTransaction(this.jobId)
+        this._documentRepo.LockCsTransaction(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
