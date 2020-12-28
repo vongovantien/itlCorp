@@ -832,6 +832,16 @@ namespace eFMS.API.Documentation.DL.Services
             var type = string.Empty;
             switch (serviceName)
             {
+                case "Sea":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.SeaConsolImport;
+                    }
+                    else
+                    {
+                        type = TermData.SeaConsolExport;
+                    }
+                    break;
                 case "Sea FCL":
                     if (serviceMode == "Import")
                     {
