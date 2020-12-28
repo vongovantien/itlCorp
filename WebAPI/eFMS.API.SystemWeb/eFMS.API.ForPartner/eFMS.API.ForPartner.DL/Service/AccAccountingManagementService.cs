@@ -1327,7 +1327,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         /// <summary>
-        /// Type là VOUCHER => eFMS sẽ xóa mã VOUCHER tương ứng
+        /// Type là VOUCHER/PAYMENT => eFMS sẽ xóa mã VOUCHER/PAYMENT tương ứng
         /// Type là CDNOTE/SOA/SETTLEMENT => Reset trạng thái "Rejected" Cho từng phiều tương ứng
         /// </summary>
         /// <param name="model"></param>
@@ -1357,8 +1357,11 @@ namespace eFMS.API.ForPartner.DL.Service
                 case "VOUCHER":
                     result = DeleteVoucher(model.ReferenceID, model.Reason);
                     break;
+                case "PAYMENT":
+                    result = DeletePayment(model.ReferenceID, model.Reason);
+                    break;
                 default:
-                    result = new HandleState((object)"Type không hợp lệ (Các type hợp lệ: SETTLEMENT, SOA, CDNOTE, VOUCHER)");
+                    result = new HandleState((object)"Type không hợp lệ (Các type hợp lệ: SETTLEMENT, SOA, CDNOTE, VOUCHER, PAYMENT)");
                     break;
             }
             return result;
@@ -1467,6 +1470,13 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }
         }
+        
+        private HandleState DeletePayment(string id, string reason)
+        {
+            //Cập nhật sau
+            return new HandleState();
+        }
+
         #endregion --- REJECT & REMOVE DATA ---
 
     }

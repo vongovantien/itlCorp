@@ -390,6 +390,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = cdNote.Note;
+                sync.EmailEInvoice = cdNotePartner?.BillingEmail; //Tạm lấy BillingEmail của partner
                 sync.DataType = "CDNOTE";
 
                 int decimalRound = 0;
@@ -580,6 +581,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = soa.Currency;
                 sync.ExchangeRate0 = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = soa.Note;
+                sync.EmailEInvoice = soaPartner?.BillingEmail; //Tạm lấy BillingEmail của partner
                 sync.DataType = "SOA";
 
                 int decimalRound = 0;

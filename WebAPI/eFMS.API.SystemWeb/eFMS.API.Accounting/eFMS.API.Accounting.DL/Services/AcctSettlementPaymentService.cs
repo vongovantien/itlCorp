@@ -44,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
@@ -71,6 +72,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CatPartner> catPartner,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IContextBase<SysOffice> sysOffice,
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
             IUserBaseService userBase) : base(repository, mapper)
@@ -97,6 +99,7 @@ namespace eFMS.API.Accounting.DL.Services
             currencyExchangeService = currencyExchange;
             userBaseService = userBase;
             sentEmailHistoryRepo = sentEmailHistory;
+            sysOfficeRepo = sysOffice;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -1753,19 +1756,57 @@ namespace eFMS.API.Accounting.DL.Services
             result.Consignee = data.First().Consignee;
             result.Consigner = data.First().Consigner;
             result.ContainerQty = data.First().ContainerQty;
-
-            var hblids = query.Select(s => s.opst.Hblid != null ? s.opst.Hblid : s.cstd.Id).Distinct().ToList();
+            
             decimal? _gw = 0;
             decimal? _nw = 0;
             int? _psc = 0;
             decimal? _cbm = 0;
+
+            //Sum _gw, _nw, _psc, _cbm theo Housebill
+            /*var hblids = query.Select(s => s.opst.Hblid != null ? s.opst.Hblid : s.cstd.Id).Distinct().ToList();
             foreach (var hblid in hblids)
             {
-                _gw += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumGrossWeight) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.GrossWeight);
-                _nw += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumNetWeight) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.NetWeight);
-                _psc += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumPackages) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.PackageQty);
-                _cbm += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumCbm) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.Cbm);
+                var opsTransDetail = opsTrans.Where(x => x.Hblid == hblid).FirstOrDefault();
+                if (opsTransDetail != null)
+                {
+                    _gw += opsTransDetail.SumGrossWeight;
+                    _nw += opsTransDetail.SumNetWeight;
+                    _psc += opsTransDetail.SumPackages;
+                    _cbm += opsTransDetail.SumCbm;
+                }
+                else
+                {
+                    var csTransDetail = csTransDe.Where(x => x.Id == hblid).FirstOrDefault();
+                    _gw += csTransDetail?.GrossWeight;
+                    _nw += csTransDetail?.NetWeight;
+                    _psc += csTransDetail?.PackageQty;
+                    _cbm += csTransDetail?.Cbm;
+                }
+            }*/
+
+            //CR: Sum _gw, _nw, _psc, _cbm theo Masterbill [28/12/2020 - Alex]
+            //Settlement có nhiều Job thì sum all các job đó
+            var mblids = query.Select(s => s.opst.Id != null ? s.opst.Id : s.cst.Id).Distinct().ToList();
+            foreach (var mblid in mblids)
+            {
+                var _opsTrans = opsTrans.Where(x => x.Id == mblid).FirstOrDefault();
+                if (_opsTrans != null)
+                {
+                    _gw += _opsTrans.SumGrossWeight;
+                    _nw += _opsTrans.SumNetWeight;
+                    _psc += _opsTrans.SumPackages;
+                    _cbm += _opsTrans.SumCbm;
+                }
+                else
+                {
+                    var _csTrans = csTrans.Where(x => x.Id == mblid).FirstOrDefault();
+                    _gw += _csTrans?.GrossWeight;
+                    _nw += _csTrans?.NetWeight;
+                    _psc += _csTrans?.PackageQty;
+                    _cbm += _csTrans?.Cbm;
+                }
             }
+
             result.GW = _gw;
             result.NW = _nw;
             result.CustomsId = !string.IsNullOrEmpty(data.First().CustomsId) ? data.First().CustomsId : GetCustomNoOldOfShipment(data.First().JobId);
@@ -4357,6 +4398,9 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
+            var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4364,7 +4408,11 @@ namespace eFMS.API.Accounting.DL.Services
                 Department = _department,
                 SettlementNo = settlementPayment.SettlementNo,
                 Manager = _manager,
-                Accountant = _accountant
+                Accountant = _accountant,
+                IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
+                IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
+                IsBODApproved = _settlementApprove?.BuheadAprDate != null,
+                ContactOffice = _contactOffice
             };
             return infoSettlement;
         }
@@ -4471,7 +4519,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var listAdvance = new List<InfoAdvanceExport>();
             // Gom surcharge theo AdvanceNo & HBLID
-            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList();
+            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList().Where(x => x.Key.Hblid == hblId);
             foreach (var item in groupAdvanceNoAndHblID)
             {
                 //Advance Payment có Status Approve là Done
