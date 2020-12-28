@@ -523,7 +523,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private IQueryable<CatChargeModel> QueryCriteria(CatChargeCriteria criteria)
         {
-            Expression<Func<CatChargeModel, bool>> query = null;
+            Expression<Func<CatCharge, bool>> query = null;
             if (criteria.All == null)
             {
                 query = x => (x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -542,38 +542,40 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.ServiceTypeId ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase))
                                    && (x.Active == criteria.Active || criteria.Active == null);
             }
-            var list = Get(query);
+            var list = DataContext.Get(query);
             var currencies = currencyService.Get();
             var units = catUnitService.Get();
-            list = list.Join(currencies, x => x.CurrencyId, y => y.Id, (x, y) => new { x, y.CurrencyName })
-                        .Join(units, x => x.x.UnitId, y => y.Id, (x, y) => new CatChargeModel
-                        {
-                            Id = x.x.Id,
-                            Code = x.x.Code,
-                            ChargeNameVn = x.x.ChargeNameVn,
-                            ChargeNameEn = x.x.ChargeNameEn,
-                            ServiceTypeId = x.x.ServiceTypeId,
-                            Type = x.x.Type,
-                            CurrencyId = x.x.CurrencyId,
-                            UnitPrice = x.x.UnitPrice,
-                            UnitId = x.x.UnitId,
-                            Vatrate = x.x.Vatrate,
-                            IncludedVat = x.x.IncludedVat,
-                            UserCreated = x.x.UserCreated,
-                            DatetimeCreated = x.x.DatetimeCreated,
-                            UserModified = x.x.UserModified,
-                            DatetimeModified = x.x.DatetimeModified,
-                            Active = x.x.Active,
-                            InactiveOn = x.x.InactiveOn,
-                            currency = y.UnitNameEn,
-                            unit = y.UnitNameEn,
-                            OfficeId =x.x.OfficeId,
-                            GroupId = x.x.GroupId,
-                            CompanyId = x.x.CompanyId,
-                            DepartmentId = x.x.DepartmentId,
-                            ChargeGroup = x.x.ChargeGroup
-                        });
-            return list?.OrderByDescending(x=>x.DatetimeModified);
+            var catChargeLst = (from charge in list
+                                join curr in currencies on charge.CurrencyId equals curr.Id
+                                join unit in units on charge.UnitId equals unit.Id
+                                select new CatChargeModel
+                                {
+                                    Id = charge.Id,
+                                    Code = charge.Code,
+                                    ChargeNameVn = charge.ChargeNameVn,
+                                    ChargeNameEn = charge.ChargeNameEn,
+                                    ServiceTypeId = charge.ServiceTypeId,
+                                    Type = charge.Type,
+                                    CurrencyId = charge.CurrencyId,
+                                    UnitPrice = charge.UnitPrice,
+                                    UnitId = charge.UnitId,
+                                    Vatrate = charge.Vatrate,
+                                    IncludedVat = charge.IncludedVat,
+                                    UserCreated = charge.UserCreated,
+                                    DatetimeCreated = charge.DatetimeCreated,
+                                    UserModified = charge.UserModified,
+                                    DatetimeModified = charge.DatetimeModified,
+                                    Active = charge.Active,
+                                    InactiveOn = charge.InactiveOn,
+                                    GroupId = charge.GroupId,
+                                    DepartmentId = charge.DepartmentId,
+                                    OfficeId = charge.OfficeId,
+                                    CompanyId = charge.CompanyId,
+                                    ChargeGroup = charge.ChargeGroup,
+                                    currency = unit.UnitNameEn,
+                                    unit = unit.UnitNameEn
+                                })?.OrderBy(x => x.DatetimeModified).AsQueryable();
+            return catChargeLst;
 
         }
 
