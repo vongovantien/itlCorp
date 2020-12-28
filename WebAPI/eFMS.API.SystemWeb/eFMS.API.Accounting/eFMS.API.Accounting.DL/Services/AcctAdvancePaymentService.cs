@@ -44,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
 
@@ -66,6 +67,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IContextBase<SysOffice> sysOffice,
             ICurrencyExchangeService currencyExchange,
             IStringLocalizer<LanguageSub> localizer,
             IUserBaseService userBase) : base(repository, mapper)
@@ -90,6 +92,7 @@ namespace eFMS.API.Accounting.DL.Services
             userBaseService = userBase;
             stringLocalizer = localizer;
             sentEmailHistoryRepo = sentEmailHistory;
+            sysOfficeRepo = sysOffice;
         }
 
         #region --- LIST & PAGING ---
@@ -3108,6 +3111,9 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
+            var office = sysOfficeRepo.Get(x => x.Id == advancePayment.OfficeId).FirstOrDefault();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+
             var infoAdvance = new InfoAdvanceExport
             {
                 Requester = _requester,
@@ -3119,7 +3125,11 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvanceReason = advancePayment.AdvanceNote,
                 DealinePayment = advancePayment.DeadlinePayment,
                 Manager = _manager,
-                Accountant = _accountant
+                Accountant = _accountant,
+                IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
+                IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
+                IsBODApproved = _advanceApprove?.BuheadAprDate != null,
+                ContactOffice = _contactOffice
             };
             return infoAdvance;
         }

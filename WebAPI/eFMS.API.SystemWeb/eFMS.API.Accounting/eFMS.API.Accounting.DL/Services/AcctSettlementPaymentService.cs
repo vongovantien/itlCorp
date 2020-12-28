@@ -44,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
@@ -71,6 +72,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CatPartner> catPartner,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IContextBase<SysOffice> sysOffice,
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
             IUserBaseService userBase) : base(repository, mapper)
@@ -97,6 +99,7 @@ namespace eFMS.API.Accounting.DL.Services
             currencyExchangeService = currencyExchange;
             userBaseService = userBase;
             sentEmailHistoryRepo = sentEmailHistory;
+            sysOfficeRepo = sysOffice;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -4395,6 +4398,9 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
+            var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4402,7 +4408,11 @@ namespace eFMS.API.Accounting.DL.Services
                 Department = _department,
                 SettlementNo = settlementPayment.SettlementNo,
                 Manager = _manager,
-                Accountant = _accountant
+                Accountant = _accountant,
+                IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
+                IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
+                IsBODApproved = _settlementApprove?.BuheadAprDate != null,
+                ContactOffice = _contactOffice
             };
             return infoSettlement;
         }
@@ -4509,7 +4519,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var listAdvance = new List<InfoAdvanceExport>();
             // Gom surcharge theo AdvanceNo & HBLID
-            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList();
+            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList().Where(x => x.Key.Hblid == hblId);
             foreach (var item in groupAdvanceNoAndHblID)
             {
                 //Advance Payment có Status Approve là Done
