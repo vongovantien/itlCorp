@@ -804,14 +804,13 @@ namespace eFMS.API.Documentation.DL.Services
         /// Get air/sea information when link from ops
         /// </summary>
         /// <param name="hblNo">HBL No's ops</param>
-        /// <param name="mblNo">MBL No's ops</param>
         /// <param name="serviceName">product service</param>
         /// <param name="serviceMode">service mode</param>
         /// <returns></returns>
-        public object GetLinkASInfomation(string hblNo, string mblNo, string serviceName, string serviceMode)
+        public object GetLinkASInfomation(string hblNo, string serviceName, string serviceMode)
         {
-            var jobNo = string.Empty;
-            var id = string.Empty;
+            String jobNo = null;
+            String id = null;
             var shipmentType = GetServiceType(serviceName, serviceMode);
             var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo).FirstOrDefault();
             if (houseDetail != null)
@@ -821,19 +820,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     id = houseDetail.Id.ToString();
                 }
-                else
-                {
-                    jobNo = string.Empty;
-                }
             }
-            else
-            {
-                var shipmentDetail = string.IsNullOrEmpty(mblNo) ? null : transactionRepository.Get(x => x.Mawb == mblNo && x.TransactionType == shipmentType).FirstOrDefault();
-                if (shipmentDetail != null)
-                {
-                    jobNo = shipmentDetail.JobNo;
-                }
-            }
+
             return new { jobNo, id };
         }
 

@@ -50,14 +50,13 @@ export class CommercialBranchSubListComponent extends AppList {
     ];
   }
 
-  getSubListPartner(partnerId: string, partnerType: string) {
+  getSubListPartner(partnerId: string) {
     this.isLoading = true;
-    this._catalogueRepo.getSubListPartner(partnerId, partnerType)
+    this._catalogueRepo.getSubListPartner(partnerId)
       .pipe(catchError(this.catchError), finalize(() => {
         this.isLoading = false;
       })).subscribe(
         (res: Partner[]) => {
-          this.partnerType = partnerType;
           this.partners = res || [];
         }
       );
@@ -147,7 +146,7 @@ export class CommercialBranchSubListComponent extends AppList {
               .subscribe(
                 (res: CommonInterface.IResult) => {
                   if (res.status) {
-                    this.getSubListPartner(this.parentId, this.partnerType);
+                    this.getSubListPartner(this.parentId);
                     this._toastService.success(res.message);
                   } else {
                     this._toastService.error(res.message);

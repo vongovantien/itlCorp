@@ -156,6 +156,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             shipmentType: this.opsTransaction.shipmentType,
         });
 
+        this.shipmentNo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
 
     }
@@ -291,8 +292,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     getASInfoToLink() {
-        if (!this.hwbno.value && !this.mblno.value) {
-            this._toaster.warning("HBL No/MBL No is empty. Please complete first!");
+        if (!this.hwbno.value) {
+            this._toaster.warning("HBL No is empty. Please complete first!");
             return;
         }
 
@@ -300,30 +301,19 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
             this._toaster.warning("Service's not valid to link. Please select another!");
         } else {
-            console.log('Transaction', this.opsTransaction)
-            if (this.hwbno.value !== this.opsTransaction.hwbno || this.productService.value !== this.opsTransaction.productService
-                || this.serviceMode.value !== this.opsTransaction.serviceMode) {
-                this._documentRepo.getASTransactionInfo(this.hwbno.value, this.mblno.value, this.productService.value, this.serviceMode.value)
-                    .pipe(catchError(this.catchError))
-                    .subscribe((res: any) => {
-                        if (!!res) {
-                            this.shipmentNo = res.jobNo;
-                            if (res.jobNo !== '') {
-                                this.shipmentNoti = "The valid shipment was linked to this job:<br>" + res.jobNo;
-                            } else {
-                                this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
-                            }
-                            this.infoServicePopup.show();
+            this._documentRepo.getASTransactionInfo(this.hwbno.value, this.productService.value, this.serviceMode.value)
+                .pipe(catchError(this.catchError))
+                .subscribe((res: any) => {
+                    if (!!res) {
+                        this.shipmentNo = res.jobNo;
+                        if (!!res.jobNo) {
+                            this.shipmentNoti = "The valid shipment was linked to this job:<br>" + res.jobNo;
+                        } else {
+                            this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
                         }
-                    });
-            } else {
-                if (!this.opsTransaction.serviceNo) {
-                    this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
-                } else {
-                    this.shipmentNoti = "The valid shipment was linked to this job:<br>" + this.opsTransaction.serviceNo;
-                }
-                this.infoServicePopup.show();
-            }
+                        this.infoServicePopup.show();
+                    }
+                });
         }
     }
 }

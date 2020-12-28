@@ -32,6 +32,6 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckDeletePermission(Guid id);
         HandleState LockCsTransaction(Guid jobId);
         Crystal PreviewShipmentCoverPage(Guid id);
-        object GetLinkASInfomation(string hblNo, string mblNo, string serviceName, string serviceMode);
+        object GetLinkASInfomation(string hblNo, string serviceName, string serviceMode);
     }
 }

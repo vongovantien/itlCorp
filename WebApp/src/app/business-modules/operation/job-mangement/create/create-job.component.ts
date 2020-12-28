@@ -47,7 +47,7 @@ export class JobManagementCreateJobComponent extends AppForm {
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
         opsTransaction.salemanId = form.salemansId;
 
-        if (form.shipmentMode === 'Internal' && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
+        if (!!this.formCreateComponent.shipmentNo && form.shipmentMode === 'Internal' && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
         }
         return opsTransaction;
@@ -75,11 +75,11 @@ export class JobManagementCreateJobComponent extends AppForm {
 
     saveJob(model: OpsTransaction) {
         if (this.isSaveLink) {
-            this._documentRepo.getASTransactionInfo(model.hwbno, model.mblno, model.productService, model.serviceMode)
+            this._documentRepo.getASTransactionInfo(model.hwbno, model.productService, model.serviceMode)
                 .subscribe((res: any) => {
                     if (!!res) {
-                        model.serviceNo = res.jobNo === '' ? null : res.jobNo;
-                        model.serviceHblId = res.jobNo === '' ? null : res.id;
+                        model.serviceNo = res.jobNo;
+                        model.serviceHblId = res.id;
                         this._documentRepo.addOPSJob(model).pipe(
                             takeUntil(this.ngUnsubscribe),
                             catchError(this.catchError),
