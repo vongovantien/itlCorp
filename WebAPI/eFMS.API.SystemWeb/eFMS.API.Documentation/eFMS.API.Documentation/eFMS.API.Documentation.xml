@@ -580,6 +580,15 @@
             <param name="id">id that want to retrieve transaction</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetLinkASInfomation(System.String,System.String,System.String)">
+            <summary>
+            Get Air/Sea job no and hblId
+            </summary>
+            <param name="hblNo">hbl no's ops</param>
+            <param name="serviceName">product service</param>
+            <param name="serviceMode">service mode</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Post(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
             <summary>
             add new transaction

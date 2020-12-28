@@ -54,6 +54,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     hblid: string = '';
 
     deleteMessage: string = '';
+    isSaveLink: boolean = false;
 
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
@@ -270,22 +271,52 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.packageTypeId = form.packageTypeId;
         this.opsTransaction.commodityGroupId = form.commodityGroupId;
         this.opsTransaction.shipmentType = form.shipmentType;
+
+        if (this.editForm.shipmentNo !== this.opsTransaction.serviceNo && form.shipmentMode === 'Internal' && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
+            this.isSaveLink = true;
+        } else {
+            this.opsTransaction.serviceNo = null;
+            this.opsTransaction.serviceHblId = null;
+        }
     }
 
     updateShipment() {
         this._spinner.show();
-        this._documentRepo.updateShipment(this.opsTransaction)
-            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                        this.getShipmentDetails(this.opsTransaction.id);
-                    } else {
-                        this._toastService.warning(res.message);
+        if (this.isSaveLink) {
+            this._documentRepo.getASTransactionInfo(this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
+                .pipe(catchError(this.catchError))
+                .subscribe((res: any) => {
+                    if (!!res) {
+                        this.opsTransaction.serviceNo = res.jobNo;
+                        this.opsTransaction.serviceHblId = res.id;
+                        this._documentRepo.updateShipment(this.opsTransaction)
+                            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                            .subscribe(
+                                (res: CommonInterface.IResult) => {
+                                    if (res.status) {
+                                        this._toastService.success(res.message);
+                                        this.getShipmentDetails(this.opsTransaction.id);
+                                    } else {
+                                        this._toastService.warning(res.message);
+                                    }
+                                }
+                            );
                     }
-                }
-            );
+                });
+        } else {
+            this._documentRepo.updateShipment(this.opsTransaction)
+                .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.getShipmentDetails(this.opsTransaction.id);
+                        } else {
+                            this._toastService.warning(res.message);
+                        }
+                    }
+                );
+        }
     }
 
     insertDuplicateJob() {

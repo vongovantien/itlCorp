@@ -102,7 +102,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserCreated = currentUser.UserID;
             model.DatetimeModified = model.DatetimeCreated;
             model.UserModified = model.UserCreated;
-            model.CurrentStatus = "InSchedule";
+            model.CurrentStatus = TermData.InSchedule;
             model.GroupId = currentUser.GroupId;
             model.DepartmentId = currentUser.DepartmentId;
             model.OfficeId = currentUser.OfficeID;
@@ -831,17 +831,18 @@ namespace eFMS.API.Documentation.DL.Services
             customDeclarationRepository.SubmitChanges();
             return result;
         }
+
+        /// <summary>
+        /// Check if hbl+mbl no has been existed
+        /// </summary>
+        /// <param name="model">OpsTransactionModel</param>
+        /// <returns></returns>
         public string CheckExist(OpsTransactionModel model)
         {
-            var existedHBL = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.CurrentStatus != TermData.Canceled);
-            var existedMBL = DataContext.Any(x => x.Id != model.Id && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
-            if (existedHBL)
+            var existedMblHbl = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+            if (existedMblHbl)
             {
-                return stringLocalizer[DocumentationLanguageSub.MSG_HBNO_EXISTED, model.Hwbno].Value;
-            }
-            if (existedMBL)
-            {
-                return stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mblno].Value;
+                return stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_HBNO_EXISTED].Value;
             }
             return null;
         }

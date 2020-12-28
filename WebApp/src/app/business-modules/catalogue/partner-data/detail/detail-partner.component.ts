@@ -175,7 +175,7 @@ export class PartnerDetailComponent extends AppList {
                             this.formPartnerComponent.isDisabledInternalCode = true;
                         }
                         if (!!this.partner.partnerType && !this.isAddSubPartner) {
-                            this.getSubListPartner(this.partner.id, this.partner.partnerType);
+                            this.getSubListPartner(this.partner.id);
                         }
                         this.formPartnerComponent.activePartner = this.partner.active;
                     }
@@ -574,16 +574,16 @@ export class PartnerDetailComponent extends AppList {
             );
     }
 
-    getSubListPartner(partnerId: string, partnerType: string) {
+    getSubListPartner(partnerId: string) {
         this.isLoading = true;
-        this._catalogueRepo.getSubListPartner(partnerId, partnerType)
+        this._catalogueRepo.getSubListPartner(partnerId)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             })).subscribe(
                 (res: Partner[]) => {
                     this.listSubPartner.partners = res || [];
                     this.listSubPartner.parentId = partnerId;
-                    this.listSubPartner.partnerType = partnerType;
+                    this.listSubPartner.partnerType = this.partner.partnerType;
                 }
             );
     }

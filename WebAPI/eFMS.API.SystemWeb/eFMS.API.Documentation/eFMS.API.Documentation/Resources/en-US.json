@@ -15,6 +15,7 @@
   "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
   "MSG_MAWB_EXISTED": "MBL has existed",
   "MSG_HBNO_EXISTED": "HBL has existed",
+  "MSG_MBLNO_HBNO_EXISTED": "MBL No and HBL No has existed",
   "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted",
   "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?",
   "MSG_CLEARANCE_CONVERT_TO_JOB": "Clearance convert to a job successfully!!!",

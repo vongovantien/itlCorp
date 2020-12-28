@@ -72,7 +72,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     if (!this.isAddSubPartner) {
                         this.contractList.partnerId = this.partnerId;
                         this.contractList.getListContract(this.partnerId);
-                        this.partnerList.getSubListPartner(this.partnerId, this.type);
+                        this.partnerList.getSubListPartner(this.partnerId);
                     }
                 } else {
                     this.gotoList();
@@ -158,8 +158,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             );
     }
 
-    getSubListPartner(partnerId: string, partnerType: string) {
-        this._catalogueRepo.getSubListPartner(partnerId, partnerType)
+    getSubListPartner(partnerId: string) {
+        this._catalogueRepo.getSubListPartner(partnerId)
             .pipe(catchError(this.catchError), finalize(() =>
                 this.partnerList.isLoading = false
             )).subscribe(
