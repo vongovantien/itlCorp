@@ -40,7 +40,8 @@ export class UserAddNewComponent extends AppPage {
                     tel: this.formAdd.phone.value,
                     email: this.formAdd.email.value,
                     title: this.formAdd.title.value,
-                    staffCode: this.formAdd.staffcode.value
+                    staffCode: this.formAdd.staffcode.value,
+                    personalId: this.formAdd.personalId.value
                 },
                 username: this.formAdd.username.value,
                 userType: this.formAdd.usertype.value.value,

@@ -90,6 +90,7 @@ export class UserDetailsComponent extends AppPage {
                     bankAccountNo: this.userDetail.sysEmployeeModel.bankAccountNo,
                     bankName: this.userDetail.sysEmployeeModel.bankName,
                     photo: this.userDetail.avatar,
+                    personalId: this.formAdd.personalId.value
 
                 },
                 username: this.formAdd.username.value,
@@ -143,6 +144,7 @@ export class UserDetailsComponent extends AppPage {
                             this.formAdd.title.setValue(res.data.sysEmployeeModel.title);
                             this.formAdd.email.setValue(res.data.sysEmployeeModel.email);
                             this.formAdd.phone.setValue(res.data.sysEmployeeModel.tel);
+                            this.formAdd.personalId.setValue(res.data.sysEmployeeModel.personalId);
                         }
 
                         this.formAdd.workingg.setValue(this.formAdd.working.filter(i => i.value === res.data.workingStatus)[0]);
