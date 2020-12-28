@@ -135,7 +135,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             displayFields: [
                 { field: 'chargeNameEn', label: 'Name' },
                 { field: 'unitPrice', label: 'Unit Price' },
-                { field: 'unitId', label: 'Unit' },
+                { field: 'unit', label: 'Unit' },
                 { field: 'code', label: 'Code' },
             ]
         }, { selectedDisplayFields: ['chargeNameEn'], });
