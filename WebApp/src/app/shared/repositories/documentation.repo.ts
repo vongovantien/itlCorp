@@ -1022,14 +1022,14 @@ export class DocumentationRepo {
     }
 
     checkExistSIExport(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction/CheckExistSIExport/${id}`).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction/CheckExistSIExport`, { jobId: id }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     checkExistManifestExport(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsManifest/CheckExistManifestExport/${id}`).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsManifest/CheckExistManifestExport`, { jobId: id }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

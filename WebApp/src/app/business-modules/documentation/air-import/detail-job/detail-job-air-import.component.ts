@@ -36,7 +36,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
@@ -230,7 +230,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         }
     }
 
-    previewPLsheet(currency: string,) {
+    previewPLsheet(currency: string, ) {
         const hblid = "00000000-0000-0000-0000-000000000000";
         this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
             .pipe(catchError(this.catchError))

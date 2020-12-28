@@ -50,6 +50,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
         private readonly IContextBase<AccAccountReceivable> accAccountReceivableRepository;
         private readonly IContextBase<SysUserLevel> userlevelRepository;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
 
@@ -72,6 +73,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IContextBase<SysOffice> sysOffice,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CatContract> catContractRepo,
             IContextBase<SysSettingFlow> sysSettingFlowRepo,
@@ -108,6 +110,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserNotifyRepository = sysUserNotifyRepo;
             accAccountReceivableRepository = accAccountRepo;
             userlevelRepository = userLevelRepo;
+            sysOfficeRepo = sysOffice;
         }
 
         #region --- LIST & PAGING ---
@@ -1188,17 +1191,17 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvance.AdvDpManagerStickDeny = null;
             acctAdvance.AdvDpManagerStickApp = null;
             acctAdvance.AdvDpManagerName = managerName;
-            acctAdvance.AdvDpSignDate = null;
+            acctAdvance.AdvDpSignDate = approveAdvance?.ManagerAprDate;
             acctAdvance.AdvAcsDpManagerID = "N/A";
             acctAdvance.AdvAcsDpManagerStickDeny = null;
             acctAdvance.AdvAcsDpManagerStickApp = null;
             acctAdvance.AdvAcsDpManagerName = accountantName;
-            acctAdvance.AdvAcsSignDate = null;
+            acctAdvance.AdvAcsSignDate = approveAdvance?.AccountantAprDate;
             acctAdvance.AdvBODID = "N/A";
             acctAdvance.AdvBODStickDeny = null;
             acctAdvance.AdvBODStickApp = null;
             acctAdvance.AdvBODName = "N/A";
-            acctAdvance.AdvBODSignDate = null;
+            acctAdvance.AdvBODSignDate = approveAdvance?.BuheadAprDate;
             acctAdvance.AdvCashier = "N/A";
             acctAdvance.AdvCashierName = "N/A";
             acctAdvance.CashedDate = null;
@@ -3390,6 +3393,9 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
+            var office = sysOfficeRepo.Get(x => x.Id == advancePayment.OfficeId).FirstOrDefault();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+
             var infoAdvance = new InfoAdvanceExport
             {
                 Requester = _requester,
@@ -3401,7 +3407,11 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvanceReason = advancePayment.AdvanceNote,
                 DealinePayment = advancePayment.DeadlinePayment,
                 Manager = _manager,
-                Accountant = _accountant
+                Accountant = _accountant,
+                IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
+                IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
+                IsBODApproved = _advanceApprove?.BuheadAprDate != null,
+                ContactOffice = _contactOffice
             };
             return infoAdvance;
         }

@@ -109,7 +109,7 @@
 
 
 <info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Create Job'"></info-popup>
+    [title]="'Cannot Update Job'"></info-popup>
 
 <confirm-popup #deleteConfirmTemplate [body]="'You you sure you want to delete this Job'" [title]="'Alert'"
     [labelConfirm]="'Yes'" (onSubmit)="onDeleteJob()"></confirm-popup>
@@ -132,6 +132,6 @@
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
 
-<info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+<info-popup #notAllowDelete [body]="'You are not allowed to delete this job'"></info-popup>
 
 <permission-403-popup></permission-403-popup>
