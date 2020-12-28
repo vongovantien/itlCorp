@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { NgForm, AbstractControl } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -8,7 +8,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, SubHeaderComponent } from '@common';
 import { OpsTransaction, CsTransactionDetail, CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
 import * as fromShareBussiness from './../../share-business/store';
@@ -17,10 +17,10 @@ import { OPSTransactionGetDetailSuccessAction } from '../store';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { AppForm } from 'src/app/app.form';
 import { ICanComponentDeactivate } from '@core';
-import { Observable, of } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
 import { RoutingConstants } from '@constants';
 
@@ -36,12 +36,14 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('confirmDelete') confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild('confirmLockShipment') confirmLockShipmentPopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessSellingChargeComponent) sellingChargeComponent: ShareBussinessSellingChargeComponent;
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
 
     @ViewChild(JobManagementFormEditComponent) editForm: JobManagementFormEditComponent;
     @ViewChild('addOpsForm') formOps: NgForm;
     @ViewChild('notAllowUpdate') infoPoup: InfoPopupComponent;
+    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
 
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];
@@ -57,6 +59,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
     selectedTabSurcharge: string = 'BUY';
+    action: any = {};
 
     constructor(
         private _spinner: NgxSpinnerService,
@@ -67,7 +70,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         private _router: Router,
         private _toastService: ToastrService,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
-        protected _actionStoreSubject: ActionsSubject
+        protected _actionStoreSubject: ActionsSubject,
+        protected _cd: ChangeDetectorRef,
     ) {
         super();
 
@@ -75,16 +79,23 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     ngOnInit() {
-
-        this.route.params
-            .pipe(takeUntil(this.ngUnsubscribe))
+        combineLatest([
+            this.route.params,
+            this.route.queryParams
+        ]).pipe(
+            map(([params, qParams]) => ({ ...params, ...qParams }))
+        )
             .subscribe((params: any) => {
-                this.tab = 'job-edit';
+                this.tab = !!params.tab ? params.tab : 'job-edit';
                 this.tabCharge = 'buying';
-                if (!!params && !!params.id) {
+                if (!!params) {
                     this.jobId = params.id;
+                    if (!!params.action) {
+                        this.isDuplicate = params.action.toUpperCase() === 'COPY';
+                    }
                     this.getShipmentDetails(params.id);
                 }
+
             });
 
         this._actionStoreSubject
@@ -131,11 +142,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         }
         containerDescription = containerDescription.replace(/;$/, "");
 
-        this.editForm.formEdit.controls['sumCbm'].setValue(sumCbm);
-        this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages);
-        this.editForm.formEdit.controls['sumContainers'].setValue(sumContainers);
-        this.editForm.formEdit.controls['sumNetWeight'].setValue(sumNetWeight);
-        this.editForm.formEdit.controls['sumGrossWeight'].setValue(sumGrossWeight);
+        this.editForm.formEdit.controls['sumCbm'].setValue(sumCbm === 0 ? null : sumCbm);
+        this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages === 0 ? null : sumPackages);
+        this.editForm.formEdit.controls['sumContainers'].setValue(sumContainers === 0 ? null : sumContainers);
+        this.editForm.formEdit.controls['sumNetWeight'].setValue(sumNetWeight === 0 ? null : sumNetWeight);
+        this.editForm.formEdit.controls['sumGrossWeight'].setValue(sumGrossWeight === 0 ? null : sumGrossWeight);
         this.editForm.formEdit.controls['containerDescription'].setValue(containerDescription);
     }
 
@@ -202,7 +213,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         }
 
         this.onSubmitData();
-        this.updateShipment();
+        if (this.isDuplicate) {
+            this.insertDuplicateJob();
+        } else {
+            this.updateShipment();
+        }
     }
 
     checkValidateForm() {
@@ -213,11 +228,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         let valid: boolean = true;
         if (!this.editForm.formEdit.valid
             || (!!this.editForm.serviceDate.value && !this.editForm.serviceDate.value.startDate)
-            || this.editForm.sumGrossWeight.value === 0
-            || this.editForm.sumNetWeight.value === 0
-            || this.editForm.sumCbm.value === 0
-            || this.editForm.sumPackages.value === 0
-            || this.editForm.sumContainers.value === 0
             || (!!this.editForm.finishDate.value.startDate && this.editForm.serviceDate.value.startDate > this.editForm.finishDate.value.startDate)
         ) {
             valid = false;
@@ -248,11 +258,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.clearanceLocation = form.clearanceLocation;
         this.opsTransaction.shipper = form.shipper;
         this.opsTransaction.consignee = form.consignee;
-        this.opsTransaction.sumGrossWeight = form.sumGrossWeight;
-        this.opsTransaction.sumNetWeight = form.sumNetWeight;
-        this.opsTransaction.sumPackages = form.sumPackages;
-        this.opsTransaction.sumContainers = form.sumContainers;
-        this.opsTransaction.sumCbm = form.sumCbm;
+        this.opsTransaction.sumGrossWeight = form.sumGrossWeight === 0 ? null : form.sumGrossWeight;
+        this.opsTransaction.sumNetWeight = form.sumNetWeight === 0 ? null : form.sumNetWeight;
+        this.opsTransaction.sumPackages = form.sumPackages === 0 ? null : form.sumPackages;
+        this.opsTransaction.sumContainers = form.sumContainers === 0 ? null : form.sumContainers;
+        this.opsTransaction.sumCbm = form.sumCbm === 0 ? null : form.sumCbm;
         this.opsTransaction.containerDescription = form.containerDescription;
 
         this.opsTransaction.shipmentMode = form.shipmentMode;
@@ -307,6 +317,26 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     }
                 );
         }
+    }
+
+    insertDuplicateJob() {
+        this._spinner.show();
+        this._documentRepo.insertDuplicateShipment(this.opsTransaction)
+            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res) {
+                        this._toastService.success(res.message);
+                        this.jobId = res.data.id;
+                        this.isDuplicate = true;
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
+                            queryParams: Object.assign({}, { tab: 'job-edit' })
+                        });
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                }
+            );
     }
 
     lockShipment() {
@@ -368,7 +398,13 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.opsTransaction.hblid }));
 
+                            this.editForm.isJobCopy = this.isDuplicate;
                             this.editForm.setFormValue();
+                        }
+
+                        if (this.isDuplicate) {
+                            this.editForm.getBillingOpsId();
+                            this.headerComponent.resetBreadcrumb("Create Job");
                         }
                     }
                 },
@@ -452,7 +488,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             return of(true);
         }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
-        if (this.isCancelFormPopupSuccess) {
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
         if (isEdited && !this.isCancelFormPopupSuccess) {
@@ -462,4 +498,16 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         return of(!isEdited);
     }
 
+    confirmDuplicate() {
+        this.confirmDuplicatePopup.show();
+    }
+
+    onSubmitDuplicateConfirm() {
+        this.action = { action: 'copy' };
+        this.editForm.isSubmitted = false;
+        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
+            queryParams: Object.assign({}, { tab: 'job-edit' }, this.action)
+        });
+        this.confirmDuplicatePopup.hide();
+    }
 }

@@ -51,7 +51,7 @@ namespace eFMS.API.System.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<CatDepartment>(entity =>
             {
@@ -407,6 +407,11 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PersonalId)
+                    .HasColumnName("PersonalID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Photo).HasMaxLength(500);
 

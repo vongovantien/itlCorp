@@ -117,67 +117,73 @@ namespace eFMS.API.System.DL.Services
             permission.SysPermissionSampleGenerals = userPermissionGeneralService.GetBy(permission.Id);
             permission.SysPermissionSampleSpecials = userPermissionSpecialService.GetBy(permission.Id);
 
-            permission.UserName = userRepository.Get(x=>x.Id == permission.UserId).Select(t=>t.Username).FirstOrDefault();
+            permission.UserName = userRepository.Get(x => x.Id == permission.UserId).Select(t => t.Username).FirstOrDefault();
             var userCreated = userRepository.Get(x => x.Id == permission.UserCreated).FirstOrDefault();
             var userModified = userRepository.Get(x => x.Id == permission.UserModified).FirstOrDefault();
 
             permission.NameUserCreated = userCreated?.Username;
             permission.NameUserModified = userModified?.Username;
-           
+
 
             return permission;
         }
         public HandleState Add(List<SysUserPermissionEditModel> list)
         {
-            Contract.Ensures(Contract.Result<HandleState>() != null);
-            List<SysUserPermission> userPermissions = new List<SysUserPermission>();
-            List<SysUserPermissionGeneral> permissionGenerals = null;
-            List<SysUserPermissionSpecial> permissionSpecials = null;
-            foreach (var item in list)
-            {
-                var userPermission = mapper.Map<SysUserPermission>(item);
-                if (item.Id == null)
-                {
-                    userPermission.Id = Guid.NewGuid();
-                }
-                userPermission.UserCreated = userPermission.UserModified = currentUser.UserID;
-                userPermission.DatetimeCreated = userPermission.DatetimeModified = DateTime.Now;
-                userPermissions.Add(userPermission);
-                permissionGenerals = GetPermissionGeneralDefault(item.PermissionSampleId, userPermission.Id);
-                permissionSpecials = GetPermissionSpecilaDefault(item.PermissionSampleId, userPermission.Id);
-            }
+            HandleState result = new HandleState();
+            List<SysUserPermissionEditModel> listAdd = new List<SysUserPermissionEditModel>();
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var data = DataContext.Get();
-                    var hs = new HandleState();
-                    var checkExisted = data.Where(d => userPermissions.Any(u => d.Id == u.Id));
-                    foreach (var item in userPermissions)
+                    foreach (SysUserPermissionEditModel item in list)
                     {
-                        if (checkExisted.Where(x => x.Id == item.Id).Select(t => t.Id).FirstOrDefault() == Guid.Empty)
+                        if (item.Id == Guid.Empty)
                         {
-                            //hs = DataContext.Update(item, x => x.Id == item.Id);
-                            hs = DataContext.Add(item, false);
+                            // Trong một office user chỉ có 1 bộ quyền
+                            List<SysUserPermission> sysUserPerInOffice = DataContext.Get(x => x.UserId == item.UserId && x.OfficeId == item.OfficeId).ToList();
+                            if (sysUserPerInOffice.Count == 0)
+                            {
+                                listAdd.Add(item);
+                            }
                         }
                     }
-                    if (hs.Success)
-                    {
-                        if (permissionGenerals.Count > 0)
-                        {
-                            var hsGeneral = userPermissionGeneralRepository.Add(permissionGenerals);
-                        }
-                        if (permissionSpecials.Count > 0)
-                        {
-                            var hsSpecial = userPermissionSpecialRepository.Add(permissionSpecials);
-                        }
-                    }
-                    DataContext.SubmitChanges();
-                    userPermissionGeneralRepository.SubmitChanges();
-                    userPermissionSpecialRepository.SubmitChanges();
-                    trans.Commit();
-                    return hs;
 
+                    if (listAdd.Count > 0)
+                    {
+                        List<SysUserPermissionGeneral> permissionGenerals = null;
+                        List<SysUserPermissionSpecial> permissionSpecials = null;
+                        foreach (var item in listAdd)
+                        {
+                            SysUserPermission userPermission = mapper.Map<SysUserPermission>(item);
+                            userPermission.Id = Guid.NewGuid();
+                            userPermission.DatetimeCreated = userPermission.DatetimeModified = DateTime.Now;
+
+                            DataContext.Add(userPermission, false);
+
+                            // Lấy bộ quyền General và special từ bộ chuẩn
+                            permissionGenerals = GetPermissionGeneralDefault(item.PermissionSampleId, userPermission.Id);
+                            permissionSpecials = GetPermissionSpecilaDefault(item.PermissionSampleId, userPermission.Id);
+
+                            if (permissionGenerals.Count > 0)
+                            {
+                                HandleState hsGeneral = userPermissionGeneralRepository.Add(permissionGenerals, false);
+                            }
+                            if (permissionSpecials.Count > 0)
+                            {
+                                HandleState hsSpecial = userPermissionSpecialRepository.Add(permissionSpecials, false);
+                            }
+                        }
+
+                        result = DataContext.SubmitChanges();
+
+                        userPermissionGeneralRepository.SubmitChanges();
+                        userPermissionSpecialRepository.SubmitChanges();
+
+                        trans.Commit();
+                    }
+
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -190,7 +196,6 @@ namespace eFMS.API.System.DL.Services
                 }
             }
         }
-
 
         public HandleState Update(SysUserPermissionModel entity)
         {
@@ -207,9 +212,9 @@ namespace eFMS.API.System.DL.Services
                     {
                         general.UserModified = currentUser.UserID;
                         general.DatetimeModified = DateTime.Now;
-                        if(general.Id != Guid.Empty)
+                        if (general.Id != Guid.Empty)
                         {
-                            var hs =userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
+                            var hs = userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
                         }
                         else
                         {
@@ -365,7 +370,7 @@ namespace eFMS.API.System.DL.Services
                 List = generalPermission.List,
                 Import = generalPermission.Import,
                 Export = generalPermission.Export,
-                AllowAdd = generalPermission.Write == "None"?false: true,
+                AllowAdd = generalPermission.Write == "None" ? false : true,
                 SpecialActions = specialPermissions?.Select(x => new SpecialAction
                 {
                     Action = x.ActionName,

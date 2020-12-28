@@ -454,14 +454,15 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             if (criteria.RangeSearch == PermissionRange.None) return null;
-            var data = QueryByPermission(criteria.RangeSearch);
-            if (data == null)
-                return null;
+            IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+            if (data == null) return null;
+
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();
             IQueryable<OpsTransaction> datajoin = data.Where(x => x.CurrentStatus != TermData.Canceled);
-            if (criteria.ClearanceNo != null)
+
+            if (!string.IsNullOrEmpty(criteria.ClearanceNo))
             {
-                var listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
+                IQueryable<CustomsDeclaration> listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
                 if(listCustomsDeclaration.Count() > 0)
                 {
                     datajoin = from custom in listCustomsDeclaration
@@ -477,9 +478,9 @@ namespace eFMS.API.Documentation.DL.Services
                     return results.AsQueryable();
                 }
             }
-            if(criteria.CreditDebitInvoice != null)
+            if(!string.IsNullOrEmpty(criteria.CreditDebitInvoice))
             {
-                var listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
+                IQueryable<AcctCdnote> listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
                 if(listDebit.Count() > 0)
                 {
                     datajoin = from acctnote in listDebit
@@ -1054,7 +1055,7 @@ namespace eFMS.API.Documentation.DL.Services
             var hs = Update(model, x => x.Id == model.Id);
             if (hs.Success)
             {
-                if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count > 0)
+                if (model.CsMawbcontainers != null)
                 {
                     var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
                 }
@@ -1238,6 +1239,162 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Add a duplicate job to OpsTransaction
+        /// </summary>
+        /// <param name="model">OpsTransactionModel</param>
+        /// <returns></returns>
+        public ResultHandle ImportDuplicateJob(OpsTransactionModel model)
+        {
+            var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
+            if (code == 403) return new ResultHandle { Status = false, Message = "You can't duplicate this job." };
+            var newContainers = new List<CsMawbcontainer>();
+            var newSurcharges = new List<CsShipmentSurcharge>();
+            // Create model import
+            var _id = model.Id;
+            var _hblId = model.Hblid;
+            model.Id = Guid.NewGuid();
+            model.Hblid = Guid.NewGuid();
+            model.JobNo = CreateJobNoOps();
+            model.UserModified = currentUser.UserID;
+            model.DatetimeModified = DateTime.Now;
+            model.UserCreated = currentUser.UserID;
+            model.GroupId = currentUser.GroupId;
+            model.DepartmentId = currentUser.DepartmentId;
+            model.OfficeId = currentUser.OfficeID;
+            model.CompanyId = currentUser.CompanyID;
+            var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+            if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+            {
+                var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                if (dataGroup.Any())
+                {
+                    model.SalesGroupId = string.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                    model.SalesDepartmentId = string.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                    model.SalesOfficeId = string.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                    model.SalesCompanyId = string.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                }
+                else
+                {
+                    model.SalesGroupId = string.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                    model.SalesDepartmentId = string.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                    model.SalesOfficeId = string.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                    model.SalesCompanyId = string.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                }
+            }
+            var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+            if (dayStatus > 0)
+            {
+                model.CurrentStatus = TermData.InSchedule;
+            }
+            else
+            {
+                model.CurrentStatus = TermData.Processing;
+            }
+
+            // Update list Container
+            var listContainerOld = model.CsMawbcontainers;
+            if (listContainerOld != null)
+            {
+                var masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
+                newContainers.AddRange(masterContainers);
+            }
+            // Update list SurCharge
+            var listSurCharge = CopySurChargeToNewJob(_hblId, model.Hblid);
+            if (listSurCharge.Count() > 0)
+            {
+                newSurcharges.AddRange(listSurCharge);
+            }
+
+            try
+            {
+                var entity = mapper.Map<OpsTransaction>(model);
+                var hs = DataContext.Add(entity);
+                if (hs.Success)
+                {
+                    if (newContainers.Count > 0)
+                    {
+                        var hsContainer = csMawbcontainerRepository.Add(newContainers, false);
+                        csMawbcontainerRepository.SubmitChanges();
+                    }
+
+                    if (newSurcharges.Count() > 0)
+                    {
+                        HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
+                        surchargeRepository.SubmitChanges();
+                    }
+                    return new ResultHandle { Status = true, Message = "Job have been save!", Data = entity };
+                }
+                return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
+            }
+            catch (Exception ex)
+            {
+                return new ResultHandle { Status = false, Message = ex.Message };
+            }
+        }
+
+        /// <summary>
+        /// Get list surcharges from old job to new job
+        /// </summary>
+        /// <param name="_oldHblId"></param>
+        /// <param name="_newHblId"></param>
+        /// <returns></returns>
+        private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId, Guid _newHblId)
+        {
+            List<CsShipmentSurcharge> surCharges = null;
+            var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId);
+            if (charges.Select(x => x.Id).Count() != 0)
+            {
+                surCharges = new List<CsShipmentSurcharge>();
+                foreach (var item in charges)
+                {
+                    item.Id = Guid.NewGuid();
+                    item.UserCreated = currentUser.UserID;
+                    item.DatetimeCreated = DateTime.Now;
+                    item.Hblid = _newHblId;
+                    item.Soano = null;
+                    item.PaySoano = null;
+                    item.CreditNo = null;
+                    item.DebitNo = null;
+                    item.Soaclosed = null;
+                    item.SettlementCode = null;
+
+                    item.AcctManagementId = null;
+                    item.InvoiceNo = null;
+                    item.InvoiceDate = null;
+                    item.VoucherId = null;
+                    item.VoucherIddate = null;
+
+                    surCharges.Add(item);
+                }
+            }
+            return surCharges;
+        }
+
+        /// <summary>
+        /// Get list containers from old job to new job
+        /// </summary>
+        /// <param name="newJobId"></param>
+        /// <param name="newHblId"></param>
+        /// <param name="csMawbcontainers"></param>
+        /// <returns></returns>
+        private List<CsMawbcontainer> GetNewMasterBillContainer(Guid newJobId, Guid newHblId, List<CsMawbcontainerModel> csMawbcontainers)
+        {
+            var containers = new List<CsMawbcontainer>();
+            foreach (var item in csMawbcontainers)
+            {
+                item.Id = Guid.NewGuid();
+                item.Mblid = newJobId;
+                item.Hblid = newHblId;
+                item.UserModified = currentUser.UserID;
+                item.DatetimeModified = DateTime.Now;
+                containers.Add(item);
+            }
+            return containers;
         }
     }
 }

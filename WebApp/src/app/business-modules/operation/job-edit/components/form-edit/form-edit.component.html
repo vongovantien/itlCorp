@@ -9,7 +9,7 @@
 					<label class="form-control-label" for="">
 						Job ID
 					</label>
-					<input type="text" required class="form-control m-input m-input--square" placeholder="Enter text"
+					<input type="text" class="form-control m-input m-input--square" placeholder="Job ID"
 						name="jobNo" disabled=true formControlName="jobNo">
 
 				</div>
@@ -352,7 +352,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="row" *ngIf="opsTransaction">
+		<div class="row" *ngIf="opsTransaction && !isJobCopy">
 			<div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
 				<span class="m--font-bolder">Created:</span>
 				<span
@@ -375,50 +375,38 @@
 		<hr>
 		<div class="row">
 			<div class="col-lg-4">
-				<div class="form-group"
-					[ngClass]="{'m-form__group has-danger': isSubmitted && sumGrossWeight.value == 0}">
+				<div class="form-group">
 					<label class="form-control-label" for="">
 						GW (kg)
 					</label>
 					<input type="number" autocomplete="nope" class="form-control m-input m-input--square"
 						placeholder="Enter number" name="sumGrossWeight" min="0.01" decimalNumberGreaterThan0
 						formControlName="sumGrossWeight">
-					<div class="form-control-feedback" *ngIf="isSubmitted && sumGrossWeight.value == 0">
-						Sum of gross weight must be greater than 0
-					</div>
 				</div>
 			</div>
 			<div class="col-lg-4">
-				<div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && sumNetWeight.value == 0}">
+				<div class="form-group">
 					<label class="form-control-label" for="">
 						NW (kg)
 					</label>
 					<input type="number" autocomplete="nope" class="form-control m-input m-input--square"
 						placeholder="Enter number" name="sumNetWeight" min="0.01" decimalNumberGreaterThan0
 						formControlName="sumNetWeight">
-					<div class="form-control-feedback" *ngIf="isSubmitted && sumNetWeight.value == 0">
-						Sum of net weight must be greater than 0
-					</div>
 				</div>
 			</div>
 			<div class="col-lg-4">
-				<div class="form-group"
-					[ngClass]="{'m-form__group has-danger':isSubmitted && sumContainers.value == 0}">
+				<div class="form-group">
 					<label class="form-control-label" for="">
 						Container Qty
 					</label>
 					<input type="number" class="form-control m-input m-input--square" min="1" integer
 						name="sumContainers" placeholder="Enter number" formControlName="sumContainers">
-					<div class="form-control-feedback" *ngIf="isSubmitted && sumContainers.value == 0">
-						Container Qty must be greater than 0
-					</div>
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-lg-4">
-				<div class="form-group"
-					[ngClass]="{'m-form__group has-danger':isSubmitted && opsTransaction.sumPackages == 0}">
+				<div class="form-group">
 					<label class="form-control-label" for="">
 						Packages Qty
 					</label>
@@ -434,22 +422,16 @@
 							</ng-select>
 						</div>
 					</div>
-					<div class="form-control-feedback" *ngIf="isSubmitted && opsTransaction.sumPackages == 0">
-						Packages Qty must be greater than 0
-					</div>
 				</div>
 			</div>
 
 			<div class="col-lg-4">
-				<div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && sumCbm.value == 0}">
+				<div class="form-group">
 					<label class="form-control-label" for="">
 						CBM
 					</label>
 					<input type="number" autocomplete="nope" class="form-control m-input m-input--square" min="0.01"
-						placeholder="Enter number" name="sumCbm" formControlName="sumCbm">
-					<div class="form-control-feedback" *ngIf="isSubmitted && sumCbm.value == 0">
-						Sum of CBM must be greater than 0
-					</div>
+						placeholder="Enter number" name="sumCbm" formControlName="sumCbm" decimalNumberGreaterThan0>
 				</div>
 			</div>
 

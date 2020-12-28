@@ -70,9 +70,9 @@
                                     </td>
                                     <td>{{customer.accountNo}}</td>
                                     <td>{{customer.shortName}}</td>
-                                    <td>{{customer.addressVn}}</td>
                                     <td>{{customer.taxCode}}</td>
                                     <td>{{customer.userCreatedName}}</td>
+                                    <td>{{customer.addressVn}}</td>
                                     <td>{{customer.datetimeModified | date:'dd/MM/yyyy' }}</td>
                                     <td [ngClass]="customer.active ? 'text-success' : 'text-danger'">
                                         {{customer.active ? 'Active' : 'Inactive'}}</td>
@@ -89,6 +89,9 @@
                                                 <tr *ngFor="let sale of saleMans; let j = index;">
                                                     <td><span>{{j + 1}}</span></td>
                                                     <td>
+                                                        <span>{{sale.username}}</span>
+                                                    </td>
+                                                    <td>
                                                         <span>{{sale.saleServiceName}}</span>
                                                     </td>
                                                     <td>
@@ -97,9 +100,7 @@
                                                     <td>
                                                         <span>{{sale.companyNameAbbr}}</span>
                                                     </td>
-                                                    <td>
-                                                        <span>{{sale.username}}</span>
-                                                    </td>
+
                                                     <td [ngClass]="sale.active ? 'text-success' : 'text-danger'">
                                                         {{sale.active ? 'Active' : 'Inactive'}}</td>
                                                     <td>

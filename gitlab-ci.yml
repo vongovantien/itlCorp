@@ -10,7 +10,6 @@ cache:
         - package-lock.json
 stages:
     - build
-    # - deploy
 
 job_build:
     stage: build

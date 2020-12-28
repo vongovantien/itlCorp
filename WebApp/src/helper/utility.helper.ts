@@ -284,4 +284,12 @@ export class UtilityHelper {
         );
     }
 
+    decodeEntities(str: string) {
+        if (str && typeof str === 'string') {
+            // str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+            str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+        }
+        return str;
+    }
+
 }

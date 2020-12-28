@@ -347,7 +347,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" /*&& x.BranchId == currentUser.OfficeID*/)?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null && listEmailAR.Any())
             {
@@ -891,6 +891,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var sysUsers = sysUserRepository.Get();
+            var agreementData = contractRepository.Get();
+            string salemans = string.IsNullOrEmpty(criteria.Saleman) ? criteria.All : criteria.Saleman;
+            string SalemanId = sysUsers.Where(x => x.Username == salemans).Select(t => t.Id).FirstOrDefault();
             ClearCache();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             if (partners == null) return null;
@@ -899,8 +902,8 @@ namespace eFMS.API.Catalogue.DL.Services
                          join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user, partner, x }
-                          );
+                         select new { user, partner, x  }
+                        );
             if (string.IsNullOrEmpty(criteria.All))
             {
                 query = query.Where(x => ((x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -917,7 +920,16 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.PartnerType ?? "").Contains(criteria.PartnerType ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            ));
+                if (!string.IsNullOrEmpty(SalemanId))
+                {
+                    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                }
+                else if (!string.IsNullOrEmpty(criteria.Saleman))
+                {
+                    query = null;
+                }
             }
+
             else
             {
                 query = query.Where(x =>
@@ -931,10 +943,15 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                           //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
+                                        //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
+                           || (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id)))
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
+                //if (!string.IsNullOrEmpty(SalemanId))
+                //{
+                //    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                //}
 
             }
             if (query == null) return null;
@@ -1774,6 +1791,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
+            ClearCache();
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
