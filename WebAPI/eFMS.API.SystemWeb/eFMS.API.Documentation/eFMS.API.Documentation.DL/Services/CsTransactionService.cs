@@ -812,16 +812,18 @@ namespace eFMS.API.Documentation.DL.Services
             String jobNo = null;
             String id = null;
             var shipmentType = GetServiceType(serviceName, serviceMode);
-            var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo).FirstOrDefault();
-            if (houseDetail != null)
+            if (!string.IsNullOrEmpty(shipmentType))
             {
-                jobNo = transactionRepository.Get(x => x.Id == houseDetail.JobId && x.TransactionType == shipmentType).Select(x => x.JobNo).FirstOrDefault();
-                if (jobNo != null)
+                var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo).FirstOrDefault();
+                if (houseDetail != null)
                 {
-                    id = houseDetail.Id.ToString();
+                    jobNo = transactionRepository.Get(x => x.Id == houseDetail.JobId && x.TransactionType == shipmentType).Select(x => x.JobNo).FirstOrDefault();
+                    if (jobNo != null)
+                    {
+                        id = houseDetail.Id.ToString();
+                    }
                 }
             }
-
             return new { jobNo, id };
         }
 
