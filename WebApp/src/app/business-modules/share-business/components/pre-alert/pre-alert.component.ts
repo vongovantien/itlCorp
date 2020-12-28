@@ -18,8 +18,8 @@ import { delayTime } from '@decorators';
 import { getTransactionLocked, TransactionGetDetailAction } from '@share-bussiness';
 
 
-import { combineLatest, forkJoin, of, from, Observable } from 'rxjs';
-import { catchError, finalize, map, take, switchMap, mergeMap, delay, takeUntil } from 'rxjs/operators';
+import { combineLatest, forkJoin, of, from, Observable, timer } from 'rxjs';
+import { catchError, finalize, map, take, switchMap, mergeMap, delay, takeUntil, retry, retryWhen, delayWhen, concatMap } from 'rxjs/operators';
 
 import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-attachment.popup';
 import { environment } from 'src/environments/environment';
@@ -348,8 +348,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 catchError(err => of(err)),
                 switchMap((res: Crystal[]) => {
                     return from(res).pipe(
-                        mergeMap((item) => of(item).pipe(delay(1000))),
-                    ).pipe(catchError((err, caught) => of(err)))
+                        concatMap((item) => of(item).pipe(delay(1000))),
+                    ).pipe(
+                        catchError((err, caught) => of(err)),
+                        retryWhen(errors => errors.pipe(
+                            delayWhen(val => timer(1000))
+                        ))
+                    )
                 }),
             )
             .subscribe(
@@ -358,17 +363,16 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     setTimeout(() => {
                         this.formRp.nativeElement.submit();
                         this.attachedFile.push(res.pathReportGenerate);
-                    });
-                    dataStreamCount++;
-
-                    if (dataStreamCount === streamUploadFile.length) {
-                        if (res instanceof HttpErrorResponse && res.status === SystemConstants.HTTP_CODE.NOT_FOUND) {
-                            return;
+                        dataStreamCount++;
+                        if (dataStreamCount === streamUploadFile.length) {
+                            if (res instanceof HttpErrorResponse && res.status === SystemConstants.HTTP_CODE.NOT_FOUND) {
+                                return;
+                            }
+                            setTimeout(() => {
+                                this.sendMail()
+                            }, streamUploadFile.length * 1000);
                         }
-                        setTimeout(() => {
-                            this.sendMail()
-                        }, 3000);
-                    }
+                    }, 500);
                 },
             );
     }
