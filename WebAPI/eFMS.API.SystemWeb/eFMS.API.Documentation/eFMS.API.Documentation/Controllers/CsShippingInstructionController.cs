@@ -112,7 +112,9 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        [HttpGet("CheckExistSIExport/{id}")]
+        [HttpGet("CheckExistSIExport")]
+        [Authorize]
+
         public IActionResult CheckExistSIExport(Guid jobId)
         {
             return Ok(shippingInstructionService.CheckExistSIExport(jobId));

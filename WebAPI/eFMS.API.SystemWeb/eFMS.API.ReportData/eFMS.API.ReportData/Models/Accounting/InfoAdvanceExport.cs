@@ -14,5 +14,9 @@ namespace eFMS.API.ReportData.Models.Accounting
         public DateTime? DealinePayment { get; set; }
         public string Manager { get; set; }
         public string Accountant { get; set; }
+        public bool IsManagerApproved { get; set; }
+        public bool IsAccountantApproved { get; set; }
+        public bool IsBODApproved { get; set; }
+        public string ContactOffice { get; set; }
     }
 }

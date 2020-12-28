@@ -613,7 +613,6 @@ namespace eFMS.API.Documentation.DL.Services
             var _manifest = DataContext.Get(x => x.JobId == jobId).FirstOrDefault();
             if (_manifest != null)
             {
-                var transaction = csTransactionService.GetDetails(jobId);
                 CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
                 var housebills = transactionDetailService.Query(criteria);
                 if (housebills != null)

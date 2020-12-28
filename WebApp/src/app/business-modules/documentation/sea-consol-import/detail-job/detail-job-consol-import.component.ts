@@ -35,7 +35,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
 
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
