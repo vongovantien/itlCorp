@@ -335,8 +335,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         charge.DateConfirm = DateTime.Now;
                         charge.DatePackage = DateTime.Now;
-                        charge.LocalVessel = houserBill.OceanVessel?.ToUpper();//Ocean Vessel of HBL
-                        charge.ContSealNo = houserBill.OceanVoyNo?.ToUpper();// Ocean Voy No of HBL
+                        charge.LocalVessel = houserBill.LocalVessel?.ToUpper();//Arrival Vessel of HBL [CR: 29/12/2020]
+                        charge.ContSealNo = houserBill.LocalVoyNo?.ToUpper();// Arrival Voy No of HBL [CR: 29/12/2020]
                         charge.ForCarrier = string.Empty;
                         charge.DepartureAirport = polName?.ToUpper();//POL of HBL
                         charge.PortofDischarge = podName?.ToUpper();//POD of HBL
@@ -398,8 +398,8 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     charge.DateConfirm = DateTime.Now;
                     charge.DatePackage = DateTime.Now;
-                    charge.LocalVessel = houserBill.OceanVessel?.ToUpper();//Ocean Vessel of HBL
-                    charge.ContSealNo = houserBill.OceanVoyNo?.ToUpper();// Ocean Voy No of HBL
+                    charge.LocalVessel = houserBill.LocalVessel?.ToUpper();//Arrival Vessel of HBL [CR: 29/12/2020]
+                    charge.ContSealNo = houserBill.LocalVoyNo?.ToUpper();// Arrival Voy No of HBL [CR: 29/12/2020]
                     charge.ForCarrier = string.Empty;
                     charge.DepartureAirport = polName?.ToUpper();//POL of HBL
                     charge.PortofDischarge = podName?.ToUpper();//POD of HBL
