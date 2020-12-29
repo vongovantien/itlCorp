@@ -153,7 +153,8 @@
                         <table class="table table-striped table-brand dataTable">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
                             <tbody class="tbody-group">
-                                <tr class="" *ngFor="let item of CdNoteDetail.listSurcharges;let i = index;">
+                                <tr class="" *ngFor="let item of CdNoteDetail.listSurcharges;let i = index;"
+                                    [class.synced-row]="item.isSynced">
                                     <td>
                                         <span>{{item.hwbno}}</span>
                                     </td>
@@ -189,6 +190,9 @@
                                     </td>
                                     <td class='m--align-right'>
                                         <span>{{item.exchangeRate | number:'1.0-3'}}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-danger">{{item.syncedFromBy}}</span>
                                     </td>
                                 </tr>
 
@@ -266,3 +270,5 @@
 </ng-container>
 
 <payment-method-popup (onApply)="onApplyPaymentMethod($event)"></payment-method-popup>
+<info-popup #validateSyncedCDNotePopup [body]="messageValidate" [title]="'Alert'">
+</info-popup>

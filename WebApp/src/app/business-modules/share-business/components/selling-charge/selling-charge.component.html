@@ -31,7 +31,7 @@
                                 <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
                             </div>
                         </div>
-                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="!allowSaving">
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="allowSaving">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-refresh"></i>Sync charge<span class="caret"></span>
                             </button>
@@ -42,7 +42,8 @@
                                 </ng-container>
                             </div>
                         </div>
-                        <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveSellingSurCharge()" [disabled]="allowSaving">
+                        <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveSellingSurCharge()"
+                            [disabled]="!allowSaving">
                         </app-default-button>
                     </ng-container>
                 </div>
@@ -63,7 +64,7 @@
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge">
-                                    <div class="table-actions" *ngIf="!allowSaving">
+                                    <div class="table-actions" *ngIf="allowSaving">
                                         <button (click)="duplicate(i, 'SELL')"
                                             class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
                                             title="Duplicate"><i class="la la-copy"></i>
@@ -192,7 +193,8 @@
                                                 || (isLocked | async) === true; else qtyHint">
                                                 <select class="form-control border" disabled>
                                                     <option [value]="charge.quantityType">
-                                                        {{!!charge.quantityType ? (charge.quantityType | uppercase) : '-'}}
+                                                        {{!!charge.quantityType ? (charge.quantityType | uppercase) :
+                                                        '-'}}
                                                     </option>
                                                 </select>
                                             </ng-container>
@@ -438,7 +440,7 @@
                     </tr>
                     <tr *ngIf="(isLocked | async) === false">
                         <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
-                            <td colspan=1 class="fixed-side" *ngIf="!allowSaving">
+                            <td colspan=1 class="fixed-side" *ngIf="allowSaving">
                                 <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
                                     (click)="addCharge('SELL')">
                                     <i class="fa fa-plus-circle fa-2x"></i>

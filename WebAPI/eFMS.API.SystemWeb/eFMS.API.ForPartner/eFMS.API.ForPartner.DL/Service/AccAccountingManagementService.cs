@@ -304,6 +304,8 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
             invoice.AccountNo = !string.IsNullOrEmpty(debitChargeFirst.AccountNo) ? debitChargeFirst.AccountNo : SetAccountNoForInvoice(partner?.PartnerMode, model.Currency);
             invoice.Description = model.Description;
+            var _serviceTypeCharge = surchargeRepo.Get(x => debitCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
+            invoice.ServiceType = string.Format(";", _serviceTypeCharge);
             return invoice;
         }
 
@@ -336,6 +338,8 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
             invoice.AccountNo = obhCharges[0].AccountNo;
             invoice.Description = model.Description;
+            var _serviceTypeCharge = surchargeRepo.Get(x => obhCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
+            invoice.ServiceType = string.Format(";", _serviceTypeCharge);
             return invoice;
         }
 
@@ -1043,6 +1047,25 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserModified = currentUser.UserID,
                             };
                             sysUserNotificationRepository.Add(sysUserNotify);
+
+                            //Update PaySyncedFrom or SyncedFrom equal NULL by SoaNo
+                            var surcharges = surchargeRepo.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == "OBH")
+                                {
+                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? null : surcharge.PaySyncedFrom;
+                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? null : surcharge.SyncedFrom;
+                                }
+                                else
+                                {
+                                    surcharge.SyncedFrom = null;
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                            var smSurcharge = surchargeRepo.SubmitChanges();
                         }
                         trans.Commit();
                     }
@@ -1113,6 +1136,25 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserModified = currentUser.UserID,
                             };
                             var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify);
+
+                            //Update PaySyncedFrom or SyncedFrom equal NULL CDNote Code
+                            var surcharges = surchargeRepo.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == "OBH")
+                                {
+                                    surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? null : surcharge.PaySyncedFrom;
+                                    surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? null : surcharge.SyncedFrom;
+                                }
+                                else
+                                {
+                                    surcharge.SyncedFrom = null;
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                            var smSurcharge = surchargeRepo.SubmitChanges();
                         }
                         trans.Commit();
                     }
@@ -1183,6 +1225,17 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserModified = currentUser.UserID,
                             };
                             sysUserNotificationRepository.Add(sysUserNotify);
+
+                            //Update SyncedFrom equal NULL by Id of Voucher
+                            var surcharges = surchargeRepo.Get(x => x.AcctManagementId == voucher.Id);
+                            foreach (var surcharge in surcharges)
+                            {
+                                surcharge.SyncedFrom = null;
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                            var smSurcharge = surchargeRepo.SubmitChanges();
                         }
                         trans.Commit();
                     }
@@ -1274,7 +1327,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         /// <summary>
-        /// Type là VOUCHER => eFMS sẽ xóa mã VOUCHER tương ứng
+        /// Type là VOUCHER/PAYMENT => eFMS sẽ xóa mã VOUCHER/PAYMENT tương ứng
         /// Type là CDNOTE/SOA/SETTLEMENT => Reset trạng thái "Rejected" Cho từng phiều tương ứng
         /// </summary>
         /// <param name="model"></param>
@@ -1304,8 +1357,11 @@ namespace eFMS.API.ForPartner.DL.Service
                 case "VOUCHER":
                     result = DeleteVoucher(model.ReferenceID, model.Reason);
                     break;
+                case "PAYMENT":
+                    result = DeletePayment(model.ReferenceID, model.Reason);
+                    break;
                 default:
-                    result = new HandleState((object)"Type không hợp lệ (Các type hợp lệ: SETTLEMENT, SOA, CDNOTE, VOUCHER)");
+                    result = new HandleState((object)"Type không hợp lệ (Các type hợp lệ: SETTLEMENT, SOA, CDNOTE, VOUCHER, PAYMENT)");
                     break;
             }
             return result;
@@ -1335,6 +1391,8 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.SeriesNo = null;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
+                            charge.SyncedFrom = null; //Update SyncedFrom equal NULL
+                            charge.ReferenceNo = null;
                             surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
 
@@ -1391,7 +1449,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             UserModified = currentUser.UserID,
                         };
                         var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify, false);
-
+                        
                         var smNotifi = sysNotificationRepository.SubmitChanges();
                         var smUserNotifi = sysUserNotificationRepository.SubmitChanges();
                         var smSurcharge = surchargeRepo.SubmitChanges();
@@ -1412,6 +1470,13 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }
         }
+        
+        private HandleState DeletePayment(string id, string reason)
+        {
+            //Cập nhật sau
+            return new HandleState();
+        }
+
         #endregion --- REJECT & REMOVE DATA ---
 
     }

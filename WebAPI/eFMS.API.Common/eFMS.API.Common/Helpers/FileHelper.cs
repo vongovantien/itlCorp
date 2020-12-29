@@ -59,7 +59,6 @@ namespace eFMS.API.Common.Helpers
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }

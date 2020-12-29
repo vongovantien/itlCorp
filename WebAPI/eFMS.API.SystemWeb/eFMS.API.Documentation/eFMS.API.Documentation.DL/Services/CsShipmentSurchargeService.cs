@@ -190,9 +190,19 @@ namespace eFMS.API.Documentation.DL.Services
                     listCharges.ForEach(fe =>
                     {
                         fe.Hwbno = houseBill.Hwbno;
+                        if (fe.Type == DocumentConstants.CHARGE_OBH_TYPE && fe.PayerId == partnerId)
+                        {
+                            fe.IsSynced = !string.IsNullOrEmpty(fe.PaySyncedFrom) && (fe.PaySyncedFrom.Equals("CDNOTE") || fe.PaySyncedFrom.Equals("SOA") || fe.PaySyncedFrom.Equals("VOUCHER"));
+                        }
+                        else
+                        {
+                            fe.IsSynced = !string.IsNullOrEmpty(fe.SyncedFrom) && (fe.SyncedFrom.Equals("CDNOTE") || fe.SyncedFrom.Equals("SOA") || fe.SyncedFrom.Equals("VOUCHER"));
+                        }
                     });
-                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = listCharges, FlexId = houseBill.FlexId };
 
+                    //Chỉ lấy những charge chưa sync
+                    var _listCharges = listCharges.Where(x => x.IsSynced == false).ToList();
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = _listCharges, FlexId = houseBill.FlexId };
                     returnList.Add(returnObj);
                 }
             }
@@ -224,9 +234,19 @@ namespace eFMS.API.Documentation.DL.Services
                 listCharges.ForEach(fe =>
                 {
                     fe.Hwbno = houseBill.Hwbno;
+                    if (fe.Type == DocumentConstants.CHARGE_OBH_TYPE && fe.PayerId == partnerId)
+                    {
+                        fe.IsSynced = !string.IsNullOrEmpty(fe.PaySyncedFrom) && (fe.PaySyncedFrom.Equals("CDNOTE") || fe.PaySyncedFrom.Equals("SOA") || fe.PaySyncedFrom.Equals("VOUCHER"));
+                    }
+                    else
+                    {
+                        fe.IsSynced = !string.IsNullOrEmpty(fe.SyncedFrom) && (fe.SyncedFrom.Equals("CDNOTE") || fe.SyncedFrom.Equals("SOA") || fe.SyncedFrom.Equals("VOUCHER"));
+                    }
                 });
-                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = listCharges, FlexId = null };
 
+                //Chỉ lấy những charge chưa sync
+                var _listCharges = listCharges.Where(x => x.IsSynced == false).ToList();
+                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = _listCharges, FlexId = null };
                 returnList.Add(returnObj);
             }
 
