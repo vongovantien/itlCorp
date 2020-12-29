@@ -18,7 +18,7 @@ import { delayTime } from '@decorators';
 import { getTransactionLocked, TransactionGetDetailAction } from '@share-bussiness';
 
 
-import { combineLatest, forkJoin, of, from, Observable, timer } from 'rxjs';
+import { combineLatest, forkJoin, of, from, Observable, timer, throwError } from 'rxjs';
 import { catchError, finalize, map, take, switchMap, mergeMap, delay, takeUntil, retry, retryWhen, delayWhen, concatMap } from 'rxjs/operators';
 
 import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-attachment.popup';
@@ -374,9 +374,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                             if (res instanceof HttpErrorResponse && res.status === SystemConstants.HTTP_CODE.NOT_FOUND) {
                                 return;
                             }
-                            setTimeout(() => {
-                                this.sendMail()
-                            }, streamUploadFile.length * 1000);
+                            this.sendMail()
                         }
                     }, 500);
                 },
@@ -397,7 +395,19 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         };
         this._spinner.show();
         this._documentRepo.sendMailDocument(emailContent)
-            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._spinner.hide()),
+                mergeMap((err: CommonInterface.IResult) => {
+                    if (!err.status) {
+                        return throwError("error when sendmail");
+                    }
+                    return of(err);
+                }),
+                retryWhen(errors => errors.pipe(
+                    delayWhen(val => timer(1000))
+                ))
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
