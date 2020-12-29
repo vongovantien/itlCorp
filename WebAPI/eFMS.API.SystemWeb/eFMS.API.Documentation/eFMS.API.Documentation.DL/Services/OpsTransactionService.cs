@@ -1254,9 +1254,7 @@ namespace eFMS.API.Documentation.DL.Services
             var newContainers = new List<CsMawbcontainer>();
             var newSurcharges = new List<CsShipmentSurcharge>();
             // Create model import
-            var _id = model.Id;
             var _hblId = model.Hblid;
-            model.Id = Guid.NewGuid();
             model.Hblid = Guid.NewGuid();
             model.JobNo = CreateJobNoOps();
             model.UserModified = currentUser.UserID;
@@ -1332,7 +1330,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             catch (Exception ex)
             {
-                return new ResultHandle { Status = false, Message = ex.Message };
+                return new ResultHandle { Status = false, Message = "Job can't be saved!" };
             }
         }
 
