@@ -3728,7 +3728,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Send Mail đề nghị Approve
-        private bool SendMailSuggestApproval(string settlementNo, string userReciver, string emailUserReciver, List<string> usersDeputy)
+        private bool SendMailSuggestApproval(string settlementNo, string userReciver, string emailUserReciver, List<string> emailUsersDeputy)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
 
@@ -3818,19 +3818,13 @@ namespace eFMS.API.Accounting.DL.Services
                 emailRequester
             };
 
-            if (usersDeputy.Count > 0)
+            if (emailUsersDeputy.Count > 0)
             {
-                foreach (var userName in usersDeputy)
+                foreach (var email in emailUsersDeputy)
                 {
-                    //Lấy ra userId by userName
-                    var userId = sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.Id;
-                    //Lấy ra employeeId của user
-                    var employeeIdOfUser = userBaseService.GetEmployeeIdOfUser(userId);
-                    //Lấy ra email của user
-                    var emailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
-                    if (!string.IsNullOrEmpty(emailUser))
+                    if (!string.IsNullOrEmpty(email))
                     {
-                        emailCCs.Add(emailUser);
+                        emailCCs.Add(email);
                     }
                 }
             }
