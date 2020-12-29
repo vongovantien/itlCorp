@@ -147,12 +147,12 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
 
                         }
+                        trans.Commit();
                         SendMailCreatedSuccess(partner);
                     }
                     ClearCache();
                     Get();
                     var result = hsTransPartner;
-                    trans.Commit();
                     return new { model = partner, result };
                 }
                 catch (Exception ex)
@@ -351,12 +351,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (listEmailAR != null && listEmailAR.Any())
             {
-                lstToAR = listEmailAR.Split(";").ToList();
+                lstToAR = listEmailAR.Split(";").Select(x=>x.ToLower().Trim()).ToList();
             }
 
             if (listEmailAccountant != null && listEmailAccountant.Any())
             {
-                lstToAccountant = listEmailAccountant.Split(";").ToList();
+                lstToAccountant = listEmailAccountant.Split(";").Select(x=>x.ToLower().Trim()).ToList();
             }
 
             switch (partner.PartnerType)
@@ -407,6 +407,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (partner.PartnerType == "Customer" || partner.PartnerType == "Agent")
             {
                 lstToAccountant.AddRange(lstToAR);
+                lstToAccountant = lstToAccountant.Where(x => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrEmpty(x)).Distinct().ToList();
                 if (lstToAccountant.Any())
                 {
                     resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, lstCcCreator, lstCc);

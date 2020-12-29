@@ -70,7 +70,7 @@
                                     <td>{{agent.accountNo}}</td>
                                     <td>{{agent.shortName}}</td>
                                     <td>{{agent.taxCode}}</td>
-                                    <td>{{agent.userCreatedName}}</td>
+                                    <td> <span class="text-success">{{agent.userCreatedName}}</span> </td>
                                     <td>{{agent.addressVn}}</td>
                                     <td>{{agent.datetimeModified | date:'dd/MM/yyyy' }}</td>
                                     <td [ngClass]="agent.active ? 'text-success' : 'text-danger'">
