@@ -1485,7 +1485,7 @@ namespace eFMS.API.Accounting.DL.Services
                         partnerEn = partner?.PartnerNameEn;
                         taxCode = partner?.TaxCode;
                         serviceName = GetServiceNameOfCdNote(debitNote.Code);
-                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.CreditNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
+                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.DebitNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
                         urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId);
 
