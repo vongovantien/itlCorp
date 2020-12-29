@@ -120,9 +120,10 @@ namespace eFMS.API.Common.Helpers
             }
         }
 
-        public static async Task<bool> DeleteFile(string fileName, string folderName)
+        public static async Task<bool> DeleteFile(string fileName, string folderName, string option="files")
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\files\\" + folderName, fileName);
+          
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + option + "\\" + folderName, fileName);
             if (!System.IO.File.Exists(path)) return false;
             try
             {
@@ -133,6 +134,8 @@ namespace eFMS.API.Common.Helpers
             {
                 return false;
             }
+
+
         }
     }
 }
