@@ -88,25 +88,9 @@ namespace eFMS.API.System.Controllers
             {
                 return false;
             }
-            var result1 = await ImageHelper.DeleteFile(image.Name, "User","images");
+            var result1 = await ImageHelper.DeleteFile(image.Name, image.Folder, "images");
             return result1;
         }
-        [HttpDelete]
-        [Route("DeleteImageCompany")]
-        [Authorize]
-        public async Task<bool> DeleteImageCompany([FromForm]SysImage image)
-        {
-            HandleState img = imageService.Delete(image.Id);
-            string message = HandleError.GetMessage(img, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = img.Success, Message = stringLocalizer[message].Value };
-
-            if (!img.Success)
-            {
-                return false;
-            }
-            var result1 = await ImageHelper.DeleteFile(image.Name, "Company", "images");
-            return result1;
-        }
-
+     
     }
 }
