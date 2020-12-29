@@ -3303,9 +3303,9 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             // Get header
-            forMonth = string.Join(" - ", commissionData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate?.ToString("MMM")).Distinct());
-            forMonth += " ," + commissionData.Details.FirstOrDefault().ServiceDate?.ToString("yyyy");
-            commissionData.ForMonth = forMonth;
+            //forMonth = string.Join(" - ", commissionData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate?.ToString("MMM")).Distinct());
+            //forMonth += " ," + commissionData.Details.FirstOrDefault().ServiceDate?.ToString("yyyy");
+            //commissionData.ForMonth = forMonth;
             commissionData.CustomerName = isOPSReport ? catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.ShortName
                                                         : catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
             commissionData.ExchangeRate = criteria.ExchangeRate;
