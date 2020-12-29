@@ -1,15 +1,19 @@
 .custom-label {
     display: inline-block;
     color: white;
-
     font-family: sans-serif;
-
     cursor: pointer;
-
     border-radius: 15px;
     min-width: 100px;
 }
 
 .box-shadow {
     box-shadow: 0 1px #ffffff inset, 0 1px 3px rgba(34, 25, 25, 0.4);
+}
+
+.auto_image {
+    width: 160px;
+    -o-object-fit: cover;
+    object-fit: cover;
+    height: 160px;
 }
