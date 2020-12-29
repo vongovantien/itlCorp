@@ -124,7 +124,7 @@
 </ng-container>
 
 <info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Create Job'"></info-popup>
+    [title]="'Cannot Update Job'"></info-popup>
 <confirm-popup #duplicateconfirmTemplate
     [body]="'The system will open the Job Create Screen. Are you sure you want to leave?'"
     [title]="'Duplicate job detail'" [labelConfirm]="'Yes'" (onSubmit)="duplicateConfirm()"></confirm-popup>
@@ -142,6 +142,6 @@
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="confirmCancel()"></confirm-popup>
 
-<info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+<info-popup #notAllowDelete [body]="'You are not allowed to delete this job'"></info-popup>
 
 <permission-403-popup></permission-403-popup>

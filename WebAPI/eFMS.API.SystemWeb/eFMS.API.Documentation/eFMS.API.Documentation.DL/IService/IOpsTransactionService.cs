@@ -30,6 +30,6 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
         ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list);
         HandleState LockOpsTransaction(Guid jobId);
-
+        ResultHandle ImportDuplicateJob(OpsTransactionModel model);
     }
 }

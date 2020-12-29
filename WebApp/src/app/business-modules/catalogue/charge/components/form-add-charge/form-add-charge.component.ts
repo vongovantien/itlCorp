@@ -110,9 +110,9 @@ export class FormAddChargeComponent extends AppForm {
         this.generateSelling = this.formGroup.controls["generateSelling"];
         this.type.valueChanges
             .subscribe(
-                (value: CommonInterface.INg2Select[]) => {
+                (value: any) => {
                     if (!!value && !!value.length) {
-                        if (value[0].id.toLowerCase() === CommonEnum.CHARGE_TYPE.CREDIT.toLowerCase()) {
+                        if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.CREDIT.toLowerCase()) {
                             this.isShowMappingSelling = true;
                         } else {
                             this.isShowMappingSelling = false;
@@ -204,10 +204,10 @@ export class FormAddChargeComponent extends AppForm {
             type: res.charge.type,
             service: this.activeServices,
             debitCharge: res.charge.debitCharge,
-            chargeGroup: { id: res.charge.chargeGroup, text: this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup).text },
+            chargeGroup: !!res.charge.chargeGroup && !!this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup) ? { id: res.charge.chargeGroup, text: this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup).text } : null,
             active: res.charge.active,
             productDept: res.charge.productDept,
-            unit: { text: this.ngDataUnit.find(x => x.id === res.charge.unitId).text, id: res.charge.unitId }
+            unit: !!res.charge.unitId && !!this.ngDataUnit.find(x => x.id === res.charge.unitId) ? { text: this.ngDataUnit.find(x => x.id === res.charge.unitId).text, id: res.charge.unitId } : null
         });
     }
 }

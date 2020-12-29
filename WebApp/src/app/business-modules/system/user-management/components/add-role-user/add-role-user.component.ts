@@ -8,7 +8,7 @@ import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { DataService } from '@services';
 @Component({
     selector: 'add-role-user',
@@ -225,8 +225,8 @@ export class AddRoleUserComponent extends AppList {
         }
         this.listRoles.forEach(item => {
             item.userId = this.id;
-            if (item.id === '') {
-                item.id = null;
+            if (!item.id) {
+                item.id = SystemConstants.EMPTY_GUID;
             }
         });
         this.addRoleToUser(this.listRoles);

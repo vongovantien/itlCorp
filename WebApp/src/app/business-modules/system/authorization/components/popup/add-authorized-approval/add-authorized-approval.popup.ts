@@ -4,7 +4,7 @@ import { Validators, FormBuilder, AbstractControl, FormGroup } from '@angular/fo
 import { formatDate } from '@angular/common';
 
 import { PopupBase } from '@app';
-import { SystemRepo, CatalogueRepo } from '@repositories';
+import { SystemRepo } from '@repositories';
 import { ConfirmPopupComponent } from '@common';
 import { User } from '@models';
 
@@ -40,16 +40,15 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     users: Observable<User[]>;
 
 
-    typeList: any[] = ['Advance', 'Settlement', 'unlock Shipment'];
+    typeList: string[] = ['Advance', 'Settlement', 'Unlock Shipment'];
 
     minDateExpired: any = null;
     minDateEffective: any = null;
 
     constructor(
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
-        private _toastService: ToastrService,) {
+        private _toastService: ToastrService, ) {
         super();
     }
 
@@ -64,7 +63,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
             commissioner: [null, Validators.required],
             effectiveDate: [null],
             expirationDate: [null],
-            type: [],
+            type: [null, Validators.required],
             status: [true],
             description: []
         });
@@ -95,7 +94,6 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     }
 
     saveAuthorizedAprroval() {
-        [this.type].forEach((control: AbstractControl) => this.setError(control));
         this.isSubmitted = true;
         if (this.formAuthorizedApproval.valid) {
             const body: IAuthorizedArroval = {

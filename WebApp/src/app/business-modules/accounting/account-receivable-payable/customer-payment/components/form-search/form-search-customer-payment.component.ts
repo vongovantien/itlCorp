@@ -1,5 +1,6 @@
+import { ARCustomerPaymentComponent } from './../../customer-payment.component';
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AccountingConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
@@ -13,8 +14,6 @@ import { AppForm } from '@app';
     templateUrl: './form-search-customer-payment.component.html',
 })
 export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnInit {
-
-    @Output() onSearch: EventEmitter<IAcctReceiptCriteria> = new EventEmitter<IAcctReceiptCriteria>();
 
     formSearch: FormGroup;
     customerID: AbstractControl;
@@ -43,6 +42,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
+        private _listReceipt: ARCustomerPaymentComponent
     ) {
         super();
         this.requestReset = this.requestSearch;
@@ -76,6 +76,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.syncStatus = this.formSearch.controls['syncStatus'];
         this.status = this.formSearch.controls['status'];
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
@@ -101,7 +102,9 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
             status: this.status.value !== this.statuss[0] ? this.status.value : null,
         };
-        this.onSearch.emit(body);
+        this._listReceipt.getCPs(body);
+        // this.onSearch.emit(body);
+
     }
 
     reset() {
@@ -115,8 +118,9 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.currency.setValue('VND');
         this.syncStatus.reset(this.syncStatuss[0]);
         this.status.reset(this.statuss[0]);
+        this._listReceipt.getCPs({});
 
-        this.onSearch.emit(<any>{});
+        // this.onSearch.emit(<any>{});
     }
 
 }

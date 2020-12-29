@@ -8,8 +8,10 @@
                     <h3>{{accountingManagement.voucherId}}
                         <span
                             class="m-badge m-badge--{{accountingManagement.status === 'New' && (!accountingManagement.syncStatus || accountingManagement.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
-                            {{!accountingManagement.syncStatus ? accountingManagement.status : accountingManagement.syncStatus}}
-                            {{accountingManagement.syncStatus === 'Rejected' && accountingManagement.reasonReject ? ' - ' + accountingManagement.reasonReject : ''}}
+                            {{!accountingManagement.syncStatus ? accountingManagement.status :
+                            accountingManagement.syncStatus}}
+                            {{accountingManagement.syncStatus === 'Rejected' && accountingManagement.reasonReject ? ' -
+                            ' + accountingManagement.reasonReject : ''}}
                         </span>
                     </h3>
                     <div>
@@ -61,3 +63,5 @@
 
 <confirm-popup #confirmSyncVoucher (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
     body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
+
+<info-popup #validateSyncedVoucherPopup [body]="messageValidate" [title]="'Alert'"></info-popup>

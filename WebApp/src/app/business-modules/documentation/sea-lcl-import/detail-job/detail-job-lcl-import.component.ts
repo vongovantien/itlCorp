@@ -35,7 +35,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     @ViewChild("confirmLockShipment") confirmLockPopup: ConfirmPopupComponent;
     @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     jobId: string;

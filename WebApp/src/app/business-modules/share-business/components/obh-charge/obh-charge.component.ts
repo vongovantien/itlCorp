@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -27,6 +27,7 @@ import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingChargeComponent {
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.OBH;
+    @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,

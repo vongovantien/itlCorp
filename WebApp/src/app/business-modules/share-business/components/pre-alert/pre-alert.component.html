@@ -273,7 +273,6 @@
                                 </div>
                                 <div class="file-item__name m--margin-left-20">
                                     <a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}</a>
-
                                 </div>
                             </div>
                         </div>
@@ -286,6 +285,12 @@
 </div>
 
 <add-attachment-popup (onAdd)="onAddFile($event)"></add-attachment-popup>
+
+<form class="hidden" #formReportPDF target="framePDF" method="POST" [action]="srcReportPDF | safe:'resourceUrl'">
+    <input name="crystal" type="hidden" [value]="valuePDF">
+</form>
+<iframe style="display: none;" #framePDF id="framePDF" name="framePDF" src="" type="application/pdf" height="1080px"
+    width="100%" allowfullscreen frameborder="0"></iframe>
 
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>

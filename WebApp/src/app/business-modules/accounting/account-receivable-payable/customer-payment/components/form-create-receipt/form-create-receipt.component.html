@@ -42,7 +42,8 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="form-group">
+                <div class="form-group" class="form-group"
+                    [ngClass]="{'m-form__group has-danger':isSubmitted && !agreementId.valid }">
                     <label required>Agreement
                     </label>
                     <app-combo-grid-virtual-scroll #combogridAgreement

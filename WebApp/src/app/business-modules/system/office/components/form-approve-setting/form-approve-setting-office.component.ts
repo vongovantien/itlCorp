@@ -35,6 +35,8 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
         ChargeConstants.SLE_CODE,
         ChargeConstants.SFI_CODE,
         ChargeConstants.SFE_CODE,
+        ChargeConstants.SCI_CODE,
+        ChargeConstants.SCE_CODE,
         ChargeConstants.CL_CODE,
     ];
     officeId: string;
@@ -66,7 +68,7 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
     }
 
     initLockingShipmentSetting() {
-        for (let index = 0; index < 7; index++) {
+        for (let index = 0; index < 9; index++) {
             this.serviceLockSettings.push(new LockShipmentSetting({ serviceType: this.services[index] }));
         }
     }

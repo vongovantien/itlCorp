@@ -551,6 +551,7 @@ namespace eFMS.API.System.DL.Services
             result.SysEmployeeModel.BankName = currEmployee?.BankName;
             result.SysEmployeeModel.Tel = currEmployee?.Tel;
             result.SysEmployeeModel.StaffCode = currEmployee?.StaffCode;
+            result.SysEmployeeModel.PersonalId = currEmployee?.PersonalId;
             // get avatar through last modified date.
             result.Avatar = currEmployee?.Photo;
 

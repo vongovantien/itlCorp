@@ -3,7 +3,7 @@
         <div class="c-button-actions">
             <ng-container *ngIf="!!shipmentDetail && !shipmentDetail.isLocked">
                 <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
-                    *ngIf="!!shipmentDetail && shipmentDetail.permission.allowLock">
+                    [disabled]="ACTION === 'COPY'" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowLock">
                 </app-default-button>
             </ng-container>
             <span *ngIf="!!shipmentDetail && !!shipmentDetail.isLocked" class="m--margin-right-10 align-middle">
@@ -123,7 +123,7 @@
 </ng-container>
 
 <info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Create Job'"></info-popup>
+    [title]="'Cannot Update Job'"></info-popup>
 
 <confirm-popup #duplicateconfirmTemplate
     [body]="'The system will open the Job Create Screen. Are you sure you want to leave?'"
@@ -143,6 +143,6 @@
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="confirmCancel()" labelConfirm="Yes"></confirm-popup>
 
-<info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+<info-popup #notAllowDelete [body]="'You are not allowed to delete this job'"></info-popup>
 
 <permission-403-popup></permission-403-popup>
