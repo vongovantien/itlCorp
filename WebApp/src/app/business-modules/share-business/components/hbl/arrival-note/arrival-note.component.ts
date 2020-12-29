@@ -3,21 +3,19 @@ import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
+import { ActivatedRoute, Params } from '@angular/router';
 
-import { AppList } from 'src/app/app.list';
-import { ArrivalFreightCharge, User, CsTransaction } from 'src/app/shared/models';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SortService } from 'src/app/shared/services';
-import { SystemConstants } from 'src/constants/system.const';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
+import { AppList } from '@app';
+import { ArrivalFreightCharge, User, CsTransaction, HBLArrivalNote } from '@models';
+import { DocumentationRepo } from '@repositories';
+import { SortService } from '@services';
+import { SystemConstants, ChargeConstants } from '@system-constants';
+import { CommonEnum } from '@enums';
 
-import { catchError, finalize, takeUntil, tap, switchMap, map, concatMap } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, switchMap, map, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../store';
 import { getSellingSurChargeState, getTransactionDetailCsTransactionState } from './../../../store';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { ActivatedRoute, Params } from '@angular/router';
 import { of } from 'rxjs';
 
 
@@ -38,7 +36,20 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
 
     private _transationType: string = ChargeConstants.SFI_CODE;
 
-    headers: CommonInterface.IHeaderTable[];
+    headers: CommonInterface.IHeaderTable[] = [
+        { title: 'Charge', field: 'chargeId', sortable: true, width: 250 },
+        { title: 'Quantity', field: 'quantity', sortable: true, width: 150 },
+        { title: 'Unit', field: 'unitId', sortable: true },
+        { title: 'Unit Price', field: 'unitPrice', sortable: true },
+        { title: 'Currency', field: 'currencyId', sortable: true },
+        { title: 'VAT', field: 'vatrate', sortable: true },
+        { title: 'Total Amount', field: 'total', sortable: true },
+        { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
+        { title: 'Note', field: 'notes', sortable: true },
+        { title: 'Show', field: 'isShow', sortable: true },
+        { title: 'Full', field: 'isFull', sortable: true },
+        { title: 'Tick', field: 'isTick', sortable: true },
+    ];
 
     hblArrivalNote: HBLArrivalNote = new HBLArrivalNote();
 
@@ -68,12 +79,11 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     }
 
     ngOnInit() {
-        this.configData();
-
         this._activedRoute.params
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 map((p: Params) => {
+                    console.log(p);
                     if (p.hblId) {
                         this.hblid = p.hblId;
                     } else {
@@ -92,7 +102,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
                     this.hblArrivalNote.csArrivalFrieghtCharges = data.csArrivalFrieghtCharges || [];
 
                     if (!data.arrivalNo) {
-                        return this._store.select(getTransactionDetailCsTransactionState);
+                        return this._store.select(getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe));
                     } else {
                         this.hblArrivalNote.arrivalNo = data.arrivalNo;
                         this.hblArrivalNote.arrivalFirstNotice = !!data.arrivalFirstNotice ? {
@@ -119,12 +129,15 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
                         startDate: new Date(),
                         endDate: new Date()
                     };
-                    this.hblArrivalNote.arrivalHeader = `
+                    if (!this.hblArrivalNote.arrivalHeader) {
+                        this.hblArrivalNote.arrivalHeader = `
                     <p><strong>The following documents are requested against the Delivery Order (Thủ tục y&ecirc;u cầu khi nhận D/O)</strong><br>☑☐&nbsp; &nbsp;Giấy giới thiệu<br>Pls pick-up DO after vessel&#39;s arrival 1 day. Thks! ( Vui l&ograve;ng nhận DO sau ng&agrave;y t&agrave;u
                     cập 1 ng&agrave;y)<br><u><strong>PLS PICK-UP DO AT (Li&ecirc;n hệ nhận D/O:)</strong></u><br><strong><em>C&ocirc;ng ty cổ phần giao nhận v&agrave; vận chuyển In Do Trần<br>52 - 54 - 56 Trường Sơn,
                     Phường 2, Quận T&acirc;n B&igrave;nh, TP. HCM, Việt Nam</em></strong><br><u><strong>Giờ l&agrave;m việc:<br></strong></u><strong>S&aacute;ng: 8.00 - 12.00/Chiều: 13.30 -
                     17.30</strong></p><p><br></p>
                     `;
+                    }
+
                     return new HBLArrivalNote(this.hblArrivalNote);
                 })
             )
@@ -134,23 +147,6 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
 
         // * Get selling charge for sync.
         this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.hblid }));
-    }
-
-    configData() {
-        this.headers = [
-            { title: 'Charge', field: 'chargeId', sortable: true, width: 250 },
-            { title: 'Quantity', field: 'quantity', sortable: true, width: 150 },
-            { title: 'Unit', field: 'unitId', sortable: true },
-            { title: 'Unit Price', field: 'unitPrice', sortable: true },
-            { title: 'Currency', field: 'currencyId', sortable: true },
-            { title: 'VAT', field: 'vatrate', sortable: true },
-            { title: 'Total Amount', field: 'total', sortable: true },
-            { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
-            { title: 'Note', field: 'notes', sortable: true },
-            { title: 'Show', field: 'isShow', sortable: true },
-            { title: 'Full', field: 'isFull', sortable: true },
-            { title: 'Tick', field: 'isTick', sortable: true },
-        ];
     }
 
     sortFreightCharge() {

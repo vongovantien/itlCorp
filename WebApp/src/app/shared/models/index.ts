@@ -64,6 +64,7 @@ export * from './document/csBookingnote';
 export * from './document/arrival-note-hbl';
 export * from './document/shippingInstruction.model';
 export * from './document/emailContent';
+export * from './document/arrival-note-hbl';
 
 export * from './tool-setting/tariff';
 export * from './tool-setting/ecus-connection';
