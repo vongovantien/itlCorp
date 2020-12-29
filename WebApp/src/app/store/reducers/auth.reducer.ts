@@ -2,7 +2,7 @@ import { Action, createReducer, on } from "@ngrx/store";
 import { GetCurrenctUser, UpdateCurrentUser } from "../actions";
 
 export interface IAuthState {
-    currentUser: any;
+    currentUser: Partial<SystemInterface.IClaimUser>;
 }
 
 export const initialState: IAuthState = {

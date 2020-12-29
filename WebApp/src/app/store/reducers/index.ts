@@ -1,4 +1,3 @@
-import { AuthActions } from './../actions/auth.action';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
 import { IMenuState, menuReducer } from './menu.reducer';

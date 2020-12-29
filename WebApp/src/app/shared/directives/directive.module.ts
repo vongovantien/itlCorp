@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import {
     AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterNoSpaceDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
-    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective
+    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective
 } from '.';
 import { CurrencyPipe } from '@angular/common';
 
@@ -22,7 +22,8 @@ const APP_DIRECTIVES = [
     InjectViewContainerRefDirective,
     IconCalendarDirective,
     IConClearCalendarDirective,
-    DisabledControlDirective
+    DisabledControlDirective,
+    HasOwnerPermissionDirective
 ];
 @NgModule({
     declarations: [

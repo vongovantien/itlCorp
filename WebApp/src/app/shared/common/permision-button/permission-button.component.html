@@ -56,10 +56,15 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'delete'">
-        <button type="button" NoDbClick class="btn btn-{{class ? class : 'danger'}}  m-btn--icon m-btn--icon-only"
-            *ngIf="(menuPermission | async)?.delete !== 'None'" (click)="onClicked($event)">
-            <i class="la la-trash"></i>
-        </button>
+        <ng-container *ngIf="(menuPermission | async)?.delete !== 'None'">
+            <ng-container *ngIf="!!user && (menuPermission | async)?.delete=== 'Owner';else deleteTpl">
+                <button type="button" NoDbClick
+                    class="btn btn-{{class ? class : 'danger'}}  m-btn--icon m-btn--icon-only"
+                    (click)="onClicked($event)" *hasOwnerPermission="user">
+                    <i class="la la-trash"></i>
+                </button>
+            </ng-container>
+        </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'add'">
         <button type="button" NoDbClick class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--uppercase"
@@ -84,3 +89,11 @@
         </button>
     </ng-container>
 </ng-container>
+
+
+<ng-template #deleteTpl>
+    <button type="button" NoDbClick class="btn btn-{{class ? class : 'danger'}}  m-btn--icon m-btn--icon-only"
+        (click)="onClicked($event)">
+        <i class="la la-trash"></i>
+    </button>
+</ng-template>

@@ -15,6 +15,7 @@ export * from './icon-calendar.directive';
 export * from './icon-clear-calendar.directive';
 export * from './load-module.directive';
 export * from './disabled-control.directive';
+export * from './hasOwnerPermisison.directive';
 
 
 
