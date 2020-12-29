@@ -74,7 +74,7 @@
         <div class="row">
             <div class="col-12">
                 <tabset type="tabs" class="custom-class-tab">
-                    <tab heading="Job detail" (selectTab)="selectTab('job-edit')">
+                    <tab heading="Job detail" (selectTab)="selectTab('job-edit')" [active]="tab === 'job-edit'">
                         <!-- <div *ngIf="tab === 'job-edit'"> -->
                         <div class="m-form m-form--state">
                             <div class="m-portlet">
@@ -90,7 +90,7 @@
                         <div class="m-portlet" style="position: relative;">
                             <div class="m-portlet__body">
                                 <tabset class="custom-class-tab">
-                                    <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
+                                    <tab heading="Buying" (selectTab)="getSurCharges('BUY')" [active]="selectedTabSurcharge === 'BUY'">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <buying-charge [showGetCharge]="false" service="logistic" [allowSaving]="isJobCopy"

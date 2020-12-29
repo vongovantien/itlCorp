@@ -92,6 +92,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     this.jobId = params.id;
                     if (!!params.action) {
                         this.isJobCopy = params.action.toUpperCase() === 'COPY';
+                        this.selectedTabSurcharge = 'BUY';
                     }
                     this.getShipmentDetails(params.id);
                 }
@@ -300,9 +301,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this.jobId = res.data.id;
                         this.isDuplicate = true;
                         this.isJobCopy = false;
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
-                            queryParams: Object.assign({}, { tab: 'job-edit' })
-                        });
+                        this.headerComponent.resetBreadcrumb("Detail Job");
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
                     } else {
                         this._toastService.warning(res.message);
                     }

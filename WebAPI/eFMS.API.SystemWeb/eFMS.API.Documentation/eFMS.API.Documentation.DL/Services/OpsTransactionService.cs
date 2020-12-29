@@ -1303,7 +1303,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             // Update list SurCharge
             var listSurCharge = CopySurChargeToNewJob(_hblId, model.Hblid);
-            if (listSurCharge.Count() > 0)
+            if (listSurCharge?.Count() > 0)
             {
                 newSurcharges.AddRange(listSurCharge);
             }
@@ -1325,7 +1325,7 @@ namespace eFMS.API.Documentation.DL.Services
                         HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
                         surchargeRepository.SubmitChanges();
                     }
-                    return new ResultHandle { Status = true, Message = "Job have been save!", Data = entity };
+                    return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
                 }
                 return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
             }
