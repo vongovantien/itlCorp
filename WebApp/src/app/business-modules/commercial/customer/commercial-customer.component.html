@@ -71,7 +71,7 @@
                                     <td>{{customer.accountNo}}</td>
                                     <td>{{customer.shortName}}</td>
                                     <td>{{customer.taxCode}}</td>
-                                    <td>{{customer.userCreatedName}}</td>
+                                    <td> <span class="text-success">{{customer.userCreatedName}}</span></td>
                                     <td>{{customer.addressVn}}</td>
                                     <td>{{customer.datetimeModified | date:'dd/MM/yyyy' }}</td>
                                     <td [ngClass]="customer.active ? 'text-success' : 'text-danger'">
