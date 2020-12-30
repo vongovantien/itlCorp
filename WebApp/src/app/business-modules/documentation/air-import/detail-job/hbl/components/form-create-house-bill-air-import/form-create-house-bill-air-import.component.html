@@ -194,7 +194,11 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Unit</label>
-                                <ng-select class="custom" (itemSelected)="onSelectDataFormInfo($event, 'packageType')" placeholder="Please select" [items]="ngDataUnit | async" bindLabel="code" bindValue="id" formControlName="packageType" [loading]="isLoadingPort | async"></ng-select>
+                                <select class="form-control" formControlName="packageType">
+                                    <option *ngFor="let unit of (ngDataUnit | async)" [value]="unit.id">
+                                        {{unit.unitNameEn}}</option>
+                                </select>
+
                             </div>
                         </div>
                     </div>
