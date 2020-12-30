@@ -183,7 +183,7 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && x.JobNo.StartsWith("H"))
+                                                    && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault(); //CR: HAN -> H [15202]
                 }
@@ -192,7 +192,7 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && x.JobNo.StartsWith("D"))
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault(); //CR: DAD -> D [15202]
                 }
@@ -201,8 +201,8 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && !x.JobNo.StartsWith("D")
-                                                        && !x.JobNo.StartsWith("H"))
+                                                        && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-") 
+                                                        && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
                 }
@@ -212,8 +212,8 @@ namespace eFMS.API.Documentation.DL.Services
                 currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && !x.JobNo.StartsWith("D")
-                                                    && !x.JobNo.StartsWith("H"))
+                                                    && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                    && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
             }

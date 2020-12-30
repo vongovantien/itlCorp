@@ -184,22 +184,22 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (office.Code == "ITLHAN")
                 {
-                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("H")).FirstOrDefault(); //CR: HAN -> H [15202]
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
-                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("D")).FirstOrDefault(); //CR: DAD -> D [15202]
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")).FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
-                    currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D")
-                                                           && !x.Code.StartsWith("H")).FirstOrDefault();
+                    currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
+                                                           && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
                 }
             }
             else
             {
-                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D")
-                                                       && !x.Code.StartsWith("H")).FirstOrDefault();
+                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
+                                                       && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
             }
             return currentCdNote;
         }
