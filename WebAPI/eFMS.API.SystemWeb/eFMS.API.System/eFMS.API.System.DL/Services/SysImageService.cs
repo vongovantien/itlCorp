@@ -97,7 +97,17 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState Delete(Guid id)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            try
+            {
+                HandleState img = DataContext.Delete(x => x.Id == id);
+                return img;
+            }
+            catch (Exception ex)
+            {
+                var img = new HandleState(ex.Message);
+                return img;
+            }
         }
 
         public IQueryable<SysImageModel> GetAll()
