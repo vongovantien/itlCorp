@@ -45,6 +45,7 @@ export class UserProfilePageComponent extends AppForm {
 
     photoUrl: string;
 
+
     constructor(
         private _ngProgressService: NgProgress,
         private _fb: FormBuilder,
@@ -86,7 +87,8 @@ export class UserProfilePageComponent extends AppForm {
     }
 
     initImageLibary() {
-        this._zone.run(() => {
+        let selectImg = null;
+        this._zone.runOutsideAngular(() => {
             $(this.el.nativeElement).froalaEditor({
                 requestWithCORS: true,
                 language: 'vi',
@@ -95,14 +97,23 @@ export class UserProfilePageComponent extends AppForm {
                 imageAllowedTypes: ['jpeg', 'jpg', 'png'],
                 requestHeaders: {
                     Authorization: `Bearer ${localStorage.getItem(SystemConstants.ACCESS_TOKEN)}`,
-                    Module: 'User',
+                    Module: 'User', // thu muc anh chua anh cua user.
                     ObjectId: `${this.currentUserId}`,
                 },
                 imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
                 imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/User?userId=${this.currentUserId}`,
-
+                imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
+                imageManagerDeleteMethod: 'DELETE',
+                imageManagerDeleteParams: { id: selectImg?.id }
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
+            }).on('froalaEditor.imageManager.imageDeleted', (e, editor, data) => {
+                if (e.error) {
+                    this._toastService.error("Xóa thất bại");
+                } else
+                    this._toastService.success("Xóa thành công");
+
+
             }).on('froalaEditor.image.error', (e, editor, error, response) => {
                 console.log(error);
                 switch (error.code) {
@@ -116,7 +127,7 @@ export class UserProfilePageComponent extends AppForm {
                         this._toastService.error(error.message);
                         break;
                 }
-            });
+            })
         });
     }
 

@@ -176,6 +176,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult InsertDuplicateJob(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            model.Id = Guid.NewGuid();
             var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {

@@ -91,6 +91,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     this.jobId = params.id;
                     if (!!params.action) {
                         this.isDuplicate = params.action.toUpperCase() === 'COPY';
+                        this.selectedTabSurcharge = 'BUY';
                     }
                     this.getShipmentDetails(params.id);
                 }
@@ -294,13 +295,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    if (res) {
+                    if (res.status) {
                         this._toastService.success(res.message);
                         this.jobId = res.data.id;
-                        this.isDuplicate = true;
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
-                            queryParams: Object.assign({}, { tab: 'job-edit' })
-                        });
+                        this.isDuplicate = false;
+                        this.headerComponent.resetBreadcrumb("Detail Job");
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
                     } else {
                         this._toastService.warning(res.message);
                     }
@@ -457,7 +457,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             return of(true);
         }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
-        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
+        if (this.isCancelFormPopupSuccess || !this.isDuplicate) {
             return of(true);
         }
         if (isEdited && !this.isCancelFormPopupSuccess) {

@@ -667,6 +667,8 @@ namespace eFMS.API.Setting.DL.Services
             var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
             var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
 
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
             if (approve == null)
             {
                 if ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup) || leaderLevel.UserDeputies.Contains(userCurrent.UserID)) //Leader
@@ -677,7 +679,7 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     isManagerOrLeader = true;
                 }
-                else if ((isAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) //Accountant Manager
+                else if (((isAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) && isDeptAccountant) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -705,10 +707,11 @@ namespace eFMS.API.Setting.DL.Services
                     isManagerOrLeader = true;
                 }
                 else if (
-                            (userCurrent.GroupId == SettingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                            ( (userCurrent.GroupId == SettingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                           ||
-                            accountantLevel.UserDeputies.Contains(currentUser.UserID)
-                        ) //Accountant Manager
+                            accountantLevel.UserDeputies.Contains(currentUser.UserID) )
+                          && isDeptAccountant
+                        ) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -775,9 +778,10 @@ namespace eFMS.API.Setting.DL.Services
                 }
             }
             else if (
-                       ((isAccountant && isDeptAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                       ( ((isAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                       ||
-                        accountantLevel.UserDeputies.Contains(currentUser.UserID))
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID)) )
+                      && isDeptAccountant
                     ) //Accountant Manager
             {
                 if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (managerLevel.Role == SettingConstants.ROLE_NONE && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE))

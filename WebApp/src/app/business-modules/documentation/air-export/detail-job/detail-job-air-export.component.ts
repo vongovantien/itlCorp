@@ -33,8 +33,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment") confirmLockPopup: ConfirmPopupComponent;
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild('Permission403PopupComponent') permissionPopup: Permission403PopupComponent;
     @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
 
     jobId: string;

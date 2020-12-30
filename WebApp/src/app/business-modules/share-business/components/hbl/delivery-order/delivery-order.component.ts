@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { ActivatedRoute, Params } from '@angular/router';
 
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 import { DeliveryOrder, User, CsTransaction } from '@models';
 import { DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
@@ -73,8 +73,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
                     this.deliveryOrder.doheader1 = data.doheader1;
 
                     if (!data.deliveryOrderNo) {
-                        // ! Select Store chỗ nào thì takeUntil để tranh memoryLeak
-                        return this._store.select(fromShare.getTransactionDetailCsTransactionState);
+                        return this._store.select(fromShare.getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe));
                     } else {
                         this.deliveryOrder.deliveryOrderNo = data.deliveryOrderNo;
                         this.deliveryOrder.deliveryOrderPrintedDate = {
@@ -92,7 +91,9 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
                     }
 
                     // * Update field from shipment
-                    this.deliveryOrder.doheader1 = this.generateDoHeader(res, this.isAir);
+                    if (!this.deliveryOrder.doheader1) {
+                        this.deliveryOrder.doheader1 = this.generateDoHeader(res, this.isAir);
+                    }
                     this.deliveryOrder.deliveryOrderNo = res.jobNo + "-" + this.generateDeliveryOrderNo(this.isAir);
                     this.deliveryOrder.deliveryOrderPrintedDate = {
                         startDate: new Date(),
@@ -113,7 +114,6 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: { [key: string]: any }) => {
-                    console.log(res);
                     if (res.podName) {
                         this.deliveryOrder.doheader1 = res.podName;
                     }

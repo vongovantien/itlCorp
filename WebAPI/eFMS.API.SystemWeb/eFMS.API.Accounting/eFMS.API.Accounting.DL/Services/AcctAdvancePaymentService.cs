@@ -44,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
 
@@ -66,6 +67,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IContextBase<SysOffice> sysOffice,
             ICurrencyExchangeService currencyExchange,
             IStringLocalizer<LanguageSub> localizer,
             IUserBaseService userBase) : base(repository, mapper)
@@ -90,6 +92,7 @@ namespace eFMS.API.Accounting.DL.Services
             userBaseService = userBase;
             stringLocalizer = localizer;
             sentEmailHistoryRepo = sentEmailHistory;
+            sysOfficeRepo = sysOffice;
         }
 
         #region --- LIST & PAGING ---
@@ -1170,17 +1173,17 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvance.AdvDpManagerStickDeny = null;
             acctAdvance.AdvDpManagerStickApp = null;
             acctAdvance.AdvDpManagerName = managerName;
-            acctAdvance.AdvDpSignDate = null;
+            acctAdvance.AdvDpSignDate = approveAdvance?.ManagerAprDate;
             acctAdvance.AdvAcsDpManagerID = "N/A";
             acctAdvance.AdvAcsDpManagerStickDeny = null;
             acctAdvance.AdvAcsDpManagerStickApp = null;
             acctAdvance.AdvAcsDpManagerName = accountantName;
-            acctAdvance.AdvAcsSignDate = null;
+            acctAdvance.AdvAcsSignDate = approveAdvance?.AccountantAprDate;
             acctAdvance.AdvBODID = "N/A";
             acctAdvance.AdvBODStickDeny = null;
             acctAdvance.AdvBODStickApp = null;
             acctAdvance.AdvBODName = "N/A";
-            acctAdvance.AdvBODSignDate = null;
+            acctAdvance.AdvBODSignDate = approveAdvance?.BuheadAprDate;
             acctAdvance.AdvCashier = "N/A";
             acctAdvance.AdvCashierName = "N/A";
             acctAdvance.CashedDate = null;
@@ -2096,7 +2099,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Send Mail đề nghị Approve
-        private bool SendMailSuggestApproval(string advanceNo, string userReciver, string emailUserReciver, List<string> usersDeputy)
+        private bool SendMailSuggestApproval(string advanceNo, string userReciver, string emailUserReciver, List<string> emailUsersDeputy)
         {
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
@@ -2169,20 +2172,13 @@ namespace eFMS.API.Accounting.DL.Services
                 emailRequester
             };
 
-            if (usersDeputy.Count > 0)
+            if (emailUsersDeputy.Count > 0)
             {
-                foreach (var userName in usersDeputy)
+                foreach (var email in emailUsersDeputy)
                 {
-                    //Lấy ra userId by userName
-                    var userId = sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.Id;
-
-                    //Lấy ra employeeId của user
-                    var employeeIdOfUser = userBaseService.GetEmployeeIdOfUser(userId);
-                    //Lấy ra email của user
-                    var emailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
-                    if (!string.IsNullOrEmpty(emailUser))
+                    if (!string.IsNullOrEmpty(email))
                     {
-                        emailCCs.Add(emailUser);
+                        emailCCs.Add(email);
                     }
                 }
             }
@@ -2735,6 +2731,8 @@ namespace eFMS.API.Accounting.DL.Services
             var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
             var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
 
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
             if (approve == null)
             {
                 if ((isLeader && userCurrent.GroupId != AccountingConstants.SpecialGroup) || leaderLevel.UserDeputies.Contains(userCurrent.UserID)) //Leader
@@ -2745,7 +2743,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     isManagerOrLeader = true;
                 }
-                else if ((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) //Accountant Manager
+                else if (((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) && isDeptAccountant) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -2773,10 +2771,11 @@ namespace eFMS.API.Accounting.DL.Services
                     isManagerOrLeader = true;
                 }
                 else if (
-                            (userCurrent.GroupId == AccountingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                            ( (userCurrent.GroupId == AccountingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                           ||
-                            accountantLevel.UserDeputies.Contains(currentUser.UserID)
-                        ) //Accountant Manager
+                            accountantLevel.UserDeputies.Contains(currentUser.UserID) )
+                          && isDeptAccountant
+                        ) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -2849,9 +2848,10 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             else if (
-                       ((isAccountant && isDeptAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                       ( ((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                       ||
-                        accountantLevel.UserDeputies.Contains(currentUser.UserID))
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID)) )
+                      && isDeptAccountant
                     ) //Accountant Manager
             {
                 isShowBtnDeny = false;
@@ -3108,6 +3108,9 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
+            var office = sysOfficeRepo.Get(x => x.Id == advancePayment.OfficeId).FirstOrDefault();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+
             var infoAdvance = new InfoAdvanceExport
             {
                 Requester = _requester,
@@ -3119,7 +3122,11 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvanceReason = advancePayment.AdvanceNote,
                 DealinePayment = advancePayment.DeadlinePayment,
                 Manager = _manager,
-                Accountant = _accountant
+                Accountant = _accountant,
+                IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
+                IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
+                IsBODApproved = _advanceApprove?.BuheadAprDate != null,
+                ContactOffice = _contactOffice
             };
             return infoAdvance;
         }

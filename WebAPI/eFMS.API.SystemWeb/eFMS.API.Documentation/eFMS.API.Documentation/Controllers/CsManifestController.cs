@@ -147,7 +147,9 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        [HttpGet("CheckExistManifestExport/{id}")]
+        [HttpGet("CheckExistManifestExport")]
+        [Authorize]
+
         public IActionResult CheckExistManifestExport(Guid jobId)
         {
             return Ok(manifestService.CheckExistManifestExport(jobId));

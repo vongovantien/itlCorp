@@ -557,8 +557,8 @@ namespace eFMS.API.ReportData.FormatExcel
         private void SetWidthColumnExcelDetailAdvancePayment(ExcelWorksheet workSheet)
         {
             workSheet.Column(1).Width = 8; //Cột A
-            workSheet.Column(2).Width = 20; //Cột B
-            workSheet.Column(3).Width = 30; //Cột C
+            workSheet.Column(2).Width = 21; //Cột B
+            workSheet.Column(3).Width = 25; //Cột C
             workSheet.Column(4).Width = 20; //Cột D
             workSheet.Column(5).Width = 15; //Cột E
             workSheet.Column(8).Width = 15; //Cột H
@@ -653,6 +653,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
         private void BindingDataDetailAdvancePaymentExcel(ExcelWorksheet workSheet, AdvanceExport advanceExport, string language)
         {
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 11));
+            workSheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
             SetWidthColumnExcelDetailAdvancePayment(workSheet);
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -670,13 +673,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["H1"].Style.Font.Italic = true;
             workSheet.Cells["H2:K2"].Merge = true;
             workSheet.Cells["H2:K2"].Style.WrapText = true;
-            workSheet.Cells["H2"].Value = headers[1];
+            workSheet.Cells["H2"].Value = advanceExport.InfoAdvance.ContactOffice;
             workSheet.Cells["H2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
             workSheet.Cells["H2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Row(2).Height = 60;
-
-            workSheet.Cells.Style.Font.Name = "Times New Roman";
-
+            
             //Title
             workSheet.Cells["A4:K4"].Merge = true;
             workSheet.Cells["A4"].Value = headers[2]; //Phiếu đề nghị tạm ứng
@@ -729,6 +730,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[9, 5].Value = headers[11]; // C.W           
             workSheet.Cells[9, 6].Value = headers[12]; //Số kiện            
             workSheet.Cells[9, 7].Value = headers[13]; //số CBM
+
+            workSheet.Cells[8, 1, 8, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[8, 8, 8, 11].Merge = true;
             workSheet.Cells[8, 8, 8, 11].Value = headers[9];//Số tiến tạm ứng           
@@ -839,24 +842,18 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[8, 1, p, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[8, 1, p, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
-            //In đậm border Cột 1
             for (var i = 8; i < p + 1; i++)
             {
+                //In đậm border bên trái của Cột 1
+                workSheet.Cells[i, 1].Style.Border.Left.Style = ExcelBorderStyle.Medium;
+                //In đậm border Cột 3
                 workSheet.Cells[i, 3].Style.Border.Right.Style = ExcelBorderStyle.Medium;
-            }
-
-            //In đậm border Cột 2
-            for (var i = 8; i < p + 1; i++)
-            {
+                //In đậm border Cột 7
                 workSheet.Cells[i, 7].Style.Border.Right.Style = ExcelBorderStyle.Medium;
-            }
-
-            //In đậm border Cột 3
-            for (var i = 8; i < p + 1; i++)
-            {
+                //In đậm border Cột 11
                 workSheet.Cells[i, 11].Style.Border.Right.Style = ExcelBorderStyle.Medium;
             }
-
+            
             //Clear border Shipment
             int r = 10;
             int c = 16;
@@ -921,8 +918,31 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 10, p, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 10, p, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            p = p + 5; //Bỏ trống 5 row
+            p = p + 1;
 
+            if (advanceExport.InfoAdvance.RequestDate != null)
+            {
+                AddIconTick(workSheet, p, 2); //Tick Requester
+            }
+
+            if (advanceExport.InfoAdvance.IsManagerApproved)
+            {
+                AddIconTick(workSheet, p, 4); //Tick Manager Dept
+            }
+
+            if (advanceExport.InfoAdvance.IsAccountantApproved)
+            {
+                workSheet.Cells[p, 7, p, 8].Merge = true;
+                AddIconTick(workSheet, p, 7); //Tick Accountant
+            }
+
+            if (advanceExport.InfoAdvance.IsBODApproved)
+            {
+                workSheet.Cells[p, 10, p, 11].Merge = true;
+                AddIconTick(workSheet, p, 10); //Tick BOD
+            }
+
+            p = p + 1;
 
             for (int x = 2; x < 5; x++)
             {
@@ -939,10 +959,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 7, p, 8].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
             workSheet.Cells[p, 10, p, 11].Merge = true;
-            workSheet.Cells[p, 10, p, 11].Value = string.Empty; //Giám đốc
-
-            //Set font size từ header table trở xuống
-            workSheet.Cells[8, 1, p, 11].Style.Font.Size = 10;
+            workSheet.Cells[p, 10, p, 11].Value = string.Empty; //Giám đốc            
         }
         #endregion --- ADVANCE PAYMENT ---
         #region --- SOA ---
@@ -2612,16 +2629,16 @@ namespace eFMS.API.ReportData.FormatExcel
 
         private void SetWidthColumnExcelDetailSettlementPayment(ExcelWorksheet workSheet)
         {
-            workSheet.Column(1).Width = 8; //Cột A
-            workSheet.Column(2).Width = 20; //Cột B
-            workSheet.Column(3).Width = 30; //Cột C
+            workSheet.Column(1).Width = 5; //Cột A
+            workSheet.Column(2).Width = 21; //Cột B
+            workSheet.Column(3).Width = 24; //Cột C
             workSheet.Column(4).Width = 6; //Cột D
             workSheet.Column(5).Width = 30; //Cột E
             workSheet.Column(6).Width = 20; //Cột F
-            workSheet.Column(7).Width = 15; //Cột G
-            workSheet.Column(8).Width = 15; //Cột H
+            workSheet.Column(7).Width = 12; //Cột G
+            workSheet.Column(8).Width = 12; //Cột H
             workSheet.Column(9).Width = 20; //Cột I
-            workSheet.Column(10).Width = 15; //Cột J
+            workSheet.Column(10).Width = 12; //Cột J
             workSheet.Column(11).Width = 18; //Cột K
         }
 
@@ -2715,6 +2732,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
         private void BindingDataDetailSettlementPaymentExcel(ExcelWorksheet workSheet, SettlementExport settlementExport, string language)
         {
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 11));
+            workSheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
             SetWidthColumnExcelDetailSettlementPayment(workSheet);
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -2728,25 +2748,24 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["H1:K1"].Merge = true;
             workSheet.Cells["H1"].Value = headers[0];
-            workSheet.Cells["H1"].Style.Font.SetFromFont(new Font("Arial Black", 10));
+            workSheet.Cells["H1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
             workSheet.Cells["H1"].Style.Font.Italic = true;
             workSheet.Cells["H2:K2"].Merge = true;
-            workSheet.Cells["H2:K2"].Style.WrapText = true;
-            workSheet.Cells["H2"].Value = headers[1];
-            workSheet.Cells["H2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 8));
+            workSheet.Cells["H2"].Style.WrapText = true;
+            workSheet.Cells["H2"].Value = settlementExport.InfoSettlement.ContactOffice;
+            workSheet.Cells["H2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 9));
             workSheet.Cells["H2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Row(2).Height = 50;
+            workSheet.Row(2).Height = 60;
 
             //Title
             workSheet.Cells["A3:K3"].Merge = true;
-            workSheet.Cells["A3"].Style.Font.SetFromFont(new Font("Times New Roman", 16));
+            workSheet.Cells["A3"].Style.Font.SetFromFont(new Font("Times New Roman", 18));
             workSheet.Cells["A3"].Value = headers[2]; //Đề nghị thanh toán
-            workSheet.Cells["A3"].Style.Font.Size = 16;
             workSheet.Cells["A3"].Style.Font.Bold = true;
             workSheet.Cells["A3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A3"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            workSheet.Cells["A5:J6"].Style.Font.SetFromFont(new Font("Times New Roman", 11));
+            workSheet.Cells["A5:J6"].Style.Font.SetFromFont(new Font("Times New Roman", 12));
 
             workSheet.Cells["A5:B5"].Merge = true;
             workSheet.Cells["A5"].Value = headers[3]; //Người yêu cầu
@@ -2755,6 +2774,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["I5"].Value = headers[4]; //Ngày thanh toán
             workSheet.Cells["I5"].Style.Font.Bold = true;
+            workSheet.Cells["J5:K5"].Merge = true;
             workSheet.Cells["J5"].Value = settlementExport.InfoSettlement.RequestDate;
             workSheet.Cells["J5"].Style.Numberformat.Format = "dd MMM, yyyy";
             workSheet.Cells["J5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
@@ -2766,9 +2786,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["I6"].Value = headers[6]; //Số chứng từ
             workSheet.Cells["I6"].Style.Font.Bold = true;
+            workSheet.Cells["J6:K6"].Merge = true;
             workSheet.Cells["J6"].Value = settlementExport.InfoSettlement.SettlementNo;
-
-            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 10));
 
             //Bôi đen header
             workSheet.Cells["A8:K8"].Style.Font.Bold = true;
@@ -2778,6 +2797,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[8, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[8, col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[8, col].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[8, col].Style.WrapText = true;
             }
             workSheet.Cells["A8"].Value = headers[7];//STT
 
@@ -3026,7 +3046,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 _sumTotalDifference = _sumTotalAmount - _sumTotalAdvancedAmount;
             }
 
-            ////TỖNG CỘNG
+            ////TỔNG CỘNG
             workSheet.Cells[p, 1, p, 5].Merge = true;
             workSheet.Cells[p, 1, p, 5].Value = headers[31]; //Title TỔNG CỘNG
             workSheet.Cells[p, 1, p, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -3098,7 +3118,32 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 9, p, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 9, p, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            p = p + 5;
+            p = p + 1;
+
+            if (settlementExport.InfoSettlement.RequestDate != null)
+            {
+                AddIconTick(workSheet, p, 2); //Tick Requester
+            }
+
+            if (settlementExport.InfoSettlement.IsManagerApproved)
+            {
+                workSheet.Cells[p, 4, p, 5].Merge = true; 
+                AddIconTick(workSheet, p, 4); //Tick Manager Dept
+            }
+
+            if (settlementExport.InfoSettlement.IsAccountantApproved)
+            {
+                workSheet.Cells[p, 6, p, 8].Merge = true;
+                AddIconTick(workSheet, p, 6); //Tick Accountant
+            }
+            
+            if (settlementExport.InfoSettlement.IsBODApproved)
+            {
+                workSheet.Cells[p, 9, p, 11].Merge = true;
+                AddIconTick(workSheet, p, 9); //Tick BOD
+            }
+
+            p = p + 1;
 
             workSheet.Cells[p, 2].Style.WrapText = true;
             workSheet.Cells[p, 2].Value = settlementExport.InfoSettlement.Requester; //Value Người tạm ứng    
@@ -3119,6 +3164,14 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells[p, 9, p, 11].Merge = true;
             workSheet.Cells[p, 9, p, 11].Value = string.Empty; //Value Giám đốc
+        }
+        
+        private void AddIconTick(ExcelWorksheet workSheet, int row, int col)
+        {
+            workSheet.Cells[row, col].Value = char.ConvertFromUtf32(0x0050); //Mã code của Symbol tick
+            workSheet.Cells[row, col].Style.Font.Name = "Wingdings 2";
+            workSheet.Cells[row, col].Style.Font.Size = 28;
+            workSheet.Cells[row, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
 
         #endregion --- SETTLEMENT PAYMENT ---
