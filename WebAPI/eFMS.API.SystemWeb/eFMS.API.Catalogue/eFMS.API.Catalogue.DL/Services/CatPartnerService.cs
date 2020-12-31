@@ -903,7 +903,8 @@ namespace eFMS.API.Catalogue.DL.Services
                          join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user, partner, x  }
+                         join agreement in agreementData on partner.Id equals agreement.PartnerId into agreements
+                         select new { user, partner, x , agreements }
                         );
             if (string.IsNullOrEmpty(criteria.All))
             {
@@ -923,7 +924,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (!string.IsNullOrEmpty(SalemanId))
                 {
-                    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                    query = query.Where(x=> x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
                 }
                 else if (!string.IsNullOrEmpty(criteria.Saleman))
                 {
@@ -945,13 +946,12 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id)))
-                           )
+                           || x.agreements.Any(y=> y!= null &&  y.SaleManId.Equals(SalemanId))) 
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
                 //if (!string.IsNullOrEmpty(SalemanId))
                 //{
-                //    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                //    query = query.Where(x => x.agreements.Any(y => y.SaleManId == SalemanId));
                 //}
 
             }
