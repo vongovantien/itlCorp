@@ -115,7 +115,7 @@ export class PartnerComponent extends AppList implements OnInit {
         if (event.field === "All") {
             this.criteria.all = event.searchString;
         } else {
-            if (event.field === "id") {
+            if (event.field === "accountNo") {
                 this.criteria.accountNo = event.searchString;
             }
             if (event.field === "shortName") {
