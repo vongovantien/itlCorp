@@ -298,9 +298,13 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.jobId = res.data.id;
+                        this.opsTransaction.hblid = res.data.hblid;
                         this.isDuplicate = false;
                         this.headerComponent.resetBreadcrumb("Detail Job");
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
+                        this.editForm.isSubmitted = false;
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId], {
+                            queryParams: Object.assign({}, { tab: 'job-edit' })
+                        });
                     } else {
                         this._toastService.warning(res.message);
                     }

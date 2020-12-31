@@ -598,7 +598,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (model.Id > 0)
                 {
-                    var clearance = UpdateInfoConvertClearance(model.Id);
+                    var clearance = UpdateInfoConvertClearance(model);
                     clearance.JobNo = opsTransaction.JobNo;
                     customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
                 }
@@ -647,7 +647,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserModified = currentUser.UserID,
                 ShipmentType = "Freehand",
             };
-            var customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
+            var customer = partnerRepository.Get(x => x.AccountNo == model.AccountNo).FirstOrDefault();
             if (customer != null)
             {
                 opsTransaction.CustomerId = customer.Id;
@@ -765,7 +765,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var opsTransaction = GetNewShipmentToConvert(productService, item);
                         opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
                         DataContext.Add(opsTransaction);
-                        CustomsDeclaration clearance = UpdateInfoConvertClearance(item.Id);
+                        CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
                         clearance.JobNo = opsTransaction.JobNo;
                         customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                         i = i + 1;
@@ -781,9 +781,9 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private CustomsDeclaration UpdateInfoConvertClearance(int id)
+        private CustomsDeclaration UpdateInfoConvertClearance(CustomsDeclarationModel custom)
         {
-            var clearance = customDeclarationRepository.Get(x => x.Id == id).First();
+            var clearance = mapper.Map<CustomsDeclaration>(custom);
             clearance.UserModified = currentUser.UserID;
             clearance.DatetimeModified = DateTime.Now;
             clearance.ConvertTime = DateTime.Now;
@@ -1076,19 +1076,28 @@ namespace eFMS.API.Documentation.DL.Services
             ResultHandle result = null;
             string notFoundPartnerTaxCodeMessages = string.Empty;
             string duplicateMessages = string.Empty;
-            foreach(var item in list)
+            foreach (var item in list)
             {
-                var customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
-                if (customer == null) notFoundPartnerTaxCodeMessages += item.PartnerTaxCode + ", ";
+                var customer = new CatPartner();
+                if (item.AccountNo == null)
+                {
+                    customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
+                }
+                else
+                {
+                    customer = partnerRepository.Get(x => x.AccountNo == item.AccountNo)?.FirstOrDefault();
+                }
+
+                if (customer == null) notFoundPartnerTaxCodeMessages += (item.AccountNo ?? item.PartnerTaxCode) + ", ";
                 string dupMessage = CheckExist(item, item.Id);
-                if(dupMessage != null)
+                if (dupMessage != null)
                 {
                     duplicateMessages += dupMessage + ", ";
                 }
             }
             if(notFoundPartnerTaxCodeMessages.Length > 0)
             {
-                notFoundPartnerTaxCodeMessages = "Partner TaxCode '" + notFoundPartnerTaxCodeMessages.Substring(0, notFoundPartnerTaxCodeMessages.Length - 2) + "' Not found";
+                notFoundPartnerTaxCodeMessages = "Customer '" + notFoundPartnerTaxCodeMessages.Substring(0, notFoundPartnerTaxCodeMessages.Length - 2) + "' Not found";
                 result = new ResultHandle { Status = false, Message = notFoundPartnerTaxCodeMessages, Data = 403 };
                 return result;
             }
@@ -1247,7 +1256,6 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         public ResultHandle ImportDuplicateJob(OpsTransactionModel model)
         {
-            var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
             if (code == 403) return new ResultHandle { Status = false, Message = "You can't duplicate this job." };
@@ -1311,6 +1319,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var entity = mapper.Map<OpsTransaction>(model);
                 var hs = DataContext.Add(entity);
+                DataContext.SubmitChanges();
                 if (hs.Success)
                 {
                     if (newContainers.Count > 0)
