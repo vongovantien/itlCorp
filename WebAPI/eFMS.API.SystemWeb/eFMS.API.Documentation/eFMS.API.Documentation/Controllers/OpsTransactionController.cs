@@ -122,7 +122,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             
-            var existedMessage = transactionService.CheckExist(model);
+            var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
                 return Ok(new ResultHandle { Status = false, Message = existedMessage });
@@ -149,7 +149,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Update(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var existedMessage = transactionService.CheckExist(model);
+            var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
@@ -177,7 +177,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             model.Id = Guid.NewGuid();
-            var existedMessage = transactionService.CheckExist(model);
+            var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
                 return Ok(new ResultHandle { Status = false, Message = existedMessage });

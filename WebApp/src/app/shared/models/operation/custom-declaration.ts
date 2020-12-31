@@ -32,6 +32,7 @@ export class CustomDeclaration {
     unitCode: string = '';
     userCreated: string = '';
     userModified: string = '';
+    accountNo: string = '';
 
     isSelected: boolean = false;
     gatewayName: string = '';

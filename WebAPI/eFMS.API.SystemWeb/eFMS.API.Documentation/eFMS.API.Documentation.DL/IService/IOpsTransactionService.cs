@@ -24,7 +24,7 @@ namespace eFMS.API.Documentation.DL.IService
         //HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
         HandleState ConvertExistedClearancesToJobs(List<CustomsDeclarationModel> list);
         HandleState SoftDeleteJob(Guid id);
-        string CheckExist(OpsTransactionModel model);
+        string CheckExist(OpsTransactionModel model, string mblNo, string hblNo);
         Crystal PreviewFormPLsheet(Guid id, string currency);
         HandleState Update(OpsTransactionModel model);
         IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
