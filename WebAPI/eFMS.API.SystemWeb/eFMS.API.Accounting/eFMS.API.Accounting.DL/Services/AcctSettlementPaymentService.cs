@@ -1863,7 +1863,8 @@ namespace eFMS.API.Accounting.DL.Services
                 fe.StlAscDpManagerName = infoSettleAprove != null ? infoSettleAprove.AccountantName : string.Empty;
                 fe.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
                 fe.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-
+                fe.StlRequesterSignDate = infoSettleAprove != null && infoSettleAprove.RequesterAprDate.HasValue ? infoSettleAprove.RequesterAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                
                 //Lấy ra tổng Advance Amount của các charge thuộc Settlement
                 decimal advanceAmount = 0;
 
@@ -4407,6 +4408,7 @@ namespace eFMS.API.Accounting.DL.Services
                 SettlementNo = settlementPayment.SettlementNo,
                 Manager = _manager,
                 Accountant = _accountant,
+                IsRequesterApproved = _settlementApprove?.RequesterAprDate != null,
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
