@@ -130,7 +130,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                             pod: this.shipmentDetail.pod,
                             localVessel: this.shipmentDetail.flightVesselName,
                             localVoyNo: this.shipmentDetail.voyNo,
-                            finalDestinationPlace: this.shipmentDetail.podName,
+                            finalDestination: this.shipmentDetail.podName,
                             eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
                             etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
                         };
