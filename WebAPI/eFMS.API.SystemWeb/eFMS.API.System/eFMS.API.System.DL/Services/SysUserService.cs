@@ -587,7 +587,7 @@ namespace eFMS.API.System.DL.Services
             currEmployee.Email = criteria.Email?.Trim();
             currEmployee.BankAccountNo = criteria.BankAccountNo?.Trim();
             currEmployee.BankName = criteria.BankName?.Trim();
-
+            currEmployee.PersonalId = criteria.PersonalId?.Trim();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try

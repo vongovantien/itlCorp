@@ -1160,7 +1160,8 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvance.AdvDate = advance.RequestDate.HasValue ? (DateTime?)advance.RequestDate.Value.Date : null;
             acctAdvance.AdvTo = "N/A";
             acctAdvance.AdvContactID = "N/A";
-            acctAdvance.AdvContact = requesterName;//cần lấy ra username
+            acctAdvance.AdvContact = requesterName;//cần lấy ra Name VN
+            acctAdvance.AdvContactSignDate = approveAdvance?.RequesterAprDate; //Ngày Requester approve
             acctAdvance.AdvAddress = deptRequester?.DeptNameAbbr ?? string.Empty; //Department của Requester
             acctAdvance.AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum();
             acctAdvance.AdvCurrency = advance.AdvanceCurrency;
@@ -3123,6 +3124,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DealinePayment = advancePayment.DeadlinePayment,
                 Manager = _manager,
                 Accountant = _accountant,
+                IsRequesterApproved = _advanceApprove?.RequesterAprDate != null,
                 IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
                 IsBODApproved = _advanceApprove?.BuheadAprDate != null,
