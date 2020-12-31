@@ -315,11 +315,16 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             case 'agent':
                 this.forwardingAgentId.setValue(data.id);
                 break;
+            case 'packageType':
+                this.packageType.setValue(data.id);
+                this._dataService.setDataService("packageTypeName", data.packageTypeName || "")
+                break;
             case 'sale':
                 this.saleManId.setValue(data.id);
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+
                 break;
             case 'pod':
                 this.pod.setValue(data.id);

@@ -3151,6 +3151,11 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.PersonalId)
+                    .HasColumnName("PersonalID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Photo).HasMaxLength(500);
 
                 entity.Property(e => e.Position)

@@ -920,7 +920,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (advanceExport.InfoAdvance.RequestDate != null)
+            if (advanceExport.InfoAdvance.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }
@@ -3120,7 +3120,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (settlementExport.InfoSettlement.RequestDate != null)
+            if (settlementExport.InfoSettlement.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }
@@ -3169,7 +3169,8 @@ namespace eFMS.API.ReportData.FormatExcel
         private void AddIconTick(ExcelWorksheet workSheet, int row, int col)
         {
             workSheet.Cells[row, col].Value = char.ConvertFromUtf32(0x0050); //Mã code của Symbol tick
-            workSheet.Cells[row, col].Style.Font.SetFromFont(new Font("Wingdings 2", 28));
+            workSheet.Cells[row, col].Style.Font.Name = "Wingdings 2";
+            workSheet.Cells[row, col].Style.Font.Size = 28;
             workSheet.Cells[row, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
 

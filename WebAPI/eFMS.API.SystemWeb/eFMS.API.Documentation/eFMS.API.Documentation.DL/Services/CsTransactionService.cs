@@ -183,26 +183,26 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && x.JobNo.StartsWith("HAN"))
+                                                    && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
-                                                    .FirstOrDefault();
+                                                    .FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && x.JobNo.StartsWith("DAD"))
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
                                                     .OrderByDescending(x => x.JobNo)
-                                                    .FirstOrDefault();
+                                                    .FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && !x.JobNo.StartsWith("DAD")
-                                                        && !x.JobNo.StartsWith("HAN"))
+                                                        && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-") 
+                                                        && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
                 }
@@ -212,8 +212,8 @@ namespace eFMS.API.Documentation.DL.Services
                 currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && !x.JobNo.StartsWith("DAD")
-                                                    && !x.JobNo.StartsWith("HAN"))
+                                                    && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                    && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
             }
@@ -227,11 +227,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (officeCode == "ITLHAN")
                 {
-                    prefixCode = "HAN-";
+                    prefixCode = "H"; //HAN- >> H
                 }
                 else if (officeCode == "ITLDAD")
                 {
-                    prefixCode = "DAD-";
+                    prefixCode = "D"; //DAD- >> D
                 }
             }
             return prefixCode;

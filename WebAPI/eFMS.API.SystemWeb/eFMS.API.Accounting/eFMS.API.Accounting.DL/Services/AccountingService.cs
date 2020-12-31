@@ -151,7 +151,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                              CurrencyCode = ad.AdvanceCurrency,
                                                              Description0 = ad.AdvanceNote,
                                                              CustomerName = employee.EmployeeNameVn,
-                                                             CustomerCode = employee.StaffCode,
+                                                             CustomerCode = !string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode,
                                                              OfficeCode = office.Code,
                                                              DocDate = ad.RequestDate,
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
@@ -304,7 +304,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
                                                                        Description0 = settle.Note,
                                                                        CustomerName = partner != null ? partner.ShortName : employee.EmployeeNameVn,
-                                                                       CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode,
+                                                                       CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
                                                                        PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
                                                                        CustomerMode = partner != null ? partner.PartnerMode : "External",
                                                                        LocalBranchCode = partner != null ? partner.InternalCode : null
@@ -1485,7 +1485,7 @@ namespace eFMS.API.Accounting.DL.Services
                         partnerEn = partner?.PartnerNameEn;
                         taxCode = partner?.TaxCode;
                         serviceName = GetServiceNameOfCdNote(debitNote.Code);
-                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.CreditNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
+                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.DebitNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
                         urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId);
 

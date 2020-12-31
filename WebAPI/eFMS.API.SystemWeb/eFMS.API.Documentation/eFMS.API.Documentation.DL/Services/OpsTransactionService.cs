@@ -185,22 +185,22 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("HAN"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                                                         && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
                     currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("DAD"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                                                         && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
                     currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && !x.JobNo.StartsWith("DAD")
-                                                         && !x.JobNo.StartsWith("HAN"))
+                                                         && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                         && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault();
                 }
             }
@@ -208,8 +208,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                     && !x.JobNo.StartsWith("DAD")
-                                                     && !x.JobNo.StartsWith("HAN"))
+                                                     && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                     && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
             }
             return currentShipment;
@@ -222,11 +222,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (officeCode == "ITLHAN")
                 {
-                    prefixCode = "HAN-";
+                    prefixCode = "H"; //HAN- >> H
                 }
                 else if (officeCode == "ITLDAD")
                 {
-                    prefixCode = "DAD-";
+                    prefixCode = "D"; //DAD- >> D
                 }
             }
             return prefixCode;
@@ -1255,9 +1255,7 @@ namespace eFMS.API.Documentation.DL.Services
             var newContainers = new List<CsMawbcontainer>();
             var newSurcharges = new List<CsShipmentSurcharge>();
             // Create model import
-            var _id = model.Id;
             var _hblId = model.Hblid;
-            model.Id = Guid.NewGuid();
             model.Hblid = Guid.NewGuid();
             model.JobNo = CreateJobNoOps();
             model.UserModified = currentUser.UserID;
@@ -1305,7 +1303,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             // Update list SurCharge
             var listSurCharge = CopySurChargeToNewJob(_hblId, model.Hblid);
-            if (listSurCharge.Count() > 0)
+            if (listSurCharge?.Count() > 0)
             {
                 newSurcharges.AddRange(listSurCharge);
             }
@@ -1327,13 +1325,13 @@ namespace eFMS.API.Documentation.DL.Services
                         HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
                         surchargeRepository.SubmitChanges();
                     }
-                    return new ResultHandle { Status = true, Message = "Job have been save!", Data = entity };
+                    return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
                 }
                 return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
             }
             catch (Exception ex)
             {
-                return new ResultHandle { Status = false, Message = ex.Message };
+                return new ResultHandle { Status = false, Message = "Job can't be saved!" };
             }
         }
 
