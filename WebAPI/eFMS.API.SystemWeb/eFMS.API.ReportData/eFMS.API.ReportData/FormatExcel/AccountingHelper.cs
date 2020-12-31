@@ -920,7 +920,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (advanceExport.InfoAdvance.RequestDate != null)
+            if (advanceExport.InfoAdvance.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }
@@ -3120,7 +3120,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (settlementExport.InfoSettlement.RequestDate != null)
+            if (settlementExport.InfoSettlement.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }
