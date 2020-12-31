@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
@@ -23,6 +23,7 @@ import { FormValidators } from '@validators';
 })
 export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppForm {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @Input() isUpdate: boolean = false;
 
     formGroup: FormGroup;
     customer: AbstractControl;
@@ -111,32 +112,33 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.getConfigComboGrid();
 
         this.initForm();
+        if (!this.isUpdate) {
+            this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: CsTransaction) => {
+                        this.shipmentDetail = res;
+                        this.jobId = this.shipmentDetail.id;
 
-        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: CsTransaction) => {
-                    this.shipmentDetail = res;
-                    this.jobId = this.shipmentDetail.id;
-
-                    const formData = {
-                        masterBill: this.shipmentDetail.mawb,
-                        servicetype: this.shipmentDetail.typeOfService,
-                        documentDate: { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) },
-                        supplier: this.shipmentDetail.coloaderId,
-                        issueHBLDate: { startDate: new Date(), endDate: new Date() },
-                        pol: this.shipmentDetail.pol,
-                        pod: this.shipmentDetail.pod,
-                        localVessel: this.shipmentDetail.flightVesselName,
-                        localVoyNo: this.shipmentDetail.voyNo,
-                        finalDestinationPlace: this.shipmentDetail.podName,
-                        eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
-                        etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
-                    };
-                    console.log(formData);
-                    this.formGroup.patchValue(formData);
-                }
-            );
+                        const formData = {
+                            masterBill: this.shipmentDetail.mawb,
+                            servicetype: this.shipmentDetail.typeOfService,
+                            documentDate: { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) },
+                            supplier: this.shipmentDetail.coloaderId,
+                            issueHBLDate: { startDate: new Date(), endDate: new Date() },
+                            pol: this.shipmentDetail.pol,
+                            pod: this.shipmentDetail.pod,
+                            localVessel: this.shipmentDetail.flightVesselName,
+                            localVoyNo: this.shipmentDetail.voyNo,
+                            finalDestinationPlace: this.shipmentDetail.podName,
+                            eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
+                            etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
+                        };
+                        console.log(formData);
+                        this.formGroup.patchValue(formData);
+                    }
+                );
+        }
     }
 
     getConfigComboGrid() {
