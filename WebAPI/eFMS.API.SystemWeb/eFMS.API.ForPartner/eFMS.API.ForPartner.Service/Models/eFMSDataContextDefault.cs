@@ -1010,6 +1010,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.Major).HasMaxLength(100);
 
+                entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
