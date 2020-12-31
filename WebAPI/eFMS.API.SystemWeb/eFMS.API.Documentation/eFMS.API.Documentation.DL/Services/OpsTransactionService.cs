@@ -848,15 +848,10 @@ namespace eFMS.API.Documentation.DL.Services
 
         public string CheckExist(string mblNo, string hblNo)
         {
-            var existedHBL = DataContext.Any(x => x.Hwbno == hblNo && x.CurrentStatus != TermData.Canceled);
-            var existedMBL = DataContext.Any(x => x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
-            if (existedHBL)
+            var existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo && x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
+            if (existedMblHbl)
             {
                 return stringLocalizer[DocumentationLanguageSub.MSG_HBNO_EXISTED, hblNo].Value;
-            }
-            if (existedMBL)
-            {
-                return stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, mblNo].Value;
             }
             return null;
         }
