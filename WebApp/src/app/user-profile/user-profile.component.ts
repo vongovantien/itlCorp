@@ -42,6 +42,7 @@ export class UserProfilePageComponent extends AppForm {
     workingStatus: AbstractControl;
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
+    personalId: AbstractControl;
 
     photoUrl: string;
 
@@ -76,6 +77,7 @@ export class UserProfilePageComponent extends AppForm {
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        console.log(res.data);
                         this.setUserForForm(res.data);
                     }
                 }
@@ -157,6 +159,7 @@ export class UserProfilePageComponent extends AppForm {
             workingStatus: [],
             creditLimit: [],
             creditRate: [],
+            personalId: []
         });
         //
         this.employeeNameVn = this.formUser.controls['employeeNameVn'];
@@ -174,7 +177,7 @@ export class UserProfilePageComponent extends AppForm {
         this.workingStatus = this.formUser.controls['workingStatus'];
         this.creditLimit = this.formUser.controls['creditLimit'];
         this.creditRate = this.formUser.controls['creditRate'];
-
+        this.personalId = this.formUser.controls['personalId'];
     }
 
     setUserForForm(body: any) {
@@ -192,6 +195,7 @@ export class UserProfilePageComponent extends AppForm {
             workingStatus: body.workingStatus,
             creditLimit: body.creditLimit,
             creditRate: body.creditRate,
+            personalId: !!body.sysEmployeeModel ? body.sysEmployeeModel.personalId : null
         });
         this.photoUrl = body.avatar;
     }
@@ -209,7 +213,8 @@ export class UserProfilePageComponent extends AppForm {
             bankName: !form.bankName ? '' : form.bankName,
             tel: !form.tel ? '' : form.tel,
             description: !form.description ? '' : form.description,
-            avatar: this.photoUrl
+            avatar: this.photoUrl,
+            personalId: form.personalId
         };
         this.onUpdate(body);
     }

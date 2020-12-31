@@ -42,6 +42,7 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public string StlAscDpManagerName { get; set; }
         public string StlAscDpManagerSignDate { get; set; }
         public string StlBODSignDate { get; set; }
+        public string StlRequesterSignDate { get; set; }
     }
 
     public class AscSettlementPaymentRequestReportParams
