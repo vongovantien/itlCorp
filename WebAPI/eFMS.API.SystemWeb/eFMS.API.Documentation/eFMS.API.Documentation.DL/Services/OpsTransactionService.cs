@@ -570,7 +570,7 @@ namespace eFMS.API.Documentation.DL.Services
             var result = new HandleState();
             try
             {
-                var existedMessage = CheckExist(model.Mblid, model.Hblid);
+                var existedMessage = CheckExist(null, model.Mblid, model.Hblid);
                 if (existedMessage != null)
                 {
                     return new HandleState(existedMessage);
@@ -647,7 +647,15 @@ namespace eFMS.API.Documentation.DL.Services
                 UserModified = currentUser.UserID,
                 ShipmentType = "Freehand",
             };
-            var customer = partnerRepository.Get(x => x.AccountNo == model.AccountNo).FirstOrDefault();
+            var customer = new CatPartner();
+            if (model.AccountNo == null)
+            {
+                customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
+            }
+            else
+            {
+                customer = partnerRepository.Get(x => x.AccountNo == model.AccountNo).FirstOrDefault();
+            }
             if (customer != null)
             {
                 opsTransaction.CustomerId = customer.Id;
@@ -735,7 +743,7 @@ namespace eFMS.API.Documentation.DL.Services
                 int i = 0;
                 foreach (var item in list)
                 {
-                    var existedMessage = CheckExist(item.Mblid, item.Hblid);
+                    var existedMessage = CheckExist(null, item.Mblid, item.Hblid);
                     if (existedMessage != null)
                     {
                         return new HandleState(existedMessage);
@@ -836,23 +844,23 @@ namespace eFMS.API.Documentation.DL.Services
         /// Check if hbl+mbl no has been existed
         /// </summary>
         /// <param name="model">OpsTransactionModel</param>
+        /// <param name="mblNo">MBL No of OpsTransaction</param>
+        /// <param name="hblNo">HBL No of OpsTransaction</param>
         /// <returns></returns>
-        public string CheckExist(OpsTransactionModel model)
+        public string CheckExist(OpsTransactionModel model, string mblNo, string hblNo)
         {
-            var existedMblHbl = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+            var existedMblHbl = false;
+            if (model == null)
+            {
+                existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo && x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
+            }
+            else
+            {
+                existedMblHbl = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+            }
             if (existedMblHbl)
             {
                 return stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_HBNO_EXISTED].Value;
-            }
-            return null;
-        }
-
-        public string CheckExist(string mblNo, string hblNo)
-        {
-            var existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo && x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
-            if (existedMblHbl)
-            {
-                return stringLocalizer[DocumentationLanguageSub.MSG_HBNO_EXISTED, hblNo].Value;
             }
             return null;
         }

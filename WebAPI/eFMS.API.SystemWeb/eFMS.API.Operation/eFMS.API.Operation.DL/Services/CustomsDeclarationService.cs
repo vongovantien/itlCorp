@@ -369,13 +369,13 @@ namespace eFMS.API.Operation.DL.Services
                 var exCountryCode = item.ExportCountryCode;
                 clearance.ImportCountryName = countries.FirstOrDefault(x => x.Code == imCountryCode)?.NameEn;
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
-                if(item.AccountNo == null)
+                if (item.AccountNo == null)
                 {
-                    clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
+                    clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.ShortName;
                 }
                 else
                 {
-                    clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.ShortName;
+                    clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
                 }
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
                 clearance.UserCreatedName = userRepository.Get(x => x.Id == item.UserCreated).FirstOrDefault()?.Username;
