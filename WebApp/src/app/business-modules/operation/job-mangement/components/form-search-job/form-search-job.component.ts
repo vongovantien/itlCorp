@@ -38,6 +38,7 @@ export class JobManagementFormSearchComponent extends AppForm {
     serviceDate: AbstractControl;
     customerId: AbstractControl;
     fieldOps: AbstractControl;
+    createdDate: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
@@ -101,8 +102,8 @@ export class JobManagementFormSearchComponent extends AppForm {
             'shipmentMode': [],
             'serviceDate': [],
             'customerId': [],
-            'fieldOps': []
-
+            'fieldOps': [],
+            'createdDate': []
         });
 
         this.searchText = this.formSearch.controls['searchText'];
@@ -113,6 +114,7 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.serviceDate = this.formSearch.controls['serviceDate'];
         this.customerId = this.formSearch.controls['customerId'];
         this.fieldOps = this.formSearch.controls['fieldOps'];
+        this.createdDate = this.formSearch.controls['createdDate'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -136,7 +138,6 @@ export class JobManagementFormSearchComponent extends AppForm {
             mblno: this.filterType.value.value === 'mblno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             clearanceNo: this.filterType.value.value === 'clearanceNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             creditDebitInvoice: this.filterType.value.value === 'creditDebitInvoice' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-
             productService: !!this.productService.value ? this.productService.value.id : null,
             serviceMode: !!this.serviceMode.value ? this.serviceMode.value.id : null,
             shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.id : null,
@@ -144,6 +145,8 @@ export class JobManagementFormSearchComponent extends AppForm {
             serviceDateTo: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customerId.value,
             fieldOps: this.fieldOps.value,
+            createdDateFrom: (!!this.createdDate.value && !!this.createdDate.value.startDate) ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: (!!this.createdDate.value && !!this.createdDate.value.endDate) ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null
         };
         this.onSearch.emit(body);
 
@@ -167,7 +170,7 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.resetFormControl(this.serviceDate);
         this.resetFormControl(this.customerId);
         this.resetFormControl(this.fieldOps);
-
+        this.resetFormControl(this.createdDate);
     }
 
     expanded() {
@@ -181,7 +184,11 @@ export class JobManagementFormSearchComponent extends AppForm {
                     endDate: new Date(this.dataSearch.serviceDateTo)
                 } : null,
                 customerId: this.dataSearch.customerId,
-                fieldOps: this.dataSearch.fieldOps
+                fieldOps: this.dataSearch.fieldOps,
+                createdDate: !!this.dataSearch.createdDateFrom && !!this.dataSearch.createdDateTo ? {
+                    startDate: new Date(this.dataSearch.createdDateFrom),
+                    endDate: new Date(this.dataSearch.createdDateTo)
+                } : null,
             };
 
             this.formSearch.patchValue(advanceSearchForm);
@@ -205,5 +212,7 @@ interface ISearchDataShipment {
     mblno: string;
     clearanceNo: string;
     creditDebitInvoice: string;
+    createdDateFrom: string;
+    createdDateTo: string;
 }
 
