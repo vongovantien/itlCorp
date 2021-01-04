@@ -32,6 +32,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     agent: AbstractControl;
     saleman: AbstractControl;
     creator: AbstractControl;
+    createdDate: AbstractControl;
 
     labelColoader: string = 'Shipping Line/Co-Loader';
 
@@ -138,6 +139,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
             agent: [],
             saleman: [],
             creator: [],
+            createdDate: [],
         });
 
         this.customer = this.formSearch.controls['customer'];
@@ -149,6 +151,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
         this.searchText = this.formSearch.controls['searchText'];
         this.filterType = this.formSearch.controls['filterType'];
         this.serviceDate = this.formSearch.controls['serviceDate'];
+        this.createdDate = this.formSearch.controls['createdDate'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -189,9 +192,11 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
             agentId: this.agent.value,
             saleManId: this.saleman.value,
             userCreated: this.creator.value,
-            fromDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            toDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            transactionType: null
+            fromDate: (!!this.createdDate.value && !!this.createdDate.value.startDate) ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            toDate: (!!this.createdDate.value && !!this.createdDate.value.endDate) ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            transactionType: null,
+            fromServiceDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            toServiceDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null
         };
         this.onSearch.emit(body);
         this._store.dispatch(new TransactionSearchListAction(body));
@@ -220,6 +225,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
         this.resetFormControl(this.saleman);
         this.resetFormControl(this.creator);
         this.resetFormControl(this.serviceDate);
+        this.resetFormControl(this.createdDate);
     }
 
     expanded() {
@@ -230,7 +236,11 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
                 agent: this.dataSearch.agentId,
                 saleman: this.dataSearch.saleManId,
                 creator: this.dataSearch.userCreated,
-                serviceDate: !!this.dataSearch.fromDate && !!this.dataSearch.toDate ? {
+                serviceDate: !!this.dataSearch.fromServiceDate && !!this.dataSearch.toServiceDate ? {
+                    startDate: new Date(this.dataSearch.fromServiceDate),
+                    endDate: new Date(this.dataSearch.toServiceDate)
+                } : null,
+                createdDate: !!this.dataSearch.fromDate && !!this.dataSearch.toDate ? {
                     startDate: new Date(this.dataSearch.fromDate),
                     endDate: new Date(this.dataSearch.toDate)
                 } : null
@@ -259,4 +269,6 @@ interface ISearchDataShipment {
     fromDate: string;
     toDate: string;
     transactionType: Number;
+    fromServiceDate: string;
+    toServiceDate: string;
 }

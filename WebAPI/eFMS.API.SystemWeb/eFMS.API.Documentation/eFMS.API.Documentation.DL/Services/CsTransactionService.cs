@@ -1087,7 +1087,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1103,7 +1108,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1213,7 +1223,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1229,7 +1244,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1365,7 +1385,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1381,7 +1406,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1534,7 +1564,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1550,7 +1585,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
