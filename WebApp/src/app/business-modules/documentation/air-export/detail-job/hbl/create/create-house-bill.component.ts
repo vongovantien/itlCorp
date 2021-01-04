@@ -65,7 +65,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             .subscribe((param: Params) => {
                 if (isUUID(param.jobId)) {
                     this.jobId = param.jobId;
-                    this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.permissionShipments = this._store.select(getTransactionPermission);
                 } else {
@@ -83,16 +82,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             .subscribe(
                 () => {
                     this.confirmSaveHBL();
-                }
-            );
-    }
-
-    generateHblNo(transactionType: number) {
-        this._documentationRepo.generateHBLNo(transactionType)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
                 }
             );
     }

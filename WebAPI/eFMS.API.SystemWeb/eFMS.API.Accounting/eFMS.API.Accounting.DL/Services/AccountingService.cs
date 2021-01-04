@@ -390,7 +390,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = cdNote.Note;
-                sync.EmailEInvoice = cdNotePartner?.BillingEmail; //Tạm lấy BillingEmail của partner
+                sync.EmailEInvoice = !string.IsNullOrEmpty(cdNotePartner?.BillingEmail) ? cdNotePartner?.BillingEmail.Replace(";", ",") : null; //Tạm lấy BillingEmail của partner
                 sync.DataType = "CDNOTE";
 
                 int decimalRound = 0;
@@ -541,7 +541,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.AtchDocDate = surcharge.InvoiceDate;
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
-                        
+
                         charges.Add(charge);
                     }
                     sync.Details = charges;
@@ -581,7 +581,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = soa.Currency;
                 sync.ExchangeRate0 = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = soa.Note;
-                sync.EmailEInvoice = soaPartner?.BillingEmail; //Tạm lấy BillingEmail của partner
+                sync.EmailEInvoice = !string.IsNullOrEmpty(soaPartner?.BillingEmail) ? soaPartner?.BillingEmail.Replace(";", ",") : null; //Tạm lấy BillingEmail của partner
                 sync.DataType = "SOA";
 
                 int decimalRound = 0;
@@ -937,7 +937,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
 
                         result = SettlementRepository.SubmitChanges();
-                      
+
                         trans.Commit();
                         data = new List<Guid>();
                         return result;
@@ -1004,7 +1004,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         var smSurcharge = SurchargeRepository.SubmitChanges();
                         result = DataContext.SubmitChanges();
-                      
+
                         trans.Commit();
 
                         data = new List<Guid>();
@@ -1046,7 +1046,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
                         var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
-                        foreach(var surcharge in surcharges)
+                        foreach (var surcharge in surcharges)
                         {
                             if (surcharge.Type == "OBH")
                             {
@@ -1098,7 +1098,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
                         var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                        foreach(var surcharge in surcharges)
+                        foreach (var surcharge in surcharges)
                         {
                             if (surcharge.Type == "OBH")
                             {
@@ -1535,7 +1535,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _type1 = "VAT Invoice";
                 _type2 = "Invoice";
             }
-            
+
             string subject = string.Format(@"eFMS - {0} Request - {1} {2}", _type1, _type2, refNo);
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
                                             "<p><i>Dear Accountant Team,</i></p>" +
@@ -1771,7 +1771,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
-        
+
         public bool CheckCdNoteSynced(Guid idCdNote)
         {
             var cdNote = cdNoteRepository.Get(x => x.Id == idCdNote).FirstOrDefault();
