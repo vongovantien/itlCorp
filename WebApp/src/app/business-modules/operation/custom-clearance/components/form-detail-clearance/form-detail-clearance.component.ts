@@ -51,7 +51,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
 
     cargoTypes: string[] = ['FCL', 'LCL'];
     serviceTypes: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
-    typeClearances: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    typeClearances: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
     routeClearances: string[] = JobConstants.COMMON_DATA.ROUTES;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
