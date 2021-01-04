@@ -115,7 +115,7 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
             }
             if (res.consigneeId != null) {
                 const consignee = this.consignees.find(x => x.id === res.consigneeId);
-                if (!!consignee) {
+                if (!!consignee && !this.consigneeDescription.value) {
                     this.getConsigneeDescription(consignee);
                 }
             }

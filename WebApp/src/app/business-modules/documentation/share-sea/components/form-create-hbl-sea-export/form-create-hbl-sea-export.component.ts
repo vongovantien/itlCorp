@@ -241,7 +241,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     }
 
     setDefaultOnboard(polName: string, country: string, etd: string) {
-        return `SHIPPED ON BOARD \n${polName}, ${country} \n${formatDate(etd, 'mediumDate', 'en')}`;
+        if (etd) {
+            return `SHIPPED ON BOARD \n${polName}, ${country} \n${formatDate(etd, 'mediumDate', 'en')}`;
+        }
+        return `SHIPPED ON BOARD \n${polName}, ${country}`;
     }
 
     setDefaultForwardingAgent(shipment: CsTransaction) {
