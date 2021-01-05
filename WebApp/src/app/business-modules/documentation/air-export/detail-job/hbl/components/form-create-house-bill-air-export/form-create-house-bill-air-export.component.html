@@ -457,7 +457,8 @@
                         <div class="col-md-6 ">
                             <div class="form-group">
                                 <label>Rate Charge As Arranged</label>
-                                <input autoFormatCurrency numeric class="form-control" formControlName="rateCharge">
+                                <input autoFormatCurrency numeric class="form-control" formControlName="rateCharge"
+                                    [decimals]="digitDecimal">
 
                             </div>
                         </div>
