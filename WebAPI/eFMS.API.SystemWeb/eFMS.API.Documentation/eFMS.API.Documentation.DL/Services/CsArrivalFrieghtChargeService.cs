@@ -498,7 +498,7 @@ namespace eFMS.API.Documentation.DL.Services
                 string warehouseName = string.Empty;
                 if(houseBill.WarehouseId != Guid.Empty)
                 {
-                    warehouseName = placeRepository.Get(x => x.Id == houseBill.WarehouseId)?.FirstOrDefault().DisplayName;
+                    warehouseName = placeRepository.Get(x => x.Id == houseBill.WarehouseId)?.FirstOrDefault()?.DisplayName;
                 }
 
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
