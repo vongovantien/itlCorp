@@ -53,7 +53,7 @@
                             </th>
                         </thead>
                         <tbody>
-                            <ng-container *ngIf="!!initContainers.length">
+                            <ng-container *ngIf="initContainers.length > 0">
                                 <tr class="text-center m-form m-form--state"
                                     *ngFor="let container of initContainers | filter: keyword: ['containerTypeId','seaNo','markNo']; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col fixed-side">

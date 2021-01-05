@@ -84,5 +84,6 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public string CompanyAddress { get; set; }
         public string Website { get; set; }
         public string Contact { get; set; }
+        public DateTime? AdvContactSignDate { get; set; }
     }
 }

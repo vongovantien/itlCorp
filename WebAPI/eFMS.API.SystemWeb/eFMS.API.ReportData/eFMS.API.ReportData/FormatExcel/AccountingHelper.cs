@@ -775,14 +775,17 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[j, 2].Value = headers[23]; //Khách hàng
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].Customer;
+                workSheet.Cells[j, 3].Style.WrapText = true;
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[24]; //Công ty xuất
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].Shipper;
+                workSheet.Cells[j, 3].Style.WrapText = true;
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[25]; //Công ty nhập
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].Consignee;
+                workSheet.Cells[j, 3].Style.WrapText = true;
                 j = j + 1;
 
                 /////
@@ -920,7 +923,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (advanceExport.InfoAdvance.RequestDate != null)
+            if (advanceExport.InfoAdvance.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }
@@ -3120,7 +3123,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (settlementExport.InfoSettlement.RequestDate != null)
+            if (settlementExport.InfoSettlement.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }

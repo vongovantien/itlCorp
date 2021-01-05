@@ -137,22 +137,22 @@ namespace eFMS.API.Catalogue.DL.Services
                                 {
                                     if (item.IsRequestApproval == true)
                                     {
-                                        entity.ContractService = item.SaleService;
                                         entity.ContractType = item.ContractType;
                                         entity.SalesmanId = item.SaleManId;
                                         entity.UserCreated = partner.UserCreated;
+                                        entity.ContractService = GetContractServicesName(item.SaleService);
                                         SendMailRequestApproval(entity);
                                     }
                                 }
                             }
 
                         }
+                        trans.Commit();
                         SendMailCreatedSuccess(partner);
                     }
                     ClearCache();
                     Get();
                     var result = hsTransPartner;
-                    trans.Commit();
                     return new { model = partner, result };
                 }
                 catch (Exception ex)
@@ -351,12 +351,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (listEmailAR != null && listEmailAR.Any())
             {
-                lstToAR = listEmailAR.Split(";").ToList();
+                lstToAR = listEmailAR.Split(";").Select(x=>x.ToLower().Trim()).ToList();
             }
 
             if (listEmailAccountant != null && listEmailAccountant.Any())
             {
-                lstToAccountant = listEmailAccountant.Split(";").ToList();
+                lstToAccountant = listEmailAccountant.Split(";").Select(x=>x.ToLower().Trim()).ToList();
             }
 
             switch (partner.PartnerType)
@@ -407,6 +407,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (partner.PartnerType == "Customer" || partner.PartnerType == "Agent")
             {
                 lstToAccountant.AddRange(lstToAR);
+                lstToAccountant = lstToAccountant.Where(x => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrEmpty(x)).Distinct().ToList();
                 if (lstToAccountant.Any())
                 {
                     resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, lstCcCreator, lstCc);
@@ -829,7 +830,15 @@ namespace eFMS.API.Catalogue.DL.Services
                     _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
                     break;
             }
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            var permissionRange = new PermissionRange();
+            if (_user.UserMenuPermission == null)
+            {
+                permissionRange = PermissionRange.None;
+            }
+            else
+            {
+                permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            }
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
             if (code == 403) return new HandleState(403, "");
             return new HandleState();
@@ -902,7 +911,8 @@ namespace eFMS.API.Catalogue.DL.Services
                          join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user, partner, x  }
+                         join agreement in agreementData on partner.Id equals agreement.PartnerId into agreements
+                         select new { user, partner, x , agreements }
                         );
             if (string.IsNullOrEmpty(criteria.All))
             {
@@ -922,7 +932,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (!string.IsNullOrEmpty(SalemanId))
                 {
-                    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                    query = query.Where(x=> x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
                 }
                 else if (!string.IsNullOrEmpty(criteria.Saleman))
                 {
@@ -944,13 +954,12 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id)))
-                           )
+                           || x.agreements.Any(y=> y!= null &&  y.SaleManId.Equals(SalemanId))) 
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
                 //if (!string.IsNullOrEmpty(SalemanId))
                 //{
-                //    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                //    query = query.Where(x => x.agreements.Any(y => y.SaleManId == SalemanId));
                 //}
 
             }
@@ -1730,6 +1739,60 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         #endregion
 
+        private string GetContractServicesName(string ContractService)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ContractService.Split(";").ToArray();
+            if (ContractServiceArr.Any())
+            {
+                foreach (var item in ContractServiceArr)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export; ";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import; ";
+                            break;
+                        case "SCE":
+                            ContractServicesName += "Sea Consol Export; ";
+                            break;
+                        case "SCI":
+                            ContractServicesName += "Sea Consol Import; ";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export; ";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export; ";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import; ";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic; ";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking; ";
+                            break;
+                        case "SFI":
+                            ContractServicesName += "Sea FCL Import; ";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            break;
+                    }
+                }
+
+            }
+            if (!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+            }
+            return ContractServicesName;
+        }
+
         public IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup)
         {
             ClearCache();
@@ -1826,11 +1889,10 @@ namespace eFMS.API.Catalogue.DL.Services
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public List<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType)
+        public List<CatPartnerViewModel> GetSubListPartnerByID(string id)
         {
             if (id == null) return null;
-            var currPartnerId = Get(x => x.Id == id).FirstOrDefault()?.AccountNo;
-            var data = Get(x => x.ParentId == id && x.AccountNo != currPartnerId && x.PartnerType == partnerType);
+            var data = DataContext.Get(x => x.ParentId == id && x.Id != id);
             if (data == null) return null;
             var results = new List<CatPartnerViewModel>();
             foreach (var partner in data)

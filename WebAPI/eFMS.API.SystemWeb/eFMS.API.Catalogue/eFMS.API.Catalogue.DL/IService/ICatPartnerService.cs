@@ -34,7 +34,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState CheckDeletePermission(string id);
         bool SendMailRejectComment(string partnerId, string comment);
         bool SendMailCreatedSuccess(CatPartner catPartner);
-        List<CatPartnerViewModel> GetSubListPartnerByID(string id, string partnerType);
+        List<CatPartnerViewModel> GetSubListPartnerByID(string id);
 
     }
 }

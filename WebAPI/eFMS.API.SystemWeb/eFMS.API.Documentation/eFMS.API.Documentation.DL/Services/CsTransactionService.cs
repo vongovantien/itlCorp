@@ -183,26 +183,26 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && x.JobNo.StartsWith("HAN"))
+                                                    && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
-                                                    .FirstOrDefault();
+                                                    .FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && x.JobNo.StartsWith("DAD"))
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
                                                     .OrderByDescending(x => x.JobNo)
-                                                    .FirstOrDefault();
+                                                    .FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && !x.JobNo.StartsWith("DAD")
-                                                        && !x.JobNo.StartsWith("HAN"))
+                                                        && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-") 
+                                                        && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
                 }
@@ -212,8 +212,8 @@ namespace eFMS.API.Documentation.DL.Services
                 currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && !x.JobNo.StartsWith("DAD")
-                                                    && !x.JobNo.StartsWith("HAN"))
+                                                    && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                    && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
             }
@@ -227,11 +227,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (officeCode == "ITLHAN")
                 {
-                    prefixCode = "HAN-";
+                    prefixCode = "H"; //HAN- >> H
                 }
                 else if (officeCode == "ITLDAD")
                 {
-                    prefixCode = "DAD-";
+                    prefixCode = "D"; //DAD- >> D
                 }
             }
             return prefixCode;
@@ -799,6 +799,83 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return result;
         }
+
+        /// <summary>
+        /// Get air/sea information when link from ops
+        /// </summary>
+        /// <param name="hblNo">HBL No's ops</param>
+        /// <param name="serviceName">product service</param>
+        /// <param name="serviceMode">service mode</param>
+        /// <returns></returns>
+        public object GetLinkASInfomation(string hblNo, string serviceName, string serviceMode)
+        {
+            String jobNo = null;
+            String id = null;
+            var shipmentType = GetServiceType(serviceName, serviceMode);
+            if (!string.IsNullOrEmpty(shipmentType))
+            {
+                var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
+                if (houseDetail != null)
+                {
+                    var transaction = transactionRepository.Get(x => x.TransactionType == shipmentType).Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, y.Id }).FirstOrDefault();
+                    jobNo = transaction?.JobNo.ToString();
+                    if (jobNo != null)
+                    {
+                        id = transaction?.Id.ToString();
+                    }
+                }
+            }
+            return new { jobNo, id };
+        }
+
+        private string GetServiceType(string serviceName, string serviceMode)
+        {
+            var type = string.Empty;
+            switch (serviceName)
+            {
+                case "Sea":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.SeaConsolImport;
+                    }
+                    else
+                    {
+                        type = TermData.SeaConsolExport;
+                    }
+                    break;
+                case "Sea FCL":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.SeaFCLImport;
+                    }
+                    else
+                    {
+                        type = TermData.SeaFCLExport;
+                    }
+                    break;
+                case "Sea LCL":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.SeaLCLImport;
+                    }
+                    else
+                    {
+                        type = TermData.SeaLCLExport;
+                    }
+                    break;
+                case "Air":
+                    if (serviceMode == "Import")
+                    {
+                        type = TermData.AirImport;
+                    }
+                    else
+                    {
+                        type = TermData.AirExport;
+                    }
+                    break;
+            }
+            return type;
+        }
         #endregion -- DETAILS --
 
         #region -- LIST & PAGING --       
@@ -1010,7 +1087,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1026,7 +1108,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1136,7 +1223,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1152,7 +1244,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1288,7 +1385,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1304,7 +1406,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Etd ?? null) >= (criteria.FromDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1457,7 +1564,12 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    &&
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -1473,7 +1585,12 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     ||
                     (
-                           (((x.Eta ?? null) >= (criteria.FromDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToDate ?? null)))
+                           (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
+                        || (criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+                    )
+                    ||
+                    (
+                           (((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.FromDate ?? null)) && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.ToDate ?? null)))
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
@@ -2524,7 +2641,7 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.IssuedBy = model.IssuedBy;
                             hbl.FlightDate = model.FlightDate;
                             hbl.ForwardingAgentId = model.AgentId;
-                            hbl.WarehouseNotice = model.WarehouseId;
+                            hbl.WarehouseId = string.IsNullOrEmpty(model.WarehouseId) ? hbl.WarehouseId : Guid.Parse(model.WarehouseId);
                             hbl.Route = model.Route;
                             hbl.Mawb = model.MblNo;
                             string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();

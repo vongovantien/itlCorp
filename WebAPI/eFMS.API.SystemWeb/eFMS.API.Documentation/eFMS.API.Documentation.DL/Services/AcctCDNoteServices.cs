@@ -184,22 +184,22 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (office.Code == "ITLHAN")
                 {
-                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("HAN")).FirstOrDefault();
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
-                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("DAD")).FirstOrDefault();
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")).FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
-                    currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("DAD")
-                                                           && !x.Code.StartsWith("HAN")).FirstOrDefault();
+                    currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
+                                                           && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
                 }
             }
             else
             {
-                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("DAD")
-                                                       && !x.Code.StartsWith("HAN")).FirstOrDefault();
+                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
+                                                       && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
             }
             return currentCdNote;
         }
@@ -211,11 +211,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (officeCode == "ITLHAN")
                 {
-                    prefixCode = "HAN-";
+                    prefixCode = "H"; //HAN- >> H
                 }
                 else if (officeCode == "ITLDAD")
                 {
-                    prefixCode = "DAD-";
+                    prefixCode = "D"; //DAD- >> D
                 }
             }
             return prefixCode;
@@ -936,9 +936,11 @@ namespace eFMS.API.Documentation.DL.Services
 
             }
 
+            string cdNoteType = !string.IsNullOrEmpty(model.CDNote.Type) && model.CDNote.Type != "INVOICE" ? model.CDNote.Type + " NOTE" : (model.CDNote.Type ?? string.Empty);
+
             var parameter = new AcctSOAReportParams
             {
-                DBTitle = "N/A",
+                DBTitle = cdNoteType,
                 DebitNo = model.CDNote.Code,
                 TotalDebit = model.TotalDebit == null ? string.Empty : model.TotalDebit.ToString(),
                 TotalCredit = model.TotalCredit == null ? string.Empty : model.TotalCredit.ToString(),
@@ -1647,6 +1649,9 @@ namespace eFMS.API.Documentation.DL.Services
                 result.BankAccountNameEn = officeOfUser?.BankAccountNameEn ?? string.Empty;
                 result.SwiftCode = officeOfUser?.SwiftCode ?? string.Empty;
                 result.BankAccountVND = officeOfUser?.BankAccountVnd ?? string.Empty;
+
+                string cdNoteType = !string.IsNullOrEmpty(cdNoteDetail.CDNote.Type) && cdNoteDetail.CDNote.Type != "INVOICE" ? cdNoteDetail.CDNote.Type + " NOTE" : (cdNoteDetail.CDNote.Type ?? string.Empty);
+                result.CdNoteType = cdNoteType;
             }
             return result;
         }

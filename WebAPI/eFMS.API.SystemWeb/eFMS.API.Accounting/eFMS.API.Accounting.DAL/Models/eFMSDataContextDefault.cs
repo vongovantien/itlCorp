@@ -2859,8 +2859,14 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ServiceDate).HasColumnType("datetime");
 
+                entity.Property(e => e.ServiceHblId).HasColumnName("ServiceHblID");
+
                 entity.Property(e => e.ServiceMode)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceNo)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ShipmentMode)
@@ -2920,6 +2926,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Major).HasMaxLength(100);
+
+                entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -3150,6 +3158,11 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PersonalId)
+                    .HasColumnName("PersonalID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Photo).HasMaxLength(500);
 

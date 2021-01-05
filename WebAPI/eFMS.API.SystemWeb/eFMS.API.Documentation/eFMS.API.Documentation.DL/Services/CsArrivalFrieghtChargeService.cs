@@ -495,6 +495,12 @@ namespace eFMS.API.Documentation.DL.Services
                 var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
                 var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
 
+                string warehouseName = string.Empty;
+                if(houseBill.WarehouseId != Guid.Empty)
+                {
+                    warehouseName = placeRepository.Get(x => x.Id == houseBill.WarehouseId)?.FirstOrDefault()?.DisplayName;
+                }
+
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
                     foreach (var frieght in arrival.CsArrivalFrieghtCharges)
@@ -508,6 +514,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                         charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
                         charge.LastDestination = _podName?.ToUpper(); //Destination Air Port (POD)
+                        charge.WarehouseDestination = !string.IsNullOrEmpty(warehouseName) ? string.Format(@"(WH: {0})", warehouseName) : null;
                         charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader (Không UpperCase)
                         charge.DatePackage = DateTime.Now; //Current Date
                         charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty
