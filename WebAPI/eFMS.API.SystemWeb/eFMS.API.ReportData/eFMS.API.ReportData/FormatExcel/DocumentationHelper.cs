@@ -3178,7 +3178,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Title
             workSheet.Cells["A8:J8"].Merge = true;
             workSheet.Cells["A8"].Style.Font.SetFromFont(new Font("Arial", 16, FontStyle.Bold));
-            workSheet.Cells["A8"].Value = titles[0];
+            workSheet.Cells["A8"].Value = cdNoteModel.CdNoteType;
             workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             workSheet.Cells["A9:J9"].Merge = true;

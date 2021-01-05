@@ -329,9 +329,9 @@ namespace eFMS.API.Documentation.DL.Services
             var transactionType = DataTypeEx.GetType(transactionTypeEnum);
             if (transactionType == TermData.AirImport || transactionType == TermData.AirExport)
             {
+                //Không order theo DatetimeCreated, chỉ order giảm dần theo số HAWBNo
                 var hblNos = Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
-                    .OrderByDescending(o => o.DatetimeCreated)
-                    .ThenByDescending(o => o.Hwbno)
+                    .OrderByDescending(o => o.Hwbno)
                     .Select(s => s.Hwbno);
                 int count = 0;
                 if (hblNos != null && hblNos.Count() > 0)

@@ -936,9 +936,11 @@ namespace eFMS.API.Documentation.DL.Services
 
             }
 
+            string cdNoteType = !string.IsNullOrEmpty(model.CDNote.Type) && model.CDNote.Type != "INVOICE" ? model.CDNote.Type + " NOTE" : (model.CDNote.Type ?? string.Empty);
+
             var parameter = new AcctSOAReportParams
             {
-                DBTitle = "N/A",
+                DBTitle = cdNoteType,
                 DebitNo = model.CDNote.Code,
                 TotalDebit = model.TotalDebit == null ? string.Empty : model.TotalDebit.ToString(),
                 TotalCredit = model.TotalCredit == null ? string.Empty : model.TotalCredit.ToString(),
@@ -1647,6 +1649,9 @@ namespace eFMS.API.Documentation.DL.Services
                 result.BankAccountNameEn = officeOfUser?.BankAccountNameEn ?? string.Empty;
                 result.SwiftCode = officeOfUser?.SwiftCode ?? string.Empty;
                 result.BankAccountVND = officeOfUser?.BankAccountVnd ?? string.Empty;
+
+                string cdNoteType = !string.IsNullOrEmpty(cdNoteDetail.CDNote.Type) && cdNoteDetail.CDNote.Type != "INVOICE" ? cdNoteDetail.CDNote.Type + " NOTE" : (cdNoteDetail.CDNote.Type ?? string.Empty);
+                result.CdNoteType = cdNoteType;
             }
             return result;
         }
