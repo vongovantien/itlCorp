@@ -36,3 +36,4 @@ StlDpManagerSignDate	String	50
 StlAscDpManagerName	String	100	
 StlAscDpManagerSignDate	String	50	
 StlBODSignDate	String	50	
+StlRequesterSignDate	String	50	

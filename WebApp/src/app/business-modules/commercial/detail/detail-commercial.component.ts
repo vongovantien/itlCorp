@@ -93,21 +93,27 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         this._catalogueRepo.getDetailPartner(partnerId)
             .subscribe(
                 (res: Partner) => {
-                    this.partner = res;
-                    console.log("detail partner:", this.partner);
-                    this.formCreate.isBranchSub = this.isAddSubPartner;
-                    this.setDataForm(this.partner);
-                    if (this.isAddSubPartner) {
-                        this.formCreate.isUpdate = false;
-                        this.formCreate.getACRefName(this.partner.id);
-                    } else {
-                        this.formCreate.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, true, this.partner.id);
-                        this.formCreate.getACRefName(this.partner.parentId);
-                    }
-                    // this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
+                    if (!!res) {
+                        this.partner = res;
+                        console.log("detail partner:", this.partner);
+                        this.formCreate.isBranchSub = this.isAddSubPartner;
+                        this.setDataForm(this.partner);
+                        if (this.isAddSubPartner) {
+                            this.formCreate.isUpdate = false;
+                            this.formCreate.getACRefName(this.partner.id);
+                        } else {
+                            this.formCreate.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, true, this.partner.id);
+                            this.formCreate.getACRefName(this.partner.parentId);
+                        }
+                        // this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
 
-                    this.formCreate.getShippingProvinces(res.countryShippingId);
-                    this.formCreate.getBillingProvinces(res.countryId);
+                        this.formCreate.getShippingProvinces(res.countryShippingId);
+                        this.formCreate.getBillingProvinces(res.countryId);
+                    }
+                    else {
+                        this.back();
+                    }
+
                 }
             );
     }

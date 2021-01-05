@@ -1178,7 +1178,8 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvance.AdvDate = advance.RequestDate.HasValue ? (DateTime?)advance.RequestDate.Value.Date : null;
             acctAdvance.AdvTo = "N/A";
             acctAdvance.AdvContactID = "N/A";
-            acctAdvance.AdvContact = requesterName;//cần lấy ra username
+            acctAdvance.AdvContact = requesterName;//cần lấy ra Name VN
+            acctAdvance.AdvContactSignDate = approveAdvance?.RequesterAprDate; //Ngày Requester approve
             acctAdvance.AdvAddress = deptRequester?.DeptNameAbbr ?? string.Empty; //Department của Requester
             acctAdvance.AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum();
             acctAdvance.AdvCurrency = advance.AdvanceCurrency;
@@ -2120,7 +2121,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Send Mail đề nghị Approve
-        private bool SendMailSuggestApproval(string advanceNo, string userReciver, string emailUserReciver, List<string> usersDeputy)
+        private bool SendMailSuggestApproval(string advanceNo, string userReciver, string emailUserReciver, List<string> emailUsersDeputy)
         {
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
@@ -2193,20 +2194,13 @@ namespace eFMS.API.Accounting.DL.Services
                 emailRequester
             };
 
-            if (usersDeputy.Count > 0)
+            if (emailUsersDeputy.Count > 0)
             {
-                foreach (var userName in usersDeputy)
+                foreach (var email in emailUsersDeputy)
                 {
-                    //Lấy ra userId by userName
-                    var userId = sysUserRepo.Get(x => x.Username == userName).FirstOrDefault()?.Id;
-
-                    //Lấy ra employeeId của user
-                    var employeeIdOfUser = userBaseService.GetEmployeeIdOfUser(userId);
-                    //Lấy ra email của user
-                    var emailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
-                    if (!string.IsNullOrEmpty(emailUser))
+                    if (!string.IsNullOrEmpty(email))
                     {
-                        emailCCs.Add(emailUser);
+                        emailCCs.Add(email);
                     }
                 }
             }
@@ -3020,6 +3014,8 @@ namespace eFMS.API.Accounting.DL.Services
             var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
             var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
 
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
             if (approve == null)
             {
                 if ((isLeader && userCurrent.GroupId != AccountingConstants.SpecialGroup) || leaderLevel.UserDeputies.Contains(userCurrent.UserID)) //Leader
@@ -3030,7 +3026,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     isManagerOrLeader = true;
                 }
-                else if ((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) //Accountant Manager
+                else if (((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) && isDeptAccountant) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -3058,10 +3054,11 @@ namespace eFMS.API.Accounting.DL.Services
                     isManagerOrLeader = true;
                 }
                 else if (
-                            (userCurrent.GroupId == AccountingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                            ( (userCurrent.GroupId == AccountingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                           ||
-                            accountantLevel.UserDeputies.Contains(currentUser.UserID)
-                        ) //Accountant Manager
+                            accountantLevel.UserDeputies.Contains(currentUser.UserID) )
+                          && isDeptAccountant
+                        ) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -3134,9 +3131,10 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             else if (
-                       ((isAccountant && isDeptAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                       ( ((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                       ||
-                        accountantLevel.UserDeputies.Contains(currentUser.UserID))
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID)) )
+                      && isDeptAccountant
                     ) //Accountant Manager
             {
                 isShowBtnDeny = false;
@@ -3408,6 +3406,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DealinePayment = advancePayment.DeadlinePayment,
                 Manager = _manager,
                 Accountant = _accountant,
+                IsRequesterApproved = _advanceApprove?.RequesterAprDate != null,
                 IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
                 IsBODApproved = _advanceApprove?.BuheadAprDate != null,

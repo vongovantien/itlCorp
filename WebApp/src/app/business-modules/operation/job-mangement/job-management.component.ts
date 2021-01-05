@@ -34,8 +34,8 @@ export class JobManagementComponent extends AppList implements OnInit {
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     defaultDataSearch = {
-        serviceDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
-        serviceDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
+        createdDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
+        createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
 
     constructor(

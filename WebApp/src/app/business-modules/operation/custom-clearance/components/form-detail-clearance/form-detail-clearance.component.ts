@@ -51,7 +51,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
 
     cargoTypes: string[] = ['FCL', 'LCL'];
     serviceTypes: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
-    typeClearances: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    typeClearances: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
     routeClearances: string[] = JobConstants.COMMON_DATA.ROUTES;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
@@ -239,7 +239,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         const form = this.formGroup.getRawValue();
         console.log(form);
         this.customDeclaration.clearanceNo = !!form.clearanceNo ? form.clearanceNo.trim() : null;
-        this.customDeclaration.partnerTaxCode = !!form.partnerTaxCode ? this.taxCode : null;
+        this.customDeclaration.partnerTaxCode = !!this.taxCode ? this.taxCode : this.customDeclaration.partnerTaxCode;
         this.customDeclaration.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.customDeclaration.hblid = !!form.hblid ? form.hblid.trim() : null;
         this.customDeclaration.mblid = !!form.mblid ? form.mblid.trim() : null;

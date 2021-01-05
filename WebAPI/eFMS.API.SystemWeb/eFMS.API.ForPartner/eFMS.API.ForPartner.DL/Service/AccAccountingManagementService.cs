@@ -781,7 +781,8 @@ namespace eFMS.API.ForPartner.DL.Service
                 AcctAdvancePayment adv = acctAdvanceRepository.Get(x => x.Id == model.AdvanceID)?.FirstOrDefault();
                 if (adv == null)
                 {
-                    return new HandleState((object)"Not found advance  " + model.AdvanceNo);
+                    string mesg = "Not found advance  " + model.AdvanceNo;
+                    return new HandleState((object)mesg);
                 }
 
                 if (adv.StatusApproval == ForPartnerConstants.STATUS_APPROVAL_DONE)

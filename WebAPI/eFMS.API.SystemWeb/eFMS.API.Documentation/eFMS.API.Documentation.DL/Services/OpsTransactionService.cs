@@ -185,22 +185,22 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("HAN"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                                                         && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
                     currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("DAD"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                                                         && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
                     currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && !x.JobNo.StartsWith("DAD")
-                                                         && !x.JobNo.StartsWith("HAN"))
+                                                         && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                         && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault();
                 }
             }
@@ -208,8 +208,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                     && !x.JobNo.StartsWith("DAD")
-                                                     && !x.JobNo.StartsWith("HAN"))
+                                                     && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                     && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
             }
             return currentShipment;
@@ -222,11 +222,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (officeCode == "ITLHAN")
                 {
-                    prefixCode = "HAN-";
+                    prefixCode = "H"; //HAN- >> H
                 }
                 else if (officeCode == "ITLDAD")
                 {
-                    prefixCode = "DAD-";
+                    prefixCode = "D"; //DAD- >> D
                 }
             }
             return prefixCode;
@@ -510,6 +510,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
                                 && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
+                                && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= criteria.CreatedDateFrom || criteria.CreatedDateFrom == null)
+                                && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= criteria.CreatedDateTo || criteria.CreatedDateTo == null)
                             ).OrderByDescending(x => x.DatetimeModified);
             }
             else
@@ -522,7 +524,8 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.CustomerId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.FieldOpsId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
-                               && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
+                                   || ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
+                                   || ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.CreatedDateFrom ?? null) && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.CreatedDateTo ?? null))
                                ).OrderByDescending(x => x.DatetimeModified);
             }
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
@@ -570,7 +573,7 @@ namespace eFMS.API.Documentation.DL.Services
             var result = new HandleState();
             try
             {
-                var existedMessage = CheckExist(model.Mblid, model.Hblid);
+                var existedMessage = CheckExist(null, model.Mblid, model.Hblid);
                 if (existedMessage != null)
                 {
                     return new HandleState(existedMessage);
@@ -598,7 +601,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (model.Id > 0)
                 {
-                    var clearance = UpdateInfoConvertClearance(model.Id);
+                    var clearance = UpdateInfoConvertClearance(model);
                     clearance.JobNo = opsTransaction.JobNo;
                     customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
                 }
@@ -647,7 +650,15 @@ namespace eFMS.API.Documentation.DL.Services
                 UserModified = currentUser.UserID,
                 ShipmentType = "Freehand",
             };
-            var customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
+            var customer = new CatPartner();
+            if (model.AccountNo == null)
+            {
+                customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
+            }
+            else
+            {
+                customer = partnerRepository.Get(x => x.AccountNo == model.AccountNo).FirstOrDefault();
+            }
             if (customer != null)
             {
                 opsTransaction.CustomerId = customer.Id;
@@ -735,7 +746,7 @@ namespace eFMS.API.Documentation.DL.Services
                 int i = 0;
                 foreach (var item in list)
                 {
-                    var existedMessage = CheckExist(item.Mblid, item.Hblid);
+                    var existedMessage = CheckExist(null, item.Mblid, item.Hblid);
                     if (existedMessage != null)
                     {
                         return new HandleState(existedMessage);
@@ -765,7 +776,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var opsTransaction = GetNewShipmentToConvert(productService, item);
                         opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
                         DataContext.Add(opsTransaction);
-                        CustomsDeclaration clearance = UpdateInfoConvertClearance(item.Id);
+                        CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
                         clearance.JobNo = opsTransaction.JobNo;
                         customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                         i = i + 1;
@@ -781,9 +792,9 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private CustomsDeclaration UpdateInfoConvertClearance(int id)
+        private CustomsDeclaration UpdateInfoConvertClearance(CustomsDeclarationModel custom)
         {
-            var clearance = customDeclarationRepository.Get(x => x.Id == id).First();
+            var clearance = mapper.Map<CustomsDeclaration>(custom);
             clearance.UserModified = currentUser.UserID;
             clearance.DatetimeModified = DateTime.Now;
             clearance.ConvertTime = DateTime.Now;
@@ -836,28 +847,23 @@ namespace eFMS.API.Documentation.DL.Services
         /// Check if hbl+mbl no has been existed
         /// </summary>
         /// <param name="model">OpsTransactionModel</param>
+        /// <param name="mblNo">MBL No of OpsTransaction</param>
+        /// <param name="hblNo">HBL No of OpsTransaction</param>
         /// <returns></returns>
-        public string CheckExist(OpsTransactionModel model)
+        public string CheckExist(OpsTransactionModel model, string mblNo, string hblNo)
         {
-            var existedMblHbl = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+            var existedMblHbl = false;
+            if (model == null)
+            {
+                existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo && x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
+            }
+            else
+            {
+                existedMblHbl = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+            }
             if (existedMblHbl)
             {
                 return stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_HBNO_EXISTED].Value;
-            }
-            return null;
-        }
-
-        public string CheckExist(string mblNo, string hblNo)
-        {
-            var existedHBL = DataContext.Any(x => x.Hwbno == hblNo && x.CurrentStatus != TermData.Canceled);
-            var existedMBL = DataContext.Any(x => x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
-            if (existedHBL)
-            {
-                return stringLocalizer[DocumentationLanguageSub.MSG_HBNO_EXISTED, hblNo].Value;
-            }
-            if (existedMBL)
-            {
-                return stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, mblNo].Value;
             }
             return null;
         }
@@ -1077,19 +1083,28 @@ namespace eFMS.API.Documentation.DL.Services
             ResultHandle result = null;
             string notFoundPartnerTaxCodeMessages = string.Empty;
             string duplicateMessages = string.Empty;
-            foreach(var item in list)
+            foreach (var item in list)
             {
-                var customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
-                if (customer == null) notFoundPartnerTaxCodeMessages += item.PartnerTaxCode + ", ";
+                var customer = new CatPartner();
+                if (item.AccountNo == null)
+                {
+                    customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
+                }
+                else
+                {
+                    customer = partnerRepository.Get(x => x.AccountNo == item.AccountNo)?.FirstOrDefault();
+                }
+
+                if (customer == null) notFoundPartnerTaxCodeMessages += (item.AccountNo ?? item.PartnerTaxCode) + ", ";
                 string dupMessage = CheckExist(item, item.Id);
-                if(dupMessage != null)
+                if (dupMessage != null)
                 {
                     duplicateMessages += dupMessage + ", ";
                 }
             }
             if(notFoundPartnerTaxCodeMessages.Length > 0)
             {
-                notFoundPartnerTaxCodeMessages = "Partner TaxCode '" + notFoundPartnerTaxCodeMessages.Substring(0, notFoundPartnerTaxCodeMessages.Length - 2) + "' Not found";
+                notFoundPartnerTaxCodeMessages = "Customer '" + notFoundPartnerTaxCodeMessages.Substring(0, notFoundPartnerTaxCodeMessages.Length - 2) + "' Not found";
                 result = new ResultHandle { Status = false, Message = notFoundPartnerTaxCodeMessages, Data = 403 };
                 return result;
             }
@@ -1248,16 +1263,13 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         public ResultHandle ImportDuplicateJob(OpsTransactionModel model)
         {
-            var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
             if (code == 403) return new ResultHandle { Status = false, Message = "You can't duplicate this job." };
             var newContainers = new List<CsMawbcontainer>();
             var newSurcharges = new List<CsShipmentSurcharge>();
             // Create model import
-            var _id = model.Id;
             var _hblId = model.Hblid;
-            model.Id = Guid.NewGuid();
             model.Hblid = Guid.NewGuid();
             model.JobNo = CreateJobNoOps();
             model.UserModified = currentUser.UserID;
@@ -1305,7 +1317,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             // Update list SurCharge
             var listSurCharge = CopySurChargeToNewJob(_hblId, model.Hblid);
-            if (listSurCharge.Count() > 0)
+            if (listSurCharge?.Count() > 0)
             {
                 newSurcharges.AddRange(listSurCharge);
             }
@@ -1314,6 +1326,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var entity = mapper.Map<OpsTransaction>(model);
                 var hs = DataContext.Add(entity);
+                DataContext.SubmitChanges();
                 if (hs.Success)
                 {
                     if (newContainers.Count > 0)
@@ -1327,13 +1340,13 @@ namespace eFMS.API.Documentation.DL.Services
                         HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
                         surchargeRepository.SubmitChanges();
                     }
-                    return new ResultHandle { Status = true, Message = "Job have been save!", Data = entity };
+                    return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
                 }
                 return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
             }
             catch (Exception ex)
             {
-                return new ResultHandle { Status = false, Message = ex.Message };
+                return new ResultHandle { Status = false, Message = "Job can't be saved!" };
             }
         }
 

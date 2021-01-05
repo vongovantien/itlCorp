@@ -244,7 +244,7 @@ namespace eFMS.API.Operation.DL.Services
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
                                                                                     && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
-                                                                                    && (x.AccountNo == criteria.CustomerNo || string.IsNullOrEmpty(criteria.CustomerNo));
+                                                                                    && ((x.AccountNo ?? x.PartnerTaxCode) == criteria.CustomerNo || string.IsNullOrEmpty(criteria.CustomerNo));
 
             if (criteria.ImPorted == true)
             {
@@ -369,7 +369,14 @@ namespace eFMS.API.Operation.DL.Services
                 var exCountryCode = item.ExportCountryCode;
                 clearance.ImportCountryName = countries.FirstOrDefault(x => x.Code == imCountryCode)?.NameEn;
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
-                clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
+                if (item.AccountNo == null)
+                {
+                    clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.ShortName;
+                }
+                else
+                {
+                    clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
+                }
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
                 clearance.UserCreatedName = userRepository.Get(x => x.Id == item.UserCreated).FirstOrDefault()?.Username;
                 clearance.UserModifieddName = userRepository.Get(x => x.Id == item.UserModified).FirstOrDefault()?.Username;
@@ -1226,6 +1233,10 @@ namespace eFMS.API.Operation.DL.Services
         {
             CustomsDeclaration clearance = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (clearance == null) return null;
+            if(clearance.AccountNo == null)
+            {
+                clearance.AccountNo = clearance.PartnerTaxCode;
+            }
             var result = mapper.Map<CustomsDeclarationModel>(clearance);
             result.UserCreatedName = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
             result.UserModifieddName = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;

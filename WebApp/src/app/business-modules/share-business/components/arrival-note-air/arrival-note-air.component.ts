@@ -114,7 +114,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     this.hblArrivalNote.hblid = data.hblid;
 
                     if (!data.arrivalNo) {
-                        return this._store.select(getTransactionDetailCsTransactionState);  // * Stream 2: get shipment detail
+                        return this._store.select(getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe));  // * Stream 2: get shipment detail
                     } else {
                         this.hblArrivalNote.arrivalNo = data.arrivalNo;
                         this.hblArrivalNote.arrivalFirstNotice = !!data.arrivalFirstNotice ? {
