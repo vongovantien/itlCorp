@@ -72,6 +72,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     isConvertJob: boolean = false;
     isDisableCargo: boolean = false;
     taxCode: string = '';
+    customerName: string = '';
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -185,6 +186,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
                 this.cargoType.enable();
             }
         }
+        this.customerName = this.customDeclaration.customerName;
 
     }
 
