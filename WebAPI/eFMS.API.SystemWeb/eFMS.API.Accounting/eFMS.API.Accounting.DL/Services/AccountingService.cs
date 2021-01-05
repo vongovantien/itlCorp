@@ -403,7 +403,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn;
+                    charge.Description = _charge?.ChargeNameVn + "\n" + surcharge.Mblno + "\n" + surcharge.Hblno; //Format: ChargeName + Enter + MBL + Enter + HBL [CR: 05-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -430,7 +430,7 @@ namespace eFMS.API.Accounting.DL.Services
                         // Exchange Rate from currency original charge to currency debit note
                         var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, cdNote.CurrencyId);
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
-                        charge.OriginalUnitPrice = Math.Round(_unitPrice ?? 0, decimalRound); //Đơn giá
+                        charge.OriginalUnitPrice = _unitPrice ?? 0; //Math.Round(_unitPrice ?? 0, decimalRound); //Đơn giá không cần round
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
                         var _totalNoVat = surcharge.Quantity * _unitPrice;
                         charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
@@ -594,7 +594,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn;
+                    charge.Description = _charge?.ChargeNameVn + "\n" + surcharge.Mblno + "\n" + surcharge.Hblno; //Format: ChargeName + Enter + MBL + Enter + HBL [CR: 05-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -621,7 +621,7 @@ namespace eFMS.API.Accounting.DL.Services
                         // Exchange Rate from currency original charge to currency SOA
                         var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, sync.CurrencyCode0);
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
-                        charge.OriginalUnitPrice = Math.Round(_unitPrice ?? 0, decimalRound); //Đơn giá
+                        charge.OriginalUnitPrice = _unitPrice ?? 0; //Math.Round(_unitPrice ?? 0, decimalRound); //Đơn giá không cần round
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
                         var _totalNoVat = surcharge.Quantity * _unitPrice;
                         charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
