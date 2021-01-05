@@ -139,7 +139,7 @@ export class CreateHouseBillComponent extends AppForm {
 
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.formHouseBill.formGroup.valid) {
+        if (!this.formHouseBill.formGroup.valid || (!!this.formHouseBill.eta.value && !this.formHouseBill.eta.value.startDate)) {
             valid = false;
         }
         return valid;
