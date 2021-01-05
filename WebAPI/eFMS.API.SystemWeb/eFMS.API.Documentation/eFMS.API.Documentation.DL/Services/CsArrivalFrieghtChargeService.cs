@@ -514,7 +514,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                         charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
                         charge.LastDestination = _podName?.ToUpper(); //Destination Air Port (POD)
-                        charge.WarehouseDestination = string.Format(@"(WH: {0})", warehouseName);
+                        charge.WarehouseDestination = !string.IsNullOrEmpty(warehouseName) ? string.Format(@"(WH: {0})", warehouseName) : null;
                         charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader (Không UpperCase)
                         charge.DatePackage = DateTime.Now; //Current Date
                         charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty

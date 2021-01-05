@@ -2641,7 +2641,7 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.IssuedBy = model.IssuedBy;
                             hbl.FlightDate = model.FlightDate;
                             hbl.ForwardingAgentId = model.AgentId;
-                            hbl.WarehouseNotice = model.WarehouseId;
+                            hbl.WarehouseId = string.IsNullOrEmpty(model.WarehouseId) ? hbl.WarehouseId : Guid.Parse(model.WarehouseId);
                             hbl.Route = model.Route;
                             hbl.Mawb = model.MblNo;
                             string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
