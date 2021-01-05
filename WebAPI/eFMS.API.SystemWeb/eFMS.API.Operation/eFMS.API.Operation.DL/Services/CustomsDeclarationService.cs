@@ -113,7 +113,7 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     DataContext.Add(lists);
                     DataContext.SubmitChanges();
-                    result = new HandleState(true, lists.Count + stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
+                    result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, lists.Count]);
                 }
                 else
                 {
