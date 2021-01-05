@@ -223,7 +223,7 @@ namespace eFMS.API.Operation.DL.Services
                               FROM " + database + @".[dbo].[DTOKHAIMD]
                                     INNER JOIN " + database + @".[dbo].[DTOKHAIMD_VNACCS2]
                                     ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID
-                              WHERE DATEADD(MONTH, -3, @eoMonth) <= NGAY_DK AND NGAY_DK <= @eoMonth";
+                              WHERE DATEADD(MONTH, -3, @eoMonth) < NGAY_DK AND NGAY_DK <= @eoMonth";
 
             string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
             try
