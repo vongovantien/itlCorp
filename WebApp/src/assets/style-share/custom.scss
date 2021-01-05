@@ -1033,6 +1033,7 @@ table.dataTable {
     &.daterange-rtl-custom {
         .md-drppicker {
             right: 0 !important;
+            padding-top: 0;
         }
     }
 }

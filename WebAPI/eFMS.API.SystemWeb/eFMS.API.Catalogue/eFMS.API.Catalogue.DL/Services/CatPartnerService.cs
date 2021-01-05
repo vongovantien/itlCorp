@@ -830,7 +830,15 @@ namespace eFMS.API.Catalogue.DL.Services
                     _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
                     break;
             }
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            var permissionRange = new PermissionRange();
+            if (_user.UserMenuPermission == null)
+            {
+                permissionRange = PermissionRange.None;
+            }
+            else
+            {
+                permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            }
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
             if (code == 403) return new HandleState(403, "");
             return new HandleState();

@@ -19,5 +19,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public DateTime? ServiceDateFrom { get; set; }
         public DateTime? ServiceDateTo { get; set; }
         public PermissionRange RangeSearch { get; set; }
+        public DateTime? CreatedDateFrom { get; set; }
+        public DateTime? CreatedDateTo { get; set; }
     }
 }
