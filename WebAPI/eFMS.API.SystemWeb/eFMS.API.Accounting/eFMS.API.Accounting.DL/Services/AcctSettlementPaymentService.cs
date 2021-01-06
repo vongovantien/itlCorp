@@ -4479,7 +4479,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
             }
-            return listData;
+            var result = listData.ToArray().OrderBy(x => x.JobNo); //Sắp xếp tăng dần theo JobNo [05-01-2021]
+            return result.ToList();
         }
 
         private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange)
