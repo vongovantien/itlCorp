@@ -2441,7 +2441,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.InputData = string.Empty; //Gán rỗng
                         charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
                         charge.SalesProfit = charge.SalesProfit + _decimalNumber; //Cộng thêm phần thập phân
-                        charge.Quantity = surcharge.Quantity;
+                        charge.Quantity = surcharge.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                         charge.UnitPrice = (surcharge.UnitPrice ?? 0);
                         charge.UnitPrice = charge.UnitPrice + _decimalNumber; //Cộng thêm phần thập phân
                         charge.Unit = unitCode;
