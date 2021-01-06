@@ -119,6 +119,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     setDataForm(partner: Partner) {
+        this.formCreate.provinceShippingIdName = partner.provinceShippingName;
+        this.formCreate.countryShippingIdName = partner.countryShippingName;
+        this.formCreate.provinceIdName = partner.provinceName;
+        this.formCreate.countryIdName = partner.countryName;
         this.formCreate.formGroup.patchValue({
             accountNo: this.isAddSubPartner ? null : partner.accountNo,
             partnerNameEn: partner.partnerNameEn,

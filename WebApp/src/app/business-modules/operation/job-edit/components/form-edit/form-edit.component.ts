@@ -253,6 +253,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
+                this.customerName = data.shortName;
                 this.customerId.setValue(data.id);
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
                     if (!!res) {

@@ -211,7 +211,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
             this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
         }
-
         this.keyManager.setActiveItem(index);
         // * Reset keyword search.
         this.keyword = '';
