@@ -144,22 +144,24 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-lg-6">
-                                    <label class="form-control-label" for="">
-                                        ETD
-                                    </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true"
-                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                            [singleDatePicker]="true" formControlName="etd" readonly
-                                            [allowRemove]="!!etd.value && !!etd.value.startDate"
-                                            (remove)="resetFormControl(etd)" calendar />
+                                    <div class="form-group">
+                                        <label class="form-control-label">
+                                            ETD
+                                        </label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd [autoApply]="true"
+                                                [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                [singleDatePicker]="true" formControlName="etd" readonly
+                                                [allowRemove]="!!etd.value && !!etd.value.startDate"
+                                                (remove)="resetFormControl(etd)" calendar />
 
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div
-                                        [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.valid) || (isSubmited && !eta.valid)}">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && !eta.value) || (isSubmited && !eta.value.startDate)}">
                                         <label class="form-control-label" for="">
                                             ETA <span class="m--font-danger">(*)</span>
                                         </label>
@@ -170,11 +172,6 @@
                                                 [singleDatePicker]="true" formControlName="eta" readonly
                                                 [allowRemove]="!!eta.value && !!eta.value.startDate"
                                                 (remove)="resetFormControl(eta)" calendar />
-
-                                        </div>
-                                        <div class="form-control-feedback"
-                                            *ngIf="isSubmited && (eta.errors | equalError: 'required') || (eta.errors | equalError: 'required') && eta.dirty">
-                                            Estimated Time of Arrival is required !
                                         </div>
                                     </div>
                                 </div>
