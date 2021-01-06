@@ -194,10 +194,11 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     () => forkJoin([
                         this._documentationRepo.getAirwayBill(this.jobId),
                         this._systemRepo.getLocationOfficeById(currenctUser),
+                        this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
                     ])
                 ))
             .subscribe(
-                ([airwaybill, fesponseOfficeLocation]) => {
+                ([airwaybill, fesponseOfficeLocation, hawbNoGenerate]) => {
                     if (!!airwaybill) {
                         this.airwayBill = airwaybill;
                         this.forwardingAgentId.setValue(this.airwayBill.consigneeId);
@@ -211,6 +212,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     }
                     if (fesponseOfficeLocation.status) {
                         this.issueHblplace.setValue(fesponseOfficeLocation.data);
+                    }
+
+                    // * CR 15222
+                    if (this.shipmentDetail.isHawb) {
+                        this.hwbno.setValue('N/H');
+                    } else {
+                        this.hwbno.setValue(hawbNoGenerate.hblNo);
                     }
                 }
             );
@@ -734,4 +742,5 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.formCreate.controls["otherCharge"].setValue(text);
         this.otherCharges = data.charges;
     }
+
 }
