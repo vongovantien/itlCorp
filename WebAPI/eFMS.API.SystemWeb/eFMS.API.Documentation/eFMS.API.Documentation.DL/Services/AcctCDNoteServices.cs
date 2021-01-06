@@ -1048,7 +1048,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Delivery = null,
                         HWBNO = model.HbLadingNo,
                         Description = item.NameEn,
-                        Quantity = item.Quantity,
+                        Quantity = item.Quantity + _decimalNumber,
                         QUnit = "N/A",
                         UnitPrice = item.UnitPrice ?? 0,
                         VAT = (_vatAmount ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
@@ -1206,10 +1206,11 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Subject = "LOCAL CHARGES";
                     charge.Description = item.NameEn;//Charge name
                     charge.Notes = string.IsNullOrEmpty(item.Notes) ? "" : "(" + item.Notes + ")";
-                    charge.Quantity = item.Quantity;
+                    charge.Quantity = item.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                     charge.Unit = item.UnitCode; //Unit Code
                     charge.QUnit = isOriginCurr ? item.CurrencyId : criteria.Currency;
-                    charge.UnitPrice = ((item.UnitPrice ?? 0) * _exchangeRate) + _decimalNumber; //Unit Price đã được Exchange Rate theo Currency, cộng thêm phần thập phân
+                    var _unitPrice = ((item.UnitPrice ?? 0) * _exchangeRate) + _decimalNumber; //Unit Price đã được Exchange Rate theo Currency, cộng thêm phần thập phân
+                    charge.UnitPrice = _unitPrice;
                     charge.VAT = (item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
                     var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
                     if (isOriginCurr)
@@ -1416,13 +1417,14 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.HWBNO = data.HbLadingNo?.ToUpper(); //HBLNOs
                     charge.WChargeable = data.HbChargeWeight; //Total Charge Weight of HBL
 
-                    //Thông tin list charge
+                    //Thông tin list charges
                     charge.Subject = "FREIGHT CHARGES";
                     charge.Description = item.NameEn;//Charge name
-                    charge.Quantity = item.Quantity;
+                    charge.Quantity = item.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                     charge.Unit = item.Unit;
                     charge.QUnit = isOriginCurr ? item.CurrencyId : criteria.Currency;
-                    charge.UnitPrice = ((item.UnitPrice ?? 0) * _exchangeRate) + _decimalNumber; //Unit Price đã được Exchange Rate theo Currency, cộng thêm phần thập phân
+                    var _unitPrice = ((item.UnitPrice ?? 0) * _exchangeRate) + _decimalNumber; //Unit Price đã được Exchange Rate theo Currency, cộng thêm phần thập phân                    
+                    charge.UnitPrice = _unitPrice;
                     charge.VAT = (item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
                     var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
                     if (isOriginCurr)
@@ -1465,7 +1467,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.DebitNo = criteria.CreditDebitNo;
             parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
-            parameter.ReviseNotice = "Revised: " + DateTime.Now.ToString("dd/MM/yyyy");
+            parameter.ReviseNotice = DateTime.Now.ToString("dd/MM/yyyy"); //Bỏ chữ Revised
 
             var _inword = string.Empty;
             // Preview with Original

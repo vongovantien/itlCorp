@@ -154,7 +154,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                              //CustomerCode = !string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode,
                                                              CustomerCode = employee.StaffCode, //Chỉ lấy StaffCode [06/01/2021]
                                                              OfficeCode = office.Code,
-                                                             DocDate = ad.RequestDate,
+                                                             DocDate = ad.RequestDate.HasValue ? ad.RequestDate.Value.Date : ad.RequestDate, //Chỉ lấy Date (không lấy Time)
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
                                                              DueDate = ad.PaymentTerm,
                                                              PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod
@@ -207,7 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                   CustomerName = p.PartnerNameVn,
                                                                   CustomerMode = p.PartnerMode,
                                                                   LocalBranchCode = p.InternalCode,
-                                                                  DocDate = voucher.Date,
+                                                                  DocDate = voucher.Date.HasValue ? voucher.Date.Value.Date : voucher.Date, //Chỉ lấy Date (không lấy Time)
                                                                   OfficeCode = office.Code,
                                                                   ReferenceNo = voucher.VoucherId,
                                                                   CurrencyCode = voucher.Currency,
@@ -261,7 +261,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                       AtchDocNo = surcharge.InvoiceNo,
-                                                                                      AtchDocDate = surcharge.InvoiceDate,
+                                                                                      AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate, //Chỉ lấy Date (không lấy Time)
                                                                                       AtchDocSerialNo = surcharge.SeriesNo,
                                                                                       AccountNo = item.AccountNo, // AccountNo của voucher
                                                                                       ContracAccount = chgDef.CreditAccountNo,
@@ -345,7 +345,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
-                                                                                             AtchDocDate = surcharge.InvoiceDate,
+                                                                                             AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate, //Chỉ lấy Date (không lấy Time)
                                                                                              AtchDocSerialNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
                                                                                              CustomerCodeBook = obhP.AccountNo
@@ -382,7 +382,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
                 sync.Transcode = string.Empty;
-                sync.DocDate = cdNote.DatetimeCreated;
+                sync.DocDate = cdNote.DatetimeCreated.HasValue ? cdNote.DatetimeCreated.Value.Date : cdNote.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                 sync.ReferenceNo = cdNote.Code;
                 var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                 sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
@@ -488,7 +488,7 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.BranchCode = string.Empty;
                     sync.OfficeCode = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
                     sync.Transcode = string.Empty;
-                    sync.DocDate = cdNote.DatetimeCreated;
+                    sync.DocDate = cdNote.DatetimeCreated.HasValue ? cdNote.DatetimeCreated.Value.Date : cdNote.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                     sync.ReferenceNo = cdNote.Code;
                     var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                     sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
@@ -540,7 +540,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ContraAccount = string.Empty;
                         charge.VATAccount = string.Empty;
                         charge.AtchDocNo = surcharge.InvoiceNo;
-                        charge.AtchDocDate = surcharge.InvoiceDate;
+                        charge.AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate; //Chỉ lấy Date (không lấy Time)
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
 
@@ -573,7 +573,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
                 sync.Transcode = string.Empty;
-                sync.DocDate = soa.DatetimeCreated;
+                sync.DocDate = soa.DatetimeCreated.HasValue ? soa.DatetimeCreated.Value.Date : soa.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                 sync.ReferenceNo = soa.Soano;
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
@@ -678,7 +678,7 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.BranchCode = string.Empty;
                     sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
                     sync.Transcode = string.Empty;
-                    sync.DocDate = soa.DatetimeCreated;
+                    sync.DocDate = soa.DatetimeCreated.HasValue ? soa.DatetimeCreated.Value.Date : soa.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                     sync.ReferenceNo = soa.Soano;
                     var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                     sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
@@ -730,7 +730,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ContraAccount = string.Empty;
                         charge.VATAccount = string.Empty;
                         charge.AtchDocNo = surcharge.InvoiceNo;
-                        charge.AtchDocDate = surcharge.InvoiceDate;
+                        charge.AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate; //Chỉ lấy Date (không lấy Time)
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
 
@@ -756,7 +756,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.Stt = invoice.Id.ToString();
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == invoice.OfficeId).FirstOrDefault()?.Code;
-                sync.DocDate = invoice.Date; //Invoice Date
+                sync.DocDate = invoice.Date.HasValue ? invoice.Date.Value.Date : invoice.Date; //Invoice Date
                 sync.ReferenceNo = invoice.InvoiceNoReal; //Invoice No
                 var invoicePartner = partners.Where(x => x.Id == invoice.PartnerId).FirstOrDefault();
                 sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
@@ -803,7 +803,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.Stt = soa.Id.ToString();
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
-                sync.DocDate = soa.DatetimeCreated; //Created Date SOA
+                sync.DocDate = soa.DatetimeCreated.HasValue ? soa.DatetimeCreated.Value.Date : soa.DatetimeCreated; //Created Date SOA
                 sync.ReferenceNo = soa.Soano; //SOA No
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
@@ -1706,7 +1706,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var officeCode = offices.Where(x => x.Id == receipt.OfficeId).FirstOrDefault()?.Code;
                 sync.BranchCode = officeCode;
                 sync.OfficeCode = officeCode;
-                sync.DocDate = receipt.PaymentDate; //Payment Date
+                sync.DocDate = receipt.PaymentDate.HasValue ? receipt.PaymentDate.Value.Date : receipt.PaymentDate; //Payment Date (Chỉ lấy Date, không lấy time)
                 sync.ReferenceNo = receipt.PaymentRefNo; //Receipt No
                 var invoicePartner = partners.Where(x => x.Id == receipt.CustomerId).FirstOrDefault();
                 sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
