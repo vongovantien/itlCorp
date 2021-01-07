@@ -73,7 +73,6 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     isDisableCargo: boolean = false;
     taxCode: string = '';
     customerName: string = '';
-
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IShareBussinessState>,
@@ -193,6 +192,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
+                this.customerName = data.shortName;
                 this.partnerTaxCode.setValue(data.accountNo);
                 this.taxCode = data.taxCode;
                 break;

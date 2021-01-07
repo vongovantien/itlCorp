@@ -49,7 +49,7 @@
                     <div class="form-group">
                         <label>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
-                            [currentActiveItemId]="{ field: 'id', value: shipperId.value, hardValue:!!selectedCustomer ? selectedCustomer.shortName : null}"
+                            [currentActiveItemId]="{ field: 'id', value: shipperId.value, hardValue: customerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
                             [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(shipperId)"
                             placeholder="Please select shipper">
