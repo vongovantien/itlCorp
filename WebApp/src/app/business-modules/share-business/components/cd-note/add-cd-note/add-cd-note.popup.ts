@@ -148,13 +148,13 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                             ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
                             ele.canEdit = true;
                             if (ele.type === "OBH") {
-                                if (ele.creditNo !== null && ele.debitNo !== null) {
-                                    if ((ele.paySoano !== null && ele.soano !== null) || ele.voucherId !== null) {
+                                if (!!ele.creditNo && !!ele.debitNo) {
+                                    if ((!!ele.paySoano && !!ele.soano) || !!ele.voucherId) {
                                         ele.canEdit = false;
                                     }
                                 }
                             } else {
-                                if ((ele.debitNo !== null || ele.creditNo !== null) && (ele.soano !== null || ele.voucherId !== null)) {
+                                if ((!!ele.debitNo || !!ele.creditNo) && (!!ele.soano || !!ele.voucherId)) {
                                     ele.canEdit = false;
                                 }
                             }
@@ -205,9 +205,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         for (const group of this.listChargePartner) {
             group.isSelected = this.isCheckAllCharge;
             for (const item of group.listCharges) {
-                if (item.creditNo === null && item.debitNo === null) {
-                    item.isSelected = this.isCheckAllCharge;
-                } else if (item.canEdit) {
+                if ((!item.creditNo && !item.debitNo) || item.canEdit) {
                     item.isSelected = this.isCheckAllCharge;
                 }
             }
@@ -217,9 +215,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     onChangeCheckBoxGrpCharge(charges: any) {
         this.isCheckAllCharge = this.listChargePartner.every((item: any) => item.isSelected);
         for (const charge of charges.listCharges) {
-            if (charge.creditNo === null && charge.debitNo === null) {
-                charge.isSelected = charges.isSelected;
-            } else if (charge.canEdit) {
+            if ((!charge.creditNo && !charge.debitNo) || charge.canEdit) {
                 charge.isSelected = charges.isSelected;
             }
         }
@@ -235,7 +231,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
-                    charge.isDeleted = (charge.creditNo === null || charge.debitNo === null) ? true : charge.canEdit;
+                    charge.isDeleted = (!charge.creditNo || !charge.debitNo) ? true : charge.canEdit;
                 }
 
                 const chargeLen = charges.listCharges.length;
@@ -271,13 +267,13 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.messageValidate = this.selectedNoteType + " Note existed Charge not match type, Please check again!";
         for (const charges of listChargePartner) {
             if (this.selectedNoteType === "DEBIT" || this.selectedNoteType === "INVOICE") {
-                const existsCredit = charges.listCharges.filter(group => group.credit !== null);
+                const existsCredit = charges.listCharges.filter(group => !!group.credit);
                 if (existsCredit.length > 0) {
                     this.validateCDNotePopup.show();
                     return true;
                 }
             } else {
-                const existsDebit = charges.listCharges.filter(group => group.debit !== null);
+                const existsDebit = charges.listCharges.filter(group => !!group.debit);
                 if (existsDebit.length > 0) {
                     this.validateCDNotePopup.show();
                     return true;
