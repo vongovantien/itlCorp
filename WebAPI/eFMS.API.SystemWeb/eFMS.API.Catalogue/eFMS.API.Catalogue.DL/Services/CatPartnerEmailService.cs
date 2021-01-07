@@ -18,16 +18,19 @@ namespace eFMS.API.Catalogue.DL.Services
         private ICurrentUser currentUser;
         private readonly IContextBase<CatPartner> catPartnerRepository;
         private readonly IContextBase<SysUser> sysUserRepository;
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
 
         public CatPartnerEmailService(IContextBase<CatPartnerEmail> repository,
             IMapper mapper,
             IContextBase<CatPartner> catPartnerRepo,
             IContextBase<SysUser> userRepo,
+            IContextBase<SysOffice> officeRepo,
             ICurrentUser currtUser) : base(repository, mapper)
         {
             currentUser = currtUser;
             catPartnerRepository = catPartnerRepo;
             sysUserRepository = userRepo;
+            sysOfficeRepository = officeRepo;
         }
         #region List
         public IQueryable<CatPartnerEmailModel> GetBy(string partnerId)
@@ -35,7 +38,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var data = DataContext.Get(x => x.PartnerId == partnerId);
             if (data == null) return null;
             var results = data.ProjectTo<CatPartnerEmailModel>(mapper.ConfigurationProvider).ToList();
-            results.ForEach(x => x.UserModfiedName = sysUserRepository.Get(y => y.Id == x.UserModified).Select(t => t.Username).FirstOrDefault());
+            results.ForEach(x => { x.UserModfiedName = sysUserRepository.Get(y => y.Id == x.UserModified).Select(t => t.Username).FirstOrDefault();
+            x.OfficeAbbrName = sysOfficeRepository.Get(y => y.Id == x.OfficeId).Select(t => t.ShortName).FirstOrDefault();} );
             return results?.AsQueryable();
         }
 
@@ -54,6 +58,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             model.UserModified = model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+            model.Id = Guid.NewGuid();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try

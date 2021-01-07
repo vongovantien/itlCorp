@@ -44,6 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        private readonly IContextBase<CatPartnerEmail> catpartnerEmailRepository;
         private readonly IOptions<ApiUrl> ApiUrl;
 
 
@@ -64,6 +65,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatDepartment> catDepartmentRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<CatPartnerEmail> emailRepo,
             IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -81,6 +83,7 @@ namespace eFMS.API.Catalogue.DL.Services
             catDepartmentRepository = catDepartmentRepo;
             userlevelRepository = userlevelRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
+            catpartnerEmailRepository = emailRepo;
             ApiUrl = apiurl;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -146,6 +149,18 @@ namespace eFMS.API.Catalogue.DL.Services
                                 }
                             }
 
+                        }
+                        if(entity.PartnerEmails.Count > 0)
+                        {
+                            var emails = mapper.Map<List<CatPartnerEmail>>(entity.PartnerEmails);
+                            emails.ForEach(x =>
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.PartnerId = partner.Id;
+                                x.DatetimeCreated = DateTime.Now;
+                                x.UserCreated = x.UserModified = currentUser.UserID;
+                            });
+                            var hsEmail = catpartnerEmailRepository.Add(emails);
                         }
                         trans.Commit();
                         SendMailCreatedSuccess(partner);

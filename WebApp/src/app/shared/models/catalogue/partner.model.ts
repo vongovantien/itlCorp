@@ -1,5 +1,6 @@
 import { PermissionPartner } from "./permissionPartner";
 import { Contract } from "./catContract.model";
+import { PartnerEmail } from "./partnerEmail.model";
 
 export class Partner {
     id: string = '';
@@ -69,6 +70,8 @@ export class Partner {
 
     saleManRequests: SaleManRequest[] = [];
     contracts: Contract[] = [];
+    partnerEmails: PartnerEmail[] = [];
+
 
     partnerType: string = '';
     partnerMode: string = '';

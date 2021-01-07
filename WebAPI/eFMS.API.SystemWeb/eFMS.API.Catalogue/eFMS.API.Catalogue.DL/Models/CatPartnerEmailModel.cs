@@ -9,5 +9,6 @@ namespace eFMS.API.Catalogue.DL.Models
     {
         public string UserCreatedName { get; set; }
         public string UserModfiedName { get; set; }
+        public string OfficeAbbrName { get; set; }
     }
 }

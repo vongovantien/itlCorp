@@ -1,6 +1,7 @@
 ﻿using System;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -11,8 +12,10 @@ using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Catalogue.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [MiddlewareFilter(typeof(LocalizationMiddleware))]
+    [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class CatPartnerEmailController : ControllerBase
     {
 
@@ -38,12 +41,13 @@ namespace eFMS.API.Catalogue.Controllers
         /// <summary>
         /// get partners email by partner Id
         /// </summary>
-        /// <param name="partnerId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("GetBy")]
-        public IActionResult GetBy(string partnerId)
+        [HttpGet]
+        [Route("GetBy/{id}")]
+        public IActionResult GetBy(string id)
         {
-            var results = catPartnerEmailService.GetBy(partnerId);
+            var results = catPartnerEmailService.GetBy(id);
             return Ok(results);
         }
 
@@ -52,6 +56,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+       [HttpGet("Get")]
         public IActionResult Get(Guid id)
         {
             var data = catPartnerEmailService.GetDetail(id);
@@ -74,22 +79,21 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var result = catPartnerEmailService.Add(model);
+            var result = catPartnerEmailService.AddEmail(model);
             return Ok(result);
         }
 
         /// <summary>
         /// update an existed item
         /// </summary>
-        /// <param name="id">id of data that need to update</param>
         /// <param name="model">object to update</param>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize]
-        public IActionResult Put(string id, CatPartnerEmailModel model)
+        public IActionResult Put(CatPartnerEmailModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(id, model);
+            var checkExistMessage = CheckExist(model.Id.ToString(), model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -130,7 +134,7 @@ namespace eFMS.API.Catalogue.Controllers
 
                 if (catPartnerEmailService.Any(x => x.Type == model.Type && x.OfficeId == model.OfficeId && x.PartnerId == model.PartnerId) )
                 {
-                    message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    message = "Duplicate office, type on this partner";
                 }
 
             }
@@ -138,7 +142,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 if (catPartnerEmailService.Any(x => x.Type == model.Type && x.OfficeId == model.OfficeId && x.PartnerId == model.PartnerId && x.Id.ToString() != id))
                 {
-                    message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    message = "Duplicate office, type on this partner";
                 }
             }
             return message;
