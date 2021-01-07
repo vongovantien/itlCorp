@@ -68,20 +68,9 @@ export class FormUpdateEmailCommercialCatalogueComponent extends PopupBase {
                 (res: Office[]) => {
                     if (!!res) {
                         this.offices = this.utility.prepareNg2SelectData(res || [], 'id', 'shortName');
-                        this.offices = [{ id: 'All', text: 'All' }, ...this.offices];
                     }
                 },
             );
-    }
-    selectedOffice($event: any) {
-        if ($event.length > 0) {
-            if ($event[$event.length - 1].id === 'All') {
-                this.officeId.setValue([{ id: 'All', text: 'All' }]);
-            } else {
-                const arrNotIncludeAll = $event.filter(x => x.id !== 'All'); //
-                this.officeId.setValue(arrNotIncludeAll);
-            }
-        }
     }
 
     getFormData() {
@@ -143,7 +132,6 @@ export class FormUpdateEmailCommercialCatalogueComponent extends PopupBase {
             }
         }
         else {
-            console.log(mergeObj);
             mergeObj.index = this.indexDetailEmail;
             this.onRequest.emit(mergeObj);
         }

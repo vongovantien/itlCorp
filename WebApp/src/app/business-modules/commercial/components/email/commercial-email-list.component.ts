@@ -19,7 +19,7 @@ export class CommercialEmailListComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(FormUpdateEmailCommercialCatalogueComponent) formUpdateEmailPopup: FormUpdateEmailCommercialCatalogueComponent;
-    constructor(private _router: Router,
+    constructor(
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
@@ -43,10 +43,6 @@ export class CommercialEmailListComponent extends AppList {
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Update', field: '', sortable: false },
         ];
-    }
-
-    ngAfterViewInit() {
-        this.formUpdateEmailPopup.partnerId = this.partnerId;
     }
 
     getEmailPartner(partnerId: string) {
