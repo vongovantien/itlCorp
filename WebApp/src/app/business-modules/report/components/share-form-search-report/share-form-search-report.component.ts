@@ -230,7 +230,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     // Check if choose All
-    selectAllDataInForm(data: any){
+    selectAllDataInForm(data: any) {
         if (data.length === 1) {
             return data[0].id === 'All';
         } else {
@@ -739,9 +739,9 @@ export class ShareFormSearchReportComponent extends AppForm {
                 (department: any) => {
                     if (!!department) {
                         department = department.map((item: any) => ({ officeId: item.branchId, departmentId: item.id, departmentAbbrName: item.deptNameAbbr }));
-                        department.forEach(element => {
-                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
-                        });
+                        // department.forEach(element => {
+                        //     this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
+                        // });
                         this.departmentsInit = department;
                         this.getDepartment(department);
                     }
@@ -760,6 +760,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                         group = group.map((item: any) => ({ departmentId: item.departmentId, groupId: item.id, groupAbbrName: item.shortName }));
                         group.forEach(element => {
                             this.groupSpecial.push({ departmentId: element.departmentId, groupId: element.groupId, groupAbbrName: element.groupAbbrName });
+                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
                         });
                         this.groupsInit = this.groupSpecial;
                         this.getGroup(this.groupSpecial);

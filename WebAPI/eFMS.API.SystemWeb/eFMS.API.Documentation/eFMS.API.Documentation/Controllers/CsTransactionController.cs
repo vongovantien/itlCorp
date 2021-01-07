@@ -497,7 +497,8 @@ namespace eFMS.API.Documentation.Controllers
                 if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
-                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1))
+                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1)) 
+                    && x.OfficeId == currentUser.OfficeID
                     && x.CurrentStatus != TermData.Canceled))
                     {
                         message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
@@ -511,6 +512,7 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
                         && x.TransactionType.Contains(model.TransactionType.Substring(0, 1))
+                        && x.OfficeId == currentUser.OfficeID
                         && x.Id != id
                         && x.CurrentStatus != TermData.Canceled))
                     {
