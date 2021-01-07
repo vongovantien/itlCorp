@@ -3511,7 +3511,8 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 shipmentsAdvance.Add(shipmentAdvance);
             }
-            return shipmentsAdvance;
+            var result = shipmentsAdvance.ToArray().OrderBy(x => x.JobNo); //Sắp xếp tăng dần theo JobNo [05-01-2021]
+            return result.ToList();
         }
         #endregion --- EXPORT ADVANCE ---
 
