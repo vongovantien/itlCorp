@@ -61,9 +61,13 @@ export class CommercialEmailListComponent extends AppList {
             );
     }
 
-    showConfirmDelete(id: string, index: string) {
+    showConfirmDelete(id: string, index: number) {
         this.id = id;
-        this.confirmDeletePopup.show();
+        if (!!this.id) {
+            this.confirmDeletePopup.show();
+        } else {
+            this.partnerEmails = [...this.partnerEmails.slice(0, index), ...this.partnerEmails.slice(index + 1)];
+        }
     }
 
     gotoDetailEmail(id: string, index: number = null) {
