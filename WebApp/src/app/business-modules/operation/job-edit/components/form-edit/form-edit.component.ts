@@ -159,6 +159,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             shipmentType: this.opsTransaction.shipmentType,
         });
 
+        this.customerName = this.opsTransaction.customerName;
         this.shipmentNo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
 
