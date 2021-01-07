@@ -77,6 +77,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     shipmentNo: string = null;
     shipmentNoti: string = '';
+    customerName: string = '';
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
