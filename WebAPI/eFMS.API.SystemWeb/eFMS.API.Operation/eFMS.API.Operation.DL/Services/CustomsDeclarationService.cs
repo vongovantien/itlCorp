@@ -80,7 +80,7 @@ namespace eFMS.API.Operation.DL.Services
         public HandleState ImportClearancesFromEcus()
         {
             string userId = currentUser.UserID;
-            var connections = ecusCconnectionService.Get(x => x.UserId == userId);
+            var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
             var result = new HandleState();
             var lists = new List<CustomsDeclaration>();
             foreach (var item in connections)
@@ -111,9 +111,15 @@ namespace eFMS.API.Operation.DL.Services
             {
                 if (lists.Count > 0)
                 {
-                    DataContext.Add(lists);
-                    DataContext.SubmitChanges();
+                    HandleState hs = DataContext.Add(lists);
+                    if (hs.Success)
+                    {
                     result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, lists.Count]);
+                }
+                else
+                {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
+                    }
                 }
                 else
                 {
