@@ -466,7 +466,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 charge.invoiceDate = null;
             }
 
-            charge.unitPrice = +charge.unitPrice;
+            // ! round unitPrice
+            charge.unitPrice = +(+(charge.unitPrice)).toFixed(3);
 
             // Update HBL ID,Type
             if (!!this.hbl && !!this.hbl.id) {
