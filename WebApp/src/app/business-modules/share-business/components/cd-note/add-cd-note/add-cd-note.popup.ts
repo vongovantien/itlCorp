@@ -147,14 +147,12 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
                             ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
                             ele.canEdit = true;
-                            if (ele.type === "OBH") {
-                                if (!!ele.creditNo && !!ele.debitNo) {
-                                    if ((!!ele.paySoano && !!ele.soano) || !!ele.voucherId) {
-                                        ele.canEdit = false;
-                                    }
+                            const setEdit= ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo): (!!ele.creditNo || !!ele.debitNo);
+                            if (setEdit) {
+                                if ((!!ele.creditNo && !!ele.paySoano) || !!ele.acctManagementId) {
+                                    ele.canEdit = false;
                                 }
-                            } else {
-                                if ((!!ele.debitNo || !!ele.creditNo) && (!!ele.soano || !!ele.voucherId)) {
+                                if ((!!ele.debitNo && !!ele.soano) || !!ele.acctManagementId) {
                                     ele.canEdit = false;
                                 }
                             }
