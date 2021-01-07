@@ -1,51 +1,26 @@
-import * as fromRouter from '@ngrx/router-store';
-import { Params, RouterStateSnapshot, Data } from '@angular/router';
+import { AuthActions } from './../actions/auth.action';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
-import { spinnerReducer, ISpinnerState } from './spinner.reducer';
 import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
 import { IMenuState, menuReducer } from './menu.reducer';
-
-
-export interface IRouterStateUrl {
-    url: string;
-    queryParams: Params;
-    params: Params;
-    data: Data;
-}
-
+import { IAuthState, authReducer } from './auth.reducer';
 export interface IAppState {
     catalogueReducer: ICatalogueState;
     menuReducer: IMenuState;
+    authReducer: IAuthState
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
     catalogueReducer: catalogueReducer,
-    menuReducer: menuReducer
+    menuReducer: menuReducer,
+    authReducer: authReducer
 };
 
-// * Custom Serializer
-
-export class CustomSerializer implements fromRouter.RouterStateSerializer<IRouterStateUrl> {
-    serialize(routerStateSnapshot: RouterStateSnapshot): IRouterStateUrl {
-
-        let state = routerStateSnapshot.root;
-
-        while (state.firstChild) {
-            state = state.firstChild;
-        }
-
-        const { url, root: { queryParams }, } = routerStateSnapshot;
-        const { params, data } = state;
-
-        return { url, params, queryParams, data };
-    }
-}
 
 // * Selector
 
 export const catalogueState = createFeatureSelector<any>('catalogueReducer');
 export const menuState = createFeatureSelector<any>('menuReducer');
-
+export const authState = createFeatureSelector<any>('authReducer');
 
 
 // * CATALOGUE 
@@ -55,7 +30,6 @@ export const getCataloguePortLoadingState = createSelector(catalogueState, (stat
 
 export const getCatalogueWarehouseState = createSelector(catalogueState, (state: ICatalogueState) => state && state.warehouses);
 export const getCatalogueWarehouseLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
-
 
 export const getCatalogueCarrierState = createSelector(catalogueState, (state: ICatalogueState) => state && state.carriers);
 export const getCatalogueCarrierLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
@@ -84,9 +58,6 @@ export const getCatalogueCountryLoadingState = createSelector(catalogueState, (s
 export const getCatalogueCurrencyState = createSelector(catalogueState, (state: ICatalogueState) => state && state.currencies);
 export const getCatalogueCurrencyLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
-// * SPINNER
-export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);
-
 // * Menu
 export const getMenuPermissionState = createSelector(menuState, (state: IMenuState) => state);
 export const getMenuUserPermissionState = createSelector(menuState, (state: IMenuState) => state && state.permission);
@@ -97,3 +68,7 @@ export const getMenuUserSpecialPermissionState = createSelector(menuState, (stat
         }
     }
 });
+
+// * Auth
+export const getAuthState = createSelector(authState, (state: IAuthState) => state);
+export const getCurrentUserState = createSelector(authState, (state: IAuthState) => state?.currentUser);
