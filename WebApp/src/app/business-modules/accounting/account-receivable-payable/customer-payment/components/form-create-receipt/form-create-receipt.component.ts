@@ -90,6 +90,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
+                this.customerName = (data as Partner).shortName;
                 this.customerId.setValue((data as Partner).id);
                 this._dataService.setData('customer', data);
 

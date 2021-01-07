@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, Input } from "@angular/core";
 import { AppForm } from "src/app/app.form";
 import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
-import { Customer, PortIndex, Partner } from "@models";
+import { Customer, PortIndex } from "@models";
 import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
@@ -230,7 +230,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     // Check if choose All
-    selectAllDataInForm(data: any){
+    selectAllDataInForm(data: any) {
         if (data.length === 1) {
             return data[0].id === 'All';
         } else {
@@ -494,23 +494,28 @@ export class ShareFormSearchReportComponent extends AppForm {
                 officeSelected = this.officeActive.map(i => i);
             }
             data = data.filter(f => f.departmentId !== null && officeSelected.includes(f.officeId));
-        } else {
-            data = [];
+        }
+        else {
+            // Nếu Office không selected giá trị -> Lấy tất cả các Department có trong list Office hiện tại
+            officeSelected = this.officeList.map(i => i.id);
+            data = data.filter(f => f.departmentId !== null && officeSelected.includes(f.officeId));
         }
 
         this.departmentList = data
             .map((item: any) => ({ text: item.departmentAbbrName, id: item.departmentId.toString() }))
             .filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct department
 
-        if (this.departmentList.length > 0 && this.officeActive.length > 0) {
+        if (this.departmentList.length > 0) {
             this.departmentList.unshift({ id: 'All', text: 'All' });
-            if (this.menuPermission.list === 'Department'
-                || this.menuPermission.list === 'Office'
-                || this.menuPermission.list === 'Company'
-                || this.menuPermission.list === 'All') {
-                this.departmentActive = [this.departmentList[0].id];
-            } else {
-                this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0].id];
+            if (this.officeActive.length > 0) {
+                if (this.menuPermission.list === 'Department'
+                    || this.menuPermission.list === 'Office'
+                    || this.menuPermission.list === 'Company'
+                    || this.menuPermission.list === 'All') {
+                    this.departmentActive = [this.departmentList[0].id];
+                } else {
+                    this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0].id];
+                }
             }
         } else {
             this.departmentActive = [];
@@ -528,24 +533,29 @@ export class ShareFormSearchReportComponent extends AppForm {
                 deparmentSelected = this.departmentActive.map(i => i);
             }
             data = data.filter(f => f.groupId !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
-        } else {
-            data = [];
+        }
+        else {
+            // Nếu Department không selected giá trị -> Lấy tất cả các Group có trong list Group hiện tại
+            deparmentSelected = this.departmentList.map(i => i.id);
+            data = data.filter(f => f.groupId !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
         }
 
         this.groupList = data
             .map((item: any) => ({ text: item.groupAbbrName, id: item.groupId.toString() }))
             .filter((g, i, arr) => arr.findIndex(t => t.id === g.id) === i); // Distinct group
 
-        if (this.groupList.length > 0 && this.departmentActive.length > 0) {
+        if (this.groupList.length > 0) {
             this.groupList.unshift({ id: 'All', text: 'All' });
-            if (this.menuPermission.list === 'Group'
-                || this.menuPermission.list === 'Department'
-                || this.menuPermission.list === 'Office'
-                || this.menuPermission.list === 'Company'
-                || this.menuPermission.list === 'All') {
-                this.groupActive = [this.groupList[0].id];
-            } else {
-                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
+            if (this.departmentActive.length > 0) {
+                if (this.menuPermission.list === 'Group'
+                    || this.menuPermission.list === 'Department'
+                    || this.menuPermission.list === 'Office'
+                    || this.menuPermission.list === 'Company'
+                    || this.menuPermission.list === 'All') {
+                    this.groupActive = [this.groupList[0].id];
+                } else {
+                    this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
+                }
             }
         } else {
             this.groupActive = [];
@@ -570,13 +580,13 @@ export class ShareFormSearchReportComponent extends AppForm {
                 } else {
                     deparmentSelected = this.departmentActive.map(i => i);
                 }
+            } else {
+                deparmentSelected = this.departmentList.map(i => i.id);
             }
 
             data = data.filter(f => f.userId !== null && f.groupId !== null && f.departmentId !== null
                 && deparmentSelected.includes(f.departmentId.toString())
                 && groupSelected.includes(f.groupId.toString()));
-        } else {
-            data = [];
         }
 
         this.staffList = data
@@ -585,10 +595,12 @@ export class ShareFormSearchReportComponent extends AppForm {
 
         if (this.staffList.length > 0) {
             this.staffList.unshift({ id: 'All', text: 'All' });
-            if (this.menuPermission.list === 'Owner') {
-                this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0].id];
-            } else {
-                this.staffActive = [this.staffList[0].id];
+            if (this.groupActive.length > 0) {
+                if (this.menuPermission.list === 'Owner') {
+                    this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0].id];
+                } else {
+                    this.staffActive = [this.staffList[0].id];
+                }
             }
         } else {
             this.staffActive = [];
@@ -666,6 +678,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             } else {
                 result = dataSelected.map((item: any) => item).toString().replace(/(?:,)/g, ';');
             }
+        } else {
+            const list = dataList.filter(f => f.id !== 'All');
+            result = list.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
         }
         return result;
     }
@@ -739,9 +754,6 @@ export class ShareFormSearchReportComponent extends AppForm {
                 (department: any) => {
                     if (!!department) {
                         department = department.map((item: any) => ({ officeId: item.branchId, departmentId: item.id, departmentAbbrName: item.deptNameAbbr }));
-                        department.forEach(element => {
-                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
-                        });
                         this.departmentsInit = department;
                         this.getDepartment(department);
                     }
@@ -760,6 +772,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                         group = group.map((item: any) => ({ departmentId: item.departmentId, groupId: item.id, groupAbbrName: item.shortName }));
                         group.forEach(element => {
                             this.groupSpecial.push({ departmentId: element.departmentId, groupId: element.groupId, groupAbbrName: element.groupAbbrName });
+                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
                         });
                         this.groupsInit = this.groupSpecial;
                         this.getGroup(this.groupSpecial);

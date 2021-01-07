@@ -12,7 +12,7 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !customer.value}">
                         <label required>Customer (Payer)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
-                            [currentActiveItemId]="{ field: 'id', value: customer.value,hardValue: shipmmentDetail.customerName}"
+                            [currentActiveItemId]="{ field: 'id', value: customer.value, hardValue: customerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(customer)"
                             placeholder="Please select Payer" [loading]="isLoadingCustomer">
@@ -36,7 +36,7 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipper.value}">
                         <label required>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
-                            [currentActiveItemId]="{ field: 'id', value: shipper.value,hardValue: shipmmentDetail.supp}"
+                            [currentActiveItemId]="{ field: 'id', value: shipper.value, hardValue: shipperName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
                             [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(shipper)"
                             placeholder="Please select shipper" [loading]="isLoadingShipper">
