@@ -378,6 +378,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 this.applyDIM = data.applyDim;
                 this.roundUp = data.roundUpMethod;
 
+                this.supplierName = data.shortName;
                 this.coloaderId.setValue(data.id);
 
                 // * if DIM had been saved
@@ -391,6 +392,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 this.pod.setValue(data.id);
                 break;
             case 'agent':
+                this.agentName = data.shortName;
                 this.agentId.setValue(data.id);
                 break;
             case 'warehouse':

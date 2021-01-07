@@ -93,6 +93,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     isLoadingConsignee: boolean = false;
 
     csBookingNotes: csBookingNote[] = [];
+    customerName: string;
+    shipperName: string;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -342,6 +344,9 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     }
 
     updateFormValue(data: CsTransactionDetail) {
+        this.customerName = data.customerName;
+        this.shipperName = data.shipperName;
+
         const formValue = {
             closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
             sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
@@ -422,6 +427,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
+                this.customerName = data.shortName;
                 this.customer.setValue(data.id);
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.shipmmentDetail.id).subscribe((res: any) => {
                     if (!!res) {
@@ -444,6 +450,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                 }
                 break;
             case 'shipper':
+                this.shipperName = data.shortName;
                 this.shipper.setValue(data.id);
                 this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
