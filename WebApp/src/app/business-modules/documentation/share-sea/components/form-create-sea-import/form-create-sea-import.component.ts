@@ -236,9 +236,11 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
     onSelectDataFormInfo(data: any, key: string | any) {
         switch (key) {
             case 'supplier':
+                this.supplierName = data.shortName; 
                 this.coloader.setValue(data.id);
                 break;
             case 'agent':
+                this.agentName = data.shortName;
                 this.agentId.setValue(data.id);
                 break;
             case 'port-loading':

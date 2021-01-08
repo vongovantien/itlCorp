@@ -77,6 +77,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     shipmentNo: string = null;
     shipmentNoti: string = '';
+    customerName: string = '';
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
@@ -158,6 +159,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             shipmentType: this.opsTransaction.shipmentType,
         });
 
+        this.customerName = this.opsTransaction.customerName;
         this.shipmentNo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
 
@@ -253,6 +255,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
+                this.customerName = data.shortName;
                 this.customerId.setValue(data.id);
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
                     if (!!res) {

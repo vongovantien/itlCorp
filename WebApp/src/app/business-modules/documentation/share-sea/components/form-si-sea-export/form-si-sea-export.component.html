@@ -84,7 +84,7 @@
                                 </label>
 
                                 <app-combo-grid-virtual-scroll [dataSources]="suppliers"
-                                    [currentActiveItemId]="{field:'id',value: supplier.value, hardValue: shippingInstruction.supplierName}"
+                                    [currentActiveItemId]="{field:'id',value: supplier.value, hardValue: supplierName}"
                                     (itemSelected)="onSelectDataForm($event, 'supplier')"
                                     [selectedDisplayFields]="['partnerNameEn']" [displayFields]="displayFieldPartner"
                                     (remove)="resetFormControl(supplier)">
@@ -129,7 +129,7 @@
                                     Consignee <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll [dataSources]="consignees"
-                                    [currentActiveItemId]="{field:'id',value:consignee.value, hardValue: shippingInstruction.consigneeName}"
+                                    [currentActiveItemId]="{field:'id',value:consignee.value, hardValue: consigneeName}"
                                     (itemSelected)="onSelectDataForm($event, 'consignee')"
                                     [selectedDisplayFields]="['partnerNameEn']" [displayFields]="displayFieldPartner"
                                     (remove)="resetFormControl(consignee)">

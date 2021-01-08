@@ -438,6 +438,13 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     foreach (var item in surcharges)
                     {
+                        item.Notes = string.IsNullOrEmpty(item.Notes?.Trim()) ? null : item.Notes;
+                        item.InvoiceNo = string.IsNullOrEmpty(item.InvoiceNo?.Trim()) ? null : item.InvoiceNo;
+                        item.SeriesNo = string.IsNullOrEmpty(item.SeriesNo?.Trim()) ? null : item.SeriesNo;
+                        item.CreditNo = string.IsNullOrEmpty(item.CreditNo?.Trim()) ? null : item.CreditNo;
+                        item.DebitNo = string.IsNullOrEmpty(item.DebitNo?.Trim()) ? null : item.DebitNo;
+                        item.Soano = string.IsNullOrEmpty(item.Soano?.Trim()) ? null : item.Soano;
+                        item.PaySoano = string.IsNullOrEmpty(item.PaySoano?.Trim()) ? null : item.PaySoano;
                         if (item.Id == Guid.Empty)
                         {
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;

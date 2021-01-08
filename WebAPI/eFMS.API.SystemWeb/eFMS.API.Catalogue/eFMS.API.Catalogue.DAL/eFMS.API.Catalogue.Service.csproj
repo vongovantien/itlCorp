@@ -46,7 +46,6 @@
     <Compile Remove="Models\CsShipmentProfitShares.cs" />
     <Compile Remove="Models\CsShipmentSellingRate.cs" />
     <Compile Remove="Models\CsShippingInstruction.cs" />
-    <Compile Remove="Models\CustomsDeclaration.cs" />
     <Compile Remove="Models\eFMSDataContext.cs" />
     <Compile Remove="Models\SetEcusconnection.cs" />
     <Compile Remove="Models\SetTariff.cs" />

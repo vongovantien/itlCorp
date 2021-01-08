@@ -45,6 +45,7 @@ namespace eFMS.API.Catalogue.DL.Services
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
         private readonly IOptions<ApiUrl> ApiUrl;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
 
 
         public CatPartnerService(IContextBase<CatPartner> repository,
@@ -64,7 +65,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatDepartment> catDepartmentRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             IContextBase<SysUserLevel> userlevelRepo,
-            IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
+            IOptions<ApiUrl> apiurl,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -82,6 +84,7 @@ namespace eFMS.API.Catalogue.DL.Services
             userlevelRepository = userlevelRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
             ApiUrl = apiurl;
+            customsDeclarationRepository = customsDeclarationRepo;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -541,7 +544,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             if (!string.IsNullOrEmpty(id))
             {
-                if (transactionDetailRepository.Any(x => x.CustomerId == id))
+                var partner = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                var existClearance = customsDeclarationRepository.Any(x => (x.AccountNo ?? "").Contains(partner.AccountNo) || x.PartnerTaxCode.Contains(partner.TaxCode));
+                if (transactionDetailRepository.Any(x => x.CustomerId == id) || existClearance)
                 {
                     return new HandleState("This partner is already in use so you can not delete it");
                 }
@@ -1856,12 +1861,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             ClearCache();
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
-            var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
+            var data = DataContext.Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
             if (!string.IsNullOrEmpty(criteria.Id))
             {
-                data = data.Where(x => x.ParentId != criteria.Id);
+                data = data.Where(x => x.Id == criteria.Id || x.ParentId != criteria.Id);
             }
             if (data == null) return null;
             var results = data.Select(x => new CatPartnerViewModel

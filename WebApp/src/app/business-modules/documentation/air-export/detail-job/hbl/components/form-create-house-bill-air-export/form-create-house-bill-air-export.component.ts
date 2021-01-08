@@ -106,7 +106,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     totalCBM: number = null;
 
     shipmentDetail: CsTransaction;
-    selectedCustomer: Customer;
+    customerName: string;
 
     AA: string = 'As Arranged';
 
@@ -187,6 +187,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 this.totalHeightWeight = valueDefaultFromShipment.hw;
                                 this.formCreate.patchValue(valueDefaultFromShipment);
                             }
+                            this.customerName = this.shipmentDetail.customerName;
                         }
                     }
                 ),
@@ -475,8 +476,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
-                this.selectedCustomer = data;
-
+                this.customerName = data.shortName;
+                this.shipperId.setValue(data.id);
+                
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.jobId).subscribe((res: any) => {
                     if (!!res) {
                         if (!!res.salemanId) {
@@ -496,6 +498,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 }
                 break;
             case 'shipper':
+                this.customerName = data.shortName;
                 this.shipperId.setValue(data.id);
                 this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
