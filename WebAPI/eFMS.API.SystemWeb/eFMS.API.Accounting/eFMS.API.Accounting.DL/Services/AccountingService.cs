@@ -405,7 +405,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn + "\n" + surcharge.Mblno + "\n" + surcharge.Hblno; //Format: ChargeName + Enter + MBL + Enter + HBL [CR: 05-01-2020]
+                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, surcharge.Hblno, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -414,7 +414,6 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
 
-                    // var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault(); //CR: 24-11-2020
                     charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                     charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
@@ -434,9 +433,9 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
                         charge.OriginalUnitPrice = _unitPrice ?? 0; //Đơn giá không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * _unitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế (có làm tròn)
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                        var _netAmount = Math.Round((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
 
@@ -452,9 +451,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); //Lấy giá trị FinalExchangeRate, nếu không có thì quy đổi về Currency Local theo ExchangeDate
                         charge.OriginalUnitPrice = surcharge.UnitPrice; //Đơn giá
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế (có làm tròn)
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        var _netAmount = Math.Round((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
                     charges.Add(charge);
@@ -528,9 +527,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Quantity9 = surcharge.Quantity;
                         charge.OriginalUnitPrice = surcharge.UnitPrice ?? 0; //Đơn giá không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế (có làm tròn)
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        var _netAmount = Math.Round((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
@@ -596,7 +595,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn + "\n" + surcharge.Mblno + "\n" + surcharge.Hblno; //Format: ChargeName + Enter + MBL + Enter + HBL [CR: 05-01-2020]
+                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, surcharge.Hblno, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -605,7 +604,6 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
 
-                    // var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault(); //CR: 24-11-2020
                     charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                     charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
@@ -625,9 +623,9 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
                         charge.OriginalUnitPrice = _unitPrice ?? 0; //Đơn giá làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * _unitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế (có làm tròn)
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                        var _netAmount = Math.Round((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
 
@@ -643,9 +641,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); //Lấy giá trị FinalExchangeRate, nếu không có thì quy đổi về Currency Local theo ExchangeDate
                         charge.OriginalUnitPrice = surcharge.UnitPrice; //Đơn giá
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế (có làm tròn)
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        var _netAmount = Math.Round((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
                     charges.Add(charge);
@@ -718,9 +716,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Quantity9 = surcharge.Quantity;
                         charge.OriginalUnitPrice = surcharge.UnitPrice ?? 0; //Không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế (có làm tròn)
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        var _netAmount = Math.Round((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
