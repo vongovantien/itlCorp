@@ -19,7 +19,7 @@
                                     [selectedDisplayFields]="['jobId','mbl','hbl']" [dataSources]="shipments"
                                     [displayFields]="configShipmentDisplayFields"
                                     [placeholder]="'Please Select Shipment'"
-                                    (remove)="resetFormControl(shipment); charges = []" [disabled]="isUpdate">
+                                    (remove)="resetFormControl(shipment); charges = []">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -82,8 +82,7 @@
                                                         [selectedDisplayFields]="['chargeNameEn']"
                                                         [dataSources]="listCharges"
                                                         [displayFields]="configChargeDisplayFields" [height]="150"
-                                                        placeholder="Please Select" (remove)="charge.chargeId = null"
-                                                        [clearable]="false">
+                                                        placeholder="Please Select" (remove)="charge.chargeId = null">
                                                     </app-combo-grid-virtual-scroll>
                                                 </div>
                                             </div>
