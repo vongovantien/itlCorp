@@ -98,7 +98,7 @@ namespace eFMS.API.Operation.DL.Services
                         var clearanceNo = clearance.SOTK?.ToString().Trim();
                         var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
                         var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                        if (itemExisted == null && clearanceNo != null && countDuplicated < 2)
+                        if (itemExisted == null && clearanceNo != null && countDuplicated < 1)
                         {
                             var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
                             newClearance.Source = OperationConstants.FromEcus;
@@ -114,10 +114,10 @@ namespace eFMS.API.Operation.DL.Services
                     HandleState hs = DataContext.Add(lists);
                     if (hs.Success)
                     {
-                    result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, lists.Count]);
-                }
-                else
-                {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, lists.Count]);
+                    }
+                    else
+                    {
                         result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
                     }
                 }
@@ -136,9 +136,12 @@ namespace eFMS.API.Operation.DL.Services
         private CustomsDeclaration MapEcusClearanceToCustom(DTOKHAIMD clearance, string clearanceNo)
         {
             var type = ClearanceConstants.Export_Type_Value;
-            if (clearance.XorN.Contains(ClearanceConstants.Import_Type))
+            if (clearance.XorN != null)
             {
-                type = ClearanceConstants.Import_Type_Value;
+                if (clearance.XorN.Contains(ClearanceConstants.Import_Type))
+                {
+                    type = ClearanceConstants.Import_Type_Value;
+                }
             }
             var serviceType = GetServiceType(clearance, out string cargoType);
             var route = clearance.PLUONG != null ? GetRouteType(clearance.PLUONG) : string.Empty;

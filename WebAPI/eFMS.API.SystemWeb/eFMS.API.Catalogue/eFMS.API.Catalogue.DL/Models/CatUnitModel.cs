@@ -14,6 +14,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string UnitNameEn { get; set; }
         [Required]
         public string UnitType { get; set; }
+        public string UnitTypeName { get; set; }
         public string DescriptionEn { get; set; }
         public string DescriptionVn { get; set; }
         public string UserCreated { get; set; }
