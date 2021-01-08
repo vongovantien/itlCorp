@@ -2,21 +2,21 @@ import { Action, createReducer, on } from '@ngrx/store';
 import * as Types from '../actions';
 
 
-export interface ICommercialSearchParamsState {
+export interface IAgentSearchParamsState {
     searchParams: any;
 
 }
-export const initialState: ICommercialSearchParamsState = {
+export const initialState: IAgentSearchParamsState = {
     searchParams: {}
 };
 
-const commercialReducer = createReducer(
+const agentReducer = createReducer(
     initialState,
-    on(Types.SearchList, (state: ICommercialSearchParamsState, data: any) => ({
+    on(Types.SearchList, (state: IAgentSearchParamsState, data: any) => ({
         ...state, searchParams: { ...data.payload }
     })),
 );
 
 export function reducer(state: any | undefined, action: Action) {
-    return commercialReducer(state, action);
+    return agentReducer(state, action);
 };

@@ -15,7 +15,8 @@ import { Permission403PopupComponent, ConfirmPopupComponent, SearchOptionsCompon
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { ICommercialState, SearchList, getCommercialSearchParamsState } from '../store';
+import { SearchList } from './store/actions/customer.action';
+import { ICustomerState, getCustomerSearchParamsState } from './store';
 
 
 @Component({
@@ -41,7 +42,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     headerSearch: CommonInterface.IHeaderTable[];
 
     constructor(private _ngProgressService: NgProgress,
-        private _store: Store<ICommercialState>,
+        private _store: Store<ICustomerState>,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
         private _router: Router,
@@ -58,7 +59,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
 
     ngOnInit(): void {
-        this._store.select(getCommercialSearchParamsState)
+        this._store.select(getCustomerSearchParamsState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )
@@ -118,13 +119,22 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
         this.dataSearch[event.field || "All"] = event.searchString || '';
+        if (!!this.dataSearchs.keyword) {
+            if (this.dataSearchs.type === 'All' && event.searchString !== '') {
+                this.dataSearch.all = !!event.searchString ? event.searchString : this.dataSearchs.keyword;
+            }
+            else if (this.dataSearchs.type !== 'All' && event.searchString !== '') {
+                this.dataSearch[this.dataSearchs.type] = !!event.searchString ? event.searchString : this.dataSearchs.keyword;
+            }
+
+        }
         this.dataSearch.partnerType = 'Customer';
         if (event.field === "userCreatedName") {
             this.dataSearch.userCreated = event.searchString;
         }
         const searchData: ISearchGroup = {
-            type: event.field,
-            keyword: event.searchString
+            type: !!event.field ? event.field : this.dataSearchs.type,
+            keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
         };
         this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
@@ -167,7 +177,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     resetSearch(event) {
         this.dataSearch = {};
-
+        this.dataSearchs = {};
         this.onSearch(event);
     }
 
@@ -273,9 +283,4 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 interface ISearchGroup {
     type: string;
     keyword: string;
-}
-
-interface ISearchObject extends CommonInterface.IValueDisplay {
-    searchString: string;
-    field: string;
 }
