@@ -61,6 +61,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public DateTime SailingDate { get; set; }
         public byte[] ShipPicture { get; set; }
         public string PicMarks { get; set; }
+        public string ContSTC { get; set; }
+        public string SpecialText { get; set; }
+        public string Service { get; set; }
     }
 
     public class SeaHBillofLadingReportParams1

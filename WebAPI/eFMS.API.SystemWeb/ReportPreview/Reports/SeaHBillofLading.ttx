@@ -55,3 +55,6 @@ Signature	String	50
 SailingDate	Date		
 ShipPicture	BLOB		
 PicMarks	String	255	
+ContSTC	String	255	
+SpecialText	String	255	
+Service	String	50	
