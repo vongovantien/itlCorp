@@ -1222,13 +1222,13 @@ namespace eFMS.API.Documentation.DL.Services
                     if (isOriginCurr)
                     {
                         _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
                         _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
                     }
                     else
                     {
                         _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
                         _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
                     }
 
@@ -1453,13 +1453,13 @@ namespace eFMS.API.Documentation.DL.Services
                     if (isOriginCurr)
                     {
                         _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
                         _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
                     }
                     else
                     {
                         _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
                         _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
                     }                    
 
