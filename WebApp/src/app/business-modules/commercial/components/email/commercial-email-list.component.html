@@ -51,8 +51,9 @@
                                 <td>{{item.officeAbbrName}}</td>
                                 <td>{{item.email}}</td>
                                 <td>{{item.type}}</td>
-                                <td>Updated By:{{item.userModfiedName}} {{item.datetimeModified | date:
-                                    'dd/MM/yyyy HH:mm'}}</td>
+                                <td>Updated: {{item.datetimeModified | date:
+                                    'dd/MM/yyyy HH:mm'}} By: <span class="text-success">{{item.userModfiedName}}</span>
+                                </td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(isLoading) && !partnerEmails.length"></tr>

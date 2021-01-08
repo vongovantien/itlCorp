@@ -99,47 +99,45 @@ export class FormUpdateEmailCommercialCatalogueComponent extends PopupBase {
 
     onSubmit() {
         const mergeObj = this.getFormData();
-        if (!!this.partnerId) {
-            if (!this.isUpdate) {
-                this._catalogueRepo.addEmailPartner(mergeObj)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: any) => {
-                            if (res.success) {
-                                this._toastService.success('New data added');
-                                this.onRequest.emit(true);
-                                this.hide();
-                            } else {
-                                this._toastService.error("Opps", "Something getting error!");
+        if (this.formGroup.valid) {
+            if (!!this.partnerId) {
+                if (!this.isUpdate) {
+                    this._catalogueRepo.addEmailPartner(mergeObj)
+                        .pipe(catchError(this.catchError))
+                        .subscribe(
+                            (res: any) => {
+                                if (res.success) {
+                                    this._toastService.success('New data added');
+                                    this.onRequest.emit(true);
+                                    this.hide();
+                                } else {
+                                    this._toastService.error("Opps", "Something getting error!");
+                                }
                             }
-                        }
-                    );
-            } else {
-                mergeObj.id = this.id;
-                this._catalogueRepo.updateEmailPartner(mergeObj)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: any) => {
-                            if (res.status) {
-                                this._toastService.success(res.message);
-                                this.onRequest.emit(true);
-                                this.hide();
-                            } else {
-                                this._toastService.error("Opps", "Something getting error!");
+                        );
+                } else {
+                    mergeObj.id = this.id;
+                    this._catalogueRepo.updateEmailPartner(mergeObj)
+                        .pipe(catchError(this.catchError))
+                        .subscribe(
+                            (res: any) => {
+                                if (res.status) {
+                                    this._toastService.success(res.message);
+                                    this.onRequest.emit(true);
+                                    this.hide();
+                                } else {
+                                    this._toastService.error("Opps", "Something getting error!");
+                                }
                             }
-                        }
-                    );
+                        );
+                }
+            }
+            else {
+                mergeObj.index = this.indexDetailEmail;
+                this.onRequest.emit(mergeObj);
             }
         }
-        else {
-            mergeObj.index = this.indexDetailEmail;
-            this.onRequest.emit(mergeObj);
-        }
-
-
     }
-
-
 
     close() {
         this.hide();

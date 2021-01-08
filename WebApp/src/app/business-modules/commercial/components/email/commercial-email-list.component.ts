@@ -122,6 +122,9 @@ export class CommercialEmailListComponent extends AppList {
         }
         else {
             data.officeAbbrName = this.formUpdateEmailPopup.offices.find(x => x.id === data.officeId).text;
+            data.datetimeModified = new Date();
+            const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+            data.userModfiedName = userLogged.userName;
             if (this.indexLstEmail !== null) {
                 this.partnerEmails[this.indexLstEmail].index = this.indexLstEmail;
                 const checkUpdate = this.partnerEmails.some(x => data.type.includes(x.type) && data.officeId.includes(x.officeId) && x.index !== data.index);

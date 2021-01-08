@@ -73,6 +73,7 @@ export class Partner {
     partnerEmails: PartnerEmail[] = [];
 
 
+
     partnerType: string = '';
     partnerMode: string = '';
     partnerLocation: string = '';

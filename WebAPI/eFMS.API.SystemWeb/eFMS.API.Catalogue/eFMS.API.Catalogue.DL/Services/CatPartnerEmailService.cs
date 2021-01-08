@@ -40,7 +40,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var results = data.ProjectTo<CatPartnerEmailModel>(mapper.ConfigurationProvider).ToList();
             results.ForEach(x => { x.UserModfiedName = sysUserRepository.Get(y => y.Id == x.UserModified).Select(t => t.Username).FirstOrDefault();
             x.OfficeAbbrName = sysOfficeRepository.Get(y => y.Id == x.OfficeId).Select(t => t.ShortName).FirstOrDefault();} );
-            return results?.AsQueryable();
+            return results?.OrderByDescending(x=>x.DatetimeModified).AsQueryable();
         }
 
         #endregion

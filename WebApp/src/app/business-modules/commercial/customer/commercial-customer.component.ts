@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AppList } from 'src/app/app.list';
@@ -11,9 +11,11 @@ import { CatalogueRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { CommonEnum } from '@enums';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
+import { Permission403PopupComponent, ConfirmPopupComponent, SearchOptionsComponent } from '@common';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { ICommercialState, SearchList, getCommercialSearchParamsState } from '../store';
 
 
 @Component({
@@ -24,9 +26,13 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
 
     customers: Customer[] = [];
     saleMans: Contract[] = [];
+
+    dataSearchs: any = [];
+
 
     selectedCustomer: Customer;
 
@@ -35,11 +41,13 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     headerSearch: CommonInterface.IHeaderTable[];
 
     constructor(private _ngProgressService: NgProgress,
+        private _store: Store<ICommercialState>,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
         private _router: Router,
         private _toastService: ToastrService,
-        private _exportRepo: ExportRepo) {
+        private _exportRepo: ExportRepo,
+        private _cd: ChangeDetectorRef) {
         super();
 
         this._progressRef = this._ngProgressService.ref();
@@ -50,6 +58,18 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
 
     ngOnInit(): void {
+        this._store.select(getCommercialSearchParamsState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (!!data && !!data.keyword) {
+                        this.dataSearchs = data;
+                    }
+
+                }
+            );
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Salesman', field: 'username', sortable: true },
@@ -85,7 +105,13 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         localStorage.removeItem('success_add_sub');
         this.dataSearch = { All: '' };
         this.dataSearch.partnerType = 'Customer';
-        this.getPartners();
+        if (!!this.dataSearchs.keyword) {
+            if (this.dataSearchs.type === 'All') {
+                this.dataSearch.all = this.dataSearchs.keyword;
+            }
+        }
+        // this.getPartners();
+        this.onSearch(this.dataSearch);
 
     }
 
@@ -96,8 +122,22 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         if (event.field === "userCreatedName") {
             this.dataSearch.userCreated = event.searchString;
         }
+        const searchData: ISearchGroup = {
+            type: event.field,
+            keyword: event.searchString
+        };
         this.page = 1;
+        this._store.dispatch(SearchList({ payload: searchData }));
         this.requestList();
+    }
+
+    ngAfterViewInit() {
+        if (Object.keys(this.dataSearchs).length > 0) {
+            this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
+            this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
+            this.searchOptionsComponent.searchObject.displayName = this.dataSearchs.type;
+        }
+        this._cd.detectChanges();
     }
 
     getPartners() {
@@ -230,4 +270,12 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             );
     }
 }
+interface ISearchGroup {
+    type: string;
+    keyword: string;
+}
 
+interface ISearchObject extends CommonInterface.IValueDisplay {
+    searchString: string;
+    field: string;
+}
