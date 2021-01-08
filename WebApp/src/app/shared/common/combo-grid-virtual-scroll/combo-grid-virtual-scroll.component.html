@@ -7,10 +7,12 @@
         (focus)="onFocusInputPlaceholder($event)" dropdownToggle>
     <ng-container>
         <div class="e--combogrid_icon">
-            <span class="e--combogrid_icon__dropdown"
-                (click)="clkSearch.click(); showAngledownIcon = !showAngledownIcon">
-                <i class="fa fa-angle-down" aria-hidden="true"></i>
-            </span>
+            <ng-container *ngIf="!Disabled">
+                <span class="e--combogrid_icon__dropdown"
+                    (click)="clkSearch.click(); showAngledownIcon = !showAngledownIcon">
+                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                </span>
+            </ng-container>
             <ng-container *ngIf="clearable">
                 <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()"
                     *ngIf="!!displaySelectedStr && !Disabled">

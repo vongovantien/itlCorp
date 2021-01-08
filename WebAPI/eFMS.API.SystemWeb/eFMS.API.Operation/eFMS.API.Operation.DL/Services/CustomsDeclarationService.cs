@@ -1247,6 +1247,7 @@ namespace eFMS.API.Operation.DL.Services
                 clearance.AccountNo = clearance.PartnerTaxCode;
             }
             var result = mapper.Map<CustomsDeclarationModel>(clearance);
+            result.CustomerName = customerRepository.Get(x => x.AccountNo == result.AccountNo).FirstOrDefault()?.ShortName;
             result.UserCreatedName = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
             result.UserModifieddName = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);

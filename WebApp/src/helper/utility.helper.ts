@@ -292,4 +292,37 @@ export class UtilityHelper {
         return str;
     }
 
+    getServiceType(jobNo: string) {
+        let transactionType: string = ChargeConstants.CL_CODE;
+
+        if (jobNo) {
+            if (jobNo.indexOf('AE') > -1) {
+                transactionType = ChargeConstants.AE_CODE;
+            }
+            if (jobNo.indexOf('AI') > - 1) {
+                transactionType = ChargeConstants.AI_CODE;
+            }
+            if (jobNo.indexOf('FE') > - 1) {
+                transactionType = ChargeConstants.SFE_CODE;
+            }
+            if (jobNo.indexOf('FI') > - 1) {
+                transactionType = ChargeConstants.SFI_CODE;
+            }
+            if (jobNo.indexOf('LE') > - 1) {
+                transactionType = ChargeConstants.SLE_CODE;
+            }
+            if (jobNo.indexOf('LI') > - 1) {
+                transactionType = ChargeConstants.SLI_CODE;
+            }
+            if (jobNo.indexOf('CE') > - 1) {
+                transactionType = ChargeConstants.SCE_CODE;
+            }
+            if (jobNo.indexOf('CI') > - 1) {
+                transactionType = ChargeConstants.SCI_CODE;
+            }
+        }
+
+        return transactionType;
+    }
+
 }

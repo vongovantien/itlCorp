@@ -29,13 +29,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     @Output() onUpdate: EventEmitter<Surcharge[]> = new EventEmitter<Surcharge[]>();
     @ViewChildren('comboGridCharge') comboGridCharges: QueryList<ComboGridVirtualScrollComponent>;
 
-
     headers: CommonInterface.IHeaderTable[];
     headerPartner: CommonInterface.IHeaderTable[] = [];
     partnerType: CommonInterface.IValueDisplay[];
 
     listCharges: any[];
-
     listUnits: Observable<Unit[]>;
     shipments: OperationInteface.IShipment[];
     cds: CustomDeclaration[];
@@ -138,7 +136,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.getMasterCharges();
         this.getShipmentCommonData();
         this.getCustomDecleration();
-        // this.getAdvances();
         this.initForm();
         this.getPartner();
         this.getUnits();
@@ -223,7 +220,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.listUnits = this._store.select(getCatalogueUnitState);
     }
 
-    getMasterCharges(serviceTypeId: string = null) {
+    getMasterCharges(serviceTypeId: string = null, isChangeService: boolean = false) {
         forkJoin([
             this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId }),
             this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId }),
@@ -233,7 +230,19 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             })
         ).subscribe(
             (res: any[]) => {
-                this.listCharges = res;
+                this.listCharges = [...res];
+                if (isChangeService) {
+                    this.charges.forEach((charge: Surcharge) => {
+                        if (charge.chargeId) {
+                            charge.chargeId = null;
+                            charge.chargeName = null;
+                        }
+                    });
+
+                    this.comboGridCharges.forEach(c => {
+                        c.displaySelectedStr = '';
+                    });
+                }
             }
         );
     }
@@ -246,32 +255,27 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.serviceTypeId = data.service;
                 this.selectedShipment = data;
 
-                this.shipment.setValue(this.selectedShipment.hblid);
-                this.getMasterCharges(this.serviceTypeId);
-
                 this.advanceNo.reset();
                 this.advs.length = 0;
-                this.getAdvances(this.selectedShipment.jobId);
-                // * FINDING ITEM ADVANCE BELONG TO SELECTED SHIPMENT.
-
-
-                // * check list charge current => Has charge exist after master charge changed.
-                this.charges.forEach((charge: Surcharge) => {
-                    if (!this.checkExistCharge(charge.chargeId, this.listCharges)) {
-                        charge.chargeId = null;
-                        charge.chargeName = null;
-                    }
-                });
-                // * Reset charge name.
-                this.comboGridCharges.forEach(c => {
-                    c.displaySelectedStr = '';
-                });
 
                 this.customNo.setValue(null);
+                this.getAdvances(this.selectedShipment.jobId);
+
+                this.shipment.setValue(this.selectedShipment.hblid);
+
                 const _customDeclarations = this.filterCDByShipment(data);
 
                 if (_customDeclarations.length > 0) {
                     this.customNo.setValue(_customDeclarations[0].clearanceNo);
+                }
+                if (!!this.charges.length) {
+                    if (this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
+                        this.getMasterCharges(this.serviceTypeId, true);
+                    }
+                    for (const charge of this.charges) {
+                        charge.jobId = this.selectedShipment.jobId;
+                        charge.jobNo = this.selectedShipment.jobId;
+                    }
                 }
                 break;
             case 'cd':
@@ -284,29 +288,24 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 const _shipments = this.filterShipmentByCD(data);
                 if (_shipments.length > 0) {
                     this.shipment.setValue(_shipments[0].hblid);
-                    this.getMasterCharges(this.serviceTypeId);
                     this.selectedShipment = _shipments[0];
 
-                    // * check list charge current => Has charge exist after master charge changed.
-                    this.charges.forEach((charge: Surcharge) => {
-                        if (!this.checkExistCharge(charge.chargeId, this.listCharges)) {
-                            charge.chargeId = null;
-                            charge.chargeName = null;
-                        }
-                    });
-                    // * Reset charge name.
-                    this.comboGridCharges.forEach(c => {
-                        c.displaySelectedStr = '';
-                    });
+                    if (!!this.charges.length && this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
+                        this.getMasterCharges(this.serviceTypeId, true);
 
+                        for (const charge of this.charges) {
+                            charge.jobId = this.selectedShipment.jobId;
+                            charge.jobNo = this.selectedShipment.jobId;
+                        }
+                    }
                     this.getAdvances(data.jobNo);
+
                 } else {
                     this.selectedAdvance = null;
                 }
                 break;
             case 'advanceNo':
                 this.selectedAdvance = data;
-
                 this.advanceNo.setValue(data.advanceNo);
 
                 if (!!this.charges.length) {
@@ -400,7 +399,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
-    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string,) {
+    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
         let partner: Partner;
         switch (type) {
             case 'partner-type':
@@ -521,7 +520,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             charge.jobId = this.selectedShipment.jobId;
             charge.jobNo = this.selectedShipment.jobId;
             charge.mblno = this.selectedShipment.mbl;
+            charge.mbl = this.selectedShipment.mbl;
             charge.hblno = this.selectedShipment.hbl;
+            charge.hbl = this.selectedShipment.hbl;
+            charge.hblid = this.selectedShipment.hblid;
+
             // *end: cập nhật shipment charges
 
             if (charge.type === CommonEnum.CHARGE_TYPE.OBH) {
@@ -533,7 +536,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             if (typeof date !== 'string') {
                 if (!!date && !!date.startDate) {
                     charge.invoiceDate = new Date(date.startDate);
-                } else {
+                } else if (Object.prototype.toString.call(date) === '[object Date]') {
+                    charge.invoiceDate = new Date(date);
+                }
+                else {
                     charge.invoiceDate = null;
                 }
             }

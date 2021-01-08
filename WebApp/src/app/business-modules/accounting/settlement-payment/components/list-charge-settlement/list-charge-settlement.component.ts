@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { AppList } from '@app';
 import { Surcharge, Partner } from '@models';
 import { SortService } from '@services';
@@ -28,8 +28,6 @@ import { BehaviorSubject } from 'rxjs';
 })
 
 export class SettlementListChargeComponent extends AppList implements ICrystalReport {
-    @Output() onChangeType: EventEmitter<any> = new EventEmitter<any>();
-
     @ViewChild(SettlementExistingChargePopupComponent) existingChargePopup: SettlementExistingChargePopupComponent;
     @ViewChild(SettlementFormChargePopupComponent) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
@@ -266,8 +264,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     switchToGroup() {
         if (this.TYPE === 'GROUP') {
             this.TYPE = 'LIST';
-        } else if (this.STATE !== 'READ') {
-            this.onChangeType.emit();
         } else {
             this.TYPE = 'GROUP';
         }
