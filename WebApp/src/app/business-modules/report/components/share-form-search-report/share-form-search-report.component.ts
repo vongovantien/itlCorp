@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, ViewChild, Input } from "@angular/core
 import { AppForm } from "src/app/app.form";
 import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
 import { Observable } from "rxjs";
-import { Customer, PortIndex } from "@models";
+import { Customer, PortIndex, Partner } from "@models";
 import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
