@@ -405,7 +405,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, surcharge.Hblno, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
+                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) ? (surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno.Replace("N/H", string.Empty) : surcharge.Hblno) : string.Empty;
+                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, _hblNo, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -595,7 +596,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, surcharge.Hblno, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
+                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) ? (surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno.Replace("N/H", string.Empty) : surcharge.Hblno) : string.Empty;
+                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, _hblNo, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
