@@ -2197,7 +2197,9 @@ namespace eFMS.API.Documentation.DL.Services
                     item.InvoiceDate = null;
                     item.VoucherId = null;
                     item.VoucherIddate = null;
-
+                    item.SyncedFrom = null;
+                    item.PaySyncedFrom = null;
+                    item.ReferenceNo = null;
                     surCharges.Add(item);
                 }
             }
