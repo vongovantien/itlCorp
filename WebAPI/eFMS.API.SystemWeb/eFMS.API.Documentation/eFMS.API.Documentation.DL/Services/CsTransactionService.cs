@@ -803,11 +803,12 @@ namespace eFMS.API.Documentation.DL.Services
         /// <summary>
         /// Get air/sea information when link from ops
         /// </summary>
+        /// <param name="mblNo">HBL No's ops</param>
         /// <param name="hblNo">HBL No's ops</param>
         /// <param name="serviceName">product service</param>
         /// <param name="serviceMode">service mode</param>
         /// <returns></returns>
-        public object GetLinkASInfomation(string hblNo, string serviceName, string serviceMode)
+        public object GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode)
         {
             String jobNo = null;
             String id = null;
@@ -817,11 +818,45 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
                 if (houseDetail != null)
                 {
-                    var transaction = transactionRepository.Get(x => x.TransactionType == shipmentType).Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, y.Id }).FirstOrDefault();
+                    var transaction = transactionRepository.Get(x => x.TransactionType == shipmentType).Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, y.Id, x.Mawb, x.BookingNo });
+                    if (transaction.Count() > 1)
+                    {
+                        jobNo = transaction.FirstOrDefault()?.JobNo.ToString();
+                        if (jobNo != null)
+                        {
+                            id = transaction.FirstOrDefault()?.Id.ToString();
+                        }
+                    }
+                    else
+                    {
+                        var transFilter = transaction.Where(x => x.Mawb == mblNo).FirstOrDefault();
+                        jobNo = transFilter?.JobNo.ToString();
+                        if (jobNo != null)
+                        {
+                            id = transFilter?.Id.ToString();
+                        }
+                        else
+                        {
+                            transFilter = transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
+                        }
+                    }
+                }
+                else
+                {
+                    var transaction = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo).FirstOrDefault();
                     jobNo = transaction?.JobNo.ToString();
                     if (jobNo != null)
                     {
                         id = transaction?.Id.ToString();
+                    }
+                    else
+                    {
+                        transaction = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo).FirstOrDefault();
+                        jobNo = transaction?.JobNo.ToString();
+                        if (jobNo != null)
+                        {
+                            id = transaction?.Id.ToString();
+                        }
                     }
                 }
             }

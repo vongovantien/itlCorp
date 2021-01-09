@@ -73,8 +73,9 @@
                                             </label>
                                         </div>
                                         <div class="col-lg-4" *ngIf="shipmentMode.value === 'Internal'">
-                                            <span><a class="pointer" style="text-decoration: underline;"
-                                                    (click)="getASInfoToLink()">Link Air/Sea</a></span>
+                                            <a class="pointer" style="text-decoration: underline;"
+                                                    (click)="getASInfoToLink()">Link Air/Sea</a>&nbsp;&nbsp;
+                                                    <span class="text-warning">{{shipmentInfo}} item</span>
                                         </div>
                                 </div>
                                     <ng-select class="custom" [items]="shipmentModes" placeholder="Please select"
@@ -238,6 +239,4 @@
     </div>
 </form>
 <info-popup #comfirmCusAgreement [body]="" [title]="'Notification'" [label]="'Ok'">
-</info-popup>
-<info-popup #comfirmServiceInfo [body]="shipmentNoti" [title]="'Notification'" [label]="'Ok'">
 </info-popup>
