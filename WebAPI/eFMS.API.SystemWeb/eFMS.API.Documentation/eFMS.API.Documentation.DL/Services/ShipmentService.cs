@@ -1202,7 +1202,12 @@ namespace eFMS.API.Documentation.DL.Services
                 {
 
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    CatChargeGroup ChargeGroupModel = new CatChargeGroup();
+                    ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                    if (ChargeGroupModel == null)
+                    {
+                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    }
                     //SELL
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -1212,19 +1217,19 @@ namespace eFMS.API.Documentation.DL.Services
                         _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
                     }*/
                     // tinh total phi chargeGroup freight
-                    if (charGroupObj?.Name == "Freight")
+                    if (ChargeGroupModel?.Name == "Freight")
                     {
                         _totalSellAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Trucking")
+                    if (ChargeGroupModel?.Name == "Trucking")
                     {
                         _totalSellAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Handling")
+                    if (ChargeGroupModel?.Name == "Handling")
                     {
                         _totalSellAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Other")
+                    if (ChargeGroupModel?.Name == "Other")
                     {
                         _totalSellAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
@@ -1247,7 +1252,12 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeBuy)
                 {
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    CatChargeGroup ChargeGroupModel = new CatChargeGroup();
+                    ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                    if (ChargeGroupModel == null)
+                    {
+                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    }
                     //BUY
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -1257,19 +1267,19 @@ namespace eFMS.API.Documentation.DL.Services
                         _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
                     }*/
                     // tinh total phi chargeGroup freight
-                    if (charGroupObj?.Name == "Freight")
+                    if (ChargeGroupModel?.Name == "Freight")
                     {
                         _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Trucking")
+                    if (ChargeGroupModel?.Name == "Trucking")
                     {
                         _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Handling")
+                    if (ChargeGroupModel?.Name == "Handling")
                     {
                         _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if (charGroupObj?.Name == "Other")
+                    if (ChargeGroupModel?.Name == "Other")
                     {
                         _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }

@@ -499,6 +499,7 @@ export class PartnerDetailComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this.formPartnerComponent.activePartner = this.partner.active;
+                            this.getParentCustomers();
                             this._toastService.success(res.message);
                         } else {
                             this._toastService.warning(res.message);
