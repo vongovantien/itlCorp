@@ -83,32 +83,32 @@ namespace eFMS.API.Operation.DL.Services
             var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
             var result = new HandleState();
             var lists = new List<CustomsDeclaration>();
-            foreach (var item in connections)
+            try
             {
-                var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-                if (clearanceEcus == null)
+                foreach (var item in connections)
                 {
-                    continue;
-                }
-                else
-                {
-                    var clearances = DataContext.Get();
-                    foreach (var clearance in clearanceEcus)
+                    var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+                    if (clearanceEcus == null)
                     {
-                        var clearanceNo = clearance.SOTK?.ToString().Trim();
-                        var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                        var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                        if (itemExisted == null && clearanceNo != null && countDuplicated < 1)
+                        continue;
+                    }
+                    else
+                    {
+                        var clearances = DataContext.Get();
+                        foreach (var clearance in clearanceEcus)
                         {
-                            var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
-                            newClearance.Source = OperationConstants.FromEcus;
-                            lists.Add(newClearance);
+                            var clearanceNo = clearance.SOTK?.ToString().Trim();
+                            var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                            var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                            if (itemExisted == null && clearanceNo != null && countDuplicated < 1)
+                            {
+                                var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
+                                newClearance.Source = OperationConstants.FromEcus;
+                                lists.Add(newClearance);
+                            }
                         }
                     }
                 }
-            }
-            try
-            {
                 if (lists.Count > 0)
                 {
                     HandleState hs = DataContext.Add(lists);
@@ -125,12 +125,12 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
                 }
-                return result;
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                result = new HandleState(ex.Message);
             }
+            return result;
         }
 
         private CustomsDeclaration MapEcusClearanceToCustom(DTOKHAIMD clearance, string clearanceNo)
