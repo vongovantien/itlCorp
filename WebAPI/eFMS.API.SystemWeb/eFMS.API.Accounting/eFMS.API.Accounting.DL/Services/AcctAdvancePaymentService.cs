@@ -965,6 +965,13 @@ namespace eFMS.API.Accounting.DL.Services
                 advance.OfficeId = advanceCurrent.OfficeId;
                 advance.CompanyId = advanceCurrent.CompanyId;
 
+                advance.VoucherNo = advanceCurrent.VoucherNo;
+                advance.VoucherDate = advanceCurrent.VoucherDate;
+                advance.LastSyncDate = advanceCurrent.LastSyncDate;
+                advance.SyncStatus = advanceCurrent.SyncStatus;
+                advance.ReasonReject = advanceCurrent.ReasonReject;
+                advance.LockedLog = advanceCurrent.LockedLog;
+
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && advanceCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {

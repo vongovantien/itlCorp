@@ -64,6 +64,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string ContSTC { get; set; }
         public string SpecialText { get; set; }
         public string Service { get; set; }
+        public string AttachList { get; set; }
     }
 
     public class SeaHBillofLadingReportParams1

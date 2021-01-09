@@ -1511,6 +1511,10 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.DepartmentId = settlementCurrent.DepartmentId;
                 settlement.OfficeId = settlementCurrent.OfficeId;
                 settlement.CompanyId = settlementCurrent.CompanyId;
+                settlement.LastSyncDate = settlementCurrent.LastSyncDate;
+                settlement.SyncStatus = settlementCurrent.SyncStatus;
+                settlement.ReasonReject = settlementCurrent.ReasonReject;
+                settlement.LockedLog = settlementCurrent.LockedLog;
 
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))

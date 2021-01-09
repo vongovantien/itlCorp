@@ -1474,6 +1474,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExportReferences = data.ExportReferenceNo; //NOT USE
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
                 housebill.Signature = data?.Hbltype?.ToUpper() ?? string.Empty; //HBL Type
+                housebill.AttachList = data.AttachList;
                 if (data?.SailingDate != null)
                 {
                     housebill.SailingDate = data.SailingDate.Value; //NOT USE
@@ -1495,6 +1496,9 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case DocumentConstants.HBLOFLANDING_FBL_FRAME:
                     _reportName = "SeaHBillofLadingFBLFrame.rpt";
+                    break;
+                case DocumentConstants.HBLOFLANDING_FBL_NOFRAME:
+                    _reportName = "SeaHBillofLadingVLA.rpt";
                     break;
                 case DocumentConstants.HBLOFLANDING_ITL_KESCO:
                     _reportName = "SeaHBillofLadingITL_KESCO.rpt";
@@ -1556,7 +1560,8 @@ namespace eFMS.API.Documentation.DL.Services
             if (reportType == DocumentConstants.HBLOFLANDING_ITL_KESCO
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO
-                || reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME)
+                || reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME
+                || reportType == DocumentConstants.HBLOFLANDING_FBL_NOFRAME)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {

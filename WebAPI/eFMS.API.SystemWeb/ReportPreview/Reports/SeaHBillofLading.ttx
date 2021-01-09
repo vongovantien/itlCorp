@@ -58,3 +58,4 @@ PicMarks	String	255
 ContSTC	String	255	
 SpecialText	String	255	
 Service	String	50	
+AttachList	Memo		
