@@ -17,6 +17,8 @@ import { PartnerDetailComponent } from './detail/detail-partner.component';
 import { PartnerOtherChargePopupComponent } from './components/other-charge/partner-other-charge.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/reducers';
 
 const routing: Routes = [
     {
@@ -52,7 +54,8 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         ModalModule.forRoot(),
         TabsModule.forRoot(),
-        ShareModulesModule
+        ShareModulesModule,
+        StoreModule.forFeature('partnerData', reducers),
     ],
     exports: [],
     declarations: [

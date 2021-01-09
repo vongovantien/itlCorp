@@ -106,11 +106,6 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         localStorage.removeItem('success_add_sub');
         this.dataSearch = { All: '' };
         this.dataSearch.partnerType = 'Customer';
-        if (!!this.dataSearchs.keyword) {
-            if (this.dataSearchs.type === 'All') {
-                this.dataSearch.all = this.dataSearchs.keyword;
-            }
-        }
         // this.getPartners();
         this.onSearch(this.dataSearch);
 
@@ -119,18 +114,9 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
         this.dataSearch[event.field || "All"] = event.searchString || '';
-        if (!!this.dataSearchs.keyword) {
-            if (this.dataSearchs.type === 'All' && event.searchString !== '') {
-                this.dataSearch.all = !!event.searchString ? event.searchString : this.dataSearchs.keyword;
-            }
-            else if (this.dataSearchs.type !== 'All' && event.searchString !== '') {
-                this.dataSearch[this.dataSearchs.type] = !!event.searchString ? event.searchString : this.dataSearchs.keyword;
-            }
 
-        }
-        this.dataSearch.partnerType = 'Customer';
-        if (event.field === "userCreatedName") {
-            this.dataSearch.userCreated = event.searchString;
+        if (!!event.field && event.searchString === "") {
+            this.dataSearchs.keyword = "";
         }
         const searchData: ISearchGroup = {
             type: !!event.field ? event.field : this.dataSearchs.type,
@@ -138,6 +124,10 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         };
         this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
+        if (Object.keys(this.dataSearchs).length > 0) {
+            this.dataSearch[this.dataSearchs.type] = this.dataSearchs.keyword;
+        }
+
         this.requestList();
     }
 
@@ -145,7 +135,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         if (Object.keys(this.dataSearchs).length > 0) {
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
-            this.searchOptionsComponent.searchObject.displayName = this.dataSearchs.type;
+            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type).title;
         }
         this._cd.detectChanges();
     }

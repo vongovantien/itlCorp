@@ -110,7 +110,6 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.dataSearch = {};
         this.dataSearch[event.field || "All"] = event.searchString || '';
 
-        this.page = 1;
         if (!!event.field && event.searchString === "") {
             this.dataSearchs.keyword = "";
         }
@@ -155,7 +154,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         if (Object.keys(this.dataSearchs).length > 0) {
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
-            this.searchOptionsComponent.searchObject.displayName = this.dataSearchs.type;
+            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type).title;
         }
         this._cd.detectChanges();
     }
