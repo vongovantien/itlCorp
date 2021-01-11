@@ -246,7 +246,13 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
-                ) //BOD AND DEPUTY OF BOD                
+                ) //BOD AND DEPUTY OF BOD    
+                || 
+                (
+                 userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.advancePayment.OfficeId, x.advancePayment.CompanyId) // Is User Admin
+                 && 
+                 (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //[CR: 09/01/2021]
             ).Select(s => s.advancePayment);
             return result;
         }
@@ -869,6 +875,10 @@ namespace eFMS.API.Accounting.DL.Services
             var detail = DataContext.Get(x => x.AdvanceNo == advanceNo)?.FirstOrDefault();
             if (detail == null) return false;
 
+            //Nếu User là Admin thì sẽ cho phép xem detail [CR: 09/01/2021]
+            var isAdmin = userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, detail.OfficeId, detail.CompanyId);
+            if (isAdmin) return true;
+
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
                 UserCreated = detail.UserCreated,
@@ -894,6 +904,10 @@ namespace eFMS.API.Accounting.DL.Services
             var detail = DataContext.Get(x => x.Id == advanceId)?.FirstOrDefault();
             if (detail == null) return false;
 
+            //Nếu User là Admin thì sẽ cho phép xem detail [CR: 09/01/2021]
+            var isAdmin = userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, detail.OfficeId, detail.CompanyId);
+            if (isAdmin) return true;
+
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
                 UserCreated = detail.UserCreated,
@@ -904,7 +918,7 @@ namespace eFMS.API.Accounting.DL.Services
             };
             int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
 
-            if (code == 403) return false;
+            if (code == 403) return false;            
 
             return true;
         }
