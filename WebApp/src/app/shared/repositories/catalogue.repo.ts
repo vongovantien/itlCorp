@@ -365,6 +365,19 @@ export class CatalogueRepo {
         );
     }
 
+    deletePartnerEmail(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerEmail/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getDetailPartnerEmail(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerEmail/Get/`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getContractFilesAttach(partnerId: string, contractId) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetFileAttachsContract`, { partnerId: partnerId, contractId: contractId }).pipe(
             map((data: any) => data)
@@ -571,6 +584,12 @@ export class CatalogueRepo {
         );
     }
 
+    getEmailPartner(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerEmail/GetBy/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getDetailContract(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetById/`, { id: id }).pipe(
             map((data: any) => data)
@@ -647,6 +666,18 @@ export class CatalogueRepo {
 
     updateContract(body: any) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addEmailPartner(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerEmail/add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateEmailPartner(body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerEmail`, body).pipe(
             map((data: any) => data)
         );
     }
