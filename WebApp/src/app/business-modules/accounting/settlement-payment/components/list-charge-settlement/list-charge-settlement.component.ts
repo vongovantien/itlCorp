@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { Component, ViewChild, ViewChildren, QueryList, Input } from '@angular/core';
 import { AppList } from '@app';
 import { Surcharge, Partner } from '@models';
 import { SortService } from '@services';
@@ -99,6 +99,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.tableListChargePopup.isUpdate = false;
         this.tableListChargePopup.formGroup.reset();
         this.tableListChargePopup.initTableListCharge();
+        this.tableListChargePopup.settlementCode = this.settlementCode || null;
         this.tableListChargePopup.show();
     }
 
@@ -110,17 +111,24 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
-        if (charges.length === 1) {
-            const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === charges[0].hblid);
-            if (indexChargeUpdating !== -1) {
-                this.surcharges[indexChargeUpdating] = charges[0];
-                this.surcharges = [...this.surcharges];
-            }
-        } else {
-            const hblIds: string[] = charges.map(i => i.hblid);
-            this.surcharges = [...this.surcharges].filter(x => !hblIds.includes(x.hblid));
-            this.surcharges = [...this.surcharges, ...charges];
+        if (charges.length) {
+            const hblIds: string[] = charges.map(x => x.hblid);
+
+            this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
+            this.surcharges = [...charges, ...this.surcharges];
+
         }
+        // if (charges.length === 1) {
+        //     const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === charges[0].hblid);
+        //     if (indexChargeUpdating !== -1) {
+        //         this.surcharges[indexChargeUpdating] = charges[0];
+        //         this.surcharges = [...this.surcharges];
+        //     }
+        // } else {
+        //     const hblIds: string[] = charges.map(i => i.hblid);
+        //     this.surcharges = [...this.surcharges].filter(x => !hblIds.includes(x.hblid));
+        //     this.surcharges = [...this.surcharges, ...charges];
+        // }
     }
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
@@ -290,6 +298,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
             if (!!shipment) {
                 this.tableListChargePopup.selectedShipment = shipment;
+                this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
                 const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
@@ -319,7 +328,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                             item.invoiceDate = { startDate: new Date(item.invoiceDate), endDate: new Date(item.invoiceDate) };
                         }
                     });
-                    this.tableListChargePopup.getAdvances(shipment.jobId);
+                    if (!!this.settlementCode) {
+                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo, this.settlementCode);
+                    } else {
+                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo);
+                    }
 
                     const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);
                     if (!!selectedCD) {
@@ -328,7 +341,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     // * Update value form.
                     this.tableListChargePopup.formGroup.patchValue({
                         shipment: shipment.hblid,
-                        advanceNo: surcharges[0].advanceNo,
+                        advanceNo: !!charge.advanceNo ? charge.advanceNo : null,
                         customNo: !!surcharges[0].clearanceNo ? surcharges[0].clearanceNo : null
                     });
                     this.tableListChargePopup.isUpdate = true;

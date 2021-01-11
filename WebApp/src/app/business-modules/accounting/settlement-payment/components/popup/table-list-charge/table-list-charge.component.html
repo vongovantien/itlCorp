@@ -30,14 +30,15 @@
                                     [currentActiveItemId]="{field:'clearanceNo', value:customNo.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'cd')"
                                     [selectedDisplayFields]="['clearanceNo']" [dataSources]="cds"
-                                    [displayFields]="configCustomDisplayFields" (remove)="resetFormControl(customNo)">
+                                    [displayFields]="configCustomDisplayFields"
+                                    (remove)="resetFormControl(customNo); selectedCD = null">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label> Advance No </label>
-                                <app-combo-grid-virtual-scroll
+                                <app-combo-grid-virtual-scroll #comboGridAdv
                                     [currentActiveItemId]="{field:'advanceNo', value:advanceNo.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'advanceNo')"
                                     [selectedDisplayFields]="['advanceNo','amount','requestCurrency']"
@@ -66,7 +67,8 @@
                                                     title="Duplicate" (click)="duplicateCharge(i)"><i
                                                         class="la la-copy"></i>
                                                 </button>
-                                                <button type="button" (click)="deleteCharge(i)" *ngIf="!isUpdate"
+                                                <button type="button" (click)="deleteCharge(i)"
+                                                    *ngIf="charges.length > 1"
                                                     class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                     title="Remove">
                                                     <i class="la la-trash"></i>
