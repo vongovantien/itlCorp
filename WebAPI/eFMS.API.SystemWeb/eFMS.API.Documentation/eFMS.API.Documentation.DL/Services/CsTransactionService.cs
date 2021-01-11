@@ -816,46 +816,48 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(shipmentType))
             {
                 var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
-                if (houseDetail != null)
+                var transaction = houseDetail != null ? transactionRepository.Get(x => x.TransactionType == shipmentType).Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, y.Id, x.Mawb, x.BookingNo })
+                                                    : null;
+                if (transaction?.Count() == 1)
                 {
-                    var transaction = transactionRepository.Get(x => x.TransactionType == shipmentType).Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, y.Id, x.Mawb, x.BookingNo });
-                    if (transaction.Count() > 1)
+                    jobNo = transaction.FirstOrDefault()?.JobNo.ToString();
+                    if (jobNo != null)
                     {
-                        jobNo = transaction.FirstOrDefault()?.JobNo.ToString();
-                        if (jobNo != null)
-                        {
-                            id = transaction.FirstOrDefault()?.Id.ToString();
-                        }
-                    }
-                    else
-                    {
-                        var transFilter = transaction.Where(x => x.Mawb == mblNo).FirstOrDefault();
-                        jobNo = transFilter?.JobNo.ToString();
-                        if (jobNo != null)
-                        {
-                            id = transFilter?.Id.ToString();
-                        }
-                        else
-                        {
-                            transFilter = transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
-                        }
+                        id = transaction.FirstOrDefault()?.Id.ToString();
                     }
                 }
                 else
                 {
-                    var transaction = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo).FirstOrDefault();
-                    jobNo = transaction?.JobNo.ToString();
-                    if (jobNo != null)
+                    if (transaction?.Count() > 1)
                     {
-                        id = transaction?.Id.ToString();
+                        var masDetail = transaction == null ? null : transaction.Where(x => x.Mawb == mblNo).FirstOrDefault();
+                        if (masDetail == null)
+                        {
+                            masDetail = transaction.Where(x => x.Mawb == mblNo).FirstOrDefault();
+                            masDetail = masDetail ?? transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
+                        }
+                        jobNo = masDetail?.JobNo.ToString();
+                        if (jobNo != null)
+                        {
+                            id = masDetail?.Id.ToString();
+                        }
                     }
                     else
                     {
-                        transaction = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo).FirstOrDefault();
-                        jobNo = transaction?.JobNo.ToString();
+                        var masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo).FirstOrDefault();
+                        jobNo = masDetail?.JobNo.ToString();
                         if (jobNo != null)
                         {
-                            id = transaction?.Id.ToString();
+                            id = masDetail?.Id.ToString();
+                        }
+                        else
+                        {
+                            masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo).FirstOrDefault();
+                            jobNo = masDetail?.JobNo.ToString();
+                            if (jobNo != null)
+                            {
+                                id = masDetail?.Id.ToString();
+                            }
                         }
                     }
                 }

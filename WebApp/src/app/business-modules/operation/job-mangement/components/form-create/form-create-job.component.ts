@@ -206,7 +206,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                             this.shipmentInfo = res.jobNo;
                         } else {
                             this.shipmentInfo = null;
-                            this._toaster.warning("There's no valid Job ID of Air/Sea to display. Please check again!");
+                            this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                         }
                     }
                 });
