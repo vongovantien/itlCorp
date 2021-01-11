@@ -29,7 +29,6 @@
     <Compile Remove="Models\CatUnit.cs" />
     <Compile Remove="Models\CsManifest.cs" />
     <Compile Remove="Models\CsMawbcontainer.cs" />
-    <Compile Remove="Models\CsShipmentSurcharge.cs" />
     <Compile Remove="Models\CsShippingInstruction.cs" />
     <Compile Remove="ViewModels\ChangeLog.cs" />
   </ItemGroup>
