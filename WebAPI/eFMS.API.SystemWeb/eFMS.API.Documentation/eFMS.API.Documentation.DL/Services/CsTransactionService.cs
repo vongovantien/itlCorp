@@ -449,6 +449,9 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.Soano)
                             || !string.IsNullOrEmpty(surcharge.PaySoano)
                             || !string.IsNullOrEmpty(surcharge.SettlementCode)
+                            || !string.IsNullOrEmpty(surcharge.AdvanceNo)
+                            || !string.IsNullOrEmpty(surcharge.VoucherId)
+                            || !string.IsNullOrEmpty(surcharge.SyncedFrom)
                             || surcharge.AcctManagementId != null
                          select detail);
             if (query.Any())
