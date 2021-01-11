@@ -75,7 +75,7 @@ export class JobManagementCreateJobComponent extends AppForm {
 
     saveJob(model: OpsTransaction) {
         if (this.isSaveLink) {
-            this._documentRepo.getASTransactionInfo(model.hwbno, model.productService, model.serviceMode)
+            this._documentRepo.getASTransactionInfo(model.mblno, model.hwbno, model.productService, model.serviceMode)
                 .subscribe((res: any) => {
                     if (!!res) {
                         model.serviceNo = res.jobNo;
