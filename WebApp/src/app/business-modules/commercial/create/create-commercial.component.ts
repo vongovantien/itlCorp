@@ -16,6 +16,7 @@ import { CommercialBranchSubListComponent } from '../components/branch-sub/comme
 import { of } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
+import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
 
 
 @Component({
@@ -27,6 +28,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     @ViewChild(CommercialFormCreateComponent) formCreate: CommercialFormCreateComponent;
     @ViewChild(CommercialContractListComponent) contractList: CommercialContractListComponent;
     @ViewChild(CommercialBranchSubListComponent) partnerList: CommercialBranchSubListComponent;
+    @ViewChild(CommercialEmailListComponent) partnerEmailList: CommercialEmailListComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild('taxCodeInfo') infoPopupTaxCode: InfoPopupComponent;
     @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
@@ -69,7 +71,6 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
 
     onSave() {
         this.formCreate.isSubmitted = true;
-
         if (!this.formCreate.formGroup.valid) {
             this.infoPopup.show();
             return;
@@ -86,7 +87,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         modelAdd.partnerType = this.type;
         this.type === 'Customer' ? modelAdd.partnerGroup = 'CUSTOMER' : modelAdd.partnerGroup = 'CUSTOMER; AGENT';
         modelAdd.contracts = [...this.contractList.contracts];
-
+        modelAdd.partnerEmails = [...this.partnerEmailList.partnerEmails];
 
         this.saveCustomerCommercial(modelAdd);
     }

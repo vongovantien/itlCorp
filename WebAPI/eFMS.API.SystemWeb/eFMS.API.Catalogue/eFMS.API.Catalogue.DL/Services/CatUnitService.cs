@@ -125,11 +125,28 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Get().Where(query);
-            if (criteria.All != null && data.Where(x => x.Code == criteria.All).Any())
+            var result = data.Select(x => new CatUnitModel
             {
-                data = data.OrderByDescending(x => x.Code == criteria.All);
+                Id = x.Id,
+                Code = x.Code,
+                UnitNameVn = x.UnitNameVn,
+                UnitNameEn = x.UnitNameEn,
+                UnitType = x.UnitType,
+                UnitTypeName = GetUnitTypes().Where(u => u.Value == x.UnitType).Select(u => u.DisplayName).FirstOrDefault(),
+                DescriptionEn = x.DescriptionEn,
+                DescriptionVn = x.DescriptionVn,
+                UserCreated = x.UserCreated,
+                DatetimeCreated = x.DatetimeCreated,
+                UserModified = x.UserModified,
+                DatetimeModified = x.DatetimeModified,
+                Active = x.Active,
+                InActiveOn = x.InActiveOn
+            });
+            if (criteria.All != null && result.Where(x => x.Code == criteria.All).Any())
+            {
+                result = result.OrderByDescending(x => x.Code == criteria.All);
             }
-            return data;
+            return result;
         }
     }
 }

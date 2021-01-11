@@ -46,6 +46,7 @@
         public const string HBLOFLANDING_ITL = "ITL";
         public const string HBLOFLANDING_ITL_FRAME = "ITL_FRAME";
         public const string HBLOFLANDING_FBL_FRAME = "FBL_FRAME";
+        public const string HBLOFLANDING_FBL_NOFRAME = "FBL_NOFRAME";
         public const string HBLOFLANDING_ITL_KESCO = "ITL_KESCO";
         public const string HBLOFLANDING_ITL_FRAME_KESCO = "ITL_FRAME_KESCO";
         public const string HBLOFLANDING_ITL_SEKO = "ITL_SEKO";

@@ -22,9 +22,11 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button *ngIf="!isAddSubPartner" [buttonSetting]="saveButtonSetting" (onClick)="onSaveDetail()">
+                            <app-default-button *ngIf="!isAddSubPartner && !!partner && partner.permission.allowUpdate"
+                                [buttonSetting]="saveButtonSetting" (onClick)="onSaveDetail()">
                             </app-default-button>
-                            <app-default-button *ngIf="isAddSubPartner" [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
+                            <app-default-button *ngIf="isAddSubPartner && !!partner && partner.permission.allowUpdate"
+                                [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
                             </app-default-button>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
                             </app-default-button>
@@ -61,6 +63,9 @@
             </tab>
             <tab heading="Branch/Sub">
                 <app-commercial-branch-sub-list></app-commercial-branch-sub-list>
+            </tab>
+            <tab heading="Email">
+                <app-commercial-email-list></app-commercial-email-list>
             </tab>
         </tabset>
     </div>
