@@ -82,10 +82,10 @@ export class FormAddChargeComponent extends AppForm {
             code: [null, Validators.required],
             nameEn: [null, Validators.required],
             nameVn: [null, Validators.required],
-            unit: [null, Validators.required],
-            unitPrice: [null, Validators.required],
-            currency: [null, Validators.required],
-            vat: [null, Validators.required],
+            unit: [],
+            unitPrice: [],
+            currency: [],
+            vat: [],
             type: [null, Validators.required],
             service: [null, Validators.required],
             debitCharge: [],
@@ -126,6 +126,8 @@ export class FormAddChargeComponent extends AppForm {
         let valid: boolean = true;
         this.setError(this.service);
         this.setError(this.chargeGroup);
+        this.setError(this.formGroup.controls['unitPrice']);
+        this.setError(this.formGroup.controls['vat']);
         this.setError(this.formGroup.controls['productDept']);
         if (!this.formGroup.valid) {
             valid = false;
@@ -199,7 +201,8 @@ export class FormAddChargeComponent extends AppForm {
             nameEn: res.charge.chargeNameEn,
             nameVn: res.charge.chargeNameVn,
             unitPrice: res.charge.unitPrice,
-            currency: { text: this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId).text, id: res.charge.currencyId },
+            // currency: { text: this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId).text, id: res.charge.currencyId },
+            currency: !!res.charge.currencyId && !!this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId) ? { id: res.charge.currencyId, text: this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId).text } : null,
             vat: res.charge.vatrate,
             type: res.charge.type,
             service: this.activeServices,
