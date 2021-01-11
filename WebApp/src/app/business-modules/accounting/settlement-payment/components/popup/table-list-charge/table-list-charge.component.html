@@ -67,7 +67,8 @@
                                                     title="Duplicate" (click)="duplicateCharge(i)"><i
                                                         class="la la-copy"></i>
                                                 </button>
-                                                <button type="button" (click)="deleteCharge(i)" *ngIf="!isUpdate"
+                                                <button type="button" (click)="deleteCharge(i)"
+                                                    *ngIf="charges.length > 1"
                                                     class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                     title="Remove">
                                                     <i class="la la-trash"></i>

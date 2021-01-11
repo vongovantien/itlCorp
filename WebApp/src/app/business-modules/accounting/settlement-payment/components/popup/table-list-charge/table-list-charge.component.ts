@@ -259,8 +259,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.serviceTypeId = data.service;
                 this.selectedShipment = data;
 
-                this.advanceNo.reset();
-                this.advs.length = 0;
+                this.resetAdvanceData();
 
                 this.customNo.setValue(null);
                 this.getAdvances(this.selectedShipment.jobId, true, this.settlementCode);
@@ -286,8 +285,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.selectedCD = data;
                 this.customNo.setValue(data.clearanceNo);
 
-                this.advanceNo.reset();
-                this.advs.length = 0;
+                this.resetAdvanceData();
 
                 const _shipments = this.filterShipmentByCD(data);
                 if (_shipments.length > 0) {
@@ -646,6 +644,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     removeAdvanceNo(advNo: string) {
         this.resetFormControl(this.advanceNo);
         this.selectedAdvance = null;
+    }
+
+    resetAdvanceData() {
+        this.advanceNo.reset();
+        this.comboGridAdv.displaySelectedStr = '';
+        this.advs.length = 0;
     }
 
 }

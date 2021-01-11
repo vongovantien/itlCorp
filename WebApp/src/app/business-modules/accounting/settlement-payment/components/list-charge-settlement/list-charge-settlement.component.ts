@@ -111,17 +111,24 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
-        if (charges.length === 1) {
-            const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === charges[0].hblid);
-            if (indexChargeUpdating !== -1) {
-                this.surcharges[indexChargeUpdating] = charges[0];
-                this.surcharges = [...this.surcharges];
-            }
-        } else {
-            const hblIds: string[] = charges.map(i => i.hblid);
-            this.surcharges = [...this.surcharges].filter(x => !hblIds.includes(x.hblid));
-            this.surcharges = [...this.surcharges, ...charges];
+        if (charges.length) {
+            const hblIds: string[] = charges.map(x => x.hblid);
+
+            this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
+            this.surcharges = [...charges, ...this.surcharges];
+
         }
+        // if (charges.length === 1) {
+        //     const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === charges[0].hblid);
+        //     if (indexChargeUpdating !== -1) {
+        //         this.surcharges[indexChargeUpdating] = charges[0];
+        //         this.surcharges = [...this.surcharges];
+        //     }
+        // } else {
+        //     const hblIds: string[] = charges.map(i => i.hblid);
+        //     this.surcharges = [...this.surcharges].filter(x => !hblIds.includes(x.hblid));
+        //     this.surcharges = [...this.surcharges, ...charges];
+        // }
     }
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
