@@ -1205,36 +1205,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         #region --- PREVIEW ---
-        public Crystal Preview(CsTransactionDetailModel model)
-        {
-            if (model == null)
-            {
-                return null;
-            }
-            Crystal result = null;
-            var parameter = new SeaHBillofLadingITLFrameParameter
-            {
-                Packages = model.PackageContainer,
-                GrossWeight = model.GW == null ? (decimal)model.GW : 0,
-                Measurement = string.Empty
-            };
-            result = new Crystal
-            {
-                ReportName = "SeaHBillofLadingITLFrame.rpt",
-                AllowPrint = true,
-                AllowExport = true
-            };
-            var housebills = new List<SeaHBillofLadingITLFrame>();
-            //continue
-            var freightCharges = new List<FreightCharge>();
-            if (freightCharges.Count == 0)
-                return null;
-            result.AddDataSource(housebills);
-            result.FormatType = ExportFormatType.PortableDocFormat;
-            result.AddSubReport("Freightcharges", freightCharges);
-            result.SetParameter(parameter);
-            return result;
-        }
         public Crystal PreviewProofOfDelivery(Guid Id)
         {
             var data = GetById(Id);
@@ -1462,8 +1432,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
                 housebill.NoPieces = string.Format("{0:n}", data.PackageQty) + " " + _packageType; // Package Qty & Package Type of HBL
-                // hbConstainers += " CONTAINER(S) S.T.C:";
-                housebill.Qty = (!string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper() ) + " CONTAINER(S) S.T.C:"; //Ưu tiên Package container >> List of good
+                housebill.ContSTC = "CONTAINER(S) S.T.C:";
+                housebill.SpecialText = "AT SHIPPER´S LOAD, COUNT, STOWAGE AND SEAL. THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER´S ACCOUNT";
+                housebill.Service = data.TransactionType;
+                housebill.Qty = !string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper(); //Ưu tiên Package container >> List of good
                 housebill.MaskNos = markNo?.ToUpper();
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 var _totalGwCont = conts.Select(s => s.Gw).Sum() ?? 0; //Tổng grossweight trong list cont;
@@ -1502,6 +1474,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExportReferences = data.ExportReferenceNo; //NOT USE
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
                 housebill.Signature = data?.Hbltype?.ToUpper() ?? string.Empty; //HBL Type
+                housebill.AttachList = data.AttachList;
                 if (data?.SailingDate != null)
                 {
                     housebill.SailingDate = data.SailingDate.Value; //NOT USE
@@ -1523,6 +1496,9 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case DocumentConstants.HBLOFLANDING_FBL_FRAME:
                     _reportName = "SeaHBillofLadingFBLFrame.rpt";
+                    break;
+                case DocumentConstants.HBLOFLANDING_FBL_NOFRAME:
+                    _reportName = "SeaHBillofLadingVLA.rpt";
                     break;
                 case DocumentConstants.HBLOFLANDING_ITL_KESCO:
                     _reportName = "SeaHBillofLadingITL_KESCO.rpt";
@@ -1584,7 +1560,8 @@ namespace eFMS.API.Documentation.DL.Services
             if (reportType == DocumentConstants.HBLOFLANDING_ITL_KESCO
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO
-                || reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME)
+                || reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME
+                || reportType == DocumentConstants.HBLOFLANDING_FBL_NOFRAME)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
