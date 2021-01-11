@@ -189,7 +189,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     }
 
     getASInfoToLink() {
-        if (!this.hwbno.value && !this.mblno.value) {
+        if (!this.hwbno.value || !this.mblno.value) {
             this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
             return;
         }

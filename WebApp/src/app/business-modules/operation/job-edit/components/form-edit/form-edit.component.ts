@@ -159,7 +159,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         });
 
         this.customerName = this.opsTransaction.customerName;
-        this.shipmentNo = this.opsTransaction.serviceNo;
+        this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
 
     }
@@ -296,8 +296,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     getASInfoToLink() {
-        if (!this.hwbno.value) {
-            this._toaster.warning("HBL No is empty. Please complete first!");
+        if (!this.hwbno.value || !this.mblno.value) {
+            this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
             return;
         }
 
