@@ -821,10 +821,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (transaction?.Count() == 1)
                 {
                     jobNo = transaction.FirstOrDefault()?.JobNo.ToString();
-                    if (jobNo != null)
-                    {
-                        id = transaction.FirstOrDefault()?.Id.ToString();
-                    }
+                    id = transaction.FirstOrDefault()?.Id.ToString();
                 }
                 else
                 {
@@ -833,31 +830,20 @@ namespace eFMS.API.Documentation.DL.Services
                         var masDetail = transaction == null ? null : transaction.Where(x => x.Mawb == mblNo).FirstOrDefault();
                         if (masDetail == null)
                         {
-                            masDetail = masDetail ?? transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
+                            masDetail = transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
                         }
                         jobNo = masDetail?.JobNo.ToString();
-                        if (jobNo != null)
-                        {
-                            id = masDetail?.Id.ToString();
-                        }
+                        id = masDetail?.Id.ToString();
                     }
                     else
                     {
                         var masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo).FirstOrDefault();
-                        jobNo = masDetail?.JobNo.ToString();
-                        if (jobNo != null)
-                        {
-                            id = masDetail?.Id.ToString();
-                        }
-                        else
+                        if (masDetail == null)
                         {
                             masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo).FirstOrDefault();
-                            jobNo = masDetail?.JobNo.ToString();
-                            if (jobNo != null)
-                            {
-                                id = masDetail?.Id.ToString();
-                            }
                         }
+                        jobNo = masDetail?.JobNo.ToString();
+                        id = null;
                     }
                 }
             }
