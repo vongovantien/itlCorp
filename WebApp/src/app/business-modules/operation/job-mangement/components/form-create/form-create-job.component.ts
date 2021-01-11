@@ -56,7 +56,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     salesmans: Observable<User[]>;
 
     shipmentNo: string = null;
-    shipmentNoti: string = '';
     shipmentInfo: string = '';
 
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
