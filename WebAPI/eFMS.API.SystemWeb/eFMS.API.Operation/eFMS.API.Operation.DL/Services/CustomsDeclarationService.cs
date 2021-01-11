@@ -43,6 +43,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CatPartner> customerRepository;
+        readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -56,6 +57,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<OpsTransaction> opsTransaction,
             IContextBase<OpsStageAssigned> opsStageAssigned,
             IContextBase<SysUser> userRepo,
+            IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -70,6 +72,7 @@ namespace eFMS.API.Operation.DL.Services
             opsStageAssignedRepo = opsStageAssigned;
             userRepository = userRepo;
             customerRepository = customerRepo;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -1298,6 +1301,24 @@ namespace eFMS.API.Operation.DL.Services
             var data = mapper.Map<List<CustomsDeclarationModel>>(query);
             data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
             return data;
+        }
+        public bool CheckAllowUpdate(int id)
+        {
+            string jobNo = DataContext.Get(x => x.Id == id).Select(t => t.JobNo).FirstOrDefault();
+            Guid jobId = opsTransactionRepo.Get(x => x.JobNo == jobNo).Select(t => t.Id).FirstOrDefault();
+            var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
+            var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
+                          || !string.IsNullOrEmpty(x.AdvanceNo)
+                          || !string.IsNullOrEmpty(x.VoucherId)
+                          || !string.IsNullOrEmpty(x.PaySoano)
+                          || !string.IsNullOrEmpty(x.SettlementCode)
+                          || !string.IsNullOrEmpty(x.SyncedFrom))
+                          );
+            if (query.Any())
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
