@@ -15,6 +15,8 @@ import { CommercialContractListComponent } from "../commercial/components/contra
 import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
 import { CommercialBranchSubListComponent } from "../commercial/components/branch-sub/commercial-branch-sub-list.component";
 import { NgSelectModule } from "@ng-select/ng-select";
+import { CommercialEmailListComponent } from '../commercial/components/email/commercial-email-list.component';
+import { FormUpdateEmailCommercialCatalogueComponent } from './components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
 
 const COMPONENTS = [
     ShareModulesInputShipmentPopupComponent,
@@ -23,6 +25,8 @@ const COMPONENTS = [
     SalesmanCreditLimitPopupComponent,
     PartnerRejectPopupComponent,
     CommercialBranchSubListComponent,
+    CommercialEmailListComponent,
+    FormUpdateEmailCommercialCatalogueComponent,
     ShareModulesReasonRejectPopupComponent
 ];
 @NgModule({

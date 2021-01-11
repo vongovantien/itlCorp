@@ -7,6 +7,8 @@ import { CommercialCreateComponent } from '../create/create-commercial.component
 import { ShareCommercialModule } from '../share-commercial.module';
 import { ContractImportComponent } from '../components/contract/import/contract-import.component';
 import { CustomerAgentImportComponent } from '../components/customer-agent-import/customer-agent-import.component';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/reducers';
 
 const routing: Routes = [
     {
@@ -42,7 +44,8 @@ const routing: Routes = [
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
-        ShareCommercialModule
+        ShareCommercialModule,
+        StoreModule.forFeature('agent', reducers),
     ],
     exports: [],
     providers: [],

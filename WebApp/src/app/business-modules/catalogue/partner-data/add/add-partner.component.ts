@@ -19,6 +19,7 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import _merge from 'lodash/merge';
+import { CommercialEmailListComponent } from 'src/app/business-modules/commercial/components/email/commercial-email-list.component';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -32,6 +33,7 @@ export class AddPartnerDataComponent extends AppList {
     @ViewChild(CommercialContractListComponent) contractList: CommercialContractListComponent;
     @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
     @ViewChild('duplicatePartnerPopup') confirmDuplicatePartner: InfoPopupComponent;
+    @ViewChild(CommercialEmailListComponent) partnerEmailList: CommercialEmailListComponent;
 
 
     contracts: Contract[] = [];
@@ -332,6 +334,7 @@ export class AddPartnerDataComponent extends AppList {
         //merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
         console.log(mergeObjPartner);
+        mergeObjPartner.partnerEmails = [...this.partnerEmailList.partnerEmails];
         //
         this.onCreatePartner(mergeObjPartner);
     }

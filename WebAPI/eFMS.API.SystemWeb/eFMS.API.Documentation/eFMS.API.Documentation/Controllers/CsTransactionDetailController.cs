@@ -295,14 +295,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
-
-        [HttpPost]
-        [Route("PreviewSeaHBofLading")]
-        public IActionResult PreviewSeaHBofLading(CsTransactionDetailModel model)
-        {
-            var result = csTransactionDetailService.Preview(model);
-            return Ok(result);
-        }
+        
         [HttpGet]
         [Route("GetGoodSummaryOfAllHblByJobId")]
         public IActionResult GetGoodSummaryOfAllHBLByJobId(Guid jobId)
