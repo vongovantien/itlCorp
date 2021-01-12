@@ -57,8 +57,11 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;
     isBranchSub: boolean;
-    partnerId: string = '';
     parentName: string = '';
+    provinceIdName: string;
+    countryIdName: string;
+    countryShippingIdName: string;
+    provinceShippingIdName: string;
     //
     @ViewChild('focusInput') internalReferenceRef: ElementRef;
 
@@ -160,25 +163,31 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'acRef':
-                this.parentName = null;
+                this.parentName = data.shortName;
                 this.parentId.setValue(data.id);
                 break;
             case 'shippping-country':
-
+                this.countryShippingIdName = data.nameEn;
                 this.countryShippingId.setValue(data.id);
+                this.provinceShippingIdName = null;
                 this.provinceShippingId.setValue(data.id);
 
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
+                this.provinceShippingIdName = data.name_EN;
                 this.provinceShippingId.setValue(data.id);
                 break;
             case 'billing-country':
+                this.countryIdName = data.nameEn;
                 this.countryId.setValue(data.id);
+                this.provinceIdName = null;
                 this.provinceId.setValue(data.id);
+
                 this.getBillingProvinces(data.id, !!this.provinceId.value ? this.provinceId.value : null);
                 break;
             case 'billing-city':
+                this.provinceIdName = data.name_EN;
                 this.provinceId.setValue(data.id);
                 break;
             default:
@@ -272,6 +281,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     //
     handleFocusInternalReference() {
         this.setFocusInput(this.internalReferenceRef);
+        console.log('data', this.internalReferenceRef)
     }
 
     getACRefName(parentId: string) {

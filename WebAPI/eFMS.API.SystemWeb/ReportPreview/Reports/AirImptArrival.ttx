@@ -6,6 +6,7 @@ FlightNo	String	50
 DepartureAirport	String	150	
 CussignedDate	DateTime		
 LastDestination	String	50	
+WarehouseDestination	String	150					
 ShippingMarkImport	Memo		
 DatePackage	DateTime		
 NoPieces	String	150	

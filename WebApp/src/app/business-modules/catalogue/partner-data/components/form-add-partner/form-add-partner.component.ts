@@ -387,30 +387,32 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     onSelectDataFormInfo(data: any, type: string) {
-
         switch (type) {
             case 'acRef':
-                this.parentName = null;
+                this.parentName = data.shortName;
                 this.partnerAccountRef.setValue(data.id);
                 break;
             case 'shippping-country':
+                this.countryShippingIdName = data.nameEn;
                 this.countryShippingId.setValue(data.id);
                 this.shippingProvinceName = null;
                 this.provinceShippingId.setValue(data.id);
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
+                this.shippingProvinceName = data.name_EN;
                 this.provinceShippingId.setValue(data.id);
                 break;
             case 'billing-country':
+                this.countryIdName = data.nameEn;
                 this.countryId.setValue(data.id);
                 this.billingProvinceName = null;
                 this.provinceId.setValue(data.id);
                 this.getBillingProvinces(data.id, !!this.provinceId.value ? this.provinceId.value : null);
                 break;
             case 'billing-city':
+                this.billingProvinceName = data.name_EN;
                 this.provinceId.setValue(data.id);
-
                 break;
             default:
                 break;

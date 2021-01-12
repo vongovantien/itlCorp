@@ -12,6 +12,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string DepartureAirport { get; set; }
         public DateTime? CussignedDate { get; set; }
         public string LastDestination { get; set; }
+        public string WarehouseDestination { get; set; }
         public string ShippingMarkImport { get; set; }
         public DateTime DatePackage { get; set; }
         public string NoPieces { get; set; }

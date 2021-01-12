@@ -246,7 +246,13 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
-                ) //BOD AND DEPUTY OF BOD                
+                ) //BOD AND DEPUTY OF BOD    
+                || 
+                (
+                 userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.advancePayment.OfficeId, x.advancePayment.CompanyId) // Is User Admin
+                 && 
+                 (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //[CR: 09/01/2021]
             ).Select(s => s.advancePayment);
             return result;
         }
@@ -869,6 +875,10 @@ namespace eFMS.API.Accounting.DL.Services
             var detail = DataContext.Get(x => x.AdvanceNo == advanceNo)?.FirstOrDefault();
             if (detail == null) return false;
 
+            //Nếu User là Admin thì sẽ cho phép xem detail [CR: 09/01/2021]
+            var isAdmin = userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, detail.OfficeId, detail.CompanyId);
+            if (isAdmin) return true;
+
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
                 UserCreated = detail.UserCreated,
@@ -894,6 +904,10 @@ namespace eFMS.API.Accounting.DL.Services
             var detail = DataContext.Get(x => x.Id == advanceId)?.FirstOrDefault();
             if (detail == null) return false;
 
+            //Nếu User là Admin thì sẽ cho phép xem detail [CR: 09/01/2021]
+            var isAdmin = userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, detail.OfficeId, detail.CompanyId);
+            if (isAdmin) return true;
+
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
                 UserCreated = detail.UserCreated,
@@ -904,7 +918,7 @@ namespace eFMS.API.Accounting.DL.Services
             };
             int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
 
-            if (code == 403) return false;
+            if (code == 403) return false;            
 
             return true;
         }
@@ -964,6 +978,13 @@ namespace eFMS.API.Accounting.DL.Services
                 advance.DepartmentId = advanceCurrent.DepartmentId;
                 advance.OfficeId = advanceCurrent.OfficeId;
                 advance.CompanyId = advanceCurrent.CompanyId;
+
+                advance.VoucherNo = advanceCurrent.VoucherNo;
+                advance.VoucherDate = advanceCurrent.VoucherDate;
+                advance.LastSyncDate = advanceCurrent.LastSyncDate;
+                advance.SyncStatus = advanceCurrent.SyncStatus;
+                advance.ReasonReject = advanceCurrent.ReasonReject;
+                advance.LockedLog = advanceCurrent.LockedLog;
 
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && advanceCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
@@ -2917,17 +2938,19 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion -- Check Exist, Check Is Manager, Is Approved --
 
-        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment()
+        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string settlementCode)
         {
             //Advance Payment has Status Approve is Done
-            var request = from ar in acctAdvanceRequestRepo.Get()
+            IQueryable<AcctAdvanceRequest> request = from ar in acctAdvanceRequestRepo.Get()
                           join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
                           select ar;
-            var opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
-            var docShipment = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
-            var surcharge = csShipmentSurchargeRepo.Get();
 
-            var requestOrder = request.GroupBy(g => new { g.AdvanceNo, g.Hbl }).Select(s => new AcctAdvanceRequest
+            IQueryable<OpsTransaction> opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            IQueryable<CsTransaction> docShipment = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            IQueryable<CsShipmentSurcharge> surcharge = csShipmentSurchargeRepo.Get();
+            IQueryable<SysUser> sysUsers = sysUserRepo.Get();
+
+            IQueryable<AcctAdvanceRequest> requestOrder = request.GroupBy(g => new { g.AdvanceNo, g.Hbl }).Select(s => new AcctAdvanceRequest
             {
                 Amount = s.Sum(a => a.Amount),
                 AdvanceNo = s.First().AdvanceNo,
@@ -2939,11 +2962,12 @@ namespace eFMS.API.Accounting.DL.Services
             });
 
             //So sánh bằng
-            var queryOps = from req in requestOrder
+            IQueryable<AcctAdvanceRequestModel> queryOps = from req in requestOrder
                            join ops in opsShipment on req.JobId equals ops.JobNo into ops2
                            from ops in ops2
                            join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
                            from adv in adv2
+                           join user in sysUsers on adv.Requester equals user.Id
                            select new AcctAdvanceRequestModel
                            {
                                Id = req.Id,
@@ -2954,15 +2978,18 @@ namespace eFMS.API.Accounting.DL.Services
                                RequestDate = adv.RequestDate,
                                Amount = req.Amount,
                                AdvanceNo = req.AdvanceNo,
-                               RequestCurrency = req.RequestCurrency
+                               RequestCurrency = req.RequestCurrency,
+                               Requester = user.Id,
+                               RequesterName = user.Username
                            };
 
             //So sánh bằng
-            var queryDoc = from req in requestOrder
+            IQueryable<AcctAdvanceRequestModel> queryDoc = from req in requestOrder
                            join doc in docShipment on req.JobId equals doc.JobNo into doc2
                            from doc in doc2
                            join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
                            from adv in adv2
+                           join user in sysUsers on adv.Requester equals user.Id
                            select new AcctAdvanceRequestModel
                            {
                                Id = req.Id,
@@ -2973,12 +3000,26 @@ namespace eFMS.API.Accounting.DL.Services
                                RequestDate = adv.RequestDate,
                                Amount = req.Amount,
                                AdvanceNo = req.AdvanceNo,
-                               RequestCurrency = req.RequestCurrency
+                               RequestCurrency = req.RequestCurrency,
+                               Requester = user.Id,
+                               RequesterName = user.Username
                            };
-            var mergeAdvRequest = queryOps.Union(queryDoc);
+            IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = queryOps.Union(queryDoc);
 
-            //Get advance theo shipment và advance chưa làm settlement; order tăng dần theo ngày request date
-            var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo && a.Hblid == x.Hblid)).OrderBy(x => x.RequestDate);
+            //Get advance theo shipment và advance chưa làm settlement ngoại trừ settle đang xét; order tăng dần theo ngày request date
+            IOrderedEnumerable<AcctAdvanceRequestModel> data = null;
+            if (string.IsNullOrEmpty(settlementCode))
+            {
+                data = mergeAdvRequest.ToList()
+                .Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo && a.Hblid == x.Hblid))
+                .OrderBy(x => x.RequestDate);
+            }
+            else
+            {
+                data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo && a.Hblid == x.Hblid && a.SettlementCode != settlementCode))
+                .OrderBy(x => x.RequestDate);
+            }
+        
             return data.ToList();
         }
 
@@ -3151,6 +3192,7 @@ namespace eFMS.API.Accounting.DL.Services
                 string _shipper = string.Empty;
                 string _consignee = string.Empty;
                 string _container = string.Empty;
+                string _personInCharge = string.Empty;
                 decimal? _cw = 0;
                 decimal? _pcs = 0;
                 decimal? _cbm = 0;
@@ -3164,6 +3206,8 @@ namespace eFMS.API.Accounting.DL.Services
                         _cw = ops.SumChargeWeight ?? 0;
                         _pcs = ops.SumPackages ?? 0;
                         _cbm = ops.SumCbm ?? 0;
+                        var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
+                        _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
                 }
                 else
@@ -3180,8 +3224,10 @@ namespace eFMS.API.Accounting.DL.Services
                             _container = tranDetail.PackageContainer;
                             _cw = tranDetail.ChargeWeight;
                             _pcs = tranDetail.PackageQty;
-                            _cbm = tranDetail.Cbm;
+                            _cbm = tranDetail.Cbm;                            
                         }
+                        var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
+                        _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
                 }
                 var shipmentAdvance = new InfoShipmentAdvanceExport
@@ -3194,6 +3240,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Shipper = _shipper,
                     Consignee = _consignee,
                     Container = _container,
+                    PersonInCharge = _personInCharge,
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
@@ -3229,7 +3276,8 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 shipmentsAdvance.Add(shipmentAdvance);
             }
-            return shipmentsAdvance;
+            var result = shipmentsAdvance.ToArray().OrderBy(x => x.JobNo); //Sắp xếp tăng dần theo JobNo [05-01-2021]
+            return result.ToList();
         }
         #endregion --- EXPORT ADVANCE ---
 

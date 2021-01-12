@@ -122,6 +122,7 @@ export class SettlementFormCreateComponent extends AppForm {
         return [
             { title: 'Cash', value: 'Cash' },
             { title: 'Bank Transfer', value: 'Bank' },
+            { title: 'Other', value: 'Other' },
         ];
     }
 

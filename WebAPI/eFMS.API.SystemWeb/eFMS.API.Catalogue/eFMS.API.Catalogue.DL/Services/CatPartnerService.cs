@@ -44,8 +44,9 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        private readonly IContextBase<CatPartnerEmail> catpartnerEmailRepository;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IOptions<ApiUrl> ApiUrl;
-
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -64,6 +65,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatDepartment> catDepartmentRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<CatPartnerEmail> emailRepo,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -81,6 +84,8 @@ namespace eFMS.API.Catalogue.DL.Services
             catDepartmentRepository = catDepartmentRepo;
             userlevelRepository = userlevelRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
+            catpartnerEmailRepository = emailRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
             ApiUrl = apiurl;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -146,6 +151,18 @@ namespace eFMS.API.Catalogue.DL.Services
                                 }
                             }
 
+                        }
+                        if(entity.PartnerEmails.Count > 0)
+                        {
+                            var emails = mapper.Map<List<CatPartnerEmail>>(entity.PartnerEmails);
+                            emails.ForEach(x =>
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.PartnerId = partner.Id;
+                                x.DatetimeCreated = DateTime.Now;
+                                x.UserCreated = x.UserModified = currentUser.UserID;
+                            });
+                            var hsEmail = catpartnerEmailRepository.Add(emails);
                         }
                         trans.Commit();
                         SendMailCreatedSuccess(partner);
@@ -541,7 +558,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             if (!string.IsNullOrEmpty(id))
             {
-                if (transactionDetailRepository.Any(x => x.CustomerId == id))
+                var partner = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                var existClearance = customsDeclarationRepository.Any(x => (x.AccountNo ?? "").Contains(partner.AccountNo) || x.PartnerTaxCode.Contains(partner.TaxCode));
+                if (transactionDetailRepository.Any(x => x.CustomerId == id) || existClearance)
                 {
                     return new HandleState("This partner is already in use so you can not delete it");
                 }
@@ -830,7 +849,15 @@ namespace eFMS.API.Catalogue.DL.Services
                     _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
                     break;
             }
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            var permissionRange = new PermissionRange();
+            if (_user.UserMenuPermission == null)
+            {
+                permissionRange = PermissionRange.None;
+            }
+            else
+            {
+                permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            }
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
             if (code == 403) return new HandleState(403, "");
             return new HandleState();
@@ -996,7 +1023,20 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             List<CatContract> salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
 
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            ICurrentUser _user = null;
+            switch (queryDetail.PartnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+                    break;
+            }
+
             PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             PermissionRange permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int checkDelete = GetPermissionToDelete(new ModelUpdate { GroupId = queryDetail.GroupId, OfficeId = queryDetail.OfficeId, CompanyId = queryDetail.CompanyId, UserCreator = queryDetail.UserCreated, Salemans = salemans, PartnerGroup = queryDetail.PartnerGroup }, permissionRangeDelete);

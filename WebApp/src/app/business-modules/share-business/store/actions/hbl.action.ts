@@ -9,6 +9,7 @@ export enum HBLActionTypes {
     GET_DETAIL_SUCCESS = '[HBL] Get Detail Success',
     GET_DETAIL_FAIL = '[HBL] Get Detail Fail',
 
+    INIT_PROFIT = '[HBL] Init Profit',
     GET_PROFIT = '[HBL] Get Profit',
     GET_PROFIT_SUCCESS = '[HBL] Get Profit Success',
     GET_PROFIT_FAIL = '[HBL] Get Profit Fail',
@@ -56,6 +57,11 @@ export class GetListHBLFailAction implements Action {
 }
 
 /* Profit */
+export class InitProfitHBLAction implements Action {
+    readonly type = HBLActionTypes.INIT_PROFIT;
+
+    constructor() { }
+}
 export class GetProfitHBLAction implements Action {
     readonly type = HBLActionTypes.GET_PROFIT;
 
@@ -104,5 +110,6 @@ export type HBLActions =
     | GetProfitHBLFailFailAction
     | GetContainersHBLAction
     | GetContainersHBLSuccessAction
-    | GetContainersHBLFailAction;
+    | GetContainersHBLFailAction
+    | InitProfitHBLAction;
 

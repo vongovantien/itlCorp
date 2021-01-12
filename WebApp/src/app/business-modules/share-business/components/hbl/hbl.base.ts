@@ -1,3 +1,4 @@
+import { InitProfitHBLAction } from './../../store/actions/hbl.action';
 import { AppList } from "src/app/app.list";
 import { SortService } from "@services";
 import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
@@ -135,6 +136,8 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                         this.selectHBL(this.houseBills[0]);
                     } else {
                         this.selectedHbl = null;
+
+                        this._store.dispatch(new InitProfitHBLAction())
                     }
                 }
             );
@@ -212,6 +215,9 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                             this.houseBills = [...this.houseBills.slice(0, this.selectedIndexHBL), ...this.houseBills.slice(this.selectedIndexHBL + 1)];
                             if (!!this.houseBills.length) {
                                 this.selectHBL(this.houseBills[0]);
+                            } else {
+                                this.selectedHbl = null;
+                                this._store.dispatch(new InitProfitHBLAction())
                             }
                         }
                     } else {
@@ -309,17 +315,13 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             );
     }
 
-    gotoList() { }
+    abstract gotoList(): void;
+    abstract gotoCreate(): void;
+    abstract gotoDetail(id: string): void;
+    abstract onSelectTab(tabName: string): void;
+    abstract duplicateConfirm(): void;
 
-    gotoCreate() { }
-
-    gotoDetail(id: string) { }
-
-    onSelectTab(tabName: string) { }
-
-    duplicateConfirm() { }
-
-    listenShortcutMovingTab() { }
+    public listenShortcutMovingTab(): void { }
 
 
 

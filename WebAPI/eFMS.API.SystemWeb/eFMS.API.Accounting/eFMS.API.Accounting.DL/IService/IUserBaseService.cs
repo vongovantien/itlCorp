@@ -19,9 +19,6 @@ namespace eFMS.API.Accounting.DL.IService
         SysEmployee GetEmployeeByEmployeeId(string employeeId);
         SysEmployee GetEmployeeByUserId(string userId);
         bool CheckIsAccountantDept(int? deptId);
-        List<string> GetListUserDeputyByDept(string dept);
-        bool CheckDeputyManagerByUser(int? departmentId, string userId);
-        bool CheckDeputyAccountantByUser(int? departmentId, string userId);
         bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId);
         SysSettingFlow GetSettingFlowApproval(string type, Guid? officeId);
         string GetRoleByLevel(string level, string type, Guid? officeId);
@@ -31,5 +28,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
         bool CheckIsUserDeputy(string type, string commissioner, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
         bool CheckIsAccountantByOfficeDept(Guid? officeId, int? deptId);
+        bool CheckIsUserAdmin(string currUserId, Guid currOfficeId, Guid currCompanyId, Guid? objOfficeId, Guid? objCompanyId);
     }
 }

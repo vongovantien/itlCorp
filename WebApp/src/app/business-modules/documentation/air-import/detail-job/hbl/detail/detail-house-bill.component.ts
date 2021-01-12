@@ -122,8 +122,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this.arrivalNoteComponent.isSubmitted = true;
                 if (!this.arrivalNoteComponent.checkValidate()) {
                     return;
-                } else if (!this.arrivalNoteComponent.checkValidateFirstNote() || !this.arrivalNoteComponent.checkValidateSecondtNote()) {
-                    return;
                 } else if (!!this.arrivalNoteComponent.hblArrivalNote.arrivalNo) {
                     this.arrivalNoteComponent.saveArrivalNote();
                 }

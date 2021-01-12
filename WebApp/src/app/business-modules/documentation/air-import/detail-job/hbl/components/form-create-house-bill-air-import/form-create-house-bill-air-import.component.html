@@ -194,11 +194,8 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Unit</label>
-                                <select class="form-control" formControlName="packageType">
-                                    <option *ngFor="let unit of (ngDataUnit | async)" [value]="unit.id">
-                                        {{unit.unitNameEn}}</option>
-                                </select>
-
+                                <ng-select class="custom" [items]="ngDataUnit | async" bindLabel="code" bindValue="id" formControlName="packageType">
+                                </ng-select>
                             </div>
                         </div>
                     </div>

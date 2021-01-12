@@ -461,11 +461,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         }
         if (this.selectedCharge.type === 'OBH') {
             const dataChargeOBH = {
-                payerId: this.selectedPayer.value,
-                paymentObjectId: this.selectedOBHPartner.value,
+                payerId: this.selectedPayer?.value,
+                paymentObjectId: this.selectedOBHPartner?.value,
                 objectBePaid: null,
-                payer: this.selectedPayerData.shortName,
-                obhPartnerName: this.selectedOBHData.shortName
+                payer: this.selectedPayerData?.shortName,
+                obhPartnerName: this.selectedOBHData?.shortName
             };
             Object.assign(body, dataChargeOBH);
         }

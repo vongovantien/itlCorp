@@ -152,15 +152,16 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// Get Air/Sea job no and hblId
         /// </summary>
+        /// <param name="mblNo">mbl no's ops</param>
         /// <param name="hblNo">hbl no's ops</param>
         /// <param name="serviceName">product service</param>
         /// <param name="serviceMode">service mode</param>
         /// <returns></returns>
         [HttpGet("GetLinkASInfomation")]
         [Authorize]
-        public IActionResult GetLinkASInfomation(string hblNo, string serviceName, string serviceMode)
+        public IActionResult GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode)
         {
-            var data = csTransactionService.GetLinkASInfomation(hblNo, serviceName, serviceMode);
+            var data = csTransactionService.GetLinkASInfomation(mblNo, hblNo, serviceName, serviceMode);
             return Ok(data);
         }
         #region -- INSERT & UPDATE
@@ -497,7 +498,8 @@ namespace eFMS.API.Documentation.Controllers
                 if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
-                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1))
+                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1)) 
+                    && x.OfficeId == currentUser.OfficeID
                     && x.CurrentStatus != TermData.Canceled))
                     {
                         message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
@@ -511,6 +513,7 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
                         && x.TransactionType.Contains(model.TransactionType.Substring(0, 1))
+                        && x.OfficeId == currentUser.OfficeID
                         && x.Id != id
                         && x.CurrentStatus != TermData.Canceled))
                     {

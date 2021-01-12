@@ -61,6 +61,9 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
     displayFieldPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
+    supplierName: string;
+    consigneeName: string;
+
     constructor(private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder) {
@@ -77,6 +80,8 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
     }
     setformValue(res: CsShippingInstruction) {
         if (!!res) {
+            this.supplierName = res.supplierName;
+            this.consigneeName = res.consigneeName;
             this.formSI.setValue({
                 siRefNo: res.refNo, // * disabled
                 bookingNo: res.bookingNo,
@@ -115,7 +120,7 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
             }
             if (res.consigneeId != null) {
                 const consignee = this.consignees.find(x => x.id === res.consigneeId);
-                if (!!consignee) {
+                if (!!consignee && !this.consigneeDescription.value) {
                     this.getConsigneeDescription(consignee);
                 }
             }
@@ -252,9 +257,11 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
                 this.issuedUser.setValue(data.id);
                 break;
             case 'supplier':
+                this.supplierName = data.partnerNameEn;
                 this.supplier.setValue(data.id);
                 break;
             case 'consignee':
+                this.consigneeName = data.partnerNameEn;
                 this.consignee.setValue(data.id);
                 const indexConsignee = this.consignees.findIndex(x => x.id === data.id);
                 if (indexConsignee > -1) {

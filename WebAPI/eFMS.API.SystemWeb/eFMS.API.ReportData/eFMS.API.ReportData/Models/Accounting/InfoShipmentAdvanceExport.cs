@@ -9,6 +9,7 @@
         public string Customer { get; set; }
         public string Shipper { get; set; }
         public string Consignee { get; set; }
+        public string PersonInCharge { get; set; }
         public string Container { get; set; }
         public decimal? Cw { get; set; }
         public decimal? Pcs { get; set; }
