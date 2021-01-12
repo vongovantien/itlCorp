@@ -1171,7 +1171,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
                 data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
                 string Code = catUnitRepo.Get(x => x.Id == item.PackageQty).Select(t => t.Code).FirstOrDefault();
-                data.QTy = !string.IsNullOrEmpty(Code) ? item.QTy + " " + Code : string.Empty;
+                data.QTy =  item.QTy + " " + Code ;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -1379,8 +1379,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
                                         Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
                                         Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
-                                        GW = master.GrossWeight,
-                                        CW = master.ChargeWeight,
+                                        GW = house.GrossWeight,
+                                        CW = house.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
                                         HblId = house.Id,
                                         CustomerId = house.CustomerId,
@@ -1430,8 +1430,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
                                         Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
                                         Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
-                                        GW = master.GrossWeight,
-                                        CW = master.ChargeWeight,
+                                        GW = house.GrossWeight,
+                                        CW = house.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
                                         HblId = house.Id,
                                         CustomerId = house.CustomerId,

@@ -52,7 +52,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<DeniedInfoResult> GetHistoryDeniedAdvance(string advanceNo);
 
-        List<AcctAdvanceRequestModel> GetAdvancesOfShipment();
+        List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string settlementCode = null);
 
         LockedLogResultModel GetAdvanceToUnlock(List<string> keyWords);
 

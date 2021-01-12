@@ -31,7 +31,6 @@ namespace eFMS.API.Documentation.DL.IService
         object GetGoodSummaryOfAllHBLByJobId(Guid jobId);
         object ImportCSTransactionDetail(CsTransactionDetailModel model);
         //CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
-        Crystal Preview(CsTransactionDetailModel model);
         string GenerateHBLNoSeaExport(string podCode);
 
         int CheckDetailPermission(Guid id);

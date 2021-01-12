@@ -244,7 +244,13 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 && (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
-                ) //BOD AND DEPUTY OF BOD                
+                ) //BOD AND DEPUTY OF BOD   
+                ||
+                (
+                 userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId) // Is User Admin
+                 &&
+                 (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //[CR: 09/01/2021]
             ).Select(s => s.settlementPayment);
             return result;
         }
@@ -1511,6 +1517,10 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.DepartmentId = settlementCurrent.DepartmentId;
                 settlement.OfficeId = settlementCurrent.OfficeId;
                 settlement.CompanyId = settlementCurrent.CompanyId;
+                settlement.LastSyncDate = settlementCurrent.LastSyncDate;
+                settlement.SyncStatus = settlementCurrent.SyncStatus;
+                settlement.ReasonReject = settlementCurrent.ReasonReject;
+                settlement.LockedLog = settlementCurrent.LockedLog;
 
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
@@ -3504,234 +3514,6 @@ namespace eFMS.API.Accounting.DL.Services
             return listJobId;
         }
         
-        //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
-        //Nếu group hiện tại đã được approve thì không cho approve nữa
-        private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string settlementNo, ICurrentUser _userCurrent, string deptOfUser)
-        {
-            HandleState result = new HandleState("Not allow approve/deny");
-
-            //Lấy ra Settlement Approval dựa vào settlementNo
-            var acctApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == false).FirstOrDefault();
-            if (acctApprove == null)
-            {
-                result = new HandleState("Not found settlement approval by SettlementNo is " + settlementNo);
-                return result;
-            }
-
-            //Lấy ra Settlement Payment dựa vào SettlementNo
-            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
-            if (settlement == null)
-            {
-                result = new HandleState("Not found settlement payment by SettlementNo is" + settlementNo);
-                return result;
-            }
-
-            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-            {
-                result = new HandleState("Settlement payment approved");
-                return result;
-            }
-
-            //Lấy ra brandId của user requester
-            var brandOfUserRequest = settlement.OfficeId;
-            if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-            //Lấy ra brandId của userId
-            var brandOfUserId = _userCurrent.OfficeID;
-            if (brandOfUserId == Guid.Empty || brandOfUserId == null) return new HandleState("Not found office of user");
-
-            //Trường hợp không có Leader
-            if (string.IsNullOrEmpty(acctApprove.Leader))
-            {
-                //Manager Department Approve
-                var managerOfUserRequester = userBaseService.GetDeptManager(settlement.CompanyId, settlement.OfficeId, settlement.DepartmentId).FirstOrDefault();
-                var IsDenyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
-                //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
-                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
-                    && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId) == false
-                    && _userCurrent.UserID == managerOfUserRequester)
-                        || IsDenyManager
-                   )
-                {
-                    //Kiểm tra User Approve có thuộc cùng dept với User Requester hay ko
-                    //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (_userCurrent.CompanyID == settlement.CompanyId
-                       && _userCurrent.OfficeID == settlement.OfficeId
-                       && _userCurrent.DepartmentId != settlement.DepartmentId)
-                    {
-                        result = new HandleState("Not in the same department");
-                    }
-                    else
-                    {
-                        result = new HandleState();
-                    }
-
-                    //Requester đã approve thì Manager mới được phép Approve
-                    if (!string.IsNullOrEmpty(acctApprove.Requester) && acctApprove.RequesterAprDate != null)
-                    {
-                        result = new HandleState();
-                        //Check group CSManager đã approve chưa
-                        //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
-                            && acctApprove.ManagerAprDate != null
-                            && !string.IsNullOrEmpty(acctApprove.ManagerApr))
-                        {
-                            result = new HandleState("Manager department approved");
-                        }
-                    }
-                    else
-                    {
-                        result = new HandleState("Not found Requester or Requester not approve");
-                    }
-                }
-
-                //Accountant Approve
-                var accountantOfUser = userBaseService.GetAccoutantManager(settlement.CompanyId, settlement.OfficeId).FirstOrDefault();
-                var IsDenyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
-                //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt hay không
-                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
-                    && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId)
-                    && _userCurrent.UserID == accountantOfUser)
-                    || IsDenyAccountant)
-                {
-                    //Check group DepartmentManager đã được Approve chưa
-                    if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
-                        && acctApprove.ManagerAprDate != null
-                        && !string.IsNullOrEmpty(acctApprove.ManagerApr))
-                    {
-                        result = new HandleState();
-                        //Check group Accountant đã approve chưa
-                        //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DONE)
-                            && acctApprove.AccountantAprDate != null
-                            && !string.IsNullOrEmpty(acctApprove.AccountantApr))
-                        {
-                            result = new HandleState("Chief accountant approved");
-                        }
-                    }
-                    else
-                    {
-                        result = new HandleState("Not found Manager or Manager not approve");
-                    }
-                }
-            }
-            else //Trường hợp có leader
-            {
-                //Leader Approve
-                if (_userCurrent.GroupId != AccountingConstants.SpecialGroup && _userCurrent.UserID == userBaseService.GetLeaderIdOfUser(settlement.Requester))
-                {
-                    //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
-                    //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (_userCurrent.CompanyID == settlement.CompanyId
-                       && _userCurrent.OfficeID == settlement.OfficeId
-                       && _userCurrent.DepartmentId != settlement.DepartmentId)
-                    {
-                        result = new HandleState("Not in the same department");
-                    }
-                    else
-                    {
-                        result = new HandleState();
-                    }
-
-                    //Check Requester đã approve chưa
-                    if (!string.IsNullOrEmpty(acctApprove.Requester)
-                        && acctApprove.RequesterAprDate != null)
-                    {
-                        result = new HandleState();
-                        //Check group Leader đã được approve chưa
-                        //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED)
-                            && acctApprove.LeaderAprDate != null
-                            && !string.IsNullOrEmpty(acctApprove.Leader))
-                        {
-                            result = new HandleState("Leader approved");
-                        }
-                    }
-                    else
-                    {
-                        result = new HandleState("Not found Requester or Requester not approve");
-                    }
-                }
-
-                //Manager Department Approve
-                var managerOfUserRequester = userBaseService.GetDeptManager(settlement.CompanyId, settlement.OfficeId, settlement.DepartmentId).FirstOrDefault();
-                var IsDenyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
-                //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
-                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
-                    && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId) == false
-                    && _userCurrent.UserID == managerOfUserRequester)
-                        || IsDenyManager)
-                {
-                    //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
-                    //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (_userCurrent.CompanyID == settlement.CompanyId
-                       && _userCurrent.OfficeID == settlement.OfficeId
-                       && _userCurrent.DepartmentId != settlement.DepartmentId)
-                    {
-                        result = new HandleState("Not in the same department");
-                    }
-                    else
-                    {
-                        result = new HandleState();
-                    }
-
-                    //Check group Leader đã được approve chưa
-                    if (!string.IsNullOrEmpty(acctApprove.Leader)
-                        && settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED)
-                        && acctApprove.LeaderAprDate != null)
-                    {
-                        result = new HandleState();
-                        //Check group Manager Department đã approve chưa
-                        //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
-                            && acctApprove.ManagerAprDate != null
-                            && !string.IsNullOrEmpty(acctApprove.ManagerApr))
-                        {
-                            result = new HandleState("Manager department approved");
-                        }
-                    }
-                    else
-                    {
-                        result = new HandleState("Not found Leader or Leader not approve");
-                    }
-                }
-
-                //Accountant Approve
-                var accountantOfUser = userBaseService.GetAccoutantManager(settlement.CompanyId, settlement.OfficeId).FirstOrDefault();
-                var IsDenyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
-                //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
-                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
-                    && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId)
-                    && _userCurrent.UserID == accountantOfUser)
-                    || IsDenyAccountant)
-                {
-                    //Check group DepartmentManager đã được Approve chưa
-                    if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
-                        && acctApprove.ManagerAprDate != null
-                        && !string.IsNullOrEmpty(acctApprove.ManagerApr))
-                    {
-                        result = new HandleState();
-                        //Check group Accountant đã approve chưa
-                        //Nếu đã approve thì không được approve nữa
-                        if (settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DONE)
-                            && acctApprove.AccountantAprDate != null
-                            && !string.IsNullOrEmpty(acctApprove.AccountantApr))
-                        {
-                            result = new HandleState("Chief accountant approved");
-                        }
-                    }
-                    else
-                    {
-                        result = new HandleState("Not found Manager or Manager not approve");
-                    }
-                }
-            }
-
-            return result;
-        }
-
         //Send Mail đề nghị Approve
         private bool SendMailSuggestApproval(string settlementNo, string userReciver, string emailUserReciver, List<string> emailUsersDeputy)
         {
@@ -4061,82 +3843,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return sendMailResult;
         }
-
-        //Kiểm tra User đăng nhập vào có thuộc các user Approve Settlement không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
-        //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true
-        private bool CheckUserInApproveSettlementAndDeptApproved(ICurrentUser userCurrent, AcctApproveSettlementModel approveSettlement)
-        {
-            var isApproved = false;
-            var IsDenyManage = userBaseService.CheckDeputyManagerByUser(userCurrent.DepartmentId, userCurrent.UserID);
-            var IsDenyAccoutant = userBaseService.CheckDeputyAccountantByUser(userCurrent.DepartmentId, userCurrent.UserID);
-
-            // 1 user vừa có thể là Requester, Manager Dept, Accountant Dept nên khi check Approved cần phải dựa vào group
-            // Group 11 chính là group Manager
-
-            if (userCurrent.GroupId != AccountingConstants.SpecialGroup
-                && userCurrent.UserID == approveSettlement.Requester) //Requester
-            {
-                isApproved = true;
-                if (approveSettlement.RequesterAprDate == null)
-                {
-                    isApproved = false;
-                }
-            }
-            else if (userCurrent.GroupId != AccountingConstants.SpecialGroup
-                && userCurrent.UserID == approveSettlement.Leader) //Leader
-            {
-                isApproved = true;
-                if (approveSettlement.LeaderAprDate == null)
-                {
-                    isApproved = false;
-                }
-            }
-            else if (
-                (userCurrent.GroupId == AccountingConstants.SpecialGroup
-                && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId) == false
-                && (userCurrent.UserID == approveSettlement.Manager
-                    || userCurrent.UserID == approveSettlement.ManagerApr))
-
-                    || IsDenyManage) //Dept Manager
-            {
-                isApproved = true;
-                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)).Any();
-                if (string.IsNullOrEmpty(approveSettlement.ManagerApr) && approveSettlement.ManagerAprDate == null && isDeptWaitingApprove)
-                {
-                    isApproved = false;
-                }
-            }
-            else if (
-                (userCurrent.GroupId == AccountingConstants.SpecialGroup
-                && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId)
-                && (userCurrent.UserID == approveSettlement.Accountant
-                    || userCurrent.UserID == approveSettlement.AccountantApr))
-
-                    || IsDenyAccoutant)//Accountant Manager
-            {
-                isApproved = true;
-                var isDeptWaitingApprove = DataContext.Get(x => x.SettlementNo == approveSettlement.SettlementNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
-                if (string.IsNullOrEmpty(approveSettlement.AccountantApr) && approveSettlement.AccountantAprDate == null && isDeptWaitingApprove)
-                {
-                    isApproved = false;
-                }
-            }
-            else if (userCurrent.UserID == approveSettlement.Buhead || userCurrent.UserID == approveSettlement.BuheadApr) //BUHead
-            {
-                isApproved = true;
-                if (string.IsNullOrEmpty(approveSettlement.BuheadApr) && approveSettlement.BuheadAprDate == null)
-                {
-                    isApproved = false;
-                }
-            }
-            else
-            {
-                //Đây là trường hợp các User không thuộc Approve Settlement
-                isApproved = true;
-            }
-            return isApproved;
-        }
-
+        
         public ResultHandle UnLock(List<string> keyWords)
         {
             var settleToUnLocks = DataContext.Get(x => keyWords.Contains(x.SettlementNo));
@@ -4277,6 +3984,10 @@ namespace eFMS.API.Accounting.DL.Services
 
             var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
             if (detail == null) return false;
+
+            //Nếu User là Admin thì sẽ cho phép xem detail [CR: 09/01/2021]
+            var isAdmin = userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, detail.OfficeId, detail.CompanyId);
+            if (isAdmin) return true;
 
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
@@ -4443,6 +4154,7 @@ namespace eFMS.API.Accounting.DL.Services
                 shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
                 #endregion -- CHANRGE AND ADVANCE OF SETTELEMENT --
 
+                string _personInCharge = string.Empty;
                 var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
                 if (ops != null)
                 {
@@ -4456,6 +4168,10 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
 
+                    var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
+                    _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                    shipmentSettlement.PersonInCharge = _personInCharge;
+
                     listData.Add(shipmentSettlement);
                 }
                 else
@@ -4463,7 +4179,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var tranDetail = csTransactionDetailRepo.Get(x => x.Id == houseBillId.hblId).FirstOrDefault();
                     if (tranDetail != null)
                     {
-                        shipmentSettlement.JobNo = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.JobNo;
+                        var trans = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault();
+                        shipmentSettlement.JobNo = trans?.JobNo;
                         shipmentSettlement.CustomNo = string.Empty; //Hàng Documentation không có CustomNo
                         shipmentSettlement.HBL = tranDetail.Hwbno;
                         shipmentSettlement.MBL = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.Mawb;
@@ -4475,6 +4192,12 @@ namespace eFMS.API.Accounting.DL.Services
                         shipmentSettlement.Pcs = tranDetail.PackageQty;
                         shipmentSettlement.Cbm = tranDetail.Cbm;
 
+                        if (trans != null)
+                        {
+                            var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
+                            _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                            shipmentSettlement.PersonInCharge = _personInCharge;
+                        }
                         listData.Add(shipmentSettlement);
                     }
                 }

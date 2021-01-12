@@ -2,10 +2,12 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SortService } from '@services';
 import { Partner, Company } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { IPartnerDataState, getPartnerDataSearchParamsState } from '../../store';
+import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -25,9 +27,13 @@ export class PartnerListComponent extends AppList implements OnInit {
     offices: any[] = [];
     company: Company[] = [];
 
+    isSearch: boolean = false;
+    dataSearchs: any = [];
+
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
+        private _store: Store<IPartnerDataState>,
         private _systemRepo: SystemRepo) {
         super();
 
@@ -41,6 +47,23 @@ export class PartnerListComponent extends AppList implements OnInit {
         this.getService();
         this.getOffice();
         this.getCompany();
+        this._store.select(getPartnerDataSearchParamsState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (!!data && !!data.keyword) {
+                        this.dataSearchs = data;
+                        console.log(this.dataSearchs);
+                        if (Object.keys(this.dataSearchs).length > 0) {
+                            this.dataSearchs.type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
+                            this.criteria[this.dataSearchs.type] = this.dataSearchs.keyword;
+                        }
+                    }
+
+                }
+            );
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
@@ -68,7 +91,7 @@ export class PartnerListComponent extends AppList implements OnInit {
         } else {
             this.isCustomer = false;
         }
-        console.log(this.dataSearch);
+
         this.getPartners();
     }
 

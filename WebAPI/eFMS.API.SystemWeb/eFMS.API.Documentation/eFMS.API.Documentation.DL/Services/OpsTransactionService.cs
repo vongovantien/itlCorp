@@ -399,7 +399,13 @@ namespace eFMS.API.Documentation.DL.Services
             var model = new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId };
             int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
             if (code == 403) return false;
-            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null));
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null 
+                            || !string.IsNullOrEmpty(x.AdvanceNo)
+                            || !string.IsNullOrEmpty(x.VoucherId)
+                            || !string.IsNullOrEmpty(x.PaySoano)
+                            || !string.IsNullOrEmpty(x.SettlementCode)
+                            || !string.IsNullOrEmpty(x.SyncedFrom))
+                            );
             if (query.Any())
             {
                 return false;
