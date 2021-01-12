@@ -4154,6 +4154,7 @@ namespace eFMS.API.Accounting.DL.Services
                 shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
                 #endregion -- CHANRGE AND ADVANCE OF SETTELEMENT --
 
+                string _personInCharge = string.Empty;
                 var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
                 if (ops != null)
                 {
@@ -4167,6 +4168,10 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
 
+                    var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
+                    _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                    shipmentSettlement.PersonInCharge = _personInCharge;
+
                     listData.Add(shipmentSettlement);
                 }
                 else
@@ -4174,7 +4179,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var tranDetail = csTransactionDetailRepo.Get(x => x.Id == houseBillId.hblId).FirstOrDefault();
                     if (tranDetail != null)
                     {
-                        shipmentSettlement.JobNo = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.JobNo;
+                        var trans = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault();
+                        shipmentSettlement.JobNo = trans?.JobNo;
                         shipmentSettlement.CustomNo = string.Empty; //Hàng Documentation không có CustomNo
                         shipmentSettlement.HBL = tranDetail.Hwbno;
                         shipmentSettlement.MBL = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.Mawb;
@@ -4186,6 +4192,12 @@ namespace eFMS.API.Accounting.DL.Services
                         shipmentSettlement.Pcs = tranDetail.PackageQty;
                         shipmentSettlement.Cbm = tranDetail.Cbm;
 
+                        if (trans != null)
+                        {
+                            var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
+                            _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                            shipmentSettlement.PersonInCharge = _personInCharge;
+                        }
                         listData.Add(shipmentSettlement);
                     }
                 }

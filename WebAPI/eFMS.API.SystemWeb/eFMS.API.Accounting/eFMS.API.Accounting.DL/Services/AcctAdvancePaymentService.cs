@@ -3192,6 +3192,7 @@ namespace eFMS.API.Accounting.DL.Services
                 string _shipper = string.Empty;
                 string _consignee = string.Empty;
                 string _container = string.Empty;
+                string _personInCharge = string.Empty;
                 decimal? _cw = 0;
                 decimal? _pcs = 0;
                 decimal? _cbm = 0;
@@ -3205,6 +3206,8 @@ namespace eFMS.API.Accounting.DL.Services
                         _cw = ops.SumChargeWeight ?? 0;
                         _pcs = ops.SumPackages ?? 0;
                         _cbm = ops.SumCbm ?? 0;
+                        var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
+                        _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
                 }
                 else
@@ -3221,8 +3224,10 @@ namespace eFMS.API.Accounting.DL.Services
                             _container = tranDetail.PackageContainer;
                             _cw = tranDetail.ChargeWeight;
                             _pcs = tranDetail.PackageQty;
-                            _cbm = tranDetail.Cbm;
+                            _cbm = tranDetail.Cbm;                            
                         }
+                        var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
+                        _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
                 }
                 var shipmentAdvance = new InfoShipmentAdvanceExport
@@ -3235,6 +3240,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Shipper = _shipper,
                     Consignee = _consignee,
                     Container = _container,
+                    PersonInCharge = _personInCharge,
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
