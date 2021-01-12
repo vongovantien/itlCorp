@@ -47,6 +47,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatDepartment> departmentRepo;
         private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
         private readonly IContextBase<AcctReceipt> receiptRepository;
+        private readonly IContextBase<CatContract> contractRepository;
+        private readonly IContextBase<CatPartnerEmail> partnerEmailRepository;
         private readonly IUserBaseService userBaseService;
         #endregion --Dependencies--
 
@@ -88,6 +90,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysUserLevel> sysUserLevel,
             IContextBase<AcctReceipt> receiptRepo,
+            IContextBase<CatContract> contractRepo,
+            IContextBase<CatPartnerEmail> partnerEmailRepo,
             IUserBaseService userBase,
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
@@ -120,6 +124,8 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserLevelRepo = sysUserLevel;
             receiptRepository = receiptRepo;
             userBaseService = userBase;
+            contractRepository = contractRepo;
+            partnerEmailRepository = partnerEmailRepo;
             // ---
 
             users = UserRepository.Get();
@@ -392,12 +398,21 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = cdNote.Note;
-                sync.EmailEInvoice = !string.IsNullOrEmpty(cdNotePartner?.BillingEmail) ? cdNotePartner?.BillingEmail.Replace(";", ",") : null; //Tạm lấy BillingEmail của partner
+
+                //Lấy email của partner có type là Billing & office = office Debit Note (nếu ko có thì lấy Billing Email của Partner) [CR: 12/01/2021]
+                var emailPartner = partnerEmailRepository.Get(x => x.PartnerId == cdNote.PartnerId && x.OfficeId == cdNote.OfficeId && x.Type == "Billing").FirstOrDefault()?.Email;
+                var _billingEmailPartner = !string.IsNullOrEmpty(emailPartner) ? emailPartner : cdNotePartner?.BillingEmail;
+                var _emailEInvoice = !string.IsNullOrEmpty(_billingEmailPartner) ? _billingEmailPartner.Replace(";", ",") : null;
+                sync.EmailEInvoice = _emailEInvoice;
+
                 sync.DataType = "CDNOTE";
 
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
+                var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
+
                 foreach (var surcharge in surcharges)
                 {
                     var charge = new ChargeSyncModel();
@@ -405,8 +420,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) ? (surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno.Replace("N/H", string.Empty) : surcharge.Hblno) : string.Empty;
-                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, _hblNo, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
+                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) && !surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno : surcharge.Mblno;
+                    charge.Description = string.Format("{0} {1}", _charge?.ChargeNameVn, _hblNo); //Format: ChargeName + HBL [CR: 12-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -457,6 +472,9 @@ namespace eFMS.API.Accounting.DL.Services
                         var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
+
+                    charge.DueDate = _dueDate;
+
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -583,12 +601,21 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = soa.Currency;
                 sync.ExchangeRate0 = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = soa.Note;
-                sync.EmailEInvoice = !string.IsNullOrEmpty(soaPartner?.BillingEmail) ? soaPartner?.BillingEmail.Replace(";", ",") : null; //Tạm lấy BillingEmail của partner
+
+                //Lấy email của partner có type là Billing & office = office SOA (nếu ko có thì lấy Billing Email của Partner) [CR: 12/01/2021]
+                var emailPartner = partnerEmailRepository.Get(x => x.PartnerId == soa.Customer && x.OfficeId == soa.OfficeId && x.Type == "Billing").FirstOrDefault()?.Email;
+                var _billingEmailPartner = !string.IsNullOrEmpty(emailPartner) ? emailPartner : soaPartner?.BillingEmail;
+                var _emailEInvoice = !string.IsNullOrEmpty(_billingEmailPartner) ? _billingEmailPartner.Replace(";", ",") : null;
+                sync.EmailEInvoice = _emailEInvoice;
+
                 sync.DataType = "SOA";
 
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                var servicesOfSoaDebit = surcharges.Select(s => s.TransactionType).Distinct().ToList();
+                var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
+
                 foreach (var surcharge in surcharges)
                 {
                     var charge = new ChargeSyncModel();
@@ -596,8 +623,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) ? (surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno.Replace("N/H", string.Empty) : surcharge.Hblno) : string.Empty;
-                    charge.Description = string.Format("{0} {1} {2}", _charge?.ChargeNameVn, _hblNo, surcharge.Mblno); //Format: ChargeName + HBL + MBL [CR: 05-01-2020]
+                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) && !surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno : surcharge.Mblno;
+                    charge.Description = string.Format("{0} {1}", _charge?.ChargeNameVn, _hblNo); //Format: ChargeName + HBL [CR: 12-01-2020]
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -648,6 +675,9 @@ namespace eFMS.API.Accounting.DL.Services
                         var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
                         charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
+
+                    charge.DueDate = _dueDate;
+
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -1153,6 +1183,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return exchangeRate;
         }
+
         private string GetDeptCode(string JobNo)
         {
             string deptCode = "ITLCS";
@@ -1175,6 +1206,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return deptCode;
         }
+
         private decimal GetOrgVatAmount(decimal? vatrate, decimal? orgAmount, string currency)
         {
             decimal amount = 0;
@@ -1185,6 +1217,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return amount;
         }
+
         private string GetCustomerHBL(Guid? Id)
         {
             string customerName = "";
@@ -1196,6 +1229,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return customerName;
         }
+
         private string GetLinkCdNote(string cdNoteNo, Guid jobId)
         {
             string _link = string.Empty;
@@ -1246,6 +1280,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return _link;
         }
+
         private decimal GetOriginalUnitPriceWithAccountNo(decimal unitPrice, string accountNo, decimal finalExchange = 1)
         {
             decimal _unitPrice = 0;
@@ -1260,6 +1295,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _unitPrice;
         }
+
         private decimal GetOriginAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _originAmount = 0;
@@ -1279,6 +1315,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _originAmount;
         }
+
         private decimal GetOrgVatAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _orgVatAmout = 0;
@@ -1294,6 +1331,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _orgVatAmout;
         }
+
         private string GetServiceNameOfCdNote(string cdNoteNo)
         {
             string _serviceName = string.Empty;
@@ -1343,6 +1381,49 @@ namespace eFMS.API.Accounting.DL.Services
             return _serviceName;
         }
 
+        /// <summary>
+        /// Get due date by partner & service
+        /// </summary>
+        /// <param name="partner"></param>
+        /// <param name="service"></param>
+        /// <returns></returns>
+        private decimal? GetDueDate(CatPartner partner, List<string> services)
+        {
+            decimal? dueDate = 1;
+            if (partner != null)
+            {
+                var _partnerId = (partner.Id == partner.ParentId || string.IsNullOrEmpty(partner.ParentId)) ? partner.Id : partner.ParentId;
+                var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && services.Where(w => x.SaleService.Contains(w)).Any());
+                if (contracts != null)
+                {
+                    // Ưu tiên Official >> Trial >> Cash (Default là 1)
+                    var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();                    
+                    if (contractsOffice != null)
+                    {
+                        dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                        return dueDate;
+                    }
+                    else
+                    {
+                        var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
+                        if (contractsTrial != null)
+                        {
+                            dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                            return dueDate;
+                        }
+                        //else
+                        //{
+                        //    var contractCash = contracts.Where(x => x.ContractType == "Cash").FirstOrDefault();
+                        //    if (contractCash != null)
+                        //    {
+                        //        return dueDate;
+                        //    }
+                        //}
+                    }
+                }
+            }
+            return dueDate;
+        }
         #endregion -- Private Method --
 
         #region --- Send Mail & Push Notification to Accountant ---

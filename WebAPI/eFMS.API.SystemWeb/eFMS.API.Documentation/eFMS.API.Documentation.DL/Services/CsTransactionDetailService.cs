@@ -830,7 +830,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Owner:
                     houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 );
@@ -838,7 +838,7 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
                     houseBills = houseBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 || dataUserLevel.Contains(x.SaleManId)
@@ -847,7 +847,7 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
                     houseBills = houseBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 || dataUserLevelDepartment.Contains(x.SaleManId)
@@ -862,7 +862,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Company:
                     houseBills = houseBills.Where(x => x.CompanyId == currentUser.CompanyID
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID);
                     break;
