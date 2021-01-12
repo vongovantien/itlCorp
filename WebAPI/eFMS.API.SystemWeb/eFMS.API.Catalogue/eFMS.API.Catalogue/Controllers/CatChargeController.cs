@@ -351,10 +351,10 @@ namespace eFMS.API.Catalogue.Controllers
                     {
                         active = false;
                     }
-                    decimal unitPrice = -1;
+                    decimal unitPrice = 0;
                     var price = worksheet.Cells[row, 5].Value;
                     if(price != null) { unitPrice = Convert.ToDecimal(price); }
-                    decimal vatRate = -1;
+                    decimal vatRate = 0;
                     var vat = worksheet.Cells[row, 7].Value;
                     if(vat != null) { vatRate = Convert.ToDecimal(vat); }
 
