@@ -107,7 +107,7 @@ export class AddPartnerDataComponent extends AppList {
     ngAfterViewInit() {
         this.contractList.isActiveNewContract = false;
         this.formPartnerComponent.isUpdate = false;
-        this.formPartnerComponent.creditPayment.setValue('Direct');
+        this.formPartnerComponent.creditPayment.setValue('Credit');
         this._cd.detectChanges();
     }
 
