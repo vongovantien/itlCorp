@@ -82,9 +82,9 @@ export class FormAddChargeComponent extends AppForm {
             code: [null, Validators.required],
             nameEn: [null, Validators.required],
             nameVn: [null, Validators.required],
-            unit: [],
+            unit: [null],
             unitPrice: [],
-            currency: [],
+            currency: [null],
             vat: [],
             type: [null, Validators.required],
             service: [null, Validators.required],
@@ -126,8 +126,6 @@ export class FormAddChargeComponent extends AppForm {
         let valid: boolean = true;
         this.setError(this.service);
         this.setError(this.chargeGroup);
-        this.setError(this.formGroup.controls['unitPrice']);
-        this.setError(this.formGroup.controls['vat']);
         this.setError(this.formGroup.controls['productDept']);
         if (!this.formGroup.valid) {
             valid = false;

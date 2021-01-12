@@ -47,9 +47,9 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.chargeNameEn = this.formAddCharge.nameEn.value;
         this.ChargeToAdd.charge.chargeNameVn = this.formAddCharge.nameVn.value;
         this.ChargeToAdd.charge.unitId = !!this.formAddCharge.unit.value ? this.formAddCharge.unit.value.id : 0;
-        this.ChargeToAdd.charge.unitPrice = +this.formAddCharge.unitPrice.value
+        this.ChargeToAdd.charge.unitPrice = +this.formAddCharge.unitPrice.value;
         this.ChargeToAdd.charge.currencyId = !!this.formAddCharge.currency.value ? this.formAddCharge.currency.value.id : null;
-        this.ChargeToAdd.charge.vatrate = +this.formAddCharge.vat.value
+        this.ChargeToAdd.charge.vatrate = +this.formAddCharge.vat.value;
         this.ChargeToAdd.charge.debitCharge = this.formAddCharge.debitCharge.value;
         this.ChargeToAdd.charge.chargeGroup = this.formAddCharge.chargeGroup.value.id;
         this.ChargeToAdd.charge.active = this.formAddCharge.active.value;
