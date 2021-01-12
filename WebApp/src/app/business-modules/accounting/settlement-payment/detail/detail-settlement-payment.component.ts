@@ -167,9 +167,9 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
                     this.requestSurchargeListComponent.isShowButtonCopyCharge = false;
 
-                    if (this.requestSurchargeListComponent.groupShipments.length) {
-                        this.requestSurchargeListComponent.openAllCharge.next(true);
-                    }
+                    // if (this.requestSurchargeListComponent.groupShipments.length) {
+                    //     this.requestSurchargeListComponent.openAllCharge.next(true);
+                    // }
                 },
             );
     }

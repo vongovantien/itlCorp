@@ -1002,8 +1002,8 @@ export class DocumentationRepo {
         );
     }
 
-    getASTransactionInfo(hblNo: string, serviceName: string, serviceMode: string) {
+    getASTransactionInfo(mblNo: string, hblNo: string, serviceName: string, serviceMode: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/GetLinkASInfomation/`,
-            { hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
+            { mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
     }
 }

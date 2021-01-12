@@ -1203,7 +1203,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.HWBNO = data.HbLadingNo?.ToUpper(); //HBLNOs
 
                     //Thông tin list charge
-                    charge.Subject = "LOCAL CHARGES";
+                    charge.Subject = (item.Type == DocumentConstants.CHARGE_OBH_TYPE) ? "ON BEHALF" : "CHARGES";
                     charge.Description = item.NameEn;//Charge name
                     charge.Notes = string.IsNullOrEmpty(item.Notes) ? "" : "(" + item.Notes + ")";
                     charge.Quantity = item.Quantity + _decimalNumber; //Cộng thêm phần thập phân
@@ -1435,7 +1435,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.WChargeable = data.HbChargeWeight; //Total Charge Weight of HBL
 
                     //Thông tin list charges
-                    charge.Subject = "FREIGHT CHARGES";
+                    charge.Subject = (item.Type == DocumentConstants.CHARGE_OBH_TYPE) ? "OB BEHALF" : "FREIGHT CHARGES";
                     charge.Description = item.NameEn;//Charge name
                     charge.Quantity = item.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                     charge.Unit = item.Unit;
