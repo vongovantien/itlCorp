@@ -144,7 +144,7 @@ export class AddChargeComponent extends AppPage {
                     (res: any) => {
                         if (!!res) {
                             this._toastService.success('Create Selling Charge Success!!', '');
-                            this.formAddCharge.debitCharge.setValue(res[0].id);
+                            this.formAddCharge.debitCharge.setValue(data[res]);
                             this.popupGenerateSelling.hide();
                         } else {
                             this._toastService.error(res.message, '');
