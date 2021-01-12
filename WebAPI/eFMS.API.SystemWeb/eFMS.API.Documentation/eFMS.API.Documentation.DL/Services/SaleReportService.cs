@@ -154,15 +154,21 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (x.Pod == criteria.Pod || criteria.Pod == null)
                                                                  && (x.Pol == criteria.Pol || criteria.Pol == null)
                                                                  && (x.SupplierId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesOfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
-                                                                                : (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
-                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesDepartmentId) || string.IsNullOrEmpty(criteria.DepartmentId))
-                                                                                : (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
-                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesGroupId) || string.IsNullOrEmpty(criteria.GroupId))
-                                                                                : (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
                                                                  && (criteria.PersonInCharge.Contains(x.BillingOpsId) || string.IsNullOrEmpty(criteria.PersonInCharge))
-                                                                 && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator)
-                                                                 && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan)));
+                                                                 && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator))
+                                                                 && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan));
+            if (hasSalesman)
+            {
+                queryOpsTrans = queryOpsTrans.And(x => (!string.IsNullOrEmpty(x.SalesOfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                && (!string.IsNullOrEmpty(x.SalesDepartmentId) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                && (!string.IsNullOrEmpty(x.SalesGroupId) || string.IsNullOrEmpty(criteria.GroupId)));
+            }
+            else
+            {
+                queryOpsTrans = queryOpsTrans.And(x => (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                && (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                && (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId)));
+            }
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
                 queryOpsTrans = queryOpsTrans.And(x => x.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && x.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date);
@@ -359,11 +365,14 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (x.Pod == criteria.Pod || criteria.Pod == null)
                                                                  && (x.Pol == criteria.Pol || criteria.Pol == null)
                                                                  && (x.ColoaderId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 && !hasSalesman ? (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId)) : true
-                                                                 && !hasSalesman ? (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId)) : true
-                                                                 && !hasSalesman ? (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId)) : true
                                                                  && (criteria.PersonInCharge.Contains(x.PersonIncharge) || string.IsNullOrEmpty(criteria.PersonInCharge))
                                                                  && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator));
+            if (!hasSalesman)
+            {
+                queryTrans = queryTrans.And(x => criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId)
+                                            && criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId)
+                                            && criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId));
+            }
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
                 queryTrans = queryTrans.And(x => x.TransactionType.Contains("E") ?

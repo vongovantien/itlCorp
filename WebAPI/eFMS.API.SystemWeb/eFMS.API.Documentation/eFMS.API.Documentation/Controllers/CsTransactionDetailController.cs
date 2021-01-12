@@ -235,14 +235,14 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     if (model.Id == Guid.Empty)
                     {
-                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID))
                         {
                             message = "Housebill of Lading No is existed !";
                         }
                     }
                     else
                     {
-                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
                             message = "Housebill of Lading No is existed !";
                         }
@@ -253,14 +253,14 @@ namespace eFMS.API.Documentation.Controllers
                     if(model.Id == Guid.Empty)
                     {
 
-                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId ))
+                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID))
                         {
                             message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                         }
                     }
                     else
                     {
-                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.Id != model.Id ))
+                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id ))
                         {
                             message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                         }
@@ -295,14 +295,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
-
-        [HttpPost]
-        [Route("PreviewSeaHBofLading")]
-        public IActionResult PreviewSeaHBofLading(CsTransactionDetailModel model)
-        {
-            var result = csTransactionDetailService.Preview(model);
-            return Ok(result);
-        }
+        
         [HttpGet]
         [Route("GetGoodSummaryOfAllHblByJobId")]
         public IActionResult GetGoodSummaryOfAllHBLByJobId(Guid jobId)

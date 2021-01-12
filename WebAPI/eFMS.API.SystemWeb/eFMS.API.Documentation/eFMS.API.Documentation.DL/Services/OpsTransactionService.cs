@@ -399,7 +399,13 @@ namespace eFMS.API.Documentation.DL.Services
             var model = new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId };
             int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
             if (code == 403) return false;
-            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null));
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null 
+                            || !string.IsNullOrEmpty(x.AdvanceNo)
+                            || !string.IsNullOrEmpty(x.VoucherId)
+                            || !string.IsNullOrEmpty(x.PaySoano)
+                            || !string.IsNullOrEmpty(x.SettlementCode)
+                            || !string.IsNullOrEmpty(x.SyncedFrom))
+                            );
             if (query.Any())
             {
                 return false;
@@ -510,6 +516,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
                                 && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
+                                && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= criteria.CreatedDateFrom || criteria.CreatedDateFrom == null)
+                                && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= criteria.CreatedDateTo || criteria.CreatedDateTo == null)
                             ).OrderByDescending(x => x.DatetimeModified);
             }
             else
@@ -522,7 +530,8 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.CustomerId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.FieldOpsId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
-                               && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
+                                   || ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
+                                   || ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.CreatedDateFrom ?? null) && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.CreatedDateTo ?? null))
                                ).OrderByDescending(x => x.DatetimeModified);
             }
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
@@ -1378,6 +1387,10 @@ namespace eFMS.API.Documentation.DL.Services
                     item.InvoiceDate = null;
                     item.VoucherId = null;
                     item.VoucherIddate = null;
+
+                    item.SyncedFrom = null;
+                    item.PaySyncedFrom = null;
+                    item.ReferenceNo = null;
 
                     surCharges.Add(item);
                 }

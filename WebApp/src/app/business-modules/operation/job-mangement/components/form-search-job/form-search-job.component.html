@@ -82,6 +82,28 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
+                                <div class="form-group form-control-serviceDateFromTo daterange-rtl">
+                                    <label class="form-control-label" for="">
+                                        Service Date: From - To
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                        [ranges]="ranges" [alwaysShowCalendars]="true" formControlName="serviceDate"
+                                        name="daterange" placeholder="From date - to date" readonly />
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group form-control-createdDateFromTo daterange-rtl">
+                                    <label class="form-control-label" for="">
+                                        Create Date: From - To
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                        [ranges]="ranges" [alwaysShowCalendars]="true" formControlName="createdDate"
+                                        name="daterange" placeholder="From date - to date" readonly />
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label">
                                         Field OPS
@@ -92,17 +114,6 @@
                                         [displayFields]="[{field: 'username', label: 'User Name'}]"
                                         (remove)="resetFormControl(fieldOps)" placeholder="Select OPS" size="15">
                                     </app-combo-grid-virtual-scroll>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group form-control-serviceDateFromTo daterange-rtl">
-                                    <label class="form-control-label" for="">
-                                        Service Date From - To
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                        [ranges]="ranges" [alwaysShowCalendars]="true" formControlName="serviceDate"
-                                        name="daterange" placeholder="From date - to date" readonly />
                                 </div>
                             </div>
                         </div>

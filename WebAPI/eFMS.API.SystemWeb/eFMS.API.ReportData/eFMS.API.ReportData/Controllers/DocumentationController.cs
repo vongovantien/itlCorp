@@ -507,7 +507,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            string fileName = "Export OPS Debit Note.xlsx";
+            string fileName = "Export OPS CD Note.xlsx";
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
             return fileContent;
         }

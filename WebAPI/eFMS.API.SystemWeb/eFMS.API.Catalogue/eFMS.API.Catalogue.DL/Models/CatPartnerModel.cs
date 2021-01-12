@@ -7,6 +7,7 @@ namespace eFMS.API.Catalogue.DL.Models
     public class CatPartnerModel: CatPartner
     {
         public List<CatContractModel> Contracts { get; set; }
+        public List<CatPartnerEmailModel> PartnerEmails { get; set; }
         public string CountryName { get; set; }
         public string CountryShippingName { get; set; }
         public string ProvinceName { get; set; }

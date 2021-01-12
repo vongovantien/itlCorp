@@ -213,8 +213,8 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: Crystal) => {
-                    this.dataReport = JSON.stringify(res);
-                    if (res != null && res.dataSource.length > 0) {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
                         setTimeout(() => {
                             this.reportPopup.frm.nativeElement.submit();
                             this.reportPopup.show();

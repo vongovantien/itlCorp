@@ -238,6 +238,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':
+                this.supplierName = data.shortName;
                 this.coloader.setValue(data.id);
                 break;
             case 'pol':
@@ -247,6 +248,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                 this.pod.setValue(data.id);
                 break;
             case 'agent':
+                this.agentName = data.shortName;
                 this.agent.setValue(data.id);
                 break;
             default:

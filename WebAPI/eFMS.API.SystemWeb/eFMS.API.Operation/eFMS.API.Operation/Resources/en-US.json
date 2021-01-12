@@ -33,9 +33,10 @@
   "MSG_INVALID_MAX_LENGTH": "Should be at most {0} symbols",
   "MSG_INVALID_NEGATIVE": "Not allow negative numbers",
   "MSG_CUSTOM_INVALID_CHARACTER_SPECIAL": "Not allowed to enter special characters. Except for characters ./_- and space",
-  "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS": " have been convert from ecus system",
+  "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS": "{0} rows have been convert from ecus system",
   "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA": "There is no data converted from ecus system",
   //------------end: Custom Clearance,
-  "MSG_STAGE_ASSIGNED_EXISTED": "This stage had been added. Please choose another"
+  "MSG_STAGE_ASSIGNED_EXISTED": "This stage had been added. Please choose another",
+  "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted"
 
 }

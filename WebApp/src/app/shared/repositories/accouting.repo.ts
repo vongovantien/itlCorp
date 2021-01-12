@@ -325,8 +325,8 @@ export class AccountingRepo {
         );
     }
 
-    getAdvanceOfShipment(jobNo: string): Observable<any> {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancesOfShipment`, { jobId: jobNo }).pipe(
+    getAdvanceOfShipment(jobNo: string, settleCode: string = null): Observable<any> {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancesOfShipment`, { jobId: jobNo, settleCode: settleCode }).pipe(
             map((data: any) => data)
         );
     }

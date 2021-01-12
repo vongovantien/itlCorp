@@ -15,6 +15,7 @@ import { ConfirmPopupComponent } from '@common';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommonEnum } from '@enums';
+import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -69,8 +70,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     this.partnerList.parentId = this.partnerId;
 
                     this.getDetailCustomer(this.partnerId);
+                    this.partnerEmailList.getEmailPartner(this.partnerId);
                     if (!this.isAddSubPartner) {
                         this.contractList.partnerId = this.partnerId;
+                        this.partnerEmailList.partnerId = this.partnerId;
                         this.contractList.getListContract(this.partnerId);
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
@@ -119,6 +122,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     setDataForm(partner: Partner) {
+        this.formCreate.provinceShippingIdName = partner.provinceShippingName;
+        this.formCreate.countryShippingIdName = partner.countryShippingName;
+        this.formCreate.provinceIdName = partner.provinceName;
+        this.formCreate.countryIdName = partner.countryName;
         this.formCreate.formGroup.patchValue({
             accountNo: this.isAddSubPartner ? null : partner.accountNo,
             partnerNameEn: partner.partnerNameEn,

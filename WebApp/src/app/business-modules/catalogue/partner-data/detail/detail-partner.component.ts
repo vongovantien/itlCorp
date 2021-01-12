@@ -25,6 +25,7 @@ import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { RoutingConstants } from '@constants';
 import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { CommercialEmailListComponent } from 'src/app/business-modules/commercial/components/email/commercial-email-list.component';
 
 
 @Component({
@@ -46,6 +47,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(CommercialContractListComponent) listContract: CommercialContractListComponent;
     @ViewChild(CommercialBranchSubListComponent) listSubPartner: CommercialBranchSubListComponent;
+    @ViewChild(CommercialEmailListComponent) partnerEmailList: CommercialEmailListComponent;
 
     public originRoute: string = null;
     contracts: Contract[] = [];
@@ -143,7 +145,8 @@ export class PartnerDetailComponent extends AppList {
 
     ngAfterViewInit() {
         this.formPartnerComponent.isUpdate = !this.isAddSubPartner;
-
+        this.partnerEmailList.getEmailPartner(this.partner.id);
+        this.partnerEmailList.partnerId = this.partner.id;
         this._cd.detectChanges();
     }
 
@@ -496,6 +499,7 @@ export class PartnerDetailComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this.formPartnerComponent.activePartner = this.partner.active;
+                            this.getParentCustomers();
                             this._toastService.success(res.message);
                         } else {
                             this._toastService.warning(res.message);
