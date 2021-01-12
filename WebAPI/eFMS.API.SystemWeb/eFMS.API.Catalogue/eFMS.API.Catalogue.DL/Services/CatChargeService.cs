@@ -337,24 +337,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.ChargeNameVnError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
-                //if (string.IsNullOrEmpty(item.UnitCode))
-                //{
-                //    item.UnitError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_UNIT_EMPTY];
-                //    item.IsValid = false;
-                //}
-                //else
-                //{
-                //    var unit = units.FirstOrDefault(x => x.Code.ToLower() == item.UnitCode.ToLower());
-                //    if (unit == null)
-                //    {
-                //        item.UnitError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_UNIT_NOT_FOUND];
-                //        item.IsValid = false;
-                //    }
-                //    else
-                //    {
-                //        item.UnitId = unit.Id;
-                //    }
-                //}
                 if (item.UnitPrice < 0)
                 {
                     item.IsValid = false;
@@ -365,20 +347,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.IsValid = false;
                     item.VatrateError = "VAT is must be lower than 100";
                 }
-                //if (!string.IsNullOrEmpty(item.CurrencyId))
-                //{
-                //    var currency = currencies.FirstOrDefault(x => x.Id == item.CurrencyId);
-                //    if (currency == null)
-                //    {
-                //        item.CurrencyError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_CURRENCY_NOT_FOUND];
-                //        item.IsValid = false;
-                //    }
-                //}
-                //else
-                //{
-                //    item.CurrencyError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_CURRENCY_EMPTY];
-                //    item.IsValid = false;
-                //}
+                
                 if (string.IsNullOrEmpty(item.Type))
                 {
                     item.TypeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_TYPE_EMPTY];

@@ -134,7 +134,8 @@
                                     <span>{{ item.unitCode }}</span>
                                 </td>
                                 <td class="">
-                                    <span>{{ item.unitPrice }}</span>
+                                    <span *ngIf="item.unitPriceError === null">{{ item.unitPrice }}</span>
+                                    <span class="m--font-danger" *ngIf="item.unitPriceError !== null">{{ item.unitPriceError}}</span>
                                 </td>
                                 <td class="">
                                     <span>{{ item.currencyId }}</span>
