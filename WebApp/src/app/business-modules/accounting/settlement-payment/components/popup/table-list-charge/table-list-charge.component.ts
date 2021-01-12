@@ -187,7 +187,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 })
             ).subscribe(
                 (res: any[] = []) => {
-                    this.advs = cloneDeep(res);
+                    this.advs = res;
 
                     // ? Have rewrite default value
                     if (!this.advanceNo.value && isUpdateFControl) {
