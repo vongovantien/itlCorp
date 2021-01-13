@@ -49,6 +49,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctReceipt> receiptRepository;
         private readonly IContextBase<CatContract> contractRepository;
         private readonly IContextBase<CatPartnerEmail> partnerEmailRepository;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IUserBaseService userBaseService;
         #endregion --Dependencies--
 
@@ -92,6 +93,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctReceipt> receiptRepo,
             IContextBase<CatContract> contractRepo,
             IContextBase<CatPartnerEmail> partnerEmailRepo,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IUserBaseService userBase,
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
@@ -126,6 +128,7 @@ namespace eFMS.API.Accounting.DL.Services
             userBaseService = userBase;
             contractRepository = contractRepo;
             partnerEmailRepository = partnerEmailRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
             // ---
 
             users = UserRepository.Get();
@@ -420,8 +423,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) && !surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno : surcharge.Mblno;
-                    charge.Description = string.Format("{0} {1}", _charge?.ChargeNameVn, _hblNo); //Format: ChargeName + HBL [CR: 12-01-2020]
+                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.JobNo, surcharge.Mblno, surcharge.Hblno);
+                    charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -623,8 +626,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    var _hblNo = !string.IsNullOrEmpty(surcharge.Hblno) && !surcharge.Hblno.Trim().Equals("N/H") ? surcharge.Hblno : surcharge.Mblno;
-                    charge.Description = string.Format("{0} {1}", _charge?.ChargeNameVn, _hblNo); //Format: ChargeName + HBL [CR: 12-01-2020]
+                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.JobNo, surcharge.Mblno, surcharge.Hblno);
+                    charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -1074,27 +1077,36 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.DatetimeModified = DateTime.Now;
                         cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         cdNote.LastSyncDate = DateTime.Now;
-                        var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
-
-                        //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
+                        
                         var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
-                        foreach (var surcharge in surcharges)
+                        //Tồn tại CDNote có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        if (cdNote.Type == "CREDIT" && (cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
                         {
-                            if (surcharge.Type == "OBH")
-                            {
-                                surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
-                                surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
-                            }
-                            else
-                            {
-                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
-                                surcharge.SyncedFrom = "CDNOTE";
-                            }
-                            surcharge.UserModified = currentUser.UserID;
-                            surcharge.DatetimeModified = DateTime.Now;
-                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            cdNote.Note += " Request Voucher";
                         }
+                        else
+                        {
+                            //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == "OBH")
+                                {
+                                    surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
+                                    surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
+                                }
+                                else
+                                {
+                                    //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                    surcharge.SyncedFrom = "CDNOTE";
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                        }
+                        var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
                     }
+                    
                     var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
                     trans.Commit();
@@ -1126,26 +1138,34 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.DatetimeModified = DateTime.Now;
                         soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         soa.LastSyncDate = DateTime.Now;
-                        var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
-
-                        //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
+                        
                         var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                        foreach (var surcharge in surcharges)
+                        //Tồn tại SOA có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        if (soa.Type == "Credit" && (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
                         {
-                            if (surcharge.Type == "OBH")
-                            {
-                                surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
-                                surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;
-                            }
-                            else
-                            {
-                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
-                                surcharge.SyncedFrom = "SOA";
-                            }
-                            surcharge.UserModified = currentUser.UserID;
-                            surcharge.DatetimeModified = DateTime.Now;
-                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            soa.Note += " Request Voucher";
                         }
+                        else
+                        {
+                            //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == "OBH")
+                                {
+                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
+                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;
+                                }
+                                else
+                                {
+                                    //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                    surcharge.SyncedFrom = "SOA";
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                        }
+                        var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
                     }
                     var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = soaRepository.SubmitChanges();
@@ -1190,17 +1210,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (JobNo.Contains("LOG"))
             {
-                //_deptCode = "OPS";
                 deptCode = "ITLOPS";
             }
             else if (JobNo.Contains("A"))
             {
-                //_deptCode = "AIR";
                 deptCode = "ITLAIR";
             }
             else if (JobNo.Contains("S"))
             {
-                //_deptCode = "SEA";
                 deptCode = "ITLCS";
             }
 
@@ -1424,6 +1441,24 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return dueDate;
         }
+
+        private string GetDescriptionForSyncAcct(string chargeName, string transactionType, string jobNo, string mblNo, string hblNo)
+        {
+            var _description = string.Empty;
+            if (transactionType == "CL")
+            {
+                var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
+                var _customNo = customNos.FirstOrDefault() ?? string.Empty;
+                _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
+            }
+            else
+            {
+                var _hblNo = !string.IsNullOrEmpty(hblNo) && !hblNo.Trim().Equals("N/H") ? hblNo : mblNo;
+                _description = string.Format("{0} {1}", chargeName, _hblNo); //Format: ChargeName + HBL [CR: 12-01-2020]
+            }
+            return _description;
+        }
+
         #endregion -- Private Method --
 
         #region --- Send Mail & Push Notification to Accountant ---
