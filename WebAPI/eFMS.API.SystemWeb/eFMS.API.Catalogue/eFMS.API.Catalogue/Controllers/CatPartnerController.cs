@@ -595,5 +595,24 @@ namespace eFMS.API.Catalogue.Controllers
             var results = catPartnerService.GetSubListPartnerByID(id.Trim());
             return Ok(results);
         }
+
+        /// <summary>
+        /// Update info for partner
+        /// </summary>
+        /// <param name="criteria">CatPartnerCriteria</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UpdateInfoForPartner")]
+        public IActionResult UpdateInfoForPartner(CatPartnerCriteria criteria)
+        {
+            var hs = catPartnerService.UpdatePartnerData(criteria);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
