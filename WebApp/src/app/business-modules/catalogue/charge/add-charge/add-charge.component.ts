@@ -26,6 +26,8 @@ export class AddChargeComponent extends AppPage {
     @ViewChild(VoucherListComponent) voucherList: VoucherListComponent;
     @ViewChild(GenerateSellingChargePopupComponent) popupGenerateSelling: GenerateSellingChargePopupComponent;
 
+    resultStateAddNew;
+
     constructor(
         protected router: Router,
         protected _catalogueRepo: CatalogueRepo,
@@ -134,6 +136,7 @@ export class AddChargeComponent extends AppPage {
                     finalize(() => this._progressRef.complete()),
                     concatMap((res: CommonInterface.IResult) => {
                         if (res.status) {
+                            this.resultStateAddNew = res;
                             this.formAddCharge.debitCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
                             return this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
                         }
@@ -141,13 +144,13 @@ export class AddChargeComponent extends AppPage {
                     })
                 )
                 .subscribe(
-                    (res: any) => {
-                        if (!!res) {
+                    (listCharge: any) => {
+                        if (!!listCharge) {
                             this._toastService.success('Create Selling Charge Success!!', '');
-                            this.formAddCharge.debitCharge.setValue(res[0].id);
+                            this.formAddCharge.debitCharge.setValue(this.resultStateAddNew.data);
                             this.popupGenerateSelling.hide();
                         } else {
-                            this._toastService.error(res.message, '');
+                            this._toastService.error(listCharge.message, '');
                         }
                     }
                 );

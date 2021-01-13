@@ -35,9 +35,9 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     users: User[] = [];
     userLogged: User;
     customers: Observable<Customer[]>;
-    
+
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
-    
+
     constructor(
         private _fb: FormBuilder,
         private _dataService: DataService,
@@ -119,12 +119,12 @@ export class CustomClearanceFormSearchComponent extends AppForm {
 
     searchCustomClearance() {
         const body: ISearchCustomClearance = {
-            clearanceNo: !!this.clearanceNo.value ? this.clearanceNo.value.split('\n').map(item=>item.trim()).join(';') : null,
+            clearanceNo: !!this.clearanceNo.value ? this.clearanceNo.value.split('\n').map(item => item.trim()).join(';') : null,
             fromClearanceDate: !!this.clearanceDate.value ? formatDate(this.clearanceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toClearanceDate: !!this.clearanceDate.value ? formatDate(this.clearanceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             imPorted: !!this.importStatus.value ? this.importStatus.value.value : null,
-            fromImportDate: !!this.importDate.value ? formatDate(this.importDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            toImportDate: !!this.importDate.value ? formatDate(this.importDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            fromImportDate: !!this.importDate.value?.startDate ? formatDate(this.importDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            toImportDate: !!this.importDate.value?.startDate ? formatDate(this.importDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             type: !!this.type.value ? this.type.value.value : null,
             personHandle: this.personalHandle.value.id,
             customerNo: this.customer.value,
@@ -144,6 +144,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
         // this.importStatus.setValue(this.status[1]);
         this.importStatus.setValue(null);
         this.resetFormControl(this.customer);
+
         this.searchCustomClearance();
     }
 

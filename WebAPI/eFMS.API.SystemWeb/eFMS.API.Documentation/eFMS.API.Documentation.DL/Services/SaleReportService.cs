@@ -159,15 +159,15 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan));
             if (hasSalesman)
             {
-                queryOpsTrans = queryOpsTrans.And(x => !string.IsNullOrEmpty(x.SalesOfficeId) || string.IsNullOrEmpty(criteria.OfficeId)
-                                                && !string.IsNullOrEmpty(x.SalesDepartmentId) || string.IsNullOrEmpty(criteria.DepartmentId)
-                                                && !string.IsNullOrEmpty(x.SalesGroupId) || string.IsNullOrEmpty(criteria.GroupId));
+                queryOpsTrans = queryOpsTrans.And(x => (!string.IsNullOrEmpty(x.SalesOfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                && (!string.IsNullOrEmpty(x.SalesDepartmentId) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                && (!string.IsNullOrEmpty(x.SalesGroupId) || string.IsNullOrEmpty(criteria.GroupId)));
             }
             else
             {
-                queryOpsTrans = queryOpsTrans.And(x => criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId)
-                                                && criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId)
-                                                && criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId));
+                queryOpsTrans = queryOpsTrans.And(x => (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                && (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                && (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId)));
             }
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
