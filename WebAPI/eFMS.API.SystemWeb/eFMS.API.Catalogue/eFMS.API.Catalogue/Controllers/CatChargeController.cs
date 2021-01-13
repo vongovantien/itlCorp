@@ -193,7 +193,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var hs = catChargeService.AddCharge(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value , Data = model.Charge.Id};
             if (!hs.Success)
             {
                 return BadRequest(result);
