@@ -125,7 +125,8 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
         if (Object.keys(this.dataSearchs).length > 0) {
-            this.dataSearch[this.dataSearchs.type] = this.dataSearchs.keyword;
+            const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
+            this.dataSearch[type] = this.dataSearchs.keyword;
         }
 
         this.requestList();
@@ -134,8 +135,9 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
+            const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
-            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type).title;
+            this.searchOptionsComponent.searchObject.displayName = this.dataSearchs.type !== "All" ? this.headerSearch.find(x => x.field === type).title : this.dataSearchs.type;
         }
         this._cd.detectChanges();
     }
