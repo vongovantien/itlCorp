@@ -605,7 +605,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Người chứng từ\n(Ký, ghi rõ họ tên)", //31
                 "Trưởng bộ phận\n(Ký, ghi rõ họ tên)", //32
                 "Kế toán\n(Ký, ghi rõ họ tên)", //33
-                "Giám đốc\n(Ký, ghi rõ họ tên)" //34
+                "Giám đốc\n(Ký, ghi rõ họ tên)", //34
+                "Chứng từ:" //35
             };
 
             List<string> engHeaders = new List<string>()
@@ -644,7 +645,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Documentation Staff\n(Name, Signature)", //31
                 "Head of Department\n(Name, Signature)", //32
                 "Chief Accountant\n(Name, Signature)", //33
-                "Director\n(Name, Signature)" //34
+                "Director\n(Name, Signature)", //34
+                "Doc CS:" //35
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -788,6 +790,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j, 3].Style.WrapText = true;
                 j = j + 1;
 
+                workSheet.Cells[j, 2].Value = headers[35]; //Chứng từ
+                workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].PersonInCharge;
+                workSheet.Cells[j, 3].Style.WrapText = true;
+                j = j + 1;
                 /////
                 workSheet.Cells[p, 1, j - 1, 1].Merge = true;
                 workSheet.Cells[p, 1, j - 1, 1].Value = i + 1; //Value STT
@@ -859,14 +865,14 @@ namespace eFMS.API.ReportData.FormatExcel
             
             //Clear border Shipment
             int r = 10;
-            int c = 16;
+            int c = 17;
             for (var i = 0; i < advanceExport.ShipmentsAdvance.Count; i++)
             {
                 workSheet.Cells["B" + r + ":C" + c].Style.Border.Bottom.Style = ExcelBorderStyle.None;//Xóa border bottom
                 workSheet.Cells["B" + r + ":B" + c].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right
                 workSheet.Cells["B" + r + ":B" + (c + 1)].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right (dư)
-                r = r + 8;
-                c = c + 8;
+                r = r + 9;
+                c = c + 9;
             }
 
             ////Bỏ qua 2 dòng
@@ -2685,7 +2691,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Người chứng từ\n(Ký, ghi rõ họ tên)", //33
                 "Trưởng bộ phận\n(Ký, ghi rõ họ tên)", //34
                 "Kế toán\n(Ký, ghi rõ họ tên)", //35
-                "Giám đốc\n(Ký, ghi rõ họ tên)" //36
+                "Giám đốc\n(Ký, ghi rõ họ tên)", //36
+                "Chứng từ:" //37
             };
 
             List<string> engHeaders = new List<string>()
@@ -2726,7 +2733,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Documentation Staff\n(Name, Signature)", //33
                 "Head of Department\n(Name, Signature)", //34
                 "Chief Accountant\n(Name, Signature)", //35
-                "Director\n(Name, Signature)" //36
+                "Director\n(Name, Signature)", //36
+                "Doc CS:" //37
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -2956,6 +2964,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j, 2].Value = headers[26]; //Công ty nhập
                 workSheet.Cells[j, 3].Style.WrapText = true;
                 workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].Consignee;
+                j = j + 1;
+
+                workSheet.Cells[j, 2].Value = headers[37]; //Chứng từ
+                workSheet.Cells[j, 3].Style.WrapText = true;
+                workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].PersonInCharge;
                 j = j + 1;
                 #endregion --- Thông tin chung ---
 
