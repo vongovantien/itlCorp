@@ -51,7 +51,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
 
     cargoTypes: string[] = ['FCL', 'LCL'];
     serviceTypes: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
-    typeClearances: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    typeClearances: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
     routeClearances: string[] = JobConstants.COMMON_DATA.ROUTES;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
@@ -72,7 +72,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     isConvertJob: boolean = false;
     isDisableCargo: boolean = false;
     taxCode: string = '';
-
+    customerName: string = '';
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IShareBussinessState>,
@@ -185,12 +185,14 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
                 this.cargoType.enable();
             }
         }
+        this.customerName = this.customDeclaration.customerName;
 
     }
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
+                this.customerName = data.shortName;
                 this.partnerTaxCode.setValue(data.accountNo);
                 this.taxCode = data.taxCode;
                 break;

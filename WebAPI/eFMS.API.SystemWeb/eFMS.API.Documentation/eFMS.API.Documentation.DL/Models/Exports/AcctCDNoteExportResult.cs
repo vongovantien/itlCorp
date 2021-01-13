@@ -28,6 +28,6 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public string BankAddressEn { get; set; }
         public string BankAccountNameEn { get; set; }
         public string SwiftCode { get; set; }
-
+        public string CdNoteType { get; set; }
     }
 }

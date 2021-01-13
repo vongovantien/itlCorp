@@ -22,7 +22,6 @@ import { catchError } from 'rxjs/operators';
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
     @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
-    @ViewChild('comfirmServiceInfo') infoServicePopup: InfoPopupComponent;
     formCreate: FormGroup;
 
     hwbno: AbstractControl;
@@ -57,7 +56,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     salesmans: Observable<User[]>;
 
     shipmentNo: string = null;
-    shipmentNoti: string = '';
+    shipmentInfo: string = '';
 
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
@@ -189,25 +188,25 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     }
 
     getASInfoToLink() {
-        if (!this.hwbno.value) {
-            this._toaster.warning("HBL No is empty. Please complete first!");
+        if (!this.hwbno.value || !this.mblno.value) {
+            this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
             return;
         }
         if (!this.productService.value || !this.serviceMode.value
             || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
             this._toaster.warning("Service's not valid to link. Please select another!");
         } else {
-            this._documentRepo.getASTransactionInfo(this.hwbno.value, this.productService.value, this.serviceMode.value)
+            this._documentRepo.getASTransactionInfo(this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
                 .pipe(catchError(this.catchError))
                 .subscribe((res: any) => {
                     if (!!res) {
                         this.shipmentNo = res.jobNo;
                         if (!!res.jobNo) {
-                            this.shipmentNoti = "The valid shipment was linked to this job:<br>" + res.jobNo;
+                            this.shipmentInfo = res.jobNo;
                         } else {
-                            this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
+                            this.shipmentInfo = null;
+                            this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                         }
-                        this.infoServicePopup.show();
                     }
                 });
         }

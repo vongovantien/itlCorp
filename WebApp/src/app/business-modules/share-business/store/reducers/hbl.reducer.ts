@@ -60,7 +60,9 @@ export function HBLReducer(state = initHBlState, action: HBLActions): IHBLState 
         case HBLActionTypes.GET_CONTAINERS_SUCCESS: {
             return { ...state, containers: action.payload, isLoading: false, isLoaded: true };
         }
-
+        case HBLActionTypes.INIT_PROFIT: {
+            return { ...state, profit: null };
+        }
         default: {
             return state;
         }

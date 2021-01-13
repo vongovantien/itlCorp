@@ -232,7 +232,7 @@ namespace eFMS.API.Operation.Controllers
             var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
             if (code == 403) return Forbid();
             var hs = customsDeclarationService.ImportClearancesFromEcus();
-            var message = HandleError.GetMessage(hs, Crud.Update);
+            var message = hs.Message?.ToString();
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
             {
@@ -261,6 +261,10 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost("UpdateJobToClearances")]
         public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
+            if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t=>t.Id).FirstOrDefault()) == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[OperationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+            }
             var result = customsDeclarationService.UpdateJobToClearances(clearances);
             return Ok(result);
         }

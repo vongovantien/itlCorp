@@ -4,6 +4,7 @@ export class Unit {
      unitNameVn: string = '';
      unitNameEn: string = '';
      unitType: string = '';
+     unitTypeName: string = '';
      userCreated: string = '';
      datetimeCreated: any = '';
      userModified: string = '';
