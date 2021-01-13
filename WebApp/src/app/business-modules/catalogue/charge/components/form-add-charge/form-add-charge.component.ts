@@ -89,7 +89,7 @@ export class FormAddChargeComponent extends AppForm {
             type: [null, Validators.required],
             service: [null, Validators.required],
             debitCharge: [],
-            chargeGroup: [null],
+            chargeGroup: [],
             active: [true],
             generateSelling: [true],
             productDept: []
@@ -125,7 +125,9 @@ export class FormAddChargeComponent extends AppForm {
     checkValidateForm() {
         let valid: boolean = true;
         this.setError(this.service);
-        this.setError(this.chargeGroup);
+        // this.setError(this.unit);
+        // this.setError(this.currency);
+        // this.setError(this.chargeGroup);
         this.setError(this.formGroup.controls['productDept']);
         if (!this.formGroup.valid) {
             valid = false;
@@ -199,15 +201,15 @@ export class FormAddChargeComponent extends AppForm {
             nameEn: res.charge.chargeNameEn,
             nameVn: res.charge.chargeNameVn,
             unitPrice: res.charge.unitPrice,
-            currency: { id: res.charge.currencyId, text: !!this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId) ? this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId).text : null },
+            currency: res.charge.currencyId,
             vat: res.charge.vatrate,
             type: res.charge.type,
             service: this.activeServices,
             debitCharge: res.charge.debitCharge,
-            chargeGroup: !!res.charge.chargeGroup && !!this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup) ? { id: res.charge.chargeGroup, text: this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup).text } : null,
+            chargeGroup: res.charge.chargeGroup,
             active: res.charge.active,
             productDept: res.charge.productDept,
-            unit: !!res.charge.unitId && !!this.ngDataUnit.find(x => x.id === res.charge.unitId) ? { text: this.ngDataUnit.find(x => x.id === res.charge.unitId).text, id: res.charge.unitId } : null
+            unit: res.charge.unitId,
         });
     }
 }

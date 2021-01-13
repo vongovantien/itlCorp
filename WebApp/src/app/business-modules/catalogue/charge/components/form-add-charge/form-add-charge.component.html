@@ -44,7 +44,7 @@
                                 <label class="form-control-label">
                                     Unit 
                                 </label>
-                                <ng-select [clearable]="true" [items]="ngDataUnit" placeholder="Select Unit" class="custom" bindLabel="text" formControlName="unit">
+                                <ng-select [clearable]="true" [items]="ngDataUnit" placeholder="Select Unit" class="custom" bindLabel="text" bindValue="id" formControlName="unit">
                                 </ng-select>
                             </div>
                         </div>
@@ -61,7 +61,7 @@
                                 <label class="form-control-label">
                                     Currency
                                 </label>
-                                <ng-select [clearable]="true" [items]="ngDataCurrentcyUnit" class="custom" bindLabel="text" placeholder="Select Currency" formControlName="currency">
+                                <ng-select [clearable]="true" [items]="ngDataCurrentcyUnit" class="custom" bindLabel="text" bindValue="id" placeholder="Select Currency" formControlName="currency">
                                 </ng-select>
                             </div>
                         </div>
@@ -116,7 +116,7 @@
                                 <label class="form-control-label">
                                     Charge Group
                                 </label>
-                                <ng-select [clearable]="true" [items]="ngDataChargeGroup" class="custom" bindLabel="text" placeholder="Select Chare Group" formControlName="chargeGroup">
+                                <ng-select [clearable]="true" [items]="ngDataChargeGroup" class="custom" bindLabel="text" bindValue="id" placeholder="Select Chare Group" formControlName="chargeGroup">
                                 </ng-select>
                             </div>
 
