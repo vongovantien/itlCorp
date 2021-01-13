@@ -329,9 +329,17 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                         }
                     });
                     if (!!this.settlementCode) {
-                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo, this.settlementCode);
+                        if (charge.advanceNo) {
+                            this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo, this.settlementCode);
+                        } else {
+                            this.tableListChargePopup.advs.length = 0;
+                        }
                     } else {
-                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo);
+                        if (charge.advanceNo) {
+                            this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo);
+                        } else {
+                            this.tableListChargePopup.advs.length = 0;
+                        }
                     }
 
                     const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);

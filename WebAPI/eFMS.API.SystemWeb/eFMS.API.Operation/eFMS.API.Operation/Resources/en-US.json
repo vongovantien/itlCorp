@@ -36,6 +36,7 @@
   "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS": "{0} rows have been convert from ecus system",
   "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA": "There is no data converted from ecus system",
   //------------end: Custom Clearance,
-  "MSG_STAGE_ASSIGNED_EXISTED": "This stage had been added. Please choose another"
+  "MSG_STAGE_ASSIGNED_EXISTED": "This stage had been added. Please choose another",
+  "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted"
 
 }

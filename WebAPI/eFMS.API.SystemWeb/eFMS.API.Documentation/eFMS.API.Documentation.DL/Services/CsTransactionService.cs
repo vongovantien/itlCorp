@@ -449,6 +449,9 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.Soano)
                             || !string.IsNullOrEmpty(surcharge.PaySoano)
                             || !string.IsNullOrEmpty(surcharge.SettlementCode)
+                            || !string.IsNullOrEmpty(surcharge.AdvanceNo)
+                            || !string.IsNullOrEmpty(surcharge.VoucherId)
+                            || !string.IsNullOrEmpty(surcharge.SyncedFrom)
                             || surcharge.AcctManagementId != null
                          select detail);
             if (query.Any())
@@ -2824,7 +2827,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewShipmentCoverPage(Guid Id)
         {
             var dataShipment = DataContext.Get(x => x.Id == Id).FirstOrDefault();
-            var dataHouseBills = csTransactionDetailRepo.Get(x => x.JobId == dataShipment.Id);
+            var dataHouseBills = csTransactionDetailRepo.Get(x => x.JobId == dataShipment.Id && x.ParentId == null);
             var dataContainers = csMawbcontainerRepo.Get(x => x.Mblid == dataShipment.Id);
 
             var listShipment = new List<ShimentConverPageSeaReport>();

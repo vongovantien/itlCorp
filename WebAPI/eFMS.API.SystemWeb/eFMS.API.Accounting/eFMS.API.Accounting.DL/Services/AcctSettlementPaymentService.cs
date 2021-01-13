@@ -1695,111 +1695,81 @@ namespace eFMS.API.Accounting.DL.Services
             var advanceNoDone = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceNo && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE).Select(s => s.AdvanceNo).FirstOrDefault();
             var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo
             && x.AdvanceNo == advanceNoDone
-            //&& x.JobId == jobNo 
-            //&& x.Mbl == mbl
-            //&& x.Hbl == hbl
             && x.Hblid == hblId);
-            //var query = from adv in advance
-            //join req in request on adv.AdvanceNo equals req.AdvanceNo //into req1
-            //from req in req1.DefaultIfEmpty()
-            //select req;
             var advanceAmount = request.Sum(x => x.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.RequestCurrency, Currency));
             return advanceAmount.Value;
         }
 
         public AscSettlementPaymentRequestReportParams GetFirstShipmentOfSettlement(string settlementNo)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
-            var opsTrans = opsTransactionRepo.Get();
-            var csTransDe = csTransactionDetailRepo.Get();
-            var csTrans = csTransactionRepo.Get();
+            //Order giảm dần theo JobNo
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).OrderByDescending(x => x.JobNo);            
+            var firstCharge = surcharges.FirstOrDefault(); //Get charge đầu tiên
 
-            var advRequest = acctAdvanceRequestRepo.Get();
-            var advPayment = acctAdvancePaymentRepo.Get();
-
-            var customer = catPartnerRepo.Get();
-            var consignee = catPartnerRepo.Get();
-            var consigner = catPartnerRepo.Get();
-
-            var query = from sur in surcharge
-                        join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                        from opst in opst2.DefaultIfEmpty()
-                        join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-                        from cstd in cstd2.DefaultIfEmpty()
-                        join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                        from cst in cst2.DefaultIfEmpty()
-                        join request in advRequest on (opst.Hblid == null ? cstd.Id : opst.Hblid) equals request.Hblid into request1
-                        from request in request1.DefaultIfEmpty()
-                        join advance in advPayment on request.AdvanceNo equals advance.AdvanceNo into advance1
-                        from advance in advance1.DefaultIfEmpty()
-                        join cus in customer on (opst.CustomerId == null ? cstd.CustomerId : opst.CustomerId) equals cus.Id into cus1
-                        from cus in cus1.DefaultIfEmpty()
-                        join cnee in consignee on cstd.ConsigneeId equals cnee.Id into cnee1
-                        from cnee in cnee1.DefaultIfEmpty()
-                        join cner in consigner on cstd.ShipperId equals cner.Id into cner1
-                        from cner in cner1.DefaultIfEmpty()
-                        where
-                            sur.SettlementCode == settlementNo
-                        select new { sur, opst, cst, cstd, advance, cus, cnee, cner };
-            var data = query.Select(s => new AscSettlementPaymentRequestReportParams
-            {
-                JobId = (s.opst.JobNo == null ? s.cst.JobNo : s.opst.JobNo),
-                AdvDate = (!string.IsNullOrEmpty(s.advance.StatusApproval) && s.advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE ? s.advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
-                Customer = s.cus.PartnerNameVn != null ? s.cus.PartnerNameVn.ToUpper() : string.Empty,
-                Consignee = s.cnee.PartnerNameVn != null ? s.cnee.PartnerNameVn.ToUpper() : string.Empty,
-                Consigner = s.cner.PartnerNameVn != null ? s.cner.PartnerNameVn.ToUpper() : string.Empty,
-                ContainerQty = s.opst.SumContainers.HasValue ? s.opst.SumContainers.Value.ToString() + "/" : string.Empty,
-                //GW = (opst.SumGrossWeight ?? cstd.GrossWeight),
-                //NW = (opst.SumNetWeight ?? cstd.NetWeight),
-                CustomsId = s.sur.ClearanceNo,
-                //PSC = (opst.SumPackages ?? cstd.PackageQty),
-                //CBM = (opst.SumCbm ?? cstd.Cbm),
-                HBL = (s.opst.Hwbno == null ? s.cstd.Hwbno : s.opst.Hwbno),
-                MBL = (s.opst.Mblno == null ? (s.cst.Mawb ?? string.Empty) : s.opst.Mblno),
-                StlCSName = string.Empty
-            });
-            data = data.OrderByDescending(x => x.JobId);
-            var result = new AscSettlementPaymentRequestReportParams();
-            result.JobId = data.First().JobId;
-            result.AdvDate = data.First().AdvDate;
-            result.Customer = data.First().Customer;
-            result.Consignee = data.First().Consignee;
-            result.Consigner = data.First().Consigner;
-            result.ContainerQty = data.First().ContainerQty;
-            
+            string _jobId = string.Empty;
+            string _mbl = string.Empty;
+            string _hbl = string.Empty;
+            string _containerQty = string.Empty;
+            string _customerName = string.Empty;
+            string _consigneeName = string.Empty;
+            string _consignerName = string.Empty;
+            string _advDate = string.Empty;
             decimal? _gw = 0;
             decimal? _nw = 0;
             int? _psc = 0;
             decimal? _cbm = 0;
 
-            //Sum _gw, _nw, _psc, _cbm theo Housebill
-            /*var hblids = query.Select(s => s.opst.Hblid != null ? s.opst.Hblid : s.cstd.Id).Distinct().ToList();
-            foreach (var hblid in hblids)
+            var opsTran = opsTransactionRepo.Get(x => x.Hblid == firstCharge.Hblid).FirstOrDefault();
+            if (opsTran != null)
             {
-                var opsTransDetail = opsTrans.Where(x => x.Hblid == hblid).FirstOrDefault();
-                if (opsTransDetail != null)
+                _jobId = opsTran?.JobNo;
+                _mbl = opsTran?.Mblno;
+                _hbl = opsTran?.Hwbno;
+                _containerQty = opsTran.SumContainers != null ? opsTran.SumContainers.Value.ToString() + "/" : string.Empty;
+                _customerName = catPartnerRepo.Get(x => x.Id == opsTran.CustomerId).FirstOrDefault()?.PartnerNameVn;
+            }
+            else
+            {
+                var csTranDetail = csTransactionDetailRepo.Get(x => x.Id == firstCharge.Hblid).FirstOrDefault();
+                if (csTranDetail != null)
                 {
-                    _gw += opsTransDetail.SumGrossWeight;
-                    _nw += opsTransDetail.SumNetWeight;
-                    _psc += opsTransDetail.SumPackages;
-                    _cbm += opsTransDetail.SumCbm;
+                    var csTran = csTransactionRepo.Get(x => x.Id == csTranDetail.JobId).FirstOrDefault();
+                    _jobId = csTran?.JobNo;
+                    _mbl = csTran?.Mawb;
+                    _hbl = csTranDetail?.Hwbno;
                 }
-                else
-                {
-                    var csTransDetail = csTransDe.Where(x => x.Id == hblid).FirstOrDefault();
-                    _gw += csTransDetail?.GrossWeight;
-                    _nw += csTransDetail?.NetWeight;
-                    _psc += csTransDetail?.PackageQty;
-                    _cbm += csTransDetail?.Cbm;
-                }
-            }*/
+                _customerName = catPartnerRepo.Get(x => x.Id == csTranDetail.CustomerId).FirstOrDefault()?.PartnerNameVn;
+                _consigneeName = catPartnerRepo.Get(x => x.Id == csTranDetail.ConsigneeId).FirstOrDefault()?.PartnerNameVn;
+                _consignerName = catPartnerRepo.Get(x => x.Id == csTranDetail.ShipperId).FirstOrDefault()?.PartnerNameVn;
+            }
 
+            var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == firstCharge.Hblid && x.AdvanceNo == firstCharge.AdvanceNo).FirstOrDefault();
+            if (advanceRequest != null)
+            {
+                var advancePayment = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE).FirstOrDefault();
+                if (advancePayment != null)
+                {
+                    _advDate = advancePayment.DatetimeCreated.Value.ToString("dd/MM/yyyy");
+                }
+            }
+
+            var result = new AscSettlementPaymentRequestReportParams();
+            result.JobId = _jobId;
+            result.AdvDate = _advDate;
+            result.Customer = _customerName;
+            result.Consignee = _consigneeName;
+            result.Consigner = _consignerName;
+            result.ContainerQty = _containerQty;
+            result.CustomsId = !string.IsNullOrEmpty(firstCharge.ClearanceNo) ? firstCharge.ClearanceNo : GetCustomNoOldOfShipment(_jobId);
+            result.HBL = _hbl;
+            result.MBL = _mbl;
+            result.StlCSName = string.Empty;
+            
             //CR: Sum _gw, _nw, _psc, _cbm theo Masterbill [28/12/2020 - Alex]
             //Settlement có nhiều Job thì sum all các job đó
-            var mblids = query.Select(s => s.opst.Id != null ? s.opst.Id : s.cst.Id).Distinct().ToList();
-            foreach (var mblid in mblids)
+            foreach (var surcharge in surcharges)
             {
-                var _opsTrans = opsTrans.Where(x => x.Id == mblid).FirstOrDefault();
+                var _opsTrans = opsTransactionRepo.Where(x => x.Hblid == surcharge.Hblid).FirstOrDefault();
                 if (_opsTrans != null)
                 {
                     _gw += _opsTrans.SumGrossWeight;
@@ -1809,22 +1779,26 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    var _csTrans = csTrans.Where(x => x.Id == mblid).FirstOrDefault();
-                    _gw += _csTrans?.GrossWeight;
-                    _nw += _csTrans?.NetWeight;
-                    _psc += _csTrans?.PackageQty;
-                    _cbm += _csTrans?.Cbm;
+                    var csTranDetail = csTransactionDetailRepo.Get(x => x.Id == surcharge.Hblid).FirstOrDefault();
+                    //_gw += csTransDetail?.GrossWeight;
+                    //_nw += csTransDetail?.NetWeight;
+                    //_psc += csTransDetail?.PackageQty;
+                    //_cbm += csTransDetail?.Cbm;
+                    if (csTranDetail != null)
+                    {
+                        var _csTrans = csTransactionRepo.Where(x => x.Id == csTranDetail.JobId).FirstOrDefault();
+                        _gw += _csTrans?.GrossWeight;
+                        _nw += _csTrans?.NetWeight;
+                        _psc += _csTrans?.PackageQty;
+                        _cbm += _csTrans?.Cbm;
+                    }
                 }
             }
 
             result.GW = _gw;
             result.NW = _nw;
-            result.CustomsId = !string.IsNullOrEmpty(data.First().CustomsId) ? data.First().CustomsId : GetCustomNoOldOfShipment(data.First().JobId);
             result.PSC = _psc;
             result.CBM = _cbm;
-            result.HBL = data.First().HBL;
-            result.MBL = data.First().MBL;
-            result.StlCSName = data.First().StlCSName;
             return result;
         }
 
@@ -1905,11 +1879,6 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AscSettlementPaymentRequestReport> GetChargeOfSettlement(string settlementNo, string currency)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
-            var charge = catChargeRepo.Get();
-            var opsTrans = opsTransactionRepo.Get();
-            var csTransDe = csTransactionDetailRepo.Get();
-            var csTrans = csTransactionRepo.Get();
             var settle = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             //Quy đổi tỉ giá theo ngày Request Date, nếu không có thì lấy exchange rate mới nhất
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settle.RequestDate.Value.Date).ToList();
@@ -1918,37 +1887,48 @@ namespace eFMS.API.Accounting.DL.Services
                 DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
+            
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
+            var data = new List<AscSettlementPaymentRequestReport>();
+            foreach(var surcharge in surcharges)
+            {
+                var item = new AscSettlementPaymentRequestReport();
+                item.AdvID = settlementNo;
+                string _jobId = string.Empty;
+                string _hbl = string.Empty;
+                var opsTran = opsTransactionRepo.Get(x => x.Hblid == surcharge.Hblid).FirstOrDefault();
+                if (opsTran != null)
+                {
+                    _jobId = opsTran?.JobNo;
+                    _hbl = opsTran?.Hwbno;
+                }
+                else
+                {
+                    var csTranDetail = csTransactionDetailRepo.Get(x => x.Id == surcharge.Hblid).FirstOrDefault();
+                    if (csTranDetail != null)
+                    {
+                        var csTrans = csTransactionRepo.Get(x => x.Id == csTranDetail.JobId).FirstOrDefault();
+                        _jobId = csTrans?.JobNo;
+                        _hbl = csTranDetail?.Hwbno;
+                    }
+                }
+                item.JobId = _jobId;
+                item.HBL = _hbl;
+                item.Description = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault()?.ChargeNameEn;
+                item.InvoiceNo = surcharge.InvoiceNo ?? string.Empty;
+                item.Amount = surcharge.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, surcharge.CurrencyId, currency) + _decimalNumber;
+                item.Debt = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false;
+                item.Currency = string.Empty;
+                item.Note = surcharge.Notes;
+                item.CompanyName = AccountingConstants.COMPANY_NAME;
+                item.CompanyAddress = AccountingConstants.COMPANY_ADDRESS1;
+                item.Website = AccountingConstants.COMPANY_WEBSITE;
+                item.Tel = AccountingConstants.COMPANY_CONTACT;
+                item.Contact = currentUser.UserName;
 
-            var data = from sur in surcharge
-                       join cat in charge on sur.ChargeId equals cat.Id into cat2
-                       from cat in cat2.DefaultIfEmpty()
-                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                       from opst in opst2.DefaultIfEmpty()
-                       join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-                       from cstd in cstd2.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                       from cst in cst2.DefaultIfEmpty()
-                       where
-                            sur.SettlementCode == settlementNo
-                       select new AscSettlementPaymentRequestReport
-                       {
-                           AdvID = settlementNo,
-                           JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                           HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
-                           Description = cat.ChargeNameEn,
-                           InvoiceNo = string.IsNullOrEmpty(sur.InvoiceNo) ? string.Empty : sur.InvoiceNo,
-                           Amount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency) + _decimalNumber,
-                           Debt = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false,
-                           Currency = string.Empty,
-                           Note = sur.Notes,
-                           CompanyName = AccountingConstants.COMPANY_NAME,
-                           CompanyAddress = AccountingConstants.COMPANY_ADDRESS1,
-                           Website = AccountingConstants.COMPANY_WEBSITE,
-                           Tel = AccountingConstants.COMPANY_CONTACT,
-                           Contact = currentUser.UserName
-                       };
-
-            return data.OrderByDescending(x => x.JobId);
+                data.Add(item);
+            }
+            return data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
         }
 
         public Crystal Preview(string settlementNo)
@@ -4154,6 +4134,7 @@ namespace eFMS.API.Accounting.DL.Services
                 shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
                 #endregion -- CHANRGE AND ADVANCE OF SETTELEMENT --
 
+                string _personInCharge = string.Empty;
                 var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
                 if (ops != null)
                 {
@@ -4167,6 +4148,10 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
 
+                    var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
+                    _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                    shipmentSettlement.PersonInCharge = _personInCharge;
+
                     listData.Add(shipmentSettlement);
                 }
                 else
@@ -4174,7 +4159,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var tranDetail = csTransactionDetailRepo.Get(x => x.Id == houseBillId.hblId).FirstOrDefault();
                     if (tranDetail != null)
                     {
-                        shipmentSettlement.JobNo = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.JobNo;
+                        var trans = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault();
+                        shipmentSettlement.JobNo = trans?.JobNo;
                         shipmentSettlement.CustomNo = string.Empty; //Hàng Documentation không có CustomNo
                         shipmentSettlement.HBL = tranDetail.Hwbno;
                         shipmentSettlement.MBL = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.Mawb;
@@ -4186,6 +4172,12 @@ namespace eFMS.API.Accounting.DL.Services
                         shipmentSettlement.Pcs = tranDetail.PackageQty;
                         shipmentSettlement.Cbm = tranDetail.Cbm;
 
+                        if (trans != null)
+                        {
+                            var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
+                            _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
+                            shipmentSettlement.PersonInCharge = _personInCharge;
+                        }
                         listData.Add(shipmentSettlement);
                     }
                 }
