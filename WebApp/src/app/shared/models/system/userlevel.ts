@@ -19,6 +19,8 @@ export class UserLevel {
     companyAbbrName: string = null;
     departmentAbbrName: string = null;
     officeAbbrName: string = null;
+    userName: string = null;
+    isSelected: boolean = false;
 
     constructor(data?: any) {
         let self = this;
