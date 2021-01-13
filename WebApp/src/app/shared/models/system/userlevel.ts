@@ -19,7 +19,7 @@ export class UserLevel {
     companyAbbrName: string = null;
     departmentAbbrName: string = null;
     officeAbbrName: string = null;
-
+    userName: string = null;
     constructor(data?: any) {
         let self = this;
         for (const key in data) {
