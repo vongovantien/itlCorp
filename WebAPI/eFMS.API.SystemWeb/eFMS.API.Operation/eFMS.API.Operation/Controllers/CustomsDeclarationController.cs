@@ -259,12 +259,16 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("UpdateJobToClearances")]
-        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances )
         {
-            if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t=>t.Id).FirstOrDefault()) == false)
+            if (clearances.Any(x => x.isDelete == true))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[OperationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+                if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t => t.jobId).FirstOrDefault()) == false)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[OperationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+                }
             }
+          
             var result = customsDeclarationService.UpdateJobToClearances(clearances);
             return Ok(result);
         }

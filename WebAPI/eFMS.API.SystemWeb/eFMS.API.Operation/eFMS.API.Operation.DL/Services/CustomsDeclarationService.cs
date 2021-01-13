@@ -1329,10 +1329,8 @@ namespace eFMS.API.Operation.DL.Services
             data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
             return data;
         }
-        public bool CheckAllowUpdate(int id)
+        public bool CheckAllowUpdate(Guid? jobId)
         {
-            string jobNo = DataContext.Get(x => x.Id == id).Select(t => t.JobNo).FirstOrDefault();
-            Guid jobId = opsTransactionRepo.Get(x => x.JobNo == jobNo).Select(t => t.Id).FirstOrDefault();
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
             var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
                           || !string.IsNullOrEmpty(x.AdvanceNo)
