@@ -239,5 +239,58 @@ namespace eFMS.API.System.DL.Services
             }
             return results;
         }
+
+        /// <summary>
+        /// Get list user info by current user's company
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public List<SysUserLevelModel> GetListUsersByCurrentCompany(SysUserLevelModel userModel)
+        {
+            List<SysUserLevelModel> userList = new List<SysUserLevelModel>();
+            var companies = companyRepository.Get(x => x.Id == userModel.CompanyId);
+            if (companies?.Count() == 0)
+            {
+                return userList;
+            }
+            var userLvs = DataContext.Get(x => x.Active == userModel.Active && x.CompanyId == userModel.CompanyId);
+            var users = userRepository.Get();
+            var groups = groupRepository.Get();
+            var offices = officeRepository.Get();
+            var results = from usLV in userLvs
+                          join us in users on usLV.UserId equals us.Id into user
+                          from us in user.DefaultIfEmpty()
+                          join o in offices on usLV.OfficeId equals o.Id into office
+                          from o in office.DefaultIfEmpty()
+                          join gr in groups on usLV.GroupId equals gr.Id into sysGroup
+                          from grp in sysGroup.DefaultIfEmpty()
+                          orderby us.Username
+                          select new
+                          {
+                              usLV.UserId,
+                              usLV.CompanyId,
+                              usLV.OfficeId,
+                              usLV.GroupId,
+                              us.Username,
+                              GroupName = (grp == null ? string.Empty : grp.ShortName),
+                              OfficeName = (o == null ? string.Empty : o.ShortName)
+                          };
+            if (results?.Count() > 0)
+            {
+                foreach (var user in results)
+                {
+                    var model = new SysUserLevelModel();
+                    model.UserId = user.UserId;
+                    model.CompanyId = user.CompanyId;
+                    model.OfficeId = user.OfficeId;
+                    model.GroupId = user.GroupId;
+                    model.UserName = user.Username;
+                    model.GroupName = user.GroupName;
+                    model.OfficeName = user.OfficeName;
+                    userList.Add(model);
+                }
+            }
+            return userList;
+        }
     }
 }

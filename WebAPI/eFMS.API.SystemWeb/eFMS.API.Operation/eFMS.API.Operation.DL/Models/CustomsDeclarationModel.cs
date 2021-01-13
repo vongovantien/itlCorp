@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common.Models;
 using eFMS.API.Operation.Service.Models;
+using System;
 
 namespace eFMS.API.Operation.DL.Models
 {
@@ -12,6 +13,8 @@ namespace eFMS.API.Operation.DL.Models
         public PermissionAllowBase Permission { get; set; }
         public string UserCreatedName { get; set; }
         public string UserModifieddName { get; set; }
+        public bool? isDelete { get; set; }
+        public Guid? jobId { get; set; }
     }
 
 }

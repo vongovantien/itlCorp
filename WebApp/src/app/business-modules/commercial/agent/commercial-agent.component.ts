@@ -120,7 +120,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
         if (Object.keys(this.dataSearchs).length > 0) {
-            this.dataSearch[this.dataSearchs.type] = this.dataSearchs.keyword;
+            const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
+            this.dataSearch[type] = this.dataSearchs.keyword;
         }
         this.requestList();
     }

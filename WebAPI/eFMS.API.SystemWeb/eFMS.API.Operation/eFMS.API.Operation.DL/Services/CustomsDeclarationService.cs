@@ -43,6 +43,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CatPartner> customerRepository;
+        readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -56,6 +57,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<OpsTransaction> opsTransaction,
             IContextBase<OpsStageAssigned> opsStageAssigned,
             IContextBase<SysUser> userRepo,
+            IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -70,6 +72,7 @@ namespace eFMS.API.Operation.DL.Services
             opsStageAssignedRepo = opsStageAssigned;
             userRepository = userRepo;
             customerRepository = customerRepo;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -95,18 +98,28 @@ namespace eFMS.API.Operation.DL.Services
                     else
                     {
                         var clearances = DataContext.Get();
-                        foreach (var clearance in clearanceEcus)
+                        var cleancesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
+                        if (cleancesNotExsitInFMS.Count() > 0)
                         {
-                            var clearanceNo = clearance.SOTK?.ToString().Trim();
-                            var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                            var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                            if (itemExisted == null && clearanceNo != null && countDuplicated < 1)
+                            foreach (var d in cleancesNotExsitInFMS)
                             {
-                                var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
+                                var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
                                 newClearance.Source = OperationConstants.FromEcus;
                                 lists.Add(newClearance);
                             }
                         }
+                        //foreach (var clearance in clearanceEcus)
+                        //{
+                        //    var clearanceNo = clearance.SOTK?.ToString().Trim();
+                        //    var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                        //    var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                        //    if (itemExisted == null && clearanceNo != null && countDuplicated < 1)
+                        //    {
+                        //        var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
+                        //        newClearance.Source = OperationConstants.FromEcus;
+                        //        lists.Add(newClearance);
+                        //    }
+                        //}
                     }
                 }
                 if (lists.Count > 0)
@@ -130,6 +143,20 @@ namespace eFMS.API.Operation.DL.Services
             {
                 result = new HandleState(ex.Message);
             }
+            return result;
+        }
+
+        private bool checkExistEcusInEFMS(string tokhai)
+        {
+            var result = false;
+            var clearances = DataContext.Get();
+
+            var data = clearances.Where(x => x.ClearanceNo == tokhai).ToList();
+            if (data.Count > 0)
+            {
+                result = true;
+            }
+
             return result;
         }
 
@@ -242,7 +269,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
-            if(rangeSearch == PermissionRange.None)
+            if (rangeSearch == PermissionRange.None)
             {
                 rowsCount = 0;
                 return null;
@@ -263,7 +290,7 @@ namespace eFMS.API.Operation.DL.Services
             {
                 query = query.And(x => x.JobNo == null);
             }
-            
+
             // Query with Permission Range.
             switch (rangeSearch)
             {
@@ -271,11 +298,11 @@ namespace eFMS.API.Operation.DL.Services
                     query = query.And(x => x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Group:
-                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                         || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Department:
-                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                         || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Office:
@@ -336,7 +363,7 @@ namespace eFMS.API.Operation.DL.Services
                                 );
 
 
-            var data = Get().Where(query); 
+            var data = Get().Where(query);
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
@@ -422,7 +449,7 @@ namespace eFMS.API.Operation.DL.Services
                 foreach (var item in clearances)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
-                    if(clearance != null)
+                    if (clearance != null)
                     {
                         clearance.JobNo = item.JobNo;
                         clearance.ConvertTime = item.ConvertTime;
@@ -635,7 +662,7 @@ namespace eFMS.API.Operation.DL.Services
                     result = deleteMultipleModel(customs);
                     break;
                 default:
-                    return new HandleState(403,"");
+                    return new HandleState(403, "");
             }
 
             return result;
@@ -1147,7 +1174,7 @@ namespace eFMS.API.Operation.DL.Services
                     item.OfficeId = currentUser.OfficeID;
                     item.CompanyId = currentUser.CompanyID;
                 }
-               
+
                 var hs = Add(data);
                 return hs;
             }
@@ -1242,7 +1269,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             CustomsDeclaration clearance = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (clearance == null) return null;
-            if(clearance.AccountNo == null)
+            if (clearance.AccountNo == null)
             {
                 clearance.AccountNo = clearance.PartnerTaxCode;
             }
@@ -1301,6 +1328,22 @@ namespace eFMS.API.Operation.DL.Services
             var data = mapper.Map<List<CustomsDeclarationModel>>(query);
             data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
             return data;
+        }
+        public bool CheckAllowUpdate(Guid? jobId)
+        {
+            var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
+            var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
+                          || !string.IsNullOrEmpty(x.AdvanceNo)
+                          || !string.IsNullOrEmpty(x.VoucherId)
+                          || !string.IsNullOrEmpty(x.PaySoano)
+                          || !string.IsNullOrEmpty(x.SettlementCode)
+                          || !string.IsNullOrEmpty(x.SyncedFrom))
+                          );
+            if (query.Any())
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

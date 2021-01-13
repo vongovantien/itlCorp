@@ -193,7 +193,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var hs = catChargeService.AddCharge(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value , Data = model.Charge.Id};
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -351,10 +351,10 @@ namespace eFMS.API.Catalogue.Controllers
                     {
                         active = false;
                     }
-                    decimal unitPrice = -1;
+                    decimal unitPrice = 0;
                     var price = worksheet.Cells[row, 5].Value;
                     if(price != null) { unitPrice = Convert.ToDecimal(price); }
-                    decimal vatRate = -1;
+                    decimal vatRate = 0;
                     var vat = worksheet.Cells[row, 7].Value;
                     if(vat != null) { vatRate = Convert.ToDecimal(vat); }
 

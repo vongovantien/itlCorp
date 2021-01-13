@@ -510,7 +510,7 @@ namespace eFMS.API.Catalogue.DL.Services
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
 
-            if (model.Contracts.Count > 0)
+            if (model.Contracts?.Count > 0)
             {
                 entity.SalePersonId = model.Contracts.FirstOrDefault().SaleManId.ToString();
             }
@@ -1952,6 +1952,32 @@ namespace eFMS.API.Catalogue.DL.Services
                 results.Add(item);
             }
             return results;
+        }
+
+        /// <summary>
+        /// Update info for partner
+        /// </summary>
+        /// <param name="model">CatPartnerModel</param>
+        /// <returns></returns>
+        public HandleState UpdatePartnerData(CatPartnerCriteria model)
+        {
+            var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            var entity = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+
+            if (entity == null) return new HandleState(403, "");
+            int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = entity.PartnerGroup }, permissionRange, null);
+            if (code == 403) return new HandleState(403, "");
+
+            entity.UserCreated = model.UserCreated; // change creator
+            var hs = DataContext.Update(entity, x => x.Id == model.Id);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return hs;
         }
     }
 }
