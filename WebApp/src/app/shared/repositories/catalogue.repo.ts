@@ -1267,4 +1267,10 @@ export class CatalogueRepo {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/VI/CatContract/QueryAgreement`, body);
 
     }
+
+    updateInfoForPartner(data?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/UpdateInfoForPartner`, data).pipe(
+            map((data: any) => data)
+        );
+    }
 }

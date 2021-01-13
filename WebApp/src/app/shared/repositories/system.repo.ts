@@ -661,5 +661,14 @@ export class SystemRepo {
         return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserNotification/Delete`, { Id: Id });
     }
 
+    getListUsersByCurrentCompany(body: any ={}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/GetListUsersByCurrentCompany`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
 }
 

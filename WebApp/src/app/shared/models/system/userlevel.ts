@@ -20,6 +20,8 @@ export class UserLevel {
     departmentAbbrName: string = null;
     officeAbbrName: string = null;
     userName: string = null;
+    isSelected: boolean = false;
+
     constructor(data?: any) {
         let self = this;
         for (const key in data) {
