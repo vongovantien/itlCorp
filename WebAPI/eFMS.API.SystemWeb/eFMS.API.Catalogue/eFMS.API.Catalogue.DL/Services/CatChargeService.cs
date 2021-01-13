@@ -514,10 +514,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var list = DataContext.Get(query);
             var currencies = currencyService.Get();
             var units = catUnitService.Get();
-            var catChargeLst = (from charge in list
-                                join curr in currencies on charge.CurrencyId equals curr.Id
-                                join unit in units on charge.UnitId equals unit.Id
-                                select new CatChargeModel
+            var catChargeLst = (from charge in list select new CatChargeModel
                                 {
                                     Id = charge.Id,
                                     Code = charge.Code,
@@ -541,9 +538,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     OfficeId = charge.OfficeId,
                                     CompanyId = charge.CompanyId,
                                     ChargeGroup = charge.ChargeGroup,
-                                    currency = unit.UnitNameEn,
-                                    unit = unit.UnitNameEn
-                                })?.OrderBy(x => x.DatetimeModified).AsQueryable();
+            })?.OrderBy(x => x.DatetimeModified).AsQueryable();
             return catChargeLst;
 
         }
