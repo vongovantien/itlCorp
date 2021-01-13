@@ -549,7 +549,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result = true;
                     break;
                 case PermissionRange.Owner:
-                    if (detail.SaleManId == currentUser.UserID || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if (detail.SaleManId == currentUser.UserID || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -560,7 +560,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Group:
                     if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID || detail.UserCreated == currentUser.UserID)
-                        || authorizeUserIds.Contains(detail.SaleManId))
+                        || authorizeUserIds.Contains(detail.UserCreated))
                     {
                         result = true;
                     }
@@ -570,7 +570,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Department:
-                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -580,7 +580,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Office:
-                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -590,7 +590,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Company:
-                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
