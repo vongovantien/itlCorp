@@ -834,7 +834,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (masDetail == null)
                         {
                             masDetail = transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
-                            masDetail = masDetail == null ? transaction.FirstOrDefault() : masDetail;
+                            masDetail = masDetail == null ? transaction?.FirstOrDefault() : masDetail;
                         }
                         jobNo = masDetail?.JobNo.ToString();
                         id = masDetail?.Id.ToString();
