@@ -140,19 +140,16 @@ namespace eFMS.API.Catalogue.DL.Services
                             {
                                 foreach (var item in entity.Contracts)
                                 {
-                                    if (item.IsRequestApproval == true)
-                                    {
-                                        entity.ContractType = item.ContractType;
-                                        entity.SalesmanId = item.SaleManId;
-                                        entity.UserCreated = partner.UserCreated;
-                                        entity.ContractService = GetContractServicesName(item.SaleService);
-                                        SendMailRequestApproval(entity);
-                                    }
+                                    entity.ContractType = item.ContractType;
+                                    entity.SalesmanId = item.SaleManId;
+                                    entity.UserCreated = partner.UserCreated;
+                                    entity.ContractService = GetContractServicesName(item.SaleService);
+                                    SendMailRequestApproval(entity);
                                 }
                             }
 
                         }
-                        if(entity.PartnerEmails.Count > 0)
+                        if (entity.PartnerEmails.Count > 0)
                         {
                             var emails = mapper.Map<List<CatPartnerEmail>>(entity.PartnerEmails);
                             emails.ForEach(x =>
@@ -165,7 +162,10 @@ namespace eFMS.API.Catalogue.DL.Services
                             var hsEmail = catpartnerEmailRepository.Add(emails);
                         }
                         trans.Commit();
-                        SendMailCreatedSuccess(partner);
+                        if (partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
+                        {
+                            SendMailCreatedSuccess(partner);
+                        }
                     }
                     ClearCache();
                     Get();
@@ -251,7 +251,7 @@ namespace eFMS.API.Catalogue.DL.Services
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-            List<string> lstCc = ListMailCC();
+            List<string> lstCc = ListMailBCC();
             List<string> lstTo = new List<string>();
 
             lstTo.Add(creatorObj?.Email);
@@ -331,11 +331,10 @@ namespace eFMS.API.Catalogue.DL.Services
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-            List<string> lstCc = ListMailCC();
-
+            List<string> lstBCc = ListMailBCC();
+            List<string> lstCc = new List<string>();
             lstCc.Add(objInfoSalesman?.Email);
-
-            bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            bool result = SendMail.Send(subject, body, lstTo, null, null, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
             {
@@ -359,7 +358,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string url = string.Empty;
             List<string> lstToAR = new List<string>();
             List<string> lstToAccountant = new List<string>();
-            List<string> lstCc = ListMailCC();
+            List<string> lstCc = ListMailBCC();
             List<string> lstCcCreator = new List<string>();
 
             // info send to and cc
@@ -368,12 +367,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (listEmailAR != null && listEmailAR.Any())
             {
-                lstToAR = listEmailAR.Split(";").Select(x=>x.ToLower().Trim()).ToList();
+                lstToAR = listEmailAR.Split(";").Select(x => x.ToLower().Trim()).ToList();
             }
 
             if (listEmailAccountant != null && listEmailAccountant.Any())
             {
-                lstToAccountant = listEmailAccountant.Split(";").Select(x=>x.ToLower().Trim()).ToList();
+                lstToAccountant = listEmailAccountant.Split(";").Select(x => x.ToLower().Trim()).ToList();
             }
 
             switch (partner.PartnerType)
@@ -447,7 +446,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return resultSenmail;
         }
 
-        private List<string> ListMailCC()
+        private List<string> ListMailBCC()
         {
             List<string> lstCc = new List<string>
             {
@@ -931,7 +930,7 @@ namespace eFMS.API.Catalogue.DL.Services
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
                          join agreement in agreementData on partner.Id equals agreement.PartnerId into agreements
-                         select new { user, partner, x , agreements }
+                         select new { user, partner, x, agreements }
                         );
             if (string.IsNullOrEmpty(criteria.All))
             {
@@ -951,7 +950,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (!string.IsNullOrEmpty(SalemanId))
                 {
-                    query = query.Where(x=> x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
+                    query = query.Where(x => x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
                 }
                 else if (!string.IsNullOrEmpty(criteria.Saleman))
                 {
@@ -972,8 +971,8 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                        //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || x.agreements.Any(y=> y!= null &&  y.SaleManId.Equals(SalemanId))) 
+                           //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
+                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId)))
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
                 //if (!string.IsNullOrEmpty(SalemanId))
