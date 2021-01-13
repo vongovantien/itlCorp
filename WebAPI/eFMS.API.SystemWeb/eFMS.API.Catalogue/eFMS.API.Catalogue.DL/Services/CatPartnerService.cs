@@ -138,14 +138,18 @@ namespace eFMS.API.Catalogue.DL.Services
 
                             if (hsContract.Success)
                             {
-                                foreach (var item in entity.Contracts)
+                                if(partner.IsRequestApproval == true)
                                 {
-                                    entity.ContractType = item.ContractType;
-                                    entity.SalesmanId = item.SaleManId;
-                                    entity.UserCreated = partner.UserCreated;
-                                    entity.ContractService = GetContractServicesName(item.SaleService);
-                                    SendMailRequestApproval(entity);
+                                    foreach (var item in entity.Contracts)
+                                    {
+                                        entity.ContractType = item.ContractType;
+                                        entity.SalesmanId = item.SaleManId;
+                                        entity.UserCreated = partner.UserCreated;
+                                        entity.ContractService = GetContractServicesName(item.SaleService);
+                                        SendMailRequestApproval(entity);
+                                    }
                                 }
+                              
                             }
 
                         }
@@ -334,7 +338,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
             lstCc.Add(objInfoSalesman?.Email);
-            bool result = SendMail.Send(subject, body, lstTo, null, null, lstBCc);
+            bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
             {

@@ -75,7 +75,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         }
     }
 
-    onSave() {
+    onSave(isRequestApproval: boolean) {
         this.formCreate.isSubmitted = true;
         if (!this.formCreate.formGroup.valid) {
             this.infoPopup.show();
@@ -94,7 +94,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         this.type === 'Customer' ? modelAdd.partnerGroup = 'CUSTOMER' : modelAdd.partnerGroup = 'CUSTOMER; AGENT';
         modelAdd.contracts = [...this.contractList.contracts];
         modelAdd.partnerEmails = [...this.partnerEmailList.partnerEmails];
-
+        modelAdd.isRequestApproval = isRequestApproval;
         this.saveCustomerCommercial(modelAdd);
     }
 
