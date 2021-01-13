@@ -1695,14 +1695,7 @@ namespace eFMS.API.Accounting.DL.Services
             var advanceNoDone = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceNo && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE).Select(s => s.AdvanceNo).FirstOrDefault();
             var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo
             && x.AdvanceNo == advanceNoDone
-            //&& x.JobId == jobNo 
-            //&& x.Mbl == mbl
-            //&& x.Hbl == hbl
             && x.Hblid == hblId);
-            //var query = from adv in advance
-            //join req in request on adv.AdvanceNo equals req.AdvanceNo //into req1
-            //from req in req1.DefaultIfEmpty()
-            //select req;
             var advanceAmount = request.Sum(x => x.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.RequestCurrency, Currency));
             return advanceAmount.Value;
         }
