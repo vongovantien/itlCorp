@@ -14,6 +14,7 @@ import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChar
 import { CommonEnum } from '@enums';
 import { of } from 'rxjs';
 import { RoutingConstants } from '@constants';
+import { chargeState } from '../store';
 
 @Component({
     selector: 'add-charge',
@@ -51,7 +52,7 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.currencyId = this.formAddCharge.currency.value;
         this.ChargeToAdd.charge.vatrate = +this.formAddCharge.vat.value;
         this.ChargeToAdd.charge.debitCharge = this.formAddCharge.debitCharge.value;
-        this.ChargeToAdd.charge.chargeGroup = !!this.formAddCharge.chargeGroup.value ? this.formAddCharge.chargeGroup.value.id : null;
+        this.ChargeToAdd.charge.chargeGroup = this.formAddCharge.chargeGroup.value;
         this.ChargeToAdd.charge.active = this.formAddCharge.active.value;
         this.ChargeToAdd.charge.productDept = this.formAddCharge.formGroup.controls['productDept'].value;
         let serviceTypeId = '';

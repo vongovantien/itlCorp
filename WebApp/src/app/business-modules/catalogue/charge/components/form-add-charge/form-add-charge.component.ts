@@ -125,9 +125,7 @@ export class FormAddChargeComponent extends AppForm {
     checkValidateForm() {
         let valid: boolean = true;
         this.setError(this.service);
-        // this.setError(this.unit);
-        // this.setError(this.currency);
-        // this.setError(this.chargeGroup);
+        this.setError(this.chargeGroup);
         this.setError(this.formGroup.controls['productDept']);
         if (!this.formGroup.valid) {
             valid = false;
@@ -164,11 +162,6 @@ export class FormAddChargeComponent extends AppForm {
             if (!!res) {
                 const chargeGroup = res;
                 this.ngDataChargeGroup = chargeGroup.map(x => ({ text: x.name, id: x.id }));
-
-                if (this.isUpdate === false) {
-                    this.chargeGroup.setValue({ id: this.ngDataChargeGroup.find(x => x.text === 'Other').id, text: 'Other' });
-
-                }
             }
         });
     }
