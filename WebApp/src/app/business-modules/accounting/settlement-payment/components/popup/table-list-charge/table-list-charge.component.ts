@@ -239,6 +239,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     this.charges.forEach((charge: Surcharge) => {
                         if (charge.chargeId) {
                             charge.chargeId = null;
+                            charge.id = SystemConstants.EMPTY_GUID;
                             charge.chargeName = null;
                         }
                     });
