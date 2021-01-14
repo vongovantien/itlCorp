@@ -273,15 +273,18 @@
 				</div>
 			</div>
 			<div class="col-lg-4">
-				<div class="form-group">
-					<label class="form-control-label" for="">
+				<div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !salemansId.value}">
+					<label class="form-control-label" for="" required>
 						Salesman
 					</label>
 					<app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value: salemansId.value}"
-						(itemSelected)="onSelectDataFormInfo($event, 'salesman')"
-						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async" size="15"
-						[displayFields]="displayFieldSalesman" (remove)="resetFormControl(salemansId)">
+						(itemSelected)="onSelectDataFormInfo($event, 'salesman')" [selectedDisplayFields]="['employeeNameEn']"
+						[dataSources]="salesmans | async" size="15" [displayFields]="displayFieldSalesman"
+						(remove)="resetFormControl(salemansId)">
 					</app-combo-grid-virtual-scroll>
+					<div class="form-control-feedback" *ngIf="isSubmitted && !salemansId.value">
+						Salesman is required!
+					</div>
 				</div>
 			</div>
 		</div>
@@ -458,7 +461,16 @@
 						class="form-control"></textarea>
 				</div>
 			</div>
-			<div class="col-8" *ngIf="opsTransaction">
+			<div class="col-4">
+				<div class="form-group">
+					<label class="form-control-label" for="">
+						Note
+					</label>
+					<textarea formControlName="note" name="note" placeholder="Note"
+						class="form-control"></textarea>
+				</div>
+			</div>
+			<div class="col-4" *ngIf="opsTransaction">
 				<div class="text-right" *ngIf="!opsTransaction.isLocked">
 					<div class="m--margin-bottom-15 m--margin-top-25" *ngIf="opsTransaction.permission.allowUpdate">
 						<button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"

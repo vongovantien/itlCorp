@@ -166,7 +166,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             supplierId: [],
             agentId: [],
             billingOpsId: [this.userLogged.id, Validators.required],
-            salemansId: []
+            salemansId: [null, Validators.required]
         }, { validator: FormValidators.comparePort });
 
         this.hwbno = this.formCreate.controls['hwbno'];

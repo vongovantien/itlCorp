@@ -26,7 +26,7 @@
                         </span>
                     </span>
                 </button>
-                <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="(menuSpecialPermission | async | specialPermission: 'ChangeInfo') === true">
+                <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="(menuSpecialPermission | async | specialPermission: 'ChangeInfo') === true && !isAddSubPartner">
                     <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                             <i class="la la-exchange"></i>
                             Change Info
@@ -117,4 +117,4 @@
     [labelConfirm]="'Ok'" [labelCancel]="'Cancel'" [align]="'left'"></confirm-popup>
 <info-popup #duplicatePartnerPopup [body]="deleteMessage"></info-popup>
 <partner-reject-popup (onSave)="onSaveReject($event)"></partner-reject-popup>
-<app-user-create-popup></app-user-create-popup>
+<app-user-create-popup *ngIf="(menuSpecialPermission | async | specialPermission: 'ChangeInfo') === true && !isAddSubPartner"></app-user-create-popup>

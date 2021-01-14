@@ -18,7 +18,6 @@ export class UserCreatePopupComponent extends PopupBase implements OnInit {
   userList: UserLevel[] = [];
   partnerId: string = '';
   selectedUser: any = new UserLevel();
-  isChecked: boolean = false;
   valueSearch: AbstractControl;
   constructor(private _systemRepo: SystemRepo,
     private _catalogueRepo: CatalogueRepo,
