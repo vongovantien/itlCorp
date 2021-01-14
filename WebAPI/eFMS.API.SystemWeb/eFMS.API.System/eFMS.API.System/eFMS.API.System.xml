@@ -581,9 +581,9 @@
         </member>
         <member name="M:eFMS.API.System.Controllers.SysUserLevelController.GetListUsersByCurrentCompany(eFMS.API.System.DL.Models.SysUserLevelModel)">
             <summary>
-            Get user by type
+            Get user by company of current user
             </summary>
-            <param name="companyId"></param>
+            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.System.Controllers.SysUserPermissionController">
