@@ -16,6 +16,8 @@ import { CommercialFormCreateComponent } from '../components/form-create/form-cr
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommonEnum } from '@enums';
 import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
+import { Store } from '@ngrx/store';
+import { IAppState } from '@store';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -36,8 +38,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         private _activedRoute: ActivatedRoute,
         private _cd: ChangeDetectorRef,
         protected _ngProgressService: NgProgress,
+        protected _store: Store<IAppState>
     ) {
-        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute);
+        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute, _store);
     }
 
     ngOnInit(): void {
