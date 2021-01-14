@@ -264,6 +264,13 @@ export class ExportRepo {
         );
     }
 
+    exportACSAirwayBill(jobId: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportTCSAirExport?jobId=${jobId}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportAccountingPLSheet(body: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingPlSheet`, body).pipe(
             catchError((error) => throwError(error)),

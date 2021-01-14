@@ -233,6 +233,31 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> ExportACSAirExport(string jobId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + jobId);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateTCSAirExportExcel(dataObject.Result);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân ACS.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
         /// Export Shipment Overview
         /// </summary>
         /// <param name="criteria">Id of shipment</param>

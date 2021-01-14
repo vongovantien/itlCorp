@@ -874,6 +874,10 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             );
     }
 
+    exportACS() {
+        this._progressRef.start();
+    }
+
     preview(reportType: string) {
         this._documentationRepo.previewAirwayBill(this.jobId, reportType)
             .pipe(
