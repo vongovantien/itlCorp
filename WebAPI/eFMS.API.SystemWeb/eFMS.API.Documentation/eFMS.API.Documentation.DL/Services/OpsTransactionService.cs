@@ -1245,7 +1245,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        private HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model)
+        public HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model)
         {
             try
             {
@@ -1255,6 +1255,8 @@ namespace eFMS.API.Documentation.DL.Services
                     surcharge.JobNo = model.JobNo;
                     surcharge.Mblno = model.Mblno;
                     surcharge.Hblno = model.Hwbno;
+                    surcharge.DatetimeModified = DateTime.Now;
+                    surcharge.UserModified = currentUser.UserID;
                     var hsUpdateSurcharge = surchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);                    
                 }
                 var sm = surchargeRepository.SubmitChanges();

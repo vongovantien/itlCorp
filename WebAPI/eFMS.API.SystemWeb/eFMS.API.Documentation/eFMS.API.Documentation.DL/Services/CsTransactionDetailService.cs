@@ -2133,7 +2133,7 @@ namespace eFMS.API.Documentation.DL.Services
             return housebillDaily;
         }
 
-        private HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
+        public HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
         {
             try
             {
@@ -2144,6 +2144,8 @@ namespace eFMS.API.Documentation.DL.Services
                     surcharge.JobNo = masterbill?.JobNo;
                     surcharge.Mblno = !string.IsNullOrEmpty(masterbill?.Mawb) ? masterbill?.Mawb : model.Mawb;
                     surcharge.Hblno = model.Hwbno;
+                    surcharge.DatetimeModified = DateTime.Now;
+                    surcharge.UserModified = currentUser.UserID;
                     var hsUpdateSurcharge = surchareRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
                 }
                 var sm = surchareRepository.SubmitChanges();

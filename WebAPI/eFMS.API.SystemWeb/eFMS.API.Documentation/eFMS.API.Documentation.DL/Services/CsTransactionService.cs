@@ -388,6 +388,15 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         var hsContainerDetele = dimensionDetailService.Delete(x => x.Mblid == model.Id);
                     }
+
+                    //Cập nhật JobNo, Mbl, Hbl cho các charge của các housebill thuộc job
+                    var houseBills = csTransactionDetailRepo.Get(x => x.JobId == transaction.Id);
+                    foreach (var houseBill in houseBills)
+                    {
+                        var modelHouse = mapper.Map<CsTransactionDetailModel>(houseBill);
+                        var hsSurcharge = transactionDetailService.UpdateSurchargeOfHousebill(modelHouse);
+                    }
+
                     DataContext.SubmitChanges();
                 }
 
