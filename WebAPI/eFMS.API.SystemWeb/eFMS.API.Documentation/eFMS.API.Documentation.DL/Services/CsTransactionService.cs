@@ -834,6 +834,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (masDetail == null)
                         {
                             masDetail = transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
+                            masDetail = masDetail == null ? transaction?.FirstOrDefault() : masDetail;
                         }
                         jobNo = masDetail?.JobNo.ToString();
                         id = masDetail?.Id.ToString();
@@ -2827,7 +2828,7 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewShipmentCoverPage(Guid Id)
         {
             var dataShipment = DataContext.Get(x => x.Id == Id).FirstOrDefault();
-            var dataHouseBills = csTransactionDetailRepo.Get(x => x.JobId == dataShipment.Id);
+            var dataHouseBills = csTransactionDetailRepo.Get(x => x.JobId == dataShipment.Id && x.ParentId == null);
             var dataContainers = csMawbcontainerRepo.Get(x => x.Mblid == dataShipment.Id);
 
             var listShipment = new List<ShimentConverPageSeaReport>();

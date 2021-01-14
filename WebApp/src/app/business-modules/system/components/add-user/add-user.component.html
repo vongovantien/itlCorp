@@ -30,7 +30,7 @@
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (item.userId === null || item.isDup )}">
                                     <app-combo-grid-virtual-scroll (itemSelected)="selectedUser(item,$event)"
-                                        [currentActiveItemId]="{ field: 'id', value: item.userId}"
+                                        [currentActiveItemId]="{ field: 'id', value: item.userId, hardValue: item.userName}"
                                         [selectedDisplayFields]="['username']" [dataSources]="users"
                                         [displayFields]="[{field: 'username', label: 'User Name'}]" [disabled]="item.id"
                                         (remove)="item.userId = null" placeholder="Please select user" size="15">

@@ -453,6 +453,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
                 this.selectedContract.fileList = this.fileList;
                 const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
+
                 if (!objCheckContract) {
                     this.onRequest.emit(new Contract(this.selectedContract));
                 } else {

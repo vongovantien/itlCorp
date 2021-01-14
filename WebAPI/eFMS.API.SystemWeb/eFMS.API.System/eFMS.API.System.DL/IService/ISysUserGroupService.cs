@@ -18,6 +18,6 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserLevelModel> Query(SysUserLevelCriteria criteria);
         IQueryable<SysUserLevelModel> GetByUserId(string id);
         IQueryable<SysUserLevelModel> GetUsersByType(UserLevelCriteria criteria);
-
+        List<SysUserLevelModel> GetListUsersByCurrentCompany(SysUserLevelModel model);
     }
 }

@@ -19,6 +19,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/reducers';
+import { UserCreatePopupComponent } from './components/user-create-popup/user-create-popup.component';
 
 const routing: Routes = [
     {
@@ -66,7 +67,8 @@ const routing: Routes = [
         AddPartnerDataComponent,
         PartnerDetailComponent,
         PartnerListComponent,
-        PartnerOtherChargePopupComponent
+        PartnerOtherChargePopupComponent,
+        UserCreatePopupComponent
 
     ],
     providers: [],
