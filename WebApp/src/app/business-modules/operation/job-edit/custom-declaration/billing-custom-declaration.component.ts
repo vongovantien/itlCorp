@@ -18,7 +18,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
     @ViewChild(AddMoreModalComponent) poupAddMore: AddMoreModalComponent;
     currentJob: OpsTransaction;
     customClearances: any[];
-    importedData: any[];
+    importedData: any = [];
     headers: CommonInterface.IHeaderTable[];
 
     searchImportedString: string = '';
@@ -137,8 +137,9 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         if (dataToUpdate.length > 0) {
             dataToUpdate.forEach(x => {
                 x.jobNo = null;
+                x.jobId = this.currentJob.id;
+                x.isDelete = true;
             });
-
             this._operationRepo.updateJobToClearances(dataToUpdate)
                 .subscribe(
                     (responses: any) => {

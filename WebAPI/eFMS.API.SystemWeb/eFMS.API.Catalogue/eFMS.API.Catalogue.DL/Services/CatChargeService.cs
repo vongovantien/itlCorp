@@ -337,24 +337,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.ChargeNameVnError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.UnitCode))
-                {
-                    item.UnitError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_UNIT_EMPTY];
-                    item.IsValid = false;
-                }
-                else
-                {
-                    var unit = units.FirstOrDefault(x => x.Code.ToLower() == item.UnitCode.ToLower());
-                    if (unit == null)
-                    {
-                        item.UnitError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_UNIT_NOT_FOUND];
-                        item.IsValid = false;
-                    }
-                    else
-                    {
-                        item.UnitId = unit.Id;
-                    }
-                }
                 if (item.UnitPrice < 0)
                 {
                     item.IsValid = false;
@@ -365,20 +347,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.IsValid = false;
                     item.VatrateError = "VAT is must be lower than 100";
                 }
-                if (!string.IsNullOrEmpty(item.CurrencyId))
-                {
-                    var currency = currencies.FirstOrDefault(x => x.Id == item.CurrencyId);
-                    if (currency == null)
-                    {
-                        item.CurrencyError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_CURRENCY_NOT_FOUND];
-                        item.IsValid = false;
-                    }
-                }
-                else
-                {
-                    item.CurrencyError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_CURRENCY_EMPTY];
-                    item.IsValid = false;
-                }
+                
                 if (string.IsNullOrEmpty(item.Type))
                 {
                     item.TypeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_TYPE_EMPTY];
@@ -545,10 +514,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var list = DataContext.Get(query);
             var currencies = currencyService.Get();
             var units = catUnitService.Get();
-            var catChargeLst = (from charge in list
-                                join curr in currencies on charge.CurrencyId equals curr.Id
-                                join unit in units on charge.UnitId equals unit.Id
-                                select new CatChargeModel
+            var catChargeLst = (from charge in list select new CatChargeModel
                                 {
                                     Id = charge.Id,
                                     Code = charge.Code,
@@ -572,9 +538,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     OfficeId = charge.OfficeId,
                                     CompanyId = charge.CompanyId,
                                     ChargeGroup = charge.ChargeGroup,
-                                    currency = unit.UnitNameEn,
-                                    unit = unit.UnitNameEn
-                                })?.OrderBy(x => x.DatetimeModified).AsQueryable();
+            })?.OrderBy(x => x.DatetimeModified).AsQueryable();
             return catChargeLst;
 
         }

@@ -113,6 +113,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
+        this.dataSearch.partnerType = 'Customer';
         this.dataSearch[event.field || "All"] = event.searchString || '';
 
         if (!!event.field && event.searchString === "") {

@@ -28,6 +28,6 @@ namespace eFMS.API.Operation.DL.IService
         int CheckDetailPermission(int id);
         CustomsDeclarationModel GetDetail(int id);
         List<CustomsDeclarationModel> GetListCustomNoAsignPIC();
-        bool CheckAllowUpdate(int id);
+        bool CheckAllowUpdate(Guid? jobId);
     }
 }
