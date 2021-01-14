@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
+        private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
@@ -67,6 +68,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodity> commodityRepo,
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysOffice> sysOffice,
+            IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -92,6 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
             commodityRepository = commodityRepo;
             sysOfficeRepo = sysOffice;
             userlevelRepository = userlevelRepo;
+            accAdvanceRequestRepository = accAdvanceRequestRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -406,7 +409,8 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(x.SettlementCode)
                             || !string.IsNullOrEmpty(x.SyncedFrom))
                             );
-            if (query.Any())
+            //var dataAdvance = accAdvanceRequestRepository.Get(x => x.JobId == detail.JobNo);
+            if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
             {
                 return false;
             }

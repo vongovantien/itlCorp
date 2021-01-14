@@ -50,6 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysGroup> groupRepository;
         readonly IContextBase<CatCommodity> commodityRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -80,6 +81,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsAirWayBill> airwaybillRepo,
             IContextBase<SysGroup> groupRepo,
             IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -109,6 +111,7 @@ namespace eFMS.API.Documentation.DL.Services
             groupRepository = groupRepo;
             commodityRepository = commodityRepo;
             userlevelRepository = userlevelRepo;
+            accAdvanceRequestRepository = accAdvanceRequestRepo;
 
         }
 
@@ -454,7 +457,9 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.SyncedFrom)
                             || surcharge.AcctManagementId != null
                          select detail);
-            if (query.Any())
+            var data = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
+            
+            if (query.Any() || accAdvanceRequestRepository.Any(x=>x.JobId == data.JobNo))
             {
                 return false;
             }
