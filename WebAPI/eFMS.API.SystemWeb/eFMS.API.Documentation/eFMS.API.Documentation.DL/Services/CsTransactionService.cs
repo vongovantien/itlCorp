@@ -2236,6 +2236,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.AmountVnd = null;
                     item.VatAmountVnd = null;
                     item.ClearanceNo = null;
+                    item.AdvanceNo = null;
 
                     surCharges.Add(item);
                 }

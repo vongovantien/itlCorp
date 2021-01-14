@@ -1400,6 +1400,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.AmountVnd = null;
                     item.VatAmountVnd = null;
                     item.ClearanceNo = null;
+                    item.AdvanceNo = null;
 
                     item.JobNo = shipment.JobNo;
                     item.Hblno = shipment.Hwbno;
