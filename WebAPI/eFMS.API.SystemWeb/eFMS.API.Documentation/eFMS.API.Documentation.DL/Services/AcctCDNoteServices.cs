@@ -374,10 +374,13 @@ namespace eFMS.API.Documentation.DL.Services
                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
                 }
                 var entity = mapper.Map<AcctCdnote>(model);
-                entity.GroupId = model.GroupId;
-                entity.DepartmentId = model.DepartmentId;
-                entity.OfficeId = model.OfficeId;
-                entity.CompanyId = model.CompanyId;
+                entity.GroupId = cdNote.GroupId;
+                entity.DepartmentId = cdNote.DepartmentId;
+                entity.OfficeId = cdNote.OfficeId;
+                entity.CompanyId = cdNote.CompanyId;
+                entity.LastSyncDate = cdNote.LastSyncDate;
+                entity.SyncStatus = cdNote.SyncStatus;
+                entity.ReasonReject = cdNote.ReasonReject;
 
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
