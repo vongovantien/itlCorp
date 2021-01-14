@@ -252,7 +252,9 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.DepartmentId = soaCurrent.DepartmentId;
                         soa.OfficeId = soaCurrent.OfficeId;
                         soa.CompanyId = soaCurrent.CompanyId;
-
+                        soa.SyncStatus = soaCurrent.SyncStatus;
+                        soa.LastSyncDate = soaCurrent.LastSyncDate;
+                        soa.ReasonReject = soaCurrent.ReasonReject;
 
                         //Check exists OBH Debit Charge
                         var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null

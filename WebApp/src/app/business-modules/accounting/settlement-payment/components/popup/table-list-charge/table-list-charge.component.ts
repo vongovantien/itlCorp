@@ -187,7 +187,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 })
             ).subscribe(
                 (res: any[] = []) => {
-                    this.advs = cloneDeep(res);
+                    this.advs = res;
 
                     // ? Have rewrite default value
                     if (!this.advanceNo.value && isUpdateFControl) {
@@ -239,6 +239,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     this.charges.forEach((charge: Surcharge) => {
                         if (charge.chargeId) {
                             charge.chargeId = null;
+                            charge.id = SystemConstants.EMPTY_GUID;
                             charge.chargeName = null;
                         }
                     });

@@ -138,9 +138,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
                             if (hsContract.Success)
                             {
-                                foreach (var item in entity.Contracts)
+                                if(partner.IsRequestApproval == true)
                                 {
-                                    if (item.IsRequestApproval == true)
+                                    foreach (var item in entity.Contracts)
                                     {
                                         entity.ContractType = item.ContractType;
                                         entity.SalesmanId = item.SaleManId;
@@ -149,10 +149,11 @@ namespace eFMS.API.Catalogue.DL.Services
                                         SendMailRequestApproval(entity);
                                     }
                                 }
+                              
                             }
 
                         }
-                        if(entity.PartnerEmails.Count > 0)
+                        if (entity.PartnerEmails.Count > 0)
                         {
                             var emails = mapper.Map<List<CatPartnerEmail>>(entity.PartnerEmails);
                             emails.ForEach(x =>
@@ -165,7 +166,10 @@ namespace eFMS.API.Catalogue.DL.Services
                             var hsEmail = catpartnerEmailRepository.Add(emails);
                         }
                         trans.Commit();
-                        SendMailCreatedSuccess(partner);
+                        if (partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
+                        {
+                            SendMailCreatedSuccess(partner);
+                        }
                     }
                     ClearCache();
                     Get();
@@ -251,7 +255,7 @@ namespace eFMS.API.Catalogue.DL.Services
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-            List<string> lstCc = ListMailCC();
+            List<string> lstCc = ListMailBCC();
             List<string> lstTo = new List<string>();
 
             lstTo.Add(creatorObj?.Email);
@@ -331,11 +335,10 @@ namespace eFMS.API.Catalogue.DL.Services
             ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-            List<string> lstCc = ListMailCC();
-
+            List<string> lstBCc = ListMailBCC();
+            List<string> lstCc = new List<string>();
             lstCc.Add(objInfoSalesman?.Email);
-
-            bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
             {
@@ -359,7 +362,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string url = string.Empty;
             List<string> lstToAR = new List<string>();
             List<string> lstToAccountant = new List<string>();
-            List<string> lstCc = ListMailCC();
+            List<string> lstCc = ListMailBCC();
             List<string> lstCcCreator = new List<string>();
 
             // info send to and cc
@@ -368,12 +371,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (listEmailAR != null && listEmailAR.Any())
             {
-                lstToAR = listEmailAR.Split(";").Select(x=>x.ToLower().Trim()).ToList();
+                lstToAR = listEmailAR.Split(";").Select(x => x.ToLower().Trim()).ToList();
             }
 
             if (listEmailAccountant != null && listEmailAccountant.Any())
             {
-                lstToAccountant = listEmailAccountant.Split(";").Select(x=>x.ToLower().Trim()).ToList();
+                lstToAccountant = listEmailAccountant.Split(";").Select(x => x.ToLower().Trim()).ToList();
             }
 
             switch (partner.PartnerType)
@@ -447,7 +450,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return resultSenmail;
         }
 
-        private List<string> ListMailCC()
+        private List<string> ListMailBCC()
         {
             List<string> lstCc = new List<string>
             {
@@ -510,7 +513,7 @@ namespace eFMS.API.Catalogue.DL.Services
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
 
-            if (model.Contracts.Count > 0)
+            if (model.Contracts?.Count > 0)
             {
                 entity.SalePersonId = model.Contracts.FirstOrDefault().SaleManId.ToString();
             }
@@ -931,7 +934,7 @@ namespace eFMS.API.Catalogue.DL.Services
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
                          join agreement in agreementData on partner.Id equals agreement.PartnerId into agreements
-                         select new { user, partner, x , agreements }
+                         select new { user, partner, x, agreements }
                         );
             if (string.IsNullOrEmpty(criteria.All))
             {
@@ -951,7 +954,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (!string.IsNullOrEmpty(SalemanId))
                 {
-                    query = query.Where(x=> x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
+                    query = query.Where(x => x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
                 }
                 else if (!string.IsNullOrEmpty(criteria.Saleman))
                 {
@@ -972,8 +975,8 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                        //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || x.agreements.Any(y=> y!= null &&  y.SaleManId.Equals(SalemanId))) 
+                           //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
+                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId)))
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
                 //if (!string.IsNullOrEmpty(SalemanId))
@@ -1952,6 +1955,32 @@ namespace eFMS.API.Catalogue.DL.Services
                 results.Add(item);
             }
             return results;
+        }
+
+        /// <summary>
+        /// Update info for partner
+        /// </summary>
+        /// <param name="model">CatPartnerModel</param>
+        /// <returns></returns>
+        public HandleState UpdatePartnerData(CatPartnerCriteria model)
+        {
+            var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            var entity = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+
+            if (entity == null) return new HandleState(403, "");
+            int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = entity.PartnerGroup }, permissionRange, null);
+            if (code == 403) return new HandleState(403, "");
+
+            entity.UserCreated = model.UserCreated; // change creator
+            var hs = DataContext.Update(entity, x => x.Id == model.Id);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return hs;
         }
     }
 }
