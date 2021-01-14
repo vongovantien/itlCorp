@@ -79,6 +79,7 @@ export class Partner {
     partnerLocation: string = '';
     internalCode: string = '';
     creditPayment: string = '';
+    isRequestApproval: boolean = false;
 
 
     permission: PermissionPartner = new PermissionPartner();

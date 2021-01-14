@@ -8,10 +8,19 @@
                     <h3>{{type == 'Customer'? 'Customer': 'Agent'}}</h3>
                     <div>
                         <div class="c-button-actions">
+                            <button (click)="onSave(true)"
+                                *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === false  "
+                                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-send"></i>
+                                    <span> Save & Request Approval </span>
+                                </span>
+                            </button>
                             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
                             </app-default-button>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
                             </app-default-button>
+
                         </div>
                     </div>
                 </div>
