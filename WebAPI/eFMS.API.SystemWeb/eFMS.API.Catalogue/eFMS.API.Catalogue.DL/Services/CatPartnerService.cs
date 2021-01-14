@@ -338,6 +338,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
             lstCc.Add(objInfoSalesman?.Email);
+            lstCc.Add(objInfoCreator?.Email);
             bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
