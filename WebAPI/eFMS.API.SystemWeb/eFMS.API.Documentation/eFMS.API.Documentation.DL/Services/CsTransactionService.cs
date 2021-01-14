@@ -168,7 +168,7 @@ namespace eFMS.API.Documentation.DL.Services
                 default:
                     break;
             }
-            
+
             if (currentShipment != null)
             {
                 countNumberJob = Convert.ToInt32(currentShipment.JobNo.Substring(shipment.Length + 5, 5));
@@ -204,7 +204,7 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-") 
+                                                        && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
                                                         && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
@@ -693,7 +693,7 @@ namespace eFMS.API.Documentation.DL.Services
             var SalemansIds = csTransactionDetailRepo.Get(x => x.JobId == id).Select(t => t.SaleManId).ToArray();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, SalemanIds = SalemansIds, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups , Departments = lstDepartments }, permissionRange, detail.TransactionType);
+            int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = detail.PersonIncharge, SalemanIds = SalemansIds, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups, Departments = lstDepartments }, permissionRange, detail.TransactionType);
             return code;
         }
 
@@ -935,7 +935,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     break;
                 case PermissionRange.Group:
-                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t=>t.UserId).ToList();
+                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
                     masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
@@ -1990,19 +1990,20 @@ namespace eFMS.API.Documentation.DL.Services
             if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0 && model.TransactionType != "SFE" && model.TransactionType != "SLE" && model.TransactionType != "SCE")
                 return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
 
-            var transaction = GetDefaultJob(model);
+            CsTransaction transaction = GetDefaultJob(model);
             List<CsMawbcontainer> containers = new List<CsMawbcontainer>();
             List<CsDimensionDetail> dimensionDetails = new List<CsDimensionDetail>();
             List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>();
             List<CsArrivalFrieghtCharge> freightCharges = new List<CsArrivalFrieghtCharge>();
+
             if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count() > 0)
             {
-                var masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
+                List<CsMawbcontainer> masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
                 containers.AddRange(masterContainers);
             }
             if (model.DimensionDetails != null && model.DimensionDetails.Count() > 0)
             {
-                var masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
+                List<CsDimensionDetail> masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
                 dimensionDetails.AddRange(masterDimensionDetails);
             }
 
@@ -2022,7 +2023,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 foreach (var item in detailTrans)
                 {
-                    var oldHouseId = item.Id;
+                    Guid oldHouseId = item.Id;
                     item.Id = Guid.NewGuid();
                     item.JobId = transaction.Id;
                     item.ManifestRefNo = null;
@@ -2064,32 +2065,30 @@ namespace eFMS.API.Documentation.DL.Services
                     item.OfficeId = currentUser.OfficeID;
                     item.CompanyId = currentUser.CompanyID;
 
-                    var housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
+                    List<CsMawbcontainer> housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
                     if (housebillcontainers != null) containers.AddRange(housebillcontainers);
-                    var housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
+
+                    List<CsDimensionDetail> housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
                     if (housebillDimensions != null) dimensionDetails.AddRange(housebillDimensions);
-                    var houseSurcharges = GetCharges(oldHouseId, item.Id);
-                    if (houseSurcharges != null)
-                    {
-                        surcharges.AddRange(houseSurcharges);
-                    }
-                    var houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
-                    if (houseFreigcharges != null)
-                    {
-                        freightCharges.AddRange(houseFreigcharges);
-                    }
+
+                    List<CsShipmentSurcharge> houseSurcharges = GetCharges(oldHouseId, item, transaction);
+                    if (houseSurcharges != null) surcharges.AddRange(houseSurcharges);
+                 
+                    List<CsArrivalFrieghtCharge> houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
+                    if (houseFreigcharges != null) freightCharges.AddRange(houseFreigcharges);
+                  
                     countDetail = countDetail + 1;
                 }
             }
             try
             {
-                var hsTrans = transactionRepository.Add(transaction);
+                HandleState hsTrans = transactionRepository.Add(transaction);
                 if (hsTrans.Success)
                 {
                     if (detailTrans != null && detailTrans.Count() > 0)
                     {
                         HandleState hsTransDetails = csTransactionDetailRepo.Add(detailTrans, false);
-                        var hs = csTransactionDetailRepo.SubmitChanges();
+                        HandleState hs = csTransactionDetailRepo.SubmitChanges();
                     }
 
                     if (containers != null && containers.Count() > 0)
@@ -2203,10 +2202,11 @@ namespace eFMS.API.Documentation.DL.Services
             return charges;
         }
 
-        private List<CsShipmentSurcharge> GetCharges(Guid oldHouseId, Guid newHouseId)
+        private List<CsShipmentSurcharge> GetCharges(Guid oldHouseId, CsTransactionDetail newHouse, CsTransaction shipment)
         {
             List<CsShipmentSurcharge> surCharges = null;
-            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId);
+            IQueryable<CsShipmentSurcharge> charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId && x.IsFromShipment == true); // Không lấy phí hiện trường
+
             if (charges.Select(x => x.Id).Count() != 0)
             {
                 surCharges = new List<CsShipmentSurcharge>();
@@ -2215,22 +2215,34 @@ namespace eFMS.API.Documentation.DL.Services
                     item.Id = Guid.NewGuid();
                     item.UserCreated = currentUser.UserID;
                     item.DatetimeCreated = DateTime.Now;
-                    item.Hblid = newHouseId;
+                    item.Hblid = newHouse.Id;
+
+                    item.JobNo = shipment.JobNo;
+                    item.Hblno = newHouse.Hwbno;
+                    item.Mblno = newHouse.Mawb;
+
                     item.Soano = null;
                     item.PaySoano = null;
                     item.CreditNo = null;
                     item.DebitNo = null;
                     item.Soaclosed = null;
                     item.SettlementCode = null;
-
                     item.AcctManagementId = null;
                     item.InvoiceNo = null;
+                    item.SeriesNo = null;
                     item.InvoiceDate = null;
                     item.VoucherId = null;
                     item.VoucherIddate = null;
                     item.SyncedFrom = null;
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
+                    item.ExchangeDate = DateTime.Now;
+                    item.FinalExchangeRate = null;
+                    item.AmountVnd = null;
+                    item.VatAmountVnd = null;
+                    item.ClearanceNo = null;
+                    item.AdvanceNo = null;
+
                     surCharges.Add(item);
                 }
             }
@@ -2679,7 +2691,7 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.Mawb = model.MblNo;
                             string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
                             hbl.ForwardingAgentDescription = agentDescription;
-                            
+
 
                             // CR 14501
                             hbl.PackageQty = model.PackageQty;
