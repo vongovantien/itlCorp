@@ -336,21 +336,21 @@ namespace eFMS.API.Documentation.Controllers
         /// download file excel from server
         /// </summary>
         /// <returns></returns>
-        [HttpGet("DownloadExcel")]
-        public async Task<ActionResult> DownloadExcel()
-        {
-            string fileName = Templates.CatPartner.ExcelImportFileName + Templates.ExcelImportEx;
-            string templateName = _hostingEnvironment.ContentRootPath;
-            var result = await new FileHelper().ExportExcel(templateName, fileName);
-            if (result != null)
-            {
-                return result;
-            }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-            }
-        }
+        //[HttpGet("DownloadExcel")]
+        //public async Task<ActionResult> DownloadExcel()
+        //{
+        //    string fileName = Templates.Container.ExcelImportFileName + Templates.ExcelImportEx;
+        //    string templateName = _hostingEnvironment.ContentRootPath;
+        //    var result = await new FileHelper().ExportExcel(templateName, fileName);
+        //    if (result != null)
+        //    {
+        //        return result;
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        //    }
+        //}
         #endregion
 
     }
