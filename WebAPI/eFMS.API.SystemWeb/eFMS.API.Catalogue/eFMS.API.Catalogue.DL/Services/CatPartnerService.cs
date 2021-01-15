@@ -146,6 +146,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         entity.SalesmanId = item.SaleManId;
                                         entity.UserCreated = partner.UserCreated;
                                         entity.ContractService = GetContractServicesName(item.SaleService);
+                                        entity.ContractNo = item.ContractNo;
                                         SendMailRequestApproval(entity);
                                     }
                                 }
