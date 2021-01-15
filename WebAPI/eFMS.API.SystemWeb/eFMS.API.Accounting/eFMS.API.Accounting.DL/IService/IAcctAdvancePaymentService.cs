@@ -72,6 +72,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         void UpdateStatusPaymentOfAdvanceRequest(string settlementCode);
 
+        void UpdateStatusPaymentNotSettledOfAdvanceRequest(Guid hblId, string advanceNo);
+
         HandleState RecallRequest(Guid advanceId);
 
         HandleState UpdatePaymentVoucher(AcctAdvancePaymentModel model);

@@ -1533,6 +1533,10 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (var item in chargeShipmentOld)
                                 {
+                                    #region -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+                                    acctAdvancePaymentService.UpdateStatusPaymentNotSettledOfAdvanceRequest(item.Hblid, item.AdvanceNo);
+                                    #endregion -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+
                                     item.SettlementCode = null;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;
@@ -1600,6 +1604,14 @@ namespace eFMS.API.Accounting.DL.Services
                             if (chargeSceneUpdate.Count() > 0)
                             {
                                 var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
+
+                                #region -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+                                foreach (var chargeExist in listChargeExists)
+                                {
+                                    acctAdvancePaymentService.UpdateStatusPaymentNotSettledOfAdvanceRequest(chargeExist.Hblid, chargeExist.AdvanceNo);
+                                }
+                                #endregion -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+
                                 var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
                                 foreach (ShipmentChargeSettlement itemScene in chargeSceneUpdate)
                                 {
