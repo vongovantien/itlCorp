@@ -91,6 +91,7 @@
     <Compile Include="AutoLockShipmentService.Designer.cs">
       <DependentUpon>AutoLockShipmentService.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\CommonData.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\SendMailHelper.cs" />
     <Compile Include="Models\catDepartment.cs">

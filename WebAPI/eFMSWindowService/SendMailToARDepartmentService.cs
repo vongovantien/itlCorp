@@ -2,21 +2,17 @@
 using eFMSWindowService.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace eFMSWindowService
 {
     partial class SendMailToARDepartmentService : ServiceBase
     {
-        System.Timers.Timer _timer;
+        Timer _timer;
         DateTime _scheduleTime;
 
         public SendMailToARDepartmentService()
@@ -37,6 +33,7 @@ namespace eFMSWindowService
             // Enable timer
             _timer.Enabled = true;
         }
+
         protected override void OnStart(string[] args)
         {
             this.Start();
@@ -95,11 +92,13 @@ namespace eFMSWindowService
                                 }
                                 tableBody = tableBody.Replace("[content]", content.ToString());
                                 string body = headerBody + tableBody + footerBody;
+                                body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
                                 var jobs = data.Where(x => x.OfficeID == item.BranchID);
                                 List<string> toEmails = item.Email.Split(';').Where(x => x != null).ToList();
+                                List<string> emailBCCs = CommonData.EmailBCCs;
                                 if (toEmails.Count > 0 && shipments.Count() > 0)
                                 {
-                                    var s = SendMailHelper.Send(subject, body, toEmails);
+                                    var s = SendMailHelper.Send(subject, body, toEmails, null, null, emailBCCs);
 
                                     #region --- Ghi Log Send Mail ---
                                     var logSendMail = new sysSentEmailHistory
@@ -109,7 +108,8 @@ namespace eFMSWindowService
                                         Subject = subject,
                                         Sent = s,
                                         SentDateTime = DateTime.Now,
-                                        Body = body
+                                        Body = body,
+                                        BCCs = string.Join("; ", emailBCCs)
                                     };
                                     var hsLogSendMail = db.sysSentEmailHistories.Add(logSendMail);
                                     var hsSc = db.SaveChanges();
@@ -136,6 +136,7 @@ namespace eFMSWindowService
             _timer.Stop();
             _timer.Dispose();
         }
+
         protected override void OnStop()
         {
             this.Stop();

@@ -259,40 +259,31 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var surcharge = csShipmentSurchargeRepo.Get();
             var opst = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
-            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
-            var csTransDe = csTransactionDetailRepo.Get();
             var custom = customsDeclarationRepo.Get();
-            var advRequest = acctAdvanceRequestRepo.Get();
+            var advPayment = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
                 refNo = (from set in settlementPayments
-                         join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
-                         from sur in sc.DefaultIfEmpty()
-                         join ops in opst on sur.Hblid equals ops.Hblid into op
-                         from ops in op.DefaultIfEmpty()
-                         join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
-                         from cstd in csd.DefaultIfEmpty()
-                         join cst in csTrans on cstd.JobId equals cst.Id into cs
-                         from cst in cs.DefaultIfEmpty()
-                         join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
-                         from cus in cus1.DefaultIfEmpty()
-                         join req in advRequest on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno) } equals new { JobNo = req.JobId, HBL = req.Hbl, MBL = req.Mbl } into req1
-                         from req in req1.DefaultIfEmpty()
+                         join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
+                         from sur in grpSur.DefaultIfEmpty()
+                         join ops in opst on sur.Hblid equals ops.Hblid into grpOps
+                         from ops in grpOps.DefaultIfEmpty()
+                         join cus in custom on ops.JobNo equals cus.JobNo into grpCus
+                         from cus in grpCus.DefaultIfEmpty()
+                         join adv in advPayment on sur.AdvanceNo equals adv.AdvanceNo into grpAdv
+                         from adv in grpAdv.DefaultIfEmpty()
                          where
                          (
                               criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                               (
                                   (
-                                      (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.Mawb, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Hblno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Mblno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.JobNo, StringComparer.OrdinalIgnoreCase) : true)
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
                                   )
                               )
                               :

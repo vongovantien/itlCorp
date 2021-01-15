@@ -11,10 +11,10 @@ namespace eFMS.API.Common
 {
     public class SendMail
     {
-        public const string _emailFrom = "info.fms@itlvn.com"; // "noreply-efms@itlvn.com";
-        private const string _smtpHost = "webmail.itlvn.com"; // "email-smtp.ap-southeast-2.amazonaws.com";
+        public const string _emailFrom = "info.fms@itlvn.com"; //"noreply-efms@itlvn.com";
+        private const string _smtpHost = "webmail.itlvn.com"; //"email-smtp.ap-southeast-2.amazonaws.com";
         private const string _smptUser = "info.fms"; //"AKIA2AI6JMUOVFIQJQXN";
-        private const string _smtpPassword = "ITPr0No1!"; // "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP";
+        private const string _smtpPassword = "ITPr0No1!"; //"BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP";
 
         public static bool Send(string subject, string body, List<string> toEmails, List<string> attachments, List<string> emailCCs, List<string> emailBCC = null)
         {
@@ -102,7 +102,6 @@ namespace eFMS.API.Common
             }
             finally
             {
-                // InsertEmailHistory(SentUser, Receivers, CCs, "", Subject, result, Description);
             }
             return result;
         }
