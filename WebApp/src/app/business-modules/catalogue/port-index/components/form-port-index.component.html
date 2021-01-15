@@ -15,14 +15,10 @@
                                 <label class="form-control-label">
                                     Port code <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter code" pattern="[a-zA-Z0-9]*" name="code" autocomplete="nope" minlength="3" formControlName="code" maxlength="10">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Please enter code" name="code" autocomplete="nope" minlength="3" formControlName="code" maxlength="10">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && code.invalid">
-                                    Code is required least 3 characters
+                                    Code is required least 3 characters, a-z, A-Z, Unsigned characters, Special Character, No distance
                                 </div>
-                                <div class="form-control-feedback" *ngIf="code.errors?.pattern && isSubmitted">
-                                    Code is required a-z, A-Z, Unsigned characters, Special Character, No distance
-                                </div>
-
                             </div>
                         </div>
                         <div class="col-lg-4">

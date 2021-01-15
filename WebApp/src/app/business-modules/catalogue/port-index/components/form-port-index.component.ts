@@ -37,7 +37,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     isSubmitted: boolean = false;
     isUpdate: boolean = false;
     isShowUpdate: boolean = true;
-
+    codePattern = "[a-zA-Z0-9]*";
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService) {
@@ -51,7 +51,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
 
     initForm() {
         this.portindexForm = this._fb.group({
-            code: [null, FormValidators.required],
+            code: [null, Validators.pattern(this.codePattern)],
             portIndexeNameEN: [null, FormValidators.required],
             portIndexeNameLocal: [null, FormValidators.required],
             country: [null, Validators.required],
@@ -70,15 +70,14 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
         this.warehouseId = this.portindexForm.controls['warehouseId'];
         this.active = this.portindexForm.controls['active'];
     }
+    // get codepattern() {
+    //     return this.portindexForm.get('code');
+    // }
 
     onSubmit() {
         this.isSubmitted = true;
-
-        // Trick to remove validate ng-select
         this.setError(this.zone);
         this.setError(this.warehouseId);
-
-
         const formData = this.portindexForm.getRawValue();
         this.trimInputForm(formData);
         if (this.portindexForm.valid) {
