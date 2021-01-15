@@ -15,5 +15,10 @@ namespace eFMS.API.Documentation.DL.Common
         {
             public static string ExelImportFileName = "Goods";
         }
+        public struct SurCharge
+        {
+            public static string ExcelImportFileName = "Surcharge";
+            public static string ExelImportSurchargeFileName = "Surcharge";
+        }
     }
 }

@@ -13,6 +13,7 @@ import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
 import { JobManagementFormCreateComponent } from './components/form-create/form-create-job.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { JobChargeImportComponent } from './job-import/job-charge-import.component';
 
 
 const routing: Routes = [
@@ -21,16 +22,21 @@ const routing: Routes = [
             {
                 path: '', component: JobManagementComponent
             },
+
             {
                 path: "new",
                 component: JobManagementCreateJobComponent,
                 data: { name: "New", }
             },
             {
+                path: 'import-charge', component: JobChargeImportComponent, data: { name: "ImportJobCharge" }
+            },
+            {
                 path: "job-edit",
                 loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
                 data: { name: 'Detail Job' }
             },
+
         ]
     },
 
@@ -54,6 +60,7 @@ const LIB = [
     ],
     exports: [],
     declarations: [
+        JobChargeImportComponent,
         JobManagementComponent,
         JobManagementCreateJobComponent,
         JobManagementFormSearchComponent,
