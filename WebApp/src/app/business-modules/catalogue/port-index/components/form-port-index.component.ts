@@ -51,7 +51,7 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
 
     initForm() {
         this.portindexForm = this._fb.group({
-            code: [null, Validators.required, Validators.pattern(this.codePattern)],
+            code: [null, Validators.compose([Validators.required, Validators.pattern(this.codePattern), Validators.minLength(3), Validators.maxLength(10)])],
             portIndexeNameEN: [null, FormValidators.required],
             portIndexeNameLocal: [null, FormValidators.required],
             country: [null, Validators.required],
