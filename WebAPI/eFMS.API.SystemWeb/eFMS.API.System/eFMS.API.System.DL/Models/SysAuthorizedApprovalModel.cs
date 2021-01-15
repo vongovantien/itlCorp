@@ -8,5 +8,6 @@ namespace eFMS.API.System.DL.Models
         public string CommissionerName { get; set; }
         public string NameUserCreated { get; set; }
         public string NameUserModified { get; set; }
+        public string OfficeCommissionerName { get; set; }
     }
 }

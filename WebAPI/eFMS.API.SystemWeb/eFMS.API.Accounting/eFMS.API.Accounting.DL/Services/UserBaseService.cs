@@ -210,9 +210,9 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- SETTING FLOW APPROVAL ---
 
         #region --- AUTHORIZED APPROVAL ---
-        public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer)
+        public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer, Guid? officeCommissioner)
         {
-            var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
+            var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && x.OfficeCommissioner == officeCommissioner && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
             return userAuthorizedApprovals;
         }
         #endregion  --- AUTHORIZED APPROVAL ---
@@ -240,15 +240,11 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var userDeputies = new List<string>();
             if (string.IsNullOrEmpty(userId)) return userDeputies;
-            //Get list user authorized of user
-            var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(type, userId);
+            //Get list user authorized of user by type & office
+            var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(type, userId, officeId);
             foreach (var userAuth in userAuthorizedApprovals)
             {
-                //var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
-                //if (isSame)
-                {
-                    userDeputies.Add(userAuth);
-                }
+                userDeputies.Add(userAuth);
             }
             return userDeputies;
         }
