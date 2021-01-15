@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, QueryList, ViewChildren, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, QueryList, ViewChildren, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
@@ -270,6 +270,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 const _customDeclarations = this.filterCDByShipment(data);
 
                 if (_customDeclarations.length > 0) {
+                    this.selectedCD = _customDeclarations[0];
                     this.customNo.setValue(_customDeclarations[0].clearanceNo);
                 }
                 if (!!this.charges.length) {
@@ -517,10 +518,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
 
         const listChargesToSave = cloneDeep(this.charges);
+
+        const formData = this.formGroup.getRawValue();
+
         for (const charge of listChargesToSave) {
             // *start: cập nhật shipment charges
-            charge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
-            charge.advanceNo = !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null;
+            charge.clearanceNo = formData.customNo;
+            charge.advanceNo = formData.advanceNo;
             charge.jobId = this.selectedShipment.jobId;
             charge.jobNo = this.selectedShipment.jobId;
             charge.mblno = this.selectedShipment.mbl;

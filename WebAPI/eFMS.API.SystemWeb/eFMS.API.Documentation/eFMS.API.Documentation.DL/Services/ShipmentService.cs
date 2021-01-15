@@ -1431,6 +1431,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Agent = master.AgentId,
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
+                                        ShipperDescription = house.ShipperDescription,
+                                        ConsigneeDescription = house.ConsigneeDescription,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
