@@ -12,25 +12,47 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !authorizer.value }">
-                                <label required>Authorizer</label>
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !type.value }">
+                                <label for="" required>Type</label>
+                                <ng-select class="custom" formControlName="type" [items]="typeList" [clearable]='false'>
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !officeCommissioner.value }">
+                                <label for="" required>
+                                    Office
+                                </label>
+                                <ng-select [multiple]='false' formControlName="officeCommissioner" class="custom"
+                                    (change)="changeOffice($event)" [items]="officeList" bindLabel="text"
+                                    bindValue="id">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && (!authorizer.value || userList.length === 0) }">
+                                <label for="" required>Authorizer</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, null)"
-                                    [currentActiveItemId]="{ field: 'id', value: authorizer.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="users | async"
-                                    [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
+                                    [currentActiveItemId]="{ field: 'userId', value: authorizer.value}"
+                                    [selectedDisplayFields]="['userName']" [dataSources]="userList"
+                                    [displayFields]="[{field: 'userName', label: 'User Name'}, { field: 'employeeName', label: 'Full Name' }]"
                                     placeholder="Select Authorizer" [height]="200" size="15">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':isSubmitted && !commissioner.value}">
-                                <label required>Commissioner</label>
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && (!commissioner.value || userList.length === 0) }">
+                                <label for="" required>Commissioner</label>
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectDataFormInfo($event,'commisioner')"
-                                    [currentActiveItemId]="{ field: 'id', value: commissioner.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="users | async"
-                                    [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
+                                    [currentActiveItemId]="{ field: 'userId', value: commissioner.value}"
+                                    [selectedDisplayFields]="['userName']" [dataSources]="userList"
+                                    [displayFields]="[{field: 'userName', label: 'User Name'}, { field: 'employeeName', label: 'Full Name' }]"
                                     placeholder="Select Commisioner" [height]="200" size="15">
                                 </app-combo-grid-virtual-scroll>
                             </div>
@@ -77,24 +99,6 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !type.value }">
-                                <label for="" required>Type</label>
-                                <ng-select class="custom" formControlName="type" [items]="typeList" [clearable]='false'>
-                                </ng-select>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-lg-12">
-                                        <app-switch [toggle]="status.value" (change)="changeStatus(status.value)"
-                                            [disabled]="!isUpdate" (toggleChange)="status.setValue($event)">
-                                        </app-switch>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label>
                                     Description
@@ -102,7 +106,18 @@
                                 <textarea formControlName="description" class="form-control m-input m-input--square"
                                     rows="6"></textarea>
                             </div>
-
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-lg-4 col-form-label form-control-label"> Status </label>
+                                    <div class="col-lg-8">
+                                        <app-switch [toggle]="status.value" (change)="changeStatus(status.value)"
+                                            [disabled]="!isUpdate" (toggleChange)="status.setValue($event)">
+                                        </app-switch>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row" *ngIf="isUpdate">
