@@ -17,7 +17,7 @@ namespace eFMS.API.Documentation.DL.Common
         }
         public struct SurCharge
         {
-            public static string ExcelImportFileName = "Surcharge";
+            public static string ExcelImportFileName = "LogisticsImportChargeTemplate.xlsx";
             public static string ExelImportSurchargeFileName = "Surcharge";
         }
     }

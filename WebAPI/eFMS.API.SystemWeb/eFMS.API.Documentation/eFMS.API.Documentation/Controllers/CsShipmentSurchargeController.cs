@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -11,6 +13,7 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -29,6 +32,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeService;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// constructor
@@ -36,11 +40,13 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, ICurrentUser user)
+        /// <param name="hostingEnvironment"></param>
+        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             csShipmentSurchargeService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -336,21 +342,21 @@ namespace eFMS.API.Documentation.Controllers
         /// download file excel from server
         /// </summary>
         /// <returns></returns>
-        //[HttpGet("DownloadExcel")]
-        //public async Task<ActionResult> DownloadExcel()
-        //{
-        //    string fileName = Templates.Container.ExcelImportFileName + Templates.ExcelImportEx;
-        //    string templateName = _hostingEnvironment.ContentRootPath;
-        //    var result = await new FileHelper().ExportExcel(templateName, fileName);
-        //    if (result != null)
-        //    {
-        //        return result;
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-        //    }
-        //}
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string fileName = Templates.SurCharge.ExcelImportFileName;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
         #endregion
 
     }

@@ -1006,4 +1006,11 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/GetLinkASInfomation/`,
             { mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
     }
+
+    downloadChargeExcel() {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }

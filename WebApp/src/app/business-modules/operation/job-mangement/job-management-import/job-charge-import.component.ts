@@ -7,7 +7,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { NgProgress } from '@ngx-progressbar/core';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { AppPage } from 'src/app/app.base';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { finalize, catchError } from 'rxjs/operators';
 
@@ -15,7 +15,7 @@ import { finalize, catchError } from 'rxjs/operators';
     selector: 'app-job-charge-import',
     templateUrl: './job-charge-import.component.html'
 })
-export class JobChargeImportComponent extends AppPage implements OnInit {
+export class JobManagementChargeImportComponent extends AppPage implements OnInit {
     @ViewChild(InfoPopupComponent) invaliDataAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
@@ -29,6 +29,7 @@ export class JobChargeImportComponent extends AppPage implements OnInit {
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
+        private _documentRepo: DocumentationRepo,
         private pagingService: PagingService,
         private sortService: SortService,
         private _progressService: NgProgress,
@@ -120,11 +121,11 @@ export class JobChargeImportComponent extends AppPage implements OnInit {
         }
     }
     downloadSample() {
-        this._catalogueRepo.downloadChargeExcel()
+        this._documentRepo.downloadChargeExcel()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "ImportChargeTemplate.xlsx");
+                    this.downLoadFile(res, "application/ms-excel", "LogisticsImportChargeTemplate.xlsx");
                 },
             );
     }
