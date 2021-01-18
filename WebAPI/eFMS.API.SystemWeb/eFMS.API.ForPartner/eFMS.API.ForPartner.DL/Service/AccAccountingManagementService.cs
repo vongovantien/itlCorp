@@ -976,7 +976,22 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                             };
-                            sysUserNotificationRepository.Add(sysUserNotify);
+                            sysUserNotificationRepository.AddAsync(sysUserNotify);
+
+                            IQueryable<CsShipmentSurcharge> surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
+
+                            if(surcharges != null && surcharges.Count() > 0)
+                            {
+                                foreach (var item in surcharges)
+                                {
+                                    item.PaySyncedFrom = null;
+                                    item.SyncedFrom = null;
+
+                                    var hsUpdateSurcharge = surchargeRepo.Update(item, x => x.Id == item.Id, false);
+                                }
+
+                                surchargeRepo.SubmitChanges();
+                            }
                         }
                         trans.Commit();
                     }
