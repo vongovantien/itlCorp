@@ -334,6 +334,8 @@ namespace eFMS.API.Documentation.DL.Services
             transaction.CompanyId = job.CompanyId;
             transaction.DatetimeCreated = job.DatetimeCreated;
             transaction.UserCreated = job.UserCreated;
+            transaction.TransactionType = job.TransactionType;
+            transaction.JobNo = job.JobNo; //JobNo is unique
 
             if (transaction.IsLocked.HasValue)
             {

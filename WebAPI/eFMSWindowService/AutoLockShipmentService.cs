@@ -9,18 +9,19 @@ namespace eFMSWindowService
 {
     partial class AutoLockShipmentService : ServiceBase
     {
-        System.Timers.Timer _timer;
+        Timer _timer;
         DateTime _scheduleTime;
         public AutoLockShipmentService()
         {
             InitializeComponent();
-            _scheduleTime = DateTime.Today.AddDays(1).AddSeconds(1);
+            _scheduleTime = DateTime.Today.AddDays(1).AddHours(1);
         }
+
         public void Start()
         {
             // Tạo 1 timer từ libary System.Timers
             _timer = new Timer();
-            // Execute mỗi ngày vào lúc 0h sáng
+            // Execute mỗi ngày vào lúc 1h sáng
             _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
             // _timer.Interval = 30000;
             // Những gì xảy ra khi timer đó dc tick
@@ -46,12 +47,14 @@ namespace eFMSWindowService
                 throw ex;
             }
         }
+
         public new void Stop()
         {
             FileHelper.WriteToFile("AutoLockShipment", "Auto lock shipment is stopped at " + DateTime.Now);
             _timer.Stop();
             _timer.Dispose();
         }
+
         protected override void OnStart(string[] args)
         {
             this.Start();

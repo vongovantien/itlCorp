@@ -1335,7 +1335,7 @@ namespace eFMS.API.Operation.DL.Services
         public bool CheckAllowUpdate(Guid? jobId)
         {
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
-            var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Id &&
+            var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid &&
                           (!string.IsNullOrEmpty(x.CreditNo)
                           || !string.IsNullOrEmpty(x.DebitNo)
                           || !string.IsNullOrEmpty(x.Soano)
