@@ -339,19 +339,21 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HousbillProfit GetHouseBillTotalProfit(Guid hblid)
         {
-            var result = new HousbillProfit
+            HousbillProfit result = new HousbillProfit
             {
                 HBLID = hblid,
                 HouseBillTotalCharge = new HouseBillTotalCharge()
             };
-            var surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
+            List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
             if (!surcharges.Any()) return result;
             foreach (var item in surcharges)
             {
                 decimal _rateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 decimal _rateToUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                decimal totalLocal = item.Total * _rateToLocal; //item.RateToLocal;
-                decimal totalUSD = item.Total * _rateToUSD; //item.RateToUSD;
+
+                decimal totalLocal = item.Quantity * (item.UnitPrice ?? 0)  * _rateToLocal; // without vat - 15305
+                decimal totalUSD = item.Quantity * (item.UnitPrice ?? 0) * _rateToUSD; // without vat - 15305
+
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
@@ -368,8 +370,10 @@ namespace eFMS.API.Documentation.DL.Services
                     result.HouseBillTotalCharge.TotalOBHUSD = result.HouseBillTotalCharge.TotalOBHUSD + totalUSD;
                 }
             }
+
             result.ProfitLocal = result.HouseBillTotalCharge.TotalSellingLocal - result.HouseBillTotalCharge.TotalBuyingLocal;
             result.ProfitUSD = result.HouseBillTotalCharge.TotalSellingUSD - result.HouseBillTotalCharge.TotalBuyingUSD;
+
             return result;
         }
 
@@ -499,17 +503,19 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<HousbillProfit> GetShipmentTotalProfit(Guid jobId)
         {
-            var results = new List<HousbillProfit>();
+            List<HousbillProfit> results = new List<HousbillProfit>();
             IQueryable<OpsTransaction> opsShipments = null;
             CsTransaction csShipment = null;
             IQueryable<HousbillProfit> hblids = null;
+
             opsShipments = opsTransRepository.Get(x => x.Id == jobId);
+
             if (opsShipments.Count() == 0)
             {
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
-                    var houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
                     //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
                     //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                     hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
@@ -521,9 +527,9 @@ namespace eFMS.API.Documentation.DL.Services
                 hblids = opsShipments.Select(x => new HousbillProfit { HBLID = x.Hblid, HBLNo = x.Hwbno });
             }
             if (hblids.Count() == 0) return results;
-            foreach (var item in hblids)
+            foreach (HousbillProfit item in hblids)
             {
-                var profit = GetHouseBillTotalProfit(item.HBLID);
+                HousbillProfit profit = GetHouseBillTotalProfit(item.HBLID);
                 profit.HBLNo = item.HBLNo;
                 results.Add(profit);
             }

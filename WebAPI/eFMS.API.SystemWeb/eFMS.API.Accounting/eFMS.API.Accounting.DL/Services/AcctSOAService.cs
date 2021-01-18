@@ -682,7 +682,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
                                             PIC = useGrp.Username,
-                                            IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
+                                            IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"))
                                         };
             var listOperation = queryBuySellOperation.ToList();
             listOperation.ForEach(fe =>
@@ -751,7 +751,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            PackageContainer = cstd.PackageContainer,
                                            TypeCharge = chg.Type,
                                            PIC = useGrp.Username,
-                                           IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
+                                           IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"))
                                        };
             queryBuySellDocument = queryBuySellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -821,7 +821,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
                                             PIC = useGrp.Username,
-                                            IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
+                                            IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"))
                                         };
             var listOperation = queryObhSellOperation.ToList();
             listOperation.ForEach(fe =>
@@ -890,7 +890,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            ExchangeDate = sur.ExchangeDate,
                                            TypeCharge = chg.Type,
                                            PIC = useGrp.Username,
-                                           IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
+                                           IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"))
                                        };
             queryObhSellDocument = queryObhSellDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -959,7 +959,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            FinalExchangeRate = sur.FinalExchangeRate,
                                            TypeCharge = chg.Type,
                                            PIC = useGrp.Username,
-                                           IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER"))
+                                           IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER") || sur.PaySyncedFrom.Equals("SETTLEMENT"))
                                        };
             var listOperation = queryObhBuyOperation.ToList();
             listOperation.ForEach(fe =>
@@ -1030,7 +1030,7 @@ namespace eFMS.API.Accounting.DL.Services
                                           PackageContainer = cstd.PackageContainer,
                                           TypeCharge = chg.Type,
                                           PIC = useGrp.Username,
-                                          IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER"))
+                                          IsSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER") || sur.PaySyncedFrom.Equals("SETTLEMENT"))
                                       };
             queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -1717,79 +1717,140 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        private List<ChargeShipmentModel> GetListChargeOfSoa(IQueryable<ChargeSOAResult> charge, string soaNo, string currencyLocal)
+        private List<ChargeShipmentModel> GetChargesForDetailSoa(string soaNo)
         {
             var data = new List<ChargeShipmentModel>();
-            foreach (var item in charge)
+            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
+            if (soa != null)
             {
-                var chg = new ChargeShipmentModel();
-                chg.SOANo = item.SOANo;
-                chg.ID = item.ID;
-                chg.ChargeCode = item.ChargeCode;
-                chg.ChargeName = item.ChargeName;
-                chg.JobId = item.JobId;
-                chg.HBL = item.HBL;
-                chg.MBL = item.MBL;
-                chg.CustomNo = item.CustomNo;
-                chg.Type = item.Type;
-                chg.Debit = item.Debit;
-                chg.Credit = item.Credit;
-                chg.Currency = item.Currency;
-                chg.InvoiceNo = item.InvoiceNo;
-                chg.ServiceDate = item.ServiceDate;
-                chg.Note = item.Note;
-                chg.CurrencyToLocal = currencyLocal;
-                chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, currencyLocal);
-                chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
-                chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, AccountingConstants.CURRENCY_USD);
-                chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
-                chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
-                chg.DatetimeModifiedSurcharge = item.DatetimeModified;
-                chg.CDNote = item.CDNote;
-                chg.PIC = item.PIC;
-                chg.IsSynced = item.IsSynced;
-                
-                string _syncedFromBy = null;
-                var surcharge = csShipmentSurchargeRepo.Get(x => x.Id == chg.ID).FirstOrDefault();
-                if (chg.Type == AccountingConstants.TYPE_CHARGE_BUY || chg.Type == AccountingConstants.TYPE_CHARGE_SELL || chg.Type == AccountingConstants.TYPE_CHARGE_OBH_SELL)
+                var surcharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soaNo : x.PaySoano == soaNo);
+                foreach (var surcharge in surcharges)
                 {
-                    if (surcharge.SyncedFrom == "SOA")
-                    {
-                        _syncedFromBy = chg.SOANo;
-                    }
-                    if (surcharge.SyncedFrom == "CDNOTE")
-                    {
-                        _syncedFromBy = chg.CDNote;
-                    }
-                    if (surcharge.SyncedFrom == "VOUCHER")
-                    {
-                        _syncedFromBy = surcharge.VoucherId;
-                    }
-                }
-                else if (chg.Type == AccountingConstants.TYPE_CHARGE_OBH_BUY)
-                {
-                    if (surcharge.PaySyncedFrom == "SOA")
-                    {
-                        _syncedFromBy = chg.SOANo;
-                    }
-                    if (surcharge.PaySyncedFrom == "CDNOTE")
-                    {
-                        _syncedFromBy = chg.CDNote;
-                    }
-                    if (surcharge.PaySyncedFrom == "VOUCHER")
-                    {
-                        _syncedFromBy = surcharge.VoucherId;
-                    }
-                }
-                chg.SyncedFromBy = _syncedFromBy;
+                    var chg = new ChargeShipmentModel();
+                    chg.SOANo = soa.Type == "Debit" ? surcharge.Soano : surcharge.PaySoano;
+                    chg.ID = surcharge.Id;
 
-                data.Add(chg);
+                    var charge = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
+                    chg.ChargeCode = charge?.Code;
+                    chg.ChargeName = charge?.ChargeNameEn;
+
+                    chg.JobId = surcharge.JobNo;
+                    chg.HBL = surcharge.Hblno;
+                    chg.MBL = surcharge.Mblno;
+                    chg.Type = surcharge.Type;
+                    chg.Debit = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == soa.Customer && surcharge.Type == "OBH") ? (decimal?)surcharge.Total : null;
+                    chg.Credit = surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == soa.Customer && surcharge.Type == "OBH") ? (decimal?)surcharge.Total : null;
+                    chg.Currency = surcharge.CurrencyId;
+                    chg.InvoiceNo = surcharge.InvoiceNo;
+                    chg.Note = surcharge.Notes;
+                    chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
+                    chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
+                    var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
+                    chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
+                    chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
+                    var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_USD);
+                    chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
+                    chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
+                    chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
+
+                    string _pic = string.Empty;
+                    DateTime? _serviceDate = null;
+                    string _customNo = string.Empty;
+                    if (surcharge.TransactionType == "CL")
+                    {
+                        var ops = opsTransactionRepo.Get(x => x.Hblid == surcharge.Hblid).FirstOrDefault();
+                        if (ops != null)
+                        {
+                            _serviceDate = ops.ServiceDate;
+                            var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
+                            _pic = user?.Username;
+                            _customNo = customsDeclarationRepo.Get(x => x.JobNo == ops.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                        }
+                    }
+                    else
+                    {
+                        var transDetail = csTransactionDetailRepo.Get(x => x.Id == surcharge.Hblid).FirstOrDefault();
+                        if (transDetail != null)
+                        {
+                            var tran = csTransactionRepo.Get(x => x.Id == transDetail.JobId).FirstOrDefault();
+                            if (tran != null)
+                            {
+                                _serviceDate = (tran.TransactionType == "AI" || tran.TransactionType == "SFI" || tran.TransactionType == "SLI" || tran.TransactionType == "SCI" ? tran.Eta : tran.Etd);
+                                var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
+                                _pic = user?.Username;
+                            }
+                        }
+                    }
+                    chg.CustomNo = _customNo;
+                    chg.ServiceDate = _serviceDate;
+                    chg.PIC = _pic;
+
+                    bool _isSynced = false;
+                    string _syncedFromBy = null;
+                    string _cdNote = string.Empty;
+                    if (soa != null)
+                    {
+                        if (soa.Customer == surcharge.PayerId && surcharge.Type == "OBH")
+                        {
+                            _isSynced = !string.IsNullOrEmpty(surcharge.PaySyncedFrom) && (surcharge.PaySyncedFrom.Equals("SOA") || surcharge.PaySyncedFrom.Equals("CDNOTE") || surcharge.PaySyncedFrom.Equals("VOUCHER") || surcharge.PaySyncedFrom.Equals("SETTLEMENT"));
+                            if (surcharge.PaySyncedFrom == "SOA")
+                            {
+                                _syncedFromBy = chg.SOANo;
+                            }
+                            if (surcharge.PaySyncedFrom == "CDNOTE")
+                            {
+                                _syncedFromBy = chg.CDNote;
+                            }
+                            if (surcharge.PaySyncedFrom == "VOUCHER")
+                            {
+                                _syncedFromBy = surcharge.VoucherId;
+                            }
+                            if (surcharge.PaySyncedFrom == "SETTLEMENT")
+                            {
+                                _syncedFromBy = surcharge.SettlementCode;
+                            }
+                            _cdNote = surcharge.CreditNo;
+                        }
+                        else
+                        {
+                            _isSynced = !string.IsNullOrEmpty(surcharge.SyncedFrom) && (surcharge.SyncedFrom.Equals("SOA") || surcharge.SyncedFrom.Equals("CDNOTE") || surcharge.SyncedFrom.Equals("VOUCHER") || surcharge.SyncedFrom.Equals("SETTLEMENT"));
+                            if (surcharge.SyncedFrom == "SOA")
+                            {
+                                _syncedFromBy = chg.SOANo;
+                            }
+                            if (surcharge.SyncedFrom == "CDNOTE")
+                            {
+                                _syncedFromBy = chg.CDNote;
+                            }
+                            if (surcharge.SyncedFrom == "VOUCHER")
+                            {
+                                _syncedFromBy = surcharge.VoucherId;
+                            }
+                            if (surcharge.SyncedFrom == "SETTLEMENT")
+                            {
+                                _syncedFromBy = surcharge.SettlementCode;
+                            }
+
+                            if (surcharge.Type == "BUY")
+                            {
+                                _cdNote = surcharge.CreditNo;
+                            }
+                            if (surcharge.Type == "SELL" || surcharge.Type == "OBH")
+                            {
+                                _cdNote = surcharge.DebitNo;
+                            }
+                        }
+                    }
+                    chg.CDNote = _cdNote;
+                    chg.IsSynced = _isSynced;
+                    chg.SyncedFromBy = _syncedFromBy;
+
+                    data.Add(chg);
+                }
             }
             return data;
         }
-
+        
         public AcctSOADetailResult GetDetailBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
             var data = new AcctSOADetailResult();
@@ -1798,10 +1859,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return data;
             }
-            //Chỉ lấy ra những charge có SOANo == soaNo (Để hạn chế việc join & get data không cần thiết)
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
-            var chargeShipments = GetListChargeOfSoa(charge, soaNo, currencyLocal);
+            var chargeShipments = GetChargesForDetailSoa(soaNo);
             var _groupShipments = new List<GroupShipmentModel>();
             _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC })
             .Select(s => new GroupShipmentModel
@@ -2330,17 +2388,20 @@ namespace eFMS.API.Accounting.DL.Services
                         it.VATAmount = percent * (it.UnitPrice * it.Quantity);
                         if (it.Currency != "VND")
                         {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 2);
 
+                        }
+                        else
+                        {
+                            it.VATAmount = Math.Round(it.VATAmount ?? 0);
                         }
                     }
                     else
                     {
-                        it.VATAmount = it.VATRate;
+                        it.VATAmount = (it.Currency == "VND" ? Math.Round(it.VATRate ?? 0) : Math.Round(it.VATRate ?? 0, 2));
                     }
 
-                    it.NetAmount = it.UnitPrice * it.Quantity;
-
+                    it.NetAmount = (it.Currency == "VND" ? Math.Round((it.UnitPrice * it.Quantity) ?? 0) : Math.Round((it.UnitPrice * it.Quantity) ?? 0, 2));
                 }
 
             }

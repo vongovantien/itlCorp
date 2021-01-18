@@ -265,7 +265,8 @@
                                         <label>Credit Limit</label>
                                         <input
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true || !isUpdate ?  null : 'disabled'"
-                                            type="number" class="form-control" formControlName="creditLimit">
+                                            type="number" autoFormatCurrency class="form-control"
+                                            formControlName="creditLimit">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

@@ -1572,7 +1572,6 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 for (int i = 0; i < lstSoa.exportSOAOPs.Count; i++)
                 {
-
                     var item = lstSoa.exportSOAOPs[i];
                     workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
                     workSheet.Cells[i + addressStartContent, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -1633,20 +1632,20 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 17].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 17].Style.Fill.BackgroundColor.SetColor(colFromHex);
 
-                    workSheet.Cells[i + addressStartContent, 12].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount);
+                    workSheet.Cells[i + addressStartContent, 12].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0));
                     workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
 
-                    workSheet.Cells[i + addressStartContent, 13].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
+                    workSheet.Cells[i + addressStartContent, 13].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0)) + item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
 
-                    workSheet.Cells[i + addressStartContent, 17].Value = item.Charges.Sum(t => t.VATAmount) + item.Charges.Sum(t => t.NetAmount);
+                    workSheet.Cells[i + addressStartContent, 17].Value = item.Charges.Sum(t => Math.Abs(t.VATAmount ?? 0)) + item.Charges.Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat;
 
                     workSheet.Cells[i + addressStartContent, 14].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
 
-                    workSheet.Cells[i + addressStartContent, 15].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.VATAmount);
+                    workSheet.Cells[i + addressStartContent, 15].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0));
 
-                    workSheet.Cells[i + addressStartContent, 16].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
+                    workSheet.Cells[i + addressStartContent, 16].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0)) + item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
                     workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
                     workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
@@ -1669,22 +1668,20 @@ namespace eFMS.API.ReportData.FormatExcel
                         {
                             workSheet.Cells[i + addressStartContent, 12].Value = vatAmount;
                             workSheet.Cells[i + addressStartContent, 15].Value = vatAmount;
-
-
                         }
                         else
                         {
                             workSheet.Cells[i + addressStartContent, 12].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormatUSD;
                         }
-                        workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                        workSheet.Cells[i + addressStartContent, 13].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
                         workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
 
                         if (itemCharge.Type.Contains("OBH"))
                         {
                             workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.NetAmount;
                             workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
-                            workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                            workSheet.Cells[i + addressStartContent, 16].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
                             workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
                             workSheet.Cells[i + addressStartContent, 15].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormatUSD;
@@ -1742,13 +1739,13 @@ namespace eFMS.API.ReportData.FormatExcel
                         if (!it.Type.Contains("OBH"))
                         {
                             totalNetAmountNormalCharge += it.NetAmount.GetValueOrDefault(0M);
-                            totalVATNormalCharge += it.VATAmount.GetValueOrDefault(0M);
+                            totalVATNormalCharge += Math.Abs(it.VATAmount ?? 0);
                             totalNormalCharge = totalNetAmountNormalCharge.GetValueOrDefault(0M) + totalVATNormalCharge.GetValueOrDefault(0M);
                         }
                         else
                         {
                             totalNetAmountOBHCharge += it.NetAmount.GetValueOrDefault(0M);
-                            totalVATOBHCharge += it.VATAmount.GetValueOrDefault(0M);
+                            totalVATOBHCharge += Math.Abs(it.VATAmount ?? 0);
                             totalOBHCharge = totalNetAmountOBHCharge.GetValueOrDefault(0M) + totalVATOBHCharge.GetValueOrDefault(0M);
                         }
 
