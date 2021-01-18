@@ -9,6 +9,7 @@ namespace eFMS.API.ReportData.Models
         public string BillingAddressVN { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public string SoaNo { get; set; }
         public List<ExportSOAOPS> exportSOAOPs { get; set; }
     }
 }
