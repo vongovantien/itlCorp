@@ -1634,13 +1634,31 @@ namespace eFMS.API.Accounting.DL.Services
                                 foreach (var item in listChargeSceneUpdate)
                                 {
                                     var sceneCharge = listChargeExists.Where(x => x.Id == item.Id).FirstOrDefault();
+
                                     if (sceneCharge != null)
                                     {
+                                        sceneCharge.UnitId = item.UnitId;
+                                        sceneCharge.UnitPrice = item.UnitPrice;
+                                        sceneCharge.ChargeId = item.ChargeId;
+                                        sceneCharge.Quantity = item.Quantity;
+                                        sceneCharge.CurrencyId = item.CurrencyId;
+                                        sceneCharge.Vatrate = item.Vatrate;
+                                        sceneCharge.ContNo = item.ContNo;
+                                        sceneCharge.InvoiceNo = item.InvoiceNo;
+                                        sceneCharge.InvoiceDate = item.InvoiceDate;
+                                        sceneCharge.SeriesNo = item.SeriesNo;
+                                        sceneCharge.Notes = item.Notes;
+                                        sceneCharge.PayerId = item.PayerId;
+                                        sceneCharge.PaymentObjectId = item.PaymentObjectId;
+                                        sceneCharge.Type = item.Type;
+                                        sceneCharge.ChargeGroup = item.ChargeGroup;
+
                                         sceneCharge.ClearanceNo = item.ClearanceNo;
                                         sceneCharge.AdvanceNo = item.AdvanceNo;
                                         sceneCharge.JobNo = item.JobNo;
                                         sceneCharge.Mblno = item.Mblno;
                                         sceneCharge.Hblno = item.Hblno;
+
                                         sceneCharge.UserModified = userCurrent;
                                         sceneCharge.DatetimeModified = DateTime.Now;
                                         sceneCharge.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
