@@ -7,6 +7,8 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class RecentlyChargeCriteria
     {
+        public Guid JobId { get; set; }
+        public Guid HblId { get; set; }
         public TransactionTypeEnum TransactionType { get; set; }
         public string CustomerId { get; set; } // HBL
         public string AgentId { get; set; }    // MBL

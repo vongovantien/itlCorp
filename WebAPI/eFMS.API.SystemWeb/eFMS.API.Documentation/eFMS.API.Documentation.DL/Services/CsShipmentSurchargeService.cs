@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -534,22 +535,33 @@ namespace eFMS.API.Documentation.DL.Services
         {
             // get charge info of newest shipment by charge type of an PIC and not existed in current shipment and by criteria: POL, POD, Customer, Shipping Line, Consignee
             string transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            CsTransaction shipment = csTransactionRepository.Get(x => x.OfficeId == currentUser.OfficeID
+
+            Expression<Func<CsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
                                                         && (x.AgentId == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
                                                         && (x.ColoaderId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                                                        && x.TransactionType == transactionType)?.OrderByDescending(x => x.DatetimeCreated)?.FirstOrDefault();
-            if (shipment == null) return null;
+                                                        && x.TransactionType == transactionType);
+
+
+            if (queryShipmentNearest == null) return null;
             List<Guid> houseIds = new List<Guid>();
 
             if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
             {
                 if (criteria.ColoaderId == null) return null;
-                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id).Select(x => x.Id).ToList();
+                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
+
+                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
+                if (shipment == null) return null;
+
+                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.Id != criteria.HblId).Select(x => x.Id).ToList();
             }
-            if (criteria.ChargeType == DocumentConstants.CHARGE_SELL_TYPE)
+           else
             {
                 if (criteria.CustomerId == null) return null;
+                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
+                if (shipment == null) return null;
 
+                // Chỉ lấy house
                 houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))).Select(x => x.Id).ToList();
             }
 
@@ -557,7 +569,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
             if (csShipmentSurcharge == null) return null;
 
-            var result = (
+            IQueryable<CsShipmentSurchargeDetailsModel> result = (
                 from surcharge in csShipmentSurcharge
                 join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
                 join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
@@ -594,7 +606,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                     ChargeNameEn = charge.ChargeNameEn,
                     ChargeCode = charge.Code,
-
                 });
             return result;
         }
