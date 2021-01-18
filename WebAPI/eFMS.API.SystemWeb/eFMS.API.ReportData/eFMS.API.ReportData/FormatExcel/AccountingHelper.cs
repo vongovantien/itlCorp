@@ -1460,7 +1460,7 @@ namespace eFMS.API.ReportData.FormatExcel
                "Đơn Vị Tính/Đơn vị",
                "Số Tờ Khai/Customs Declaration No",
                "Số Vận Đơn/HBL No",
-               "Số HĐ/Invoice No.",
+               "Số HĐ/Invoice No",
                "Trọng Lượng/VOLUMNE",
                "Phí dịch vụ làm hàng/Customs clearance fee",
                "Phí thu hộ/Authorized fees",
