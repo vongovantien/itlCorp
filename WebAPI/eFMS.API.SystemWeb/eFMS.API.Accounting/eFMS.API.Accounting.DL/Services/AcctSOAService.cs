@@ -2330,7 +2330,7 @@ namespace eFMS.API.Accounting.DL.Services
                         it.VATAmount = percent * (it.UnitPrice * it.Quantity);
                         if (it.Currency != "VND")
                         {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 2);
 
                         }
                         else
@@ -2340,10 +2340,10 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        it.VATAmount = (it.Currency == "VND" ? Math.Round(it.VATRate ?? 0) : Math.Round(it.VATRate ?? 0, 3));
+                        it.VATAmount = (it.Currency == "VND" ? Math.Round(it.VATRate ?? 0) : Math.Round(it.VATRate ?? 0, 2));
                     }
 
-                    it.NetAmount = (it.Currency == "VND" ? Math.Round((it.UnitPrice * it.Quantity) ?? 0) : Math.Round((it.UnitPrice * it.Quantity) ?? 0, 3));
+                    it.NetAmount = (it.Currency == "VND" ? Math.Round((it.UnitPrice * it.Quantity) ?? 0) : Math.Round((it.UnitPrice * it.Quantity) ?? 0, 2));
                 }
 
             }
