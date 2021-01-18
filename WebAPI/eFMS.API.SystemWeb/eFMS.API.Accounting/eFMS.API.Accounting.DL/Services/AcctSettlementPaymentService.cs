@@ -1430,6 +1430,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
                                     item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
+                                    item.OfficeId = currentUser.OfficeID;
+                                    item.CompanyId = currentUser.CompanyID;
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }
@@ -1594,6 +1597,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
                                     item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
+                                    item.OfficeId = currentUser.OfficeID;
+                                    item.CompanyId = currentUser.CompanyID;
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }
@@ -1628,27 +1634,18 @@ namespace eFMS.API.Accounting.DL.Services
                                 foreach (var item in listChargeSceneUpdate)
                                 {
                                     var sceneCharge = listChargeExists.Where(x => x.Id == item.Id).FirstOrDefault();
-                                    item.UserCreated = sceneCharge?.UserCreated;
-                                    item.DatetimeCreated = sceneCharge?.DatetimeCreated;
-                                    item.UserModified = userCurrent;
-                                    item.DatetimeModified = DateTime.Now;
-                                    item.ExchangeDate = sceneCharge?.ExchangeDate;
-                                    item.FinalExchangeRate = sceneCharge?.FinalExchangeRate;
-                                    item.CreditNo = sceneCharge?.CreditNo;
-                                    item.DebitNo = sceneCharge?.DebitNo;
-                                    item.PaySoano = sceneCharge?.PaySoano;
-                                    item.Soano = sceneCharge?.Soano;
-                                    item.KickBack = sceneCharge?.KickBack;
-                                    item.QuantityType = sceneCharge?.QuantityType;
-                                    item.IncludedVat = sceneCharge?.IncludedVat;
-                                    item.PaymentRefNo = sceneCharge?.PaymentRefNo;
-                                    item.Status = sceneCharge?.Status;
-                                    item.VoucherId = sceneCharge?.VoucherId;
-                                    item.VoucherIddate = sceneCharge?.VoucherIddate;
-                                    item.VoucherIdre = sceneCharge?.VoucherIdre;
-                                    item.VoucherIdredate = sceneCharge?.VoucherIdredate;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
-                                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                    if (sceneCharge != null)
+                                    {
+                                        sceneCharge.ClearanceNo = item.ClearanceNo;
+                                        sceneCharge.AdvanceNo = item.AdvanceNo;
+                                        sceneCharge.JobNo = item.JobNo;
+                                        sceneCharge.Mblno = item.Mblno;
+                                        sceneCharge.Hblno = item.Hblno;
+                                        sceneCharge.UserModified = userCurrent;
+                                        sceneCharge.DatetimeModified = DateTime.Now;
+                                        sceneCharge.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                        csShipmentSurchargeRepo.Update(sceneCharge, x => x.Id == sceneCharge.Id);
+                                    }
                                 }
                             }
 
@@ -4525,6 +4522,25 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return isLocked;
+        }
+
+        private string GetTransactionTypeOfChargeByHblId(Guid? hblId)
+        {
+            string transactionType = string.Empty;
+            var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
+            if (ops != null)
+            {
+                transactionType = "CL";
+            } else
+            {
+                var tranDetail = csTransactionDetailRepo.Get(x => x.Id == hblId).FirstOrDefault();
+                if (tranDetail != null)
+                {
+                    var tran = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault();
+                    transactionType = tran?.TransactionType;
+                }
+            }
+            return transactionType;
         }
     }
 }
