@@ -196,7 +196,7 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(Guid id)
         {
-            if (transactionService.CheckAllowDelete(id) == false)
+            if (transactionService.CheckAllowDeleteJobUsed(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }

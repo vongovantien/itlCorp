@@ -188,9 +188,9 @@ export class SeaFCLExportComponent extends AppList {
                 (respone: boolean) => {
                     if (respone === true) {
                         this.confirmDeletePopup.show();
-                    } else {
-                        this.infoPopup.show();
-                    }
+                    } //else {
+                    //this.infoPopup.show();
+                    // }
                 }
             );
     }
