@@ -530,7 +530,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && x.AssignTo == currentUser.UserID
                                                                  && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
                                                                  && x.Services.Contains(transactionType)
-                                                                 )?.Select(x => x.UserId).ToList();
+                                                                 )?.Select(x => x.AssignTo).ToList();
             int code = PermissionEx.GetPermissionToUpdateHbl(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
