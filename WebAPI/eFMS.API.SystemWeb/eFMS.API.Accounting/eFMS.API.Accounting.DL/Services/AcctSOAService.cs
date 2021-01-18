@@ -2333,14 +2333,17 @@ namespace eFMS.API.Accounting.DL.Services
                             it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
 
                         }
+                        else
+                        {
+                            it.VATAmount = Math.Round(it.VATAmount ?? 0);
+                        }
                     }
                     else
                     {
-                        it.VATAmount = it.VATRate;
+                        it.VATAmount = (it.Currency == "VND" ? Math.Round(it.VATRate ?? 0) : Math.Round(it.VATRate ?? 0, 3));
                     }
 
-                    it.NetAmount = it.UnitPrice * it.Quantity;
-
+                    it.NetAmount = (it.Currency == "VND" ? Math.Round((it.UnitPrice * it.Quantity) ?? 0) : Math.Round((it.UnitPrice * it.Quantity) ?? 0, 3));
                 }
 
             }
