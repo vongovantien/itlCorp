@@ -55,6 +55,7 @@
         #region -- PAYMENT METHOD --
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
         public static readonly string PAYMENT_METHOD_BANK = "Bank";
+        public static readonly string PAYMENT_METHOD_OTHER = "Other";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --

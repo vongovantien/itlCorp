@@ -2278,7 +2278,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  PartnerNameVN = pat.PartnerNameVn,
                                  BillingAddressVN = pat.AddressVn,
                                  FromDate = s.SoaformDate,
-                                 ToDate = s.SoatoDate
+                                 ToDate = s.SoatoDate,
+                                 SoaNo = s.Soano
                              };
 
             var results = charge.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
@@ -2316,6 +2317,7 @@ namespace eFMS.API.Accounting.DL.Services
             opssoa.BillingAddressVN = resultData?.Select(t => t.BillingAddressVN).FirstOrDefault();
             opssoa.PartnerNameVN = resultData?.Select(t => t.PartnerNameVN).FirstOrDefault();
             opssoa.FromDate = resultData?.Select(t => t.FromDate).FirstOrDefault();
+            opssoa.SoaNo = resultData?.Select(t => t.SoaNo).FirstOrDefault();
 
             foreach (var item in opssoa.exportSOAOPs)
             {
@@ -2324,7 +2326,7 @@ namespace eFMS.API.Accounting.DL.Services
                     decimal? percent = 0;
                     if (it.VATRate > 0)
                     {
-                        percent = (it.VATRate * 10) / 100;
+                        percent = it.VATRate / 100;
                         it.VATAmount = percent * (it.UnitPrice * it.Quantity);
                         if (it.Currency != "VND")
                         {
