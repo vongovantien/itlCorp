@@ -2,16 +2,13 @@ import { Component, Output, ViewChild, EventEmitter } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Validators, FormBuilder, AbstractControl, FormGroup } from '@angular/forms';
 import { formatDate } from '@angular/common';
-
 import { PopupBase } from '@app';
 import { SystemRepo } from '@repositories';
 import { ConfirmPopupComponent } from '@common';
 import { User } from '@models';
-
 import { AuthorizedApproval } from 'src/app/shared/models/system/authorizedApproval';
-
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, catchError } from 'rxjs/operators';
+import { distinctUntilChanged, map, catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'add-authorized-approval-popup',
@@ -28,6 +25,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     formAuthorizedApproval: FormGroup;
     isUpdate: boolean = false;
 
+    officeCommissioner: AbstractControl;
     authorizer: AbstractControl;
     commissioner: AbstractControl;
     effectiveDate: AbstractControl;
@@ -38,7 +36,8 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     authorizedToUpdate: any = {};
 
     users: Observable<User[]>;
-
+    officeList: any[] = [];
+    userList: any[] = [];
 
     typeList: string[] = ['Advance', 'Settlement', 'Unlock Shipment'];
 
@@ -53,12 +52,14 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this.users = this._systemRepo.getSystemUsers({ active: true });
+        // this.users = this._systemRepo.getSystemUsers({ active: true });
+        this.getOffice();
         this.initForm();
     }
 
     initForm() {
         this.formAuthorizedApproval = this._fb.group({
+            officeCommissioner: [null, Validators.required],
             authorizer: [null, Validators.required],
             commissioner: [null, Validators.required],
             effectiveDate: [null],
@@ -68,6 +69,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
             description: []
         });
 
+        this.officeCommissioner = this.formAuthorizedApproval.controls['officeCommissioner'];
         this.authorizer = this.formAuthorizedApproval.controls['authorizer'];
         this.commissioner = this.formAuthorizedApproval.controls['commissioner'];
         this.effectiveDate = this.formAuthorizedApproval.controls['effectiveDate'];
@@ -87,15 +89,15 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
 
     onSelectDataFormInfo($event: any, type: string) {
         if (type === 'commisioner') {
-            this.commissioner.setValue($event.id);
+            this.commissioner.setValue($event.userId);
         } else {
-            this.authorizer.setValue($event.id);
+            this.authorizer.setValue($event.userId);
         }
     }
 
     saveAuthorizedAprroval() {
         this.isSubmitted = true;
-        if (this.formAuthorizedApproval.valid) {
+        if (this.formAuthorizedApproval.valid && this.userList.length > 0) {
             const body: IAuthorizedArroval = {
                 authorizer: !!this.authorizer.value ? this.authorizer.value : null,
                 commissioner: !!this.commissioner ? this.commissioner.value : null, //
@@ -104,6 +106,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
                 type: this.type.value,
                 description: this.formAuthorizedApproval.controls['description'].value,
                 active: this.status.value,
+                officeCommissioner: this.officeCommissioner.value
             };
             if (!this.isUpdate) {
                 this._systemRepo.addNewAuthorizedApproval(body)
@@ -172,6 +175,34 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
         this.minDateExpired = null;
         this.minDateEffective = null;
     }
+
+    getOffice() {
+        this._systemRepo.getAllOffice()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (res: any) => {
+                    this.officeList = res.map((item: any) => ({ id: item.id, text: item.shortName, companyId: item.buid }));
+                },
+            );
+    }
+
+    getUserByOffice(officeId: string) {
+        this._systemRepo.getUserLevelByType({ type: 'office', officeId: officeId })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (res: any) => {
+                    this.userList = res.map((item: any) => ({ userId: item.userId, userName: item.userName, employeeName: item.employeeName })).filter((o, i, arr) => arr.findIndex(t => t.userId === o.userId) === i); //Distinct User
+                },
+            );
+    }
+
+    changeOffice($event) {
+        this.getUserByOffice($event.id);
+    }
 }
 export class IAuthorizedArroval {
     id?: string;
@@ -182,4 +213,5 @@ export class IAuthorizedArroval {
     type: string;
     description: string;
     active: boolean;
+    officeCommissioner: string;
 }

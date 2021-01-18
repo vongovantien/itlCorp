@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
@@ -10,13 +11,17 @@ namespace eFMSWindowService.Helpers
 {
     public static class SendMailHelper
     {
-        public const string _emailFrom = "info.fms@itlvn.com"; // "noreply-efms@itlvn.com";
-        private const string _smtpHost = "webmail.itlvn.com"; // "email-smtp.ap-southeast-2.amazonaws.com";
+        public const string _emailFrom = "info.fms@itlvn.com"; //"noreply-efms@itlvn.com";
+        private const string _smtpHost = "webmail.itlvn.com"; //"email-smtp.ap-southeast-2.amazonaws.com";
         private const string _smptUser = "info.fms"; //"AKIA2AI6JMUOVFIQJQXN";
-        private const string _smtpPassword = "ITPr0No1!"; // "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP";
+        private const string _smtpPassword = "ITPr0No1!"; //"BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP";
 
-        public static bool Send(string subject, string body, List<string> toEmails)
+        public static bool Send(string subject, string body, List<string> toEmails, List<string> attachments = null, List<string> emailCCs = null, List<string> emailBCC = null)
         {
+            string receivers = "";
+            string CCs = "";
+            string BCCs = "";
+
             string description = "";
             bool result = true;
 
@@ -24,7 +29,6 @@ namespace eFMSWindowService.Helpers
             MailMessage message = new MailMessage();
 
             message.From = emailFrom;
-            string receivers = "";
             if (toEmails != null && toEmails.Count() > 0)
             {
                 foreach (string ToEmail in toEmails)
@@ -39,6 +43,38 @@ namespace eFMSWindowService.Helpers
             message.Subject = subject;
             message.Body = body;
 
+            // Add a carbon copy recipient.
+            if (emailCCs != null)
+            {
+                foreach (string EmailCC in emailCCs)
+                {
+                    MailAddress CC = new MailAddress(EmailCC);
+                    CCs += EmailCC + ", ";
+                    message.CC.Add(CC);
+                }
+            }
+
+            // Add a carbon copy recipient.
+            if (emailBCC != null)
+            {
+                foreach (string EmailBCC in emailBCC)
+                {
+                    MailAddress BCC = new MailAddress(EmailBCC);
+                    BCCs += emailBCC + ", ";
+                    message.Bcc.Add(BCC);
+                }
+            }
+
+            //now attached the file
+            if (attachments != null)
+            {
+                foreach (string attachment in attachments)
+                {
+                    Attachment attached = new Attachment(attachment, MediaTypeNames.Application.Octet);
+                    message.Attachments.Add(attached);
+                }
+            }
+
             SmtpClient client = new SmtpClient();
             client.UseDefaultCredentials = false;
 
@@ -47,7 +83,7 @@ namespace eFMSWindowService.Helpers
             client.EnableSsl = true;
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
             client.Credentials =
-                new System.Net.NetworkCredential(_smptUser,
+                new NetworkCredential(_smptUser,
                     _smtpPassword);
             client.Timeout = 300000;
 
@@ -65,8 +101,7 @@ namespace eFMSWindowService.Helpers
                 description = ex.Message;
             }
             finally
-            {
-                // InsertEmailHistory(SentUser, Receivers, CCs, "", Subject, result, Description);
+            {               
             }
             return result;
         }

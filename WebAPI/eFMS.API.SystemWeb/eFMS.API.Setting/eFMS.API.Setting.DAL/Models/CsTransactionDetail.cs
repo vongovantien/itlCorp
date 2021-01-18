@@ -148,6 +148,10 @@ namespace eFMS.API.Setting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public string SalesGroupId { get; set; }
+        public string SalesDepartmentId { get; set; }
+        public string SalesOfficeId { get; set; }
+        public string SalesCompanyId { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

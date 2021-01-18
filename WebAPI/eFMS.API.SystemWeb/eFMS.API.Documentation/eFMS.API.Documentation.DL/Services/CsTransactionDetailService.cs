@@ -1436,7 +1436,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.SpecialText = "AT SHIPPER´S LOAD, COUNT, STOWAGE AND SEAL. THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER´S ACCOUNT";
                 housebill.Service = data.TransactionType;
                 housebill.Qty = !string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper(); //Ưu tiên Package container >> List of good
-                housebill.MaskNos = markNo?.ToUpper();
+                housebill.MaskNos = !string.IsNullOrEmpty(data.ContSealNo) ? data.ContSealNo : markNo?.ToUpper(); //Ưu tiên Container No/Container Type/Seal No của Housebill >> List of good [18/01/2021]
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 var _totalGwCont = conts.Select(s => s.Gw).Sum() ?? 0; //Tổng grossweight trong list cont;
                 var _totalGwHbl = data.GrossWeight ?? 0; //Grossweight of housebill
@@ -2133,7 +2133,7 @@ namespace eFMS.API.Documentation.DL.Services
             return housebillDaily;
         }
 
-        private HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
+        public HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
         {
             try
             {
@@ -2144,6 +2144,8 @@ namespace eFMS.API.Documentation.DL.Services
                     surcharge.JobNo = masterbill?.JobNo;
                     surcharge.Mblno = !string.IsNullOrEmpty(masterbill?.Mawb) ? masterbill?.Mawb : model.Mawb;
                     surcharge.Hblno = model.Hwbno;
+                    surcharge.DatetimeModified = DateTime.Now;
+                    surcharge.UserModified = currentUser.UserID;
                     var hsUpdateSurcharge = surchareRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
                 }
                 var sm = surchareRepository.SubmitChanges();

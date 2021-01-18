@@ -146,6 +146,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         entity.SalesmanId = item.SaleManId;
                                         entity.UserCreated = partner.UserCreated;
                                         entity.ContractService = GetContractServicesName(item.SaleService);
+                                        entity.ContractNo = item.ContractNo;
                                         SendMailRequestApproval(entity);
                                     }
                                 }
@@ -308,6 +309,9 @@ namespace eFMS.API.Catalogue.DL.Services
             string body = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
 
+            string title = string.Empty;
+            title = partner.PartnerType == "Customer" ? "Customer" : "Agent";
+
 
             linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
@@ -315,7 +319,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
-              "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
+              "<i> You have a " + title +" Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
               "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
 
               "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
@@ -338,6 +342,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
             lstCc.Add(objInfoSalesman?.Email);
+            lstCc.Add(objInfoCreator?.Email);
             bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory

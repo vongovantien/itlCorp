@@ -969,8 +969,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
                 data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
-                data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
-                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
+                data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
+                var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
+                data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription :  catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.Shipper = !string.IsNullOrEmpty( data.ShipperDescription) ? data.ShipperDescription : catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
                 data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault()?.Username;
                 data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
@@ -1374,6 +1378,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Agent = master.AgentId,
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
+                                        ShipperDescription = house.ShipperDescription,
+                                        ConsigneeDescription = house.ConsigneeDescription,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
@@ -1425,6 +1431,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Agent = master.AgentId,
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
+                                        ShipperDescription = house.ShipperDescription,
+                                        ConsigneeDescription = house.ConsigneeDescription,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,

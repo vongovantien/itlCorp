@@ -31,5 +31,6 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list);
         HandleState LockOpsTransaction(Guid jobId);
         ResultHandle ImportDuplicateJob(OpsTransactionModel model);
+        HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
     }
 }

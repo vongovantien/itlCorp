@@ -406,7 +406,7 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public HandleState AddAndUpate(List<CsShipmentSurchargeModel> list)
+        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list)
         {
             var result = new HandleState();
             var surcharges = mapper.Map<List<CsShipmentSurcharge>>(list);
@@ -424,6 +424,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.DebitNo = string.IsNullOrEmpty(item.DebitNo?.Trim()) ? null : item.DebitNo;
                         item.Soano = string.IsNullOrEmpty(item.Soano?.Trim()) ? null : item.Soano;
                         item.PaySoano = string.IsNullOrEmpty(item.PaySoano?.Trim()) ? null : item.PaySoano;
+
                         if (item.Id == Guid.Empty)
                         {
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
@@ -451,6 +452,30 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         else
                         {
+                            string _jobNo = string.Empty;
+                            string _mblNo = string.Empty;
+                            string _hblNo = string.Empty;
+                            if (item.TransactionType != "CL")
+                            {
+                                var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                _hblNo = houseBill?.Hwbno;
+                                if (houseBill != null)
+                                {
+                                    var masterBill = csTransactionRepository.Get(x => x.Id == houseBill.JobId).FirstOrDefault();
+                                    _jobNo = masterBill?.JobNo;
+                                    _mblNo = !string.IsNullOrEmpty(masterBill?.Mawb) ? masterBill?.Mawb : houseBill.Mawb;
+                                }
+                            }
+                            else
+                            {
+                                var masterBill = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                                _jobNo = masterBill?.JobNo;
+                                _mblNo = masterBill?.Mblno;
+                                _hblNo = masterBill?.Hwbno;
+                            }
+                            item.JobNo = _jobNo;
+                            item.Mblno = _mblNo;
+                            item.Hblno = _hblNo;
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
                             var d = DataContext.Update(item, x => x.Id == item.Id, true);

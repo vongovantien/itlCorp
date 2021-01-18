@@ -218,15 +218,15 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !salemansId.value}">
+                                    <label class="form-control-label" for="" required>
                                         Salesman
                                     </label>
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value: salemansId.value}"
                                         (itemSelected)="onSelectDataFormInfo($event, 'salesman')"
                                         [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async"
-                                        size="15" [displayFields]="displayFieldSalesman"
+                                        size="15" [displayFields]="displayFieldSalesman" placeholder="Please select"
                                         (remove)="resetFormControl(salemansId)">
                                     </app-combo-grid-virtual-scroll>
                                 </div>

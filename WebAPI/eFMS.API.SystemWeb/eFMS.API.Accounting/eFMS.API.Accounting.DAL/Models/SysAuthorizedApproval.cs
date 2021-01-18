@@ -22,5 +22,6 @@ namespace eFMS.API.Accounting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public Guid? OfficeCommissioner { get; set; }
     }
 }
