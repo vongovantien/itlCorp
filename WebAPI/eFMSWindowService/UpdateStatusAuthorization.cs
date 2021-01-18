@@ -2,7 +2,6 @@
 using eFMSWindowService.Models;
 using System;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Timers;

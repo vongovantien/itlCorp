@@ -259,40 +259,31 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var surcharge = csShipmentSurchargeRepo.Get();
             var opst = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
-            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
-            var csTransDe = csTransactionDetailRepo.Get();
             var custom = customsDeclarationRepo.Get();
-            var advRequest = acctAdvanceRequestRepo.Get();
+            var advPayment = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
                 refNo = (from set in settlementPayments
-                         join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
-                         from sur in sc.DefaultIfEmpty()
-                         join ops in opst on sur.Hblid equals ops.Hblid into op
-                         from ops in op.DefaultIfEmpty()
-                         join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
-                         from cstd in csd.DefaultIfEmpty()
-                         join cst in csTrans on cstd.JobId equals cst.Id into cs
-                         from cst in cs.DefaultIfEmpty()
-                         join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
-                         from cus in cus1.DefaultIfEmpty()
-                         join req in advRequest on new { JobNo = (cst.JobNo != null ? cst.JobNo : ops.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno), MBL = (cst.Mawb != null ? cst.Mawb : ops.Mblno) } equals new { JobNo = req.JobId, HBL = req.Hbl, MBL = req.Mbl } into req1
-                         from req in req1.DefaultIfEmpty()
+                         join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
+                         from sur in grpSur.DefaultIfEmpty()
+                         join ops in opst on sur.Hblid equals ops.Hblid into grpOps
+                         from ops in grpOps.DefaultIfEmpty()
+                         join cus in custom on ops.JobNo equals cus.JobNo into grpCus
+                         from cus in grpCus.DefaultIfEmpty()
+                         join adv in advPayment on sur.AdvanceNo equals adv.AdvanceNo into grpAdv
+                         from adv in grpAdv.DefaultIfEmpty()
                          where
                          (
                               criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                               (
                                   (
-                                      (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.Mawb, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Hblno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Mblno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.JobNo, StringComparer.OrdinalIgnoreCase) : true)
                                       || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
                                   )
                               )
                               :
@@ -1439,6 +1430,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
                                     item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
+                                    item.OfficeId = currentUser.OfficeID;
+                                    item.CompanyId = currentUser.CompanyID;
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }
@@ -1542,6 +1536,10 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (var item in chargeShipmentOld)
                                 {
+                                    #region -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+                                    acctAdvancePaymentService.UpdateStatusPaymentNotSettledOfAdvanceRequest(item.Hblid, item.AdvanceNo);
+                                    #endregion -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+
                                     item.SettlementCode = null;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;
@@ -1599,6 +1597,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
                                     item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
+                                    item.OfficeId = currentUser.OfficeID;
+                                    item.CompanyId = currentUser.CompanyID;
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }
@@ -1609,6 +1610,14 @@ namespace eFMS.API.Accounting.DL.Services
                             if (chargeSceneUpdate.Count() > 0)
                             {
                                 var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
+
+                                #region -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+                                foreach (var chargeExist in listChargeExists)
+                                {
+                                    acctAdvancePaymentService.UpdateStatusPaymentNotSettledOfAdvanceRequest(chargeExist.Hblid, chargeExist.AdvanceNo);
+                                }
+                                #endregion -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
+
                                 var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
                                 foreach (ShipmentChargeSettlement itemScene in chargeSceneUpdate)
                                 {
@@ -1625,27 +1634,18 @@ namespace eFMS.API.Accounting.DL.Services
                                 foreach (var item in listChargeSceneUpdate)
                                 {
                                     var sceneCharge = listChargeExists.Where(x => x.Id == item.Id).FirstOrDefault();
-                                    item.UserCreated = sceneCharge?.UserCreated;
-                                    item.DatetimeCreated = sceneCharge?.DatetimeCreated;
-                                    item.UserModified = userCurrent;
-                                    item.DatetimeModified = DateTime.Now;
-                                    item.ExchangeDate = sceneCharge?.ExchangeDate;
-                                    item.FinalExchangeRate = sceneCharge?.FinalExchangeRate;
-                                    item.CreditNo = sceneCharge?.CreditNo;
-                                    item.DebitNo = sceneCharge?.DebitNo;
-                                    item.PaySoano = sceneCharge?.PaySoano;
-                                    item.Soano = sceneCharge?.Soano;
-                                    item.KickBack = sceneCharge?.KickBack;
-                                    item.QuantityType = sceneCharge?.QuantityType;
-                                    item.IncludedVat = sceneCharge?.IncludedVat;
-                                    item.PaymentRefNo = sceneCharge?.PaymentRefNo;
-                                    item.Status = sceneCharge?.Status;
-                                    item.VoucherId = sceneCharge?.VoucherId;
-                                    item.VoucherIddate = sceneCharge?.VoucherIddate;
-                                    item.VoucherIdre = sceneCharge?.VoucherIdre;
-                                    item.VoucherIdredate = sceneCharge?.VoucherIdredate;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
-                                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                    if (sceneCharge != null)
+                                    {
+                                        sceneCharge.ClearanceNo = item.ClearanceNo;
+                                        sceneCharge.AdvanceNo = item.AdvanceNo;
+                                        sceneCharge.JobNo = item.JobNo;
+                                        sceneCharge.Mblno = item.Mblno;
+                                        sceneCharge.Hblno = item.Hblno;
+                                        sceneCharge.UserModified = userCurrent;
+                                        sceneCharge.DatetimeModified = DateTime.Now;
+                                        sceneCharge.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                        csShipmentSurchargeRepo.Update(sceneCharge, x => x.Id == sceneCharge.Id);
+                                    }
                                 }
                             }
 
@@ -4522,6 +4522,25 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return isLocked;
+        }
+
+        private string GetTransactionTypeOfChargeByHblId(Guid? hblId)
+        {
+            string transactionType = string.Empty;
+            var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
+            if (ops != null)
+            {
+                transactionType = "CL";
+            } else
+            {
+                var tranDetail = csTransactionDetailRepo.Get(x => x.Id == hblId).FirstOrDefault();
+                if (tranDetail != null)
+                {
+                    var tran = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault();
+                    transactionType = tran?.TransactionType;
+                }
+            }
+            return transactionType;
         }
     }
 }
