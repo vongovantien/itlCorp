@@ -1836,9 +1836,10 @@ namespace eFMS.API.Accounting.DL.Services
             //var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
 
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
-            var partner = catPartnerRepo.Get();
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeExportForSOAOPS(soaNo);
+            var customerId = soa?.FirstOrDefault().Customer;
+            var partner = catPartnerRepo.Get(x => x.Id == customerId || string.IsNullOrEmpty(customerId));
             var dataResult = from s in soa
                              join chg in charge on s.Soano equals chg.SOANo into chg2
                              from chg in chg2.DefaultIfEmpty()
@@ -1902,8 +1903,8 @@ namespace eFMS.API.Accounting.DL.Services
                 result.IssuedBy = sysUserRepo.Get(x => x.Id == result.IssuedBy).FirstOrDefault()?.Username;
             }
 
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeExportForSOAOPS(soaNo).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.HBL).AsQueryable();
 
             if (results.Select(x => x.Key).Count() > 0)
@@ -1917,7 +1918,7 @@ namespace eFMS.API.Accounting.DL.Services
                     air.FlightNo = chargeData.FlightNo;
                     air.ShippmentDate = chargeData.ShippmentDate;
                     air.AOL = port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
-                    air.Mawb = chargeData.MBL.Substring(0, 3) + "-" + chargeData.MBL.Substring(chargeData.MBL.Length - 9);
+                    air.Mawb = chargeData.MBL?.Trim();
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
                     air.Service = "Normal"; // tạm thời hardcode;
                     air.Pcs = chargeData.PackageQty;
@@ -2104,8 +2105,8 @@ namespace eFMS.API.Accounting.DL.Services
                 result.IssuedBy = sysUserRepo.Get(x => x.Id == result.IssuedBy).FirstOrDefault()?.Username;
             }
 
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeExportForSOAOPS(soaNo).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.JobId).AsQueryable();
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
@@ -2256,34 +2257,346 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
+        /// <summary>
+        /// Get data export for SOA OPS
+        /// </summary>
+        /// <param name="soaNo"></param>
+        /// <returns></returns>
+        public IQueryable<ChargeSOAResult> GetChargeExportForSOAOPS(string soaNo)
+        {
+            //Chỉ lấy những phí từ shipment (IsFromShipment = true)
+            var surchargeBuySell = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && (x.Type == AccountingConstants.TYPE_CHARGE_BUY || x.Type == AccountingConstants.TYPE_CHARGE_SELL)
+                                                            && x.Soano == soaNo || x.PaySoano == soaNo);
+            var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
+            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && !string.IsNullOrEmpty(x.TransactionType));
+            var csTransDe = csTransactionDetailRepo.Get();
+            var creditNote = acctCdnoteRepo.Get(x => x.Type == "CREDIT");
+            var debitNote = acctCdnoteRepo.Get(x => x.Type == "DEBIT" || x.Type == "INVOICE");
+            var charge = catChargeRepo.Get();
+            var sysUsers = sysUserRepo.Get();
+            var unit = catUnitRepo.Get();
+
+            // BUY & SELL
+            var queryBuySell = from sur in surchargeBuySell
+                               join chg in charge on sur.ChargeId equals chg.Id into chg2
+                               from chg in chg2.DefaultIfEmpty()
+                               join uni in unit on sur.UnitId equals uni.Id into uni2
+                               from uni in uni2.DefaultIfEmpty()
+                               select new ChargeSOAResult
+                               {
+                                   ID = sur.Id,
+                                   HBLID = sur.Hblid,
+                                   ChargeID = sur.ChargeId,
+                                   ChargeCode = chg.Code,
+                                   ChargeName = chg.ChargeNameEn,
+                                   JobId = null,
+                                   HBL = null,
+                                   MBL = null,
+                                   Type = sur.Type,
+                                   Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
+                                   Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
+                                   SOANo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
+                                   IsOBH = false,
+                                   Currency = sur.CurrencyId,
+                                   InvoiceNo = sur.InvoiceNo,
+                                   Note = sur.Notes,
+                                   CustomerID = sur.PaymentObjectId,
+                                   ServiceDate = null,
+                                   CreatedDate = null,
+                                   InvoiceIssuedDate = null,
+                                   TransactionType = null,
+                                   UserCreated = null,
+                                   Quantity = sur.Quantity,
+                                   UnitId = sur.UnitId,
+                                   Unit = uni.UnitNameEn,
+                                   UnitPrice = sur.UnitPrice,
+                                   VATRate = sur.Vatrate,
+                                   CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
+                                   DatetimeModified = sur.DatetimeModified,
+                                   CommodityGroupID = null,
+                                   Service = null,
+                                   CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                   TypeCharge = chg.Type,
+                                   ExchangeDate = sur.ExchangeDate,
+                                   FinalExchangeRate = sur.FinalExchangeRate,
+                                   PIC = null,
+                                   IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
+                               };
+            var queryBuySellOperation = from sur in queryBuySell
+                                        join ops in opst on sur.HBLID equals ops.Hblid
+                                        select new ChargeSOAResult
+                                        {
+                                            ID = sur.ID,
+                                            HBLID = sur.HBLID,
+                                            ChargeID = sur.ChargeID,
+                                            ChargeCode = sur.ChargeCode,
+                                            ChargeName = sur.ChargeName,
+                                            JobId = ops.JobNo,
+                                            HBL = ops.Hwbno,
+                                            MBL = ops.Mblno,
+                                            Type = sur.Type,
+                                            Debit = sur.Debit,
+                                            Credit = sur.Credit,
+                                            SOANo = sur.SOANo,
+                                            IsOBH = false,
+                                            Currency = sur.Currency,
+                                            InvoiceNo = sur.InvoiceNo,
+                                            Note = sur.Note,
+                                            CustomerID = sur.CustomerID,
+                                            ServiceDate = ops.ServiceDate,
+                                            CreatedDate = ops.DatetimeCreated,
+                                            InvoiceIssuedDate = sur.InvoiceIssuedDate,
+                                            TransactionType = null,
+                                            UserCreated = ops.UserCreated,
+                                            Quantity = sur.Quantity,
+                                            UnitId = sur.UnitId,
+                                            UnitPrice = sur.UnitPrice,
+                                            VATRate = sur.VATRate,
+                                            CreditDebitNo = sur.CreditDebitNo,
+                                            DatetimeModified = sur.DatetimeModified,
+                                            CommodityGroupID = null,
+                                            Service = "CL",
+                                            CDNote = sur.CDNote,
+                                            TypeCharge = sur.TypeCharge,
+                                            ExchangeDate = sur.ExchangeDate,
+                                            FinalExchangeRate = sur.FinalExchangeRate,
+                                            PIC = null,
+                                            IsSynced = sur.IsSynced
+                                        };
+            var queryBuySellDocument = from sur in queryBuySell
+                                       join cstd in csTransDe on sur.HBLID equals cstd.Id
+                                       join cst in csTrans on cstd.JobId equals cst.Id
+                                       select new ChargeSOAResult
+                                       {
+                                           ID = sur.ID,
+                                           HBLID = sur.HBLID,
+                                           ChargeID = sur.ChargeID,
+                                           ChargeCode = sur.ChargeCode,
+                                           ChargeName = sur.ChargeName,
+                                           JobId = cst.JobNo,
+                                           HBL = cstd.Hwbno,
+                                           MBL = cst.Mawb,
+                                           Type = sur.Type,
+                                           Debit = sur.Debit,
+                                           Credit = sur.Credit,
+                                           SOANo = sur.SOANo,
+                                           IsOBH = false,
+                                           Currency = sur.Currency,
+                                           InvoiceNo = sur.InvoiceNo,
+                                           Note = sur.Note,
+                                           CustomerID = sur.CustomerID,
+                                           ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                           CreatedDate = cst.DatetimeCreated,
+                                           InvoiceIssuedDate = sur.InvoiceIssuedDate,
+                                           TransactionType = cst.TransactionType,
+                                           UserCreated = cst.UserCreated,
+                                           Quantity = sur.Quantity,
+                                           UnitId = sur.UnitId,
+                                           Unit = sur.Unit,
+                                           UnitPrice = sur.UnitPrice,
+                                           VATRate = sur.VATRate,
+                                           CreditDebitNo = sur.CreditDebitNo,
+                                           DatetimeModified = sur.DatetimeModified,
+                                           CommodityGroupID = null,
+                                           Service = cst.TransactionType,
+                                           CDNote = sur.CDNote,
+                                           Commodity = cst.Commodity,
+                                           FlightNo = cstd.FlightNo,
+                                           ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType == "AI" ? cstd.Eta : null,
+                                           AOL = cst.Pol,
+                                           AOD = cst.Pod,
+                                           PackageQty = cstd.PackageQty,
+                                           GrossWeight = cstd.GrossWeight,
+                                           ChargeWeight = cstd.ChargeWeight,
+                                           FinalExchangeRate = sur.FinalExchangeRate,
+                                           ExchangeDate = sur.ExchangeDate,
+                                           CBM = cstd.Cbm,
+                                           PackageContainer = cstd.PackageContainer,
+                                           TypeCharge = sur.TypeCharge,
+                                           PIC = null,
+                                           IsSynced = sur.IsSynced
+                                       };
+            var queryDataBuySell = queryBuySellOperation.Union(queryBuySellDocument);
+
+            // OBH (BUY-SELL)
+            var surchargeOBH = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && (x.Soano == soaNo || x.PaySoano == soaNo));
+            var partner = catPartnerRepo.Get();
+            var queryChargeOBH = from sur in surchargeOBH
+                                 join debitN in debitNote on sur.DebitNo equals debitN.Code into debitN2
+                                 from debitN in debitN2.DefaultIfEmpty()
+                                 join creditN in creditNote on sur.CreditNo equals creditN.Code into creditN2
+                                 from creditN in creditN2.DefaultIfEmpty()
+                                 join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                 from chg in chg2.DefaultIfEmpty()
+                                 join pat in partner on sur.PaymentObjectId equals pat.Id into pat2
+                                 from pat in pat2.DefaultIfEmpty()
+                                 join uni in unit on sur.UnitId equals uni.Id into uni2
+                                 from uni in uni2.DefaultIfEmpty()
+                                 select new ChargeSOAResult
+                                 {
+                                     ID = sur.Id,
+                                     HBLID = sur.Hblid,
+                                     ChargeID = sur.ChargeId,
+                                     ChargeCode = chg.Code,
+                                     ChargeName = chg.ChargeNameEn,
+                                     JobId = null,
+                                     HBL = null,
+                                     MBL = null,
+                                     Type = sur.Type + (!string.IsNullOrEmpty(sur.DebitNo) ? "-SELL" : "-BUY"),
+                                     Debit = sur.Total,
+                                     Credit = sur.Total,
+                                     SOANo = sur.Soano,
+                                     IsOBH = true,
+                                     Currency = sur.CurrencyId,
+                                     InvoiceNo = sur.InvoiceNo,
+                                     Note = sur.Notes,
+                                     CustomerID = sur.PaymentObjectId,
+                                     ServiceDate = null,
+                                     CreatedDate = null,
+                                     InvoiceIssuedDate = debitN.DatetimeCreated != null ? debitN.DatetimeCreated : creditN.DatetimeCreated,
+                                     TransactionType = null,
+                                     UserCreated = null,
+                                     Quantity = sur.Quantity,
+                                     UnitId = sur.UnitId,
+                                     Unit = uni.UnitNameEn,
+                                     UnitPrice = sur.UnitPrice,
+                                     VATRate = sur.Vatrate,
+                                     CreditDebitNo = !string.IsNullOrEmpty(sur.DebitNo) ? sur.DebitNo : sur.CreditNo,
+                                     DatetimeModified = sur.DatetimeModified,
+                                     CommodityGroupID = null,
+                                     Service = "CL",
+                                     CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                     TaxCodeOBH = pat.TaxCode,
+                                     TypeCharge = chg.Type,
+                                     ExchangeDate = sur.ExchangeDate,
+                                     FinalExchangeRate = sur.FinalExchangeRate,
+                                     PIC = null,
+                                     IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
+                                 };
+            var queryObhOperation = (from sur in queryChargeOBH
+                                     join ops in opst on sur.HBLID equals ops.Hblid
+                                     select new ChargeSOAResult
+                                     {
+                                         ID = sur.ID,
+                                         HBLID = sur.HBLID,
+                                         ChargeID = sur.ChargeID,
+                                         ChargeCode = sur.ChargeCode,
+                                         ChargeName = sur.ChargeName,
+                                         JobId = ops.JobNo,
+                                         HBL = ops.Hwbno,
+                                         MBL = ops.Mblno,
+                                         Type = sur.Type,
+                                         Debit = sur.Debit,
+                                         Credit = sur.Credit,
+                                         SOANo = sur.SOANo,
+                                         IsOBH = true,
+                                         Currency = sur.Currency,
+                                         InvoiceNo = sur.InvoiceNo,
+                                         Note = sur.Note,
+                                         CustomerID = sur.CustomerID,
+                                         ServiceDate = ops.ServiceDate,
+                                         CreatedDate = ops.DatetimeCreated,
+                                         InvoiceIssuedDate = sur.InvoiceIssuedDate,
+                                         TransactionType = null,
+                                         UserCreated = ops.UserCreated,
+                                         Quantity = sur.Quantity,
+                                         UnitId = sur.UnitId,
+                                         Unit = sur.Unit,
+                                         UnitPrice = sur.UnitPrice,
+                                         VATRate = sur.VATRate,
+                                         CreditDebitNo = sur.CreditDebitNo,
+                                         DatetimeModified = sur.DatetimeModified,
+                                         CommodityGroupID = ops.CommodityGroupId,
+                                         Service = "CL",
+                                         CDNote = sur.CDNote,
+                                         TaxCodeOBH = sur.TaxCodeOBH,
+                                         TypeCharge = sur.Type,
+                                         ExchangeDate = sur.ExchangeDate,
+                                         FinalExchangeRate = sur.FinalExchangeRate,
+                                         PIC = null,
+                                         IsSynced = sur.IsSynced
+                                     }).AsQueryable();
+
+            var queryObhDocument = (from sur in queryChargeOBH
+                                    join cstd in csTransDe on sur.HBLID equals cstd.Id
+                                    join cst in csTrans on cstd.JobId equals cst.Id
+                                    select new ChargeSOAResult
+                                    {
+                                        ID = sur.ID,
+                                        HBLID = sur.HBLID,
+                                        ChargeID = sur.ChargeID,
+                                        ChargeCode = sur.ChargeCode,
+                                        ChargeName = sur.ChargeName,
+                                        JobId = cst.JobNo,
+                                        HBL = cstd.Hwbno,
+                                        MBL = cst.Mawb,
+                                        Type = sur.Type,
+                                        Debit = sur.Debit,
+                                        Credit = sur.Credit,
+                                        SOANo = sur.SOANo,
+                                        IsOBH = true,
+                                        Currency = sur.Currency,
+                                        InvoiceNo = sur.InvoiceNo,
+                                        Note = sur.Note,
+                                        CustomerID = sur.CustomerID,
+                                        ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                        CreatedDate = cst.DatetimeCreated,
+                                        InvoiceIssuedDate = sur.InvoiceIssuedDate,
+                                        TransactionType = cst.TransactionType,
+                                        UserCreated = cst.UserCreated,
+                                        Quantity = sur.Quantity,
+                                        UnitId = sur.UnitId,
+                                        Unit = sur.Unit,
+                                        UnitPrice = sur.UnitPrice,
+                                        VATRate = sur.VATRate,
+                                        CreditDebitNo = sur.CreditDebitNo,
+                                        DatetimeModified = sur.DatetimeModified,
+                                        CommodityGroupID = null,
+                                        Service = cst.TransactionType,
+                                        CDNote = sur.CDNote,
+                                        Commodity = cst.Commodity,
+                                        FlightNo = cstd.FlightNo,
+                                        ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType == "AI" ? cstd.Eta : null,
+                                        AOL = cst.Pol,
+                                        AOD = cst.Pod,
+                                        PackageQty = cstd.PackageQty,
+                                        GrossWeight = cstd.GrossWeight,
+                                        ChargeWeight = cstd.ChargeWeight,
+                                        FinalExchangeRate = sur.FinalExchangeRate,
+                                        ExchangeDate = sur.ExchangeDate,
+                                        TypeCharge = sur.TypeCharge,
+                                        PIC = null,
+                                        IsSynced = sur.IsSynced
+                                    }).AsQueryable();
+            var queryDataOBH = queryObhOperation.Union(queryObhDocument);
+            //Merge data
+            var dataMerge = queryDataBuySell.Union(queryDataOBH);
+            var listOperation = dataMerge.ToList();
+            listOperation.ForEach(fe =>
+            {
+                var customNo = customsDeclarationRepo.Get().Where(x => x.JobNo == fe.JobId).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                fe.CustomNo = customNo;
+            });
+            var queryData = listOperation.OrderBy(x => x.Service).AsQueryable();
+            return queryData;
+        }
+
         public SOAOPSModel GetSOAOPS(string soaNo)
         {
             SOAOPSModel opssoa = new SOAOPSModel();
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var soa = DataContext.Get(x => x.Soano == soaNo);
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
+            if (soa.FirstOrDefault() == null)
+            {
+                return opssoa;
+            }
+            var charge = GetChargeExportForSOAOPS(soaNo);
             if (soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
             soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
                 charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower() || x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_OBH.ToLower());
             }
             List<ExportSOAOPS> lstSOAOPS = new List<ExportSOAOPS>();
-            var partner = catPartnerRepo.Get();
-            var port = catPlaceRepo.Get();
-            var resultData = from s in soa
-                             join pat in partner on s.Customer equals pat.Id into pat2
-                             from pat in pat2.DefaultIfEmpty()
-                             select new SOAOPSModel
-                             {
-                                 PartnerNameVN = pat.PartnerNameVn,
-                                 BillingAddressVN = pat.AddressVn,
-                                 FromDate = s.SoaformDate,
-                                 ToDate = s.SoatoDate,
-                                 SoaNo = s.Soano
-                             };
-
             var results = charge.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
-
             foreach (var group in results)
             {
                 ExportSOAOPS exportSOAOPS = new ExportSOAOPS();
@@ -2314,10 +2627,12 @@ namespace eFMS.API.Accounting.DL.Services
                 lstSOAOPS.Add(exportSOAOPS);
             }
             opssoa.exportSOAOPs = lstSOAOPS;
-            opssoa.BillingAddressVN = resultData?.Select(t => t.BillingAddressVN).FirstOrDefault();
-            opssoa.PartnerNameVN = resultData?.Select(t => t.PartnerNameVN).FirstOrDefault();
-            opssoa.FromDate = resultData?.Select(t => t.FromDate).FirstOrDefault();
-            opssoa.SoaNo = resultData?.Select(t => t.SoaNo).FirstOrDefault();
+            var customerId = soa?.FirstOrDefault().Customer;
+            var partner = catPartnerRepo.Get(x => x.Id == customerId).FirstOrDefault();
+            opssoa.BillingAddressVN = partner?.AddressVn;
+            opssoa.PartnerNameVN = partner?.PartnerNameVn;
+            opssoa.FromDate = soa.FirstOrDefault()?.SoaformDate;
+            opssoa.SoaNo = soa.FirstOrDefault()?.Soano;
 
             foreach (var item in opssoa.exportSOAOPs)
             {
@@ -2370,10 +2685,11 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var chargeDefaults = chargeDefaultRepo.Get(x => x.Type == "Công Nợ");
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
-            var partner = catPartnerRepo.Get();
+            var charge = GetChargeExportForSOAOPS(soaNo);
+            var customerId = soa?.FirstOrDefault().Customer;
+            var partner = catPartnerRepo.Get(x => x.Id == customerId || string.IsNullOrEmpty(customerId));
             var dataResult = from s in soa
                              join chg in charge on s.Soano equals chg.SOANo into chg2
                              from chg in chg2.DefaultIfEmpty()
