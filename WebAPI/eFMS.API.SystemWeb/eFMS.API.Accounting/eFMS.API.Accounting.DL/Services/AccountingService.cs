@@ -976,12 +976,12 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     foreach (var surcharge in surcharges)
                                     {
-                                        surcharge.PaySyncedFrom = "Settle";
-                                        surcharge.SyncedFrom = "Settle";
+                                        surcharge.PaySyncedFrom = "SETTLEMENT";
+                                        surcharge.SyncedFrom = "SETTLEMENT";
                                         surcharge.UserModified = currentUser.UserID;
                                         surcharge.DatetimeModified = DateTime.Now;
 
-                                        SurchargeRepository.UpdateAsync(surcharge, x => x.Id == surcharge.Id, false);
+                                        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
                                     }
                                 }
                             }

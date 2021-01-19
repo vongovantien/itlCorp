@@ -163,7 +163,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
-        modelUpdate.transactionType = ChargeConstants.AI_CODE;
+        modelUpdate.transactionType = ChargeConstants.AE_CODE;
         modelUpdate.userCreated = this.hblDetail.userCreated;
 
         for (const dim of modelUpdate.dimensionDetails) {

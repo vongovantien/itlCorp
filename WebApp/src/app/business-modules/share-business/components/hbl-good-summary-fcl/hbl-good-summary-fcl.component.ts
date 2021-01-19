@@ -82,7 +82,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             .pipe(skip(1))
             .subscribe(
                 (containers: Container[]) => {
-                    this.containers = containers;
+                    this.containers = containers || [];
                     this.containers.forEach((c: Container) => {
                         this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
                     });

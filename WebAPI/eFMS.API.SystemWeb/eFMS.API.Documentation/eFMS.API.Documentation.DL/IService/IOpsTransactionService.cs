@@ -19,6 +19,7 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckDetailPermission(Guid id);
         OpsTransactionModel GetDetails(Guid id);
         bool CheckAllowDelete(Guid jobId);
+        bool CheckAllowDeleteJobUsed(Guid jobId);
         //HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
         HandleState ConvertClearanceToJob(CustomsDeclarationModel model);
         //HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
