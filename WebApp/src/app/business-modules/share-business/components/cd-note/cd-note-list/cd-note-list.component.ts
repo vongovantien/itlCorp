@@ -17,11 +17,6 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
     selector: 'cd-note-list',
     templateUrl: './cd-note-list.component.html',
-    styles: [
-        `:host /deep/ .modal-open{
-                overflow:initial
-     }`
-    ],
 })
 export class ShareBussinessCdNoteListComponent extends AppList {
     @ViewChild(ShareBussinessCdNoteAddPopupComponent) cdNoteAddPopupComponent: ShareBussinessCdNoteAddPopupComponent;
