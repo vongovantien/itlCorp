@@ -526,11 +526,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
-                                                                 && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
-                                                                 && x.Services.Contains(transactionType)
-                                                                 )?.Select(x => x.AssignTo).ToList();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             int code = PermissionEx.GetPermissionToUpdateHbl(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
