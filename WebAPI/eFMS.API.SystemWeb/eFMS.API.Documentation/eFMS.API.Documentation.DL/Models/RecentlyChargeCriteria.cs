@@ -7,14 +7,12 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class RecentlyChargeCriteria
     {
-        public Guid CurrentJobId { get; set; }
-        public string PersonInCharge { get; set; }
+        public Guid JobId { get; set; }
+        public Guid HblId { get; set; }
         public TransactionTypeEnum TransactionType { get; set; }
-        public string ShippingLine { get; set; }
-        public string CustomerId { get; set; }
-        public string ConsigneeId { get; set; }
-        public Guid? POL { get; set; }
-        public Guid? POD { get; set; }
-        public string ChargeType { get; set; }
+        public string CustomerId { get; set; } // HBL
+        public string AgentId { get; set; }    // MBL
+        public string ChargeType { get; set; } // BUY/SEL
+        public string ColoaderId { get; set; } // MBL
     }
 }
