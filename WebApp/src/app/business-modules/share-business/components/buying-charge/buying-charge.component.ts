@@ -251,6 +251,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (containers: Container[]) => {
                     this.containers = containers;
+                    console.log(this.containers);
                 }
             );
     }
@@ -529,7 +530,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.grossWeight;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW) : this.getDataHint(CommonEnum.QUANTITY_TYPE.GW);
+                    // chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
@@ -542,7 +544,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.netWeight;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW) : this.getDataHint(CommonEnum.QUANTITY_TYPE.NW);
+                    // chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
@@ -555,13 +558,15 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.cbm;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM) : this.getDataHint(CommonEnum.QUANTITY_TYPE.CBM);
+                    // chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
 
                 chargeItem = this.updateUnitSurcharge(chargeItem, 'CBM');
                 break;
             case CommonEnum.QUANTITY_TYPE.CONT:
-                chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
+                chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'quantity') : this.getDataHint('quantity');
+                // chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
                 break;
             case CommonEnum.QUANTITY_TYPE.CW:
                 // * Update UnitPrice to KGS
@@ -577,7 +582,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.chargeWeight;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'chargeAbleWeight') : this.getDataHint('chargeAbleWeight');
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.PACKAGE:
@@ -590,7 +595,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.packageQty;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'packageQuantity') : this.getDataHint('packageQuantity');
+                    // chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
                 }
                 break;
             default:
@@ -606,6 +612,58 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         let total: number = 0;
         total = containers.reduce((acc: any, curr: Container) => acc += curr[key], 0);
         return total;
+    }
+
+    getDataHint(key: string) {
+        let data: number = null;
+        switch (key) {
+            case 'chargeAbleWeight':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.chargeWeight;
+                } else {
+                    data = this.hbl.chargeWeight || this.hbl.cw;
+                }
+                break;
+            case 'gw':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.grossWeight;
+                } else {
+                    data = this.hbl.grossWeight || this.hbl.gw;
+                }
+                break;
+            case 'nw':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.netWeight;
+                } else {
+                    data = this.hbl.netWeight;
+                }
+                break;
+            case 'cbm':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.cbm;
+                } else {
+                    data = this.hbl.cbm;
+                }
+                break;
+            case 'packageQuantity':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.packageQty;
+                } else {
+                    data = this.hbl.packageQty;
+                }
+                break;
+            case 'quantity':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.chargeWeight;
+                } else {
+                    data = this.hbl.chargeWeight;
+                }
+                break;
+            default:
+                break;
+        }
+
+        return data;
     }
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
