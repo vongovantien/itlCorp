@@ -981,7 +981,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         surcharge.UserModified = currentUser.UserID;
                                         surcharge.DatetimeModified = DateTime.Now;
 
-                                        SurchargeRepository.UpdateAsync(surcharge, x => x.Id == surcharge.Id, false);
+                                        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
                                     }
                                 }
                             }
