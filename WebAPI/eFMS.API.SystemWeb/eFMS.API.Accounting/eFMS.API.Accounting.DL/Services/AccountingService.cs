@@ -318,7 +318,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode, //[06/01/2021]
                                                                        PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
                                                                        CustomerMode = partner != null ? partner.PartnerMode : "External",
-                                                                       LocalBranchCode = partner != null ? partner.InternalCode : null
+                                                                       LocalBranchCode = partner != null ? partner.InternalCode : null,
+                                                                       Payee = settle.Payee
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -357,7 +358,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate, //Chỉ lấy Date (không lấy Time)
                                                                                              AtchDocSerialNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
-                                                                                             CustomerCodeBook = obhP.AccountNo
+                                                                                             // CustomerCodeBook = obhP.AccountNo
+                                                                                             CustomerCodeBook = item.PaymentMethod == AccountingConstants.PAYMENT_METHOD_OTHER && !string.IsNullOrEmpty(item.Payee) ? GetPayeeCode(item.Payee) : obhP.AccountNo
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -968,9 +970,23 @@ namespace eFMS.API.Accounting.DL.Services
                                 settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
                                 SettlementRepository.Update(settle, x => x.Id == id, false);
+
+                                IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == settle.SettlementNo);
+                                if(surcharges != null && surcharges.Count() > 0)
+                                {
+                                    foreach (var surcharge in surcharges)
+                                    {
+                                        surcharge.PaySyncedFrom = "SETTLEMENT";
+                                        surcharge.SyncedFrom = "SETTLEMENT";
+                                        surcharge.UserModified = currentUser.UserID;
+                                        surcharge.DatetimeModified = DateTime.Now;
+
+                                        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                    }
+                                }
                             }
                         }
-
+                        HandleState hsCharge = SurchargeRepository.SubmitChanges();
                         result = SettlementRepository.SubmitChanges();
 
                         trans.Commit();
@@ -1398,6 +1414,18 @@ namespace eFMS.API.Accounting.DL.Services
             return _serviceName;
         }
 
+        private string GetPayeeCode(string PayeeId)
+        {
+            string PayeeCode = string.Empty;
+            CatPartner payee = PartnerRepository.Get(x => x.Id == PayeeId)?.FirstOrDefault();
+            if(payee != null)
+            {
+                PayeeCode = payee.AccountNo;
+            }
+
+            return PayeeCode;
+        }
+
         /// <summary>
         /// Get due date by partner & service
         /// </summary>
@@ -1449,7 +1477,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
                 var _customNo = customNos.FirstOrDefault() ?? string.Empty;
-                _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
+                _description = string.Format("{0} {1} TK:{2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
             }
             else
             {

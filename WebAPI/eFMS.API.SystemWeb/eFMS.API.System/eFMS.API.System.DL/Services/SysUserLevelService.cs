@@ -223,7 +223,7 @@ namespace eFMS.API.System.DL.Services
             }
             else if (criteria.Type == "office")
             {
-                results = results.Where(x => x.CompanyId == criteria.CompanyId && x.OfficeId == criteria.OfficeId);
+                results = results.Where(x => (x.CompanyId == criteria.CompanyId || criteria.CompanyId == null) && x.OfficeId == criteria.OfficeId);
             }
             else if (criteria.Type == "department")
             {

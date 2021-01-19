@@ -3281,11 +3281,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartGroup1, 2, i + addressStartGroup1, 5].Merge = true;
                     workSheet.Cells[i + addressStartGroup1, 6].Value = item.VATInvoiceNo;
                     workSheet.Cells[i + addressStartGroup1, 7].Value = item.Amount;
-                    workSheet.Cells[i + addressStartGroup1, 7].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 7].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup1, 8].Value = item.VATAmount;
-                    workSheet.Cells[i + addressStartGroup1, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 8].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup1, 9].Value = item.TotalAmount;
-                    workSheet.Cells[i + addressStartGroup1, 9].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 9].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup1, 10].Value = item.Notes;
                 }
                 // Border
@@ -3299,11 +3299,11 @@ namespace eFMS.API.ReportData.FormatExcel
             sumFee += totalFee;
             sumVat += totalVat;
             workSheet.Cells["G20"].Value = totalFee;
-            workSheet.Cells["G20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["G20"].Style.Numberformat.Format = numberFormats;
             workSheet.Cells["H20"].Value = totalVat;
-            workSheet.Cells["H20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["H20"].Style.Numberformat.Format = numberFormats;
             workSheet.Cells["I20"].Value = total;
-            workSheet.Cells["I20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["I20"].Style.Numberformat.Format = numberFormats;
             // Border
             workSheet.Cells[17, 1, 20, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[17, 1, 20, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -3323,11 +3323,11 @@ namespace eFMS.API.ReportData.FormatExcel
             sumFee += totalFee;
             sumVat += totalVat;
             workSheet.Cells[addressStartGroup2, 7].Value = totalFee;
-            workSheet.Cells[addressStartGroup2, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 7].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressStartGroup2, 8].Value = totalVat;
-            workSheet.Cells[addressStartGroup2, 8].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 8].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressStartGroup2, 9].Value = total;
-            workSheet.Cells[addressStartGroup2, 9].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 9].Style.Numberformat.Format = numberFormats;
             // Border
             workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -3352,11 +3352,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartGroup2, 2, i + addressStartGroup2, 5].Merge = true;
                     workSheet.Cells[i + addressStartGroup2, 6].Value = item.VATInvoiceNo;
                     workSheet.Cells[i + addressStartGroup2, 7].Value = item.Amount;
-                    workSheet.Cells[i + addressStartGroup2, 7].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 7].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup2, 8].Value = item.VATAmount;
-                    workSheet.Cells[i + addressStartGroup2, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 8].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup2, 9].Value = item.TotalAmount;
-                    workSheet.Cells[i + addressStartGroup2, 9].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 9].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup2, 10].Value = item.Notes;
                 }
             }
@@ -3367,11 +3367,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressOfTotal, 2, addressOfTotal, 5].Merge = true;
             workSheet.Cells[addressOfTotal, 2].Value = "Tổng chi phí / Total in charge (I) + (II):";
             workSheet.Cells[addressOfTotal, 7].Value = sumFee;
-            workSheet.Cells[addressOfTotal, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 7].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressOfTotal, 8].Value = sumVat;
-            workSheet.Cells[addressOfTotal, 8].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 8].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressOfTotal, 9].Value = sumFee + sumVat;
-            workSheet.Cells[addressOfTotal, 9].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 9].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;

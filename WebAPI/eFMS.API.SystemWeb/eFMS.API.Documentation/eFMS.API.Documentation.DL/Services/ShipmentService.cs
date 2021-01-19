@@ -688,6 +688,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
+            // Search CustomerId
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                queryTrans = queryTrans.And(q => q.AgentId == criteria.CustomerId);
+            }
             return queryTrans;
         }
 
@@ -969,8 +974,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
                 data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
-                data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
-                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
+                data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
+                var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
+                data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription :  catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.Shipper = !string.IsNullOrEmpty( data.ShipperDescription) ? data.ShipperDescription : catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
                 data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault()?.Username;
                 data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
@@ -1188,7 +1197,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.JobNo = item.JobNo;
                 data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
-                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = item.Consignee;
                 data.MblMawb = item.Mblno;
                 data.HblHawb = item.Hwbno;
                 data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
@@ -1329,6 +1338,11 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Creator = sysUserRepo.Get(x => x.Id == item.BillingOpsId).Select(t => t.Username).FirstOrDefault();
                 data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
                 data.Created = item.DatetimeCreated;
+                data.Salesman = sysUserRepo.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.Username;
+                data.AgentName = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameVn;
+                data.Agent = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.ShortName;
+                data.Carrier = catPartnerRepo.Get(x => x.Id == item.SupplierId).FirstOrDefault()?.ShortName;
+
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -1374,6 +1388,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Agent = master.AgentId,
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
+                                        ShipperDescription = house.ShipperDescription,
+                                        ConsigneeDescription = house.ConsigneeDescription,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
@@ -1425,6 +1441,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Agent = master.AgentId,
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
+                                        ShipperDescription = house.ShipperDescription,
+                                        ConsigneeDescription = house.ConsigneeDescription,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
@@ -1772,7 +1790,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             // Filter data without customerId
             var criteriaNoCustomer = criteria;
-            criteriaNoCustomer.CustomerId = null;
+            //criteriaNoCustomer.CustomerId = null;
             Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteriaNoCustomer);
             
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
@@ -2533,7 +2551,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             // Filter data without customerId
             var criteriaNoCustomer = criteria;
-            criteriaNoCustomer.CustomerId = null;
+            //criteriaNoCustomer.CustomerId = null;
             Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteriaNoCustomer);
             Expression<Func<CsTransactionDetail, bool>> queryTranDetail = GetQueryTransationDetailDocumentation(criteriaNoCustomer);
 
@@ -3062,6 +3080,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (query != null)
             {
                 queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+                queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.CustomerID)).Where(query);
             }
             if (isOBH != null)
             {

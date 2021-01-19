@@ -244,6 +244,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 model.ContractNo = entity.ContractNo;
                 model.SalesmanId = entity.SaleManId;
                 model.UserCreatedContract = contract.UserCreated;
+                model.UserCreated = entity.UserCreated;
                 SendMailActiveSuccess(model, string.Empty);
                 ClearCache();
                 Get();
@@ -842,6 +843,8 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreatedContract).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string employeeIdPartner = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoCreatorPartner = sysEmployeeRepository.Get(e => e.Id == employeeIdPartner)?.FirstOrDefault();
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
             string url = string.Empty;
@@ -954,6 +957,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc.Add(objInfoSalesman?.Email);
+                lstCc.Add(objInfoCreatorPartner?.Email);
                 //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 

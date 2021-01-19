@@ -17,7 +17,9 @@ namespace eFMS.API.Documentation.DL.Models
         public string Carrier { get; set; }
         public string Agent { get; set; }
         public string Shipper { get; set; }
+        public string ShipperDescription { get; set; }
         public string Consignee { get; set; }
+        public string ConsigneeDescription { get; set; }
         public string ShipmentType { get; set; }
         public string Salesman { get; set; }
         public string AgentName { get; set; }

@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
+        private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
@@ -67,6 +68,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodity> commodityRepo,
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysOffice> sysOffice,
+            IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -92,6 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
             commodityRepository = commodityRepo;
             sysOfficeRepo = sysOffice;
             userlevelRepository = userlevelRepo;
+            accAdvanceRequestRepository = accAdvanceRequestRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -399,14 +402,19 @@ namespace eFMS.API.Documentation.DL.Services
             var model = new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId };
             int code = PermissionEx.GetPermissionToDelete(model, permissionRange, currentUser);
             if (code == 403) return false;
-            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null 
-                            || !string.IsNullOrEmpty(x.AdvanceNo)
-                            || !string.IsNullOrEmpty(x.VoucherId)
-                            || !string.IsNullOrEmpty(x.PaySoano)
-                            || !string.IsNullOrEmpty(x.SettlementCode)
-                            || !string.IsNullOrEmpty(x.SyncedFrom))
-                            );
-            if (query.Any())
+            return true;
+        }
+        public bool CheckAllowDeleteJobUsed(Guid jobId)
+        {
+            var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
+                        || !string.IsNullOrEmpty(x.AdvanceNo)
+                        || !string.IsNullOrEmpty(x.VoucherId)
+                        || !string.IsNullOrEmpty(x.PaySoano)
+                        || !string.IsNullOrEmpty(x.SettlementCode)
+                        || !string.IsNullOrEmpty(x.SyncedFrom))
+                        );
+            if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
             {
                 return false;
             }
@@ -1241,7 +1249,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        private HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model)
+        public HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model)
         {
             try
             {
@@ -1251,6 +1259,8 @@ namespace eFMS.API.Documentation.DL.Services
                     surcharge.JobNo = model.JobNo;
                     surcharge.Mblno = model.Mblno;
                     surcharge.Hblno = model.Hwbno;
+                    surcharge.DatetimeModified = DateTime.Now;
+                    surcharge.UserModified = currentUser.UserID;
                     var hsUpdateSurcharge = surchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);                    
                 }
                 var sm = surchargeRepository.SubmitChanges();
@@ -1269,13 +1279,15 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         public ResultHandle ImportDuplicateJob(OpsTransactionModel model)
         {
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
             if (code == 403) return new ResultHandle { Status = false, Message = "You can't duplicate this job." };
-            var newContainers = new List<CsMawbcontainer>();
-            var newSurcharges = new List<CsShipmentSurcharge>();
+
+            List<CsMawbcontainer> newContainers = new List<CsMawbcontainer>();
+            List<CsShipmentSurcharge> newSurcharges = new List<CsShipmentSurcharge>();
+
             // Create model import
-            var _hblId = model.Hblid;
+            Guid _hblId = model.Hblid;
             model.Hblid = Guid.NewGuid();
             model.JobNo = CreateJobNoOps();
             model.UserModified = currentUser.UserID;
@@ -1285,7 +1297,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.DepartmentId = currentUser.DepartmentId;
             model.OfficeId = currentUser.OfficeID;
             model.CompanyId = currentUser.CompanyID;
-            var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+
+            List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
             if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
             {
                 var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
@@ -1304,7 +1317,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.SalesCompanyId = string.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
                 }
             }
-            var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+            int dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
             if (dayStatus > 0)
             {
                 model.CurrentStatus = TermData.InSchedule;
@@ -1315,14 +1328,14 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             // Update list Container
-            var listContainerOld = model.CsMawbcontainers;
+            List<CsMawbcontainerModel> listContainerOld = model.CsMawbcontainers;
             if (listContainerOld != null)
             {
-                var masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
+                List<CsMawbcontainer> masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
                 newContainers.AddRange(masterContainers);
             }
             // Update list SurCharge
-            var listSurCharge = CopySurChargeToNewJob(_hblId, model.Hblid);
+            List<CsShipmentSurcharge> listSurCharge = CopySurChargeToNewJob(_hblId, model);
             if (listSurCharge?.Count() > 0)
             {
                 newSurcharges.AddRange(listSurCharge);
@@ -1330,9 +1343,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             try
             {
-                var entity = mapper.Map<OpsTransaction>(model);
-                var hs = DataContext.Add(entity);
-                DataContext.SubmitChanges();
+                OpsTransaction entity = mapper.Map<OpsTransaction>(model);
+                HandleState hs = DataContext.Add(entity);
+
                 if (hs.Success)
                 {
                     if (newContainers.Count > 0)
@@ -1362,7 +1375,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="_oldHblId"></param>
         /// <param name="_newHblId"></param>
         /// <returns></returns>
-        private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId, Guid _newHblId)
+        private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId,  OpsTransactionModel shipment)
         {
             List<CsShipmentSurcharge> surCharges = null;
             var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId);
@@ -1373,24 +1386,36 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.Id = Guid.NewGuid();
                     item.UserCreated = currentUser.UserID;
+
                     item.DatetimeCreated = DateTime.Now;
-                    item.Hblid = _newHblId;
+                    item.Hblid = shipment.Hblid;
+
                     item.Soano = null;
                     item.PaySoano = null;
                     item.CreditNo = null;
                     item.DebitNo = null;
                     item.Soaclosed = null;
                     item.SettlementCode = null;
-
                     item.AcctManagementId = null;
                     item.InvoiceNo = null;
+                    item.SeriesNo = null;
                     item.InvoiceDate = null;
                     item.VoucherId = null;
                     item.VoucherIddate = null;
-
                     item.SyncedFrom = null;
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
+                    item.ExchangeDate = DateTime.Now;
+                    item.FinalExchangeRate = null;
+                    item.AmountVnd = null;
+                    item.VatAmountVnd = null;
+                    item.ClearanceNo = null;
+                    item.AdvanceNo = null;
+
+                    item.JobNo = shipment.JobNo;
+                    item.Hblno = shipment.Hwbno;
+                    item.Mblno = shipment.Mblno;
+
 
                     surCharges.Add(item);
                 }

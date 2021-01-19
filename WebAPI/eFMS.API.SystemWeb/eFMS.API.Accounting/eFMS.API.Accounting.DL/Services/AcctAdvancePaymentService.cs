@@ -3573,8 +3573,23 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var avdRequest in avdRequests)
                 {
                     avdRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_SETTLED;
+                    avdRequest.DatetimeModified = DateTime.Now;
+                    avdRequest.UserModified = currentUser.UserID;
                     var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(avdRequest, x => x.Id == avdRequest.Id);
                 }
+            }
+        }
+        
+        public void UpdateStatusPaymentNotSettledOfAdvanceRequest(Guid hblId, string advanceNo)
+        {
+            //List Advance Request có Status Payment là Settled 
+            var advRequests = acctAdvanceRequestRepo.Get(x => x.Hblid == hblId && x.AdvanceNo == advanceNo && x.StatusPayment == AccountingConstants.STATUS_PAYMENT_SETTLED);
+            foreach (var advRequest in advRequests)
+            {
+                advRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                advRequest.DatetimeModified = DateTime.Now;
+                advRequest.UserModified = currentUser.UserID;
+                var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(advRequest, x => x.Id == advRequest.Id);
             }
         }
 

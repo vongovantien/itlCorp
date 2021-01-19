@@ -20,12 +20,14 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private IContextBase<SysUser> userRepository;
+        private IContextBase<SysOffice> officeRepository;
 
         public SysAuthorizedApprovalService(IContextBase<SysAuthorizedApproval> repository, IMapper mapper, ICurrentUser user,
-            IContextBase<SysUser> userRepo, ICacheServiceBase<SysAuthorizedApproval> cacheService) : base(repository, cacheService, mapper)
+            IContextBase<SysUser> userRepo, ICacheServiceBase<SysAuthorizedApproval> cacheService, IContextBase<SysOffice> officeRepo) : base(repository, cacheService, mapper)
         {
             currentUser = user;
             userRepository = userRepo;
+            officeRepository = officeRepo;
         }
         #region CRUD
         public override HandleState Add(SysAuthorizedApprovalModel model)
@@ -174,11 +176,14 @@ namespace eFMS.API.System.DL.Services
 
             var authorizeds = DataContext.Get(query);
             var users = userRepository.Get();
+            var offices = officeRepository.Get();
             var data = from author in authorizeds
                        join userCom in users on author.Commissioner equals userCom.Id into grpUserCom
                        from userCom in grpUserCom.DefaultIfEmpty()
                        join userAutho in users on author.Authorizer equals userAutho.Id into grpUserAutho
                        from userAutho in grpUserAutho.DefaultIfEmpty()
+                       join officeCom in offices on author.OfficeCommissioner equals officeCom.Id into grpOfficeCom
+                       from officeCom in grpOfficeCom.DefaultIfEmpty()
                        select new SysAuthorizedApprovalModel
                        {
                            Id = author.Id,
@@ -198,8 +203,9 @@ namespace eFMS.API.System.DL.Services
                            CompanyId = author.CompanyId,
                            OfficeId = author.OfficeId,
                            DepartmentId = author.DepartmentId,
-                           GroupId = author.GroupId
-
+                           GroupId = author.GroupId,
+                           OfficeCommissioner = author.OfficeCommissioner,
+                           OfficeCommissionerName = officeCom.ShortName
                        };
             var dataFor = data.ToList();
 
