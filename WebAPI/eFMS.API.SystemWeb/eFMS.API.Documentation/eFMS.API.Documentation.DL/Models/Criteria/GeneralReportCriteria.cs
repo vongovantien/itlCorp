@@ -2,8 +2,12 @@
 
 namespace eFMS.API.Documentation.DL.Models.Criteria
 {
-    public class GeneralReportCriteria
+    public class GeneralReportCriteria : ICloneable
     {
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
         public DateTime? ServiceDateFrom { get; set; }
         public DateTime? ServiceDateTo { get; set; }
         public DateTime? CreatedDateFrom { get; set; }
