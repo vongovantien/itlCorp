@@ -282,6 +282,9 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
+
+            string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
             List<string> lstTo = new List<string>();
 
             // info send to and cc
@@ -336,13 +339,14 @@ namespace eFMS.API.Catalogue.DL.Services
               "<b> eFMS System, </b>" +
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            string urlImage = ApiUrl.Value.Url.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", urlImage + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
             lstCc.Add(objInfoSalesman?.Email);
             lstCc.Add(objInfoCreator?.Email);
+            lstCc.Add(objInfoModified?.Email);
             bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
