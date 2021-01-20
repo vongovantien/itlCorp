@@ -1981,8 +1981,8 @@ namespace eFMS.API.Accounting.DL.Services
                     air.Pcs = chargeData.PackageQty;
                     air.CW = chargeData.ChargeWeight;
                     air.GW = chargeData.GrossWeight;
-                    air.Rate = chargeData.ChargeName == AccountingConstants.CHARGE_AIR_FREIGHT ? chargeData.UnitPrice : null;
-
+                    var chargeAF = charge.Where(x => x.HBL == item && x.ChargeName.ToUpper() == AccountingConstants.CHARGE_AIR_FREIGHT.ToUpper());
+                    air.Rate = chargeAF.FirstOrDefault()?.UnitPrice;
 
                     var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAirfrieght.Count() == 0)
@@ -2056,6 +2056,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AMS_FEE.ToLower()
                                                                     && x.ChargeCode != AccountingConstants.CHARGE_SA_DAN_AIR_CODE
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_SA_HDL_AIR_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_HANDLING_FEE.ToLower()
                         ) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
 
@@ -2101,26 +2103,30 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         air.NetAmount += air.FuelSurcharge;
                     }
-                    var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
-                    if (dataCharge.Any())
-                    {
-                        if (chargeData.FinalExchangeRate != null)
-                        {
-                            air.ExchangeRate = chargeData.FinalExchangeRate;
-                        }
-                        else
-                        {
-                            var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
-                            var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
-                            air.ExchangeRate = dataObjectCurrencyExchange.Rate;
-                        }
-                    }
-                    else
-                    {
-                        var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
-                        var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
-                        air.ExchangeRate = dataObjectCurrencyExchange.Rate;
-                    }
+
+                    // get exchange rate(vnd)
+                    var _exchangeRateVND = currencyExchangeService.CurrencyExchangeRateConvert(chargeData.FinalExchangeRate, chargeData.ExchangeDate, chargeData.Currency, AccountingConstants.CURRENCY_LOCAL);
+                    air.ExchangeRate = _exchangeRateVND;
+                    //var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
+                    //if (dataCharge.Any())
+                    //{
+                    //    if (chargeData.FinalExchangeRate != null)
+                    //    {
+                    //        air.ExchangeRate = chargeData.FinalExchangeRate;
+                    //    }
+                    //    else
+                    //    {
+                    //        var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
+                    //        var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
+                    //        air.ExchangeRate = dataObjectCurrencyExchange.Rate;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
+                    //    var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
+                    //    air.ExchangeRate = dataObjectCurrencyExchange.Rate;
+                    //}
 
                     air.TotalAmount = air.NetAmount * air.ExchangeRate;
 
@@ -2165,11 +2171,11 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var charge = GetChargeShipmentDocAndOperation(query, null, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.JobId).AsQueryable();
-            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
-            var csTransDe = csTransactionDetailRepo.Get();
 
             if (results.Select(x => x.Key).Count() > 0)
             {
+                var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
+                var csTransDe = csTransactionDetailRepo.Get();
                 result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
                 foreach (var item in results.Select(x => x.Key))
                 {
