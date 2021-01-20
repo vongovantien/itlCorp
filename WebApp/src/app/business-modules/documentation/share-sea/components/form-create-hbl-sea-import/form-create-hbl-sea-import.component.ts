@@ -182,7 +182,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.provinces = this._catalogueRepo.getAllProvinces();
         this.suppliers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER });
         this.shippers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.SHIPPER });
-        this.customers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER });
+        this.customers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER, active: true });
         this.consignees = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CONSIGNEE });
         this.consigneesAndCustomers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
     }
