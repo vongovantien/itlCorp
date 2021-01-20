@@ -1043,14 +1043,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     getRecentlyCharge() {
         const body: IRecentlyCharge = {
-            currentJobId: this.shipment.id,
-            personInCharge: this.shipment.personIncharge,
+            hblId: this.hbl.id,
+            jobId: this.shipment.id,
             transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
-            shippingLine: this.shipment.coloaderId,
-
-            consigneeId: this.hbl.consigneeId,
-            pol: this.hbl.pol,
-            pod: this.hbl.pod,
+            coloaderId: this.shipment.coloaderId,
+            agentId: this.shipment.agentId,
             chargeType: this.TYPE,
             customerId: this.hbl.customerId,
         };
@@ -1214,13 +1211,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 }
 
 interface IRecentlyCharge {
-    currentJobId: string;
-    personInCharge: string;
+    hblId: string;
     transactionType: number;
-    shippingLine: string;
-    customerId: string;
-    consigneeId: string;
-    pol: string;
-    pod: string;
+    customerId: string; // * HBL
+    agentId: string; // * MBL
+    coloaderId: string; // * MBL
     chargeType: string; // * BUY/SELL/OBH
+    jobId: string;
 }
