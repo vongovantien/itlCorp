@@ -17,6 +17,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
     selector: 'cd-note-list',
     templateUrl: './cd-note-list.component.html',
+    styleUrls: ['./cd-note-list.component.scss']
 })
 export class ShareBussinessCdNoteListComponent extends AppList {
     @ViewChild(ShareBussinessCdNoteAddPopupComponent) cdNoteAddPopupComponent: ShareBussinessCdNoteAddPopupComponent;

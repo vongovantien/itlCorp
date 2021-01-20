@@ -131,6 +131,9 @@ namespace eFMS.API.Operation.DL.Services
                     if (hs.Success)
                     {
                         result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, lists.Count]);
+
+                        string logErr = String.Format("Import Ecus thành công {0} \n {1} Tờ khai", currentUser.UserName, lists.Count);
+                        new LogHelper("ECUS", logErr);
                     }
                     else
                     {
@@ -140,10 +143,14 @@ namespace eFMS.API.Operation.DL.Services
                 else
                 {
                     result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
+                    string logErr = String.Format("Import thất bại {0} \n {1} Tờ khai", currentUser.UserName, lists.Count);
+                    new LogHelper("ECUS", logErr);
                 }
             }
             catch (Exception ex)
             {
+                string logErr = String.Format("Lỗi import Ecus {0} \n {1}", currentUser.UserID, ex.ToString());
+                new LogHelper("ECUS", logErr);
                 result = new HandleState(ex.Message);
             }
             return result;
