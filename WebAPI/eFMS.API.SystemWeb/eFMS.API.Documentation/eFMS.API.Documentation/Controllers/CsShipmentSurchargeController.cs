@@ -317,12 +317,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("GetRecentlyCharges")]
+        [Authorize]
         public IActionResult GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
-            if( criteria.PersonInCharge == null)
-            {
-                return Ok(null);
-            }
             var results = csShipmentSurchargeService.GetRecentlyCharges(criteria);
             return Ok(results);
         }

@@ -1,6 +1,5 @@
 ﻿using eFMSWindowService.Models;
 using System;
-using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Timers;
@@ -24,7 +23,7 @@ namespace eFMSWindowService
             var _interval = int.Parse(ConfigurationManager.AppSettings["intervalCurrentStatus"]);
             // Tạo 1 timer từ libary System.Timers
             timer = new Timer();
-            // Execute mỗi 2 minute
+            // Execute mỗi 1 hour
             timer.Interval = _interval;          
             // Những gì xảy ra khi timer đó dc tick
             timer.Elapsed += Timer_Elapsed;

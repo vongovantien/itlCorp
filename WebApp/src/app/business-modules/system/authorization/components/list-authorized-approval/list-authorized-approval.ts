@@ -37,6 +37,7 @@ export class AuthorizedApprovalListComponent extends AppList {
         this.headersAuthorized = [
             { title: 'Authorizer', field: 'authorizer', sortable: true },
             { title: 'Commssioner', field: 'commissionerName', sortable: true },
+            { title: 'Office', field: 'officeCommissionerName', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Effective Date', field: 'effectiveDate', sortable: true },
             { title: 'Expiration Date', field: 'expirationDate', sortable: true },
@@ -60,7 +61,7 @@ export class AuthorizedApprovalListComponent extends AppList {
                     if (res) {
                         this.formPopup.authorized = authorized;
                         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
-
+                        this.formPopup.getUserByOffice(authorized.officeCommissioner);
                         this.formPopup.formAuthorizedApproval.setValue({
                             authorizer: this.formPopup.authorized.authorizer,
                             commissioner: this.formPopup.authorized.commissioner,
@@ -69,6 +70,7 @@ export class AuthorizedApprovalListComponent extends AppList {
                             description: this.formPopup.authorized.description,
                             type: this.formPopup.authorized.type,
                             status: this.formPopup.authorized.active,
+                            officeCommissioner: this.formPopup.authorized.officeCommissioner
                         });
                         this.formPopup.minDateEffective = this.formPopup.minDateExpired = this.minDate;
 
@@ -102,13 +104,10 @@ export class AuthorizedApprovalListComponent extends AppList {
                     if (!!res) {
                         this.totalItems = res.totalItems || 0;
                         this.authorizedApprovals = res.data || [];
-                        console.log(this.authorizedApprovals);
                     } else {
                         this.totalItems = 0;
                         this.authorizedApprovals = [];
                     }
-
-
                 },
             );
     }

@@ -526,11 +526,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
-                                                                 && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
-                                                                 && x.Services.Contains(transactionType)
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             int code = PermissionEx.GetPermissionToUpdateHbl(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
@@ -1436,7 +1432,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.SpecialText = "AT SHIPPER´S LOAD, COUNT, STOWAGE AND SEAL. THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER´S ACCOUNT";
                 housebill.Service = data.TransactionType;
                 housebill.Qty = !string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper(); //Ưu tiên Package container >> List of good
-                housebill.MaskNos = markNo?.ToUpper();
+                housebill.MaskNos = !string.IsNullOrEmpty(data.ContSealNo) ? data.ContSealNo : markNo?.ToUpper(); //Ưu tiên Container No/Container Type/Seal No của Housebill >> List of good [18/01/2021]
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 var _totalGwCont = conts.Select(s => s.Gw).Sum() ?? 0; //Tổng grossweight trong list cont;
                 var _totalGwHbl = data.GrossWeight ?? 0; //Grossweight of housebill

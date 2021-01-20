@@ -319,6 +319,10 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("CheckAllowDelete/{id}")]
         public IActionResult CheckAllowDelete(Guid id)
         {
+            if (!csTransactionService.CheckAllowDelete(id))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+            }
             return Ok(csTransactionService.CheckAllowDelete(id));
         }
 

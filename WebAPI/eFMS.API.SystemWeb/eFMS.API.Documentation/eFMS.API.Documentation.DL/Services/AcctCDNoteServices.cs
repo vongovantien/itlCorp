@@ -1224,15 +1224,15 @@ namespace eFMS.API.Documentation.DL.Services
                     decimal _taxMoney = 0;
                     if (isOriginCurr)
                     {
-                        _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
+                        _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 2); //Làm tròn NetAmount
                         _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
+                        _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 2); //Làm tròn tiền thuế
                     }
                     else
                     {
-                        _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
+                        _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 2); //Làm tròn NetAmount
                         _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
+                        _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 2); //Làm tròn tiền thuế
                     }
 
                     var _totalAmount = _netAmount + _taxMoney; //Total Amount = Amount trước thuế + Tiền thuế
@@ -1241,13 +1241,13 @@ namespace eFMS.API.Documentation.DL.Services
                     var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
                     if (isOriginCurr)
                     {
-                        charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3); //Làm tròn Amount Credit
-                        charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3); //Làm tròn Amount Debit
+                        charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 2); //Làm tròn Amount Credit
+                        charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 2); //Làm tròn Amount Debit
                     }
                     else
                     {
-                        charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3); //Làm tròn Amount Credit
-                        charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3); //Làm tròn Amount Debit
+                        charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 2); //Làm tròn Amount Credit
+                        charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 2); //Làm tròn Amount Debit
                     }
                     charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
                     charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
@@ -1276,9 +1276,9 @@ namespace eFMS.API.Documentation.DL.Services
                 for (int i = 0; i < arrCurr.Count(); i++)
                 {
                     decimal _debit = 0, _credit = 0, _balance = 0;
-                    _debit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item2.Value) : Math.Round(arrCurr[i].Item2.Value, 3);
-                    _credit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item3.Value) : Math.Round(arrCurr[i].Item3.Value, 3);
-                    string formatAmount = arrCurr[i].Item1 == "DONG" ? "{0:n0}" : "{0:n3}";
+                    _debit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item2.Value) : Math.Round(arrCurr[i].Item2.Value, 2);
+                    _credit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item3.Value) : Math.Round(arrCurr[i].Item3.Value, 2);
+                    string formatAmount = arrCurr[i].Item1 == "DONG" ? "{0:n0}" : "{0:n2}";
                     _balance = Math.Abs(_debit - _credit);
                     // Total debit
                     if (_debit > 0)
@@ -1297,7 +1297,7 @@ namespace eFMS.API.Documentation.DL.Services
                     _balanceAmount += string.Format(formatAmount, _balance) + " " + arrCurr[i].Item1;
 
                     //Chuyển tiền Amount thành chữ
-                    _balance = Math.Round(_balance, 3);
+                    _balance = Math.Round(_balance, 2);
                     _inword += string.IsNullOrEmpty(_inword) ? string.Empty : "\n";
                     _inword += InWordCurrency.ConvertNumberCurrencyToStringUSD(_balance, arrCurr[i].Item1);
                 }
@@ -1307,25 +1307,25 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else // Preview with USD/VND
             {
-                var _totalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Debit).Value) : Math.Round(listCharge.Sum(x => x.Debit).Value, 3);
-                var _totalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Credit).Value) : Math.Round(listCharge.Sum(x => x.Credit).Value, 3);
+                var _totalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Debit).Value) : Math.Round(listCharge.Sum(x => x.Debit).Value, 2);
+                var _totalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Credit).Value) : Math.Round(listCharge.Sum(x => x.Credit).Value, 2);
                 parameter.TotalDebit = string.Empty;
                 if (_totalDebit != 0)
                 {
-                    parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? string.Format("{0:n0}", _totalDebit) : string.Format("{0:n3}", _totalDebit);
+                    parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? string.Format("{0:n0}", _totalDebit) : string.Format("{0:n2}", _totalDebit);
                 }
 
                 parameter.TotalCredit = string.Empty;
                 if (_totalCredit != 0)
                 {
-                    parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? string.Format("{0:n0}", _totalCredit) : string.Format("{0:n3}", _totalCredit);
+                    parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? string.Format("{0:n0}", _totalCredit) : string.Format("{0:n2}", _totalCredit);
                 }
 
                 var _blAmount = Math.Abs(_totalDebit - _totalCredit);
-                parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? string.Format("{0:n0}", _blAmount) : string.Format("{0:n3}", _blAmount);
+                parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? string.Format("{0:n0}", _blAmount) : string.Format("{0:n2}", _blAmount);
 
                 //Chuyển tiền Amount thành chữ
-                decimal _balanceAmount = Math.Round(_blAmount, 3);
+                decimal _balanceAmount = Math.Round(_blAmount, 2);
                 var _currency = criteria.Currency == DocumentConstants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
                            (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                         :
@@ -1455,15 +1455,15 @@ namespace eFMS.API.Documentation.DL.Services
                     decimal _taxMoney = 0;
                     if (isOriginCurr)
                     {
-                        _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
+                        _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 2); //Làm tròn NetAmount
                         _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
+                        _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 2); //Làm tròn tiền thuế
                     }
                     else
                     {
-                        _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 3); //Làm tròn NetAmount
+                        _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_netAmount) : Math.Round(_netAmount, 2); //Làm tròn NetAmount
                         _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 3); //Làm tròn tiền thuế
+                        _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_taxMoney) : Math.Round(_taxMoney, 2); //Làm tròn tiền thuế
                     }                    
 
                     var _totalAmount = _netAmount + _taxMoney; //Total Amount = Amount trước thuế + Tiền thuế
@@ -1472,13 +1472,13 @@ namespace eFMS.API.Documentation.DL.Services
                     var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
                     if (isOriginCurr)
                     {
-                        charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3); //Làm tròn Amount Credit
-                        charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3); //Làm tròn Amount Debit
+                        charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 2); //Làm tròn Amount Credit
+                        charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 2); //Làm tròn Amount Debit
                     }
                     else
                     {
-                        charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3); //Làm tròn Amount Credit
-                        charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3); //Làm tròn Amount Debit
+                        charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 2); //Làm tròn Amount Credit
+                        charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 2); //Làm tròn Amount Debit
                     }
                     charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
                     charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
@@ -1521,9 +1521,9 @@ namespace eFMS.API.Documentation.DL.Services
                 for (int i = 0; i < arrCurr.Count(); i++)
                 {
                     decimal _debit = 0, _credit = 0, _balance = 0;
-                    string formatAmount = arrCurr[i].Item1 == "DONG" ? "{0:n0}" : "{0:n3}";
-                    _debit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item2.Value) : Math.Round(arrCurr[i].Item2.Value, 3);
-                    _credit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item3.Value) : Math.Round(arrCurr[i].Item3.Value, 3);
+                    string formatAmount = arrCurr[i].Item1 == "DONG" ? "{0:n0}" : "{0:n2}";
+                    _debit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item2.Value) : Math.Round(arrCurr[i].Item2.Value, 2);
+                    _credit = arrCurr[i].Item1 == "DONG" ? Math.Round(arrCurr[i].Item3.Value) : Math.Round(arrCurr[i].Item3.Value, 2);
                     _balance = Math.Abs(_debit - _credit);
 
                     // Total debit
@@ -1542,7 +1542,7 @@ namespace eFMS.API.Documentation.DL.Services
                     _balanceAmount += string.IsNullOrEmpty(_balanceAmount) ? string.Empty : "\n";
                     _balanceAmount += String.Format(formatAmount, _balance) + " " + arrCurr[i].Item1;
                     //Chuyển tiền Amount thành chữ
-                    _balance = Math.Round(_balance, 3);
+                    _balance = Math.Round(_balance, 2);
                     _inword += string.IsNullOrEmpty(_inword) ? string.Empty : "\n";
                     _inword += InWordCurrency.ConvertNumberCurrencyToStringUSD(_balance, arrCurr[i].Item1);
                 }
@@ -1552,25 +1552,25 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else // Preview with USD/VND
             {
-                var _totalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Debit).Value) : Math.Round(listCharge.Sum(x => x.Debit).Value, 3);
-                var _totalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Credit).Value) : Math.Round(listCharge.Sum(x => x.Credit).Value, 3);
+                var _totalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Debit).Value) : Math.Round(listCharge.Sum(x => x.Debit).Value, 2);
+                var _totalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Credit).Value) : Math.Round(listCharge.Sum(x => x.Credit).Value, 2);
                 parameter.TotalDebit = string.Empty;
                 if (_totalDebit != 0)
                 {
-                    parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n3}", _totalDebit);
+                    parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n2}", _totalDebit);
                 }
 
                 parameter.TotalCredit = string.Empty;
                 if (_totalCredit != 0)
                 {
-                    parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n3}", _totalCredit);
+                    parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n2}", _totalCredit);
                 }
 
                 decimal _balanceAmount = Math.Abs(_totalDebit - _totalCredit);
-                parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n3}", _balanceAmount);
+                parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n2}", _balanceAmount);
 
                 //Chuyển tiền Amount thành chữ
-                _balanceAmount = Math.Round(_balanceAmount, 3);
+                _balanceAmount = Math.Round(_balanceAmount, 2);
 
                 var _currency = criteria.Currency == DocumentConstants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
                            (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
@@ -1620,7 +1620,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             parameter.Currency = isOriginCurr ? DocumentConstants.CURRENCY_LOCAL : criteria.Currency;
             parameter.HBLList = _hbllist?.ToUpper();
-            parameter.DecimalNo = 3;
+            parameter.DecimalNo = 2;
             //Exchange Rate USD to VND
             var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
             parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;
