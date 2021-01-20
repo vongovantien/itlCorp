@@ -836,7 +836,8 @@ namespace eFMS.API.Accounting.Controllers
             var duplicateCharges = model.ShipmentCharge.Where(x =>
                        !string.IsNullOrEmpty(x.ClearanceNo)
                     || !string.IsNullOrEmpty(x.ContNo)
-                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ClearanceNo, x.ContNo, x.InvoiceNo }).ToList();
+                    || !string.IsNullOrEmpty(x.InvoiceNo)
+                    ).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ClearanceNo, x.ContNo, x.InvoiceNo }).ToList();
             foreach (var charge in duplicateCharges)
             {
                 if (charge.Count() > 1)

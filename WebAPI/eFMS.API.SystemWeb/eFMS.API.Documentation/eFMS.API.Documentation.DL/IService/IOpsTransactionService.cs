@@ -33,5 +33,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState LockOpsTransaction(Guid jobId);
         ResultHandle ImportDuplicateJob(OpsTransactionModel model);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
+        int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
     }
 }
