@@ -1013,4 +1013,8 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    upLoadChargeFile(files: any) {
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/UploadFile`, files, "uploadedFile");
+    }
 }

@@ -72,7 +72,6 @@ namespace eFMS.API.Documentation.DL.Common
         // IMPORT SURCHARE 
         public static readonly string MSG_HBLNO_EMPTY = "MSG_HBLNO_EMPTY";
         public static readonly string MSG_MBLNO_EMPTY = "MSG_MBLNO_EMPTY";
-        public static readonly string MSG_CUSTOMNO_EMPTY = "MSG_CUSTOMNO_EMPTY";
         public static readonly string MSG_PARTNER_CODE_EMPTY = "MSG_PARTNER_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_EMPTY = "MSG_CHARGE_CODE_EMPTY";
         public static readonly string MSG_QTY_EMPTY = "MSG_QTY_EMPTY";
@@ -82,8 +81,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_VAT_EMPTY = "MSG_VAT_EMPTY";
         public static readonly string MSG_TOTAL_AMOUNT_EMPTY = "MSG_TOTAL_AMOUNT_EMPTY";
         public static readonly string MSG_EXCHANGE_DATE_EMPTY = "MSG_EXCHANGE_DATE_EMPTY";
-        public static readonly string MSG_FINAL_EXCHANGE_EMPTY = "MSG_EXCHANGE_DATE_EMPTY";
-        public static readonly string MSG_INVOICE_NO_EMPTY = "MSG_INVOICE_NO_EMPTY";
+        public static readonly string MSG_FINAL_EXCHANGE_EMPTY = "MSG_FINAL_EXCHANGE_EMPTY";
         public static readonly string MSG_TYPE_EMPTY = "MSG_TYPE_EMPTY";
 
         public static readonly string MSG_HBLNO_NOT_EXIST = "MSG_HBLNO_NOT_EXIST";
@@ -92,7 +90,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_CHARGE_CODE_NOT_EXIST = "MSG_CHARGE_CODE_NOT_EXIST";
         public static readonly string MSG_UNIT_NOT_EXIST = "MSG_UNIT_NOT_EXIST";
         public static readonly string MSG_TYPE_NOT_VALID = "MSG_TYPE_NOT_VALID";
-
+        public static readonly string MSG_CHARGE_CODE_DUPLICATE = "MSG_CHARGE_CODE_DUPLICATE";
 
 
     }

@@ -48,7 +48,7 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
         this._progressRef.start();
-        this._catalogueRepo.upLoadChargeFile(file.target['files'])
+        this._documentRepo.upLoadChargeFile(file.target['files'])
             .pipe(
                 finalize(() => {
                     this._progressRef.complete();

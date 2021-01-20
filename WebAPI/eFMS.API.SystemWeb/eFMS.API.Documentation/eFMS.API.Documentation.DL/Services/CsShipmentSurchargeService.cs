@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatCurrencyExchange> currentExchangeRateRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
         private readonly ICurrencyExchangeService currencyExchangeService;
@@ -43,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCurrencyExchange> currentExchangeRateRepo,
             IContextBase<CatCharge> catChargeRepo,
             IContextBase<CsTransaction> csTransactionRepo,
+            IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange
@@ -58,6 +60,7 @@ namespace eFMS.API.Documentation.DL.Services
             catChargeRepository = catChargeRepo;
             transactionDetailService = transDetailService;
             currencyExchangeService = currencyExchange;
+            unitRepository = unitRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -618,7 +621,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list)
         {
-            var listJob = opsTransRepository.Get();
+            var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.Hblno))
@@ -640,7 +643,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (!partnerRepository.Any(x => x.TaxCode == item.PartnerCode))
                     {
-                        item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST]);
+                        item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST],item.PartnerCode);
                         item.IsValid = false;
                     }
                 }
@@ -651,7 +654,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-
+                    if(!catChargeRepository.Any(x=>x.Code == item.ChargeCode.Trim()))
+                    {
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_NOT_EXIST],item.ChargeCode);
+                        item.IsValid = false;
+                    }
                 }
 
                 if (!item.Qty.HasValue)
@@ -663,6 +670,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_EMPTY]);
                     item.IsValid = false;
+                }
+                else
+                {
+                    if(!unitRepository.Any(x=>x.UnitNameEn.Trim() == item.Unit.Trim()))
+                    {
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_NOT_EXIST]);
+                        item.IsValid = false;
+                    }
                 }
                 if (!item.UnitPrice.HasValue)
                 {
@@ -692,7 +707,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (!item.FinalExchangeRate.HasValue)
                 {
-                    item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
+                    item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_FINAL_EXCHANGE_EMPTY]);
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Type))
@@ -708,22 +723,65 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
                     }
                 }
-                if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
+                if (!string.IsNullOrEmpty(item.Hblno))
                 {
-                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno))
-                    {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST]);
-                        item.IsValid = false;
-                    }
+               
                     if (!opsTransRepository.Any(x => x.Mblno == item.Mblno && x.Hwbno == item.Hblno))
                     {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST]);
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
                         item.IsValid = false;
 
                     }
                 }
+                if (!string.IsNullOrEmpty(item.Mblno))
+                {
+                    if (!opsTransRepository.Any(x => x.Mblno.Trim() == item.Mblno.Trim()))
+                    {
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST],item.Mblno);
+                        item.IsValid = false;
+                    }
+                }
+                if (item.IsValid)
+                {
+                    string PartnerId = partnerRepository.Get(x => x.TaxCode == item.PartnerCode).Select(t => t.Id).FirstOrDefault();
+                    item.PaymentObjectId = PartnerId;
+                    Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
+                    item.ChargeId = ChargeId;
+                    short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
+                    item.UnitId = UnitId;
+                    if(listChargeOps.Any(x=>x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId))
+                    {
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE]);
+                        item.IsValid = false;
+                    }
+                    if (!string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(item.InvoiceNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                    }
+                }
 
             });
+            return list;
         }
 
         private string GetTransactionType(string jobNo)

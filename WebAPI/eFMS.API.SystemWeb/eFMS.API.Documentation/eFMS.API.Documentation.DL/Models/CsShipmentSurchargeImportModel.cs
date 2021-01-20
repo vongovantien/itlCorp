@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string ChargeCodeError { get; set; }
         public string Unit { get; set; }
         public bool IsValid { get; set; }
-        public decimal? Qty { get; set; }
+        public double? Qty { get; set; }
         public string QtyError { get; set; }
         public string UnitError { get; set; }
         public string UnitPriceError { get; set; }

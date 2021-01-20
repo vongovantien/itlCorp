@@ -417,23 +417,28 @@ namespace eFMS.API.Documentation.Controllers
                         ClearanceNo = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         PartnerCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                         ChargeCode = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        Qty = (decimal?)worksheet.Cells[row, 6].Value,
-                        Unit = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                        UnitPrice = (decimal?)worksheet.Cells[row, 8].Value,
-                        CurrencyId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        Vatrate = (decimal?)worksheet.Cells[row, 10].Value,
-                        TotalAmount = (decimal?)worksheet.Cells[row, 11].Value,
-                        ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
-                        FinalExchangeRate = (decimal?)worksheet.Cells[row, 13].Value, 
+                        Qty = worksheet.Cells[row, 6].Value != null ? (double?) worksheet.Cells[row, 6].Value : (double?)null,
+                        //Unit = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                        //UnitPrice = worksheet.Cells[row, 8].Value != null ? (decimal?)worksheet.Cells[row, 8].Value : null,
+                        //CurrencyId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        //Vatrate = worksheet.Cells[row, 10].Value != null ? (decimal?)worksheet.Cells[row, 10].Value : null,
+                        //TotalAmount = worksheet.Cells[row, 11].Value != null ? (decimal?)worksheet.Cells[row, 11].Value : (Decimal?)null,
+                        //ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
+                        //FinalExchangeRate = worksheet.Cells[row, 13].Value != null ? (decimal?)worksheet.Cells[row, 13].Value : null, 
                         InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
                         InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPase : (DateTime?)null,
                         SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
                         Type = worksheet.Cells[row, 17].Value?.ToString().Trim(),
                         Notes = worksheet.Cells[row, 18].Value?.ToString().Trim(),
                     };
+                    list.Add(surcharge);
                 }
-
+                var data = csShipmentSurchargeService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
             }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
         #endregion
 

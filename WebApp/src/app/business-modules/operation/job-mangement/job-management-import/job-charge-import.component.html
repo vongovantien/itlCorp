@@ -82,38 +82,74 @@
                                 <span>No.</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
-                                (click)="sort('code')">
-                                <span>Code</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblno'), 'sorting_desc': (!isDesc && sortKey == 'hblno') }"
+                                (click)="sort('hblno')">
+                                <span required>HBL</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameEn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameEn') }"
-                                (click)="sort('chargeNameEn')">
-                                <span>Name EN</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mblno'), 'sorting_desc': (!isDesc && sortKey == 'mblno') }"
+                                (click)="sort('mblno')">
+                                <span required>MBL</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameVn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameVn') }"
-                                (click)="sort('chargeNameVn')">
-                                <span>Name Local</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
+                                (click)="sort('clearanceNo')">
+                                <span>Custom No</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitCode'), 'sorting_desc': (!isDesc && sortKey == 'unitCode') }"
-                                (click)="sort('unitCode')">
-                                <span>Unit</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerCode'), 'sorting_desc': (!isDesc && sortKey == 'partnerCode') }"
+                                (click)="sort('partnerCode')">
+                                <span required>Partner Mode</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitPrice'), 'sorting_desc': (!isDesc && sortKey == 'unitPrice') }"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeCode'), 'sorting_desc': (!isDesc && sortKey == 'chargeCode') }"
+                                (click)="sort('chargeCode')">
+                                <span>Charge Code</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qty'), 'sorting_desc': (!isDesc && sortKey == 'qty') }"
+                                (click)="sort('qty')">
+                                <span required>Qty</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unit'), 'sorting_desc': (!isDesc && sortKey == 'unit') }"
+                                (click)="sort('unit')">
+                                <span required>Unit</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitPrice'), 'sorting_desc': (!isDesc && sortKey == 'unitPrice') }"
                                 (click)="sort('unitPrice')">
                                 <span>Unit Price</span>
                             </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currencyId'), 'sorting_desc': (!isDesc && sortKey == 'currencyId') }"
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currencyId'), 'sorting_desc': (!isDesc && sortKey == 'currencyId') }"
                                 (click)="sort('currencyId')">
-                                <span>Currency</span>
+                                <span required>Currency</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatrate'), 'sorting_desc': (!isDesc && sortKey == 'vatrate') }"
                                 (click)="sort('vatrate')">
-                                <span>VAT</span>
+                                <span required>Vat</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'totalAmount'), 'sorting_desc': (!isDesc && sortKey == 'totalAmount') }"
+                                (click)="sort('totalAmount')">
+                                <span required>Total Amount</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exchangeDate'), 'sorting_desc': (!isDesc && sortKey == 'exchangeDate') }"
+                                (click)="sort('exchangeDate')">
+                                <span required>Exchange Date</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'finalExchangeRate'), 'sorting_desc': (!isDesc && sortKey == 'finalExchangeRate') }"
+                                (click)="sort('finalExchangeRate')">
+                                <span required>Final Exchange Rate</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
+                                (click)="sort('invoiceNo')">
+                                <span>Invoice No</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceDate'), 'sorting_desc': (!isDesc && sortKey == 'invoiceDate') }"
+                                (click)="sort('invoiceDate')">
+                                <span>Invoice Date</span>
+                            </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'seriesNo'), 'sorting_desc': (!isDesc && sortKey == 'seriesNo') }"
+                                (click)="sort('seriesNo')">
+                                <span>Serie No</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
@@ -121,15 +157,11 @@
                                 <span>Type </span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceName'), 'sorting_desc': (!isDesc && sortKey == 'serviceName') }"
-                                (click)="sort('serviceName')">
-                                <span>Sevice </span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'notes'), 'sorting_desc': (!isDesc && sortKey == 'notes') }"
+                                (click)="sort('notes')">
+                                <span>Notes </span>
                             </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }"
-                                (click)="sort('status')">
-                                <span>Status </span>
-                            </th>
+
                         </tr>
                     </thead>
                     <tbody *ngIf="data">
@@ -139,49 +171,98 @@
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.codeError === null">{{ item.code }}</span>
-                                    <span class="m--font-danger" *ngIf="item.codeError !== null">{{item.codeError
+                                    <span *ngIf="item.hblNoError === null">{{ item.hblno }}</span>
+                                    <span class="m--font-danger" *ngIf="item.hblNoError !== null">{{item.hblNoError
                                         }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.chargeNameEnError === null">{{ item.chargeNameEn }}</span>
-                                    <span class="m--font-danger" *ngIf="item.chargeNameEnError !== null">{{
-                                        item.chargeNameEnError }}</span>
+                                    <span *ngIf="item.mblNoError === null">{{ item.mblno }}</span>
+                                    <span class="m--font-danger" *ngIf="item.mblNoError !== null">{{item.mblNoError
+                                        }}</span>
                                 </td>
-                                <td class="">
-                                    <span *ngIf="item.chargeNameVnError === null">{{ item.chargeNameVn }}</span>
-                                    <span class="m--font-danger" *ngIf="item.chargeNameVnError !== null">{{
-                                        item.chargeNameVnError }}</span>
+                                <td>
+                                    <span> {{item.clearanceNo}} </span>
                                 </td>
-                                <td class="">
-                                    <span>{{ item.unitCode }}</span>
-                                </td>
-                                <td class="">
-                                    <span *ngIf="item.unitPriceError === null">{{ item.unitPrice }}</span>
-                                    <span class="m--font-danger" *ngIf="item.unitPriceError !== null">{{
-                                        item.unitPriceError}}</span>
-                                </td>
-                                <td class="">
-                                    <span>{{ item.currencyId }}</span>
-                                </td>
-                                <td class="">
-                                    <span *ngIf="item.vatrateError === null">{{item.vatrate}}</span>
+                                <td>
+                                    <span *ngIf="item.partnerCodeError === null">{{ item.partnerCode }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.vatrateError !== null">{{item.vatrateError}} </span>
+                                        *ngIf="item.partnerCodeError !== null">{{item.partnerCodeError
+                                        }}</span>
                                 </td>
-                                <td class="">
+                                <td>
+                                    <span *ngIf="item.chargeCodeError === null">{{ item.chargeCode }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.chargeCodeError !== null">{{item.chargeCodeError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.qtyError === null">{{ item.qty }}</span>
+                                    <span class="m--font-danger" *ngIf="item.qtyError !== null">{{item.qtyError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.unitError === null">{{ item.unit }}</span>
+                                    <span class="m--font-danger" *ngIf="item.unitError !== null">{{item.unitError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.unitPriceError === null">{{ item.unitPrice }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.unitPriceError !== null">{{item.unitPriceError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.currencyError === null">{{ item.currencyId }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.currencyError !== null">{{item.currencyError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.vatError === null">{{ item.vatRate }}</span>
+                                    <span class="m--font-danger" *ngIf="item.vatError !== null">{{item.vatError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.totalAmountError === null">{{ item.totalAmount }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.totalAmountError !== null">{{item.totalAmountError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.exchangeDateError === null">{{ item.exchangeDate | date:
+                                        'dd/MM/yyyy' }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.exchangeDateError !== null">{{item.exchangeDateError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.finalExchangeRateError === null">{{ item.finalExchangeRate
+                                        }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.finalExchangeRateError !== null">{{item.finalExchangeRateError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{item.invoiceNo}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{item.invoiceDate | date: 'dd/MM/yyyy' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{item.seriesNo}}
+                                    </span>
+                                </td>
+                                <td>
                                     <span *ngIf="item.typeError === null">{{ item.type }}</span>
                                     <span class="m--font-danger" *ngIf="item.typeError !== null">{{item.typeError
                                         }}</span>
                                 </td>
-                                <td class="">
-                                    <span *ngIf="item.serviceNameError === null">{{ item.serviceName }}</span>
-                                    <span class="m--font-danger" *ngIf="item.serviceNameError !== null">{{
-                                        item.serviceNameError }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.status }}</span>
-                                </td>
+                                <td>{{item.notes}}</td>
                             </tr>
                         </ng-container>
                     </tbody>

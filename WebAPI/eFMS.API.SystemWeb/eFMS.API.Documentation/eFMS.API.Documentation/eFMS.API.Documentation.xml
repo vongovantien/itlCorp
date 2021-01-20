@@ -493,6 +493,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read data from file excel
+            </summary>
+            <param name="uploadedFile"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShippingInstructionController.CheckExistSIExport(System.Guid)">
             <summary>
             Check if Exist Sea Export files attach
