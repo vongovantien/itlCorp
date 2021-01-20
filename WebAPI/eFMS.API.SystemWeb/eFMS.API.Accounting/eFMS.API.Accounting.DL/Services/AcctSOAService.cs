@@ -1895,7 +1895,7 @@ namespace eFMS.API.Accounting.DL.Services
             var soa = DataContext.Get(x => x.Soano == soaNo);
 
             // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeExportForSOAOPS(soa.FirstOrDefault());
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault());
             var customerId = soa?.FirstOrDefault().Customer;
             var partner = catPartnerRepo.Get(x => x.Id == customerId || string.IsNullOrEmpty(customerId));
             var dataResult = from s in soa
@@ -1962,7 +1962,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeExportForSOAOPS(soa.FirstOrDefault()).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault()).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.HBL).AsQueryable();
 
             if (results.Select(x => x.Key).Count() > 0)
@@ -2164,7 +2164,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeExportForSOAOPS(soa.FirstOrDefault()).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault()).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.JobId).AsQueryable();
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
@@ -2316,11 +2316,11 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Get data export for SOA OPS
+        /// Get data export for SOA with soa no
         /// </summary>
-        /// <param name="soaNo"></param>
+        /// <param name="soa">AcctSoa</param>
         /// <returns></returns>
-        public IQueryable<ChargeSOAResult> GetChargeExportForSOAOPS(AcctSoa soa)
+        public IQueryable<ChargeSOAResult> GetChargeExportForSOA(AcctSoa soa)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
             var surCharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soa.Soano : x.PaySoano == soa.Soano);                    
@@ -2437,7 +2437,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return opssoa;
             }
-            var charge = GetChargeExportForSOAOPS(soa);
+            var charge = GetChargeExportForSOA(soa);
             if (soa.Type?.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() && soa.Type?.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
                 charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower() || x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_OBH.ToLower());
@@ -2534,7 +2534,7 @@ namespace eFMS.API.Accounting.DL.Services
             var soa = DataContext.Get(x => x.Soano == soaNo);
             // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var chargeDefaults = chargeDefaultRepo.Get(x => x.Type == "Công Nợ");
-            var charge = GetChargeExportForSOAOPS(soa.FirstOrDefault());
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault());
             var customerId = soa.FirstOrDefault()?.Customer;
             var partner = catPartnerRepo.Get(x => x.Id == customerId);
             var dataResult = from s in soa
