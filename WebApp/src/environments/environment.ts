@@ -2,6 +2,7 @@ export const environment = {
         production: false,
         local: false,
         HOST: {
+
                 WEB_URL: "test.api-efms.itlvn.com",
                 ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
                 //ACCOUNTING: "localhost:44368",
@@ -14,6 +15,7 @@ export const environment = {
                 SYSTEM: "test.api-efms.itlvn.com/System",
                 //SYSTEM: "localhost:44360",
                 SETTING: "test.api-efms.itlvn.com/Setting",
+                // SETTING: "localhost:44363",
                 REPORT: "http://test.api-efms.itlvn.com/ReportPreview/Default.aspx",
                 // REPORT: "http://localhost:53717",
                 EXPORT: "test.api-efms.itlvn.com/Export",

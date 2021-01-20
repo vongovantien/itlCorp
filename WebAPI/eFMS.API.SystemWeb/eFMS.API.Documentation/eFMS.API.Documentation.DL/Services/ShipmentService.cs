@@ -688,6 +688,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
+            //// Search CustomerId
+            //if (!string.IsNullOrEmpty(criteria.CustomerId))
+            //{
+            //    queryTrans = queryTrans.And(q => q.AgentId == criteria.CustomerId);
+            //}
             return queryTrans;
         }
 
@@ -969,8 +974,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
                 data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
-                data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
-                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
+                data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
+                var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
+                data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription :  catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.Shipper = !string.IsNullOrEmpty( data.ShipperDescription) ? data.ShipperDescription : catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
                 data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault()?.Username;
                 data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
@@ -1188,7 +1197,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.JobNo = item.JobNo;
                 data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
-                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = item.Consignee;
                 data.MblMawb = item.Mblno;
                 data.HblHawb = item.Hwbno;
                 data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
@@ -1329,6 +1338,11 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Creator = sysUserRepo.Get(x => x.Id == item.BillingOpsId).Select(t => t.Username).FirstOrDefault();
                 data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
                 data.Created = item.DatetimeCreated;
+                data.Salesman = sysUserRepo.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.Username;
+                data.AgentName = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameVn;
+                data.Agent = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.ShortName;
+                data.Carrier = catPartnerRepo.Get(x => x.Id == item.SupplierId).FirstOrDefault()?.ShortName;
+
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -1374,6 +1388,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Agent = master.AgentId,
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
+                                        ShipperDescription = house.ShipperDescription,
+                                        ConsigneeDescription = house.ConsigneeDescription,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
@@ -1425,6 +1441,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Agent = master.AgentId,
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
+                                        ShipperDescription = house.ShipperDescription,
+                                        ConsigneeDescription = house.ConsigneeDescription,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
@@ -1770,7 +1788,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             // Filter data without customerId
             var criteriaNoCustomer = criteria;
+            string customerId = criteria.CustomerId;
             criteriaNoCustomer.CustomerId = null;
+            criteria.CustomerId = customerId;
             Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteriaNoCustomer);
             
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
@@ -1968,7 +1988,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<JobProfitAnalysisExportResult> JobProfitAnalysisDocumetation(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
-            var criteriaNoCustomer = criteria;
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
             var dataShipment = QueryDataDocumentationJobProfitAnalysis(criteriaNoCustomer);
             List<JobProfitAnalysisExportResult> dataList = new List<JobProfitAnalysisExportResult>();
@@ -2263,7 +2283,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
-            var criteriaNoCustomer = criteria;
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
             var dataShipment = QueryDataDocumentationAcctPLSheet(criteriaNoCustomer);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
@@ -2481,7 +2501,9 @@ namespace eFMS.API.Documentation.DL.Services
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
-            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
+            query = chg => chg.Service == criteria.Service;
+            var chargeData = GetChargeOBHSellPayee(query, null) ;
+
             foreach (var item in dataShipment)
             {
                 var _charges = chargeData.Where(x => x.HBLID == item.HBLID);
@@ -2530,7 +2552,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> QueryDataSummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
-            var criteriaNoCustomer = criteria;
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
             Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteriaNoCustomer);
             Expression<Func<CsTransactionDetail, bool>> queryTranDetail = GetQueryTransationDetailDocumentation(criteriaNoCustomer);
@@ -2803,7 +2825,8 @@ namespace eFMS.API.Documentation.DL.Services
             SummaryOfRevenueModel ObjectSummaryRevenue = new SummaryOfRevenueModel();
             List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
-            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayer(query, null) : GetChargeOBHSellPayer(null, null);
+            query = chg => chg.Service == criteria.Service;
+            var chargeData = GetChargeOBHSellPayer(query, null);
             var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
             foreach (var item in dataShipment)
             {
@@ -2945,64 +2968,11 @@ namespace eFMS.API.Documentation.DL.Services
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
             var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
-            var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
 
-            ////OBH Payer (BUY - Credit)
-            //var queryObhBuyOperation = from sur in surcharge
-            //                           join ops in opst on sur.Hblid equals ops.Hblid
-            //                           join chg in charge on sur.ChargeId equals chg.Id into chg2
-            //                           from chg in chg2.DefaultIfEmpty()
-            //                           join uni in unit on sur.UnitId equals uni.Id into uni2
-            //                           from uni in uni2.DefaultIfEmpty()
-            //                           select new SummaryOfCostsIncurredExportResult
-            //                           {
-            //                               ID = sur.Id,
-            //                               HBLID = sur.Hblid,
-            //                               ChargeID = sur.ChargeId,
-            //                               ChargeCode = chg.Code,
-            //                               ChargeName = chg.ChargeNameEn,
-            //                               JobId = ops.JobNo,
-            //                               HBL = ops.Hwbno,
-            //                               MBL = ops.Mblno,
-            //                               Type = sur.Type + "-BUY",
-            //                               SoaNo = sur.PaySoano,
-            //                               Debit = null,
-            //                               Credit = sur.Total,
-            //                               IsOBH = true,
-            //                               Currency = sur.CurrencyId,
-            //                               InvoiceNo = sur.InvoiceNo,
-            //                               Note = sur.Notes,
-            //                               CustomerID = sur.PayerId,
-            //                               ServiceDate = ops.ServiceDate,
-            //                               CreatedDate = ops.DatetimeCreated,
-            //                               TransactionType = null,
-            //                               UserCreated = ops.UserCreated,
-            //                               Quantity = sur.Quantity,
-            //                               UnitId = sur.UnitId,
-            //                               UnitPrice = sur.UnitPrice,
-            //                               VATRate = sur.Vatrate,
-            //                               CreditDebitNo = sur.CreditNo,
-            //                               CommodityGroupID = ops.CommodityGroupId,
-            //                               Service = "CL",
-            //                               ExchangeDate = sur.ExchangeDate,
-            //                               FinalExchangeRate = sur.FinalExchangeRate,
-            //                               TypeCharge = chg.Type,
-            //                               PayerId = sur.PayerId,
-            //                               Unit = uni.UnitNameEn,
-            //                               InvoiceDate = sur.InvoiceDate
-            //                           };
-            //if (query != null)
-            //{
-            //    queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-            //}
-            //if (isOBH != null)
-            //{
-            //    queryObhBuyOperation = queryObhBuyOperation.Where(x => x.IsOBH == isOBH);
-            //}
             var queryObhBuyDocument = from sur in surcharge
                                       join cstd in csTransDe on sur.Hblid equals cstd.Id
                                       join cst in csTrans on cstd.JobId equals cst.Id
@@ -3060,6 +3030,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (query != null)
             {
                 queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+                queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.CustomerID)).Where(query);
             }
             if (isOBH != null)
             {

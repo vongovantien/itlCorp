@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -339,19 +340,21 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HousbillProfit GetHouseBillTotalProfit(Guid hblid)
         {
-            var result = new HousbillProfit
+            HousbillProfit result = new HousbillProfit
             {
                 HBLID = hblid,
                 HouseBillTotalCharge = new HouseBillTotalCharge()
             };
-            var surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
+            List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
             if (!surcharges.Any()) return result;
             foreach (var item in surcharges)
             {
                 decimal _rateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 decimal _rateToUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                decimal totalLocal = item.Total * _rateToLocal; //item.RateToLocal;
-                decimal totalUSD = item.Total * _rateToUSD; //item.RateToUSD;
+
+                decimal totalLocal = item.Quantity * (item.UnitPrice ?? 0)  * _rateToLocal; // without vat - 15305
+                decimal totalUSD = item.Quantity * (item.UnitPrice ?? 0) * _rateToUSD; // without vat - 15305
+
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
@@ -368,8 +371,10 @@ namespace eFMS.API.Documentation.DL.Services
                     result.HouseBillTotalCharge.TotalOBHUSD = result.HouseBillTotalCharge.TotalOBHUSD + totalUSD;
                 }
             }
+
             result.ProfitLocal = result.HouseBillTotalCharge.TotalSellingLocal - result.HouseBillTotalCharge.TotalBuyingLocal;
             result.ProfitUSD = result.HouseBillTotalCharge.TotalSellingUSD - result.HouseBillTotalCharge.TotalBuyingUSD;
+
             return result;
         }
 
@@ -406,7 +411,7 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public HandleState AddAndUpate(List<CsShipmentSurchargeModel> list)
+        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list)
         {
             var result = new HandleState();
             var surcharges = mapper.Map<List<CsShipmentSurcharge>>(list);
@@ -424,6 +429,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.DebitNo = string.IsNullOrEmpty(item.DebitNo?.Trim()) ? null : item.DebitNo;
                         item.Soano = string.IsNullOrEmpty(item.Soano?.Trim()) ? null : item.Soano;
                         item.PaySoano = string.IsNullOrEmpty(item.PaySoano?.Trim()) ? null : item.PaySoano;
+
                         if (item.Id == Guid.Empty)
                         {
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
@@ -451,6 +457,30 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         else
                         {
+                            string _jobNo = string.Empty;
+                            string _mblNo = string.Empty;
+                            string _hblNo = string.Empty;
+                            if (item.TransactionType != "CL")
+                            {
+                                var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                _hblNo = houseBill?.Hwbno;
+                                if (houseBill != null)
+                                {
+                                    var masterBill = csTransactionRepository.Get(x => x.Id == houseBill.JobId).FirstOrDefault();
+                                    _jobNo = masterBill?.JobNo;
+                                    _mblNo = !string.IsNullOrEmpty(masterBill?.Mawb) ? masterBill?.Mawb : houseBill.Mawb;
+                                }
+                            }
+                            else
+                            {
+                                var masterBill = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                                _jobNo = masterBill?.JobNo;
+                                _mblNo = masterBill?.Mblno;
+                                _hblNo = masterBill?.Hwbno;
+                            }
+                            item.JobNo = _jobNo;
+                            item.Mblno = _mblNo;
+                            item.Hblno = _hblNo;
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
                             var d = DataContext.Update(item, x => x.Id == item.Id, true);
@@ -474,17 +504,19 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<HousbillProfit> GetShipmentTotalProfit(Guid jobId)
         {
-            var results = new List<HousbillProfit>();
+            List<HousbillProfit> results = new List<HousbillProfit>();
             IQueryable<OpsTransaction> opsShipments = null;
             CsTransaction csShipment = null;
             IQueryable<HousbillProfit> hblids = null;
+
             opsShipments = opsTransRepository.Get(x => x.Id == jobId);
+
             if (opsShipments.Count() == 0)
             {
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
-                    var houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
                     //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
                     //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                     hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
@@ -496,9 +528,9 @@ namespace eFMS.API.Documentation.DL.Services
                 hblids = opsShipments.Select(x => new HousbillProfit { HBLID = x.Hblid, HBLNo = x.Hwbno });
             }
             if (hblids.Count() == 0) return results;
-            foreach (var item in hblids)
+            foreach (HousbillProfit item in hblids)
             {
-                var profit = GetHouseBillTotalProfit(item.HBLID);
+                HousbillProfit profit = GetHouseBillTotalProfit(item.HBLID);
                 profit.HBLNo = item.HBLNo;
                 results.Add(profit);
             }
@@ -508,30 +540,43 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
             // get charge info of newest shipment by charge type of an PIC and not existed in current shipment and by criteria: POL, POD, Customer, Shipping Line, Consignee
-            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            var shipment = csTransactionRepository.Get(x => x.PersonIncharge == criteria.PersonInCharge
-                                                        && x.TransactionType == transactionType
-                                                        && x.Id != criteria.CurrentJobId)?.OrderByDescending(x => x.DatetimeCreated)?.FirstOrDefault();
-            if (shipment == null) return null;
-            if (criteria.ShippingLine != null && shipment.ColoaderId != criteria.ShippingLine)
+            string transactionType = DataTypeEx.GetType(criteria.TransactionType);
+
+            Expression<Func<CsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
+                                                        && (x.AgentId == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
+                                                        && (x.ColoaderId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
+                                                        && x.TransactionType == transactionType);
+
+
+            if (queryShipmentNearest == null) return null;
+            List<Guid> houseIds = new List<Guid>();
+
+            if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
             {
-                return null;
+                if (criteria.ColoaderId == null) return null;
+                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
+
+                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
+                if (shipment == null) return null;
+
+                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.Id != criteria.HblId).Select(x => x.Id).ToList();
             }
-            var housebills = tranDetailRepository.Get(x => (x.Pol == criteria.POL || criteria.POL == null)
-                                                        && (x.Pod == criteria.POD || criteria.POD == null)
-                                                        && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                                                        && (x.ConsigneeId == criteria.ConsigneeId || string.IsNullOrEmpty(criteria.ConsigneeId))
-                                                        && x.JobId == shipment.Id
-                                                ).Select(x => x.Id).ToList();
-            if (housebills.Count == 0) return null;
-            var charges = DataContext.Get(x => housebills.Contains(x.Hblid)
-                            && (x.Type == criteria.ChargeType || string.IsNullOrEmpty(criteria.ChargeType))
-                            && (x.IsFromShipment == true));
+           else
+            {
+                if (criteria.CustomerId == null) return null;
+                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
+                if (shipment == null) return null;
 
-            if (charges.Select(x => x.Id).Count() == 0) return null;
+                // Chỉ lấy house
+                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))).Select(x => x.Id).ToList();
+            }
 
-            var result = (
-                from surcharge in charges
+            if (houseIds.Count == 0) return null;
+            IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
+            if (csShipmentSurcharge == null) return null;
+
+            IQueryable<CsShipmentSurchargeDetailsModel> result = (
+                from surcharge in csShipmentSurcharge
                 join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
                 join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
                 from p1 in gp.DefaultIfEmpty()
@@ -567,7 +612,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                     ChargeNameEn = charge.ChargeNameEn,
                     ChargeCode = charge.Code,
-
                 });
             return result;
         }

@@ -176,7 +176,7 @@ namespace eFMS.API.Documentation.Controllers
             list.ForEach(fe => {
                 fe.Total = Math.Round(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn charge VND
             });
-            var hs = csShipmentSurchargeService.AddAndUpate(list);
+            var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -311,12 +311,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("GetRecentlyCharges")]
+        [Authorize]
         public IActionResult GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
-            if( criteria.PersonInCharge == null)
-            {
-                return Ok(null);
-            }
             var results = csShipmentSurchargeService.GetRecentlyCharges(criteria);
             return Ok(results);
         }

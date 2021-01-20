@@ -180,6 +180,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 model.ContractNo = entity.ContractNo;
                 model.SalesmanId = entity.SaleManId;
                 model.UserCreatedContract = contract.UserCreated;
+                model.UserCreated = entity.UserCreated;
                 SendMailActiveSuccess(model, string.Empty);
                 ClearCache();
                 Get();
@@ -778,11 +779,17 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreatedContract).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string employeeIdPartner = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoCreatorPartner = sysEmployeeRepository.Get(e => e.Id == employeeIdPartner)?.FirstOrDefault();
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoSalesman = sysEmployeeRepository.Get(e => e.Id == employeeIdSalemans)?.FirstOrDefault();
+            string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
+
+
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
 
@@ -859,6 +866,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     lstCc = lstTo;
                 }
                 lstCc.Add(objInfoSalesman?.Email);
+                lstCc.Add(objInfoCreatorPartner?.Email);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
             }
             else
@@ -890,6 +898,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc.Add(objInfoSalesman?.Email);
+                lstCc.Add(objInfoCreatorPartner?.Email);
+                lstCc.Add(objInfoModified?.Email);
                 //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 

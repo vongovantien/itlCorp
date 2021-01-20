@@ -60,5 +60,6 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<CsTransactionDetailModel> GetDataHawbToCheckExisted();
         HandleState UpdateInputBKNote(BookingNoteCriteria criteria);
         List<HousebillDailyExportResult> GetHousebillsDailyExport(DateTime? issuedDate);
+        HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model);
     }
 }
