@@ -68,5 +68,32 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA = "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA";
         public static readonly string MSG_HOUSEBILL_NOT_FOUND = "MSG_HOUSEBILL_NOT_FOUND";
         public static readonly string MSG_NOT_EXIST_SHIPMENT_COPY = "MSG_NOT_EXIST_SHIPMENT_COPY";
+
+        // IMPORT SURCHARE 
+        public static readonly string MSG_HBLNO_EMPTY = "MSG_HBLNO_EMPTY";
+        public static readonly string MSG_MBLNO_EMPTY = "MSG_MBLNO_EMPTY";
+        public static readonly string MSG_CUSTOMNO_EMPTY = "MSG_CUSTOMNO_EMPTY";
+        public static readonly string MSG_PARTNER_CODE_EMPTY = "MSG_PARTNER_CODE_EMPTY";
+        public static readonly string MSG_CHARGE_CODE_EMPTY = "MSG_CHARGE_CODE_EMPTY";
+        public static readonly string MSG_QTY_EMPTY = "MSG_QTY_EMPTY";
+        public static readonly string MSG_UNIT_EMPTY = "MSG_UNIT_EMPTY";
+        public static readonly string MSG_UNIT_PRICE_EMPTY = "MSG_UNIT_PRICE_EMPTY";
+        public static readonly string MSG_CURRENCY_EMPTY = "MSG_CURRENCY_EMPTY";
+        public static readonly string MSG_VAT_EMPTY = "MSG_VAT_EMPTY";
+        public static readonly string MSG_TOTAL_AMOUNT_EMPTY = "MSG_TOTAL_AMOUNT_EMPTY";
+        public static readonly string MSG_EXCHANGE_DATE_EMPTY = "MSG_EXCHANGE_DATE_EMPTY";
+        public static readonly string MSG_FINAL_EXCHANGE_EMPTY = "MSG_EXCHANGE_DATE_EMPTY";
+        public static readonly string MSG_INVOICE_NO_EMPTY = "MSG_INVOICE_NO_EMPTY";
+        public static readonly string MSG_TYPE_EMPTY = "MSG_TYPE_EMPTY";
+
+        public static readonly string MSG_HBLNO_NOT_EXIST = "MSG_HBLNO_NOT_EXIST";
+        public static readonly string MSG_MBLNO_NOT_EXIST = "MSG_MBLNO_NOT_EXIST";
+        public static readonly string MSG_PARTER_CODE_NOT_EXIST = "MSG_PARTER_CODE_NOT_EXIST";
+        public static readonly string MSG_CHARGE_CODE_NOT_EXIST = "MSG_CHARGE_CODE_NOT_EXIST";
+        public static readonly string MSG_UNIT_NOT_EXIST = "MSG_UNIT_NOT_EXIST";
+        public static readonly string MSG_TYPE_NOT_VALID = "MSG_TYPE_NOT_VALID";
+
+
+
     }
 }

@@ -65,5 +65,7 @@
   "DO_NOT_HAVE_PERMISSION": "Do not have permission", //403
   "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!",
   "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !",
-  "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} not found, please recheck!"
+  "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} not found, please recheck!",
+
+  "MSG_HBLNO_EMPTY": "Hbl no not allow empty!"
 }

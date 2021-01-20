@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
@@ -14,8 +15,10 @@ using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
@@ -352,6 +355,84 @@ namespace eFMS.API.Documentation.Controllers
             else
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                DateTime temp;
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CsShipmentSurchargeImportModel> list = new List<CsShipmentSurchargeImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string ExchangeDate = worksheet.Cells[row, 12].Value?.ToString().Trim();
+                    DateTime? dateToPase = null;
+                    if (DateTime.TryParse(ExchangeDate, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPase = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        if (ExchangeDate != null)
+                        {
+                            dateToPase = DateTime.Parse(ExchangeDate, culture);
+                        }
+                    }
+
+                    string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
+                    DateTime? dateToPaseInvoice = null;
+                    if (DateTime.TryParse(InvoiceDate, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPaseInvoice = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        if (ExchangeDate != null)
+                        {
+                            dateToPaseInvoice = DateTime.Parse(InvoiceDate, culture);
+                        }
+                    }
+
+                    var surcharge = new CsShipmentSurchargeImportModel
+                    {
+                        IsValid = true,
+                        Hblno = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        Mblno = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        ClearanceNo = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        PartnerCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        ChargeCode = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        Qty = (decimal?)worksheet.Cells[row, 6].Value,
+                        Unit = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                        UnitPrice = (decimal?)worksheet.Cells[row, 8].Value,
+                        CurrencyId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        Vatrate = (decimal?)worksheet.Cells[row, 10].Value,
+                        TotalAmount = (decimal?)worksheet.Cells[row, 11].Value,
+                        ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
+                        FinalExchangeRate = (decimal?)worksheet.Cells[row, 13].Value, 
+                        InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPase : (DateTime?)null,
+                        SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
+                        Type = worksheet.Cells[row, 17].Value?.ToString().Trim(),
+                        Notes = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                    };
+                }
+
             }
         }
         #endregion
