@@ -2230,9 +2230,10 @@ namespace eFMS.API.Accounting.DL.Services
             //var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
 
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
-            var partner = catPartnerRepo.Get();
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault());
+            var customerId = soa?.FirstOrDefault().Customer;
+            var partner = catPartnerRepo.Get(x => x.Id == customerId || string.IsNullOrEmpty(customerId));
             var dataResult = from s in soa
                              join chg in charge on s.Soano equals chg.SOANo into chg2
                              from chg in chg2.DefaultIfEmpty()
@@ -2296,8 +2297,8 @@ namespace eFMS.API.Accounting.DL.Services
                 result.IssuedBy = sysUserRepo.Get(x => x.Id == result.IssuedBy).FirstOrDefault()?.Username;
             }
 
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault()).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.HBL).AsQueryable();
 
             if (results.Select(x => x.Key).Count() > 0)
@@ -2311,14 +2312,14 @@ namespace eFMS.API.Accounting.DL.Services
                     air.FlightNo = chargeData.FlightNo;
                     air.ShippmentDate = chargeData.ShippmentDate;
                     air.AOL = port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
-                    air.Mawb = chargeData.MBL.Substring(0, 3) + "-" + chargeData.MBL.Substring(chargeData.MBL.Length - 9);
+                    air.Mawb = chargeData.MBL?.Trim();
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
                     air.Service = "Normal"; // tạm thời hardcode;
                     air.Pcs = chargeData.PackageQty;
                     air.CW = chargeData.ChargeWeight;
                     air.GW = chargeData.GrossWeight;
-                    air.Rate = chargeData.ChargeName == AccountingConstants.CHARGE_AIR_FREIGHT ? chargeData.UnitPrice : null;
-
+                    var chargeAF = charge.Where(x => x.HBL == item && x.ChargeName.ToUpper() == AccountingConstants.CHARGE_AIR_FREIGHT.ToUpper());
+                    air.Rate = chargeAF.FirstOrDefault()?.UnitPrice;
 
                     var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAirfrieght.Count() == 0)
@@ -2392,6 +2393,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AMS_FEE.ToLower()
                                                                     && x.ChargeCode != AccountingConstants.CHARGE_SA_DAN_AIR_CODE
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_SA_HDL_AIR_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_HANDLING_FEE.ToLower()
                         ) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
 
@@ -2437,28 +2440,32 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         air.NetAmount += air.FuelSurcharge;
                     }
-                    var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
-                    if (dataCharge.Any())
-                    {
-                        if (chargeData.FinalExchangeRate != null)
-                        {
-                            air.ExchangeRate = chargeData.FinalExchangeRate;
-                        }
-                        else
-                        {
-                            var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
-                            var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
-                            air.ExchangeRate = dataObjectCurrencyExchange.Rate;
-                        }
-                    }
-                    else
-                    {
-                        var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
-                        var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
-                        air.ExchangeRate = dataObjectCurrencyExchange.Rate;
-                    }
 
-                    air.TotalAmount = air.NetAmount * air.ExchangeRate;
+                    // get exchange rate(vnd)
+                    var _exchangeRateVND = currencyExchangeService.CurrencyExchangeRateConvert(chargeData.FinalExchangeRate, chargeData.ExchangeDate, chargeData.Currency, AccountingConstants.CURRENCY_LOCAL);
+                    air.ExchangeRate = _exchangeRateVND;
+                    //var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
+                    //if (dataCharge.Any())
+                    //{
+                    //    if (chargeData.FinalExchangeRate != null)
+                    //    {
+                    //        air.ExchangeRate = chargeData.FinalExchangeRate;
+                    //    }
+                    //    else
+                    //    {
+                    //        var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
+                    //        var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
+                    //        air.ExchangeRate = dataObjectCurrencyExchange.Rate;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
+                    //    var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
+                    //    air.ExchangeRate = dataObjectCurrencyExchange.Rate;
+                    //}
+
+                    air.TotalAmount = Math.Round((air.NetAmount * air.ExchangeRate) ?? 0);
 
                     result.HawbAirFrieghts.Add(air);
                 }
@@ -2498,14 +2505,14 @@ namespace eFMS.API.Accounting.DL.Services
                 result.IssuedBy = sysUserRepo.Get(x => x.Id == result.IssuedBy).FirstOrDefault()?.Username;
             }
 
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var charge = GetChargeShipmentDocAndOperation(query, null, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault()).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
             var results = charge.GroupBy(x => x.JobId).AsQueryable();
-            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
-            var csTransDe = csTransactionDetailRepo.Get();
 
             if (results.Select(x => x.Key).Count() > 0)
             {
+                var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
+                var csTransDe = csTransactionDetailRepo.Get();
                 result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
                 foreach (var item in results.Select(x => x.Key))
                 {
@@ -2650,34 +2657,135 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
+        /// <summary>
+        /// Get data export for SOA with soa no
+        /// </summary>
+        /// <param name="soa">AcctSoa</param>
+        /// <returns></returns>
+        public IQueryable<ChargeSOAResult> GetChargeExportForSOA(AcctSoa soa)
+        {
+            //Chỉ lấy những phí từ shipment (IsFromShipment = true)
+            var surCharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soa.Soano : x.PaySoano == soa.Soano);                    
+            // BUY & SELL
+            var result = new List<ChargeSOAResult>();
+            foreach (var sur in surCharges)
+            {
+                var charge = catChargeRepo.Get().Where(x => x.Id == sur.ChargeId).FirstOrDefault();
+                var unit = catUnitRepo.Get().Where(x => x.Id == sur.UnitId).FirstOrDefault();
+                DateTime? _serviceDate, _createdDate, _shippmentDate;
+                string _service, _userCreated, _commodity, _flightNo, _packageContainer, _customNo;
+                Guid? _aol, _aod;
+                int? _packageQty;
+                decimal? _grossWeight, _chargeWeight, _cbm;
+                if (sur.TransactionType == "CL")
+                {
+                    var opst = opsTransactionRepo.Get().Where(x => x.Hblid == sur.Hblid).FirstOrDefault();
+                    _serviceDate = opst?.ServiceDate;
+                    _createdDate = opst?.DatetimeCreated;
+                    _service = "CL";
+                    _userCreated = opst?.UserCreated;
+                    _commodity = string.Empty;
+                    _flightNo = string.Empty;
+                    _shippmentDate = null;
+                    _aol = null;
+                    _aod = null;
+                    _packageContainer = string.Empty;
+                    _packageQty = opst?.SumPackages;
+                    _grossWeight = opst?.SumGrossWeight;
+                    _chargeWeight = opst ?.SumChargeWeight;
+                    _cbm = opst?.SumCbm;
+                    _customNo = customsDeclarationRepo.Get().Where(x => x.JobNo == opst.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                } else {
+                    var csTransDe = csTransactionDetailRepo.Get(x => x.Id == sur.Hblid).FirstOrDefault();
+                    var csTrans = csTransDe == null ? new CsTransaction() : csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && x.Id == csTransDe.JobId).FirstOrDefault();
+                    _serviceDate = (csTrans?.TransactionType == "AI" || csTrans?.TransactionType == "SFI" || csTrans?.TransactionType == "SLI" || csTrans?.TransactionType == "SCI") ?
+                        csTrans?.Eta : csTrans?.Etd;
+                    _createdDate = csTrans?.DatetimeCreated;
+                    _service = csTrans.TransactionType;
+                    _userCreated = csTrans?.UserCreated;
+                    _commodity = csTrans?.Commodity;
+                    _flightNo = csTransDe?.FlightNo;
+                    _shippmentDate = csTrans?.TransactionType == "AE" ? csTransDe?.Etd : csTrans?.TransactionType == "AI" ? csTransDe?.Eta : null;
+                    _aol = csTrans?.Pol;
+                    _aod = csTrans?.Pod;
+                    _packageQty = csTransDe?.PackageQty;
+                    _grossWeight = csTransDe?.GrossWeight;
+                    _chargeWeight = csTransDe?.ChargeWeight;
+                    _cbm = csTransDe?.Cbm;
+                    _packageContainer = csTransDe?.PackageContainer;
+                    _customNo = string.Empty;
+                }
+                var chg = new ChargeSOAResult()
+                {
+                    ID = sur.Id,
+                    HBLID = sur.Hblid,
+                    ChargeID = sur.ChargeId,
+                    ChargeCode = charge?.Code,
+                    ChargeName = charge?.ChargeNameEn,
+                    JobId = sur.JobNo,
+                    HBL = sur.Hblno,
+                    MBL = sur.Mblno,
+                    Type = sur.Type,
+                    CustomNo = _customNo,
+                    Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || (sur.PaymentObjectId == soa.Customer && sur.Type == "OBH") ? (decimal?)sur.Total : null,
+                    Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || (sur.PayerId == soa.Customer && sur.Type == "OBH") ? (decimal?)sur.Total : null,
+                    SOANo = soa.Type == "Debit" ? sur.Soano : sur.PaySoano,
+                    IsOBH = false,
+                    Currency = sur.CurrencyId,
+                    InvoiceNo = sur.InvoiceNo,
+                    Note = sur.Notes,
+                    CustomerID = sur.PaymentObjectId,
+                    ServiceDate = _serviceDate,
+                    CreatedDate = _createdDate,
+                    InvoiceIssuedDate = null,
+                    TransactionType = _service,
+                    UserCreated = _userCreated,
+                    Commodity = _commodity,
+                    FlightNo = _flightNo,
+                    ShippmentDate = _shippmentDate,
+                    AOL = _aol,
+                    AOD = _aod,
+                    Quantity = sur.Quantity,
+                    UnitId = sur.UnitId,
+                    Unit = unit?.UnitNameEn,
+                    UnitPrice = sur.UnitPrice,
+                    VATRate = sur.Vatrate,
+                    PackageQty = _packageQty,
+                    GrossWeight = _grossWeight,
+                    ChargeWeight = _chargeWeight,
+                    CBM = _cbm,
+                    PackageContainer = _packageContainer,
+                    CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
+                    DatetimeModified = sur.DatetimeModified,
+                    CommodityGroupID = null,
+                    Service = _service,
+                    CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                    TypeCharge = charge?.Type,
+                    ExchangeDate = sur.ExchangeDate,
+                    FinalExchangeRate = sur.FinalExchangeRate,
+                    PIC = null,
+                    IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER"))
+                };
+                result.Add(chg);
+            }
+            return result.OrderBy(x => x.Service).AsQueryable();
+        }
+
         public SOAOPSModel GetSOAOPS(string soaNo)
         {
             SOAOPSModel opssoa = new SOAOPSModel();
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var soa = DataContext.Get(x => x.Soano == soaNo);
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
-            if (soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
-            soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
+            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
+            if (soa == null)
+            {
+                return opssoa;
+            }
+            var charge = GetChargeExportForSOA(soa);
+            if (soa.Type?.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() && soa.Type?.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
                 charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower() || x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_OBH.ToLower());
             }
             List<ExportSOAOPS> lstSOAOPS = new List<ExportSOAOPS>();
-            var partner = catPartnerRepo.Get();
-            var port = catPlaceRepo.Get();
-            var resultData = from s in soa
-                             join pat in partner on s.Customer equals pat.Id into pat2
-                             from pat in pat2.DefaultIfEmpty()
-                             select new SOAOPSModel
-                             {
-                                 PartnerNameVN = pat.PartnerNameVn,
-                                 BillingAddressVN = pat.AddressVn,
-                                 FromDate = s.SoaformDate,
-                                 ToDate = s.SoatoDate,
-                                 SoaNo = s.Soano
-                             };
-
             var results = charge.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
-
             foreach (var group in results)
             {
                 ExportSOAOPS exportSOAOPS = new ExportSOAOPS();
@@ -2708,10 +2816,12 @@ namespace eFMS.API.Accounting.DL.Services
                 lstSOAOPS.Add(exportSOAOPS);
             }
             opssoa.exportSOAOPs = lstSOAOPS;
-            opssoa.BillingAddressVN = resultData?.Select(t => t.BillingAddressVN).FirstOrDefault();
-            opssoa.PartnerNameVN = resultData?.Select(t => t.PartnerNameVN).FirstOrDefault();
-            opssoa.FromDate = resultData?.Select(t => t.FromDate).FirstOrDefault();
-            opssoa.SoaNo = resultData?.Select(t => t.SoaNo).FirstOrDefault();
+            var customerId = soa.Customer;
+            var partner = catPartnerRepo.Get(x => x.Id == customerId).FirstOrDefault();
+            opssoa.BillingAddressVN = partner?.AddressVn;
+            opssoa.PartnerNameVN = partner?.PartnerNameVn;
+            opssoa.FromDate = soa.SoaformDate;
+            opssoa.SoaNo = soa.Soano;
 
             foreach (var item in opssoa.exportSOAOPs)
             {
@@ -2764,10 +2874,11 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
-            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var chargeDefaults = chargeDefaultRepo.Get(x => x.Type == "Công Nợ");
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
-            var partner = catPartnerRepo.Get();
+            var charge = GetChargeExportForSOA(soa.FirstOrDefault());
+            var customerId = soa.FirstOrDefault()?.Customer;
+            var partner = catPartnerRepo.Get(x => x.Id == customerId);
             var dataResult = from s in soa
                              join chg in charge on s.Soano equals chg.SOANo into chg2
                              from chg in chg2.DefaultIfEmpty()
