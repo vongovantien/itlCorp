@@ -2128,7 +2128,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //    air.ExchangeRate = dataObjectCurrencyExchange.Rate;
                     //}
 
-                    air.TotalAmount = air.NetAmount * air.ExchangeRate;
+                    air.TotalAmount = Math.Round((air.NetAmount * air.ExchangeRate) ?? 0);
 
                     result.HawbAirFrieghts.Add(air);
                 }
