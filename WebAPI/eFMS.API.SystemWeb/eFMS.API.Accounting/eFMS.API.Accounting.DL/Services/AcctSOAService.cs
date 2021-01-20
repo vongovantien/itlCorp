@@ -453,35 +453,23 @@ namespace eFMS.API.Accounting.DL.Services
         private AcctSoa GetDebitCreditAmountAndTotalShipment(AcctSoaModel model)
         {
             //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào Final Exchange Rate, Exchange Date của charge)
-            Expression<Func<ChargeSOAResult, bool>> query = x => model.Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any();
-            var charge = GetChargeShipmentDocAndOperation(query, null, null);
-            //var dataResult = charge.Select(chg => new
-            //{
-            //    AmountDebit = (GetRateCurrencyExchange(today, chg.Currency, model.Currency) > 0
-            //                ?
-            //                    GetRateCurrencyExchange(today, chg.Currency, model.Currency)
-            //                :
-            //                    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, model.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
-            //    AmountCredit = (GetRateCurrencyExchange(today, chg.Currency, model.Currency) > 0
-            //                ?
-            //                    GetRateCurrencyExchange(today, chg.Currency, model.Currency)
-            //                :
-            //                    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, model.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
-            //});
+            var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Select(s => s.surchargeId).Contains(x.Id));
 
-            //Count number shipment (HBL)
-            var totalShipment = charge.Select(s => s.HBL).Distinct().Count();
+            //Count number shipment (JobNo, HBL)
+            var totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
 
             decimal debitAmount = 0;
             decimal creditAmount = 0;
-            foreach (var chg in charge)
+            foreach (var surcharge in surcharges)
             {
                 var _exchangeDate = model.Id == 0 ? DateTime.Now : model.DatetimeCreated;
-                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(chg.FinalExchangeRate, _exchangeDate, chg.Currency, model.Currency);
+                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, _exchangeDate, surcharge.CurrencyId, model.Currency);
+                var _debit = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == model.Customer && surcharge.Type == "OBH") ? surcharge.Total : 0;
+                var _credit = surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == model.Customer && surcharge.Type == "OBH") ? surcharge.Total : 0;
                 //Debit Amount
-                debitAmount += _exchangeRate * (chg.Debit ?? 0);
+                debitAmount += _exchangeRate * _debit;
                 //Credit Amount
-                creditAmount += _exchangeRate * (chg.Credit ?? 0);
+                creditAmount += _exchangeRate * _credit;
             }
             return new AcctSoa { TotalShipment = totalShipment, DebitAmount = debitAmount, CreditAmount = creditAmount };
         }
@@ -692,7 +680,7 @@ namespace eFMS.API.Accounting.DL.Services
             });
             queryBuySellOperation = listOperation.AsQueryable();
             queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-            
+
             var queryBuySellDocument = from sur in surcharge
                                        join cstd in csTransDe on sur.Hblid equals cstd.Id
                                        join cst in csTrans on cstd.JobId equals cst.Id
@@ -969,7 +957,7 @@ namespace eFMS.API.Accounting.DL.Services
             });
             queryObhBuyOperation = listOperation.AsQueryable();
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-            
+
             if (isOBH != null)
             {
                 queryObhBuyOperation = queryObhBuyOperation.Where(x => x.IsOBH == isOBH);
@@ -1245,13 +1233,365 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
+        private IQueryable<ChargeShipmentModel> GetChargeForIssueSoaByCriteria(ChargeShipmentCriteria criteria)
+        {
+            IQueryable<ChargeShipmentModel> charges = null;
+            IQueryable<CsShipmentSurcharge> surcharges = null;
+            IQueryable<CsShipmentSurcharge> obhSurcharges = null;
+            IQueryable<OpsTransaction> operations = null;
+            IQueryable<CsTransaction> transactions = null;
+
+            string typeCharge = AccountingConstants.TYPE_CHARGE_SELL; //Default is SELL
+
+            //Type Charge
+            if (!string.IsNullOrEmpty(criteria.Type))
+            {
+                if (criteria.Type == "Debit")
+                {
+                    typeCharge = AccountingConstants.TYPE_CHARGE_SELL;
+                }
+                if (criteria.Type == "Credit")
+                {
+                    typeCharge = AccountingConstants.TYPE_CHARGE_BUY;
+                }
+            }
+
+            #region -- Search by Customer --
+            if (!string.IsNullOrEmpty(criteria.CustomerID))
+            {
+                //Get charge by: Customer, loại phí, phí chưa sync, phí chưa issue SOA
+                surcharges = csShipmentSurchargeRepo.Get(x => x.Type == typeCharge
+                                                             && x.PaymentObjectId == criteria.CustomerID
+                                                             && string.IsNullOrEmpty(x.SyncedFrom)
+                                                             && (x.Type == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano)));
+                if (criteria.IsOBH) //**
+                {
+                    //SELL ~ PaymentObjectID, SOANo
+                    obhSurcharges = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
+                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? x.PaymentObjectId : x.PayerId) == criteria.CustomerID
+                                                                  && string.IsNullOrEmpty(x.PaySyncedFrom)
+                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano)));
+                }
+            }
+            #endregion -- Search by Customer --
+
+            #region -- Search by Services --
+            if (!string.IsNullOrEmpty(criteria.StrServices))
+            {
+                surcharges = surcharges.Where(x => criteria.StrServices.Contains(x.TransactionType));
+                if (criteria.IsOBH) //**
+                {
+                    obhSurcharges = obhSurcharges.Where(x => criteria.StrServices.Contains(x.TransactionType));
+                }
+            }
+            #endregion -- Search by Services --
+
+            #region -- Search by Created Date or Service Date --
+            //Created Date of Job
+            if (criteria.DateType == "CreatedDate")
+            {
+                if (criteria.StrServices.Contains("CL"))
+                {
+                    operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false));
+                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                    {
+                        transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false));
+                    }
+                }
+                else
+                {
+                    transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false));
+                }
+            }
+
+            //Service Date of Job
+            if (criteria.DateType == "ServiceDate")
+            {
+                if (criteria.StrServices.Contains("CL"))
+                {
+                    operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Date : false));
+
+                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                    {
+                        transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
+                                                          && (
+                                                                (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
+                                                                ?
+                                                                (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Date
+                                                                : false
+                                                             )); //Import - ETA, Export - ETD
+                    }
+                }
+                else
+                {
+                    transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
+                                                          && (
+                                                                (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
+                                                                ?
+                                                                (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Date
+                                                                : false
+                                                             )); //Import - ETA, Export - ETD
+                }
+            }
+
+            var dateModeJobNos = new List<string>();
+            if (operations != null)
+            {
+                dateModeJobNos = operations.Select(s => s.JobNo).ToList();
+            }
+            if (transactions != null)
+            {
+                dateModeJobNos.AddRange(transactions.Select(s => s.JobNo).ToList());
+            }
+
+            if (dateModeJobNos.Count > 0 && surcharges != null)
+            {
+                surcharges = surcharges.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any());
+                if (criteria.IsOBH) //**
+                {
+                    obhSurcharges = obhSurcharges.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any());
+                }
+            }
+            else
+            {
+                surcharges = null;
+                obhSurcharges = null;
+            }
+
+            #endregion -- Search by Created Date or Service Date --
+
+            #region -- Search by Creator of Job --
+            if (!string.IsNullOrEmpty(criteria.StrCreators))
+            {
+                var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                if (criteria.StrServices.Contains("CL"))
+                {
+                    operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                    {
+                        transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                    }
+                }
+                else
+                {
+                    transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                }
+
+                var creatorJobNos = new List<string>();
+                if (operations != null)
+                {
+                    creatorJobNos = operations.Select(s => s.JobNo).ToList();
+                }
+                if (transactions != null)
+                {
+                    creatorJobNos.AddRange(transactions.Select(s => s.JobNo).ToList());
+                }
+                if (creatorJobNos.Count > 0)
+                {
+                    surcharges = surcharges.Where(x => creatorJobNos.Where(w => w == x.JobNo).Any());
+                    if (criteria.IsOBH) //**
+                    {
+                        obhSurcharges = obhSurcharges.Where(x => creatorJobNos.Where(w => w == x.JobNo).Any());
+                    }
+                }
+                else
+                {
+                    surcharges = null;
+                    obhSurcharges = null;
+                }
+            }
+            #endregion -- Search by Creator of Job --
+
+            #region -- Search by ChargeId --
+            if (!string.IsNullOrEmpty(criteria.StrCharges))
+            {
+                var chargeIds = criteria.StrCharges.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                if (chargeIds.Count > 0 && surcharges != null)
+                {
+                    surcharges = surcharges.Where(x => chargeIds.Where(w => w == x.ChargeId.ToString()).Any());
+                    if (criteria.IsOBH) //**
+                    {
+                        obhSurcharges = obhSurcharges.Where(x => chargeIds.Where(w => w == x.ChargeId.ToString()).Any());
+                    }
+                }
+            }
+            #endregion -- Search by ChargeId --
+
+            #region -- Search by JobNo --
+            if (criteria.JobIds != null)
+            {
+                var jobNos = criteria.JobIds.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                if (jobNos.Count > 0 && surcharges != null)
+                {
+                    surcharges = surcharges.Where(x => criteria.JobIds.Where(w => w == x.JobNo).Any());
+                    if (criteria.IsOBH) //**
+                    {
+                        obhSurcharges = obhSurcharges.Where(x => criteria.JobIds.Where(w => w == x.JobNo).Any());
+                    }
+                }
+            }
+            #endregion -- Search by JobNo --
+
+            #region -- Search by HBL --
+            if (criteria.Hbls != null)
+            {
+                var hbls = criteria.Hbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                if (hbls.Count > 0 && surcharges != null)
+                {
+                    surcharges = surcharges.Where(x => criteria.Hbls.Where(w => w == x.Hblno).Any());
+                    if (criteria.IsOBH) //**
+                    {
+                        obhSurcharges = obhSurcharges.Where(x => criteria.Hbls.Where(w => w == x.Hblno).Any());
+                    }
+                }
+            }
+            #endregion -- Search by HBL --
+
+            #region -- Search by MBL --
+            if (criteria.Mbls != null)
+            {
+                var mbls = criteria.Mbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                if (mbls.Count > 0 && surcharges != null)
+                {
+                    surcharges = surcharges.Where(x => criteria.Mbls.Where(w => w == x.Mblno).Any());
+                    if (criteria.IsOBH) //**
+                    {
+                        obhSurcharges = obhSurcharges.Where(x => criteria.Mbls.Where(w => w == x.Mblno).Any());
+                    }
+                }
+            }
+            #endregion -- Search by MBL --
+
+            #region -- Search by CustomNo --
+            if (criteria.CustomNo != null)
+            {
+                //Custom only for OPS
+                if (criteria.StrServices.Contains("CL"))
+                {
+                    var customNos = criteria.CustomNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                    if (customNos.Count > 0 && surcharges != null)
+                    {
+                        //Get JobNo from CustomDeclaration by list param Custom No
+                        var clearanceJobNo = customsDeclarationRepo.Get(x => customNos.Where(w => w == x.ClearanceNo).Any()).Select(s => s.JobNo).ToList();
+                        if (clearanceJobNo.Count > 0)
+                        {
+                            surcharges = surcharges.Where(x => clearanceJobNo.Where(w => w == x.JobNo).Any());
+                            if (criteria.IsOBH) //**
+                            {
+                                obhSurcharges = obhSurcharges.Where(x => clearanceJobNo.Where(w => w == x.JobNo).Any());
+                            }
+                        }
+                        else
+                        {
+                            surcharges = null;
+                            obhSurcharges = null;
+                        }
+                    }
+                }
+            }
+            #endregion -- Search by CustomNo --
+
+            #region -- Get more OBH charge --
+            //Lấy thêm phí OBH
+            if (criteria.IsOBH)
+            {
+                if (obhSurcharges != null && surcharges != null)
+                {
+                    surcharges = surcharges.Union(obhSurcharges);
+                }
+            }
+            #endregion -- Get more OBH charge --
+
+            var data = new List<ChargeShipmentModel>();
+            if (surcharges == null) return data.AsQueryable();
+            foreach (var surcharge in surcharges)
+            {
+                var chg = new ChargeShipmentModel();
+                chg.ID = surcharge.Id;
+                var charge = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
+                chg.ChargeCode = charge?.Code;
+                chg.ChargeName = charge?.ChargeNameEn;
+                chg.JobId = surcharge.JobNo;
+                chg.HBL = surcharge.Hblno;
+                chg.MBL = surcharge.Mblno;
+                chg.Type = surcharge.Type;
+                chg.Debit = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == "OBH") ? (decimal?)surcharge.Total : null;
+                chg.Credit = surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == "OBH") ? (decimal?)surcharge.Total : null;
+                chg.Currency = surcharge.CurrencyId;
+                chg.InvoiceNo = surcharge.InvoiceNo;
+                chg.Note = surcharge.Notes;
+                chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
+                chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
+                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
+                chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
+                chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
+                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_USD);
+                chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
+                chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
+                chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
+
+                string _pic = string.Empty;
+                DateTime? _serviceDate = null;
+                string _customNo = string.Empty;
+                if (surcharge.TransactionType == "CL")
+                {
+                    var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
+                    if (ops != null)
+                    {
+                        _serviceDate = ops.ServiceDate;
+                        var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
+                        _pic = user?.Username;
+                        _customNo = customsDeclarationRepo.Get(x => x.JobNo == ops.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                    }
+                }
+                else
+                {
+                    var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
+                    if (tran != null)
+                    {
+                        _serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                        var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
+                        _pic = user?.Username;
+                    }
+                }
+                chg.CustomNo = _customNo;
+                chg.ServiceDate = _serviceDate;
+                chg.PIC = _pic;
+
+                string _cdNote = string.Empty;
+                if (criteria.CustomerID != null)
+                {
+                    if (criteria.CustomerID == surcharge.PayerId && surcharge.Type == "OBH")
+                    {
+                        _cdNote = surcharge.CreditNo;
+                    }
+                    else
+                    {
+                        if (surcharge.Type == "BUY")
+                        {
+                            _cdNote = surcharge.CreditNo;
+                        }
+                        if (surcharge.Type == "SELL" || surcharge.Type == "OBH")
+                        {
+                            _cdNote = surcharge.DebitNo;
+                        }
+                    }
+                }
+                chg.CDNote = _cdNote;
+                data.Add(chg);
+            }
+            //Sort Array sẽ nhanh hơn
+            charges = data.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
+            return charges;
+        }
+
         public ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria)
         {
-            var chargeShipmentList = GetChargesShipmentByCriteria(criteria);
+            var chargeShipmentList = GetChargeForIssueSoaByCriteria(criteria);
             var result = new ChargeShipmentResult
             {
                 ChargeShipments = chargeShipmentList.ToList(),
-                TotalShipment = chargeShipmentList.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count(),
+                TotalShipment = chargeShipmentList.Where(x => x.HBL != null).GroupBy(x => x.JobId + "_" + x.HBL).Count(),
                 TotalCharge = chargeShipmentList.Count(),
                 AmountDebitLocal = chargeShipmentList.Sum(x => x.AmountDebitLocal),
                 AmountCreditLocal = chargeShipmentList.Sum(x => x.AmountCreditLocal),
@@ -1729,11 +2069,9 @@ namespace eFMS.API.Accounting.DL.Services
                     var chg = new ChargeShipmentModel();
                     chg.SOANo = soa.Type == "Debit" ? surcharge.Soano : surcharge.PaySoano;
                     chg.ID = surcharge.Id;
-
                     var charge = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     chg.ChargeCode = charge?.Code;
                     chg.ChargeName = charge?.ChargeNameEn;
-
                     chg.JobId = surcharge.JobNo;
                     chg.HBL = surcharge.Hblno;
                     chg.MBL = surcharge.Mblno;
@@ -1758,7 +2096,7 @@ namespace eFMS.API.Accounting.DL.Services
                     string _customNo = string.Empty;
                     if (surcharge.TransactionType == "CL")
                     {
-                        var ops = opsTransactionRepo.Get(x => x.Hblid == surcharge.Hblid).FirstOrDefault();
+                        var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
                         if (ops != null)
                         {
                             _serviceDate = ops.ServiceDate;
@@ -1769,16 +2107,12 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        var transDetail = csTransactionDetailRepo.Get(x => x.Id == surcharge.Hblid).FirstOrDefault();
-                        if (transDetail != null)
+                        var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
+                        if (tran != null)
                         {
-                            var tran = csTransactionRepo.Get(x => x.Id == transDetail.JobId).FirstOrDefault();
-                            if (tran != null)
-                            {
-                                _serviceDate = (tran.TransactionType == "AI" || tran.TransactionType == "SFI" || tran.TransactionType == "SLI" || tran.TransactionType == "SCI" ? tran.Eta : tran.Etd);
-                                var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
-                                _pic = user?.Username;
-                            }
+                            _serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                            var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
+                            _pic = user?.Username;
                         }
                     }
                     chg.CustomNo = _customNo;
@@ -1792,6 +2126,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (soa.Customer == surcharge.PayerId && surcharge.Type == "OBH")
                         {
+                            _cdNote = surcharge.CreditNo;
+
                             _isSynced = !string.IsNullOrEmpty(surcharge.PaySyncedFrom) && (surcharge.PaySyncedFrom.Equals("SOA") || surcharge.PaySyncedFrom.Equals("CDNOTE") || surcharge.PaySyncedFrom.Equals("VOUCHER") || surcharge.PaySyncedFrom.Equals("SETTLEMENT"));
                             if (surcharge.PaySyncedFrom == "SOA")
                             {
@@ -1799,7 +2135,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (surcharge.PaySyncedFrom == "CDNOTE")
                             {
-                                _syncedFromBy = chg.CDNote;
+                                _syncedFromBy = _cdNote;
                             }
                             if (surcharge.PaySyncedFrom == "VOUCHER")
                             {
@@ -1809,10 +2145,18 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 _syncedFromBy = surcharge.SettlementCode;
                             }
-                            _cdNote = surcharge.CreditNo;
                         }
                         else
                         {
+                            if (surcharge.Type == "BUY")
+                            {
+                                _cdNote = surcharge.CreditNo;
+                            }
+                            if (surcharge.Type == "SELL" || surcharge.Type == "OBH")
+                            {
+                                _cdNote = surcharge.DebitNo;
+                            }
+
                             _isSynced = !string.IsNullOrEmpty(surcharge.SyncedFrom) && (surcharge.SyncedFrom.Equals("SOA") || surcharge.SyncedFrom.Equals("CDNOTE") || surcharge.SyncedFrom.Equals("VOUCHER") || surcharge.SyncedFrom.Equals("SETTLEMENT"));
                             if (surcharge.SyncedFrom == "SOA")
                             {
@@ -1820,7 +2164,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (surcharge.SyncedFrom == "CDNOTE")
                             {
-                                _syncedFromBy = chg.CDNote;
+                                _syncedFromBy = _cdNote;
                             }
                             if (surcharge.SyncedFrom == "VOUCHER")
                             {
@@ -1829,15 +2173,6 @@ namespace eFMS.API.Accounting.DL.Services
                             if (surcharge.SyncedFrom == "SETTLEMENT")
                             {
                                 _syncedFromBy = surcharge.SettlementCode;
-                            }
-
-                            if (surcharge.Type == "BUY")
-                            {
-                                _cdNote = surcharge.CreditNo;
-                            }
-                            if (surcharge.Type == "SELL" || surcharge.Type == "OBH")
-                            {
-                                _cdNote = surcharge.DebitNo;
                             }
                         }
                     }
@@ -1850,7 +2185,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return data;
         }
-        
+
         public AcctSOADetailResult GetDetailBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
             var data = new AcctSOADetailResult();
@@ -1873,6 +2208,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ChargeShipments = s.ToList()
             }).ToList();
             data = soaDetail;
+            data.TotalCharge = chargeShipments.Count;
             data.GroupShipments = _groupShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
             data.ChargeShipments = chargeShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
             data.AmountDebitLocal = Math.Round(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
@@ -2699,7 +3035,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             //Update PaySyncedFrom or SyncedFrom equal NULL by SOA No
                             var surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                            foreach(var surcharge in surcharges)
+                            foreach (var surcharge in surcharges)
                             {
                                 if (surcharge.Type == "OBH")
                                 {
@@ -2715,7 +3051,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
                             var smSurcharge = csShipmentSurchargeRepo.SubmitChanges();
-                        }                        
+                        }
                         trans.Commit();
                     }
                     return hs;

@@ -227,7 +227,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.dateModes = [
             { title: 'Created Date', value: 'CreatedDate' },
             { title: 'Service Date', value: 'ServiceDate' },
-            { title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' },
+            //{ title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' }, //Bỏ ra [20/01/2021]
         ];
         this.selectedDateMode = this.dateModes[1];
 
@@ -366,7 +366,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 type: this.selectedType.value,
                 isOBH: this.selectedObh.value,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
-                strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
+                strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0]) : this.mapServiceId('All'),
                 commodityGroupId: !!this.commodity ? this.commodity.id : null,
