@@ -833,6 +833,9 @@ namespace eFMS.API.Documentation.DL.Services
                 item.Id = Guid.NewGuid();
                 item.ExchangeDate = DateTime.Now;
                 item.DatetimeCreated = DateTime.Now;
+                OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
             }
             var datas = mapper.Map<List<CsShipmentSurcharge>>(list);
             using (var trans = DataContext.DC.Database.BeginTransaction())
