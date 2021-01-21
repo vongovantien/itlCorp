@@ -65,5 +65,26 @@
   "DO_NOT_HAVE_PERMISSION": "Do not have permission", //403
   "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!",
   "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !",
-  "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} not found, please recheck!"
+  "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} not found, please recheck!",
+
+  "MSG_HBLNO_EMPTY": "Hbl no not allow empty!",
+  "MSG_MBLNO_EMPTY": "Mbl no not allow empty!",
+  "MSG_PARTNER_CODE_EMPTY": "Partner code not allow empty!",
+  "MSG_CHARGE_CODE_EMPTY": "Charge code not allow empty!",
+  "MSG_QTY_EMPTY": "Quantity not allow empty!",
+  "MSG_UNIT_EMPTY": "Unit not allow emtpy!",
+  "MSG_UNIT_PRICE_EMPTY": "Unit Price not allow empty",
+  "MSG_CURRENCY_EMPTY": "Currency not allow empty",
+  "MSG_VAT_EMPTY": "Vat not allow emtpy!",
+  "MSG_TOTAL_AMOUNT_EMPTY": "Total amount not allow empty!",
+  "MSG_EXCHANGE_DATE_EMPTY": "Exchange Date not allow empty!",
+  "MSG_FINAL_EXCHANGE_EMPTY": "Final Exchange not allow empty!",
+  "MSG_TYPE_EMPTY": "Type not allow empty!",
+  "MSG_HBLNO_NOT_EXIST": "hbl no '{0}' not exist!",
+  "MSG_MBLNO_NOT_EXIST": "mbl no '{0}' not exist!",
+  "MSG_PARTER_CODE_NOT_EXIST": "Partner code '{0}' not exist",
+  "MSG_CHARGE_CODE_NOT_EXIST": "Charge code '{0}' not exist",
+  "MSG_UNIT_NOT_EXIST": "Unit '{0}' not exist",
+  "MSG_TYPE_NOT_VALID": "Type '{0}' not valid",
+  "MSG_CHARGE_CODE_DUPLICATE": "Charge Code '{0}' has been existed on job '{1}'!"
 }

@@ -65,6 +65,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
+            { title: 'No.', field: 'i', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },

@@ -934,6 +934,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var agreementData = contractRepository.Get();
             string salemans = string.IsNullOrEmpty(criteria.Saleman) ? criteria.All : criteria.Saleman;
             string SalemanId = sysUsers.Where(x => x.Username == salemans).Select(t => t.Id).FirstOrDefault();
+
+            string ContractType = string.IsNullOrEmpty(criteria.ContractType) ? criteria.All : criteria.ContractType.Trim();
             ClearCache();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             if (partners == null) return null;
@@ -969,8 +971,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     query = null;
                 }
+                if (!string.IsNullOrEmpty(ContractType))
+                {
+                    query = query.Where(x => x.agreements.Any(y => y.ContractType.ToLower().Contains(ContractType.ToLower())));
+                }
+                else if (!string.IsNullOrEmpty(criteria.ContractType))
+                {
+                    query = null;
+                }
             }
-
             else
             {
                 query = query.Where(x =>
@@ -985,7 +994,9 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId)))
+                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId))
+                           || x.agreements.Any(y => y != null && y.ContractType.ToLower().Contains(ContractType.ToLower()))
+                           )
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
                 //if (!string.IsNullOrEmpty(SalemanId))
