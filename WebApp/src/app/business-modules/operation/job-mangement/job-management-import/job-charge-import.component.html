@@ -206,7 +206,8 @@
                                         }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.unitPriceError === null">{{ item.unitPrice }}</span>
+                                    <span *ngIf="item.unitPriceError === null">{{ item.unitPrice
+                                        }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.unitPriceError !== null">{{item.unitPriceError
                                         }}</span>

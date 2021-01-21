@@ -86,5 +86,5 @@
   "MSG_CHARGE_CODE_NOT_EXIST": "Charge code '{0}' not exist",
   "MSG_UNIT_NOT_EXIST": "Unit '{0}' not exist",
   "MSG_TYPE_NOT_VALID": "Type '{0}' not valid",
-  "MSG_CHARGE_CODE_DUPLICATE": "Charge Code '{0}' has been existed on this job!"
+  "MSG_CHARGE_CODE_DUPLICATE": "Charge Code '{0}' has been existed on job '{1}'!"
 }
