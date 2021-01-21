@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { Charge, SOASearchCharge, User } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
@@ -11,6 +11,8 @@ import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService, SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserPermissionState } from '@store';
 
 @Component({
     selector: 'soa-form-create',
@@ -81,6 +83,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         private _catalogueRepo: CatalogueRepo,
         private _sysRepo: SystemRepo,
         private _sortService: SortService,
+        private _store: Store<IAppState>,
     ) {
         super();
     }
@@ -93,6 +96,30 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.getCharge();
         this.getService();
         this.getCommondity();
+        this.getUserLevel();
+    }
+
+    getUserLevel() {
+        this._store.select(getMenuUserPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((menuPermission: SystemInterface.IUserPermission) => {
+                if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
+                    console.log(menuPermission);
+                    if (menuPermission.list !== 'None') {
+                        if (menuPermission.list === 'Company') {
+
+                        } else if (menuPermission.list === 'Office') {
+
+                        } else if (menuPermission.list === 'Department') {
+
+                        } else if (menuPermission.list === 'Group') {
+
+                        } else {
+
+                        }
+                    }
+                }
+            });
     }
 
     getCommondity() {
@@ -163,6 +190,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                         this.services.unshift({ id: 'All', text: 'All' });
 
                         this.selectedService = [this.services[0].id];
+
+                        /* */
+                        this.dataSearch.strServices = this.services.filter(service => service.id !== 'All').map(service => service.id).toString();
+                        this.dataSearch.serviceTypeId = this.dataSearch.strServices.replace(/(?:,)/g, ';');
                     } else {
                         this.handleError(null, (data) => {
                             this._toastService.error(data.message, data.title);
@@ -285,8 +316,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.selectedService = [...this.selectedService, 'All'];
                     this.configCharge.dataSource = [...this.charges];
 
-                    this.updateDataSearch('serviceTypeId', "");
-
+                    this.updateDataSearch('serviceTypeId', this.services.filter(service => service.id !== 'All').map(service => service.id).toString().replace(/(?:,)/g, ';'));
+                    this.updateDataSearch('strServices', this.services.filter(service => service.id !== 'All').map(service => service.id).toString());
                 } else {
                     this.detectServiceWithAllOption(data.id);
 
@@ -295,6 +326,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.configCharge.dataSource = [...this.configCharge.dataSource, new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' })];
 
                     this.updateDataSearch('serviceTypeId', this.selectedService.toString().replace(/(?:,)/g, ';'));
+                    this.updateDataSearch('strServices', this.selectedService.toString());
                 }
 
                 break;
@@ -368,7 +400,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
                 note: this.note,
-                serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0]) : this.mapServiceId('All'),
+                serviceTypeId: this.selectedService[0] === 'All' ? this.services.filter(service => service.id !== 'All').map(service => service.id).toString().replace(/(?:,)/g, ';') : this.selectedService.toString().replace(/(?:,)/g, ';'),
                 commodityGroupId: !!this.commodity ? this.commodity.id : null,
                 strServices: this.selectedService[0] === 'All' ? this.services.filter(service => service.id !== 'All').map(service => service.id).toString() : this.selectedService.toString(),
                 jobIds: this.mapShipment("JOBID"),

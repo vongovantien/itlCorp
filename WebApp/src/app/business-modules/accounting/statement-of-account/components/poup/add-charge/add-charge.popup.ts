@@ -267,7 +267,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             strCreators: this.searchInfo.strCreators,
             strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
             commondityGroupId: !!this.commodity ? this.commodity.id : null,
-            strServices: this.searchInfo.strServices
+            strServices: this.searchInfo.strServices,
+            serviceTypeId: this.searchInfo.serviceTypeId
         };
         this._accoutingRepo.getListMoreCharge(body)
             .pipe(catchError(this.catchError))
@@ -351,4 +352,5 @@ interface ISearchMoreCharge {
     strCharges: string;
     commondityGroupId: any;
     strServices: string;
+    serviceTypeId: string;
 }

@@ -61,6 +61,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
+            { title: 'No.', field: '', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
@@ -203,7 +204,9 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     onUpdateMoreSOA(data: any) {
-        this.soa.chargeShipments = data.chargeShipments;
+        console.log(data)
+        this.soa.chargeShipments = [...this.soa.chargeShipments, ...data.chargeShipments]
+        console.log(this.soa.chargeShipments);
         this.dataSearch.chargeShipments = this.soa.chargeShipments;
         this.isCheckAllCharge = false;
     }
@@ -267,8 +270,6 @@ export class StatementOfAccountEditComponent extends AppList {
                             this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
                                 queryParams: { no: this.soaNO, currency: this.currencyLocal }
                             });
-
-
                         }
                     },
                 );
@@ -276,6 +277,17 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     addMoreCharge() {
+        const body = {
+            currency: this.soa.currency,
+            customerID: this.soa.customer,
+            dateType: this.soa.dateType,
+            fromDate: formatDate(this.soa.soaformDate, 'yyyy-MM-dd', 'en'),
+            toDate: formatDate(this.soa.soatoDate, 'yyyy-MM-dd', 'en'),
+            type: this.soa.type,
+            isOBH: this.soa.obh,
+            strServices: this.soa.serviceTypeId.replace(';', ','),
+        };
+        this.dataSearch = new SOASearchCharge(body);
         this.addChargePopup.searchInfo = this.dataSearch;
         this.addChargePopup.getListShipmentAndCDNote(this.dataSearch);
 

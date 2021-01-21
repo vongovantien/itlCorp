@@ -73,7 +73,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
         if (this.formCreate.isApplied && !this.formCreate.selectedRangeDate.startDate || !this.formCreate.selectedPartner.value) {
             return;
         } else {
-            this.addChargePopup.searchInfo = this.dataSearch;
+            this.dataSearch = this.formCreate.dataSearch;
+            this.addChargePopup.searchInfo = this.formCreate.dataSearch;
             this.addChargePopup.getListShipmentAndCDNote(this.formCreate.dataSearch);
 
             this.addChargePopup.charges = this.formCreate.charges;
@@ -115,7 +116,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currency: this.dataSearch.currency,
                 note: this.dataSearch.note,
                 dateType: this.dataSearch.dateType,
-                serviceTypeId: !!this.formCreate.selectedService.length ? this.formCreate.mapServiceId(this.formCreate.selectedService[0].id) : this.formCreate.mapServiceId('All'),
+                serviceTypeId: this.dataSearch.serviceTypeId,
                 customer: this.dataSearch.customerID,
                 type: this.dataSearch.type,
                 obh: this.dataSearch.isOBH,

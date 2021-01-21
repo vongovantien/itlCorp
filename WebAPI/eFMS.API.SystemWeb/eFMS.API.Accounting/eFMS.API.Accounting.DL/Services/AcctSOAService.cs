@@ -113,8 +113,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Check exists OBH Debit Charge
                 var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                               && model.Surcharges.Any(c => c.surchargeId == x.Id && c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL)
-                                                               ).Any();
+                                                               && model.Surcharges.Any(c => c.surchargeId == x.Id)
+                                                               && x.Type == "OBH"
+                                                               && x.PaymentObjectId == model.Customer).Any();
                 if (isExistObhDebitCharge)
                 {
                     model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
@@ -143,13 +144,15 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_BUY || c.type == AccountingConstants.TYPE_CHARGE_OBH_BUY))
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id)
+                                                                           && (x.Type == "BUY" || (x.Type == "OBH" && x.PayerId == model.Customer))
                                                                            ).ToList();
 
                             //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_SELL || c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL))
-                                                                           ).ToList(); //&& (x.Soano == null || x.Soano == string.Empty)
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id)
+                                                                           && (x.Type == "SELL" || (x.Type == "OBH" && x.PaymentObjectId == model.Customer))
+                                                                           ).ToList();
 
                             if (surchargeCredit.Count() > 0)
                             {
@@ -225,12 +228,18 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                         //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
-                        var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == model.Soano || x.PaySoano == model.Soano).ToList();
+                        var surcharge = csShipmentSurchargeRepo.Get(x => (model.Type == "Debit" ? x.Soano : x.PaySoano) == model.Soano).ToList();
                         foreach (var item in surcharge)
                         {
                             //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
-                            item.Soano = null;
-                            item.PaySoano = null;
+                            if (model.Type == "Debit")
+                            {
+                                item.Soano = null;
+                            }
+                            else
+                            {
+                                item.PaySoano = null;
+                            }                                                       
                             item.UserModified = currentUser.UserID;
                             item.DatetimeModified = DateTime.Now;
                             var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
@@ -258,8 +267,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Check exists OBH Debit Charge
                         var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                       && model.Surcharges.Any(c => c.surchargeId == x.Id && c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL)
-                                                                       ).Any();
+                                                                       && model.Surcharges.Any(c => c.surchargeId == x.Id)
+                                                                       && x.Type == "OBH" 
+                                                                       && x.PaymentObjectId == model.Customer).Any();
                         if (isExistObhDebitCharge)
                         {
                             soa.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
@@ -281,13 +291,15 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_BUY || c.type == AccountingConstants.TYPE_CHARGE_OBH_BUY))
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id)
+                                                                           && (x.Type == "BUY" || (x.Type == "OBH" && x.PayerId == model.Customer))
                                                                            ).ToList();
 
                             //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == AccountingConstants.TYPE_CHARGE_SELL || c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL))
-                                                                           ).ToList(); //&& (x.Soano == null || x.Soano == string.Empty)
+                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id)
+                                                                           && (x.Type == "SELL" || (x.Type == "OBH" && x.PaymentObjectId == model.Customer))
+                                                                           ).ToList();
 
                             if (surchargeCredit.Count() > 0)
                             {
@@ -454,7 +466,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào Final Exchange Rate, Exchange Date của charge)
             var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Select(s => s.surchargeId).Contains(x.Id));
-
             //Count number shipment (JobNo, HBL)
             var totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
 
