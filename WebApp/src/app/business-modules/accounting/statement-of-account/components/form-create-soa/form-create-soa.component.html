@@ -127,13 +127,16 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <label class="form-control-label" for="">
-                        Charge
-                    </label>
-                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
-                        (itemSelected)="onSelectDataFormInfo($event, 'charge')" [dataSources]="configCharge.dataSource"
-                        [displayFields]="configCharge.displayFields " [height]="150">
-                    </app-combo-grid-virtual-scroll>
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Charge
+                        </label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
+                            (itemSelected)="onSelectDataFormInfo($event, 'charge')"
+                            [dataSources]="configCharge.dataSource" [displayFields]="configCharge.displayFields "
+                            [height]="150">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
                 </div>
                 <div class="col-lg-4">
                     <!-- <label class="form-control-label" for="">
