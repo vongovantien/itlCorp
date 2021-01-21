@@ -51,6 +51,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
+            { title: 'No.', field: '', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },

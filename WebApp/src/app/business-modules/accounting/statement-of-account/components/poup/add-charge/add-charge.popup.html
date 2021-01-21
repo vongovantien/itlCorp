@@ -103,7 +103,7 @@
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <label class="form-control-label" for="">
+                            <!-- <label class="form-control-label" for="">
                                 Commodity Group
                             </label>
                             <select [(ngModel)]="commodity" class="form-control">
@@ -111,7 +111,7 @@
                                 <option *ngFor="let comodity of commodityGroup" [ngValue]="comodity">
                                     {{comodity.groupNameEn}}
                                 </option>
-                            </select>
+                            </select> -->
                         </div>
                         <div class="col-8">
                             <div class="form-actions m--align-right m--margin-top-10">
@@ -196,6 +196,7 @@
                                             </label>
                                         </div>
                                     </td>
+                                    <td>{{i + 1}}</td>
                                     <td>
                                         <span>{{charge.chargeCode}}</span>
                                     </td>
@@ -227,7 +228,8 @@
                                         <span>{{charge.invoiceNo}}</span>
                                     </td>
                                     <td>
-                                        <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
+                                        <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') :
+                                            ''}}</span>
                                     </td>
                                     <td>
                                         <span>{{charge.note}}</span>

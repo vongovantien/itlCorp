@@ -73,6 +73,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
     ngOnInit() {
         this.headers = [
+            { title: 'No', field: '', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
@@ -96,9 +97,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
     initBasicData() {
         this.types = [
-            { text: 'All', id: 1 },
-            { text: 'Debit', id: 2 },
-            { text: 'Credit', id: 3 },
+            { text: 'Debit', id: 1 },
+            { text: 'Credit', id: 2 },
         ];
         this.selectedType = this.types[0];
 
@@ -170,7 +170,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             this.updateDefaultValue(data);
         } catch (error) { }
     }
-    
+
 
     updateDefaultValue(dataSearch: SOASearchCharge) {
         this.selectedType = this.types.filter((i: any) => i.text === dataSearch.type)[0];
@@ -190,7 +190,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             case 'shipment':
                 this.selectedShipment = { field: data.jobId, value: data.hbl };
                 this.selectedShipmentData = data;
-                
+
                 this.cdNotes = [];
                 this.selectedCDNote = null;
                 this.cdNotes = this.filterCDNoteByShipment(this.selectedShipmentData);
@@ -264,7 +264,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             type: this.selectedType.text,
             isOBH: this.selectedOBH.id,
             strCreators: this.searchInfo.strCreators,
-            strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
+            strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
             commondityGroupId: !!this.commodity ? this.commodity.id : null
         };
         this._accoutingRepo.getListMoreCharge(body)
