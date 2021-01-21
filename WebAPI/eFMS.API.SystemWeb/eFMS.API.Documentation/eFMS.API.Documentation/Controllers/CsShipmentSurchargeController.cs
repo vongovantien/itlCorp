@@ -183,7 +183,7 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
             list.ForEach(fe => {
-                fe.Total = Math.Round(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn charge VND
+                fe.Total = Math.Round(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
             });
             var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
