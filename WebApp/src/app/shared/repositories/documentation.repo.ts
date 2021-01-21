@@ -1006,4 +1006,21 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/GetLinkASInfomation/`,
             { mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
     }
+
+    downloadChargeExcel() {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadChargeFile(files: any) {
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/UploadFile`, files, "uploadedFile");
+    }
+
+    importCharge(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
