@@ -14,7 +14,8 @@ import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/
 
 @Component({
     selector: 'ops-cd-note-list',
-    templateUrl: './ops-cd-note-list.component.html'
+    templateUrl: './ops-cd-note-list.component.html',
+    styleUrls: ['./ops-cd-note-list.component.scss']
 })
 export class OpsCDNoteComponent extends AppList {
     @Input() currentJob: OpsTransaction;

@@ -786,6 +786,10 @@ namespace eFMS.API.Catalogue.DL.Services
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoSalesman = sysEmployeeRepository.Get(e => e.Id == employeeIdSalemans)?.FirstOrDefault();
+            string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
+
+
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
 
@@ -862,6 +866,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     lstCc = lstTo;
                 }
                 lstCc.Add(objInfoSalesman?.Email);
+                lstCc.Add(objInfoCreatorPartner?.Email);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
             }
             else
@@ -894,6 +899,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 lstCc.Add(objInfoSalesman?.Email);
                 lstCc.Add(objInfoCreatorPartner?.Email);
+                lstCc.Add(objInfoModified?.Email);
                 //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 

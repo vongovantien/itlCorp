@@ -51,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCommodity> commodityRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
+        private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -82,6 +83,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysGroup> groupRepo,
             IContextBase<SysUserLevel> userlevelRepo,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
+            IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -112,6 +114,7 @@ namespace eFMS.API.Documentation.DL.Services
             commodityRepository = commodityRepo;
             userlevelRepository = userlevelRepo;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
+            accAdvancePaymentRepository = accAdvancePaymentRepo;
 
         }
 
@@ -469,8 +472,8 @@ namespace eFMS.API.Documentation.DL.Services
                             || surcharge.AcctManagementId != null
                          select detail);
             var data = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
-            
-            if (query.Any() || accAdvanceRequestRepository.Any(x=>x.JobId == data.JobNo))
+
+            if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == data.JobNo))
             {
                 return false;
             }
@@ -2084,10 +2087,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                     List<CsShipmentSurcharge> houseSurcharges = GetCharges(oldHouseId, item, transaction);
                     if (houseSurcharges != null) surcharges.AddRange(houseSurcharges);
-                 
+
                     List<CsArrivalFrieghtCharge> houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
                     if (houseFreigcharges != null) freightCharges.AddRange(houseFreigcharges);
-                  
+
                     countDetail = countDetail + 1;
                 }
             }
@@ -2970,6 +2973,49 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
 
+        }
+
+        public int CheckUpdateMBL(CsTransactionEditModel model, out string mblNo, out List<string> advs)
+        {
+            mblNo = string.Empty;
+            advs = new List<string>();
+            int errorCode = 0;  // 1|2
+            bool hasChargeSynced = false;
+            bool hasAdvanceRequest = false;
+
+            if (DataContext.Any(x => x.Id == model.Id && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && (x.Mawb ?? "").ToLower() != (model.Mawb ?? "")))
+            {
+                CsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
+                if (shipment != null)
+                {
+                    hasChargeSynced = csShipmentSurchargeRepo.Any(x => x.JobNo == shipment.JobNo && x.Mblno == shipment.Mawb && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                }
+
+                if(hasChargeSynced)
+                {
+                    errorCode = 1;
+                    mblNo = shipment.Mawb;
+                }
+                else
+                {
+                    var query = from advR in accAdvanceRequestRepository.Get(x => x.JobId == shipment.JobNo)
+                                join adv in accAdvancePaymentRepository.Get(x => x.SyncStatus == "Synced") on advR.AdvanceNo equals adv.AdvanceNo
+                                select adv.AdvanceNo;
+
+                    if(query != null && query.Count() > 0)
+                    {
+                        hasAdvanceRequest = true;
+                        advs = query.Distinct().ToList();
+                    }
+                    if(hasAdvanceRequest)
+                    {
+                        errorCode = 2;
+                        mblNo = shipment.Mawb;
+                    }
+                }
+            }
+
+            return errorCode;
         }
     }
     #endregion

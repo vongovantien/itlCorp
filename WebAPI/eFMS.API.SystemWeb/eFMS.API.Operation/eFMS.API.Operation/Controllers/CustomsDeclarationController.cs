@@ -102,7 +102,7 @@ namespace eFMS.API.Operation.Controllers
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
-        
+
         /// <summary>
         /// get and paging the list of custom declarations by conditions
         /// </summary>
@@ -228,6 +228,7 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost("ImportClearancesFromEcus")]
         public IActionResult ImportClearancesFromEcus()
         {
+          
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
             if (code == 403) return Forbid();

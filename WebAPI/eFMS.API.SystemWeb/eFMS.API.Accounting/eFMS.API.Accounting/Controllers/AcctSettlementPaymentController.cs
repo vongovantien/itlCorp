@@ -17,6 +17,8 @@ using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Accounting.DL.Models.ExportResults;
+using eFMS.API.Common.Helpers;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -298,10 +300,11 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model);
+                var isDuplicateCharge = CheckDuplicateCharge(model,out object dataDuplicate);
                 if (isDuplicateCharge)
                 {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
                     return BadRequest(_result);
                 }
 
@@ -379,10 +382,11 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model);
+                var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
                 if (isDuplicateCharge)
                 {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
                     return BadRequest(_result);
                 }
 
@@ -448,10 +452,11 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model);
+                var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
                 if (isDuplicateCharge)
                 {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
                     return BadRequest(_result);
                 }
 
@@ -831,16 +836,28 @@ namespace eFMS.API.Accounting.Controllers
             }
         }
 
-        private bool CheckDuplicateCharge(CreateUpdateSettlementModel model)
+        private bool CheckDuplicateCharge(CreateUpdateSettlementModel model, out object dataDuplicate)
         {
+            dataDuplicate = null;
             var duplicateCharges = model.ShipmentCharge.Where(x =>
                        !string.IsNullOrEmpty(x.ClearanceNo)
                     || !string.IsNullOrEmpty(x.ContNo)
-                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ClearanceNo, x.ContNo, x.InvoiceNo }).ToList();
+                    || !string.IsNullOrEmpty(x.SeriesNo)
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ClearanceNo, x.ContNo, x.InvoiceNo, x.SeriesNo, x.Notes}).ToList();
             foreach (var charge in duplicateCharges)
             {
                 if (charge.Count() > 1)
-                {                    
+                {
+                    string mes = JsonConvert.SerializeObject(charge);
+                    new LogHelper("Settlement_Duplicate_Charge", mes);
+
+                    dataDuplicate = new
+                    {
+                        charge.Key.JobId,
+                        charge.Key.HBL,
+                        charge.Key.MBL,
+                        charge.Key.ChargeCode
+                    };
                     return true;
                 }
             }

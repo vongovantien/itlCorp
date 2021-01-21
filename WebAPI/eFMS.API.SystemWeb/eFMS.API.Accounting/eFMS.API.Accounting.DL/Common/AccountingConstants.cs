@@ -106,6 +106,7 @@
 
         public static readonly string CHARGE_BA_DHL_AIR_CODE = "BA_HDL_Air";
         public static readonly string CHARGE_HANDLING_FEE = "handling";
+        public static readonly string CHARGE_SA_HDL_AIR_CODE = "SA_HDL_Air";
         #region -- TYPE SOA--
         public static readonly string TYPE_SOA_CREDIT = "Credit";
         public static readonly string TYPE_SOA_DEBIT = "Debit";

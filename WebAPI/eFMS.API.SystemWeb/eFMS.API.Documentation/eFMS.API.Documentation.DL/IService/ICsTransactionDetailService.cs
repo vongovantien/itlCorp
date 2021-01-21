@@ -61,5 +61,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateInputBKNote(BookingNoteCriteria criteria);
         List<HousebillDailyExportResult> GetHousebillsDailyExport(DateTime? issuedDate);
         HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model);
+
+        int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs);
     }
 }

@@ -34,7 +34,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> officeRepo;
         private readonly IContextBase<SysCompany> companyRepo;
         private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
-
+        private decimal _decimalNumber = Constants.DecimalNumber;
 
         ICsTransactionDetailService houseBills;
 
@@ -513,7 +513,7 @@ namespace eFMS.API.Documentation.DL.Services
                         _sipperInfo = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
                     }
                 }
-
+                
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
                     foreach (var frieght in arrival.CsArrivalFrieghtCharges)
@@ -537,11 +537,11 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.blnStick = frieght.IsTick ?? false;//isStick of charge arrival
                         charge.blnRoot = frieght.IsFull ?? false; //isRoot of charge arrival
                         charge.FreightCharge = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
-                        charge.Qty = frieght.Quantity ?? 0;//Quantity of charge
+                        charge.Qty = (frieght.Quantity ?? 0) + _decimalNumber;//Quantity of charge
                         charge.Unit = frieght.UnitName;//Unit name of charge arrival
-                        charge.TotalValue = frieght.UnitPrice ?? 0;//Unit price of charge arrival
+                        charge.TotalValue = (frieght.UnitPrice ?? 0) + _decimalNumber;//Unit price of charge arrival
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
-                        charge.VAT = frieght.Vatrate ?? 0; //VAT of charge arrival
+                        charge.VAT = (frieght.Vatrate ?? 0) + _decimalNumber; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
                         charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer (Không UpperCase)
                         charge.Shipper = _sipperInfo?.ToUpper(); //Shipper Name
