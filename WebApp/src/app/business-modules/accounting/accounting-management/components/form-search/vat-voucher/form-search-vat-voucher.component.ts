@@ -157,7 +157,7 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
 
     reset() {
         this.formSearch.reset();
-        this.issueDate.setValue({ startDate: new Date(), endDate: new Date() });
+        this.issueDate.reset({ startDate: new Date(new Date().setDate(new Date().getDate() - 29)), endDate: new Date() });
 
         // * Dispatch an action.
         this._store.dispatch(SearchListAccountingMngt({}));
