@@ -500,6 +500,13 @@
             <param name="uploadedFile"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Import(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeImportModel})">
+            <summary>
+            import list partner
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShippingInstructionController.CheckExistSIExport(System.Guid)">
             <summary>
             Check if Exist Sea Export files attach

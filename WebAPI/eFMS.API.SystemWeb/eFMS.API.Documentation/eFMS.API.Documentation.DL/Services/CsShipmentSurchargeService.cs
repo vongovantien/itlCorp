@@ -622,6 +622,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list)
         {
             var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
+            var listPartner = partnerRepository.Get(x => x.Active == true);
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.Hblno))
@@ -629,10 +630,27 @@ namespace eFMS.API.Documentation.DL.Services
                     item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_EMPTY]);
                     item.IsValid = false;
                 }
+                else
+                {
+                    if (!opsTransRepository.Any(x => x.Hwbno == item.Hblno.Trim()))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST],item.Hblno);
+                        item.IsValid = false;
+                    }
+                    
+                }
                 if (string.IsNullOrEmpty(item.Mblno))
                 {
                     item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_EMPTY]);
                     item.IsValid = false;
+                }
+                else
+                {
+                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno.Trim()))
+                    {
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                        item.IsValid = false;
+                    }
                 }
                 if (string.IsNullOrEmpty(item.PartnerCode))
                 {
@@ -641,7 +659,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!partnerRepository.Any(x => x.TaxCode == item.PartnerCode))
+                    if (!listPartner.Any(x => x.TaxCode == item.PartnerCode))
                     {
                         item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST],item.PartnerCode);
                         item.IsValid = false;
@@ -707,7 +725,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (!item.FinalExchangeRate.HasValue)
                 {
-                    item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_FINAL_EXCHANGE_EMPTY]);
+                    item.FinalExchangeRateError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_FINAL_EXCHANGE_EMPTY]);
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Type))
@@ -743,20 +761,33 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.IsValid)
                 {
-                    string PartnerId = partnerRepository.Get(x => x.TaxCode == item.PartnerCode).Select(t => t.Id).FirstOrDefault();
-                    item.PaymentObjectId = PartnerId;
+                    string PartnerId = listPartner.Where(x => x.TaxCode == item.PartnerCode).Select(t => t.Id).FirstOrDefault();
                     Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
                     item.ChargeId = ChargeId;
                     short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
                     item.UnitId = UnitId;
-                    if(listChargeOps.Any(x=>x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId))
+                    item.PaymentObjectId = PartnerId;
+                    Guid HblId = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim()).Select(t => t.Hblid).FirstOrDefault();
+                    item.Hblid = HblId;
+                    item.Total =  (decimal)item.TotalAmount;
+                    item.Quantity = (decimal)item.Qty;
+                    item.TransactionType = "CL";
+                    if (item.Type.ToLower() == "obh")
                     {
-                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE]);
+                        item.PayerId = PartnerId;
+                    }
+                    if (item.Type.ToLower() == "buying")
+                    {
+                        item.Type = "BUY";
+                    }
+                    if (listChargeOps.Any(x=>x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == item.Type))
+                    {
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE],item.ChargeCode);
                         item.IsValid = false;
                     }
                     if (!string.IsNullOrEmpty(item.SeriesNo))
                     {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo))
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode);
                             item.IsValid = false;
@@ -764,7 +795,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (!string.IsNullOrEmpty(item.InvoiceNo))
                     {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo))
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == item.Type))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode);
                             item.IsValid = false;
@@ -772,7 +803,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
                     {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo))
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode);
                             item.IsValid = false;
@@ -782,6 +813,53 @@ namespace eFMS.API.Documentation.DL.Services
 
             });
             return list;
+        }
+
+        public HandleState Import(List<CsShipmentSurchargeImportModel> list)
+        {
+            foreach(var item in list)
+            {
+                switch (item.Type.ToLower())
+                {
+                    case "buying": item.Type = "BUY";
+                        break;
+                    case "obh": item.Type = item.Type.ToUpper();
+                        break;
+                    case "sell": item.Type = item.Type.ToUpper();
+                        break;
+                }
+                item.UserCreated = currentUser.UserID;
+                item.Id = Guid.NewGuid();
+                item.ExchangeDate = DateTime.Now;
+                item.DatetimeCreated = DateTime.Now;
+            }
+            var datas = mapper.Map<List<CsShipmentSurcharge>>(list);
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = DataContext.Add(datas);
+                    if (hs.Success)
+                    {
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                    }
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    Get();
+                    trans.Dispose();
+                }
+            }
         }
 
         private string GetTransactionType(string jobNo)

@@ -84,12 +84,12 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblno'), 'sorting_desc': (!isDesc && sortKey == 'hblno') }"
                                 (click)="sort('hblno')">
-                                <span required>HBL</span>
+                                <span>HBL*</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mblno'), 'sorting_desc': (!isDesc && sortKey == 'mblno') }"
                                 (click)="sort('mblno')">
-                                <span required>MBL</span>
+                                <span>MBL*</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
@@ -99,21 +99,21 @@
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerCode'), 'sorting_desc': (!isDesc && sortKey == 'partnerCode') }"
                                 (click)="sort('partnerCode')">
-                                <span required>Partner Mode</span>
+                                <span>Partner Code*</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeCode'), 'sorting_desc': (!isDesc && sortKey == 'chargeCode') }"
                                 (click)="sort('chargeCode')">
-                                <span>Charge Code</span>
+                                <span>Charge Code*</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qty'), 'sorting_desc': (!isDesc && sortKey == 'qty') }"
                                 (click)="sort('qty')">
-                                <span required>Qty</span>
+                                <span>Qty*</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unit'), 'sorting_desc': (!isDesc && sortKey == 'unit') }"
                                 (click)="sort('unit')">
-                                <span required>Unit</span>
+                                <span>Unit*</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitPrice'), 'sorting_desc': (!isDesc && sortKey == 'unitPrice') }"
                                 (click)="sort('unitPrice')">
@@ -121,23 +121,23 @@
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currencyId'), 'sorting_desc': (!isDesc && sortKey == 'currencyId') }"
                                 (click)="sort('currencyId')">
-                                <span required>Currency</span>
+                                <span>Currency*</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatrate'), 'sorting_desc': (!isDesc && sortKey == 'vatrate') }"
                                 (click)="sort('vatrate')">
-                                <span required>Vat</span>
+                                <span>Vat*</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'totalAmount'), 'sorting_desc': (!isDesc && sortKey == 'totalAmount') }"
                                 (click)="sort('totalAmount')">
-                                <span required>Total Amount</span>
+                                <span>Total Amount*</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exchangeDate'), 'sorting_desc': (!isDesc && sortKey == 'exchangeDate') }"
                                 (click)="sort('exchangeDate')">
-                                <span required>Exchange Date</span>
+                                <span>Exchange Date*</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'finalExchangeRate'), 'sorting_desc': (!isDesc && sortKey == 'finalExchangeRate') }"
                                 (click)="sort('finalExchangeRate')">
-                                <span required>Final Exchange Rate</span>
+                                <span>Final Exchange*</span>
                             </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
                                 (click)="sort('invoiceNo')">
@@ -218,7 +218,7 @@
                                         }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.vatError === null">{{ item.vatRate }}</span>
+                                    <span *ngIf="item.vatError === null">{{ item.vatrate }}</span>
                                     <span class="m--font-danger" *ngIf="item.vatError !== null">{{item.vatError
                                         }}</span>
                                 </td>

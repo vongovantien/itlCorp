@@ -24,6 +24,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string TotalAmountError { get; set; }
         public string ExchangeDateError{ get; set; }
         public string FinalExchangeDateError { get; set; }
+        public string FinalExchangeRateError { get; set; }
         public string TypeError { get; set; }
 
         public decimal? TotalAmount { get; set; }

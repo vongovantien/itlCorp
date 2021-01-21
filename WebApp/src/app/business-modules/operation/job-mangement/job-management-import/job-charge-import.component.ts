@@ -101,7 +101,7 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
         } else {
             const data = this.data.filter(x => x.isValid);
             this._progressRef.start();
-            this._catalogueRepo.importCharge(data)
+            this._documentRepo.importCharge(data)
                 .pipe(
                     finalize(() => {
                         this._progressRef.complete();

@@ -408,7 +408,10 @@ namespace eFMS.API.Documentation.Controllers
                             dateToPaseInvoice = DateTime.Parse(InvoiceDate, culture);
                         }
                     }
-
+                    double? UnitPrice = worksheet.Cells[row, 8].Value != null ? (double?)worksheet.Cells[row, 8].Value : (double?)null;
+                    double? Vatrate = worksheet.Cells[row, 10].Value != null ? (double?)worksheet.Cells[row, 10].Value : (double?)null;
+                    double? TotalAmount = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;
+                    double? FinalExchangeRate = worksheet.Cells[row, 13].Value != null ? (double?)worksheet.Cells[row, 13].Value : (double?)null;
                     var surcharge = new CsShipmentSurchargeImportModel
                     {
                         IsValid = true,
@@ -418,13 +421,13 @@ namespace eFMS.API.Documentation.Controllers
                         PartnerCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                         ChargeCode = worksheet.Cells[row, 5].Value?.ToString().Trim(),
                         Qty = worksheet.Cells[row, 6].Value != null ? (double?) worksheet.Cells[row, 6].Value : (double?)null,
-                        //Unit = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                        //UnitPrice = worksheet.Cells[row, 8].Value != null ? (decimal?)worksheet.Cells[row, 8].Value : null,
-                        //CurrencyId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        //Vatrate = worksheet.Cells[row, 10].Value != null ? (decimal?)worksheet.Cells[row, 10].Value : null,
-                        //TotalAmount = worksheet.Cells[row, 11].Value != null ? (decimal?)worksheet.Cells[row, 11].Value : (Decimal?)null,
-                        //ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
-                        //FinalExchangeRate = worksheet.Cells[row, 13].Value != null ? (decimal?)worksheet.Cells[row, 13].Value : null, 
+                        Unit = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                        UnitPrice = (decimal?)UnitPrice,
+                        CurrencyId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        Vatrate = (decimal?)Vatrate,
+                        TotalAmount = (decimal?)TotalAmount,
+                        ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
+                        FinalExchangeRate = (decimal?)FinalExchangeRate, 
                         InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
                         InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPase : (DateTime?)null,
                         SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
@@ -439,6 +442,25 @@ namespace eFMS.API.Documentation.Controllers
                 return Ok(results);
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
+        /// import list partner
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<CsShipmentSurchargeImportModel> data)
+        {
+            var hs = csShipmentSurchargeService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
         }
         #endregion
 

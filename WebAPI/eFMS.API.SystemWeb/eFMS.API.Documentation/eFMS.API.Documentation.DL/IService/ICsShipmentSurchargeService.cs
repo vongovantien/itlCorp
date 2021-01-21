@@ -23,5 +23,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list);
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
         List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
+        HandleState Import(List<CsShipmentSurchargeImportModel> data);
     }
 }
