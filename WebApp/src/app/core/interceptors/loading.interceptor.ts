@@ -20,6 +20,7 @@ export class LoadingInterceptor implements HttpInterceptor {
         if (this._totalRequests > 0) {
             this._spinner.show();
         }
+        console.log(this._totalRequests);
         return next.handle(req).pipe(
             finalize(() => {
                 this._totalRequests--;
