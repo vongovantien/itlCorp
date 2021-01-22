@@ -15,13 +15,13 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th>
+                            <th class="text-right">
                                 <span>Total Debit</span>
                             </th>
-                            <th>
+                            <th class="text-right">
                                 <span>Total Credit</span>
                             </th>
-                            <th>
+                            <th class="text-right">
                                 <span>Balance</span>
                             </th>
                         </tr>
@@ -31,13 +31,13 @@
                             <td>
                                 <span>VNĐ</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{data.amountDebitLocal | number: '.0-3'}}</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{data.amountCreditLocal | number: '.0-3'}}</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{data.amountBalanceLocal | number: '.0-3'}}</span>
                             </td>
                         </tr>
@@ -45,13 +45,13 @@
                             <td>
                                 <span>USD</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{data.amountDebitUSD | number: '.0-3'}}</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{data.amountCreditUSD | number: '.0-3'}}</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{data.amountBalanceUSD | number: '.0-3'}}</span>
                             </td>
                         </tr>

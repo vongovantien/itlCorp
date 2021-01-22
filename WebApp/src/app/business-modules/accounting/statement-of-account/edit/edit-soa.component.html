@@ -34,8 +34,9 @@
                         </ng-template>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
-                        <span class="m--font-bolder">Total Shipment:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.shipment}}</span>
+                        <span class="m--font-bolder">Total Shipment/Charge:</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.shipment | number: '.0-2'}}/{{soa.totalCharge
+                            | number: '.0-2'}}</span>
                     </div>
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Service Logistic:</span>
@@ -170,7 +171,7 @@
                                     </label>
                                 </div>
                             </td>
-                            <td>{{i + 1}}</td>
+                            <td class="text-center">{{i + 1}}</td>
                             <td>
                                 <span>{{charge.chargeCode}}</span>
                             </td>
