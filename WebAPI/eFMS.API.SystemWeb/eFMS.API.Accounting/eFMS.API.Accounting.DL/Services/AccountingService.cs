@@ -1246,9 +1246,26 @@ namespace eFMS.API.Accounting.DL.Services
             amount = (vatrate != null) ? (vatrate < 101 & vatrate >= 0) ? Math.Round(((orgAmount * vatrate) / 100 ?? 0), 3) : Math.Abs(vatrate ?? 0) : 0;
             if (currency == AccountingConstants.CURRENCY_LOCAL)
             {
-                amount = Math.Round(amount, 0);
+                amount = CalculateRoundStandard(Math.Round(amount, 2));
             }
             return amount;
+        }
+
+        public decimal CalculateRoundStandard(decimal num)
+        {
+            var d = (num % 1);
+            if ((double)d < 0.5)
+            {
+                return Math.Round(num);
+            }
+            else if ((double)d >= 0.5)
+            {
+                return Math.Ceiling(num);
+            }
+            else
+            {
+                return num;
+            }
         }
 
         private string GetCustomerHBL(Guid? Id)
