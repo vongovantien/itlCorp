@@ -1492,9 +1492,9 @@ namespace eFMS.API.Accounting.DL.Services
             var _description = string.Empty;
             if (transactionType == "CL")
             {
-                var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
-                var _customNo = customNos.FirstOrDefault() ?? string.Empty;
-                _description = string.Format("{0} {1} TK:{2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
+                var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+                var _customNo = !string.IsNullOrEmpty(customNos) ? string.Format("TK:{0}", customNos) : string.Empty;
+                _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
             }
             else
             {
