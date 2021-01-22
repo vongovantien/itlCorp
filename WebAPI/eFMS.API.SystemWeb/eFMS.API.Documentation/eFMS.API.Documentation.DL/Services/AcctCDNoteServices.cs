@@ -635,9 +635,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 //Quy đổi theo Final Exchange Rate. Nếu Final Exchange Rate is null thì
                 //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
-                //var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
-                //var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
+                decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, exchargeDateSurcharge, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
                 charge.ExchangeRate = _exchangeRate;
                 charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction?.Hwbno;
@@ -801,8 +800,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             cdNoteDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
             cdNoteDetails.VesselDate = transaction != null ? transaction.FlightDate : null;
-            cdNoteDetails.HbConstainers = hbConstainers; //Container Quantity
-            cdNoteDetails.HbPackages = hbPackages; // Package Quantity
+            cdNoteDetails.HbConstainers = transaction != null ? hbConstainers : opsTransaction.ContainerDescription; //Container Quantity
+            cdNoteDetails.HbPackages = transaction != null ? hbPackages : opsTransaction.SumPackages.ToString(); // Package Quantity
             cdNoteDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
             cdNoteDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
             cdNoteDetails.IsLocked = false;
@@ -828,7 +827,7 @@ namespace eFMS.API.Documentation.DL.Services
             cdNoteDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
             return cdNoteDetails;
         }
-
+        
         public HandleState DeleteCDNote(Guid idSoA)
         {
             var hs = new HandleState();
