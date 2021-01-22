@@ -207,7 +207,7 @@
                                     </td>
                                 </tr>
                                 <tr class="collapse-toggle-row tgroup">
-                                    <td colspan="14">
+                                    <td colspan="15">
                                         <div class='row'>
                                             <div class="col-5">Shipment:
                                                 <span class='text-info'>
@@ -231,7 +231,7 @@
                                 <tr class="child"
                                     *ngFor="let charge of groupShipment.chargeShipments; let j = index; trackBy: trackByFn"
                                     [class.synced-row]="charge.isSynced">
-                                    <td>{{j + 1}}</td>
+                                    <td class="text-center">{{j + 1}}</td>
                                     <td>
                                         <span>{{charge.chargeCode}}</span>
                                     </td>
@@ -297,7 +297,7 @@
                             </tr>
                             <tr *ngFor="let charge of soa.chargeShipments  | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn"
                                 [class.synced-row]="charge.isSynced">
-                                <td>{{i + 1}}</td>
+                                <td class="text-center">{{i + 1}}</td>
                                 <td>
                                     <span>{{charge.chargeCode}}</span>
                                 </td>
@@ -316,10 +316,10 @@
                                 <td>
                                     <span>{{charge.customNo}}</span>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <span>{{charge.debit | number: '.0-3'}}</span>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <span>{{charge.credit | number: '.0-3'}}</span>
                                 </td>
                                 <td>

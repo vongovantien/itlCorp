@@ -15,7 +15,6 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -97,7 +96,6 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403, "");
-
             try
             {
                 var userCurrent = currentUser.UserID;
@@ -120,7 +118,6 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                     DateTime? dueDate = null;
-
                     dueDate = model.DatetimeCreated.Value.AddDays(30);
                     model.PaymentDueDate = dueDate;
                 }
@@ -139,7 +136,6 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.Soano = model.Soano = CreateSoaNo();
 
                         var hs = DataContext.Add(soa, false);
-
                         if (hs.Success)
                         {
                             //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
@@ -194,7 +190,6 @@ namespace eFMS.API.Accounting.DL.Services
                         DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
-
                     }
                     catch (Exception ex)
                     {
@@ -219,7 +214,6 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403, "");
-
             try
             {
                 var userCurrent = currentUser.UserID;
@@ -273,10 +267,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (isExistObhDebitCharge)
                         {
                             soa.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
-
                             DateTime? dueDate = null;
                             dueDate = soaCurrent.DatetimeCreated.Value.AddDays(30);
-
                             soa.PaymentDueDate = dueDate;
                         }
                         else
@@ -286,7 +278,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Update các thông tin của SOA
                         var hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
-
                         if (hs.Success)
                         {
                             //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
@@ -465,7 +456,7 @@ namespace eFMS.API.Accounting.DL.Services
         private AcctSoa GetDebitCreditAmountAndTotalShipment(AcctSoaModel model)
         {
             //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào Final Exchange Rate, Exchange Date của charge)
-            var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Select(s => s.surchargeId).Contains(x.Id));
+            var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
             //Count number shipment (JobNo, HBL)
             var totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
 
@@ -1835,8 +1826,6 @@ namespace eFMS.API.Accounting.DL.Services
             });
             return _result.AsQueryable();
         }
-
-
 
         public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo, string officeId)
         {

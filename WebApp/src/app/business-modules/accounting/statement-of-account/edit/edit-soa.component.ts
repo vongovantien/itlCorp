@@ -281,8 +281,8 @@ export class StatementOfAccountEditComponent extends AppList {
             currency: this.soa.currency,
             customerID: this.soa.customer,
             dateType: this.soa.dateType,
-            fromDate: formatDate(this.soa.soaformDate, 'yyyy-MM-dd', 'en'),
-            toDate: formatDate(this.soa.soatoDate, 'yyyy-MM-dd', 'en'),
+            fromDate: formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en'), //Lấy theo field Date của form Edit
+            toDate: formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en'), //Lấy theo field Date của form Edit
             type: this.soa.type,
             isOBH: this.soa.obh,
             strServices: this.soa.serviceTypeId.replace(';', ','),
