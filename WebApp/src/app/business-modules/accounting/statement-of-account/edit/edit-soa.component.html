@@ -170,6 +170,7 @@
                                     </label>
                                 </div>
                             </td>
+                            <td>{{i + 1}}</td>
                             <td>
                                 <span>{{charge.chargeCode}}</span>
                             </td>
@@ -189,10 +190,10 @@
                             <td>
                                 <span>{{charge.customNo}}</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{charge.debit | number: '.0-3'}}</span>
                             </td>
-                            <td>
+                            <td class="text-right">
                                 <span>{{charge.credit | number: '.0-3'}}</span>
                             </td>
                             <td>
