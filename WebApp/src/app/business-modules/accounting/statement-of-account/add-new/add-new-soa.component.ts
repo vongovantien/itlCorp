@@ -133,10 +133,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     (res: any) => {
                         if (res.status) {
                             this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
-
-                            // Tính công nợ
-                            this.calculatorReceivable(this.listCharges);
-
                             //  * go to detail page
                             this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail`], { queryParams: { no: res.data.soano, currency: 'VND' } });
 

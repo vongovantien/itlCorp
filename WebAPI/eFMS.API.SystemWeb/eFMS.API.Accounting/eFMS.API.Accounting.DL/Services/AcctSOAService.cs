@@ -142,15 +142,15 @@ namespace eFMS.API.Accounting.DL.Services
                             var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
                                                                            && model.Surcharges.Any(c => c.surchargeId == x.Id)
                                                                            && (x.Type == "BUY" || (x.Type == "OBH" && x.PayerId == model.Customer))
-                                                                           ).ToList();
+                                                                           );
 
                             //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
                                                                            && model.Surcharges.Any(c => c.surchargeId == x.Id)
                                                                            && (x.Type == "SELL" || (x.Type == "OBH" && x.PaymentObjectId == model.Customer))
-                                                                           ).ToList();
+                                                                           );
 
-                            if (surchargeCredit.Count() > 0)
+                            if (surchargeCredit != null)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
                                 //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
@@ -168,7 +168,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                             }
 
-                            if (surchargeDebit.Count() > 0)
+                            if (surchargeDebit != null)
                             {
                                 //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
                                 //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
@@ -222,8 +222,8 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                         //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
-                        var surcharge = csShipmentSurchargeRepo.Get(x => (model.Type == "Debit" ? x.Soano : x.PaySoano) == model.Soano).ToList();
-                        foreach (var item in surcharge)
+                        var surcharges = csShipmentSurchargeRepo.Get(x => (model.Type == "Debit" ? x.Soano : x.PaySoano) == model.Soano);
+                        foreach (var item in surcharges)
                         {
                             //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
                             if (model.Type == "Debit")
@@ -284,15 +284,15 @@ namespace eFMS.API.Accounting.DL.Services
                             var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
                                                                            && model.Surcharges.Any(c => c.surchargeId == x.Id)
                                                                            && (x.Type == "BUY" || (x.Type == "OBH" && x.PayerId == model.Customer))
-                                                                           ).ToList();
+                                                                           );
 
                             //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
                             var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
                                                                            && model.Surcharges.Any(c => c.surchargeId == x.Id)
                                                                            && (x.Type == "SELL" || (x.Type == "OBH" && x.PaymentObjectId == model.Customer))
-                                                                           ).ToList();
+                                                                           );
 
-                            if (surchargeCredit.Count() > 0)
+                            if (surchargeCredit != null)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
                                 //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
@@ -310,7 +310,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                             }
 
-                            if (surchargeDebit.Count() > 0)
+                            if (surchargeDebit != null)
                             {
                                 //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
                                 //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
@@ -419,8 +419,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     try
                     {
-                        var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo).ToList();
-                        if (surcharge.Count() > 0)
+                        var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo);
+                        if (surcharge != null)
                         {
                             //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
                             foreach (var item in surcharge)
@@ -473,6 +473,8 @@ namespace eFMS.API.Accounting.DL.Services
                 //Credit Amount
                 creditAmount += _exchangeRate * _credit;
             }
+            debitAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? Math.Round(debitAmount) : debitAmount;
+            creditAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? Math.Round(creditAmount) : creditAmount;
             return new AcctSoa { TotalShipment = totalShipment, DebitAmount = debitAmount, CreditAmount = creditAmount };
         }
 
