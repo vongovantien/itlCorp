@@ -2252,7 +2252,9 @@ namespace eFMS.API.Accounting.DL.Services
                     _chargeWeight = opst ?.SumChargeWeight;
                     _cbm = opst?.SumCbm;
                     _customNo = customsDeclarationRepo.Get().Where(x => x.JobNo == opst.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
-                } else {
+                }
+                else
+                {
                     var csTransDe = csTransactionDetailRepo.Get(x => x.Id == sur.Hblid).FirstOrDefault();
                     var csTrans = csTransDe == null ? new CsTransaction() : csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && x.Id == csTransDe.JobId).FirstOrDefault();
                     _serviceDate = (csTrans?.TransactionType == "AI" || csTrans?.TransactionType == "SFI" || csTrans?.TransactionType == "SLI" || csTrans?.TransactionType == "SCI") ?
@@ -2272,6 +2274,27 @@ namespace eFMS.API.Accounting.DL.Services
                     _packageContainer = csTransDe?.PackageContainer;
                     _customNo = string.Empty;
                 }
+
+                bool _isSynced = false;
+                string _cdNote = string.Empty;
+                if (soa.Customer == sur.PayerId && sur.Type == "OBH")
+                {
+                    _isSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER") || sur.PaySyncedFrom.Equals("SETTLEMENT"));
+                    _cdNote = sur.CreditNo;
+                }
+                else
+                {
+                    _isSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"));
+                    if (sur.Type == "BUY")
+                    {
+                        _cdNote = sur.CreditNo;
+                    }
+                    if (sur.Type == "SELL" || sur.Type == "OBH")
+                    {
+                        _cdNote = sur.DebitNo;
+                    }
+                }
+
                 var chg = new ChargeSOAResult()
                 {
                     ID = sur.Id,
@@ -2312,16 +2335,16 @@ namespace eFMS.API.Accounting.DL.Services
                     ChargeWeight = _chargeWeight,
                     CBM = _cbm,
                     PackageContainer = _packageContainer,
-                    CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
+                    CreditDebitNo = _cdNote,
                     DatetimeModified = sur.DatetimeModified,
                     CommodityGroupID = null,
                     Service = _service,
-                    CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                    CDNote = _cdNote,
                     TypeCharge = charge?.Type,
                     ExchangeDate = sur.ExchangeDate,
                     FinalExchangeRate = sur.FinalExchangeRate,
                     PIC = null,
-                    IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"))
+                    IsSynced = _isSynced
                 };
                 result.Add(chg);
             }
