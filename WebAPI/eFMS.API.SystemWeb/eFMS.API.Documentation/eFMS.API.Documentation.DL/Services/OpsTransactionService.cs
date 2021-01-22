@@ -1458,8 +1458,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (DataContext.Any(x => x.Id == model.Id 
             && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED 
-            && ( (x.Mblno ?? "").ToLower() != (model.Mblno ?? "") ) || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))
-            )
+            && ( (x.Mblno ?? "").ToLower() != (model.Mblno ?? "")  || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))    
             {
                 OpsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
                 if (shipment != null)

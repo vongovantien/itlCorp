@@ -934,6 +934,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var agreementData = contractRepository.Get();
             string salemans = string.IsNullOrEmpty(criteria.Saleman) ? criteria.All : criteria.Saleman;
             string SalemanId = sysUsers.Where(x => x.Username == salemans).Select(t => t.Id).FirstOrDefault();
+
+            string ContractType = string.IsNullOrEmpty(criteria.ContractType) ? criteria.All : criteria.ContractType.Trim();
             ClearCache();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             if (partners == null) return null;
@@ -969,8 +971,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     query = null;
                 }
+                if (!string.IsNullOrEmpty(ContractType))
+                {
+                    query = query.Where(x => x.agreements.Any(y => y.ContractType.ToLower().Contains(ContractType.ToLower())));
+                }
+                else if (!string.IsNullOrEmpty(criteria.ContractType))
+                {
+                    query = null;
+                }
             }
-
             else
             {
                 query = query.Where(x =>
@@ -985,7 +994,9 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId)))
+                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId))
+                           || x.agreements.Any(y => y != null && y.ContractType.ToLower().Contains(ContractType.ToLower()))
+                           )
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
                 //if (!string.IsNullOrEmpty(SalemanId))
@@ -1971,7 +1982,7 @@ namespace eFMS.API.Catalogue.DL.Services
         /// </summary>
         /// <param name="model">CatPartnerModel</param>
         /// <returns></returns>
-        public HandleState UpdatePartnerData(CatPartnerCriteria model)
+        public HandleState UpdatePartnerData(CatPartnerModel model)
         {
             var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);
@@ -1982,7 +1993,16 @@ namespace eFMS.API.Catalogue.DL.Services
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = entity.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
 
-            entity.UserCreated = model.UserCreated; // change creator
+            var userUpdated = userlevelRepository.Get(x => x.UserId == model.UserCreated && x.CompanyId == model.CompanyId && x.OfficeId == model.OfficeId && x.GroupId == model.GroupId).FirstOrDefault();
+            if (userUpdated == null)
+            {
+                return new HandleState(false, "Update false, Please try again.");
+            }
+            entity.UserCreated = userUpdated.UserId; // change creator
+            entity.CompanyId = userUpdated.CompanyId;
+            entity.OfficeId = userUpdated.OfficeId;
+            entity.DepartmentId = userUpdated.DepartmentId;
+            entity.GroupId = userUpdated.GroupId;
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {

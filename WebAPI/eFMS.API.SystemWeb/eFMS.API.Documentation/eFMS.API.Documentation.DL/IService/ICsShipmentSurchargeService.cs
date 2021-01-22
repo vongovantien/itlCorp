@@ -26,7 +26,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list);
         HandleState NotificationExpiredAgreement(List<CsShipmentSurchargeModel> list);
         HandleState NotificationPaymenTerm(List<CsShipmentSurchargeModel> list);
-
-
+        List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
+        HandleState Import(List<CsShipmentSurchargeImportModel> data);
     }
 }

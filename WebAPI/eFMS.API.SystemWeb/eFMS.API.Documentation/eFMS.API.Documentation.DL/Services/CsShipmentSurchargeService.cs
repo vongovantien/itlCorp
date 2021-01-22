@@ -39,6 +39,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysNotifications> notificationRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
         private readonly IContextBase<AccAccountReceivable> accAccountReceivableRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
         private readonly ICurrencyExchangeService currencyExchangeService;
@@ -57,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysNotifications> notificationRepo,
             IContextBase<SysUserNotification> sysUserNotifyRepo,
             IContextBase<AccAccountReceivable> accAccountRepo,
+            IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange
@@ -79,6 +81,7 @@ namespace eFMS.API.Documentation.DL.Services
             notificationRepository = notificationRepo;
             sysUserNotifyRepository = sysUserNotifyRepo;
             accAccountReceivableRepository = accAccountRepo;
+            unitRepository = unitRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -373,7 +376,7 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal _rateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 decimal _rateToUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
 
-                decimal totalLocal = item.Quantity * (item.UnitPrice ?? 0)  * _rateToLocal; // without vat - 15305
+                decimal totalLocal = item.Quantity * (item.UnitPrice ?? 0) * _rateToLocal; // without vat - 15305
                 decimal totalUSD = item.Quantity * (item.UnitPrice ?? 0) * _rateToUSD; // without vat - 15305
 
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
@@ -582,7 +585,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.Id != criteria.HblId).Select(x => x.Id).ToList();
             }
-           else
+            else
             {
                 if (criteria.CustomerId == null) return null;
                 CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
@@ -1056,6 +1059,253 @@ namespace eFMS.API.Documentation.DL.Services
                 users.AddRange(usersDepartmentAR);
             }
             return users;
+        }
+        
+        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list)
+        {
+            var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
+            var listPartner = partnerRepository.Get(x => x.Active == true);
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.Hblno))
+                {
+                    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!opsTransRepository.Any(x => x.Hwbno == item.Hblno.Trim()))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST],item.Hblno);
+                        item.IsValid = false;
+                    }
+                    
+                }
+                if (string.IsNullOrEmpty(item.Mblno))
+                {
+                    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno.Trim()))
+                    {
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.PartnerCode))
+                {
+                    item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!listPartner.Any(x => x.TaxCode == item.PartnerCode))
+                    {
+                        item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST],item.PartnerCode);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.ChargeCode))
+                {
+                    item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if(!catChargeRepository.Any(x=>x.Code == item.ChargeCode.Trim()))
+                    {
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_NOT_EXIST],item.ChargeCode);
+                        item.IsValid = false;
+                    }
+                }
+
+                if (!item.Qty.HasValue)
+                {
+                    item.QtyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_QTY_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Unit))
+                {
+                    item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if(!unitRepository.Any(x=>x.UnitNameEn.Trim() == item.Unit.Trim()))
+                    {
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_NOT_EXIST]);
+                        item.IsValid = false;
+                    }
+                }
+                if (!item.UnitPrice.HasValue)
+                {
+                    item.UnitPriceError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_PRICE_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CurrencyId))
+                {
+                    item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (!item.Vatrate.HasValue)
+                {
+                    item.VatError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (!item.TotalAmount.HasValue)
+                {
+                    item.TotalAmountError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TOTAL_AMOUNT_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (!item.ExchangeDate.HasValue)
+                {
+                    item.ExchangeDateError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_EXCHANGE_DATE_EMPTY]);
+                    item.IsValid = false;
+                }
+
+                if (!item.FinalExchangeRate.HasValue)
+                {
+                    item.FinalExchangeRateError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_FINAL_EXCHANGE_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Type))
+                {
+                    item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "sell" && item.Type.ToLower() != "obh")
+                    {
+                        item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_NOT_VALID]);
+                        item.IsValid = false;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.Hblno))
+                {
+               
+                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno && x.Hwbno == item.Hblno))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                        item.IsValid = false;
+
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.Mblno))
+                {
+                    if (!opsTransRepository.Any(x => x.Mblno.Trim() == item.Mblno.Trim()))
+                    {
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST],item.Mblno);
+                        item.IsValid = false;
+                    }
+                }
+                if (item.IsValid)
+                {
+                    string PartnerId = listPartner.Where(x => x.TaxCode == item.PartnerCode).Select(t => t.Id).FirstOrDefault();
+                    Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
+                    item.ChargeId = ChargeId;
+                    short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
+                    item.UnitId = UnitId;
+                    item.PaymentObjectId = PartnerId;
+                    Guid HblId = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim()).Select(t => t.Hblid).FirstOrDefault();
+                    item.Hblid = HblId;
+                    item.Total =  (decimal)item.TotalAmount;
+                    item.Quantity = (decimal)item.Qty;
+                    item.TransactionType = "CL";
+                    string jobNo = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
+                    if (item.Type.ToLower() == "obh")
+                    {
+                        item.PayerId = PartnerId;
+                    }
+                    if (item.Type.ToLower() == "buying")
+                    {
+                        item.Type = "BUY";
+                    }
+                    if (listChargeOps.Any(x=>x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == item.Type))
+                    {
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE],item.ChargeCode, jobNo);
+                        item.IsValid = false;
+                    }
+                    if (!string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(item.InvoiceNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == item.Type))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                    }
+                }
+
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CsShipmentSurchargeImportModel> list)
+        {
+            foreach(var item in list)
+            {
+                switch (item.Type.ToLower())
+                {
+                    case "buying": item.Type = "BUY";
+                        break;
+                    case "obh": item.Type = item.Type.ToUpper();
+                        break;
+                    case "sell": item.Type = item.Type.ToUpper();
+                        break;
+                }
+                item.UserCreated = currentUser.UserID;
+                item.Id = Guid.NewGuid();
+                item.ExchangeDate = DateTime.Now;
+                item.DatetimeCreated = DateTime.Now;
+                OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+            }
+            var datas = mapper.Map<List<CsShipmentSurcharge>>(list);
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = DataContext.Add(datas);
+                    if (hs.Success)
+                    {
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                    }
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    Get();
+                    trans.Dispose();
+                }
+            }
         }
 
         private string GetTransactionType(string jobNo)

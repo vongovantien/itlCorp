@@ -2910,7 +2910,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayerJob(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            var surcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
             var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
