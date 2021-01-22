@@ -35,7 +35,7 @@ namespace eFMS.API.Catalogue.DL.IService
         bool SendMailRejectComment(string partnerId, string comment);
         bool SendMailCreatedSuccess(CatPartner catPartner);
         List<CatPartnerViewModel> GetSubListPartnerByID(string id);
-        HandleState UpdatePartnerData(CatPartnerCriteria model);
+        HandleState UpdatePartnerData(CatPartnerModel model);
 
     }
 }

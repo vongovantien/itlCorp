@@ -73,7 +73,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
     ngOnInit() {
         this.headers = [
-            { title: 'No', field: '', sortable: false },
+            { title: 'No.', field: '', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },

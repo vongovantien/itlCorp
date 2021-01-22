@@ -1246,9 +1246,26 @@ namespace eFMS.API.Accounting.DL.Services
             amount = (vatrate != null) ? (vatrate < 101 & vatrate >= 0) ? Math.Round(((orgAmount * vatrate) / 100 ?? 0), 3) : Math.Abs(vatrate ?? 0) : 0;
             if (currency == AccountingConstants.CURRENCY_LOCAL)
             {
-                amount = Math.Round(amount, 0);
+                amount = CalculateRoundStandard(Math.Round(amount, 2));
             }
             return amount;
+        }
+
+        public decimal CalculateRoundStandard(decimal num)
+        {
+            var d = (num % 1);
+            if ((double)d < 0.5)
+            {
+                return Math.Round(num);
+            }
+            else if ((double)d >= 0.5)
+            {
+                return Math.Ceiling(num);
+            }
+            else
+            {
+                return num;
+            }
         }
 
         private string GetCustomerHBL(Guid? Id)
@@ -1475,9 +1492,9 @@ namespace eFMS.API.Accounting.DL.Services
             var _description = string.Empty;
             if (transactionType == "CL")
             {
-                var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
-                var _customNo = customNos.FirstOrDefault() ?? string.Empty;
-                _description = string.Format("{0} {1} TK:{2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
+                var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+                var _customNo = !string.IsNullOrEmpty(customNos) ? string.Format("TK:{0}", customNos) : string.Empty;
+                _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
             }
             else
             {
