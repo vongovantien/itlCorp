@@ -108,7 +108,8 @@
                             <ng-container
                                 *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
                                 <tr class="" [class.selected-row]="i === selectedIndexSurcharge"
-                                    [class.bg-warning]="surcharge.isFromShipment">
+                                    [class.bg-warning]="surcharge.isFromShipment"
+                                    [class.invalid-row]="surcharge.isDuplicate">
                                     <td class=" table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
