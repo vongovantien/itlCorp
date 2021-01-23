@@ -229,6 +229,15 @@ export class DocumentationRepo {
         );
     }
 
+    previewCDNoteList(data: any[], isOrigin: boolean) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/PreviewOpsCdNoteList`,  data, { isOrigin: isOrigin }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     previewPL(jobId, currency) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/PreviewFormPLsheet`, { jobId: jobId, currency: currency }).pipe(
             map((data: any) => data)

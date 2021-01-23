@@ -19,6 +19,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<object> GroupCDNoteByPartner(Guid Id, bool IsShipmentOperation);
         AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo);
         Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin);
+        Crystal PreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList, bool isOrigin);
         AcctCDNoteExportResult GetDataExportOpsCDNote(Guid JobId, string cdNo, Guid officeId);
         bool CheckAllowDelete(Guid cdNoteId);
         Crystal PreviewSIF(PreviewCdNoteCriteria criteria);

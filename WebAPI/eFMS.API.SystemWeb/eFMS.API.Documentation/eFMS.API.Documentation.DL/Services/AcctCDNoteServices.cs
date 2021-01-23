@@ -14,6 +14,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -907,6 +908,89 @@ namespace eFMS.API.Documentation.DL.Services
                 hs = new HandleState((object)ex.Message);
             }
             return hs;
+        }
+
+        /// <summary>
+        /// Preview CDNote Combine
+        /// </summary>
+        /// <param name="acctCdNoteList">AcctCdnoteModel List</param>
+        /// <param name="isOrigin"></param>
+        /// <returns></returns>
+        public Crystal PreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList, bool isOrigin)
+        {
+            AcctCDNoteDetailsModel model = new AcctCDNoteDetailsModel();
+            var cdNoteDetail = DataContext.Get(x => x.Id == acctCdNoteList.FirstOrDefault().Id);
+            model.CDNote = mapper.Map<AcctCdnote>(acctCdNoteList.FirstOrDefault());
+            model.CDNote.Code = string.Join(" ;", acctCdNoteList.Select(x => x.Code));
+            var firstAcctCDNote = acctCdNoteList.FirstOrDefault();
+            var transaction = cstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
+            var opsTransaction = opstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
+            var partner = partnerRepositoty.Get(x => x.Id == firstAcctCDNote.PartnerId).FirstOrDefault();
+            model.JobNo = opsTransaction.JobNo;
+            model.CBM = opsTransaction.SumCbm;
+            model.GW = opsTransaction.SumGrossWeight;
+            model.ServiceDate = opsTransaction.ServiceDate;
+            model.HbLadingNo = opsTransaction?.Hwbno;
+            model.MbLadingNo = opsTransaction?.Mblno;
+            model.SumContainers = opsTransaction?.SumContainers;
+            model.SumPackages = opsTransaction?.SumPackages;
+            model.ServiceMode = opsTransaction?.ServiceMode;
+            model.PartnerId = partner?.Id;
+            model.PartnerNameEn = partner?.PartnerNameEn;
+            model.PartnerPersonalContact = partner?.ContactPerson;
+            model.PartnerShippingAddress = partner?.AddressEn; //Billing Address Name En
+            model.PartnerTel = partner?.Tel;
+            model.PartnerTaxcode = partner?.TaxCode;
+            model.PartnerFax = partner?.Fax;
+            CatPlace pol = new CatPlace();
+            CatPlace pod = new CatPlace();
+            var places = placeRepository.Get();
+            if (transaction != null)
+            {
+                pol = places.FirstOrDefault(x => x.Id == transaction.Pol);
+                pod = places.FirstOrDefault(x => x.Id == transaction.Pod);
+            }
+            else
+            {
+                if (opsTransaction != null)
+                {
+                    pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
+                    pod = places.FirstOrDefault(x => x.Id == opsTransaction.Pod);
+                }
+            }
+            model.Pol = pol?.NameEn;
+            if (model.Pol != null)
+            {
+                model.PolCountry = pol == null ? null : countryRepository.Get().FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
+            }
+            model.PolName = model.Pol;
+            model.Pod = pod?.NameEn;
+            if (model.Pod != null)
+            {
+                model.PodCountry = pod == null ? null : countryRepository.Get().FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
+            }
+            model.PodName = model.Pod;
+
+            List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
+            foreach (var cdNote in acctCdNoteList)
+            {
+                var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).OrderBy(x=>x).ToList();
+                foreach (var item in charges)
+                {
+                    var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
+                    var catCharge = catchargeRepository.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+
+                    //Quy đổi theo Final Exchange Rate. Nếu Final Exchange Rate is null thì
+                    //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
+                    charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
+                    charge.ChargeCode = catCharge?.Code;
+                    charge.NameEn = catCharge?.ChargeNameEn;
+                    listSurcharges.Add(charge);
+                }
+            }
+            model.ListSurcharges = listSurcharges;
+            var result = Preview(model, isOrigin);
+            return result;
         }
 
         public Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin)

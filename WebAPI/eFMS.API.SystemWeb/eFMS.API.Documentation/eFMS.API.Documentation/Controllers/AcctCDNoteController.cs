@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -10,6 +8,9 @@ using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 
@@ -127,6 +128,22 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewOpsCdNote(AcctCDNoteDetailsModel model, bool isOrigin)
         {
             var result = cdNoteServices.Preview(model, isOrigin);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Preview CD Note (OPS) Combine
+        /// </summary>
+        /// <param name="model">AcctCDNoteDetailsModel List</param>
+        /// <param name="isOrigin">Is Preview with Original</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewOpsCdNoteList")]
+        public IActionResult PreviewOpsCdNoteList(object model, bool isOrigin)
+        {
+            var data = JsonConvert.SerializeObject(model, Formatting.Indented);
+            List<AcctCdnoteModel> acctCdNoteList = JsonConvert.DeserializeObject<List<AcctCdnoteModel>>(data);
+            var result = cdNoteServices.PreviewCDNotes(acctCdNoteList, isOrigin);
             return Ok(result);
         }
 
