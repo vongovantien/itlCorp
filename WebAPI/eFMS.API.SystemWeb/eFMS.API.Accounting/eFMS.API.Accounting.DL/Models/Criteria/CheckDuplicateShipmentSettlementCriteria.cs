@@ -17,5 +17,14 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string JobNo { get; set; }
         public string HBLNo { get; set; }
         public string MBLNo { get; set; }
+        public string Notes { get; set; }
+    }
+
+    public class DuplicateShipmentSettlementResultModel
+    {
+        public string JobNo { get; set; }
+        public string MBLNo { get; set; }
+        public string HBLNo{ get; set; }
+        public Guid ChargeId { get; set; }
     }
 }
