@@ -71,10 +71,11 @@
                                     <td>{{agent.shortName}}</td>
                                     <td>{{agent.taxCode}}</td>
                                     <td> <span class="text-success">{{agent.userCreatedName}}</span> </td>
-                                    <td>{{agent.addressVn}}</td>
                                     <td>{{agent.datetimeModified | date:'dd/MM/yyyy' }}</td>
                                     <td [ngClass]="agent.active ? 'text-success' : 'text-danger'">
                                         {{agent.active ? 'Active' : 'Inactive'}}</td>
+                                    <td>{{agent.addressVn}}</td>
+
                                 </tr>
                                 <tr class="collapse-toggle-row" class="collapse-panel-row" app-table-collapse-row
                                     [id]="'commercial-agent-00' + agent.id | removeTrim "
@@ -88,6 +89,12 @@
                                                 <tr *ngFor="let sale of saleMans; let j = index;">
                                                     <td><span>{{j + 1}}</span></td>
                                                     <td>
+                                                        <span>{{sale.username}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>{{sale.contractType}}</span>
+                                                    </td>
+                                                    <td>
                                                         <span>{{sale.saleServiceName}}</span>
                                                     </td>
                                                     <td>
@@ -96,9 +103,7 @@
                                                     <td>
                                                         <span>{{sale.companyNameAbbr}}</span>
                                                     </td>
-                                                    <td>
-                                                        <span>{{sale.username}}</span>
-                                                    </td>
+
                                                     <td [ngClass]="sale.active ? 'text-success' : 'text-danger'">
                                                         {{sale.active ? 'Active' : 'Inactive'}}</td>
                                                     <td>

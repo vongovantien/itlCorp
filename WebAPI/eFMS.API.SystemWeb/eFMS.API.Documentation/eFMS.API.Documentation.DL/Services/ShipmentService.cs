@@ -688,11 +688,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
-            // Search CustomerId
-            if (!string.IsNullOrEmpty(criteria.CustomerId))
-            {
-                queryTrans = queryTrans.And(q => q.AgentId == criteria.CustomerId);
-            }
+            //// Search CustomerId
+            //if (!string.IsNullOrEmpty(criteria.CustomerId))
+            //{
+            //    queryTrans = queryTrans.And(q => q.AgentId == criteria.CustomerId);
+            //}
             return queryTrans;
         }
 
@@ -1788,7 +1788,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             // Filter data without customerId
             var criteriaNoCustomer = criteria;
-            //criteriaNoCustomer.CustomerId = null;
+            string customerId = criteria.CustomerId;
+            criteriaNoCustomer.CustomerId = null;
+            criteria.CustomerId = customerId;
             Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteriaNoCustomer);
             
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
@@ -1986,7 +1988,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<JobProfitAnalysisExportResult> JobProfitAnalysisDocumetation(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
-            var criteriaNoCustomer = criteria;
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
             var dataShipment = QueryDataDocumentationJobProfitAnalysis(criteriaNoCustomer);
             List<JobProfitAnalysisExportResult> dataList = new List<JobProfitAnalysisExportResult>();
@@ -2281,7 +2283,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
-            var criteriaNoCustomer = criteria;
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
             var dataShipment = QueryDataDocumentationAcctPLSheet(criteriaNoCustomer);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
@@ -2499,7 +2501,9 @@ namespace eFMS.API.Documentation.DL.Services
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
-            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
+            query = chg => chg.Service == criteria.Service;
+            var chargeData = GetChargeOBHSellPayee(query, null) ;
+
             foreach (var item in dataShipment)
             {
                 var _charges = chargeData.Where(x => x.HBLID == item.HBLID);
@@ -2548,8 +2552,8 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> QueryDataSummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
-            var criteriaNoCustomer = criteria;
-            //criteriaNoCustomer.CustomerId = null;
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
+            criteriaNoCustomer.CustomerId = null;
             Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteriaNoCustomer);
             Expression<Func<CsTransactionDetail, bool>> queryTranDetail = GetQueryTransationDetailDocumentation(criteriaNoCustomer);
 
@@ -2592,7 +2596,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayee(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE);
+            var surcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE);
             var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
@@ -2821,7 +2825,8 @@ namespace eFMS.API.Documentation.DL.Services
             SummaryOfRevenueModel ObjectSummaryRevenue = new SummaryOfRevenueModel();
             List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
-            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayer(query, null) : GetChargeOBHSellPayer(null, null);
+            query = chg => chg.Service == criteria.Service;
+            var chargeData = GetChargeOBHSellPayer(query, null);
             var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
             foreach (var item in dataShipment)
             {
@@ -2903,7 +2908,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayerJob(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            var surcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
             var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
@@ -2962,65 +2967,12 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayer(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
-            var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
+            var surcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
 
-            ////OBH Payer (BUY - Credit)
-            //var queryObhBuyOperation = from sur in surcharge
-            //                           join ops in opst on sur.Hblid equals ops.Hblid
-            //                           join chg in charge on sur.ChargeId equals chg.Id into chg2
-            //                           from chg in chg2.DefaultIfEmpty()
-            //                           join uni in unit on sur.UnitId equals uni.Id into uni2
-            //                           from uni in uni2.DefaultIfEmpty()
-            //                           select new SummaryOfCostsIncurredExportResult
-            //                           {
-            //                               ID = sur.Id,
-            //                               HBLID = sur.Hblid,
-            //                               ChargeID = sur.ChargeId,
-            //                               ChargeCode = chg.Code,
-            //                               ChargeName = chg.ChargeNameEn,
-            //                               JobId = ops.JobNo,
-            //                               HBL = ops.Hwbno,
-            //                               MBL = ops.Mblno,
-            //                               Type = sur.Type + "-BUY",
-            //                               SoaNo = sur.PaySoano,
-            //                               Debit = null,
-            //                               Credit = sur.Total,
-            //                               IsOBH = true,
-            //                               Currency = sur.CurrencyId,
-            //                               InvoiceNo = sur.InvoiceNo,
-            //                               Note = sur.Notes,
-            //                               CustomerID = sur.PayerId,
-            //                               ServiceDate = ops.ServiceDate,
-            //                               CreatedDate = ops.DatetimeCreated,
-            //                               TransactionType = null,
-            //                               UserCreated = ops.UserCreated,
-            //                               Quantity = sur.Quantity,
-            //                               UnitId = sur.UnitId,
-            //                               UnitPrice = sur.UnitPrice,
-            //                               VATRate = sur.Vatrate,
-            //                               CreditDebitNo = sur.CreditNo,
-            //                               CommodityGroupID = ops.CommodityGroupId,
-            //                               Service = "CL",
-            //                               ExchangeDate = sur.ExchangeDate,
-            //                               FinalExchangeRate = sur.FinalExchangeRate,
-            //                               TypeCharge = chg.Type,
-            //                               PayerId = sur.PayerId,
-            //                               Unit = uni.UnitNameEn,
-            //                               InvoiceDate = sur.InvoiceDate
-            //                           };
-            //if (query != null)
-            //{
-            //    queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-            //}
-            //if (isOBH != null)
-            //{
-            //    queryObhBuyOperation = queryObhBuyOperation.Where(x => x.IsOBH == isOBH);
-            //}
             var queryObhBuyDocument = from sur in surcharge
                                       join cstd in csTransDe on sur.Hblid equals cstd.Id
                                       join cst in csTrans on cstd.JobId equals cst.Id

@@ -33,5 +33,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState LockCsTransaction(Guid jobId);
         Crystal PreviewShipmentCoverPage(Guid id);
         object GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode);
+        int CheckUpdateMBL(CsTransactionEditModel model, out string mblNo, out List<string> advs);
     }
 }

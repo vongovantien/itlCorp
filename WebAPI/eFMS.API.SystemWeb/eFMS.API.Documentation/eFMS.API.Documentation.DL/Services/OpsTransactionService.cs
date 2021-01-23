@@ -46,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
+        private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
@@ -69,6 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysOffice> sysOffice,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
+            IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -95,6 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             userlevelRepository = userlevelRepo;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
+            accAdvancePaymentRepository = accAdvancePaymentRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1443,6 +1446,51 @@ namespace eFMS.API.Documentation.DL.Services
                 containers.Add(item);
             }
             return containers;
+        }
+
+        public int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs)
+        {
+            mblNo = string.Empty;
+            advs = new List<string>();
+            int errorCode = 0;  // 1|2
+            bool hasChargeSynced = false;
+            bool hasAdvanceRequest = false;
+
+            if (DataContext.Any(x => x.Id == model.Id 
+            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED 
+            && ( (x.Mblno ?? "").ToLower() != (model.Mblno ?? "")  || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))    
+            {
+                OpsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
+                if (shipment != null)
+                {
+                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo  && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                }
+
+                if (hasChargeSynced)
+                {
+                    errorCode = 1;
+                    mblNo = shipment.Mblno;
+                }
+                else
+                {
+                    var query = from advR in accAdvanceRequestRepository.Get(x => x.JobId == shipment.JobNo)
+                                join adv in accAdvancePaymentRepository.Get(x => x.SyncStatus == "Synced") on advR.AdvanceNo equals adv.AdvanceNo
+                                select adv.AdvanceNo;
+
+                    if (query != null && query.Count() > 0)
+                    {
+                        hasAdvanceRequest = true;
+                        advs = query.Distinct().ToList();
+                    }
+                    if (hasAdvanceRequest)
+                    {
+                        errorCode = 2;
+                        mblNo = shipment.Mblno;
+                    }
+                }
+            }
+
+            return errorCode;
         }
     }
 }
