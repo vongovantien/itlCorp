@@ -1,5 +1,6 @@
-import { takeUntil } from 'rxjs/operators';
 import { Component, ViewChild, ViewChildren, QueryList, Input } from '@angular/core';
+import { coerceBooleanProperty } from "@angular/cdk/coercion";
+import { takeUntil } from 'rxjs/operators';
 import { AppList } from '@app';
 import { Surcharge, Partner } from '@models';
 import { SortService, DataService } from '@services';
@@ -22,13 +23,23 @@ import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from
 
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
-
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
 })
 
 export class SettlementListChargeComponent extends AppList implements ICrystalReport {
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
+
+    get readonly(): boolean {
+        return this._readonly;
+    }
+
+
+    private _readonly: boolean = false;
+
     @ViewChild(SettlementExistingChargePopupComponent) existingChargePopup: SettlementExistingChargePopupComponent;
     @ViewChild(SettlementFormChargePopupComponent) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
@@ -256,6 +267,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     openCopySurcharge(surcharge: Surcharge) {
+        if (this.STATE !== 'WRITE') { return; }
         this.formChargePopup.selectedSurcharge = surcharge;
         this.openSurchargeDetail(surcharge, null, 'copy');
     }

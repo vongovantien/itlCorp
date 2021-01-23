@@ -117,14 +117,16 @@
                                                     value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                 <span></span>
                                             </label>
-                                            <span [class.m--margin-right-20]="surcharge.isFromShipment">
-                                                <ng-container *ngIf="!surcharge.isFromShipment">
-                                                    <a (click)="openCopySurcharge(surcharge)" title="Copy"
-                                                        class="pointer">
-                                                        <i class="la la-copy"></i>
-                                                    </a>
-                                                </ng-container>
-                                            </span>
+                                            <ng-container *ngIf="!readonly">
+                                                <span [class.m--margin-right-20]="surcharge.isFromShipment">
+                                                    <ng-container *ngIf="!surcharge.isFromShipment">
+                                                        <a (click)="openCopySurcharge(surcharge)" title="Copy"
+                                                            class="pointer">
+                                                            <i class="la la-copy"></i>
+                                                        </a>
+                                                    </ng-container>
+                                                </span>
+                                            </ng-container>
                                             <span class="dropdown m-dropdown m-dropdown--inline">
                                                 <i class="la la-file-text" data-toggle="dropdown"></i>
                                                 <div class="dropdown-menu">
@@ -183,18 +185,21 @@
 
 <payment-management-popup></payment-management-popup>
 
-<existing-charge-popup (onRequest)="onRequestSurcharge($event)"></existing-charge-popup>
+<ng-container *ngIf="!readonly">
 
-<ng-container *ngIf="!!STATE && STATE === 'WRITE'">
+    <existing-charge-popup (onRequest)="onRequestSurcharge($event)"></existing-charge-popup>
+
     <form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
         (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
+
+    <copy-settlement-popup (onCopy)="onRequestSurcharge($event)"></copy-settlement-popup>
+
+    <table-list-charge-popup (onChange)="onRequestSurcharge($event)"
+        (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>
+
+    <charge-form-shipment-popup (onUpdate)="onUpdateChargeFromShipment($event)"></charge-form-shipment-popup>
+
 </ng-container>
 
-<copy-settlement-popup (onCopy)="onRequestSurcharge($event)"></copy-settlement-popup>
-
-<table-list-charge-popup (onChange)="onRequestSurcharge($event)"
-    (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>
-
-<charge-form-shipment-popup (onUpdate)="onUpdateChargeFromShipment($event)"></charge-form-shipment-popup>
 
 <ng-template inject></ng-template>

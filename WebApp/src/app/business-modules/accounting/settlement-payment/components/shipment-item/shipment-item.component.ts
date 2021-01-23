@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { ReportPreviewComponent } from '@common';
 
 @Component({
     selector: 'shipment-item',
     templateUrl: './shipment-item.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SettlementShipmentItemComponent extends AppList {
