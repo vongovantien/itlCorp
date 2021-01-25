@@ -958,13 +958,13 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.PolCountry = pol == null ? null : countryRepository.Get().FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
             }
-            model.PolName = model.Pol;
+            model.PolName = pol?.NameEn;
             model.Pod = pod?.NameEn;
             if (model.Pod != null)
             {
                 model.PodCountry = pod == null ? null : countryRepository.Get().FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
             }
-            model.PodName = model.Pod;
+            model.PodName = pod?.NameEn;
 
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
             foreach (var cdNote in acctCdNoteList)

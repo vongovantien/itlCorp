@@ -37,7 +37,6 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-    CdNoteDetail: any[] = [];
     dataReport: any = null;
 
     isDesc = true;
