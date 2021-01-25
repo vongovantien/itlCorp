@@ -4,9 +4,10 @@ namespace eFMS.API.Common.Helpers
 {
     public static class NumberHelper
     {
-        public static decimal RoundNumber(decimal number, int decimals)
+        public static decimal RoundNumber(decimal number, int? decimals = null)
         {
-            return Math.Round(number, decimals, MidpointRounding.AwayFromZero);
+            int _decimals = decimals ?? 0;
+            return Math.Round(number, _decimals, MidpointRounding.AwayFromZero);
         }
     }
 }

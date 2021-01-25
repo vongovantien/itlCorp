@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -1010,7 +1011,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                     decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
+                    charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     //SELL
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -1063,7 +1064,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                     decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
+                    charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     //BUY
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -2460,14 +2461,14 @@ namespace eFMS.API.Documentation.DL.Services
                     data.PackageContainer = charge.PackageContainer;
                     decimal? percent = 0;
                     decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
+                    charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     if (charge.VATRate > 0)
                     {
                         percent = (charge.VATRate * 10) / 100;
                         charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
-                        if (charge.Currency != "VND")
+                        if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
                         {
-                            charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                            charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 3);
                         }
                     }
                     else
@@ -2565,7 +2566,7 @@ namespace eFMS.API.Documentation.DL.Services
                     data.PackageContainer = charge.PackageContainer;
                     decimal? percent = 0;
                     decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
+                    charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
                     if (charge.VATRate > 0)
                     {
@@ -2576,9 +2577,9 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.VATAmount = charge.VATRate != null ? Math.Abs(charge.VATRate.Value) : 0;
                         charge.VATAmount = charge.VATAmount * _exchangeRate;
                     }
-                    if (charge.Currency != "VND")
+                    if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
                     {
-                        charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                        charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 3);
                     }
                     foreach (var partner in detailLookupPartner[_partnerId])
                     {
@@ -2849,7 +2850,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
                     decimal UnitPrice = it.UnitPrice ?? 0;
-                    it.UnitPrice = Math.Round(UnitPrice, 3);
+                    it.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     it.NetAmount = it.UnitPrice * it.Quantity * _exchangeRate;
                     if (it.VATRate > 0)
                     {
@@ -2860,9 +2861,9 @@ namespace eFMS.API.Documentation.DL.Services
                         it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
                         it.VATAmount = it.VATAmount * _exchangeRate;
                     }
-                    if (it.Currency != "VND")
+                    if (it.Currency != DocumentConstants.CURRENCY_LOCAL)
                     {
-                        it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                        it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 3);
                     }
 
                 }
@@ -2964,7 +2965,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
                     decimal UnitPrice = it.UnitPrice ?? 0;
-                    it.UnitPrice = Math.Round(UnitPrice, 3);
+                    it.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     it.NetAmount = UnitPrice * it.Quantity * _exchangeRate;
                     if (it.VATRate > 0)
                     {
@@ -2975,9 +2976,9 @@ namespace eFMS.API.Documentation.DL.Services
                         it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
                         it.VATAmount = it.VATAmount * _exchangeRate;
                     }
-                    if (it.Currency != "VND")
+                    if (it.Currency != DocumentConstants.CURRENCY_LOCAL)
                     {
-                        it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                        it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 3);
                     }
                 }
             }
