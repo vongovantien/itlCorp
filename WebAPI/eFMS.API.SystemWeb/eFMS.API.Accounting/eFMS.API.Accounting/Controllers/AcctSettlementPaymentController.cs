@@ -232,8 +232,8 @@ namespace eFMS.API.Accounting.Controllers
             {
                 foreach (var currency in currencies)
                 {
-                    decimal totalAdv = Math.Round(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
-                    decimal totalSet = Math.Round(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal totalAdv = NumberHelper.RoundNumber(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal totalSet = NumberHelper.RoundNumber(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
                     decimal bal = (totalAdv - totalSet);
                     totalAdvance += string.Format("{0:n}", totalAdv) + " " + currency + " | ";
                     totalSettlement += string.Format("{0:n}", totalSet) + " " + currency + " | ";
