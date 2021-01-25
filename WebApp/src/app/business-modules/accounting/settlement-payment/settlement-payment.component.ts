@@ -100,8 +100,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
-        this.getUserLogged();
-        // this.getListSettlePayment();
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
@@ -126,11 +124,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                 );
         }
 
-    }
-
-    getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this.dataSearch = { requester: this.userLogged.id };
     }
 
     onSearchSettlement(data: any) {
