@@ -50,6 +50,13 @@
             <param name="officeId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.ExportOpsCdNoteCombine(System.Object)">
+            <summary>
+            Export Excel Template of OPS CD Note Combine
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
             <summary>
             check allow delete an existed item

@@ -230,7 +230,7 @@ export class DocumentationRepo {
     }
 
     previewCDNoteList(data: any[], isOrigin: boolean) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/PreviewOpsCdNoteList`,  data, { isOrigin: isOrigin }).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNoteList`, data, { isOrigin: isOrigin }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;

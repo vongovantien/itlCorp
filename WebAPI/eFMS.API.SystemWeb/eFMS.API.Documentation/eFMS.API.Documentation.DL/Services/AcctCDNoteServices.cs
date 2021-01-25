@@ -913,12 +913,12 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         /// <summary>
-        /// Preview CDNote Combine
+        /// Get Data To Preview CDNote Combine
         /// </summary>
         /// <param name="acctCdNoteList">AcctCdnoteModel List</param>
         /// <param name="isOrigin"></param>
         /// <returns></returns>
-        public Crystal PreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList, bool isOrigin)
+        public AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList)
         {
             AcctCDNoteDetailsModel model = new AcctCDNoteDetailsModel();
             var firstAcctCDNote = acctCdNoteList.FirstOrDefault();
@@ -942,6 +942,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.SumPackages = opsTransaction?.SumPackages;
             model.ServiceMode = opsTransaction?.ServiceMode;
             model.CommodityGroupId = opsTransaction?.CommodityGroupId;
+            model.HbConstainers = opsTransaction.ContainerDescription;
             model.PartnerId = partner?.Id;
             model.PartnerNameEn = partner?.PartnerNameEn;
             model.PartnerPersonalContact = partner?.ContactPerson;
@@ -969,21 +970,23 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
             foreach (var cdNote in acctCdNoteList)
             {
-                var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).OrderBy(x => x).ToList();
+                var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
                 foreach (var item in charges)
                 {
                     var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                     var catCharge = catchargeRepository.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-
                     charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
                     charge.ChargeCode = catCharge?.Code;
                     charge.NameEn = catCharge?.ChargeNameEn;
                     listSurcharges.Add(charge);
                 }
             }
+            if(listSurcharges.Count() > 0)
+            {
+                listSurcharges = listSurcharges.OrderBy(x => (firstAcctCDNote.Type == "DEBIT" ? x.DebitNo : x.CreditNo)).ThenBy(x => x.NameEn).ToList();
+            }
             model.ListSurcharges = listSurcharges;
-            var result = Preview(model, isOrigin);
-            return result;
+            return model;
         }
 
         public Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin)
@@ -1715,9 +1718,14 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public AcctCDNoteExportResult GetDataExportOpsCDNote(Guid jobId, string cdNo, Guid officeId)
+        /// <summary>
+        /// Export Excel Template of OPS CD Note
+        /// </summary>
+        /// <param name="cdNoteDetail"></param>
+        /// <param name="officeId"></param>
+        /// <returns></returns>
+        public AcctCDNoteExportResult GetDataExportOpsCDNote(AcctCDNoteDetailsModel cdNoteDetail, Guid officeId)
         {
-            var cdNoteDetail = GetCDNoteDetails(jobId, cdNo);
             var result = new AcctCDNoteExportResult();
             if (cdNoteDetail != null)
             {

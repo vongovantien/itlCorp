@@ -19,13 +19,12 @@ namespace eFMS.API.Documentation.DL.IService
         List<object> GroupCDNoteByPartner(Guid Id, bool IsShipmentOperation);
         AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo);
         Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin);
-        Crystal PreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList, bool isOrigin);
-        AcctCDNoteExportResult GetDataExportOpsCDNote(Guid JobId, string cdNo, Guid officeId);
+        AcctCDNoteExportResult GetDataExportOpsCDNote(AcctCDNoteDetailsModel model, Guid officeId);
         bool CheckAllowDelete(Guid cdNoteId);
         Crystal PreviewSIF(PreviewCdNoteCriteria criteria);
         Crystal PreviewAir(PreviewCdNoteCriteria criteria);
         List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
         HandleState RejectCreditNote(RejectCreditNoteModel model);
-
+        AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList);
     }
 }

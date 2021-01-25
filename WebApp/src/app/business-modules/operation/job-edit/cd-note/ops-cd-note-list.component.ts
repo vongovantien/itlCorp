@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { catchError, finalize } from 'rxjs/operators';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
 import { ActivatedRoute } from '@angular/router';
@@ -28,7 +28,7 @@ export class OpsCDNoteComponent extends AppList {
     @ViewChild(OpsCdNoteDetailPopupComponent) cdNoteDetailPopupComponent: OpsCdNoteDetailPopupComponent;
     @ViewChild(OpsCdNoteAddPopupComponent) cdNoteAddPopupComponent: OpsCdNoteAddPopupComponent;
     @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
-    
+
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
     cdNoteGroups: any[] = [];
@@ -44,6 +44,7 @@ export class OpsCDNoteComponent extends AppList {
 
     constructor(
         private _documentRepo: DocumentationRepo,
+        private _exportRepo: ExportRepo,
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
         private _progressService: NgProgress,
@@ -85,7 +86,7 @@ export class OpsCDNoteComponent extends AppList {
                 (res: any) => {
                     this.cdNoteGroups = res;
                     this.initGroup = res;
-                    const selected = { isSelected: false};
+                    const selected = { isSelected: false };
                     this.cdNoteGroups.forEach(element => {
                         element.listCDNote.forEach((item: any[]) => {
                             Object.assign(item, selected);
@@ -215,14 +216,14 @@ export class OpsCDNoteComponent extends AppList {
         const type = [];
         listCheck.forEach(x => x.map(y => type.push(y.type)))
         if (listCheck.length > 1 || _uniq(type).length > 1) {
-            this._toastService.warning("You can not print C/D Notes that are different type! Please Check again");
+            this._toastService.warning("You can not print C/D Notes that are different type! Please check again");
             return false;
         }
         return true;
     }
 
     preview(isOrigin: boolean) {
-        if(!this.checkValidCDNote()){
+        if (!this.checkValidCDNote()) {
             return;
         }
 
@@ -241,6 +242,26 @@ export class OpsCDNoteComponent extends AppList {
                         }, 1000);
                     } else {
                         this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    exportCDNote() {
+        if (!this.checkValidCDNote()) {
+            return;
+        }
+        this._exportRepo.exportCDNoteCombine(this.cdNotePrint)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
                     }
                 },
             );

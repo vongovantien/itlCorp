@@ -143,7 +143,8 @@ namespace eFMS.API.Documentation.Controllers
         {
             var data = JsonConvert.SerializeObject(model, Formatting.Indented);
             List<AcctCdnoteModel> acctCdNoteList = JsonConvert.DeserializeObject<List<AcctCdnoteModel>>(data);
-            var result = cdNoteServices.PreviewCDNotes(acctCdNoteList, isOrigin);
+            var cdNoteModel = cdNoteServices.GetDataPreviewCDNotes(acctCdNoteList);
+            var result = cdNoteServices.Preview(cdNoteModel, isOrigin);
             return Ok(result);
         }
 
@@ -158,7 +159,24 @@ namespace eFMS.API.Documentation.Controllers
         [Route("ExportOpsCdNote")]
         public IActionResult ExportOpsCdNote(Guid jobId, string cdNo, Guid officeId)
         {
-            var data = cdNoteServices.GetDataExportOpsCDNote(jobId, cdNo, officeId);
+            var cdNoteDetail = cdNoteServices.GetCDNoteDetails(jobId, cdNo);
+            var data = cdNoteServices.GetDataExportOpsCDNote(cdNoteDetail, officeId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Export Excel Template of OPS CD Note Combine
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ExportOpsCdNoteCombine")]
+        public IActionResult ExportOpsCdNoteCombine(object model)
+        {
+            var cdData = JsonConvert.SerializeObject(model, Formatting.Indented);
+            List<AcctCdnoteModel> acctCdNoteList = JsonConvert.DeserializeObject<List<AcctCdnoteModel>>(cdData);
+            var cdNoteDetail = cdNoteServices.GetDataPreviewCDNotes(acctCdNoteList);
+            var data = cdNoteServices.GetDataExportOpsCDNote(cdNoteDetail, (Guid)cdNoteDetail.CDNote.OfficeId);
             return Ok(data);
         }
 
