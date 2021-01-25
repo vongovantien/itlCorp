@@ -14,6 +14,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CatContract> catContractRepo;
         IContextBase<SysNotifications> sysNotificationRepository;
         IContextBase<SysUserNotification> sysUserNotificationRepository;
+        IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -74,7 +76,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompanyRepo,
             IContextBase<CatContract> catContract,
             IContextBase<SysNotifications> sysNotifyRepo,
-            IContextBase<SysUserNotification> sysUsernotifyRepo
+            IContextBase<SysUserNotification> sysUsernotifyRepo,
+            IContextBase<CatCommodityGroup> catCommodityGroupRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -102,6 +105,7 @@ namespace eFMS.API.Documentation.DL.Services
             catContractRepo = catContract;
             sysNotificationRepository = sysNotifyRepo;
             sysUserNotificationRepository = sysUsernotifyRepo;
+            catCommodityGroupRepository = catCommodityGroupRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -908,6 +912,83 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
+        /// <summary>
+        /// Get Data To Preview CDNote Combine
+        /// </summary>
+        /// <param name="acctCdNoteList">AcctCdnoteModel List</param>
+        /// <param name="isOrigin"></param>
+        /// <returns></returns>
+        public AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList)
+        {
+            AcctCDNoteDetailsModel model = new AcctCDNoteDetailsModel();
+            var firstAcctCDNote = acctCdNoteList.FirstOrDefault();
+            var cdNoteDetail = DataContext.Get(x => x.Id == firstAcctCDNote.Id);
+            model.CDNote = mapper.Map<AcctCdnote>(firstAcctCDNote);
+            model.CDNote.Code = string.Join(";", acctCdNoteList.Select(x => x.Code));
+            var opsTransaction = opstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
+            if (opsTransaction == null)
+            {
+                return null;
+            }
+            var partner = partnerRepositoty.Get(x => x.Id == firstAcctCDNote.PartnerId).FirstOrDefault();
+            model.JobNo = opsTransaction.JobNo;
+            model.CBM = opsTransaction.SumCbm;
+            model.GW = opsTransaction.SumGrossWeight;
+            model.NW = opsTransaction.SumNetWeight;
+            model.ServiceDate = opsTransaction.ServiceDate;
+            model.HbLadingNo = opsTransaction?.Hwbno;
+            model.MbLadingNo = opsTransaction?.Mblno;
+            model.SumContainers = opsTransaction?.SumContainers;
+            model.SumPackages = opsTransaction?.SumPackages;
+            model.ServiceMode = opsTransaction?.ServiceMode;
+            model.CommodityGroupId = opsTransaction?.CommodityGroupId;
+            model.HbConstainers = opsTransaction.ContainerDescription;
+            model.PartnerId = partner?.Id;
+            model.PartnerNameEn = partner?.PartnerNameEn;
+            model.PartnerPersonalContact = partner?.ContactPerson;
+            model.PartnerShippingAddress = partner?.AddressEn; //Billing Address Name En
+            model.PartnerTel = partner?.Tel;
+            model.PartnerTaxcode = partner?.TaxCode;
+            model.PartnerFax = partner?.Fax;
+
+            var places = placeRepository.Get();
+            var pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
+            var pod = places.FirstOrDefault(x => x.Id == opsTransaction.Pod);
+            model.Pol = pol?.NameEn;
+            if (model.Pol != null)
+            {
+                model.PolCountry = pol == null ? null : countryRepository.Get().FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
+            }
+            model.PolName = pol?.NameEn;
+            model.Pod = pod?.NameEn;
+            if (model.Pod != null)
+            {
+                model.PodCountry = pod == null ? null : countryRepository.Get().FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
+            }
+            model.PodName = pod?.NameEn;
+
+            List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
+            foreach (var cdNote in acctCdNoteList)
+            {
+                var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                foreach (var item in charges)
+                {
+                    var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
+                    var catCharge = catchargeRepository.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
+                    charge.ChargeCode = catCharge?.Code;
+                    charge.NameEn = catCharge?.ChargeNameEn;
+                    listSurcharges.Add(charge);
+                }
+            }
+            if(listSurcharges.Count() > 0)
+            {
+                listSurcharges = listSurcharges.OrderBy(x => (firstAcctCDNote.Type == "DEBIT" ? x.DebitNo : x.CreditNo)).ThenBy(x => x.NameEn).ToList();
+            }
+            model.ListSurcharges = listSurcharges;
+            return model;
+        }
+
         public Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin)
         {
             if (model == null)
@@ -928,6 +1009,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
+            var commodity = model.CommodityGroupId == null ? "N/A" : catCommodityGroupRepository.Get(x => x.Id == model.CommodityGroupId).Select(x => x.GroupNameEn).FirstOrDefault();
 
             IQueryable<CustomsDeclaration> _customClearances = customsDeclarationRepository.Get(x => x.JobNo == model.JobNo);
             CustomsDeclaration _clearance = null;
@@ -1039,7 +1121,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Fax = model.PartnerFax?.ToUpper(),
                         TransID = trans,
                         LoadingDate = null,
-                        Commodity = "N/A",
+                        Commodity = commodity,
                         PortofLading = model.PolName?.ToUpper(),
                         PortofUnlading = model.PodName?.ToUpper(),
                         MAWB = model.MbLadingNo,
@@ -1072,7 +1154,7 @@ namespace eFMS.API.Documentation.DL.Services
                         CurrDecimalNo = null,
                         VATInvoiceNo = item.InvoiceNo,
                         GW = model.GW,
-                        NW = null,
+                        NW = model.NW,
                         SeaCBM = model.CBM,
                         SOTK = _clearance?.ClearanceNo,
                         NgayDK = null,
@@ -1636,9 +1718,14 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public AcctCDNoteExportResult GetDataExportOpsCDNote(Guid jobId, string cdNo, Guid officeId)
+        /// <summary>
+        /// Export Excel Template of OPS CD Note
+        /// </summary>
+        /// <param name="cdNoteDetail"></param>
+        /// <param name="officeId"></param>
+        /// <returns></returns>
+        public AcctCDNoteExportResult GetDataExportOpsCDNote(AcctCDNoteDetailsModel cdNoteDetail, Guid officeId)
         {
-            var cdNoteDetail = GetCDNoteDetails(jobId, cdNo);
             var result = new AcctCDNoteExportResult();
             if (cdNoteDetail != null)
             {
