@@ -443,6 +443,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
+                                                || x.SalemanId == currentUser.UserID
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Department:
@@ -450,6 +451,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
+                                                || x.SalemanId == currentUser.UserID
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Office:
