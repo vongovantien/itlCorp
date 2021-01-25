@@ -1276,15 +1276,16 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- GET EXISITS CHARGE --
 
         #region -- INSERT & UPDATE SETTLEMENT PAYMENT --
-        public ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
+        public ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria,out List<DuplicateShipmentSettlementResultModel> modelResult)
         {
             var result = new ResultModel();
+            modelResult = new List<DuplicateShipmentSettlementResultModel>();
             if (criteria.SurchargeID == Guid.Empty)
             {
                 if (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
-                               x.ChargeId == criteria.ChargeID
+                            x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
                             //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
@@ -1293,6 +1294,8 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.ClearanceNo == criteria.CustomNo
                             && x.InvoiceNo == criteria.InvoiceNo
                             && x.ContNo == criteria.ContNo
+                            && x.Notes == criteria.Notes
+
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -1302,7 +1305,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var charge = catChargeRepo.Get();
                         var data = from sur in surChargeExists
                                    join chg in charge on sur.ChargeId equals chg.Id
-                                   select new { JobNo = criteria.JobNo, HBLNo = criteria.HBLNo, MBLNo = criteria.MBLNo, ChargeName = chg.ChargeNameEn, SettlementCode = sur.SettlementCode };
+                                   select new { criteria.JobNo, criteria.HBLNo,  criteria.MBLNo, ChargeName = chg.ChargeNameEn,  sur.SettlementCode, sur.ChargeId };
                         string msg = string.Join("<br/>", data.ToList()
                             .Select(s => !string.IsNullOrEmpty(s.JobNo)
                             && !string.IsNullOrEmpty(s.HBLNo)
@@ -1310,6 +1313,13 @@ namespace eFMS.API.Accounting.DL.Services
                             ? string.Format(@"Shipment: [{0}-{1}-{2}] Charge [{3}] has already existed in settlement: {4}", s.JobNo, s.HBLNo, s.MBLNo, s.ChargeName, s.SettlementCode)
                             : string.Format(@"Charge [{0}] has already existed in settlement: {1}.", s.ChargeName, s.SettlementCode)));
                         result.Message = msg;
+
+                        modelResult = data.Select(x => new DuplicateShipmentSettlementResultModel {
+                            JobNo = x.JobNo,
+                            MBLNo = x.MBLNo,
+                            HBLNo = x.HBLNo,
+                            ChargeId = x.ChargeId
+                        }).ToList();
                     }
                 }
             }
@@ -1328,6 +1338,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.ClearanceNo == criteria.CustomNo
                             && x.InvoiceNo == criteria.InvoiceNo
                             && x.ContNo == criteria.ContNo
+                            && x.Notes == criteria.Notes
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -1337,7 +1348,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var charge = catChargeRepo.Get();
                         var data = from sur in surChargeExists
                                    join chg in charge on sur.ChargeId equals chg.Id
-                                   select new { JobNo = criteria.JobNo, HBLNo = criteria.HBLNo, MBLNo = criteria.MBLNo, ChargeName = chg.ChargeNameEn, SettlementCode = sur.SettlementCode };
+                                   select new {  criteria.JobNo, criteria.HBLNo,criteria.MBLNo, ChargeName = chg.ChargeNameEn,sur.SettlementCode, sur.ChargeId };
                         string msg = string.Join("<br/>", data.ToList()
                             .Select(s => !string.IsNullOrEmpty(s.JobNo)
                             && !string.IsNullOrEmpty(s.HBLNo)
@@ -1345,6 +1356,14 @@ namespace eFMS.API.Accounting.DL.Services
                             ? string.Format(@"Shipment: [{0}-{1}-{2}] Charge [{3}] has already existed in settlement: {4}", s.JobNo, s.HBLNo, s.MBLNo, s.ChargeName, s.SettlementCode)
                             : string.Format(@"Charge [{0}] has already existed in settlement: {1}.", s.ChargeName, s.SettlementCode)));
                         result.Message = msg;
+
+                        modelResult = data.Select(x => new DuplicateShipmentSettlementResultModel
+                        {
+                            JobNo = x.JobNo,
+                            MBLNo = x.MBLNo,
+                            HBLNo = x.HBLNo,
+                            ChargeId = x.ChargeId
+                        }).ToList();
                     }
                 }
             }
