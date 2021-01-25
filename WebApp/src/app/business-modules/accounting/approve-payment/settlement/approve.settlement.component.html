@@ -8,8 +8,10 @@
                         *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
                         <span
                             class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
-                            {{settlementPayment.settlement.syncStatus}}{{settlementPayment.settlement.syncStatus === 'Rejected' && 
-                            settlementPayment.settlement.reasonReject ? ' - ' + settlementPayment.settlement.reasonReject : ''}}
+                            {{settlementPayment.settlement.syncStatus}}{{settlementPayment.settlement.syncStatus ===
+                            'Rejected' &&
+                            settlementPayment.settlement.reasonReject ? ' - ' +
+                            settlementPayment.settlement.reasonReject : ''}}
                         </span>
                     </ng-container>
                 </settle-payment-form-create>
@@ -35,7 +37,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <settle-payment-list-charge></settle-payment-list-charge>
+                <settle-payment-list-charge readOnly></settle-payment-list-charge>
             </div>
         </div>
     </div>

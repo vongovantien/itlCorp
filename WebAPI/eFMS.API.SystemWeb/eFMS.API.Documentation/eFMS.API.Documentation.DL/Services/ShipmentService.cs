@@ -2700,6 +2700,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (query != null)
             {
                 queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+                queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.CustomerID)).Where(query);
             }
             if (isOBH != null)
             {
