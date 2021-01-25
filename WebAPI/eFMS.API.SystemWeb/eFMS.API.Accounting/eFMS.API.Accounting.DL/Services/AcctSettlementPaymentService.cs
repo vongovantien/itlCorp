@@ -3451,7 +3451,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.InvoiceDate = charge.InvoiceDate;
                     chargeCopy.SeriesNo = charge.SeriesNo;
                     chargeCopy.PaymentRequestType = charge.PaymentRequestType;
-                    chargeCopy.ClearanceNo = charge.ClearanceNo;
+                    chargeCopy.ClearanceNo = shipment.CustomNo; //Lấy customNo của Shipment
                     chargeCopy.ContNo = charge.ContNo;
                     chargeCopy.Soaclosed = charge.Soaclosed;
                     chargeCopy.Cdclosed = charge.Cdclosed;
