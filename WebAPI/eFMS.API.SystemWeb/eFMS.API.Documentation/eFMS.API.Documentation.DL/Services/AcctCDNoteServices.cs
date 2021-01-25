@@ -48,6 +48,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CatContract> catContractRepo;
         IContextBase<SysNotifications> sysNotificationRepository;
         IContextBase<SysUserNotification> sysUserNotificationRepository;
+        IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -75,7 +76,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompanyRepo,
             IContextBase<CatContract> catContract,
             IContextBase<SysNotifications> sysNotifyRepo,
-            IContextBase<SysUserNotification> sysUsernotifyRepo
+            IContextBase<SysUserNotification> sysUsernotifyRepo,
+            IContextBase<CatCommodityGroup> catCommodityGroupRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -103,6 +105,7 @@ namespace eFMS.API.Documentation.DL.Services
             catContractRepo = catContract;
             sysNotificationRepository = sysNotifyRepo;
             sysUserNotificationRepository = sysUsernotifyRepo;
+            catCommodityGroupRepository = catCommodityGroupRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -918,22 +921,27 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList, bool isOrigin)
         {
             AcctCDNoteDetailsModel model = new AcctCDNoteDetailsModel();
-            var cdNoteDetail = DataContext.Get(x => x.Id == acctCdNoteList.FirstOrDefault().Id);
-            model.CDNote = mapper.Map<AcctCdnote>(acctCdNoteList.FirstOrDefault());
-            model.CDNote.Code = string.Join(" ;", acctCdNoteList.Select(x => x.Code));
             var firstAcctCDNote = acctCdNoteList.FirstOrDefault();
-            var transaction = cstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
+            var cdNoteDetail = DataContext.Get(x => x.Id == firstAcctCDNote.Id);
+            model.CDNote = mapper.Map<AcctCdnote>(firstAcctCDNote);
+            model.CDNote.Code = string.Join(";", acctCdNoteList.Select(x => x.Code));
             var opsTransaction = opstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
+            if (opsTransaction == null)
+            {
+                return null;
+            }
             var partner = partnerRepositoty.Get(x => x.Id == firstAcctCDNote.PartnerId).FirstOrDefault();
             model.JobNo = opsTransaction.JobNo;
             model.CBM = opsTransaction.SumCbm;
             model.GW = opsTransaction.SumGrossWeight;
+            model.NW = opsTransaction.SumNetWeight;
             model.ServiceDate = opsTransaction.ServiceDate;
             model.HbLadingNo = opsTransaction?.Hwbno;
             model.MbLadingNo = opsTransaction?.Mblno;
             model.SumContainers = opsTransaction?.SumContainers;
             model.SumPackages = opsTransaction?.SumPackages;
             model.ServiceMode = opsTransaction?.ServiceMode;
+            model.CommodityGroupId = opsTransaction?.CommodityGroupId;
             model.PartnerId = partner?.Id;
             model.PartnerNameEn = partner?.PartnerNameEn;
             model.PartnerPersonalContact = partner?.ContactPerson;
@@ -941,22 +949,10 @@ namespace eFMS.API.Documentation.DL.Services
             model.PartnerTel = partner?.Tel;
             model.PartnerTaxcode = partner?.TaxCode;
             model.PartnerFax = partner?.Fax;
-            CatPlace pol = new CatPlace();
-            CatPlace pod = new CatPlace();
+
             var places = placeRepository.Get();
-            if (transaction != null)
-            {
-                pol = places.FirstOrDefault(x => x.Id == transaction.Pol);
-                pod = places.FirstOrDefault(x => x.Id == transaction.Pod);
-            }
-            else
-            {
-                if (opsTransaction != null)
-                {
-                    pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
-                    pod = places.FirstOrDefault(x => x.Id == opsTransaction.Pod);
-                }
-            }
+            var pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
+            var pod = places.FirstOrDefault(x => x.Id == opsTransaction.Pod);
             model.Pol = pol?.NameEn;
             if (model.Pol != null)
             {
@@ -973,14 +969,12 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
             foreach (var cdNote in acctCdNoteList)
             {
-                var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).OrderBy(x=>x).ToList();
+                var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).OrderBy(x => x).ToList();
                 foreach (var item in charges)
                 {
                     var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                     var catCharge = catchargeRepository.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
 
-                    //Quy đổi theo Final Exchange Rate. Nếu Final Exchange Rate is null thì
-                    //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                     charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
                     charge.ChargeCode = catCharge?.Code;
                     charge.NameEn = catCharge?.ChargeNameEn;
@@ -1012,6 +1006,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
+            var commodity = model.CommodityGroupId == null ? "N/A" : catCommodityGroupRepository.Get(x => x.Id == model.CommodityGroupId).Select(x => x.GroupNameEn).FirstOrDefault();
 
             IQueryable<CustomsDeclaration> _customClearances = customsDeclarationRepository.Get(x => x.JobNo == model.JobNo);
             CustomsDeclaration _clearance = null;
@@ -1123,7 +1118,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Fax = model.PartnerFax?.ToUpper(),
                         TransID = trans,
                         LoadingDate = null,
-                        Commodity = "N/A",
+                        Commodity = commodity,
                         PortofLading = model.PolName?.ToUpper(),
                         PortofUnlading = model.PodName?.ToUpper(),
                         MAWB = model.MbLadingNo,
@@ -1156,7 +1151,7 @@ namespace eFMS.API.Documentation.DL.Services
                         CurrDecimalNo = null,
                         VATInvoiceNo = item.InvoiceNo,
                         GW = model.GW,
-                        NW = null,
+                        NW = model.NW,
                         SeaCBM = model.CBM,
                         SOTK = _clearance?.ClearanceNo,
                         NgayDK = null,
