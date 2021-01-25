@@ -82,7 +82,7 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Paging`, body, {
             page: '' + page,
             size: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -262,7 +262,7 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
             page: '' + page,
             size: '' + size
-        });
+        }, { "hideSpinner": "true" });
     }
 
     getListHouseBillOfJob(data: any = {}) {
