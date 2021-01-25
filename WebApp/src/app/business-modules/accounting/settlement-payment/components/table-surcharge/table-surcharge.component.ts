@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { Surcharge } from 'src/app/shared/models';
 @Component({
     selector: 'table-surcharge-settlement',
     templateUrl: './table-surcharge.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SettlementTableSurchargeComponent extends AppList {

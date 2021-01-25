@@ -895,7 +895,7 @@ namespace eFMS.API.Operation.DL.Services
                         }
                         else
                         {
-                            item.GrossWeight = Math.Round(valueConvert, 2);
+                            item.GrossWeight = NumberHelper.RoundNumber(valueConvert, 2);
                             item.GrossWeightStr = item.GrossWeight.ToString();
                         }
                     }
@@ -924,7 +924,7 @@ namespace eFMS.API.Operation.DL.Services
                         }
                         else
                         {
-                            item.NetWeight = Math.Round(valueConvert, 2);
+                            item.NetWeight = NumberHelper.RoundNumber(valueConvert, 2);
                             item.NetWeightStr = item.NetWeight.ToString();
                         }
                     }
@@ -953,7 +953,7 @@ namespace eFMS.API.Operation.DL.Services
                         }
                         else
                         {
-                            item.Cbm = Math.Round(valueConvert, 2);
+                            item.Cbm = NumberHelper.RoundNumber(valueConvert, 2);
                             item.CbmStr = item.Cbm.ToString();
                         }
                     }

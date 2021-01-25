@@ -168,12 +168,12 @@ namespace eFMS.API.ForPartner.DL.Service
                     return new HandleState((object)message);
                 }
 
-                var matchedChargeObh = CheckMatchedCharge(obhCharges);
-                if (matchedChargeObh)
-                {
-                    string message = string.Format(@"Charge type OBH không có cùng số ReferenceNo hoặc Currency. Vui lòng kiểm tra lại");
-                    return new HandleState((object)message);
-                }
+                //var matchedChargeObh = CheckMatchedCharge(obhCharges);
+                //if (matchedChargeObh)
+                //{
+                //    string message = string.Format(@"Charge type OBH không có cùng số ReferenceNo hoặc Currency. Vui lòng kiểm tra lại");
+                //    return new HandleState((object)message);
+                //}
 
                 var partner = partnerRepo.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefault();
                 if (partner == null)
@@ -191,9 +191,9 @@ namespace eFMS.API.ForPartner.DL.Service
                         return new HandleState((object)message);
                     }
                 }
-
+                
                 var invoiceDebit = debitCharges.Count > 0 ? ModelInvoiceDebit(model, partner, debitCharges, _currentUser) : null;
-                var invoiceObh = obhCharges.Count > 0 ? ModelInvoiceObh(model, partner, obhCharges, _currentUser) : null;
+                var invoicesObh = obhCharges.Count > 0 ? ModelInvoicesObh(model, partner, obhCharges, _currentUser) : null;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -202,14 +202,17 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState hsDebit = new HandleState();
                         if (invoiceDebit != null)
                         {
+                            //Insert Invoice (Invoice Debit)
                             hsDebit = DataContext.Add(invoiceDebit, false);
                         }
                         HandleState hsObh = new HandleState();
-                        if (invoiceObh != null)
+                        if (invoicesObh != null)
                         {
-                            hsObh = DataContext.Add(invoiceObh, false);
+                            //Insert list Invoice Temp (Invoice OBH)
+                            hsObh = DataContext.Add(invoicesObh, false);
                         }
-                        if (hsDebit.Success && hsObh.Success)
+
+                        if (hsDebit.Success)
                         {
                             foreach (var debitCharge in debitCharges)
                             {
@@ -226,28 +229,35 @@ namespace eFMS.API.ForPartner.DL.Service
                                 surchargeDebit.UserModified = _currentUser.UserID;
                                 var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id, false);
                             }
-
-                            //Cập nhật số RefNo cho phí OBH
-                            foreach (var obhCharge in obhCharges)
-                            {
-                                CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
-                                surchargeObh.AcctManagementId = invoiceObh.Id;
-                                surchargeObh.InvoiceNo = null; //CR: 07/12/2020
-                                surchargeObh.InvoiceDate = null; //CR: 07/12/2020
-                                surchargeObh.VoucherId = invoiceObh.VoucherId;
-                                surchargeObh.VoucherIddate = invoiceObh.Date;
-                                surchargeObh.SeriesNo = null; //CR: 07/12/2020
-                                surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
-                                surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
-                                surchargeObh.DatetimeModified = DateTime.Now;
-                                surchargeObh.UserModified = _currentUser.UserID;
-                                var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id, false);
-                            }
-
-                            var smSurcharge = surchargeRepo.SubmitChanges();
-                            var sm = DataContext.SubmitChanges();
-                            trans.Commit();
                         }
+
+                        if (hsObh.Success)
+                        {
+                            foreach (var invoiceObh in invoicesObh)
+                            {
+                                //Cập nhật số RefNo cho phí OBH
+                                foreach (var obhCharge in obhCharges)
+                                {
+                                    CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
+                                    surchargeObh.AcctManagementId = invoiceObh.Id;
+                                    surchargeObh.InvoiceNo = null; //CR: 07/12/2020
+                                    surchargeObh.InvoiceDate = null; //CR: 07/12/2020
+                                    surchargeObh.VoucherId = invoiceObh.VoucherId;
+                                    surchargeObh.VoucherIddate = invoiceObh.Date;
+                                    surchargeObh.SeriesNo = null; //CR: 07/12/2020
+                                    surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
+                                    surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
+                                    surchargeObh.DatetimeModified = DateTime.Now;
+                                    surchargeObh.UserModified = _currentUser.UserID;
+                                    var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id, false);
+                                }
+                            }
+                        }
+
+                        var smSurcharge = surchargeRepo.SubmitChanges();
+                        var sm = DataContext.SubmitChanges();
+                        trans.Commit();
+
                         if (!hsDebit.Success)
                         {
                             return hsDebit;
@@ -275,6 +285,14 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
+        /// <summary>
+        /// Get model Invoice Debit
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="partner"></param>
+        /// <param name="debitCharges"></param>
+        /// <param name="_currentUser"></param>
+        /// <returns></returns>
         private AccAccountingManagement ModelInvoiceDebit(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> debitCharges, ICurrentUser _currentUser)
         {
             var debitChargeFirst = debitCharges[0];
@@ -309,38 +327,54 @@ namespace eFMS.API.ForPartner.DL.Service
             return invoice;
         }
 
-        private AccAccountingManagement ModelInvoiceObh(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> obhCharges, ICurrentUser _currentUser)
+        /// <summary>
+        /// Get list model Invoice OBH (Invoice Temp)
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="partner"></param>
+        /// <param name="obhCharges"></param>
+        /// <param name="_currentUser"></param>
+        /// <returns></returns>
+        private List<AccAccountingManagement> ModelInvoicesObh(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> obhCharges, ICurrentUser _currentUser)
         {
-            var obhChargeFirst = obhCharges[0];
-            AccAccountingManagement invoice = new AccAccountingManagement();
-            invoice.Id = Guid.NewGuid();
-            invoice.PartnerId = partner?.Id;
-            invoice.InvoiceNoReal = invoice.InvoiceNoTempt = obhChargeFirst?.ReferenceNo; //Lấy số referenceNo
-            invoice.Date = model.InvoiceDate;
-            invoice.Serie = "OBH/" + model.InvoiceDate.Value.ToString("yy");
-            invoice.Status = ForPartnerConstants.ACCOUNTING_INVOICE_STATUS_UPDATED; //Set default "Updated Invoice"
-            invoice.PaymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID; //Set default "Unpaid"
-            invoice.Type = ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE; //Type is InvoiceTemp (Hóa đơn tạm)
-            invoice.VoucherId = obhChargeFirst?.ReferenceNo; //Lấy số referenceNo
-            invoice.ReferenceNo = obhChargeFirst?.ReferenceNo; //Cập nhật Reference No cho Invoice
-            invoice.Currency = obhChargeFirst?.Currency ?? model.Currency; //Currency of Invoice
-            invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(obhCharges, invoice.Currency); // Calculator Total Amount
-            invoice.UserCreated = invoice.UserModified = _currentUser.UserID;
-            invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
-            invoice.GroupId = _currentUser.GroupId;
-            invoice.DepartmentId = _currentUser.DepartmentId;
+            List<AccAccountingManagement> invoices = new List<AccAccountingManagement>();
+            var grpObhCharges = obhCharges.GroupBy(x => x.ReferenceNo).Select(se => new { ReferenceNo = se.Key, Charges = se.ToList() });
+            foreach (var grpObhCharge in grpObhCharges)
+            {
+                var _obhCharges = grpObhCharge.Charges;
+                var obhChargeFirst = grpObhCharge.Charges[0];
+                AccAccountingManagement invoice = new AccAccountingManagement();
+                invoice.Id = Guid.NewGuid();
+                invoice.PartnerId = partner?.Id;
+                invoice.InvoiceNoReal = invoice.InvoiceNoTempt = grpObhCharge.ReferenceNo; //Lấy số referenceNo
+                invoice.Date = model.InvoiceDate;
+                invoice.Serie = "OBH/" + model.InvoiceDate.Value.ToString("yy");
+                invoice.Status = ForPartnerConstants.ACCOUNTING_INVOICE_STATUS_UPDATED; //Set default "Updated Invoice"
+                invoice.PaymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID; //Set default "Unpaid"
+                invoice.Type = ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE; //Type is InvoiceTemp (Hóa đơn tạm)
+                invoice.VoucherId = grpObhCharge?.ReferenceNo; //Lấy số referenceNo
+                invoice.ReferenceNo = grpObhCharge?.ReferenceNo; //Cập nhật Reference No cho Invoice
+                invoice.Currency = obhChargeFirst?.Currency ?? model.Currency; //Currency of Invoice
+                invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(_obhCharges, invoice.Currency); // Calculator Total Amount
+                invoice.UserCreated = invoice.UserModified = _currentUser.UserID;
+                invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
+                invoice.GroupId = _currentUser.GroupId;
+                invoice.DepartmentId = _currentUser.DepartmentId;
 
-            var firstCharge = surchargeRepo.Get(x => x.Id == obhCharges[0].ChargeId).Select(s => new { s.OfficeId, s.CompanyId }).FirstOrDefault();
-            invoice.OfficeId = firstCharge?.OfficeId ?? Guid.Empty; //Lấy OfficeId của first charge
-            invoice.CompanyId = firstCharge?.CompanyId ?? Guid.Empty; //Lấy CompanyId của first charge
+                var firstCharge = surchargeRepo.Get(x => x.Id == obhChargeFirst.ChargeId).Select(s => new { s.OfficeId, s.CompanyId }).FirstOrDefault();
+                invoice.OfficeId = firstCharge?.OfficeId ?? Guid.Empty; //Lấy OfficeId của first charge
+                invoice.CompanyId = firstCharge?.CompanyId ?? Guid.Empty; //Lấy CompanyId của first charge
 
-            invoice.PaymentTerm = obhCharges[0].PaymentTerm;
-            invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
-            invoice.AccountNo = obhCharges[0].AccountNo;
-            invoice.Description = model.Description;
-            var _serviceTypeCharge = surchargeRepo.Get(x => obhCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
-            invoice.ServiceType = string.Format(";", _serviceTypeCharge);
-            return invoice;
+                invoice.PaymentTerm = obhChargeFirst.PaymentTerm;
+                invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
+                invoice.AccountNo = obhChargeFirst.AccountNo;
+                invoice.Description = model.Description;
+                var _serviceTypeCharge = surchargeRepo.Get(x => _obhCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
+                invoice.ServiceType = string.Format(";", _serviceTypeCharge);
+
+                invoices.Add(invoice);
+            }
+            return invoices;
         }
 
         public HandleState UpdateInvoice(InvoiceUpdateInfo model, string apiKey)

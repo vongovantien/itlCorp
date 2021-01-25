@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { catchError, finalize } from 'rxjs/operators';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
 import { ActivatedRoute } from '@angular/router';
@@ -11,6 +11,9 @@ import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum'
 import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
 import { ToastrService } from 'ngx-toastr';
 import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
+import _uniq from 'lodash/uniq';
+import { ReportPreviewComponent } from '@common';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -24,6 +27,7 @@ export class OpsCDNoteComponent extends AppList {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(OpsCdNoteDetailPopupComponent) cdNoteDetailPopupComponent: OpsCdNoteDetailPopupComponent;
     @ViewChild(OpsCdNoteAddPopupComponent) cdNoteAddPopupComponent: OpsCdNoteAddPopupComponent;
+    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
@@ -32,12 +36,15 @@ export class OpsCDNoteComponent extends AppList {
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
+    cdNotePrint: AcctCDNote[] = [];
+    dataReport: any = null;
 
     isDesc = true;
     sortKey: string = '';
 
     constructor(
         private _documentRepo: DocumentationRepo,
+        private _exportRepo: ExportRepo,
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
         private _progressService: NgProgress,
@@ -79,6 +86,12 @@ export class OpsCDNoteComponent extends AppList {
                 (res: any) => {
                     this.cdNoteGroups = res;
                     this.initGroup = res;
+                    const selected = { isSelected: false };
+                    this.cdNoteGroups.forEach(element => {
+                        element.listCDNote.forEach((item: any[]) => {
+                            Object.assign(item, selected);
+                        });
+                    });
                 },
             );
     }
@@ -181,5 +194,76 @@ export class OpsCDNoteComponent extends AppList {
         } else {
             this.cdNoteGroups = this.initGroup;
         }
+    }
+
+
+    checkValidCDNote() {
+        this.cdNotePrint = [];
+        const listCheck = [];
+        this.cdNoteGroups.forEach(element => {
+            const item = element.listCDNote.filter(cdNote => cdNote.isSelected === true);
+            if (item.length > 0) {
+                listCheck.push(item);
+                this.cdNotePrint = item;
+            }
+        }
+        );
+
+        if (listCheck.length === 0) {
+            this._toastService.warning("Please select C/D Note to preview.");
+            return false;
+        }
+        const type = [];
+        listCheck.forEach(x => x.map(y => type.push(y.type)))
+        if (listCheck.length > 1 || _uniq(type).length > 1) {
+            this._toastService.warning("You can not print C/D Notes that are different type! Please check again");
+            return false;
+        }
+        return true;
+    }
+
+    preview(isOrigin: boolean) {
+        if (!this.checkValidCDNote()) {
+            return;
+        }
+
+        this._documentRepo.previewCDNoteList(this.cdNotePrint, isOrigin)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (res != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    exportCDNote() {
+        if (!this.checkValidCDNote()) {
+            return;
+        }
+        this._exportRepo.exportCDNoteCombine(this.cdNotePrint)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
+                },
+            );
     }
 }

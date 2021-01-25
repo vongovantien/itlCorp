@@ -33,6 +33,14 @@
             <param name="isOrigin">Is Preview with Original</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOpsCdNoteList(System.Object,System.Boolean)">
+            <summary>
+            Preview CD Note (OPS) Combine
+            </summary>
+            <param name="model">AcctCDNoteDetailsModel List</param>
+            <param name="isOrigin">Is Preview with Original</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.ExportOpsCdNote(System.Guid,System.String,System.Guid)">
             <summary>
             Data Export Details CD Note
@@ -40,6 +48,13 @@
             <param name="jobId"></param>
             <param name="cdNo"></param>
             <param name="officeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.ExportOpsCdNoteCombine(System.Object)">
+            <summary>
+            Export Excel Template of OPS CD Note Combine
+            </summary>
+            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
