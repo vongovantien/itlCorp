@@ -2448,7 +2448,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     foreach (var charge in detailLookupSur[item.JobNo])
                     {
-                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
                         var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
                         data.PurchaseOrderNo = item.PurchaseOrderNo;
@@ -2457,6 +2456,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.GrossWeight = charge.GrossWeight;
                         data.CBM = charge.CBM;
                         data.PackageContainer = charge.PackageContainer;
+                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         decimal? percent = 0;
                         decimal UnitPrice = charge.UnitPrice ?? 0;
                         charge.UnitPrice = Math.Round(UnitPrice, 3);
@@ -2513,18 +2513,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return list.ToList();
         }
-        //private string GetTopClearanceNoByJobNo(string JobNo)
-        //{
-        //    var custom = customsDeclarationRepo.Get();
-        //    var clearanceNo = custom.Where(x => x.JobNo != null && x.JobNo == JobNo)
-        //        .OrderBy(x => x.JobNo)
-        //        .OrderByDescending(x => x.ClearanceDate)
-        //        .FirstOrDefault()?.ClearanceNo;
-        //    return clearanceNo;
-        //}
+
+
         private string GetTopClearanceNoByJobNo(string JobNo, List<CustomsDeclaration> customsDeclarations)
         {
-            //var custom = customsDeclarationRepo.Get();
             var clearanceNo = customsDeclarations.Where(x => x.JobNo != null && x.JobNo == JobNo)
                 .OrderBy(x => x.JobNo)
                 .OrderByDescending(x => x.ClearanceDate)
@@ -2551,7 +2543,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     foreach (var charge in detailLookupSur[item.HBLID])
                     {
-                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
                         var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
                         data.PurchaseOrderNo = item.PurchaseOrderNo;
@@ -2560,6 +2551,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.GrossWeight = charge.GrossWeight;
                         data.CBM = charge.CBM;
                         data.PackageContainer = charge.PackageContainer;
+                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         decimal UnitPrice = charge.UnitPrice ?? 0;
                         charge.UnitPrice = Math.Round(UnitPrice, 3);
                         charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
@@ -2861,7 +2853,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                 }
             }
-            var count = ObjectSummaryRevenue.summaryOfRevenueExportResults.Count();
             return ObjectSummaryRevenue;
         }
         public SummaryOfRevenueModel GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria)
