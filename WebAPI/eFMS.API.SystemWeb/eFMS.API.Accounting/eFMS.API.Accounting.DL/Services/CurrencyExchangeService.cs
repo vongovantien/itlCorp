@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -154,18 +155,18 @@ namespace eFMS.API.Accounting.DL.Services
             //Tránh case chia 0
             _exchangeRateCurrencyTo = _exchangeRateCurrencyTo == 0 ? 1 : _exchangeRateCurrencyTo;
 
-            decimal roundCurrAmount = Math.Round(amount.Value, roundCurr.Value);
+            decimal roundCurrAmount = NumberHelper.RoundNumber(amount.Value, roundCurr.Value);
             if (finalExchangeRate != null)
             {
                 //RoundCurr (RoundLocal(RoundCurr(Amount) x  FinalExc)/ExcByDate (Currency 2) ) 
-                decimal roundCurrAmountFinal = Math.Round(roundCurrAmount * finalExchangeRate.Value, roundLocal);
-                amountResult = Math.Round(roundCurrAmountFinal / _exchangeRateCurrencyTo, roundCurr.Value);
+                decimal roundCurrAmountFinal = NumberHelper.RoundNumber(roundCurrAmount * finalExchangeRate.Value, roundLocal);
+                amountResult = NumberHelper.RoundNumber(roundCurrAmountFinal / _exchangeRateCurrencyTo, roundCurr.Value);
             }
             else
             {
                 //RoundCurr (RoundLocal(RoundCurr(Amount) x  ExcByDate (Currency 1) )/ExcByDate (Currency 2) )  
-                decimal roundCurrAmountExcDate = Math.Round(roundCurrAmount * _exchangeRateCurrencyFrom, roundLocal);
-                amountResult = Math.Round(roundCurrAmountExcDate / _exchangeRateCurrencyTo, roundCurr.Value);
+                decimal roundCurrAmountExcDate = NumberHelper.RoundNumber(roundCurrAmount * _exchangeRateCurrencyFrom, roundLocal);
+                amountResult = NumberHelper.RoundNumber(roundCurrAmountExcDate / _exchangeRateCurrencyTo, roundCurr.Value);
             }
 
             return amountResult;

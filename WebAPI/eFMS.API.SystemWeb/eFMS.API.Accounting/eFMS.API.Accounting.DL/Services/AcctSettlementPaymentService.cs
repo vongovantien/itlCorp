@@ -9,6 +9,7 @@ using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -648,7 +649,7 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalAmount = advInfo.TotalAmount ?? 0,
                     AdvanceNo = advInfo.AdvanceNo,
                     AdvanceAmount = advInfo.AdvanceAmount,
-                    Balance = Math.Round((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
+                    Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo
                 });
             }
@@ -1418,7 +1419,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.SettlementCode = settlement.SettlementNo;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
                             }
@@ -1448,7 +1449,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
                                     item.OfficeId = currentUser.OfficeID;
                                     item.CompanyId = currentUser.CompanyID;
@@ -1495,7 +1496,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             int roundDecimal = model.Settlement.SettlementCurrency != AccountingConstants.CURRENCY_LOCAL ? 3 : 0;
-            amount = Math.Round(amount, roundDecimal);
+            amount = NumberHelper.RoundNumber(amount, roundDecimal);
             return amount;
         }
 
@@ -1615,7 +1616,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
                                     item.OfficeId = currentUser.OfficeID;
                                     item.CompanyId = currentUser.CompanyID;
@@ -1680,7 +1681,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                         sceneCharge.UserModified = userCurrent;
                                         sceneCharge.DatetimeModified = DateTime.Now;
-                                        sceneCharge.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                        sceneCharge.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                         csShipmentSurchargeRepo.Update(sceneCharge, x => x.Id == sceneCharge.Id);
                                     }
                                 }
@@ -3451,7 +3452,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.InvoiceDate = charge.InvoiceDate;
                     chargeCopy.SeriesNo = charge.SeriesNo;
                     chargeCopy.PaymentRequestType = charge.PaymentRequestType;
-                    chargeCopy.ClearanceNo = charge.ClearanceNo;
+                    chargeCopy.ClearanceNo = shipment.CustomNo; //Lấy customNo của Shipment
                     chargeCopy.ContNo = charge.ContNo;
                     chargeCopy.Soaclosed = charge.Soaclosed;
                     chargeCopy.Cdclosed = charge.Cdclosed;
@@ -3562,7 +3563,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = Math.Round(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
 
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
@@ -3684,7 +3685,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = Math.Round(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
 
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
@@ -3787,7 +3788,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = Math.Round(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
 
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;

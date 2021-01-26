@@ -39,6 +39,8 @@ namespace eFMS.API.Documentation.DL.Models
         public DateTime? ServiceDate { get; set; }
         public decimal? CBM { get; set; }
         public decimal? GW { get; set; }
+        public decimal? NW { get; set; }
+        public short? CommodityGroupId { get; set; }
         public decimal? SumContainers { get; set; }
         public decimal? SumPackages { get; set; }
         public string WarehouseName { get; set; }
