@@ -247,10 +247,10 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //BOD AND DEPUTY OF BOD    
-                || 
+                ||
                 (
                  userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.advancePayment.OfficeId, x.advancePayment.CompanyId) // Is User Admin
-                 && 
+                 &&
                  (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //[CR: 09/01/2021]
             ).Select(s => s.advancePayment);
@@ -918,7 +918,7 @@ namespace eFMS.API.Accounting.DL.Services
             };
             int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
 
-            if (code == 403) return false;            
+            if (code == 403) return false;
 
             return true;
         }
@@ -2027,7 +2027,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (!isApprover)
                     {
                         return new HandleState("Not allow deny. You are not in the approval process.");
-                    }                   
+                    }
 
                     advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                     approve.IsDeny = true;
@@ -2793,9 +2793,9 @@ namespace eFMS.API.Accounting.DL.Services
                     isManagerOrLeader = true;
                 }
                 else if (
-                            ( (userCurrent.GroupId == AccountingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                            ((userCurrent.GroupId == AccountingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                           ||
-                            accountantLevel.UserDeputies.Contains(currentUser.UserID) )
+                            accountantLevel.UserDeputies.Contains(currentUser.UserID))
                           && isDeptAccountant
                         ) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
@@ -2870,9 +2870,9 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             else if (
-                       ( ((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                       (((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                       ||
-                        accountantLevel.UserDeputies.Contains(currentUser.UserID)) )
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID)))
                       && isDeptAccountant
                     ) //Accountant Manager
             {
@@ -2942,8 +2942,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Advance Payment has Status Approve is Done
             IQueryable<AcctAdvanceRequest> request = from ar in acctAdvanceRequestRepo.Get()
-                          join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
-                          select ar;
+                                                     join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
+                                                     select ar;
 
             IQueryable<OpsTransaction> opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             IQueryable<CsTransaction> docShipment = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
@@ -2963,47 +2963,47 @@ namespace eFMS.API.Accounting.DL.Services
 
             //So sánh bằng
             IQueryable<AcctAdvanceRequestModel> queryOps = from req in requestOrder
-                           join ops in opsShipment on req.JobId equals ops.JobNo into ops2
-                           from ops in ops2
-                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
-                           from adv in adv2
-                           join user in sysUsers on adv.Requester equals user.Id
-                           select new AcctAdvanceRequestModel
-                           {
-                               Id = req.Id,
-                               JobId = req.JobId,
-                               Hbl = req.Hbl,
-                               Hblid = req.Hblid,
-                               Mbl = req.Mbl,
-                               RequestDate = adv.RequestDate,
-                               Amount = req.Amount,
-                               AdvanceNo = req.AdvanceNo,
-                               RequestCurrency = req.RequestCurrency,
-                               Requester = user.Id,
-                               RequesterName = user.Username
-                           };
+                                                           join ops in opsShipment on req.JobId equals ops.JobNo into ops2
+                                                           from ops in ops2
+                                                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                                                           from adv in adv2
+                                                           join user in sysUsers on adv.Requester equals user.Id
+                                                           select new AcctAdvanceRequestModel
+                                                           {
+                                                               Id = req.Id,
+                                                               JobId = req.JobId,
+                                                               Hbl = req.Hbl,
+                                                               Hblid = req.Hblid,
+                                                               Mbl = req.Mbl,
+                                                               RequestDate = adv.RequestDate,
+                                                               Amount = req.Amount,
+                                                               AdvanceNo = req.AdvanceNo,
+                                                               RequestCurrency = req.RequestCurrency,
+                                                               Requester = user.Id,
+                                                               RequesterName = user.Username
+                                                           };
 
             //So sánh bằng
             IQueryable<AcctAdvanceRequestModel> queryDoc = from req in requestOrder
-                           join doc in docShipment on req.JobId equals doc.JobNo into doc2
-                           from doc in doc2
-                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
-                           from adv in adv2
-                           join user in sysUsers on adv.Requester equals user.Id
-                           select new AcctAdvanceRequestModel
-                           {
-                               Id = req.Id,
-                               JobId = req.JobId,
-                               Hbl = req.Hbl,
-                               Hblid = req.Hblid,
-                               Mbl = req.Mbl,
-                               RequestDate = adv.RequestDate,
-                               Amount = req.Amount,
-                               AdvanceNo = req.AdvanceNo,
-                               RequestCurrency = req.RequestCurrency,
-                               Requester = user.Id,
-                               RequesterName = user.Username
-                           };
+                                                           join doc in docShipment on req.JobId equals doc.JobNo into doc2
+                                                           from doc in doc2
+                                                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                                                           from adv in adv2
+                                                           join user in sysUsers on adv.Requester equals user.Id
+                                                           select new AcctAdvanceRequestModel
+                                                           {
+                                                               Id = req.Id,
+                                                               JobId = req.JobId,
+                                                               Hbl = req.Hbl,
+                                                               Hblid = req.Hblid,
+                                                               Mbl = req.Mbl,
+                                                               RequestDate = adv.RequestDate,
+                                                               Amount = req.Amount,
+                                                               AdvanceNo = req.AdvanceNo,
+                                                               RequestCurrency = req.RequestCurrency,
+                                                               Requester = user.Id,
+                                                               RequesterName = user.Username
+                                                           };
             IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = queryOps.Union(queryDoc);
 
             //Get advance theo shipment và advance chưa làm settlement ngoại trừ settle đang xét; order tăng dần theo ngày request date
@@ -3019,7 +3019,7 @@ namespace eFMS.API.Accounting.DL.Services
                 data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo && a.Hblid == x.Hblid && a.SettlementCode != settlementCode))
                 .OrderBy(x => x.RequestDate);
             }
-        
+
             return data.ToList();
         }
 
@@ -3224,7 +3224,7 @@ namespace eFMS.API.Accounting.DL.Services
                             _container = tranDetail.PackageContainer;
                             _cw = tranDetail.ChargeWeight;
                             _pcs = tranDetail.PackageQty;
-                            _cbm = tranDetail.Cbm;                            
+                            _cbm = tranDetail.Cbm;
                         }
                         var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
                         _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
@@ -3297,7 +3297,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
-        
+
         public void UpdateStatusPaymentNotSettledOfAdvanceRequest(Guid hblId, string advanceNo)
         {
             //List Advance Request có Status Payment là Settled 
@@ -3462,6 +3462,60 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return result;
+        }
+
+        public HandleState DenyAdvancePayments(List<Guid> Ids)
+        {
+            HandleState result = new HandleState();
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (Guid Id in Ids)
+                    {
+                        {
+                            AcctAdvancePayment adv = DataContext.First(x => x.Id == Id);
+                            if (adv != null && adv.SyncStatus == AccountingConstants.STATUS_REJECTED)
+                            {
+                                adv.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
+                                adv.UserModified = currentUser.UserID;
+                                adv.DatetimeModified = DateTime.Now;
+
+                                // ghi log
+                                string log = String.Format("{0} has been opened at {1} on {2} by {3}", adv.AdvanceNo, string.Format("{0:HH:mm:ss tt}", DateTime.Now), DateTime.Now.ToString("dd/MM/yyyy"), currentUser.UserName);
+
+                                adv.LockedLog = adv.LockedLog + log + ";";
+
+                                result = DataContext.Update(adv, x => x.Id == Id);
+
+                                if (result.Success)
+                                {
+                                    IQueryable<AcctApproveAdvance> approveAdvances = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == adv.AdvanceNo);
+                                    foreach (var approve in approveAdvances)
+                                    {
+                                        approve.IsDeny = true;
+                                        approve.UserModified = currentUser.UserID;
+                                        approve.DateModified = DateTime.Now;
+
+                                        acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    trans.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
     }
 }
