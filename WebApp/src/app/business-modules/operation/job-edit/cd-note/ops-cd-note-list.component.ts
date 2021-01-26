@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { catchError, finalize } from 'rxjs/operators';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -14,6 +14,10 @@ import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import _uniq from 'lodash/uniq';
 import { ReportPreviewComponent } from '@common';
+import { Crystal } from '@models';
+import { DomSanitizer } from '@angular/platform-browser';
+import { InjectViewContainerRefDirective } from '@directives';
+import { delayTime } from '@decorators';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -27,8 +31,9 @@ export class OpsCDNoteComponent extends AppList {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(OpsCdNoteDetailPopupComponent) cdNoteDetailPopupComponent: OpsCdNoteDetailPopupComponent;
     @ViewChild(OpsCdNoteAddPopupComponent) cdNoteAddPopupComponent: OpsCdNoteAddPopupComponent;
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
-
+    @ViewChild('popupDataCombine') reportPrePopup: ReportPreviewComponent;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
     cdNoteGroups: any[] = [];
@@ -37,7 +42,6 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-    dataReport: any = null;
 
     isDesc = true;
     sortKey: string = '';
@@ -221,6 +225,26 @@ export class OpsCDNoteComponent extends AppList {
         }
         return true;
     }
+    
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.reportContainerRef.viewContainerRef.clear();
+            });
+    }
 
     preview(isOrigin: boolean) {
         if (!this.checkValidCDNote()) {
@@ -233,13 +257,10 @@ export class OpsCDNoteComponent extends AppList {
                 finalize(() => { })
             )
             .subscribe(
-                (res: any) => {
+                (res: Crystal) => {
                     this.dataReport = res;
-                    if (res != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                    if (res.dataSource.length > 0) {
+                            this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
