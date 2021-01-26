@@ -667,8 +667,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (surchargeGrp != null && surchargeGrp.Count() > 0)
             {
                 var advDataMatch = surchargeGrp.Where(x => x.Key.AdvanceNo == _advanceNo);
-                advNo = advDataMatch?.FirstOrDefault().Key.AdvanceNo;
-                customNo = surchargeGrp?.FirstOrDefault().Key.ClearanceNo;
+                advNo = advDataMatch?.FirstOrDefault()?.Key?.AdvanceNo;
+                customNo = surchargeGrp?.FirstOrDefault()?.Key?.ClearanceNo;
             }
 
             // Trường hợp settle cho 1 phiếu advance
