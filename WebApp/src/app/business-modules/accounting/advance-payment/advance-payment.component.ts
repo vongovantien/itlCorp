@@ -150,7 +150,6 @@ export class AdvancePaymentComponent extends AppList {
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
-                    // this.confirmDeletePopup.hide();
                     this._progressRef.complete();
                 })
             )
@@ -169,7 +168,6 @@ export class AdvancePaymentComponent extends AppList {
             .subscribe((value: boolean) => {
                 if (value) {
                     this.selectedAdv = new AdvancePayment(selectedAdv);
-                    // this.confirmDeletePopup.show();
 
                     this.showPopupDynamicRender<ConfirmPopupComponent>(
                         ConfirmPopupComponent,
