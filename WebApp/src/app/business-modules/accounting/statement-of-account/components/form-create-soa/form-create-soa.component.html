@@ -31,7 +31,7 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [(ngModel)]="selectedRangeDate" [showCustomRangeLabel]="true"
                                 [keepCalendarOpeningWithRange]="true" [alwaysShowCalendars]="true" [ranges]="ranges"
-                                placeholder="From date - to date" [showClearButton]="false" [maxDate]="maxDate"
+                                placeholder="From date - to date" [showClearButton]="false"
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [showCancel]="true" readonly
                                 (datesUpdated)="onChangeRangeDate($event)" />
                             <span class=" m-input-icon__icon m-input-icon__icon--right">
@@ -127,33 +127,40 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <label class="form-control-label" for="">
-                        Charge
-                    </label>
-                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
-                        (itemSelected)="onSelectDataFormInfo($event, 'charge')" [dataSources]="configCharge.dataSource"
-                        [displayFields]="configCharge.displayFields " [height]="150">
-                    </app-combo-grid-virtual-scroll>
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Charge
+                        </label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
+                            (itemSelected)="onSelectDataFormInfo($event, 'charge')"
+                            [dataSources]="configCharge.dataSource" [displayFields]="configCharge.displayFields "
+                            [height]="150">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
                 </div>
                 <div class="col-lg-4">
-                    <label class="form-control-label" for="">
+                    <!-- <label class="form-control-label" for="">
                         Commodity Group
                     </label>
                     <select [(ngModel)]="commodity" class="form-control">
                         <option [ngValue]="null">Select Commodity</option>
                         <option *ngFor="let comodity of commodityGroup" [ngValue]="comodity">{{comodity.groupNameEn}}
                         </option>
-                    </select>
+                    </select> -->
+                    <div class="form-group">
+                        <label class="form-control-label">AirLine Code</label>
+                        <input type="text" class="form-control" [(ngModel)]="airlineCode">
+                    </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="row">
-                        <div class="col-lg-6">
+                        <!-- <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="form-control-label">AirLine Code</label>
                                 <input type="text" class="form-control" [(ngModel)]="airlineCode">
                             </div>
-                        </div>
-                        <div class="col-lg-6">
+                        </div> -->
+                        <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-control-label"></label>
                                 <div><a class="pointer" style="text-decoration: underline;"

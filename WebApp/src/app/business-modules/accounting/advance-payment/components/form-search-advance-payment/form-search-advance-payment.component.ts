@@ -207,7 +207,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.resetFormControl(this.statusPayment);
         this.resetFormControl(this.currencyId);
 
-        this._store.dispatch(SearchList({ payload: {} }));
+        // this._store.dispatch(SearchList({ payload: {} }));
         this.onSearch.emit(<any>{ requester: this.userLogged.id });
     }
 }

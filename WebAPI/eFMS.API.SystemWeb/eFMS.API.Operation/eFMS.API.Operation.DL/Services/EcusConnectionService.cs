@@ -239,7 +239,7 @@ namespace eFMS.API.Operation.DL.Services
             }
             catch (Exception ex)
             {
-                string logErr = String.Format("Lỗi query Ecus {0} {1} \n {2}", serverName, dbusername, ex.ToString());
+                string logErr = String.Format("Lỗi query Ecus {0} {1} {2} \n {3}", serverName, dbusername, database, ex.ToString());
                 new LogHelper("ECUS", logErr);
                 return null;
             }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -1999,7 +2000,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.Total = hbDetail.Total;
             result.DesOfGood = hbDetail.DesOfGoods;
             var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
-            string _dimensions = string.Join("\r\n", dimHbl.Select(s => Math.Round(s.Length.Value, 2) + "*" + Math.Round(s.Width.Value, 2) + "*" + Math.Round(s.Height.Value, 2) + "*" + Math.Round(s.Package.Value, 2)));
+            string _dimensions = string.Join("\r\n", dimHbl.Select(s => NumberHelper.RoundNumber(s.Length.Value, 2) + "*" + NumberHelper.RoundNumber(s.Width.Value, 2) + "*" + NumberHelper.RoundNumber(s.Height.Value, 2) + "*" + NumberHelper.RoundNumber(s.Package.Value, 2)));
             result.VolumeField = _dimensions;
             result.PrepaidTotal = hbDetail.TotalPp;
             result.CollectTotal = hbDetail.TotalCll;

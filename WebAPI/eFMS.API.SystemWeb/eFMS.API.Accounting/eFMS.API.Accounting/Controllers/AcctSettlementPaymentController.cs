@@ -232,8 +232,8 @@ namespace eFMS.API.Accounting.Controllers
             {
                 foreach (var currency in currencies)
                 {
-                    decimal totalAdv = Math.Round(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
-                    decimal totalSet = Math.Round(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal totalAdv = NumberHelper.RoundNumber(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal totalSet = NumberHelper.RoundNumber(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
                     decimal bal = (totalAdv - totalSet);
                     totalAdvance += string.Format("{0:n}", totalAdv) + " " + currency + " | ";
                     totalSettlement += string.Format("{0:n}", totalSet) + " " + currency + " | ";
@@ -279,8 +279,8 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("CheckDuplicateShipmentSettlement")]
         public IActionResult CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
-            var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria);
-            ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message };
+            var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria,out List<DuplicateShipmentSettlementResultModel> listDup);
+            ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message,Data = listDup };
             return Ok(result);
         }
 
@@ -322,12 +322,13 @@ namespace eFMS.API.Accounting.Controllers
                         ContNo = item.ContNo,
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
-                        JobNo = item.JobId
+                        JobNo = item.JobId,
+                        Notes = item.Notes
                     };
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message, Data = listDup };
                         return BadRequest(_result);
                     }
                 }
@@ -404,13 +405,14 @@ namespace eFMS.API.Accounting.Controllers
                         ContNo = item.ContNo,
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
-                        JobNo = item.JobId
+                        JobNo = item.JobId,
+                        Notes = item.Notes
                     };
                     
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message,Data = listDup };
                         return BadRequest(_result);
                     }
                 }
@@ -482,12 +484,13 @@ namespace eFMS.API.Accounting.Controllers
                         ContNo = item.ContNo,
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
-                        JobNo = item.JobId
+                        JobNo = item.JobId,
+                        Notes = item.Notes
                     };
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message,Data = listDup };
                         return BadRequest(_result);
                     }
                 }
@@ -843,7 +846,7 @@ namespace eFMS.API.Accounting.Controllers
                        !string.IsNullOrEmpty(x.ClearanceNo)
                     || !string.IsNullOrEmpty(x.ContNo)
                     || !string.IsNullOrEmpty(x.SeriesNo)
-                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ClearanceNo, x.ContNo, x.InvoiceNo, x.SeriesNo, x.Notes}).ToList();
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ChargeId ,x.ClearanceNo, x.ContNo, x.InvoiceNo, x.SeriesNo, x.Notes}).ToList();
             foreach (var charge in duplicateCharges)
             {
                 if (charge.Count() > 1)
@@ -856,7 +859,8 @@ namespace eFMS.API.Accounting.Controllers
                         charge.Key.JobId,
                         charge.Key.HBL,
                         charge.Key.MBL,
-                        charge.Key.ChargeCode
+                        charge.Key.ChargeCode,
+                        charge.Key.ChargeId
                     };
                     return true;
                 }

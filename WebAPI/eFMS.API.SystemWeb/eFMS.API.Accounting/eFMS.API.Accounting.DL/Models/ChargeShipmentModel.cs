@@ -30,8 +30,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string Unit { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal VATRate { get; set; }
-        public string CreditDebitNo { get; set; }
-
         public DateTime? DatetimeModifiedSurcharge { get; set; }
         public string CDNote { get; set; }
         public string PIC { get; set; }

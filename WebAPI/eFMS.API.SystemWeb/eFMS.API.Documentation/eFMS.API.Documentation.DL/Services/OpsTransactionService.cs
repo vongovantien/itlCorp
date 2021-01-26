@@ -241,8 +241,12 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetBy(id);
+            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
+            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+
+            var SalemansIds = DataContext.Get(x => x.Id == id).Select(t => t.SalemanId).ToArray();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated,SalemanIds = SalemansIds, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups, Departments = lstDepartments }, permissionRange);
             return code;
         }
         private OpsTransactionModel GetBy(Guid id)
@@ -410,7 +414,7 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckAllowDeleteJobUsed(Guid jobId)
         {
             var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
-            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Hblid && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
                         || !string.IsNullOrEmpty(x.AdvanceNo)
                         || !string.IsNullOrEmpty(x.VoucherId)
                         || !string.IsNullOrEmpty(x.PaySoano)
@@ -439,19 +443,21 @@ namespace eFMS.API.Documentation.DL.Services
                                                  || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Group:
+                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
-                                                || x.SalemanId == currentUser.UserID
+                                                || ( dataUserLevel.Contains(x.SalemanId) )
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Department:
+                    var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
-                                                || x.SalemanId == currentUser.UserID
+                                                || dataUserLevelDepartment.Contains(x.SalemanId)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Office:
@@ -1044,7 +1050,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId,  OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId,  OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
             if (code == 403) return new HandleState(403);
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;

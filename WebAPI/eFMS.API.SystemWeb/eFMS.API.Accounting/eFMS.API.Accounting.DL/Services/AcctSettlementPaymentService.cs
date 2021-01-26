@@ -9,6 +9,7 @@ using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -648,7 +649,7 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalAmount = advInfo.TotalAmount ?? 0,
                     AdvanceNo = advInfo.AdvanceNo,
                     AdvanceAmount = advInfo.AdvanceAmount,
-                    Balance = Math.Round((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
+                    Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo
                 });
             }
@@ -667,8 +668,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (surchargeGrp != null && surchargeGrp.Count() > 0)
             {
                 var advDataMatch = surchargeGrp.Where(x => x.Key.AdvanceNo == _advanceNo);
-                advNo = advDataMatch?.FirstOrDefault().Key.AdvanceNo;
-                customNo = surchargeGrp?.FirstOrDefault().Key.ClearanceNo;
+                advNo = advDataMatch?.FirstOrDefault()?.Key?.AdvanceNo;
+                customNo = surchargeGrp?.FirstOrDefault()?.Key?.ClearanceNo;
             }
 
             // Trường hợp settle cho 1 phiếu advance
@@ -1276,15 +1277,16 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- GET EXISITS CHARGE --
 
         #region -- INSERT & UPDATE SETTLEMENT PAYMENT --
-        public ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
+        public ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria,out List<DuplicateShipmentSettlementResultModel> modelResult)
         {
             var result = new ResultModel();
+            modelResult = new List<DuplicateShipmentSettlementResultModel>();
             if (criteria.SurchargeID == Guid.Empty)
             {
                 if (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
-                               x.ChargeId == criteria.ChargeID
+                            x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
                             //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
@@ -1293,6 +1295,8 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.ClearanceNo == criteria.CustomNo
                             && x.InvoiceNo == criteria.InvoiceNo
                             && x.ContNo == criteria.ContNo
+                            && x.Notes == criteria.Notes
+
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -1302,7 +1306,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var charge = catChargeRepo.Get();
                         var data = from sur in surChargeExists
                                    join chg in charge on sur.ChargeId equals chg.Id
-                                   select new { JobNo = criteria.JobNo, HBLNo = criteria.HBLNo, MBLNo = criteria.MBLNo, ChargeName = chg.ChargeNameEn, SettlementCode = sur.SettlementCode };
+                                   select new { criteria.JobNo, criteria.HBLNo,  criteria.MBLNo, ChargeName = chg.ChargeNameEn,  sur.SettlementCode, sur.ChargeId };
                         string msg = string.Join("<br/>", data.ToList()
                             .Select(s => !string.IsNullOrEmpty(s.JobNo)
                             && !string.IsNullOrEmpty(s.HBLNo)
@@ -1310,6 +1314,13 @@ namespace eFMS.API.Accounting.DL.Services
                             ? string.Format(@"Shipment: [{0}-{1}-{2}] Charge [{3}] has already existed in settlement: {4}", s.JobNo, s.HBLNo, s.MBLNo, s.ChargeName, s.SettlementCode)
                             : string.Format(@"Charge [{0}] has already existed in settlement: {1}.", s.ChargeName, s.SettlementCode)));
                         result.Message = msg;
+
+                        modelResult = data.Select(x => new DuplicateShipmentSettlementResultModel {
+                            JobNo = x.JobNo,
+                            MBLNo = x.MBLNo,
+                            HBLNo = x.HBLNo,
+                            ChargeId = x.ChargeId
+                        }).ToList();
                     }
                 }
             }
@@ -1328,6 +1339,7 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.ClearanceNo == criteria.CustomNo
                             && x.InvoiceNo == criteria.InvoiceNo
                             && x.ContNo == criteria.ContNo
+                            && x.Notes == criteria.Notes
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -1337,7 +1349,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var charge = catChargeRepo.Get();
                         var data = from sur in surChargeExists
                                    join chg in charge on sur.ChargeId equals chg.Id
-                                   select new { JobNo = criteria.JobNo, HBLNo = criteria.HBLNo, MBLNo = criteria.MBLNo, ChargeName = chg.ChargeNameEn, SettlementCode = sur.SettlementCode };
+                                   select new {  criteria.JobNo, criteria.HBLNo,criteria.MBLNo, ChargeName = chg.ChargeNameEn,sur.SettlementCode, sur.ChargeId };
                         string msg = string.Join("<br/>", data.ToList()
                             .Select(s => !string.IsNullOrEmpty(s.JobNo)
                             && !string.IsNullOrEmpty(s.HBLNo)
@@ -1345,6 +1357,14 @@ namespace eFMS.API.Accounting.DL.Services
                             ? string.Format(@"Shipment: [{0}-{1}-{2}] Charge [{3}] has already existed in settlement: {4}", s.JobNo, s.HBLNo, s.MBLNo, s.ChargeName, s.SettlementCode)
                             : string.Format(@"Charge [{0}] has already existed in settlement: {1}.", s.ChargeName, s.SettlementCode)));
                         result.Message = msg;
+
+                        modelResult = data.Select(x => new DuplicateShipmentSettlementResultModel
+                        {
+                            JobNo = x.JobNo,
+                            MBLNo = x.MBLNo,
+                            HBLNo = x.HBLNo,
+                            ChargeId = x.ChargeId
+                        }).ToList();
                     }
                 }
             }
@@ -1399,7 +1419,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.SettlementCode = settlement.SettlementNo;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
                             }
@@ -1429,7 +1449,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
                                     item.OfficeId = currentUser.OfficeID;
                                     item.CompanyId = currentUser.CompanyID;
@@ -1476,7 +1496,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             int roundDecimal = model.Settlement.SettlementCurrency != AccountingConstants.CURRENCY_LOCAL ? 3 : 0;
-            amount = Math.Round(amount, roundDecimal);
+            amount = NumberHelper.RoundNumber(amount, roundDecimal);
             return amount;
         }
 
@@ -1596,7 +1616,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.ExchangeDate = DateTime.Now;
-                                    item.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                    item.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                     item.TransactionType = GetTransactionTypeOfChargeByHblId(item.Hblid);
                                     item.OfficeId = currentUser.OfficeID;
                                     item.CompanyId = currentUser.CompanyID;
@@ -1661,7 +1681,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                         sceneCharge.UserModified = userCurrent;
                                         sceneCharge.DatetimeModified = DateTime.Now;
-                                        sceneCharge.Total = Math.Round(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
+                                        sceneCharge.Total = NumberHelper.RoundNumber(item.Total, item.CurrencyId != AccountingConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn đối với charge VND
                                         csShipmentSurchargeRepo.Update(sceneCharge, x => x.Id == sceneCharge.Id);
                                     }
                                 }
@@ -3432,7 +3452,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.InvoiceDate = charge.InvoiceDate;
                     chargeCopy.SeriesNo = charge.SeriesNo;
                     chargeCopy.PaymentRequestType = charge.PaymentRequestType;
-                    chargeCopy.ClearanceNo = charge.ClearanceNo;
+                    chargeCopy.ClearanceNo = shipment.CustomNo; //Lấy customNo của Shipment
                     chargeCopy.ContNo = charge.ContNo;
                     chargeCopy.Soaclosed = charge.Soaclosed;
                     chargeCopy.Cdclosed = charge.Cdclosed;
@@ -3543,7 +3563,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = Math.Round(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
 
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
@@ -3665,7 +3685,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = Math.Round(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
 
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
@@ -3768,7 +3788,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = Math.Round(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
 
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;

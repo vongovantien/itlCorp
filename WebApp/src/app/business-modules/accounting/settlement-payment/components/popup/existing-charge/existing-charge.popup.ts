@@ -1,12 +1,11 @@
 import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { SystemConstants } from 'src/constants/system.const';
 import { catchError, finalize } from 'rxjs/operators';
-import { DataService, SortService } from 'src/app/shared/services';
-import { AccountingRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { SortService } from '@services';
+import { AccountingRepo, DocumentationRepo, CatalogueRepo } from '@repositories';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
-import { Surcharge } from 'src/app/shared/models';
+import { Surcharge } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import cloneDeep from 'lodash/cloneDeep';
 import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-modules/share-modules/components';
@@ -58,7 +57,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     numberOfShipment: number = 0;
     constructor(
-        private _dataService: DataService,
         private _catalogue: CatalogueRepo,
         private _catalogueRepo: CatalogueRepo,
         private _accoutingRepo: AccountingRepo,
@@ -87,20 +85,16 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     getPartner() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
-            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
-        } else {
-            this.isLoadingShipmentGrid = true;
-            this._catalogue.getListPartner(null, null, { active: true })
-                .pipe(catchError(this.catchError), finalize(() => {
-                    this.isLoadingShipmentGrid = false;
-                }))
-                .subscribe(
-                    (dataPartner: any) => {
-                        this.getPartnerData(dataPartner);
-                    },
-                );
-        }
+        this.isLoadingShipmentGrid = true;
+        this._catalogue.getListPartner(null, null, { active: true })
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoadingShipmentGrid = false;
+            }))
+            .subscribe(
+                (dataPartner: any) => {
+                    this.getPartnerData(dataPartner);
+                },
+            );
     }
 
     getPartnerData(data: any) {

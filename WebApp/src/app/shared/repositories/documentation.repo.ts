@@ -82,7 +82,7 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Paging`, body, {
             page: '' + page,
             size: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -229,6 +229,15 @@ export class DocumentationRepo {
         );
     }
 
+    previewCDNoteList(data: any[], isOrigin: boolean) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNoteList`, data, { isOrigin: isOrigin }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     previewPL(jobId, currency) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/PreviewFormPLsheet`, { jobId: jobId, currency: currency }).pipe(
             map((data: any) => data)
@@ -262,7 +271,7 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
             page: '' + page,
             size: '' + size
-        });
+        }, { "hideSpinner": "true" });
     }
 
     getListHouseBillOfJob(data: any = {}) {
@@ -1005,5 +1014,22 @@ export class DocumentationRepo {
     getASTransactionInfo(mblNo: string, hblNo: string, serviceName: string, serviceMode: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/GetLinkASInfomation/`,
             { mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
+    }
+
+    downloadChargeExcel() {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    upLoadChargeFile(files: any) {
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/UploadFile`, files, "uploadedFile");
+    }
+
+    importCharge(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/import`, body).pipe(
+            map((data: any) => data)
+        );
     }
 }
