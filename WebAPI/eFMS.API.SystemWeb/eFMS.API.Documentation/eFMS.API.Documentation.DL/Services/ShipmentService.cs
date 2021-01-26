@@ -2459,14 +2459,14 @@ namespace eFMS.API.Documentation.DL.Services
                         var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         decimal? percent = 0;
                         decimal UnitPrice = charge.UnitPrice ?? 0;
-                        charge.UnitPrice = Math.Round(UnitPrice, 3);
+                        charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                         if (charge.VATRate > 0)
                         {
                             percent = (charge.VATRate * 10) / 100;
                             charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
                             if (charge.Currency != "VND")
                             {
-                                charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 3);
                             }
                         }
                         else
@@ -2553,7 +2553,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.PackageContainer = charge.PackageContainer;
                         var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         decimal UnitPrice = charge.UnitPrice ?? 0;
-                        charge.UnitPrice = Math.Round(UnitPrice, 3);
+                        charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                         charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
                         if (charge.VATRate > 0)
                         {
@@ -2566,7 +2566,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (charge.Currency != "VND")
                         {
-                            charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                            charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 3);
                         }
                         foreach (var partner in detailLookupPartner[_partnerId])
                         {
