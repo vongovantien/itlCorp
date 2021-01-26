@@ -522,6 +522,12 @@
             <param name="data"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField">
+            <summary>
+            Only Use for Dev
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShippingInstructionController.CheckExistSIExport(System.Guid)">
             <summary>
             Check if Exist Sea Export files attach

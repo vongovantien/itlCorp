@@ -148,7 +148,16 @@ namespace eFMS.API.Documentation.Controllers
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             model.DatetimeCreated = DateTime.Now;
-            model.Total = NumberHelper.RoundNumber(model.Total, model.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0);
+
+            var netAmount = csShipmentSurchargeService.CalculatorNetAmountByCurrency(model.CurrencyId, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId); //Thành tiền trước thuế (Original)                        
+            var vatAmount = csShipmentSurchargeService.CalculatorVatAmountByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId);
+            model.NetAmount = netAmount;
+            model.Total = netAmount + vatAmount; //Thành tiền sau thuế (Original)
+            model.AmountVnd = csShipmentSurchargeService.CalculatorNetAmountByCurrency(model.CurrencyId, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Thành tiền trước thuế (Local)
+            model.VatAmountVnd = csShipmentSurchargeService.CalculatorVatAmountByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Tiền thuế (Local)
+            model.AmountUsd = csShipmentSurchargeService.CalculatorNetAmountByCurrency(model.CurrencyId, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD); //Thành tiền trước thuế (USD)
+            model.VatAmountUsd = csShipmentSurchargeService.CalculatorVatAmountByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD); //Tiền thuế (USD)
+
             var hs = csShipmentSurchargeService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -182,9 +191,7 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            list.ForEach(fe => {
-                fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
-            });
+            
             var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -208,7 +215,16 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
-            model.Total = NumberHelper.RoundNumber(model.Total, model.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0);
+
+            var netAmount = csShipmentSurchargeService.CalculatorNetAmountByCurrency(model.CurrencyId, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId); //Thành tiền trước thuế (Original)                        
+            var vatAmount = csShipmentSurchargeService.CalculatorVatAmountByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId);
+            model.NetAmount = netAmount;
+            model.Total = netAmount + vatAmount; //Thành tiền sau thuế (Original)
+            model.AmountVnd = csShipmentSurchargeService.CalculatorNetAmountByCurrency(model.CurrencyId, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Thành tiền trước thuế (Local)
+            model.VatAmountVnd = csShipmentSurchargeService.CalculatorVatAmountByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Tiền thuế (Local)
+            model.AmountUsd = csShipmentSurchargeService.CalculatorNetAmountByCurrency(model.CurrencyId, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD); //Thành tiền trước thuế (USD)
+            model.VatAmountUsd = csShipmentSurchargeService.CalculatorVatAmountByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD); //Tiền thuế (USD)
+
             var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -464,6 +480,22 @@ namespace eFMS.API.Documentation.Controllers
         }
         #endregion
 
+        /// <summary>
+        /// Only Use for Dev
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("UpdateFieldNetAmount_AmountUSD_VatAmountUSD")]
+        public IActionResult UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField()
+        {
+            var hs = csShipmentSurchargeService.UpdateFieldNetAmount_AmountUSD_VatAmountUSD();
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Update Success" };
+            if (!hs.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
+                return BadRequest(_result);
+            }
+            return Ok(result);
+        }
     }
 }
 
