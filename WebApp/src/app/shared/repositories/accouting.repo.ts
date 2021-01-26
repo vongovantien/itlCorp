@@ -22,7 +22,7 @@ export class AccountingRepo {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/paging`, body, {
                 pageNumber: '' + page,
                 pageSize: '' + size
-            }).pipe(
+            }, { "hideSpinner": "true" }).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
@@ -155,7 +155,7 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/paging`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
@@ -217,7 +217,7 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/paging`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }

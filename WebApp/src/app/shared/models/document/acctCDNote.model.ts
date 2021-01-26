@@ -45,4 +45,6 @@ export class AcctCDNote {
   flexId: string = null;
   status: string = null;
   note: string = null;
+  officeId: string = null;
+  companyId: string = null;
 }

@@ -6,6 +6,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -473,8 +474,8 @@ namespace eFMS.API.Accounting.DL.Services
                 //Credit Amount
                 creditAmount += _exchangeRate * _credit;
             }
-            debitAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? Math.Round(debitAmount) : debitAmount;
-            creditAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? Math.Round(creditAmount) : creditAmount;
+            debitAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(debitAmount) : debitAmount;
+            creditAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(creditAmount) : creditAmount;
             return new AcctSoa { TotalShipment = totalShipment, DebitAmount = debitAmount, CreditAmount = creditAmount };
         }
 
@@ -1770,10 +1771,10 @@ namespace eFMS.API.Accounting.DL.Services
             data.TotalCharge = chargeShipments.Count;
             data.GroupShipments = _groupShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
             data.ChargeShipments = chargeShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
-            data.AmountDebitLocal = Math.Round(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
-            data.AmountCreditLocal = Math.Round(chargeShipments.Sum(x => x.AmountCreditLocal), 3);
-            data.AmountDebitUSD = Math.Round(chargeShipments.Sum(x => x.AmountDebitUSD), 3);
-            data.AmountCreditUSD = Math.Round(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
+            data.AmountDebitLocal = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
+            data.AmountCreditLocal = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountCreditLocal), 3);
+            data.AmountDebitUSD = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountDebitUSD), 3);
+            data.AmountCreditUSD = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
             //Thông tin các Service Name của SOA
             data.ServicesNameSoa = DataTypeEx.GetServiceNameOfSoa(data.ServiceTypeId).ToString();
             data.IsExistChgCurrDiffLocalCurr = soaDetail.Currency != AccountingConstants.CURRENCY_LOCAL || chargeShipments.Any(x => x.Currency != AccountingConstants.CURRENCY_LOCAL);
@@ -2022,7 +2023,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //    air.ExchangeRate = dataObjectCurrencyExchange.Rate;
                     //}
 
-                    air.TotalAmount = Math.Round((air.NetAmount * air.ExchangeRate) ?? 0);
+                    air.TotalAmount = NumberHelper.RoundNumber((air.NetAmount * air.ExchangeRate) ?? 0);
 
                     result.HawbAirFrieghts.Add(air);
                 }
@@ -2412,22 +2413,22 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         percent = it.VATRate / 100;
                         it.VATAmount = percent * (it.UnitPrice * it.Quantity);
-                        if (it.Currency != "VND")
+                        if (it.Currency != AccountingConstants.CURRENCY_LOCAL)
                         {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 2);
+                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 2);
 
                         }
                         else
                         {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0);
+                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0);
                         }
                     }
                     else
                     {
-                        it.VATAmount = (it.Currency == "VND" ? Math.Round(it.VATRate ?? 0) : Math.Round(it.VATRate ?? 0, 2));
+                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
                     }
 
-                    it.NetAmount = (it.Currency == "VND" ? Math.Round((it.UnitPrice * it.Quantity) ?? 0) : Math.Round((it.UnitPrice * it.Quantity) ?? 0, 2));
+                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((it.UnitPrice * it.Quantity) ?? 0) : NumberHelper.RoundNumber((it.UnitPrice * it.Quantity) ?? 0, 2));
                 }
 
             }

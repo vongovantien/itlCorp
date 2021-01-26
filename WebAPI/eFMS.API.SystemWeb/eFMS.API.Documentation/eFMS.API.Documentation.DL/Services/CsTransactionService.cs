@@ -1820,8 +1820,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 foreach (var c in charges)
                 {
-                    var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(c.FinalExchangeRate, c.ExchangeDate, c.CurrencyId, DocumentConstants.CURRENCY_LOCAL);//currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND")).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    var UsdToVnd = currencyExchangeService.CurrencyExchangeRateConvert(c.FinalExchangeRate, c.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);//currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND")).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(c.FinalExchangeRate, c.ExchangeDate, c.CurrencyId, DocumentConstants.CURRENCY_LOCAL);//currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var UsdToVnd = currencyExchangeService.CurrencyExchangeRateConvert(c.FinalExchangeRate, c.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);//currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                     var rate = exchangeRate;
                     var usdToVndRate = UsdToVnd;
                     if (c.Type.ToLower() == DocumentConstants.CHARGE_BUY_TYPE.ToLower())
