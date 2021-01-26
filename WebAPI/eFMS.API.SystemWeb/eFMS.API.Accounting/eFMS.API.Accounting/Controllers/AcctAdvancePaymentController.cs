@@ -934,7 +934,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
 
-        [HttpPut("DenyAdvances")]
+        [HttpPut("DenyAdvancePayments")]
         [Authorize]
         public IActionResult DenyAdvances(List<Guid> Ids)
         {

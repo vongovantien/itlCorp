@@ -3486,7 +3486,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                 adv.LockedLog = adv.LockedLog + log + ";";
 
-                                result = DataContext.Update(adv, x => x.Id == Id);
+                                result = DataContext.Update(adv, x => x.Id == Id, false);
 
                                 if (result.Success)
                                 {
@@ -3497,12 +3497,14 @@ namespace eFMS.API.Accounting.DL.Services
                                         approve.UserModified = currentUser.UserID;
                                         approve.DateModified = DateTime.Now;
 
-                                        acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
+                                        acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id, false);
                                     }
                                 }
                             }
                         }
                     }
+                    DataContext.SubmitChanges();
+                    acctApproveAdvanceRepo.SubmitChanges();
                     trans.Commit();
                     return result;
                 }
