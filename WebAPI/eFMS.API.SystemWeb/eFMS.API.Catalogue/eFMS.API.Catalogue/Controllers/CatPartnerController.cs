@@ -603,9 +603,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UpdateInfoForPartner")]
-        public IActionResult UpdateInfoForPartner(CatPartnerCriteria criteria)
+        public IActionResult UpdateInfoForPartner(CatPartnerEditModel model)
         {
-            var hs = catPartnerService.UpdatePartnerData(criteria);
+            var partner = mapper.Map<CatPartnerModel>(model);
+            var hs = catPartnerService.UpdatePartnerData(partner);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

@@ -332,5 +332,12 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportCDNoteCombine(data: any[]) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNoteCombine`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

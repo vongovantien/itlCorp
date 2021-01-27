@@ -46,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
+        private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
@@ -69,6 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysOffice> sysOffice,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
+            IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -95,6 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             userlevelRepository = userlevelRepo;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
+            accAdvancePaymentRepository = accAdvancePaymentRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -238,8 +241,12 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetBy(id);
+            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
+            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+
+            var SalemansIds = DataContext.Get(x => x.Id == id).Select(t => t.SalemanId).ToArray();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated,SalemanIds = SalemansIds, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups, Departments = lstDepartments }, permissionRange);
             return code;
         }
         private OpsTransactionModel GetBy(Guid id)
@@ -407,7 +414,7 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckAllowDeleteJobUsed(Guid jobId)
         {
             var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
-            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Hblid && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
                         || !string.IsNullOrEmpty(x.AdvanceNo)
                         || !string.IsNullOrEmpty(x.VoucherId)
                         || !string.IsNullOrEmpty(x.PaySoano)
@@ -436,17 +443,21 @@ namespace eFMS.API.Documentation.DL.Services
                                                  || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Group:
+                    var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
+                                                || ( dataUserLevel.Contains(x.SalemanId) )
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Department:
+                    var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
+                                                || dataUserLevelDepartment.Contains(x.SalemanId)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Office:
@@ -1039,7 +1050,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId,  OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId,  OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
             if (code == 403) return new HandleState(403);
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
@@ -1443,6 +1454,51 @@ namespace eFMS.API.Documentation.DL.Services
                 containers.Add(item);
             }
             return containers;
+        }
+
+        public int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs)
+        {
+            mblNo = string.Empty;
+            advs = new List<string>();
+            int errorCode = 0;  // 1|2
+            bool hasChargeSynced = false;
+            bool hasAdvanceRequest = false;
+
+            if (DataContext.Any(x => x.Id == model.Id 
+            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED 
+            && ( (x.Mblno ?? "").ToLower() != (model.Mblno ?? "")  || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))    
+            {
+                OpsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
+                if (shipment != null)
+                {
+                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo  && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                }
+
+                if (hasChargeSynced)
+                {
+                    errorCode = 1;
+                    mblNo = shipment.Mblno;
+                }
+                else
+                {
+                    var query = from advR in accAdvanceRequestRepository.Get(x => x.JobId == shipment.JobNo)
+                                join adv in accAdvancePaymentRepository.Get(x => x.SyncStatus == "Synced") on advR.AdvanceNo equals adv.AdvanceNo
+                                select adv.AdvanceNo;
+
+                    if (query != null && query.Count() > 0)
+                    {
+                        hasAdvanceRequest = true;
+                        advs = query.Distinct().ToList();
+                    }
+                    if (hasAdvanceRequest)
+                    {
+                        errorCode = 2;
+                        mblNo = shipment.Mblno;
+                    }
+                }
+            }
+
+            return errorCode;
         }
     }
 }

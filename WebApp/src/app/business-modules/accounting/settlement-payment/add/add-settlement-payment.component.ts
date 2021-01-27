@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -8,6 +9,7 @@ import { Surcharge } from '@models';
 import { AccountingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { RoutingConstants } from '@constants';
+import { DataService } from '@services';
 
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
@@ -28,7 +30,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private _dataService: DataService
     ) {
         super();
 
@@ -79,6 +82,13 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
                     this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                },
+                (error) => {
+                    if (error instanceof HttpErrorResponse) {
+                        if (error.error?.data) {
+                            this._dataService.setData('duplicateChargeSettlement', error.error);
+                        }
+                    }
                 }
             );
     }

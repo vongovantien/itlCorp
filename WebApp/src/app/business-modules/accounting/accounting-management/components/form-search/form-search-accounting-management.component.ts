@@ -104,6 +104,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
     resetSearch() {
         this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
+
         this.resetFormControl(this.partner);
         this.resetFormControl(this.creator);
         this.onReset.emit(<any>{ transactionType: null });

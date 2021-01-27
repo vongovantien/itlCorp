@@ -70,10 +70,12 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             );
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
+            { title: 'Salesman', field: 'username', sortable: true },
+            { title: 'Agreement Type', field: 'contractType', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
-            { title: 'Salesman', field: 'username', sortable: true },
+
             { title: 'Status', field: 'status', sortable: true },
             { title: 'CreateDate', field: 'createDate', sortable: true }
         ];
@@ -82,9 +84,9 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             { title: 'Name ABBR', field: 'shortName', sortable: true },
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
-            { title: 'Billing Address', field: 'addressVn', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
+            { title: 'Billing Address', field: 'addressVn', sortable: true },
         ];
 
         this.headerSearch = [
@@ -93,6 +95,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Salesman', field: 'Saleman', sortable: true },
+            { title: 'Agreement Type', field: 'contractType', sortable: true }
         ];
 
         this.configSearch = {

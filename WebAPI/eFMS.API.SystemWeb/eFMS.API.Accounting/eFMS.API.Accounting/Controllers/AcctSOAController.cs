@@ -241,14 +241,14 @@ namespace eFMS.API.Accounting.Controllers
 
             //Danh sách CreditDebitNote
             var listCdNote = data
-                .Where(x => x.CreditDebitNo != null)
-                .GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.CreditDebitNo })
+                .Where(x => x.CDNote != null)
+                .GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.CDNote })
                 .Select(x => new CreditDebitNote
                 {
                     JobId = x.Key.JobId,
                     HBL = x.Key.HBL,
                     MBL = x.Key.MBL,
-                    CreditDebitNo = x.Key.CreditDebitNo
+                    CreditDebitNo = x.Key.CDNote
                 }).ToList();
 
             var result = new { listShipment, listCdNote };

@@ -68,7 +68,7 @@ export class UserCreatePopupComponent extends PopupBase implements OnInit {
       this._toastService.warning("Please select user to update.");
     }
     else {
-      this._catalogueRepo.updateInfoForPartner({ id: this.partnerId, userCreated: user.userId })
+      this._catalogueRepo.updateInfoForPartner({ id: this.partnerId, userCreated: user.userId, companyId: user.companyId, officeId: user.officeId, groupId: user.groupId })
         .pipe(catchError(this.catchError))
         .subscribe(
           (res: CommonInterface.IResult) => {

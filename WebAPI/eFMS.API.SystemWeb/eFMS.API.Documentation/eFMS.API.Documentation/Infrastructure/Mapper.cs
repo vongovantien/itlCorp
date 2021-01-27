@@ -55,6 +55,8 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<OpsTransactionModel, OpsTransaction>();
 
             CreateMap<SysReportLogModel, SysReportLog>();
+
+            CreateMap<CsShipmentSurchargeImportModel, CsShipmentSurcharge>();
         }
     }
 }

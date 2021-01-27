@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -978,8 +979,8 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
                 var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
                 data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
-                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription :  catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
-                data.Shipper = !string.IsNullOrEmpty( data.ShipperDescription) ? data.ShipperDescription : catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
                 data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault()?.Username;
                 data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
@@ -1010,7 +1011,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                     decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
+                    charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     //SELL
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -1063,7 +1064,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                     decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
+                    charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     //BUY
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -1180,7 +1181,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
                 data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
                 string Code = catUnitRepo.Get(x => x.Id == item.PackageQty).Select(t => t.Code).FirstOrDefault();
-                data.QTy =  item.QTy + " " + Code ;
+                data.QTy = item.QTy + " " + Code;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -1537,7 +1538,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
             Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria);
-            
+
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
         }
@@ -1792,7 +1793,7 @@ namespace eFMS.API.Documentation.DL.Services
             criteriaNoCustomer.CustomerId = null;
             criteria.CustomerId = customerId;
             Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteriaNoCustomer);
-            
+
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
         }
@@ -1817,502 +1818,22 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
             var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            var lstPartner = catPartnerRepo.Get();
+            var lstCharge = catChargeRepo.Get();
+            var lstSurchage = surCharge.Get();
+            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
+            var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             foreach (var item in dataShipment)
             {
-                var _charges = surCharge.Get(x => x.Hblid == item.Hblid);
-                if (!string.IsNullOrEmpty(criteria.CustomerId))
-                {
-                    _charges = _charges.Where(x => criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId);
-                }
-                foreach (var charge in _charges)
+                foreach (var charge in detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true))
                 {
                     AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-
+                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
                     data.ServiceDate = item.ServiceDate;
                     data.JobId = item.JobNo;
-                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
-                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
-                    data.PartnerCode = _partner?.AccountNo;
-                    data.PartnerName = _partner?.PartnerNameEn;
-                    data.PartnerTaxCode = _partner?.TaxCode;
-                    data.Mbl = item.Mblno;
-                    data.Hbl = item.Hwbno;
+                    data.Hblid = charge.Hblid;
                     data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
-                    data.PaymentMethodTerm = string.Empty;
-                    var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-                    data.ChargeCode = _charge?.Code;
-                    data.ChargeName = _charge?.ChargeNameEn;
-                    data.Pol = item.Pol;
-
-                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-
-                    decimal? _amount = charge.Quantity * charge.UnitPrice;
-                    var _taxInvNoRevenue = string.Empty;
-                    var _voucherRevenue = string.Empty;
-                    decimal? _usdRevenue = 0;
-                    decimal? _vndRevenue = 0;
-                    decimal? _taxOut = 0;
-                    decimal? _totalRevenue = 0;
-                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                    {
-                        _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
-                        _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
-
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                        {
-                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
-                            _vndRevenue = _amount * _exchangeRateToVnd;
-                        }
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _vndRevenue = _amount;
-                        }
-
-                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
-                        {
-                            _taxOut = (_amount * _exchangeRate * charge.Vatrate) / 100;
-                        }
-                        else
-                        {
-                            _taxOut = Math.Abs(charge.Vatrate ?? 0);
-                        }
-                        _voucherRevenue = charge.VoucherId;
-                        _totalRevenue = (_amount * _exchangeRate) + _taxOut;
-                    }
-                    data.TaxInvNoRevenue = _taxInvNoRevenue;
-                    data.VoucherIdRevenue = _voucherRevenue;
-                    data.UsdRevenue = _usdRevenue;
-                    data.VndRevenue = _vndRevenue;
-                    data.TaxOut = _taxOut;
-                    data.TotalRevenue = _totalRevenue;
-
-                    var _taxInvNoCost = string.Empty;
-                    var _voucherCost = string.Empty;
-                    decimal? _usdCost = 0;
-                    decimal? _vndCost = 0;
-                    decimal? _taxIn = 0;
-                    decimal? _totalCost = 0;
-                    if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                    {
-                        _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
-                        _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
-
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                        {
-                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
-                            _vndCost = _amount * _exchangeRateToVnd;
-                        }
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _vndCost = _amount;
-                        }
-
-                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
-                        {
-                            _taxIn = (_amount * _exchangeRate * charge.Vatrate) / 100;
-                        }
-                        else
-                        {
-                            _taxIn = Math.Abs(charge.Vatrate ?? 0);
-                        }
-                        _voucherCost = charge.VoucherId;
-                        _totalCost = (_amount * _exchangeRate) + _taxIn;
-                    }
-                    data.TaxInvNoCost = _taxInvNoCost;
-                    data.VoucherIdCost = _voucherCost;
-                    data.UsdCost = _usdCost;
-                    data.VndCost = _vndCost;
-                    data.TaxIn = _taxIn;
-                    data.TotalCost = _totalCost;
-
-                    data.TotalKickBack = (charge.KickBack == true) ? _amount * _exchangeRate : 0;
-                    data.ExchangeRate = _exchangeRate;
-                    data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
-                    data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
-                    data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
-                    data.PaidDate = null;
-                    data.AcVoucherNo = string.Empty;
-                    data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
-                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
-                    data.UserExport = currentUser.UserName;
-
-                    dataList.Add(data);
-                }
-            }
-            return dataList.AsQueryable();
-        }
-
-        private IQueryable<AccountingPlSheetExportResult> QueryDataDocumentationAcctPLSheet(GeneralReportCriteria criteria)
-        {
-            Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteria);
-            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = GetQueryTransationDetailDocumentation(criteria);
-
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
-            if (queryTranDetail == null)
-            {
-                var houseBills = detailRepository.Get();
-                var queryShipment = from master in masterBills
-                                    join house in houseBills on master.Id equals house.JobId into housebill
-                                    from house in housebill.DefaultIfEmpty()
-                                    select new AccountingPlSheetExportResult
-                                    {
-                                        JobId = master.JobNo,
-                                        Mbl = master.Mawb,
-                                        Hblid = house.Id,
-                                        Hbl = house.Hwbno,
-                                        PaymentMethodTerm = master.PaymentTerm,
-                                        ServiceDate = master.ServiceDate,
-                                        Service = master.TransactionType
-                                    };
-                return queryShipment;
-            }
-            else
-            {
-                var houseBills = GetTransactionDetailDocWithSalesman(queryTranDetail, criteria);
-                var queryShipment = from master in masterBills
-                                    join house in houseBills on master.Id equals house.JobId
-                                    select new AccountingPlSheetExportResult
-                                    {
-                                        JobId = master.JobNo,
-                                        Mbl = master.Mawb,
-                                        Hblid = house.Id,
-                                        Hbl = house.Hwbno,
-                                        PaymentMethodTerm = master.PaymentTerm,
-                                        ServiceDate = master.ServiceDate,
-                                        Service = master.TransactionType
-                                    };
-                return queryShipment;
-            }
-        }
-
-        private IQueryable<JobProfitAnalysisExportResult> JobProfitAnalysisDocumetation(GeneralReportCriteria criteria)
-        {
-            // Filter data without customerId
-            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
-            criteriaNoCustomer.CustomerId = null;
-            var dataShipment = QueryDataDocumentationJobProfitAnalysis(criteriaNoCustomer);
-            List<JobProfitAnalysisExportResult> dataList = new List<JobProfitAnalysisExportResult>();
-            var dataCharge = catChargeRepo.Get();
-            foreach (var item in dataShipment)
-            {
-                var _charges = surCharge.Get(x => x.Hblid == item.Hblid && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
-                if (!string.IsNullOrEmpty(criteria.CustomerId))
-                {
-                    _charges = _charges.Where(x => (criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId) && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
-                }
-                foreach (var charge in _charges)
-                {
-                    JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
-                    data.JobNo = item.JobNo;
-                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
-                    data.Mbl = item.Mbl;
-                    data.Hbl = item.Hbl;
-                    data.Eta = item.Eta;
-                    data.Etd = item.Etd;
-                    data.Quantity = item.Quantity;
-                    data.Cont20 = item.Cont20;
-                    data.Cont40 = item.Cont40;
-                    data.Cont40HC = item.Cont40HC;
-                    data.Cont45 = item.Cont45;
-                    data.Cont = item.Cont;
-                    data.CW = item.CW;
-                    data.GW = item.GW;
-                    data.CBM = item.CBM;
-                    data.ChargeType = charge.Type;
-                    var _charge = dataCharge.FirstOrDefault(x => x.Id == charge.ChargeId);
-                    data.ChargeCode = _charge?.ChargeNameEn;
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                    {
-                        data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
-                    }
-
-                    if (_charge.DebitCharge != null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                    {
-
-                        data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
-                        var dataSelling = dataCharge.FirstOrDefault(x => x.Id == _charge.DebitCharge);
-                        var dataChargeSell = _charges.FirstOrDefault(x => x.ChargeId == dataSelling.Id && x.Type == DocumentConstants.CHARGE_SELL_TYPE);
-                        if (dataChargeSell != null)
-                        {
-                            var _rateRevenue = currencyExchangeService.CurrencyExchangeRateConvert(dataChargeSell.FinalExchangeRate, dataChargeSell.ExchangeDate, dataChargeSell.CurrencyId, criteria.Currency);
-                            data.TotalRevenue = dataChargeSell.Quantity * dataChargeSell.UnitPrice * _rateRevenue ?? 0;
-                            data.isGroup = true;
-                        }
-
-                    }
-
-                    data.TotalCost = data.TotalCost ?? 0;
-                    data.TotalRevenue = data.TotalRevenue ?? 0;
-                    data.JobProfit = data.TotalRevenue - data.TotalCost;
-                    if (data.TotalRevenue == 0)
-                    {
-                        data.JobProfit = 0;
-                    }
-
-                    if (_charge.DebitCharge == null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                    {
-                        data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
-                    }
-                    dataList.Add(data);
-                }
-            }
-            var groupedList = dataList.Where(x => x.isGroup == true).ToList();
-            if (groupedList != null)
-            {
-                foreach (var item in groupedList)
-                {
-                    var ItemToRemove = dataList.FirstOrDefault(x => x.ChargeCode == item.ChargeCode && x.isGroup == null && x.ChargeType == DocumentConstants.CHARGE_SELL_TYPE && x.Hbl == item.Hbl);
-                    if (ItemToRemove != null)
-                    {
-                        dataList.Remove(ItemToRemove);
-                    }
-                }
-            }
-            var GroupHbl = dataList.GroupBy(a => a.Hbl).Select(p => new { Hbl = p.Key, TotalCost = p.Sum(q => q.TotalCost), TotalRevenue = p.Sum(q => q.TotalRevenue), TotalJobProfit = p.Sum(q => q.JobProfit) }).ToList();
-            foreach (var item in GroupHbl)
-            {
-                if(!string.IsNullOrEmpty(item.Hbl))
-                {
-                    int i = dataList.FindLastIndex(x => x.Hbl != null && x.Hbl.StartsWith(item.Hbl));
-                    JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
-                    data.TotalCost = item.TotalCost;
-                    data.TotalRevenue = item.TotalRevenue;
-                    data.JobProfit = item.TotalJobProfit;
-                    dataList.Insert(i + 1, data);
-                }
-            }
-            return dataList.AsQueryable();
-
-        }
-
-        private IQueryable<JobProfitAnalysisExportResult> JobProfitAnalysisOperation(GeneralReportCriteria criteria)
-        {
-            var dataShipment = QueryDataOperationAcctPLSheet(criteria);
-            List<JobProfitAnalysisExportResult> dataList = new List<JobProfitAnalysisExportResult>();
-            var dataCharge = catChargeRepo.Get();
-
-            foreach (var item in dataShipment)
-            {
-                var _charges = surCharge.Get(x => x.Hblid == item.Hblid && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
-                if (!string.IsNullOrEmpty(criteria.CustomerId))
-                {
-                    _charges = _charges.Where(x => (criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId) && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
-                }
-                foreach (var charge in _charges)
-                {
-                    JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
-                    data.JobNo = item.JobNo;
-                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
-                    data.Mbl = item.Mblno;
-                    data.Hbl = item.Hwbno;
-                    data.Eta = item.ServiceDate;
-                    data.Etd = item.ServiceDate;
-                    data.Quantity = item.SumContainers;
-                    var DetailContainer = !string.IsNullOrEmpty(item.ContainerDescription) ? item.ContainerDescription.Split(";").ToArray() : null;
-                    int? Cont20 = 0;
-                    int? Cont40 = 0;
-                    int? Cont40HC = 0;
-                    int? Cont45 = 0;
-                    int? Cont = 0;
-                    if (DetailContainer != null)
-                    {
-                        foreach (var it in DetailContainer)
-                        {
-                            if (Regex.Matches(it.Trim(), "20").Count > 0)
-                            {
-                                Cont20 = Convert.ToInt16(it.Trim().Substring(0, 1));
-                            }
-
-                            if (Regex.Matches(it.Trim(), "40").Count > 0)
-                            {
-                                Cont40 = Convert.ToInt16(it.Trim().Substring(0, 1));
-                            }
-
-                            if (Regex.Matches(it.Trim(), "40´HC").Count > 0)
-                            {
-                                Cont40HC = Convert.ToInt16(it.Trim().Substring(0, 1));
-                            }
-
-                            if (Regex.Matches(it.Trim(), "45").Count > 0)
-                            {
-                                Cont45 = Convert.ToInt16(it.Trim().Substring(0, 1));
-                            }
-
-                            if (Regex.Matches(it.Trim(), "Cont").Count > 0)
-                            {
-                                Cont = Convert.ToInt16(it.Trim().Substring(0, 1));
-                            }
-
-                        }
-                    }
-                    data.Cont20 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont20 : 0;
-                    data.Cont40 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont40 : 0;
-                    data.Cont40HC = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont40HC : 0;
-                    data.Cont45 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont45 : 0;
-                    data.Cont = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont : 0;
-                    data.CW = item.SumChargeWeight;
-                    data.GW = item.SumGrossWeight;
-                    data.CBM = item.SumCbm;
-                    data.ChargeType = charge.Type;
-                    var _charge = dataCharge.Where(x => x.Id == charge.ChargeId).FirstOrDefault();
-                    data.ChargeCode = _charge?.ChargeNameEn;
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                    {
-                        data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
-                    }
-
-                    if (_charge.DebitCharge != null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                    {
-
-                        data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
-                        var dataSelling = dataCharge.FirstOrDefault(x=>x.Id == _charge.DebitCharge);
-                        var dataChargeSell = _charges.FirstOrDefault(x => x.ChargeId == dataSelling.Id && x.Type == DocumentConstants.CHARGE_SELL_TYPE);
-                        if (dataChargeSell != null)
-                        {
-                            var _rateRevenue = currencyExchangeService.CurrencyExchangeRateConvert(dataChargeSell.FinalExchangeRate, dataChargeSell.ExchangeDate, dataChargeSell.CurrencyId, criteria.Currency);
-                            data.TotalRevenue = dataChargeSell.Quantity * dataChargeSell.UnitPrice * _rateRevenue ?? 0;
-                            data.isGroup = true;
-                        }
-
-                    }
-
-                    data.TotalCost = data.TotalCost ?? 0;
-                    data.TotalRevenue = data.TotalRevenue ?? 0;
-                    data.JobProfit = data.TotalRevenue - data.TotalCost;
-                    if (data.TotalRevenue == 0)
-                    {
-                        data.JobProfit = 0;
-                    }
-
-                    if (_charge.DebitCharge == null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                    {
-                        data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
-                    }
-                    dataList.Add(data);
-                }
-            }
-            var groupedList = dataList.Where(x => x.isGroup == true).ToList();
-            if (groupedList != null)
-            {
-                foreach (var item in groupedList)
-                {
-                    var ItemToRemove = dataList.FirstOrDefault(x => x.ChargeCode == item.ChargeCode && x.isGroup == null && x.ChargeType == DocumentConstants.CHARGE_SELL_TYPE && x.Hbl == item.Hbl);
-                    if (ItemToRemove != null)
-                    {
-                        dataList.Remove(ItemToRemove);
-                    }
-                }
-            }
-            var GroupHbl = dataList.GroupBy(a => a.Hbl).Select(p => new { Hbl = p.Key, TotalCost = p.Sum(q => q.TotalCost), TotalRevenue = p.Sum(q => q.TotalRevenue), TotalJobProfit = p.Sum(q => q.JobProfit) }).ToList();
-            foreach (var item in GroupHbl)
-            {
-                int i = dataList.FindLastIndex(x => x.Hbl != null && x.Hbl.StartsWith(item.Hbl));
-                JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
-                data.TotalCost = item.TotalCost;
-                data.TotalRevenue = item.TotalRevenue;
-                data.JobProfit = item.TotalJobProfit;
-                dataList.Insert(i + 1, data);
-            }
-            return dataList.AsQueryable();
-        }
-
-
-        private IQueryable<JobProfitAnalysisExportResult> QueryDataDocumentationJobProfitAnalysis(GeneralReportCriteria criteria)
-        {
-            Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteria);
-            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = GetQueryTransationDetailDocumentation(criteria);
-
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
-            if (queryTranDetail == null)
-            {
-                var houseBills = detailRepository.Get();
-                var queryShipment = from master in masterBills
-                                    join house in houseBills on master.Id equals house.JobId into housebill
-                                    from house in housebill.DefaultIfEmpty()
-                                    select new JobProfitAnalysisExportResult
-                                    {
-                                        JobNo = master.JobNo,
-                                        Mbl = master.Mawb,
-                                        Hbl = house.Hwbno,
-                                        Hblid = house.Id,
-                                        Service = master.TransactionType,
-                                        Eta = master.Eta,
-                                        Etd = master.Etd,
-                                        GW = house.GrossWeight,
-                                        CW = house.ChargeWeight,
-                                        CBM = house.Cbm,
-                                        Quantity = house.PackageQty,
-                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
-                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
-                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
-                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
-                                        Cont = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "Cont").Count : 0
-                                    };
-                return queryShipment;
-            }
-            else
-            {
-                var houseBills = GetTransactionDetailDocWithSalesman(queryTranDetail, criteria);
-                var queryShipment = from master in masterBills
-                                    join house in houseBills on master.Id equals house.JobId
-                                    select new JobProfitAnalysisExportResult
-                                    {
-                                        JobNo = master.JobNo,
-                                        Mbl = master.Mawb,
-                                        Hbl = house.Hwbno,
-                                        Hblid = house.Id,
-                                        Service = master.TransactionType,
-                                        Eta = master.Eta,
-                                        Etd = master.Etd,
-                                        GW = house.GrossWeight,
-                                        CW = house.ChargeWeight,
-                                        CBM = house.Cbm,
-                                        Quantity = house.PackageQty,
-                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
-                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
-                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
-                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
-                                        Cont = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "Cont").Count : 0
-                                    };
-                return queryShipment;
-            }
-        }
-
-        private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria)
-        {
-            // Filter data without customerId
-            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
-            criteriaNoCustomer.CustomerId = null;
-            var dataShipment = QueryDataDocumentationAcctPLSheet(criteriaNoCustomer);
-            List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
-            foreach (var item in dataShipment)
-            {
-                var _charges = surCharge.Get(x => x.Hblid == item.Hblid);
-                if (!string.IsNullOrEmpty(criteria.CustomerId))
-                {
-                    _charges = _charges.Where(x => criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId);
-                }
-                foreach (var charge in _charges)
-                {
-                    AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-
-                    data.ServiceDate = item.ServiceDate;
-                    data.JobId = item.JobId;
-                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
-                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
-                    data.PartnerCode = _partner?.AccountNo;
-                    data.PartnerName = _partner?.PartnerNameEn;
-                    data.PartnerTaxCode = _partner?.TaxCode;
-                    data.Mbl = item.Mbl;
-                    data.Hbl = item.Hbl;
-                    data.CustomNo = string.Empty; //Service Documentation Không có CustomNo
-                    data.PaymentMethodTerm = item.PaymentMethodTerm;
-                    var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-                    data.ChargeCode = _charge?.Code;
-                    data.ChargeName = _charge?.ChargeNameEn;
-
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
                     decimal UnitPrice = charge.UnitPrice ?? 0;
                     decimal? _amount = charge.Quantity * UnitPrice;
@@ -2399,14 +1920,508 @@ namespace eFMS.API.Documentation.DL.Services
                     data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
                     data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
                     data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
-                    data.PaidDate = null;
                     data.AcVoucherNo = string.Empty;
                     data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
-                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
+                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                     data.UserExport = currentUser.UserName;
+                    data.CurrencyId = charge.CurrencyId;
+                    data.ExchangeDate = charge.ExchangeDate;
+                    data.FinalExchangeRate = charge.FinalExchangeRate;
 
+                    foreach (var partner in detailLookupPartner[_partnerId])
+                    {
+                        data.PartnerCode = partner?.AccountNo;
+                        data.PartnerName = partner?.PartnerNameEn;
+                        data.PartnerTaxCode = partner?.TaxCode;
+                    }
+                    foreach (var ch in detailLookupCharge[charge.ChargeId])
+                    {
+                        data.ChargeCode = ch?.Code;
+                        data.ChargeName = ch?.ChargeNameEn;
+                    }
                     dataList.Add(data);
                 }
+            }
+            return dataList.AsQueryable();
+        }
+
+        private IQueryable<AccountingPlSheetExportResult> QueryDataDocumentationAcctPLSheet(GeneralReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteria);
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = GetQueryTransationDetailDocumentation(criteria);
+
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
+            if (queryTranDetail == null)
+            {
+                var houseBills = detailRepository.Get();
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new AccountingPlSheetExportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        Mbl = master.Mawb,
+                                        Hblid = house.Id,
+                                        Hbl = house.Hwbno,
+                                        PaymentMethodTerm = master.PaymentTerm,
+                                        ServiceDate = master.ServiceDate,
+                                        Service = master.TransactionType
+                                    };
+                return queryShipment;
+            }
+            else
+            {
+                var houseBills = GetTransactionDetailDocWithSalesman(queryTranDetail, criteria);
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new AccountingPlSheetExportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        Mbl = master.Mawb,
+                                        Hblid = house.Id,
+                                        Hbl = house.Hwbno,
+                                        PaymentMethodTerm = master.PaymentTerm,
+                                        ServiceDate = master.ServiceDate,
+                                        Service = master.TransactionType
+                                    };
+                return queryShipment;
+            }
+        }
+
+        private IQueryable<JobProfitAnalysisExportResult> JobProfitAnalysisDocumetation(GeneralReportCriteria criteria)
+        {
+            // Filter data without customerId
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
+            criteriaNoCustomer.CustomerId = null;
+            var dataShipment = QueryDataDocumentationJobProfitAnalysis(criteriaNoCustomer);
+            List<JobProfitAnalysisExportResult> dataList = new List<JobProfitAnalysisExportResult>();
+            var dataCharge = catChargeRepo.Get();
+            var surchargeData = surCharge.Get().ToList();
+            var lookupSurcharge = surchargeData.ToLookup(q => q.Hblid);
+            if (dataShipment != null)
+            {
+                foreach (var item in dataShipment)
+                {
+                    var chargeD = lookupSurcharge[item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                    if (!string.IsNullOrEmpty(criteria.CustomerId))
+                    {
+                        chargeD = chargeD.Where(x => (criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId) && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
+                    }
+                    foreach (var charge in chargeD)
+                    {
+                        JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
+                        data.JobNo = item.JobNo;
+                        data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
+                        data.Mbl = item.Mbl;
+                        data.Hbl = item.Hbl;
+                        data.Eta = item.Eta;
+                        data.Etd = item.Etd;
+                        data.Quantity = item.Quantity;
+                        data.Cont20 = item.Cont20;
+                        data.Cont40 = item.Cont40;
+                        data.Cont40HC = item.Cont40HC;
+                        data.Cont45 = item.Cont45;
+                        data.Cont = item.Cont;
+                        data.CW = item.CW;
+                        data.GW = item.GW;
+                        data.CBM = item.CBM;
+                        data.ChargeType = charge.Type;
+                        var _charge = dataCharge.FirstOrDefault(x => x.Id == charge.ChargeId);
+                        data.ChargeCode = _charge?.ChargeNameEn;
+                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+                        if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                        {
+                            data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                        }
+                        if (_charge.DebitCharge != null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                        {
+
+                            data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                            var dataSelling = dataCharge.FirstOrDefault(x => x.Id == _charge.DebitCharge);
+                            var dataChargeSell = chargeD.FirstOrDefault(x => x.ChargeId == dataSelling.Id && x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                            if (dataChargeSell != null)
+                            {
+                                var _rateRevenue = currencyExchangeService.CurrencyExchangeRateConvert(dataChargeSell.FinalExchangeRate, dataChargeSell.ExchangeDate, dataChargeSell.CurrencyId, criteria.Currency);
+                                data.TotalRevenue = dataChargeSell.Quantity * dataChargeSell.UnitPrice * _rateRevenue ?? 0;
+                                data.isGroup = true;
+                            }
+
+                        }
+
+                        data.TotalCost = data.TotalCost ?? 0;
+                        data.TotalRevenue = data.TotalRevenue ?? 0;
+                        data.JobProfit = data.TotalRevenue - data.TotalCost;
+                        if (data.TotalRevenue == 0)
+                        {
+                            data.JobProfit = 0;
+                        }
+
+                        if (_charge.DebitCharge == null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                        {
+                            data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                        }
+                        dataList.Add(data);
+                    }
+                }
+            }
+
+            var groupedList = dataList.Where(x => x.isGroup == true).ToList();
+            if (groupedList != null)
+            {
+                foreach (var item in groupedList)
+                {
+                    var ItemToRemove = dataList.FirstOrDefault(x => x.ChargeCode == item.ChargeCode && x.isGroup == null && x.ChargeType == DocumentConstants.CHARGE_SELL_TYPE && x.Hbl == item.Hbl);
+                    if (ItemToRemove != null)
+                    {
+                        dataList.Remove(ItemToRemove);
+                    }
+                }
+            }
+            var GroupHbl = dataList.GroupBy(a => a.Hbl).Select(p => new { Hbl = p.Key, TotalCost = p.Sum(q => q.TotalCost), TotalRevenue = p.Sum(q => q.TotalRevenue), TotalJobProfit = p.Sum(q => q.JobProfit) }).ToList();
+            foreach (var item in GroupHbl)
+            {
+                if (!string.IsNullOrEmpty(item.Hbl))
+                {
+                    int i = dataList.FindLastIndex(x => x.Hbl != null && x.Hbl.StartsWith(item.Hbl));
+                    JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
+                    data.TotalCost = item.TotalCost;
+                    data.TotalRevenue = item.TotalRevenue;
+                    data.JobProfit = item.TotalJobProfit;
+                    dataList.Insert(i + 1, data);
+                }
+            }
+            return dataList.AsQueryable();
+
+        }
+
+        private IQueryable<JobProfitAnalysisExportResult> JobProfitAnalysisOperation(GeneralReportCriteria criteria)
+        {
+            var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            List<JobProfitAnalysisExportResult> dataList = new List<JobProfitAnalysisExportResult>();
+            var dataCharge = catChargeRepo.Get();
+            var surchargeData = surCharge.Get().ToList();
+            var lookupSurcharge = surchargeData.ToLookup(q => q.Hblid);
+            foreach (var item in dataShipment)
+            {
+                if (item.Hblid != Guid.Empty)
+                {
+                    var chargeD = lookupSurcharge[item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                    if (!string.IsNullOrEmpty(criteria.CustomerId))
+                    {
+                        chargeD = chargeD.Where(x => (criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId) && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
+                    }
+                    foreach (var charge in chargeD)
+                    {
+                        JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
+                        data.JobNo = item.JobNo;
+                        data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
+                        data.Mbl = item.Mblno;
+                        data.Hbl = item.Hwbno;
+                        data.Eta = item.ServiceDate;
+                        data.Etd = item.ServiceDate;
+                        data.Quantity = item.SumContainers;
+                        var DetailContainer = !string.IsNullOrEmpty(item.ContainerDescription) ? item.ContainerDescription.Split(";").ToArray() : null;
+                        int? Cont20 = 0;
+                        int? Cont40 = 0;
+                        int? Cont40HC = 0;
+                        int? Cont45 = 0;
+                        int? Cont = 0;
+                        if (DetailContainer != null)
+                        {
+                            foreach (var it in DetailContainer)
+                            {
+                                if (Regex.Matches(it.Trim(), "20").Count > 0)
+                                {
+                                    Cont20 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                                }
+
+                                if (Regex.Matches(it.Trim(), "40").Count > 0)
+                                {
+                                    Cont40 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                                }
+
+                                if (Regex.Matches(it.Trim(), "40´HC").Count > 0)
+                                {
+                                    Cont40HC = Convert.ToInt16(it.Trim().Substring(0, 1));
+                                }
+
+                                if (Regex.Matches(it.Trim(), "45").Count > 0)
+                                {
+                                    Cont45 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                                }
+
+                                if (Regex.Matches(it.Trim(), "Cont").Count > 0)
+                                {
+                                    Cont = Convert.ToInt16(it.Trim().Substring(0, 1));
+                                }
+
+                            }
+                        }
+                        data.Cont20 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont20 : 0;
+                        data.Cont40 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont40 : 0;
+                        data.Cont40HC = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont40HC : 0;
+                        data.Cont45 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont45 : 0;
+                        data.Cont = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont : 0;
+                        data.CW = item.SumChargeWeight;
+                        data.GW = item.SumGrossWeight;
+                        data.CBM = item.SumCbm;
+                        data.ChargeType = charge.Type;
+                        var _charge = dataCharge.Where(x => x.Id == charge.ChargeId).FirstOrDefault();
+                        data.ChargeCode = _charge?.ChargeNameEn;
+                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+                        if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                        {
+                            data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                        }
+
+                        if (_charge.DebitCharge != null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                        {
+
+                            data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                            var dataSelling = dataCharge.FirstOrDefault(x => x.Id == _charge.DebitCharge);
+                            var dataChargeSell = chargeD.FirstOrDefault(x => x.ChargeId == dataSelling.Id && x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                            if (dataChargeSell != null)
+                            {
+                                var _rateRevenue = currencyExchangeService.CurrencyExchangeRateConvert(dataChargeSell.FinalExchangeRate, dataChargeSell.ExchangeDate, dataChargeSell.CurrencyId, criteria.Currency);
+                                data.TotalRevenue = dataChargeSell.Quantity * dataChargeSell.UnitPrice * _rateRevenue ?? 0;
+                                data.isGroup = true;
+                            }
+
+                        }
+
+                        data.TotalCost = data.TotalCost ?? 0;
+                        data.TotalRevenue = data.TotalRevenue ?? 0;
+                        data.JobProfit = data.TotalRevenue - data.TotalCost;
+                        if (data.TotalRevenue == 0)
+                        {
+                            data.JobProfit = 0;
+                        }
+
+                        if (_charge.DebitCharge == null && charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                        {
+                            data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                        }
+                        dataList.Add(data);
+                    }
+                }
+            }
+            var groupedList = dataList.Where(x => x.isGroup == true).ToList();
+            if (groupedList != null)
+            {
+                foreach (var item in groupedList)
+                {
+                    var ItemToRemove = dataList.FirstOrDefault(x => x.ChargeCode == item.ChargeCode && x.isGroup == null && x.ChargeType == DocumentConstants.CHARGE_SELL_TYPE && x.Hbl == item.Hbl);
+                    if (ItemToRemove != null)
+                    {
+                        dataList.Remove(ItemToRemove);
+                    }
+                }
+            }
+            var GroupHbl = dataList.GroupBy(a => a.Hbl).Select(p => new { Hbl = p.Key, TotalCost = p.Sum(q => q.TotalCost), TotalRevenue = p.Sum(q => q.TotalRevenue), TotalJobProfit = p.Sum(q => q.JobProfit) }).ToList();
+            foreach (var item in GroupHbl)
+            {
+                int i = dataList.FindLastIndex(x => x.Hbl != null && x.Hbl.StartsWith(item.Hbl));
+                JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
+                data.TotalCost = item.TotalCost;
+                data.TotalRevenue = item.TotalRevenue;
+                data.JobProfit = item.TotalJobProfit;
+                dataList.Insert(i + 1, data);
+            }
+            return dataList.AsQueryable();
+        }
+
+
+        private IQueryable<JobProfitAnalysisExportResult> QueryDataDocumentationJobProfitAnalysis(GeneralReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteria);
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = GetQueryTransationDetailDocumentation(criteria);
+
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);
+            if (queryTranDetail == null)
+            {
+                var houseBills = detailRepository.Get();
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new JobProfitAnalysisExportResult
+                                    {
+                                        JobNo = master.JobNo,
+                                        Mbl = master.Mawb,
+                                        Hbl = house.Hwbno,
+                                        Hblid = house.Id,
+                                        Service = master.TransactionType,
+                                        Eta = master.Eta,
+                                        Etd = master.Etd,
+                                        GW = house.GrossWeight,
+                                        CW = house.ChargeWeight,
+                                        CBM = house.Cbm,
+                                        Quantity = house.PackageQty,
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
+                                        Cont = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "Cont").Count : 0
+                                    };
+                return queryShipment;
+            }
+            else
+            {
+                var houseBills = GetTransactionDetailDocWithSalesman(queryTranDetail, criteria);
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new JobProfitAnalysisExportResult
+                                    {
+                                        JobNo = master.JobNo,
+                                        Mbl = master.Mawb,
+                                        Hbl = house.Hwbno,
+                                        Hblid = house.Id,
+                                        Service = master.TransactionType,
+                                        Eta = master.Eta,
+                                        Etd = master.Etd,
+                                        GW = house.GrossWeight,
+                                        CW = house.ChargeWeight,
+                                        CBM = house.Cbm,
+                                        Quantity = house.PackageQty,
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
+                                        Cont = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "Cont").Count : 0
+                                    };
+                return queryShipment;
+            }
+        }
+        private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria)
+        {
+            // Filter data without customerId
+            var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
+            criteriaNoCustomer.CustomerId = null;
+            var dataShipment = QueryDataDocumentationAcctPLSheet(criteriaNoCustomer);
+            var lstPartner = catPartnerRepo.Get();
+            var lstCharge = catChargeRepo.Get();
+            var lstSurchage = surCharge.Get();
+            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
+            var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
+            List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
+            foreach(var item in dataShipment)
+            {
+                if (item.Hblid != null && item.Hblid != Guid.Empty)
+                {
+                    foreach (var charge in detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true))
+                    {
+                        AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
+                        var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
+                        data.ServiceDate = item.ServiceDate;
+                        data.JobId = item.JobId;
+                        data.Hblid = charge.Hblid;
+                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+                        decimal UnitPrice = charge.UnitPrice ?? 0;
+                        decimal? _amount = charge.Quantity * UnitPrice;
+                        var _taxInvNoRevenue = string.Empty;
+                        var _voucherRevenue = string.Empty;
+                        decimal? _usdRevenue = 0;
+                        decimal? _vndRevenue = 0;
+                        decimal? _taxOut = 0;
+                        decimal? _totalRevenue = 0;
+                        if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                        {
+                            _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
+                            _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
+
+                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                            {
+                                var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                                _vndRevenue = _amount * _exchangeRateToVnd;
+                            }
+                            if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _vndRevenue = _amount;
+                            }
+
+                            if (charge.Vatrate > 0 && charge.Vatrate < 101)
+                            {
+                                _taxOut = (_amount * _exchangeRate * charge.Vatrate) / 100;
+                            }
+                            else
+                            {
+                                _taxOut = Math.Abs(charge.Vatrate ?? 0);
+                            }
+                            _voucherRevenue = charge.VoucherId;
+                            _totalRevenue = (_amount * _exchangeRate) + _taxOut;
+                        }
+                        data.TaxInvNoRevenue = _taxInvNoRevenue;
+                        data.VoucherIdRevenue = _voucherRevenue;
+                        data.UsdRevenue = _usdRevenue;
+                        data.VndRevenue = _vndRevenue;
+                        data.TaxOut = _taxOut;
+                        data.TotalRevenue = _totalRevenue;
+
+                        var _taxInvNoCost = string.Empty;
+                        var _voucherCost = string.Empty;
+                        decimal? _usdCost = 0;
+                        decimal? _vndCost = 0;
+                        decimal? _taxIn = 0;
+                        decimal? _totalCost = 0;
+                        if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                        {
+                            _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
+                            _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
+
+                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                            {
+                                var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                                _vndCost = _amount * _exchangeRateToVnd;
+                            }
+                            if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _vndCost = _amount;
+                            }
+
+                            if (charge.Vatrate > 0 && charge.Vatrate < 101)
+                            {
+                                _taxIn = (_amount * _exchangeRate * charge.Vatrate) / 100;
+                            }
+                            else
+                            {
+                                _taxIn = Math.Abs(charge.Vatrate ?? 0);
+                            }
+                            _voucherCost = charge.VoucherId;
+                            _totalCost = (_amount * _exchangeRate) + _taxIn;
+                        }
+                        data.TaxInvNoCost = _taxInvNoCost;
+                        data.VoucherIdCost = _voucherCost;
+                        data.UsdCost = _usdCost;
+                        data.VndCost = _vndCost;
+                        data.TaxIn = _taxIn;
+                        data.TotalCost = _totalCost;
+
+                        data.TotalKickBack = (charge.KickBack == true) ? _amount * _exchangeRate : 0;
+                        data.ExchangeRate = _exchangeRate;
+                        data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
+                        data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
+                        data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
+                        data.AcVoucherNo = string.Empty;
+                        data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
+                        data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
+                        data.UserExport = currentUser.UserName;
+                        data.CurrencyId = charge.CurrencyId;
+                        data.ExchangeDate = charge.ExchangeDate;
+                        data.FinalExchangeRate = charge.FinalExchangeRate;
+
+                        foreach (var partner in detailLookupPartner[_partnerId])
+                        {
+                            data.PartnerCode = partner?.AccountNo;
+                            data.PartnerName = partner?.PartnerNameEn;
+                            data.PartnerTaxCode = partner?.TaxCode;
+                        }
+                        foreach (var ch in detailLookupCharge[charge.ChargeId])
+                        {
+                            data.ChargeCode = ch?.Code;
+                            data.ChargeName = ch?.ChargeNameEn;
+                        }
+                        dataList.Add(data);
+                    }
+                }
+
             }
             return dataList.AsQueryable();
         }
@@ -2422,51 +2437,64 @@ namespace eFMS.API.Documentation.DL.Services
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
+            var detailLookupSur = chargeData.ToLookup(q => q.JobId);
+            var dataCustom = customsDeclarationRepo.Get().ToList();
+            var partnerData = catPartnerRepo.Get();
+            var detailLookupPartner = partnerData.ToLookup(q => q.Id);
+            var DetailLookupPort = port.ToLookup(q => q.Id);
             foreach (var item in dataShipment)
             {
-                var _charges = chargeData;
-
-                _charges = chargeData.Where(x => x.JobId == item.JobNo);
-
-                foreach (var charge in _charges)
+                if (!string.IsNullOrEmpty(item.JobNo))
                 {
-                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
-                    SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
-                    var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
-                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
-                    data.SupplierCode = _partner?.AccountNo;
-                    data.SuplierName = _partner?.PartnerNameVn;
-                    data.ChargeName = charge.ChargeName;
-                    data.POLName = port.Where(x => x.Id == charge.AOL).Select(t => t.NameEn).FirstOrDefault();
-                    data.PurchaseOrderNo = item.PurchaseOrderNo;
-                    data.CustomNo = GetTopClearanceNoByJobNo(item.JobNo);
-                    data.HBL = charge.HBL;
-                    data.GrossWeight = charge.GrossWeight;
-                    data.CBM = charge.CBM;
-                    data.PackageContainer = charge.PackageContainer;
-                    decimal? percent = 0;
-                    decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
-                    if (charge.VATRate > 0)
+                    foreach (var charge in detailLookupSur[item.JobNo])
                     {
-                        percent = (charge.VATRate * 10) / 100;
-                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
-                        if (charge.Currency != "VND")
+                        SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
+                        var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
+                        data.PurchaseOrderNo = item.PurchaseOrderNo;
+                        data.CustomNo = GetTopClearanceNoByJobNo(item.JobNo, dataCustom);
+                        data.HBL = charge.HBL;
+                        data.GrossWeight = charge.GrossWeight;
+                        data.CBM = charge.CBM;
+                        data.PackageContainer = charge.PackageContainer;
+                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
+                        decimal? percent = 0;
+                        decimal UnitPrice = charge.UnitPrice ?? 0;
+                        charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
+                        if (charge.VATRate > 0)
                         {
-                            charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                            percent = (charge.VATRate * 10) / 100;
+                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
+                            if (charge.Currency != "VND")
+                            {
+                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 3);
+                            }
                         }
+                        else
+                        {
+                            charge.VATAmount = charge.VATRate;
+                        }
+                        charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
+                        foreach (var partner in detailLookupPartner[_partnerId])
+                        {
+                            data.SupplierCode = partner?.AccountNo;
+                            data.SuplierName = partner?.PartnerNameVn;
+                        }
+                        if (charge.AOL != Guid.Empty && charge.AOL != null)
+                        {
+                            foreach (var Port in DetailLookupPort[(Guid)charge.AOL])
+                            {
+                                data.POLName = Port.NameEn;
+                            }
+                        }
+                        data.ChargeName = charge.ChargeName;
+                        data.NetAmount = charge.NetAmount;
+                        data.VATAmount = charge.VATAmount;
+                        data.Type = charge.Type;
+                        data.TypeCharge = charge.TypeCharge;
+                        dataList.Add(data);
                     }
-                    else
-                    {
-                        charge.VATAmount = charge.VATRate;
-                    }
-                    charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
-                    data.NetAmount = charge.NetAmount;
-                    data.VATAmount = charge.VATAmount;
-                    data.Type = charge.Type;
-                    data.TypeCharge = charge.TypeCharge;
-                    dataList.Add(data);
                 }
+
             }
             return dataList.AsQueryable();
         }
@@ -2485,10 +2513,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return list.ToList();
         }
-        private string GetTopClearanceNoByJobNo(string JobNo)
+
+
+        private string GetTopClearanceNoByJobNo(string JobNo, List<CustomsDeclaration> customsDeclarations)
         {
-            var custom = customsDeclarationRepo.Get();
-            var clearanceNo = custom.Where(x => x.JobNo != null && x.JobNo == JobNo)
+            var clearanceNo = customsDeclarations.Where(x => x.JobNo != null && x.JobNo == JobNo)
                 .OrderBy(x => x.JobNo)
                 .OrderByDescending(x => x.ClearanceDate)
                 .FirstOrDefault()?.ClearanceNo;
@@ -2502,50 +2531,64 @@ namespace eFMS.API.Documentation.DL.Services
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
             query = chg => chg.Service == criteria.Service;
-            var chargeData = GetChargeOBHSellPayee(query, null) ;
-
+            var chargeData = GetChargeOBHSellPayee(query, null);
+            var detailLookupSur = chargeData.ToLookup(q => q.HBLID);
+            var dataCustom = customsDeclarationRepo.Get().ToList();
+            var partnerData = catPartnerRepo.Get();
+            var detailLookupPartner = partnerData.ToLookup(q => q.Id);
+            var DetailLookupPort = port.ToLookup(q => q.Id);
             foreach (var item in dataShipment)
             {
-                var _charges = chargeData.Where(x => x.HBLID == item.HBLID);
-                foreach (var charge in _charges)
+                if (item.HBLID != null && item.HBLID != Guid.Empty)
                 {
-                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
-                    SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
-                    var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
-                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
-                    data.SupplierCode = _partner?.AccountNo;
-                    data.SuplierName = _partner?.PartnerNameVn;
-                    data.ChargeName = charge.ChargeName;
-                    data.POLName = port.Where(x => x.Id == charge.AOL).Select(t => t.NameEn).FirstOrDefault();
-                    data.PurchaseOrderNo = item.PurchaseOrderNo;
-                    data.CustomNo = GetTopClearanceNoByJobNo(item.JobId);
-                    data.HBL = charge.HBL;
-                    data.GrossWeight = charge.GrossWeight;
-                    data.CBM = charge.CBM;
-                    data.PackageContainer = charge.PackageContainer;
-                    //decimal? percent = 0;
-                    decimal UnitPrice = charge.UnitPrice ?? 0;
-                    charge.UnitPrice = Math.Round(UnitPrice, 3);
-                    charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
-                    if (charge.VATRate > 0)
+                    foreach (var charge in detailLookupSur[item.HBLID])
                     {
-                        charge.VATAmount = (charge.VATRate * charge.NetAmount) / 100;
+                        SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
+                        var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
+                        data.PurchaseOrderNo = item.PurchaseOrderNo;
+                        data.CustomNo = GetTopClearanceNoByJobNo(item.JobId, dataCustom);
+                        data.HBL = charge.HBL;
+                        data.GrossWeight = charge.GrossWeight;
+                        data.CBM = charge.CBM;
+                        data.PackageContainer = charge.PackageContainer;
+                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
+                        decimal UnitPrice = charge.UnitPrice ?? 0;
+                        charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
+                        charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
+                        if (charge.VATRate > 0)
+                        {
+                            charge.VATAmount = (charge.VATRate * charge.NetAmount) / 100;
+                        }
+                        else
+                        {
+                            charge.VATAmount = charge.VATRate != null ? Math.Abs(charge.VATRate.Value) : 0;
+                            charge.VATAmount = charge.VATAmount * _exchangeRate;
+                        }
+                        if (charge.Currency != "VND")
+                        {
+                            charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 3);
+                        }
+                        foreach (var partner in detailLookupPartner[_partnerId])
+                        {
+                            data.SupplierCode = partner?.AccountNo;
+                            data.SuplierName = partner?.PartnerNameVn;
+                            data.ChargeName = charge.ChargeName;
+                        }
+                        if (charge.AOL != Guid.Empty && charge.AOL != null)
+                        {
+                            foreach (var Port in DetailLookupPort[(Guid)charge.AOL])
+                            {
+                                data.POLName = Port.NameEn;
+                            }
+                        }
+                        data.NetAmount = charge.NetAmount;
+                        data.VATAmount = charge.VATAmount;
+                        data.Type = charge.Type;
+                        data.TypeCharge = charge.TypeCharge;
+                        dataList.Add(data);
                     }
-                    else
-                    {
-                        charge.VATAmount = charge.VATRate != null ? Math.Abs(charge.VATRate.Value) : 0;
-                        charge.VATAmount = charge.VATAmount * _exchangeRate;
-                    }
-                    if (charge.Currency != "VND")
-                    {
-                        charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
-                    }
-                    data.NetAmount = charge.NetAmount;
-                    data.VATAmount = charge.VATAmount;
-                    data.Type = charge.Type;
-                    data.TypeCharge = charge.TypeCharge;
-                    dataList.Add(data);
                 }
+
             }
             return dataList.AsQueryable();
         }
@@ -2562,8 +2605,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var houseBills = detailRepository.Get();
                 var queryShipment = from master in masterBills
-                                    join house in houseBills on master.Id equals house.JobId into housebill
-                                    from house in housebill.DefaultIfEmpty()
+                                    join house in houseBills on master.Id equals house.JobId 
                                     select new SummaryOfCostsIncurredExportResult
                                     {
                                         JobId = master.JobNo,
@@ -2573,7 +2615,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         PurchaseOrderNo = master.Pono,
                                         AOL = master.Pol
                                     };
-                return queryShipment;
+
+                return queryShipment.AsQueryable();
             }
             else
             {
@@ -2596,7 +2639,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayee(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE);
+            var surcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE);
             var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
@@ -2700,6 +2743,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (query != null)
             {
                 queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+                queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.CustomerID)).Where(query);
             }
             if (isOBH != null)
             {
@@ -2724,50 +2768,64 @@ namespace eFMS.API.Documentation.DL.Services
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayerJob(query, null) : GetChargeOBHSellPayerJob(null, null);
             var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
+
+            var lookupReuslts = results.ToLookup(q => q.Key.JobId);
+            var listPartner = catPartnerRepo.Get();
+            var lookupPartner = listPartner.ToLookup(q => q.Id);
+            var dataCustom = customsDeclarationRepo.Get().ToList();
+            var commodityGroupData = catCommodityGroupRepo.Get().ToList();
+            var lookupCommodityGroup = commodityGroupData.ToLookup(q => q.Id);
+            var dataOps = opsRepository.Get().ToList();
             if (results == null)
                 return null;
             foreach (var item in dataShipment)
             {
-                var data = results;
-                data = results.Where(x => x.Key.JobId == item.JobNo);
-                //var data = results.Where(x => x.Key.HBLID == item.Hblid);
-                foreach (var group in data)
+                if (!string.IsNullOrEmpty(item.JobNo))
                 {
-                    SummaryOfRevenueExportResult SummaryRevenue = new SummaryOfRevenueExportResult();
-                    SummaryRevenue.SummaryOfCostsIncurredExportResults = new List<SummaryOfCostsIncurredExportResult>();
-                    var commodity = DataContext.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
-                    var commodityGroup = opsRepository.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
-                    string commodityName = string.Empty;
-                    var _partnerId = group.Select(t => t.CustomerID).FirstOrDefault();
-                    var _partner = catPartnerRepo.Get(x => _partnerId != null && x.Id == _partnerId).FirstOrDefault();
-                    SummaryRevenue.SupplierCode = _partner?.AccountNo;
-                    SummaryRevenue.SuplierName = _partner?.PartnerNameVn;
-                    if (commodity != null)
+                    foreach (var group in lookupReuslts[item.JobNo])
                     {
-                        string[] commodityArr = commodity.Split(',');
-                        foreach (var it in commodityArr)
+                        SummaryOfRevenueExportResult SummaryRevenue = new SummaryOfRevenueExportResult();
+                        SummaryRevenue.SummaryOfCostsIncurredExportResults = new List<SummaryOfCostsIncurredExportResult>();
+                        var commodity = DataContext.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
+                        var commodityGroup = opsRepository.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
+
+                        string commodityName = string.Empty;
+                        var _partnerId = group.Select(t => t.CustomerID).FirstOrDefault();
+                        if (commodity != null)
                         {
-                            commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                            string[] commodityArr = commodity.Split(',');
+                            foreach (var it in commodityArr)
+                            {
+                                commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                            }
+                            commodityName = commodityName.Substring(1);
                         }
-                        commodityName = commodityName.Substring(1);
+                        if (commodityGroup != null)
+                        {
+                            foreach (var commodityG in lookupCommodityGroup[(short)commodityGroup])
+                            {
+                                commodityName = commodityG.GroupNameVn;
+                            }
+                        }
+                        SummaryRevenue.ChargeName = commodityName;
+                        SummaryRevenue.POLName = port.Where(x => x.Id == item.Pol).Select(t => t.NameEn).FirstOrDefault();
+                        SummaryRevenue.CustomNo = GetTopClearanceNoByJobNo(group.Key.JobId, dataCustom);
+                        SummaryRevenue.HBL = group.Select(t => t.HBL).FirstOrDefault();
+                        SummaryRevenue.CBM = group.Select(t => t.CBM).FirstOrDefault();
+                        SummaryRevenue.GrossWeight = group.Select(t => t.GrossWeight).FirstOrDefault();
+                        SummaryRevenue.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
+                        foreach (var ele in group)
+                        {
+                            ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t => t.PartnerNameVn).FirstOrDefault();
+                        }
+                        foreach (var partner in lookupPartner[_partnerId])
+                        {
+                            SummaryRevenue.SupplierCode = partner?.AccountNo;
+                            SummaryRevenue.SuplierName = partner?.PartnerNameVn;
+                        }
+                        SummaryRevenue.SummaryOfCostsIncurredExportResults.AddRange(group.Select(t => t));
+                        dataList.Add(SummaryRevenue);
                     }
-                    if (commodityGroup != null)
-                    {
-                        commodityName = catCommodityGroupRepo.Get(x => x.Id == commodityGroup).Select(t => t.GroupNameVn).FirstOrDefault();
-                    }
-                    SummaryRevenue.ChargeName = commodityName;
-                    SummaryRevenue.POLName = port.Where(x => x.Id == item.Pol).Select(t => t.NameEn).FirstOrDefault();
-                    SummaryRevenue.CustomNo = GetTopClearanceNoByJobNo(group.Key.JobId);
-                    SummaryRevenue.HBL = group.Select(t => t.HBL).FirstOrDefault();
-                    SummaryRevenue.CBM = group.Select(t => t.CBM).FirstOrDefault();
-                    SummaryRevenue.GrossWeight = group.Select(t => t.GrossWeight).FirstOrDefault();
-                    SummaryRevenue.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
-                    foreach (var ele in group)
-                    {
-                        ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t => t.PartnerNameVn).FirstOrDefault();
-                    }
-                    SummaryRevenue.SummaryOfCostsIncurredExportResults.AddRange(group.Select(t => t));
-                    dataList.Add(SummaryRevenue);
                 }
             }
             ObjectSummaryRevenue.summaryOfRevenueExportResults = dataList;
@@ -2777,7 +2835,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
                     decimal UnitPrice = it.UnitPrice ?? 0;
-                    it.UnitPrice = Math.Round(UnitPrice, 3);
+                    it.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     it.NetAmount = it.UnitPrice * it.Quantity * _exchangeRate;
                     if (it.VATRate > 0)
                     {
@@ -2788,9 +2846,9 @@ namespace eFMS.API.Documentation.DL.Services
                         it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
                         it.VATAmount = it.VATAmount * _exchangeRate;
                     }
-                    if (it.Currency != "VND")
+                    if (it.Currency != DocumentConstants.CURRENCY_LOCAL)
                     {
-                        it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                        it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 3);
                     }
 
                 }
@@ -2828,54 +2886,63 @@ namespace eFMS.API.Documentation.DL.Services
             query = chg => chg.Service == criteria.Service;
             var chargeData = GetChargeOBHSellPayer(query, null);
             var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
+            var lookupResults = results.ToLookup(q => q.Key.HBLID);
+            var listPartner = catPartnerRepo.Get();
+            var lookupPartner = listPartner.ToLookup(q => q.Id);
+            var dataCustom = customsDeclarationRepo.Get().ToList();
             foreach (var item in dataShipment)
             {
-                var data = results.Where(x => x.Key.HBLID == item.HBLID);
-                foreach (var group in data)
+                if (item.HBLID != Guid.Empty)
                 {
-                    SummaryOfRevenueExportResult SummaryRevenue = new SummaryOfRevenueExportResult();
-                    SummaryRevenue.SummaryOfCostsIncurredExportResults = new List<SummaryOfCostsIncurredExportResult>();
-                    var commodity = DataContext.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
-                    var commodityGroup = opsRepository.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
-                    string commodityName = string.Empty;
-                    var _partnerId = group.Select(t => t.CustomerID).FirstOrDefault();
-                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
-                    SummaryRevenue.SupplierCode = _partner?.AccountNo;
-                    SummaryRevenue.SuplierName = _partner?.PartnerNameVn;
-                    if (commodity != null)
+                    foreach (var group in lookupResults[item.HBLID])
                     {
-                        string[] commodityArr = commodity.Split(',');
-                        foreach (var it in commodityArr)
-                        {
-                            if (catCommodityRepo.Any(x => x.CommodityNameEn == it.Replace("\n", "")))
-                            {
-                                commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
-                            }
-                            else
-                            {
-                                commodityName = commodityName + "," + catCommodityRepo.Get(x => x.Code == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
-                            }
-                        }
-                        commodityName = commodityName.Substring(1);
-                    }
-                    if (commodityGroup != null)
-                    {
-                        commodityName = catCommodityGroupRepo.Get(x => x.Id == commodityGroup).Select(t => t.GroupNameVn).FirstOrDefault();
-                    }
-                    SummaryRevenue.ChargeName = commodityName;
-                    SummaryRevenue.POLName = port.Where(x => x.Id == item.AOL).Select(t => t.NameEn).FirstOrDefault();
-                    SummaryRevenue.CustomNo = GetTopClearanceNoByJobNo(group.Key.JobId);
-                    SummaryRevenue.HBL = group.Select(t => t.HBL).FirstOrDefault();
-                    SummaryRevenue.CBM = group.Select(t => t.CBM).FirstOrDefault();
-                    SummaryRevenue.GrossWeight = group.Select(t => t.GrossWeight).FirstOrDefault();
-                    SummaryRevenue.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
-                    foreach (var ele in group)
-                    {
-                        ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t => t.PartnerNameVn).FirstOrDefault();
-                    }
+                        SummaryOfRevenueExportResult SummaryRevenue = new SummaryOfRevenueExportResult();
+                        SummaryRevenue.SummaryOfCostsIncurredExportResults = new List<SummaryOfCostsIncurredExportResult>();
+                        var commodity = DataContext.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
+                        var commodityGroup = opsRepository.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
+                        string commodityName = string.Empty;
+                        var _partnerId = group.Select(t => t.CustomerID).FirstOrDefault();
 
-                    SummaryRevenue.SummaryOfCostsIncurredExportResults.AddRange(group.Select(t => t));
-                    dataList.Add(SummaryRevenue);
+                        if (commodity != null)
+                        {
+                            string[] commodityArr = commodity.Split(',');
+                            foreach (var it in commodityArr)
+                            {
+                                if (catCommodityRepo.Any(x => x.CommodityNameEn == it.Replace("\n", "")))
+                                {
+                                    commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                                }
+                                else
+                                {
+                                    commodityName = commodityName + "," + catCommodityRepo.Get(x => x.Code == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                                }
+                            }
+                            commodityName = commodityName.Substring(1);
+                        }
+                        if (commodityGroup != null)
+                        {
+                            commodityName = catCommodityGroupRepo.Get(x => x.Id == commodityGroup).Select(t => t.GroupNameVn).FirstOrDefault();
+                        }
+                        SummaryRevenue.ChargeName = commodityName;
+                        SummaryRevenue.POLName = port.Where(x => x.Id == item.AOL).Select(t => t.NameEn).FirstOrDefault();
+                        SummaryRevenue.CustomNo = GetTopClearanceNoByJobNo(group.Key.JobId, dataCustom);
+                        SummaryRevenue.HBL = group.Select(t => t.HBL).FirstOrDefault();
+                        SummaryRevenue.CBM = group.Select(t => t.CBM).FirstOrDefault();
+                        SummaryRevenue.GrossWeight = group.Select(t => t.GrossWeight).FirstOrDefault();
+                        SummaryRevenue.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
+                        foreach (var ele in group)
+                        {
+                            ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t => t.PartnerNameVn).FirstOrDefault();
+                        }
+                        foreach (var partner in lookupPartner[_partnerId])
+                        {
+                            SummaryRevenue.SupplierCode = partner?.AccountNo;
+                            SummaryRevenue.SuplierName = partner?.PartnerNameVn;
+                        }
+
+                        SummaryRevenue.SummaryOfCostsIncurredExportResults.AddRange(group.Select(t => t));
+                        dataList.Add(SummaryRevenue);
+                    }
                 }
             }
             ObjectSummaryRevenue.summaryOfRevenueExportResults = dataList;
@@ -2885,7 +2952,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
                     decimal UnitPrice = it.UnitPrice ?? 0;
-                    it.UnitPrice = Math.Round(UnitPrice, 3);
+                    it.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                     it.NetAmount = UnitPrice * it.Quantity * _exchangeRate;
                     if (it.VATRate > 0)
                     {
@@ -2896,9 +2963,9 @@ namespace eFMS.API.Documentation.DL.Services
                         it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
                         it.VATAmount = it.VATAmount * _exchangeRate;
                     }
-                    if (it.Currency != "VND")
+                    if (it.Currency != DocumentConstants.CURRENCY_LOCAL)
                     {
-                        it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                        it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 3);
                     }
                 }
             }
@@ -2908,7 +2975,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayerJob(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            var surcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
             var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
@@ -2955,7 +3022,12 @@ namespace eFMS.API.Documentation.DL.Services
                                            TypeCharge = chg.Type,
                                            PayerId = sur.PayerId,
                                            Unit = uni.UnitNameEn,
-                                           InvoiceDate = sur.InvoiceDate
+                                           InvoiceDate = sur.InvoiceDate,
+                                           CBM = ops.SumCbm,
+                                           GrossWeight = ops.SumGrossWeight, 
+                                           PackageContainer = ops.ContainerDescription,
+                                           PackageQty = ops.SumPackages,
+
                                        };
             if (query != null)
             {
@@ -2967,7 +3039,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayer(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            var surcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
             var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = detailRepository.Get();
             var charge = catChargeRepo.Get();
