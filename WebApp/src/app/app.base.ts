@@ -1,3 +1,4 @@
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactoryResolver, ComponentRef, ViewContainerRef, Injector, ComponentFactory, } from "@angular/core";
 import { Observable, Subject, throwError, BehaviorSubject, Subscription } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
@@ -10,6 +11,7 @@ import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "
 import moment from "moment/moment";
 import { PermissionShipment } from "./shared/models/document/permissionShipment";
 import { PermissionHouseBill } from "./shared/models/document/permissionHouseBill";
+
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -261,5 +263,48 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
             complete: () => console.log('complete'),
         };
     }
+
+    showPopupDynamicRender<T = any>(component: T | ConfirmPopupComponent | InfoPopupComponent | any, containerRef: ViewContainerRef, config: ConfirmPopupConfig, callBack: Function) {
+        this.componentRef = this.renderDynamicComponent(component, containerRef);
+
+        const configKeys = Object.keys(config);
+        if (configKeys.length) {
+            configKeys.forEach((k: string) => {
+                this.componentRef.instance[k] = config[k];
+            });
+        }
+
+        const timeOutConfirmPopupRender = setTimeout(() => {
+            this.componentRef.instance.show();
+        });
+
+        const cancelSubscription = this.componentRef.instance.onCancel.subscribe(
+            () => {
+                cancelSubscription.unsubscribe();
+                containerRef.clear();
+                clearTimeout(timeOutConfirmPopupRender);
+            });
+
+        const submitSubscription = this.componentRef.instance.onSubmit.subscribe(
+            (v: boolean) => {
+                submitSubscription.unsubscribe();
+                containerRef.clear();
+                clearTimeout(timeOutConfirmPopupRender);
+                return callBack(v);
+            }
+        )
+    }
+
 }
 
+
+export interface ConfirmPopupConfig {
+    title?: string;
+    body: string;
+    labelConfirm?: string;
+    labelCancel?: string;
+    iconConfirm?: string;
+    iconCancel?: string;
+    align?: string;
+    [key: string]: any;
+}

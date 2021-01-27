@@ -17,6 +17,8 @@ using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Accounting.DL.Models.ExportResults;
+using eFMS.API.Common.Helpers;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -230,8 +232,8 @@ namespace eFMS.API.Accounting.Controllers
             {
                 foreach (var currency in currencies)
                 {
-                    decimal totalAdv = Math.Round(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
-                    decimal totalSet = Math.Round(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal totalAdv = NumberHelper.RoundNumber(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal totalSet = NumberHelper.RoundNumber(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
                     decimal bal = (totalAdv - totalSet);
                     totalAdvance += string.Format("{0:n}", totalAdv) + " " + currency + " | ";
                     totalSettlement += string.Format("{0:n}", totalSet) + " " + currency + " | ";
@@ -277,8 +279,8 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("CheckDuplicateShipmentSettlement")]
         public IActionResult CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
-            var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria);
-            ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message };
+            var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria,out List<DuplicateShipmentSettlementResultModel> listDup);
+            ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message,Data = listDup };
             return Ok(result);
         }
 
@@ -298,10 +300,11 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model);
+                var isDuplicateCharge = CheckDuplicateCharge(model,out object dataDuplicate);
                 if (isDuplicateCharge)
                 {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
                     return BadRequest(_result);
                 }
 
@@ -319,12 +322,13 @@ namespace eFMS.API.Accounting.Controllers
                         ContNo = item.ContNo,
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
-                        JobNo = item.JobId
+                        JobNo = item.JobId,
+                        Notes = item.Notes
                     };
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message, Data = listDup };
                         return BadRequest(_result);
                     }
                 }
@@ -379,10 +383,11 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model);
+                var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
                 if (isDuplicateCharge)
                 {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
                     return BadRequest(_result);
                 }
 
@@ -400,13 +405,14 @@ namespace eFMS.API.Accounting.Controllers
                         ContNo = item.ContNo,
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
-                        JobNo = item.JobId
+                        JobNo = item.JobId,
+                        Notes = item.Notes
                     };
                     
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message,Data = listDup };
                         return BadRequest(_result);
                     }
                 }
@@ -448,10 +454,11 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model);
+                var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
                 if (isDuplicateCharge)
                 {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
                     return BadRequest(_result);
                 }
 
@@ -477,12 +484,13 @@ namespace eFMS.API.Accounting.Controllers
                         ContNo = item.ContNo,
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
-                        JobNo = item.JobId
+                        JobNo = item.JobId,
+                        Notes = item.Notes
                     };
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
+                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)
                     {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message };
+                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message,Data = listDup };
                         return BadRequest(_result);
                     }
                 }
@@ -831,16 +839,29 @@ namespace eFMS.API.Accounting.Controllers
             }
         }
 
-        private bool CheckDuplicateCharge(CreateUpdateSettlementModel model)
+        private bool CheckDuplicateCharge(CreateUpdateSettlementModel model, out object dataDuplicate)
         {
+            dataDuplicate = null;
             var duplicateCharges = model.ShipmentCharge.Where(x =>
                        !string.IsNullOrEmpty(x.ClearanceNo)
                     || !string.IsNullOrEmpty(x.ContNo)
-                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ClearanceNo, x.ContNo, x.InvoiceNo }).ToList();
+                    || !string.IsNullOrEmpty(x.SeriesNo)
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ChargeId ,x.ClearanceNo, x.ContNo, x.InvoiceNo, x.SeriesNo, x.Notes}).ToList();
             foreach (var charge in duplicateCharges)
             {
                 if (charge.Count() > 1)
-                {                    
+                {
+                    string mes = JsonConvert.SerializeObject(charge);
+                    new LogHelper("Settlement_Duplicate_Charge", mes);
+
+                    dataDuplicate = new
+                    {
+                        charge.Key.JobId,
+                        charge.Key.HBL,
+                        charge.Key.MBL,
+                        charge.Key.ChargeCode,
+                        charge.Key.ChargeId
+                    };
                     return true;
                 }
             }
@@ -860,6 +881,21 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult PreviewMultipleSettlementBySettlementNos(List<string> settlmentNos)
         {
             var result = acctSettlementPaymentService.PreviewMultipleSettlement(settlmentNos);
+            return Ok(result);
+        }
+
+        [HttpPut("DenySettlePayments")]
+        [Authorize]
+        public IActionResult DenySettlePayments(List<Guid> Ids)
+        {
+            HandleState hs = acctSettlementPaymentService.DenyAdvancePayments(Ids);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
     }

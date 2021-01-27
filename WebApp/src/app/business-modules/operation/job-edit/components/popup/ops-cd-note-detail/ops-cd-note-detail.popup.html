@@ -265,9 +265,7 @@
 
 <info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>
 
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>
 
 <payment-method-popup (onApply)="onApplyPaymentMethod($event)"></payment-method-popup>
 <info-popup #validateSyncedCDNotePopup [body]="messageValidate" [title]="'Alert'">

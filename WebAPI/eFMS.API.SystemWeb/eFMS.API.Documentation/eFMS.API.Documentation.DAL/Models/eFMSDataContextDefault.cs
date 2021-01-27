@@ -71,7 +71,81 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+
+            modelBuilder.Entity<AcctAdvancePayment>(entity =>
+            {
+                entity.ToTable("acctAdvancePayment");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AdvanceCurrency).HasMaxLength(10);
+
+                entity.Property(e => e.AdvanceNo)
+                    .IsRequired()
+                    .HasMaxLength(11)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankAccountName).HasMaxLength(150);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(150);
+
+                entity.Property(e => e.BankName).HasMaxLength(150);
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DeadlinePayment).HasColumnType("date");
+
+                entity.Property(e => e.Department)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.PaymentMethod)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentTerm).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.RequestDate).HasColumnType("date");
+
+                entity.Property(e => e.Requester)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StatusApproval)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.VoucherDate).HasColumnType("datetime");
+
+                entity.Property(e => e.VoucherNo)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {

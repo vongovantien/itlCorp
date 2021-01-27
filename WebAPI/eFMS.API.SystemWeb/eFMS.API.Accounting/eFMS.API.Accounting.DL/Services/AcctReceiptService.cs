@@ -6,6 +6,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.Receipt;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -860,13 +861,13 @@ namespace eFMS.API.Accounting.DL.Services
                             invoice.InvoiceBalance = invoice.ReceiptExcUnpaidAmount - invoice.PaidAmount;
                         }
 
-                        invoice.ReceiptExcPaidAmount = Math.Round(invoice.PaidAmount / criteria.FinalExchangeRate ?? 0, 3);
-                        invoice.ReceiptExcInvoiceBalance = Math.Round(invoice.InvoiceBalance / criteria.FinalExchangeRate ?? 0, 3);
+                        invoice.ReceiptExcPaidAmount = NumberHelper.RoundNumber(invoice.PaidAmount / criteria.FinalExchangeRate ?? 0, 3);
+                        invoice.ReceiptExcInvoiceBalance = NumberHelper.RoundNumber(invoice.InvoiceBalance / criteria.FinalExchangeRate ?? 0, 3);
 
                     }
                     else
                     {
-                        invoice.ReceiptExcUnpaidAmount = Math.Round(invoice.UnpaidAmount / criteria.FinalExchangeRate, 3); // số tiền còn lại của invoice theo tỉ giá phiếu thu
+                        invoice.ReceiptExcUnpaidAmount = NumberHelper.RoundNumber(invoice.UnpaidAmount / criteria.FinalExchangeRate, 3); // số tiền còn lại của invoice theo tỉ giá phiếu thu
                         if (currentPaidAmount - invoice.ReceiptExcUnpaidAmount > 0) // Trừ hết số tiền còn lại của invoice
                         {
                             if (invoice.Currency != AccountingConstants.CURRENCY_LOCAL)
@@ -888,8 +889,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                         }
 
-                        invoice.ReceiptExcPaidAmount = Math.Round(invoice.PaidAmount * criteria.FinalExchangeRate ?? 0);
-                        invoice.ReceiptExcInvoiceBalance = Math.Round(invoice.InvoiceBalance * criteria.FinalExchangeRate ?? 0);
+                        invoice.ReceiptExcPaidAmount = NumberHelper.RoundNumber(invoice.PaidAmount * criteria.FinalExchangeRate ?? 0);
+                        invoice.ReceiptExcInvoiceBalance = NumberHelper.RoundNumber(invoice.InvoiceBalance * criteria.FinalExchangeRate ?? 0);
                     }
                     currentPaidAmount -= (invoice.ReceiptExcUnpaidAmount ?? 0);
 

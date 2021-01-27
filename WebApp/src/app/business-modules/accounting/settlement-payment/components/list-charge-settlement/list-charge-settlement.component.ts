@@ -1,7 +1,9 @@
 import { Component, ViewChild, ViewChildren, QueryList, Input } from '@angular/core';
+import { coerceBooleanProperty } from "@angular/cdk/coercion";
+import { takeUntil } from 'rxjs/operators';
 import { AppList } from '@app';
 import { Surcharge, Partner } from '@models';
-import { SortService } from '@services';
+import { SortService, DataService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
 import { delayTime } from '@decorators';
@@ -21,13 +23,23 @@ import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from
 
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
-
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
 })
 
 export class SettlementListChargeComponent extends AppList implements ICrystalReport {
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
+
+    get readonly(): boolean {
+        return this._readonly;
+    }
+
+
+    private _readonly: boolean = false;
+
     @ViewChild(SettlementExistingChargePopupComponent) existingChargePopup: SettlementExistingChargePopupComponent;
     @ViewChild(SettlementFormChargePopupComponent) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
@@ -62,6 +74,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _documenRepo: DocumentationRepo,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -88,6 +101,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Note', field: 'notes', sortable: true },
         ];
         this.selectedSurcharge = this.surcharges[0];
+
+        this.subscriptionDuplicateChargeState();
     }
 
     showExistingCharge() {
@@ -112,23 +127,13 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
         if (charges.length) {
+            this.selectedIndexSurcharge = -1;
             const hblIds: string[] = charges.map(x => x.hblid);
 
             this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             this.surcharges = [...charges, ...this.surcharges];
 
         }
-        // if (charges.length === 1) {
-        //     const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === charges[0].hblid);
-        //     if (indexChargeUpdating !== -1) {
-        //         this.surcharges[indexChargeUpdating] = charges[0];
-        //         this.surcharges = [...this.surcharges];
-        //     }
-        // } else {
-        //     const hblIds: string[] = charges.map(i => i.hblid);
-        //     this.surcharges = [...this.surcharges].filter(x => !hblIds.includes(x.hblid));
-        //     this.surcharges = [...this.surcharges, ...charges];
-        // }
     }
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
@@ -171,7 +176,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     changeCurrency(currency: string) {
-        // this.formChargePopup.currency.setValue(currency.id);
         this.tableListChargePopup.currencyId = currency || 'VND';
     }
 
@@ -262,9 +266,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.showPaymentManagementPopup();
     }
 
-
-
     openCopySurcharge(surcharge: Surcharge) {
+        if (this.STATE !== 'WRITE') { return; }
         this.formChargePopup.selectedSurcharge = surcharge;
         this.openSurchargeDetail(surcharge, null, 'copy');
     }
@@ -306,7 +309,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     this.tableListChargePopup.charges = cloneDeep(surcharges);
 
                     this.tableListChargePopup.charges.forEach(item => {
-
+                        item.isDuplicate = false; // * Reset duplicate state
                         if (item.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
                             // get partner theo payerId.
                             const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.payerId);
@@ -453,8 +456,46 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
-
     }
+
+    subscriptionDuplicateChargeState() {
+        this._dataService.currentMessage
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (error: any) => {
+                    if (error?.duplicateChargeSettlement?.data) {
+                        let chargeDup: Partial<DuplicateShipmentSettlementResultModel> = {};
+                        if (error?.duplicateChargeSettlement?.data?.length) {
+                            chargeDup = error?.duplicateChargeSettlement?.data[0];
+                        } else {
+                            let errorData = error?.duplicateChargeSettlement?.data;
+                            chargeDup.chargeId = errorData?.chargeId;
+                            chargeDup.jobNo = errorData?.jobId;
+                            chargeDup.mblNo = errorData?.mbl;
+                            chargeDup.hblNo = errorData?.hbl;
+                        }
+                        this.surcharges.forEach(c => {
+                            if (c.jobNo === chargeDup.jobNo
+                                && c.mblno === chargeDup.mblNo
+                                && c.hblno === chargeDup.hblNo
+                                && c.chargeId === chargeDup.chargeId) {
+                                c.isDuplicate = true;
+                            } else {
+                                c.isDuplicate = false;
+                            }
+                        })
+                    }
+                }
+            )
+    }
+}
+
+interface DuplicateShipmentSettlementResultModel {
+    jobNo: string;
+    jobId?: string;
+    mblNo: string;
+    hblNo: string;
+    chargeId: string;
 }
 
 
