@@ -367,50 +367,49 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (response: any) => {
-                    this.opsTransaction = new OpsTransaction(response);
-                    this.hblid = this.opsTransaction.hblid;
-                    if (this.opsTransaction != null) {
+                    if (response != null) {
+                        this.opsTransaction = new OpsTransaction(response);
+                        this.hblid = this.opsTransaction.hblid;
+
                         this.getListContainersOfJob();
-                        if (this.opsTransaction != null) {
-                            this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
-                            this.editForm.opsTransaction = this.opsTransaction;
-                            const hbl = new CsTransactionDetail(this.opsTransaction);
-                            hbl.id = this.opsTransaction.hblid;
-                            this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
+                        this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+                        this.editForm.opsTransaction = this.opsTransaction;
+                        const hbl = new CsTransactionDetail(this.opsTransaction);
+                        hbl.id = this.opsTransaction.hblid;
+                        this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
 
-                            const csTransation: CsTransaction = new CsTransaction(Object.assign({}, response, {
-                                grossWeight: this.opsTransaction.sumGrossWeight,
-                                netWeight: this.opsTransaction.sumNetWeight,
-                                cbm: this.opsTransaction.sumCbm,
-                                chargeWeight: this.opsTransaction.sumChargeWeight,
-                                packageQty: this.opsTransaction.sumPackages,
-                                isLocked: this.opsTransaction.isLocked,
-                                customerId: this.opsTransaction.customerId,
-                                customerName: this.opsTransaction.customerName,
-                                agentName: this.opsTransaction.agentName,
-                                supplierName: this.opsTransaction.supplierName,
-                                coloaderId: this.opsTransaction.supplierId,
-                                mawb: this.opsTransaction.mblno
-                            }));
+                        const csTransation: CsTransaction = new CsTransaction(Object.assign({}, response, {
+                            grossWeight: this.opsTransaction.sumGrossWeight,
+                            netWeight: this.opsTransaction.sumNetWeight,
+                            cbm: this.opsTransaction.sumCbm,
+                            chargeWeight: this.opsTransaction.sumChargeWeight,
+                            packageQty: this.opsTransaction.sumPackages,
+                            isLocked: this.opsTransaction.isLocked,
+                            customerId: this.opsTransaction.customerId,
+                            customerName: this.opsTransaction.customerName,
+                            agentName: this.opsTransaction.agentName,
+                            supplierName: this.opsTransaction.supplierName,
+                            coloaderId: this.opsTransaction.supplierId,
+                            mawb: this.opsTransaction.mblno
+                        }));
 
-                            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));
 
-                            // Tricking Update Transation Apply for isLocked..
+                        // Tricking Update Transation Apply for isLocked..
 
-                            this._store.dispatch(new OPSTransactionGetDetailSuccessAction(this.opsTransaction));
-                            this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
+                        this._store.dispatch(new OPSTransactionGetDetailSuccessAction(this.opsTransaction));
+                        this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
 
-                            this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
-                            this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.opsTransaction.hblid }));
+                        // this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                        // this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.opsTransaction.hblid }));
 
-                            this.editForm.isJobCopy = this.isDuplicate;
-                            this.editForm.setFormValue();
-                        }
+                        this.editForm.isJobCopy = this.isDuplicate;
+                        this.editForm.setFormValue();
+                    }
 
-                        if (this.isDuplicate) {
-                            this.editForm.getBillingOpsId();
-                            this.headerComponent.resetBreadcrumb("Create Job");
-                        }
+                    if (this.isDuplicate) {
+                        this.editForm.getBillingOpsId();
+                        this.headerComponent.resetBreadcrumb("Create Job");
                     }
                 },
             );

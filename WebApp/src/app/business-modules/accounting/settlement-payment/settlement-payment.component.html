@@ -41,6 +41,18 @@
                                                 </span>
                                             </span>
                                         </button>
+
+                                        <button class="btn btn-danger  m-btn--icon m-btn--uppercase" title="Deny"
+                                            *ngIf="menuSpecialPermission | async | specialPermission:'DenySettlement'"
+                                            (click)="denySettle()">
+                                            <span>
+                                                <i class="la la-times"></i>
+                                                <span>
+                                                    Deny
+                                                </span>
+                                            </span>
+                                        </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -132,7 +144,8 @@
                                                     {{settlePayment.syncStatus}}
                                                 </div>
                                                 <div *ngSwitchDefault class="text-danger">
-                                                    {{settlePayment.syncStatus}}{{settlePayment.reasonReject ? ' - ' +settlePayment.reasonReject : ''}}
+                                                    {{settlePayment.syncStatus}}{{settlePayment.reasonReject ? ' - '
+                                                    +settlePayment.reasonReject : ''}}
                                                 </div>
                                             </td>
                                         </tr>
@@ -188,11 +201,6 @@
 </div>
 
 
-<confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteSettlemenPayment()">
-</confirm-popup>
-
-<confirm-popup #confirmSyncSettle (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
-    body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
 
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
@@ -201,5 +209,7 @@
 <permission-403-popup></permission-403-popup>
 
 <select-requester-popup (onSelect)="hidePopupRequester()"></select-requester-popup>
-<settlement-payments-popup>
-</settlement-payments-popup>
+
+<settlement-payments-popup></settlement-payments-popup>
+
+<ng-template inject></ng-template>

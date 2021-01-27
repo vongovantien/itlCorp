@@ -1,3 +1,4 @@
+import { InjectViewContainerRefDirective } from './../../../shared/directives/inject-view-container-ref.directive';
 import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
@@ -34,13 +35,13 @@ import { catchError, finalize, map, } from 'rxjs/operators';
 })
 export class SettlementPaymentComponent extends AppList implements ICrystalReport {
 
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(SettlementPaymentsPopupComponent) settlementPaymentsPopup: SettlementPaymentsPopupComponent;
-    @ViewChild('confirmSyncSettle') confirmSyncPopup: ConfirmPopupComponent;
+
+    @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
 
 
     settlements: SettlementPayment[] = [];
@@ -100,8 +101,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
-        this.getUserLogged();
-        // this.getListSettlePayment();
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
@@ -126,11 +125,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                 );
         }
 
-    }
-
-    getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this.dataSearch = { requester: this.userLogged.id };
     }
 
     onSearchSettlement(data: any) {
@@ -172,16 +166,20 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             .subscribe((value: boolean) => {
                 if (value) {
                     this.selectedSettlement = settlement;
-                    this.confirmDeletePopup.show();
+
+                    this.showPopupDynamicRender<ConfirmPopupComponent>(
+                        ConfirmPopupComponent,
+                        this.confirmPopupContainerRef.viewContainerRef, {
+                        body: 'Do you want to delete ?',
+                        labelConfirm: 'Yes',
+                        labelCancel: 'No'
+                    }, () => {
+                        this.deleteSettlement(this.selectedSettlement.settlementNo);
+                    })
                 } else {
                     this.permissionPopup.show();
                 }
             });
-    }
-
-    onDeleteSettlemenPayment() {
-        this.confirmDeletePopup.hide();
-        this.deleteSettlement(this.selectedSettlement.settlementNo);
     }
 
     deleteSettlement(settlementNo: string) {
@@ -360,14 +358,24 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         if (!this.settleSyncIds.length) {
             return;
         }
-        this.confirmSyncPopup.show();
+
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
+            {
+                body: 'Are you sure you want to sync data to accountant system ?',   // ? Config confirm popup
+                iconConfirm: 'la la-cloud-upload',
+                labelConfirm: 'Yes'
+            },
+            (v: boolean) => {                                   // ? Hàm Callback khi sumit
+                this.onSyncBravo(this.settleSyncIds);
+            });
 
     }
 
-    onSyncBravo() {
-        this.confirmSyncPopup.hide();
+    onSyncBravo(Ids: AccountingInterface.IRequestGuid[]) {
         this._spinner.show();
-        this._accoutingRepo.syncSettleToAccountant(this.settleSyncIds)
+        this._accoutingRepo.syncSettleToAccountant(Ids)
             .pipe(
                 finalize(() => this._spinner.hide()),
                 catchError(this.catchError)
@@ -386,5 +394,47 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                     console.log(error);
                 }
             );
+    }
+
+    denySettle() {
+        const settlesDenyList = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done' && x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED);
+        if (!settlesDenyList.length) {
+            this._toastService.warning("Please select settle payment was rejected to deny");
+            return;
+        }
+
+        const hasDenied: boolean = settlesDenyList.some(x => x.statusApproval === 'Denied');
+        if (hasDenied) {
+            const advanceHasDenied: string = settlesDenyList.filter(x => x.statusApproval === 'Denied').map(a => a.settlementNo).toString();
+            this._toastService.warning(`${advanceHasDenied} had denied, Please recheck!`);
+            return;
+        }
+
+        const settleIds: string[] = settlesDenyList.map((x: SettlementPayment) => x.id);
+        if (!settleIds.length) {
+            return;
+        }
+
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,
+            { body: 'Are you sure you want to deny settle payments ?' },
+            (v: boolean) => {
+                this.onDenySettlePayments(settleIds);
+            });
+    }
+
+    onDenySettlePayments(settleIds: string[]) {
+        this._accoutingRepo.denySettlePayments(settleIds)
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.getListSettlePayment();
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            )
     }
 }

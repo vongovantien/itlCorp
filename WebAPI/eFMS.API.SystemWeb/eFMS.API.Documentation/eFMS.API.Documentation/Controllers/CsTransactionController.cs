@@ -213,6 +213,13 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
+            string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
+            if(msgCheckUpdateMawb.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
             model.UserModified = currentUser.UserID;
             var hs = csTransactionService.UpdateCSTransaction(model);
             if (hs.Code == 403)
@@ -611,6 +618,26 @@ namespace eFMS.API.Documentation.Controllers
             message = string.IsNullOrEmpty(model.PersonIncharge) ? stringLocalizer[DocumentationLanguageSub.MSG_PERSON_IN_CHARGE_REQUIRED].Value : message;
 
             return message;
+        }
+        
+        private string CheckHasMBLUpdatePermitted(CsTransactionEditModel model)
+        {
+            string errorMsg = string.Empty;
+            string mblNo = string.Empty;
+            List<string> advs = new List<string>();
+
+            int statusCode = csTransactionService.CheckUpdateMBL(model, out mblNo, out advs);
+            if (statusCode == 1)
+            {
+                errorMsg = String.Format("MBL {0} has Charges List that Synced to accounting system, Please you check Again!", mblNo);
+            }
+
+            if (statusCode == 2)
+            {
+                errorMsg = String.Format("MBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", mblNo, string.Join(", ", advs.ToArray()));
+            }
+
+            return errorMsg;
         }
         #endregion -- METHOD PRIVATE --
     }

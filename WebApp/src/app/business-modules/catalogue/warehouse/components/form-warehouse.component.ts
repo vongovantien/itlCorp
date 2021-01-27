@@ -80,7 +80,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
             warehouseNameVN: res.nameVn,
             country: { id: res.countryId, text: !!this.countries.find(x => x.id === res.countryId) ? this.countries.find(x => x.id === res.countryId).text : null },
             province: { id: res.provinceId, text: !!this.provinces.find(x => x.id === res.provinceId) ? this.provinces.find(x => x.id === res.provinceId).text : null },
-            district: { id: res.districtId, text: !!this.districts.find(x => x.id === res.districtId) ? this.districts.find(x => x.id === res.districtId).text : null },
+            district: res.districtId,
             address: res.address,
             active: res.active,
             flightVesselNo: res.flightVesselNo,
@@ -121,7 +121,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         this.warehouse.nameVn = this.warehouseNameVN.value;
         this.warehouse.countryId = this.country.value.id;
         this.warehouse.provinceId = this.province.value.id;
-        this.warehouse.districtId = this.district.value.id;
+        this.warehouse.districtId = this.district.value;
         this.warehouse.address = this.address.value;
         this.warehouse.flightVesselNo = this.flightVesselNo.value;
         this.warehouse.active = !!this.isUpdate ? this.active.value : true;

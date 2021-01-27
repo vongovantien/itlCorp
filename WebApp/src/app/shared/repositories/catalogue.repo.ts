@@ -146,7 +146,7 @@ export class CatalogueRepo {
 
     }
     getPartnersByType(type: number, active: boolean = true, exceptId: string = null) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, { partnerGroup: type, active: active, id: exceptId }).pipe(
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, { partnerGroup: type, active: active, id: exceptId }, null, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -155,7 +155,7 @@ export class CatalogueRepo {
     }
 
     getPartnerByGroups(groups: number[], active: boolean = true) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, { partnerGroups: groups, active: active }).pipe(
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, { partnerGroups: groups, active: active }, null, { "hideSpinner": "true" }).pipe(
             map((res: any) => {
                 return res;
             })
@@ -208,7 +208,7 @@ export class CatalogueRepo {
                     })
                 );
         } else {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, data).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/Query`, data, null, { "hideSpinner": "true" }).pipe(
                 catchError((error) => throwError(error)),
                 map((res: any) => {
                     return res;

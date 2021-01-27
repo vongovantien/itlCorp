@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -156,6 +157,13 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
+            string msgCheckUpdateMawb = CheckHasHBLUpdatePermitted(model);
+            if (msgCheckUpdateMawb.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = csTransactionDetailService.UpdateTransactionDetail(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -451,6 +459,26 @@ namespace eFMS.API.Documentation.Controllers
         {
             var data = csTransactionDetailService.GetHousebillsDailyExport(issuedDate);
             return Ok(data);
+        }
+
+        private string CheckHasHBLUpdatePermitted(CsTransactionDetailModel model)
+        {
+            string errorMsg = string.Empty;
+            string hblNo = string.Empty;
+            List<string> advs = new List<string>();
+
+            int statusCode = csTransactionDetailService.CheckUpdateHBL(model, out hblNo, out advs);
+            if (statusCode == 1)
+            {
+                errorMsg = String.Format("HBL {0} has Charges List that Synced to accounting system, Please you check Again!", hblNo);
+            }
+
+            if (statusCode == 2)
+            {
+                errorMsg = String.Format("HBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", hblNo, string.Join(",", advs.ToArray()));
+            }
+
+            return errorMsg;
         }
     }
 }

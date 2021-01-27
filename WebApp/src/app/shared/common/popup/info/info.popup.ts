@@ -1,13 +1,13 @@
-import { Component, Input } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { eFMSPopup } from '../popup';
 
 @Component({
     selector: 'info-popup',
     templateUrl: 'info.popup.html',
-    styleUrls: ['./info.popup.scss']
+    styleUrls: ['./info.popup.scss'],
 })
 
-export class InfoPopupComponent extends PopupBase {
+export class InfoPopupComponent extends eFMSPopup {
 
     @Input() title: string = 'Notification';
     @Input() body: string = 'Default Info Popup';
@@ -15,10 +15,17 @@ export class InfoPopupComponent extends PopupBase {
     @Input() label: string = 'Ok';
     @Input() align: CommonType.DIRECTION = 'center';
 
+    @Output() onSubmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+
     constructor() {
         super();
     }
 
     ngOnInit(): void { }
+
+    close() {
+        this.hide();
+        this.onSubmit.emit(true);
+    }
 
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -45,6 +46,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<SysCompany> sysCompanyRepo;
+        private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
+        private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
@@ -69,6 +72,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             IStringLocalizer<LanguageSub> localizer,
             IContextBase<SysCompany> sysCompany,
+            IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
+            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
@@ -92,6 +97,8 @@ namespace eFMS.API.Documentation.DL.Services
             stringLocalizer = localizer;
             sysCompanyRepo = sysCompany;
             userlevelRepository = userlevelRepo;
+            acctAdvancePaymentRepository = acctAdvancePaymentRepo;
+            acctAdvanceRequestRepository = acctAdvanceRequestRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -1993,7 +2000,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.Total = hbDetail.Total;
             result.DesOfGood = hbDetail.DesOfGoods;
             var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
-            string _dimensions = string.Join("\r\n", dimHbl.Select(s => Math.Round(s.Length.Value, 2) + "*" + Math.Round(s.Width.Value, 2) + "*" + Math.Round(s.Height.Value, 2) + "*" + Math.Round(s.Package.Value, 2)));
+            string _dimensions = string.Join("\r\n", dimHbl.Select(s => NumberHelper.RoundNumber(s.Length.Value, 2) + "*" + NumberHelper.RoundNumber(s.Width.Value, 2) + "*" + NumberHelper.RoundNumber(s.Height.Value, 2) + "*" + NumberHelper.RoundNumber(s.Package.Value, 2)));
             result.VolumeField = _dimensions;
             result.PrepaidTotal = hbDetail.TotalPp;
             result.CollectTotal = hbDetail.TotalCll;
@@ -2151,6 +2158,49 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs)
+        {
+            hblNo = string.Empty;
+            advs = new List<string>();
+            int errorCode = 0;  // 1|2
+            bool hasChargeSynced = false;
+            bool hasAdvanceRequest = false;
+
+            if (DataContext.Any(x => x.Id == model.Id  && (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? "")))
+            {
+                CsTransactionDetail houseBill = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
+                if (houseBill != null)
+                {
+                    hasChargeSynced = surchareRepository.Any(x => x.Hblno == houseBill.Hwbno && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                }
+
+                if (hasChargeSynced)
+                {
+                    errorCode = 1;
+                    hblNo = houseBill.Hwbno;
+                }
+                else
+                {
+                    var query = from advR in acctAdvanceRequestRepository.Get(x => x.Hblid == houseBill.Id)
+                                join adv in acctAdvancePaymentRepository.Get(x => x.SyncStatus == "Synced") on advR.AdvanceNo equals adv.AdvanceNo
+                                select adv.AdvanceNo;
+
+                    if (query != null && query.Count() > 0)
+                    {
+                        hasAdvanceRequest = true;
+                        advs = query.Distinct().ToList();
+                    }
+                    if (hasAdvanceRequest)
+                    {
+                        errorCode = 2;
+                        hblNo = houseBill.Hwbno;
+                    }
+                }
+            }
+
+            return errorCode;
         }
     }
 }

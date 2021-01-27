@@ -109,8 +109,9 @@
                         </ng-template>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
-                        <span class="m--font-bolder">Total Shipment:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.shipment | number: '.0-2'}}</span>
+                        <span class="m--font-bolder">Total Shipment/Charge:</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.shipment | number: '.0-2'}}/{{soa.totalCharge
+                            | number: '.0-2'}}</span>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Create Date:</span>
@@ -190,7 +191,7 @@
                     </div>
                 </div>
             </div>
-            <div class="table-wrapper">
+            <div class="table-wrapper" style="max-height:800px;overflow:scroll">
                 <table class="table table-striped table-brand dataTable">
                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
                     <tbody class="tbody-group" [@listAnimation]="!isLoading">
@@ -206,7 +207,7 @@
                                     </td>
                                 </tr>
                                 <tr class="collapse-toggle-row tgroup">
-                                    <td colspan="14">
+                                    <td colspan="15">
                                         <div class='row'>
                                             <div class="col-5">Shipment:
                                                 <span class='text-info'>
@@ -230,6 +231,7 @@
                                 <tr class="child"
                                     *ngFor="let charge of groupShipment.chargeShipments; let j = index; trackBy: trackByFn"
                                     [class.synced-row]="charge.isSynced">
+                                    <td class="text-center">{{j + 1}}</td>
                                     <td>
                                         <span>{{charge.chargeCode}}</span>
                                     </td>
@@ -248,10 +250,10 @@
                                     <td>
                                         <span>{{charge.customNo}}</span>
                                     </td>
-                                    <td>
+                                    <td class="text-right">
                                         <span>{{charge.debit | number: '.0-3'}}</span>
                                     </td>
-                                    <td>
+                                    <td class="text-right">
                                         <span>{{charge.credit | number: '.0-3'}}</span>
                                     </td>
                                     <td>
@@ -295,6 +297,7 @@
                             </tr>
                             <tr *ngFor="let charge of soa.chargeShipments  | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn"
                                 [class.synced-row]="charge.isSynced">
+                                <td class="text-center">{{i + 1}}</td>
                                 <td>
                                     <span>{{charge.chargeCode}}</span>
                                 </td>
@@ -313,10 +316,10 @@
                                 <td>
                                     <span>{{charge.customNo}}</span>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <span>{{charge.debit | number: '.0-3'}}</span>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <span>{{charge.credit | number: '.0-3'}}</span>
                                 </td>
                                 <td>
