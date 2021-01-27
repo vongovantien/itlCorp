@@ -4580,6 +4580,62 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return transactionType;
         }
+
+        public HandleState DenyAdvancePayments(List<Guid> Ids)
+        {
+            HandleState result = new HandleState();
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (Guid Id in Ids)
+                    {
+                        {
+                            AcctSettlementPayment settle = DataContext.First(x => x.Id == Id);
+                            if (settle != null && settle.SyncStatus == AccountingConstants.STATUS_REJECTED)
+                            {
+                                settle.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
+                                settle.UserModified = currentUser.UserID;
+                                settle.DatetimeModified = DateTime.Now;
+
+                                // ghi log
+                                string log = String.Format("{0} has been opened at {1} on {2} by {3}", settle.SettlementNo, string.Format("{0:HH:mm:ss tt}", DateTime.Now), DateTime.Now.ToString("dd/MM/yyyy"), currentUser.UserName);
+
+                                settle.LockedLog = settle.LockedLog + log + ";";
+
+                                result = DataContext.Update(settle, x => x.Id == Id,false);
+
+                                if (result.Success)
+                                {
+                                    IQueryable<AcctApproveSettlement> approveSettles = acctApproveSettlementRepo.Get(x => x.SettlementNo == settle.SettlementNo);
+                                    foreach (var approve in approveSettles)
+                                    {
+                                        approve.IsDeny = true;
+                                        approve.UserModified = currentUser.UserID;
+                                        approve.DateModified = DateTime.Now;
+
+                                        acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    DataContext.SubmitChanges();
+                    acctApproveSettlementRepo.SubmitChanges();
+                    trans.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
     }
 }
 
