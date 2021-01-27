@@ -214,42 +214,48 @@ namespace eFMS.API.ForPartner.DL.Service
 
                         if (hsDebit.Success)
                         {
-                            foreach (var debitCharge in debitCharges)
+                            if (invoiceDebit != null)
                             {
-                                CsShipmentSurcharge surchargeDebit = surchargeRepo.Get(x => x.Id == debitCharge.ChargeId).FirstOrDefault();
-                                surchargeDebit.AcctManagementId = invoiceDebit.Id;
-                                surchargeDebit.InvoiceNo = invoiceDebit.InvoiceNoReal;
-                                surchargeDebit.InvoiceDate = invoiceDebit.Date;
-                                surchargeDebit.VoucherId = invoiceDebit.VoucherId;
-                                surchargeDebit.VoucherIddate = invoiceDebit.Date;
-                                surchargeDebit.SeriesNo = invoiceDebit.Serie;
-                                surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency); //debitCharge.ExchangeRate;
-                                surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
-                                surchargeDebit.DatetimeModified = DateTime.Now;
-                                surchargeDebit.UserModified = _currentUser.UserID;
-                                var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id, false);
+                                foreach (var debitCharge in debitCharges)
+                                {
+                                    CsShipmentSurcharge surchargeDebit = surchargeRepo.Get(x => x.Id == debitCharge.ChargeId).FirstOrDefault();
+                                    surchargeDebit.AcctManagementId = invoiceDebit.Id;
+                                    surchargeDebit.InvoiceNo = invoiceDebit.InvoiceNoReal;
+                                    surchargeDebit.InvoiceDate = invoiceDebit.Date;
+                                    surchargeDebit.VoucherId = invoiceDebit.VoucherId;
+                                    surchargeDebit.VoucherIddate = invoiceDebit.Date;
+                                    surchargeDebit.SeriesNo = invoiceDebit.Serie;
+                                    surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency); //debitCharge.ExchangeRate;
+                                    surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
+                                    surchargeDebit.DatetimeModified = DateTime.Now;
+                                    surchargeDebit.UserModified = _currentUser.UserID;
+                                    var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id, false);
+                                }
                             }
                         }
 
                         if (hsObh.Success)
                         {
-                            foreach (var invoiceObh in invoicesObh)
+                            if (invoicesObh != null)
                             {
-                                //Cập nhật số RefNo cho phí OBH
-                                foreach (var obhCharge in obhCharges)
+                                foreach (var invoiceObh in invoicesObh)
                                 {
-                                    CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
-                                    surchargeObh.AcctManagementId = invoiceObh.Id;
-                                    surchargeObh.InvoiceNo = null; //CR: 07/12/2020
-                                    surchargeObh.InvoiceDate = null; //CR: 07/12/2020
-                                    surchargeObh.VoucherId = invoiceObh.VoucherId;
-                                    surchargeObh.VoucherIddate = invoiceObh.Date;
-                                    surchargeObh.SeriesNo = null; //CR: 07/12/2020
-                                    surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
-                                    surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
-                                    surchargeObh.DatetimeModified = DateTime.Now;
-                                    surchargeObh.UserModified = _currentUser.UserID;
-                                    var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id, false);
+                                    //Cập nhật số RefNo cho phí OBH
+                                    foreach (var obhCharge in obhCharges)
+                                    {
+                                        CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
+                                        surchargeObh.AcctManagementId = invoiceObh.Id;
+                                        surchargeObh.InvoiceNo = null; //CR: 07/12/2020
+                                        surchargeObh.InvoiceDate = null; //CR: 07/12/2020
+                                        surchargeObh.VoucherId = invoiceObh.VoucherId;
+                                        surchargeObh.VoucherIddate = invoiceObh.Date;
+                                        surchargeObh.SeriesNo = null; //CR: 07/12/2020
+                                        surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
+                                        surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
+                                        surchargeObh.DatetimeModified = DateTime.Now;
+                                        surchargeObh.UserModified = _currentUser.UserID;
+                                        var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id, false);
+                                    }
                                 }
                             }
                         }
