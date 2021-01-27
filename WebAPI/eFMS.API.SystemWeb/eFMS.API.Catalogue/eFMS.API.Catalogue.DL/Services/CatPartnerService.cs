@@ -286,6 +286,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
             List<string> lstTo = new List<string>();
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
@@ -339,7 +340,7 @@ namespace eFMS.API.Catalogue.DL.Services
               "<b> eFMS System, </b>" +
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-            string urlImage = ApiUrl.Value.Url.Replace("Catalogue", "");
+            string urlImage = UrlClone.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", urlImage + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> lstBCc = ListMailBCC();

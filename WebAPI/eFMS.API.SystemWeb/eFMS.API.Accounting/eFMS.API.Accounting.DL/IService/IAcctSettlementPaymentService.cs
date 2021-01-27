@@ -83,6 +83,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState CheckValidateMailByUserId(string userId);
 
-        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);     
+        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+
+        HandleState DenyAdvancePayments(List<Guid> Ids);
     }
 }
