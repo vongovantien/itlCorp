@@ -853,7 +853,6 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
 
-
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
 
@@ -888,6 +887,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string Name = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             string urlToSend = string.Empty;
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
             List<string> lstCc = new List<string>
             {
             };
@@ -922,7 +922,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     "</br>"
                     + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-                urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+
+                urlToSend = UrlClone.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
                 if (lstTo.Any())
@@ -958,7 +959,7 @@ namespace eFMS.API.Catalogue.DL.Services
                   "</br>"
                  + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-                urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+                urlToSend = UrlClone.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc.Add(objInfoSalesman?.Email);
@@ -1000,6 +1001,8 @@ namespace eFMS.API.Catalogue.DL.Services
             string customerName = string.Empty;
             string url = string.Empty;
             string body = string.Empty;
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
+
             if (partnerType == "Customer")
             {
                 url = "home/commercial/customer/";
@@ -1029,7 +1032,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         "</br>"
                         + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-            urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+            urlToSend = UrlClone.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
             List<string> lstCc = ListMailCC();
             List<string> lstTo = new List<string>();
@@ -1073,7 +1076,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
-
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
@@ -1127,7 +1130,7 @@ namespace eFMS.API.Catalogue.DL.Services
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-            urlToSend = ApiUrl.Value.Url.Replace("Catalogue", "");
+            urlToSend = UrlClone.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstBCc);
 

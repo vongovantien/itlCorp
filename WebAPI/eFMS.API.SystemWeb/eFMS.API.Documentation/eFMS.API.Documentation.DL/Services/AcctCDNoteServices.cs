@@ -951,6 +951,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.PartnerTel = partner?.Tel;
             model.PartnerTaxcode = partner?.TaxCode;
             model.PartnerFax = partner?.Fax;
+            model.CreatedDate = ((DateTime)acctCdNoteList.OrderBy(x => x.DatetimeCreated).FirstOrDefault().DatetimeCreated).ToString("dd'/'MM'/'yyyy");
 
             var places = placeRepository.Get();
             var pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
