@@ -18,6 +18,8 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.API.Common.Models;
 using eFMS.API.Common;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -47,7 +49,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
-
+        private readonly IContextBase<AcctAdvancePayment> acctAdvancePayment;
+        private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -69,7 +72,10 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysOffice> sysOffice,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<AcctAdvancePayment> _acctAdvancePayment,
+            IContextBase<AcctSettlementPayment> _acctSettlementPayment
+            ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -95,6 +101,8 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             userlevelRepository = userlevelRepo;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
+            acctAdvancePayment = _acctAdvancePayment;
+            acctSettlementPayment = _acctSettlementPayment;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1444,5 +1452,39 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return containers;
         }
+
+        public async Task<PageResult<OpsAdvanceSettlementModel>> opsAdvanceSettlements(string JobNo,  int page, int size)
+        {
+            var query = from ss in surchargeRepository.Get()
+                        join ap in acctAdvancePayment.Get() on ss.AdvanceNo equals ap.AdvanceNo
+                        join sp in acctSettlementPayment.Get() on ss.SettlementCode equals sp.SettlementNo
+                        join user in userRepository.Get() on ss.UserCreated equals user.UserCreated
+                        where ss.JobNo == JobNo && ap.StatusApproval =="Done"
+                        select new {ap, sp , user.Username};
+            int TotalRow = await query.CountAsync();
+            var data = await query.Skip((page - 1) * size)
+                .Take(size).Select(x => new OpsAdvanceSettlementModel()
+                {
+                    AdvanceNo = x.ap.AdvanceNo,
+                    AdvanceAmount = Convert.ToDecimal(x.ap.AdvanceCurrency),
+                    AdvanceDate = x.ap.RequestDate,
+                    Requester = x.Username,
+                    SettlemenDate = x.sp.RequestDate,
+                    SettlementAmount = Convert.ToDecimal(x.sp.SettlementCurrency),
+                    SettlementNo = x.sp.SettlementNo,
+                    Balance = Convert.ToDecimal(x.ap.AdvanceCurrency) - Convert.ToDecimal(x.sp.SettlementCurrency),
+                SettleStatusApproval = x.sp.StatusApproval,
+                StatusApproval = x.ap.StatusApproval,
+            }).ToListAsync();
+            var pageResult = new PageResult<OpsAdvanceSettlementModel>()
+            {
+                Items = data,
+                TotalRecord = TotalRow,
+            
+            };
+
+            return pageResult;
+        }
+  
     }
 }

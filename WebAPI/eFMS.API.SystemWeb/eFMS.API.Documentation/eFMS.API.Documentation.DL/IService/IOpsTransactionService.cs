@@ -8,6 +8,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -33,5 +34,8 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState LockOpsTransaction(Guid jobId);
         ResultHandle ImportDuplicateJob(OpsTransactionModel model);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
+
+        Task<PageResult<OpsAdvanceSettlementModel>> opsAdvanceSettlements(string JobNo, int page, int size);
+       
     }
 }

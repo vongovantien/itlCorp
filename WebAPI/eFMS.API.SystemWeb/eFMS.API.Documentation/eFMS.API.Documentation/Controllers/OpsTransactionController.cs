@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -27,14 +28,14 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    [Authorize]
+    // [Authorize]
     public class OpsTransactionController : CustomAuthcontroller
     {
         private readonly IStringLocalizer stringLocalizer;
         private ICurrentUser currentUser;
         private readonly IOpsTransactionService transactionService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -93,7 +94,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
             return Ok(result);
         }
-        
+
         /// <summary>
         /// get and paging the list of countries by conditions
         /// </summary>
@@ -121,7 +122,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Add(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            
+
             var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
@@ -306,5 +307,15 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+        [HttpGet("AdavanceSettlement")]
+        // [Authorize]
+        public async Task<IActionResult> opsAdvanceSettlements(string JobNo, int page, int size)
+        {
+            var job = await transactionService.opsAdvanceSettlements(JobNo, page, size);
+            if (job == null)
+                return BadRequest("Cannot find JobNo");
+            return Ok(job);
+        }
+        
     }
 }
