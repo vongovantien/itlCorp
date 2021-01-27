@@ -771,6 +771,22 @@ namespace eFMS.API.Documentation.DL.Services
                 int i = 0;
                 foreach (var item in list)
                 {
+                    // Check if customer existed
+                    var customer = new CatPartner();
+                    if (item.AccountNo == null)
+                    {
+                        customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
+                    }
+                    else
+                    {
+                        customer = partnerRepository.Get(x => x.AccountNo == item.AccountNo)?.FirstOrDefault();
+                    }
+                    if (customer == null)
+                    {
+                        var notFoundPartnerTaxCodeMessages = "Customer '" + (item.AccountNo ?? item.PartnerTaxCode) + "' Not found";
+                        return new HandleState(notFoundPartnerTaxCodeMessages);
+                    }
+
                     var existedMessage = CheckExist(null, item.Mblid, item.Hblid);
                     if (existedMessage != null)
                     {
