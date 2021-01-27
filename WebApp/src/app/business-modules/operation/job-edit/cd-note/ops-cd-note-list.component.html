@@ -182,8 +182,7 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <span>{{cdNote.lastSyncDate | date:'dd/MM/yyyy
-                                                                HH:mm:ss'}}</span>
+                                                            <span>{{cdNote.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -213,6 +212,4 @@
 <info-popup [body]="'You can not delete this C/D Note, because it was issued SOA/Voucher/VAT Invoice. Please recheck!'">
 </info-popup>
 
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>

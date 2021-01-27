@@ -607,7 +607,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (this.vas.value != null && this.vas.value.length > 0 && this.vas.value[0].id === 'All') {
             this.selectedContract.vas = this.mapVas();
         }
-        if (this.contractType.value === 'Trial' && !this.isUpdate) {
+        if (this.contractType.value === 'Trial' && this.selectedContract.active === false) {
             if (!!this.effectiveDate.value.startDate) {
                 this.trialEffectDate.setValue({
                     startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate())),

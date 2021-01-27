@@ -94,5 +94,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState UpdatePaymentTerm(Guid Id, decimal days);
 
+        HandleState DenyAdvancePayments(List<Guid> Ids);
+
     }
 }

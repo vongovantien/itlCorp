@@ -68,6 +68,17 @@
                                             </span>
                                         </span>
                                     </button>
+
+                                    <button class="btn btn-danger  m-btn--icon m-btn--uppercase" title="Deny"
+                                        *ngIf="menuSpecialPermission | async | specialPermission:'DenyAdvance'"
+                                        (click)="denyAdvance()">
+                                        <span>
+                                            <i class="la la-times"></i>
+                                            <span>
+                                                Deny
+                                            </span>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -78,10 +89,9 @@
                             <table class="table table-brand table-hover dataTable">
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                    <th class="m--w-50 first">
+                                    <th class="m--w-50 first" *ngIf="!!advancePayments.length">
                                         <label class="m-checkbox">
                                             <input type="checkbox" name="" [checked]="isCheckAll"
-                                                [disabled]="!paymentHasStatusDone"
                                                 (change)="isCheckAll=!isCheckAll; checkAllChange()">
                                             <span></span>
                                         </label>
@@ -179,7 +189,9 @@
                                                         {{advancePayment.syncStatus}}
                                                     </div>
                                                     <div *ngSwitchDefault class="text-danger">
-                                                        {{advancePayment.syncStatus}}{{advancePayment.reasonReject ? ' - ' +advancePayment.reasonReject : ''}}
+                                                        {{advancePayment.syncStatus}}
+                                                        {{advancePayment.reasonReject ? ' - '
+                                                        +advancePayment.reasonReject : ''}}
                                                     </div>
                                                 </td>
                                                 <td>
@@ -249,21 +261,11 @@
     </div>
 </div>
 
-<confirm-popup #confirmDelete (onSubmit)="onDeleteAdvPayment()" [body]="'Do you want to delete ?'"
-    [labelConfirm]="'Yes'" [labelCancel]="'No'"></confirm-popup>
-
-<confirm-popup #confirmExistedVoucher (onSubmit)="onSubmitUpdateVoucher()" [labelConfirm]="'Yes'"
-    [body]="messageVoucherExisted" [labelCancel]="'No'" title="Voucher Existed">
-</confirm-popup>
 
 <confirm-popup #confirmRemoveSelectedVoucher (onSubmit)="onRemoveSelectedVoucher()" [labelConfirm]="'Yes'"
     [body]="'Are you sure you want to remove selected payment vouchers?'" [labelCancel]="'No'"
     title="Confirm remove selected voucher">
 </confirm-popup>
-
-<confirm-popup #confirmSyncAdvance (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
-    body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
-
 
 <permission-403-popup></permission-403-popup>
 
@@ -272,3 +274,5 @@
 <info-popup body="Opps, Please check an advance to update voucher !!'" [title]="'Cannot Update Voucher'"></info-popup>
 
 <advance-payments-popup></advance-payments-popup>
+
+<ng-template inject></ng-template>

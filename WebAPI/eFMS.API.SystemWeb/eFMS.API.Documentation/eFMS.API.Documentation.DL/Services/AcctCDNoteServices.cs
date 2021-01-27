@@ -714,6 +714,7 @@ namespace eFMS.API.Documentation.DL.Services
                 cdNoteDetails.MbLadingNo = opsTransaction?.Mblno;
                 cdNoteDetails.SumContainers = opsTransaction?.SumContainers;
                 cdNoteDetails.SumPackages = opsTransaction?.SumPackages;
+                cdNoteDetails.NW = opsTransaction?.SumNetWeight;
             }
             var hbConstainers = string.Empty;
             var hbPackages = string.Empty;
@@ -951,6 +952,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.PartnerTel = partner?.Tel;
             model.PartnerTaxcode = partner?.TaxCode;
             model.PartnerFax = partner?.Fax;
+            model.CreatedDate = ((DateTime)acctCdNoteList.OrderBy(x => x.DatetimeCreated).FirstOrDefault().DatetimeCreated).ToString("dd'/'MM'/'yyyy");
 
             var places = placeRepository.Get();
             var pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
@@ -1135,7 +1137,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Description = item.NameEn,
                         Quantity = item.Quantity + _decimalNumber,
                         QUnit = "N/A",
-                        UnitPrice = item.UnitPrice ?? 0,
+                        UnitPrice = (item.UnitPrice ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         VAT = (_vatAmount ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         Debit = model.TotalDebit + _decimalNumber, //Cộng thêm phần thập phân
                         Credit = model.TotalCredit + _decimalNumber, //Cộng thêm phần thập phân
