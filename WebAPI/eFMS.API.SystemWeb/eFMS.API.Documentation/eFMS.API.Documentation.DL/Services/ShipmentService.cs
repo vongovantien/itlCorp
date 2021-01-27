@@ -772,11 +772,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
-            // Search Customer
-            if (!string.IsNullOrEmpty(criteria.CustomerId))
-            {
-                queryOpsTrans = queryOpsTrans.And(q => q.CustomerId == criteria.CustomerId);
-            }
+            //// Search Customer
+            //if (!string.IsNullOrEmpty(criteria.CustomerId))
+            //{
+            //    queryOpsTrans = queryOpsTrans.And(q => q.CustomerId == criteria.CustomerId);
+            //}
             // Search JobId
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
@@ -1788,11 +1788,9 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<OpsTransaction> QueryDataOperationAcctPLSheet(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
-            var criteriaNoCustomer = criteria;
-            string customerId = criteria.CustomerId;
-            criteriaNoCustomer.CustomerId = null;
-            criteria.CustomerId = customerId;
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteriaNoCustomer);
+            //var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
+            //criteriaNoCustomer.CustomerId = null;
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -2780,7 +2778,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             foreach (var item in dataShipment)
             {
-                if (!string.IsNullOrEmpty(item.JobNo))
+                if (item.Hblid != Guid.Empty)
                 {
                     foreach (var group in lookupReuslts[item.JobNo])
                     {
@@ -3032,6 +3030,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (query != null)
             {
                 queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+                queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.CustomerID)).Where(query);
             }
             return queryObhBuyOperation;
         }
