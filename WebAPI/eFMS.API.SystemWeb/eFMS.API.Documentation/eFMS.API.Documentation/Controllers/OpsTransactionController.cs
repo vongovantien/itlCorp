@@ -156,12 +156,6 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
-            if (msgCheckUpdateMawb.Length > 0)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
-            }
-
             var hs = transactionService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -313,13 +307,11 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-        [HttpGet("AdvanceSettlement")]
-         [Authorize]
-        public async Task<IActionResult> opsAdvanceSettlements(Guid JobNo)
+        [HttpGet("AdavanceSettlement")]
+        [Authorize]
+        public IActionResult opsAdvanceSettlements(Guid JobID)
         {
-            var job = await transactionService.opsAdvanceSettlements(JobNo);
-            if (job == null)
-                return BadRequest("Cannot find JobNo");
+            var job =  transactionService.opsAdvanceSettlements(JobID);
             return Ok(job);
         }
         

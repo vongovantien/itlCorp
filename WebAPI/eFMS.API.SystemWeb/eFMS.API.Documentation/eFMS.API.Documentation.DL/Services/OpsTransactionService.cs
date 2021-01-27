@@ -1462,16 +1462,19 @@ namespace eFMS.API.Documentation.DL.Services
             return containers;
         }
 
-        public async Task<PageResult<OpsAdvanceSettlementModel>> opsAdvanceSettlements(Guid JobNo)
+        public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
         {
             var query = from ss in surchargeRepository.Get()
                         join ap in acctAdvancePayment.Get() on ss.AdvanceNo equals ap.AdvanceNo
                         join sp in acctSettlementPayment.Get() on ss.SettlementCode equals sp.SettlementNo
                         join user in userRepository.Get() on ss.UserCreated equals user.UserCreated
-                        where ss.Id == JobNo && ap.StatusApproval =="Done"
+                        where ss.Id == JobID && ap.StatusApproval =="Done"
                         select new {ap, sp , user.Username};
-            int TotalRow = await query.CountAsync();
-            var data = await query.Select(x => new OpsAdvanceSettlementModel()
+            if(query == null)
+            {
+                return null;
+            }
+            var data =  query.Select(x => new OpsAdvanceSettlementModel()
                 {
                     AdvanceNo = x.ap.AdvanceNo,
                     AdvanceAmount = Convert.ToDecimal(x.ap.AdvanceCurrency),
@@ -1483,15 +1486,8 @@ namespace eFMS.API.Documentation.DL.Services
                     Balance = Convert.ToDecimal(x.ap.AdvanceCurrency) - Convert.ToDecimal(x.sp.SettlementCurrency),
                 SettleStatusApproval = x.sp.StatusApproval,
                 StatusApproval = x.ap.StatusApproval,
-            }).ToListAsync();
-            var pageResult = new PageResult<OpsAdvanceSettlementModel>()
-            {
-                Items = data,
-                TotalRecord = TotalRow,
-            
-            };
-
-            return pageResult;
+            }).ToList();
+            return data;
         }
   
     }
