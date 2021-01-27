@@ -100,7 +100,7 @@ const authConfig: AuthConfig = {
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true, },
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: AuthConfig, useValue: authConfig },
-        { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 300000 : 120000 },
+        { provide: DEFAULT_TIMEOUT, useValue: !environment.production ? 300000 : 600000 },
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     bootstrap: [AppComponent],
