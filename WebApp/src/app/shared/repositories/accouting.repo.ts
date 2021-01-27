@@ -791,6 +791,14 @@ export class AccountingRepo {
     checkVoucherSynced(id: any) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/CheckVoucherSynced/${id}`);
     }
+
+    denyAdvancePayments(Ids: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/DenyAdvancePayments`, Ids);
+    }
+
+    denySettlePayments(Ids: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/DenySettlePayments`, Ids);
+    }
 }
 
 

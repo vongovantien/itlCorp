@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
+import { ConfirmPopupConfig } from 'src/app/app.base';
+import { eFMSPopup } from '../popup';
 
 @Component({
     selector: 'confirm-popup',
@@ -7,7 +8,7 @@ import { PopupBase } from 'src/app/popup.base';
     styleUrls: ['./confirm.popup.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ConfirmPopupComponent extends PopupBase {
+export class ConfirmPopupComponent extends eFMSPopup implements ConfirmPopupConfig {
 
     @Input() title: string = 'Notification';
     @Input() body: string = 'You are not allow to delete';
@@ -35,3 +36,5 @@ export class ConfirmPopupComponent extends PopupBase {
         this.onCancel.emit();
     }
 }
+
+

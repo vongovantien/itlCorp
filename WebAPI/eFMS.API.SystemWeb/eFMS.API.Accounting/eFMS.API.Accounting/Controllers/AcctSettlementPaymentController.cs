@@ -883,5 +883,20 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSettlementPaymentService.PreviewMultipleSettlement(settlmentNos);
             return Ok(result);
         }
+
+        [HttpPut("DenySettlePayments")]
+        [Authorize]
+        public IActionResult DenySettlePayments(List<Guid> Ids)
+        {
+            HandleState hs = acctSettlementPaymentService.DenyAdvancePayments(Ids);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
