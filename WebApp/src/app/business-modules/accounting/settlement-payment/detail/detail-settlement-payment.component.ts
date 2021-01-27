@@ -88,11 +88,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         return settlement;
     }
 
-    updateSettlement() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+    formatInvoiceDateSurcharge() {
         this.requestSurchargeListComponent.surcharges.forEach(s => {
             if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
                 if (Object.prototype.toString.call(s.invoiceDate) === '[object Date]') {
@@ -100,6 +96,14 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 }
             }
         });
+    }
+
+    updateSettlement() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        this.formatInvoiceDateSurcharge();
         this._progressRef.start();
         const body: any = {
             settlement: this.getBodySettlement(),
@@ -185,6 +189,11 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     saveAndSendRequest() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        this.formatInvoiceDateSurcharge();
         this._progressRef.start();
         const body: any = {
             settlement: this.getBodySettlement(),
