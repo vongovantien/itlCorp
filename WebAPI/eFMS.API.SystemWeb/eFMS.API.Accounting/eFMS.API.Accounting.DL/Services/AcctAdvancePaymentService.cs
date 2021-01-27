@@ -20,6 +20,7 @@ using eFMS.API.Common.Models;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using Microsoft.Extensions.Localization;
 using System.Linq.Expressions;
+using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -2161,7 +2162,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
             {
-                totalAmount = Math.Round(totalAmount.Value, 2);
+                totalAmount = NumberHelper.RoundNumber(totalAmount.Value, 2);
             }
 
             var userReciverId = userBaseService.GetEmployeeIdOfUser(userReciver);
@@ -2528,7 +2529,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
             {
-                totalAmount = Math.Round(totalAmount.Value, 2);
+                totalAmount = NumberHelper.RoundNumber(totalAmount.Value, 2);
             }
 
             //Mail Info
@@ -2615,7 +2616,7 @@ namespace eFMS.API.Accounting.DL.Services
             var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Select(s => s.Amount).Sum();
             if (totalAmount != null)
             {
-                totalAmount = Math.Round(totalAmount.Value, 2);
+                totalAmount = NumberHelper.RoundNumber(totalAmount.Value, 2);
             }
 
             //Mail Info

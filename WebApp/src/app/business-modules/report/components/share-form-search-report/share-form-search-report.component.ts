@@ -186,7 +186,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
-        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
+        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[0].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
                 startDate: this.createMoment().startOf('month').toDate(),
@@ -427,13 +427,15 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     getService() {
-        this._catalogueRepo.getListService()
+        this._systemRepo.getListServiceByPermision()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (!!res) {
                         this.serviceList = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                        this.serviceList = this.serviceList.sort((one, two) => (one.text > two.text ? 1 : -1));
                         this.serviceList.unshift({ id: 'All', text: 'All' });
+                        console.log(this.serviceList);
                         this.serviceActive = [this.serviceList[0].id];
                     }
                 },

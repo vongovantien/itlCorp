@@ -327,14 +327,18 @@ export class ExportRepo {
     }
 
     exportCommissionPRReport(searchObject: any = {}, currentUserId: string, rptType: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportCommissionPRReport`, searchObject, {currentUserId: currentUserId, rptType: rptType}).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportCommissionPRReport`, searchObject, { currentUserId: currentUserId, rptType: rptType }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportIncentiveReport(searchObject: any = {}, currentUserId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportIncentiveReport`, searchObject, {currentUserId: currentUserId}).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportIncentiveReport`, searchObject, { currentUserId: currentUserId });
+    }
+
+    exportCDNoteCombine(data: any[]) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNoteCombine`, data).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

@@ -35,7 +35,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
 
-        ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria);
+        ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria, out List<DuplicateShipmentSettlementResultModel> data);
 
         HandleState AddSettlementPayment(CreateUpdateSettlementModel model);
 

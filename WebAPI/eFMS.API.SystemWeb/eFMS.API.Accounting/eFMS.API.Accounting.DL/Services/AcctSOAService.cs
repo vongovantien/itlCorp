@@ -6,6 +6,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -473,8 +474,8 @@ namespace eFMS.API.Accounting.DL.Services
                 //Credit Amount
                 creditAmount += _exchangeRate * _credit;
             }
-            debitAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? Math.Round(debitAmount) : debitAmount;
-            creditAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? Math.Round(creditAmount) : creditAmount;
+            debitAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(debitAmount) : debitAmount;
+            creditAmount = model.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(creditAmount) : creditAmount;
             return new AcctSoa { TotalShipment = totalShipment, DebitAmount = debitAmount, CreditAmount = creditAmount };
         }
 
@@ -1770,10 +1771,10 @@ namespace eFMS.API.Accounting.DL.Services
             data.TotalCharge = chargeShipments.Count;
             data.GroupShipments = _groupShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
             data.ChargeShipments = chargeShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
-            data.AmountDebitLocal = Math.Round(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
-            data.AmountCreditLocal = Math.Round(chargeShipments.Sum(x => x.AmountCreditLocal), 3);
-            data.AmountDebitUSD = Math.Round(chargeShipments.Sum(x => x.AmountDebitUSD), 3);
-            data.AmountCreditUSD = Math.Round(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
+            data.AmountDebitLocal = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
+            data.AmountCreditLocal = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountCreditLocal), 3);
+            data.AmountDebitUSD = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountDebitUSD), 3);
+            data.AmountCreditUSD = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
             //Thông tin các Service Name của SOA
             data.ServicesNameSoa = DataTypeEx.GetServiceNameOfSoa(data.ServiceTypeId).ToString();
             data.IsExistChgCurrDiffLocalCurr = soaDetail.Currency != AccountingConstants.CURRENCY_LOCAL || chargeShipments.Any(x => x.Currency != AccountingConstants.CURRENCY_LOCAL);
@@ -2022,7 +2023,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //    air.ExchangeRate = dataObjectCurrencyExchange.Rate;
                     //}
 
-                    air.TotalAmount = Math.Round((air.NetAmount * air.ExchangeRate) ?? 0);
+                    air.TotalAmount = NumberHelper.RoundNumber((air.NetAmount * air.ExchangeRate) ?? 0);
 
                     result.HawbAirFrieghts.Add(air);
                 }
@@ -2252,7 +2253,9 @@ namespace eFMS.API.Accounting.DL.Services
                     _chargeWeight = opst ?.SumChargeWeight;
                     _cbm = opst?.SumCbm;
                     _customNo = customsDeclarationRepo.Get().Where(x => x.JobNo == opst.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
-                } else {
+                }
+                else
+                {
                     var csTransDe = csTransactionDetailRepo.Get(x => x.Id == sur.Hblid).FirstOrDefault();
                     var csTrans = csTransDe == null ? new CsTransaction() : csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && x.Id == csTransDe.JobId).FirstOrDefault();
                     _serviceDate = (csTrans?.TransactionType == "AI" || csTrans?.TransactionType == "SFI" || csTrans?.TransactionType == "SLI" || csTrans?.TransactionType == "SCI") ?
@@ -2272,6 +2275,27 @@ namespace eFMS.API.Accounting.DL.Services
                     _packageContainer = csTransDe?.PackageContainer;
                     _customNo = string.Empty;
                 }
+
+                bool _isSynced = false;
+                string _cdNote = string.Empty;
+                if (soa.Customer == sur.PayerId && sur.Type == "OBH")
+                {
+                    _isSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER") || sur.PaySyncedFrom.Equals("SETTLEMENT"));
+                    _cdNote = sur.CreditNo;
+                }
+                else
+                {
+                    _isSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"));
+                    if (sur.Type == "BUY")
+                    {
+                        _cdNote = sur.CreditNo;
+                    }
+                    if (sur.Type == "SELL" || sur.Type == "OBH")
+                    {
+                        _cdNote = sur.DebitNo;
+                    }
+                }
+
                 var chg = new ChargeSOAResult()
                 {
                     ID = sur.Id,
@@ -2312,16 +2336,16 @@ namespace eFMS.API.Accounting.DL.Services
                     ChargeWeight = _chargeWeight,
                     CBM = _cbm,
                     PackageContainer = _packageContainer,
-                    CreditDebitNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
+                    CreditDebitNo = _cdNote,
                     DatetimeModified = sur.DatetimeModified,
                     CommodityGroupID = null,
                     Service = _service,
-                    CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                    CDNote = _cdNote,
                     TypeCharge = charge?.Type,
                     ExchangeDate = sur.ExchangeDate,
                     FinalExchangeRate = sur.FinalExchangeRate,
                     PIC = null,
-                    IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"))
+                    IsSynced = _isSynced
                 };
                 result.Add(chg);
             }
@@ -2389,22 +2413,22 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         percent = it.VATRate / 100;
                         it.VATAmount = percent * (it.UnitPrice * it.Quantity);
-                        if (it.Currency != "VND")
+                        if (it.Currency != AccountingConstants.CURRENCY_LOCAL)
                         {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 2);
+                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 2);
 
                         }
                         else
                         {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0);
+                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0);
                         }
                     }
                     else
                     {
-                        it.VATAmount = (it.Currency == "VND" ? Math.Round(it.VATRate ?? 0) : Math.Round(it.VATRate ?? 0, 2));
+                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
                     }
 
-                    it.NetAmount = (it.Currency == "VND" ? Math.Round((it.UnitPrice * it.Quantity) ?? 0) : Math.Round((it.UnitPrice * it.Quantity) ?? 0, 2));
+                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((it.UnitPrice * it.Quantity) ?? 0) : NumberHelper.RoundNumber((it.UnitPrice * it.Quantity) ?? 0, 2));
                 }
 
             }
