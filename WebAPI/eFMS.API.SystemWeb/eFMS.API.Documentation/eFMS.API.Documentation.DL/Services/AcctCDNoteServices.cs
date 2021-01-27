@@ -1137,7 +1137,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Description = item.NameEn,
                         Quantity = item.Quantity + _decimalNumber,
                         QUnit = "N/A",
-                        UnitPrice = item.UnitPrice ?? 0,
+                        UnitPrice = (item.UnitPrice ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         VAT = (_vatAmount ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         Debit = model.TotalDebit + _decimalNumber, //Cộng thêm phần thập phân
                         Credit = model.TotalCredit + _decimalNumber, //Cộng thêm phần thập phân
