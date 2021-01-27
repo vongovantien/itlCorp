@@ -427,6 +427,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             charge.AmountVnd = charge.VatAmountVnd = null;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = _currentUser.UserID;
+                            charge.SyncedFrom = null;
                             var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
 
                             //Update Status Removed Inv For SOA (SOA synced)
