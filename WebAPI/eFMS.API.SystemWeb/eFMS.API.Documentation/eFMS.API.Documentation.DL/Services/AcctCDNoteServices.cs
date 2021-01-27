@@ -714,6 +714,7 @@ namespace eFMS.API.Documentation.DL.Services
                 cdNoteDetails.MbLadingNo = opsTransaction?.Mblno;
                 cdNoteDetails.SumContainers = opsTransaction?.SumContainers;
                 cdNoteDetails.SumPackages = opsTransaction?.SumPackages;
+                cdNoteDetails.NW = opsTransaction?.SumNetWeight;
             }
             var hbConstainers = string.Empty;
             var hbPackages = string.Empty;
