@@ -1469,23 +1469,23 @@ namespace eFMS.API.Documentation.DL.Services
                         join sp in acctSettlementPayment.Get() on ss.SettlementCode equals sp.SettlementNo
                         join user in userRepository.Get() on ss.UserCreated equals user.UserCreated
                         where ss.Id == JobID && ap.StatusApproval =="Done"
-                        select new {ap, sp , user.Username};
+                        select new { rqA = ap.RequestDate, rqS = sp.RequestDate, ap.AdvanceNo, ap.AdvanceCurrency, statusAdvance = ap.StatusApproval, sp.SettlementCurrency,  sp.SettlementNo, statusSettlemet = sp.StatusApproval , user.Username};
             if(query == null)
             {
                 return null;
             }
             var data =  query.Select(x => new OpsAdvanceSettlementModel()
                 {
-                    AdvanceNo = x.ap.AdvanceNo,
-                    AdvanceAmount = Convert.ToDecimal(x.ap.AdvanceCurrency),
-                    AdvanceDate = x.ap.RequestDate,
+                    AdvanceNo = x.AdvanceNo,
+                    AdvanceAmount = Convert.ToDecimal(x.AdvanceCurrency),
+                    AdvanceDate = x.rqA,
                     Requester = x.Username,
-                    SettlemenDate = x.sp.RequestDate,
-                    SettlementAmount = Convert.ToDecimal(x.sp.SettlementCurrency),
-                    SettlementNo = x.sp.SettlementNo,
-                    Balance = Convert.ToDecimal(x.ap.AdvanceCurrency) - Convert.ToDecimal(x.sp.SettlementCurrency),
-                SettleStatusApproval = x.sp.StatusApproval,
-                StatusApproval = x.ap.StatusApproval,
+                    SettlemenDate = x.rqS,
+                    SettlementAmount = Convert.ToDecimal(x.SettlementCurrency),
+                    SettlementNo = x.SettlementNo,
+                    Balance = Convert.ToDecimal(x.AdvanceCurrency) - Convert.ToDecimal(x.SettlementCurrency),
+                SettleStatusApproval = x.statusAdvance,
+                StatusApproval = x.statusSettlemet,
             }).ToList();
             return data;
         }
