@@ -307,11 +307,11 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-        [HttpGet("AdavanceSettlement")]
-        // [Authorize]
-        public async Task<IActionResult> opsAdvanceSettlements(string JobNo, int page, int size)
+        [HttpGet("AdvanceSettlement")]
+         [Authorize]
+        public async Task<IActionResult> opsAdvanceSettlements(Guid JobNo)
         {
-            var job = await transactionService.opsAdvanceSettlements(JobNo, page, size);
+            var job = await transactionService.opsAdvanceSettlements(JobNo);
             if (job == null)
                 return BadRequest("Cannot find JobNo");
             return Ok(job);

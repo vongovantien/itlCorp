@@ -35,7 +35,7 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle ImportDuplicateJob(OpsTransactionModel model);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
 
-        Task<PageResult<OpsAdvanceSettlementModel>> opsAdvanceSettlements(string JobNo, int page, int size);
+        Task<PageResult<OpsAdvanceSettlementModel>> opsAdvanceSettlements(Guid JobNo);
        
     }
 }
