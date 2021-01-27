@@ -152,10 +152,13 @@ namespace eFMS.API.Documentation.DL.Services
             var pol = catPlaceRepo.Get(x => x.Id == masterbill.Pol).FirstOrDefault();
             var pod = catPlaceRepo.Get(x => x.Id == masterbill.Pod).FirstOrDefault();
             result.AolCode = pol?.Code;
+            result.AodCode = pod?.Code;
             result.Shipper = masterbill.ShipperDescription;
+            result.Route = masterbill.Route;
 
             //Airline lấy từ Shipment
-            var airlineId = csTransactionRepo.Get(x => x.Id == masterbill.JobId).FirstOrDefault()?.ColoaderId;
+            var shipment = csTransactionRepo.Get(x => x.Id == masterbill.JobId).FirstOrDefault();
+            var airlineId = shipment?.ColoaderId;
             result.AirlineNameEn = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName; // Name ABBR
             result.Consignee = masterbill.ConsigneeDescription;
 
@@ -187,6 +190,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.IssuranceAmount = masterbill.IssuranceAmount;
             result.HandingInfo = masterbill.HandingInformation;
             result.Pieces = masterbill.PackageQty;
+            result.PackageUnit = shipment?.PackageType;
             result.Gw = masterbill.GrossWeight;
             result.Cw = masterbill.ChargeWeight;
             result.RateCharge = masterbill.RateCharge;

@@ -233,10 +233,12 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Export ACS Excel For MAWB
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
+        [Route("ExportACSAirExport")]
+        [HttpGet]
         public async Task<IActionResult> ExportACSAirExport(string jobId)
         {
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + jobId);
@@ -247,12 +249,39 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateTCSAirExportExcel(dataObject.Result);
+            var stream = new DocumentationHelper().GenerateACSAirExportExcel(dataObject.Result, "PHIEU-CAN-ACS-Template.xlsx");
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân ACS.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export NCTS-ALS Excel For MAWB
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [Route("ExportNCTSALSAirExport")]
+        [HttpGet]
+        public async Task<IActionResult> ExportNCTSALSAirExport(string jobId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.AirwayBillExportUrl + jobId);
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
+            if (dataObject.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateNCTSALSAirExportExcel(dataObject.Result, "PHIEU-CAN-NCTS-ALS-Template.xlsx");
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân NCTS & ALS.xlsx");
 
             return fileContent;
         }

@@ -265,6 +265,20 @@
             <param name="jobId">Id of shipment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportACSAirExport(System.String)">
+            <summary>
+            Export ACS Excel For MAWB
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportNCTSALSAirExport(System.String)">
+            <summary>
+            Export NCTS-ALS Excel For MAWB
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOverview(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Export Shipment Overview
@@ -430,6 +444,22 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateACSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.String)">
+            <summary>
+            Get Data Export ACS Excel For MAWB
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateNCTSALSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.String)">
+            <summary>
+            Get Data Export NCTS-ALS Excel For MAWB
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateShipmentOverviewExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.ExportShipmentOverview},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
             <returns></returns>
         </member>
@@ -460,6 +490,49 @@
             <param name="stream"></param>
             <returns></returns>
             
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.Worksheet">
+            <summary>Excel worksheet</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartRow">
+            <summary>Start of row in excel</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.EndRow">
+            <summary>End of row in excel</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartCol">
+            <summary>Start of column in excel</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.EndCol">
+            <summary>End of column in excel</summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="fileName"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.String,System.Object,System.Boolean)">
+            <summary>
+            Set data for cell
+            </summary>
+            <param name="name">name of cell to set value</param>
+            <param name="value">value set to cell</param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetDataTable(System.String,System.Object,System.Int32,System.Boolean)">
+            <summary>
+            Set data for table
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+            <param name="rowNumber"></param>
+            <param name="isWraptext"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.ExcelStream">
+            <summary>
+            
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>

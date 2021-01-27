@@ -876,6 +876,38 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
     exportACS() {
         this._progressRef.start();
+        this._exportRepo.exportACSAirwayBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Air Export - ACS.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
+
+    exportNCTSALS(){
+        this._progressRef.start();
+        this._exportRepo.exportNCTSALSAirwayBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Air Export - NCTS & ALS.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
     }
 
     preview(reportType: string) {
