@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -402,13 +403,33 @@ namespace eFMS.API.Documentation.DL.Services
                         var hsSurcharge = transactionDetailService.UpdateSurchargeOfHousebill(modelHouse);
                     }
 
-                    DataContext.SubmitChanges();
+                    // Update MBL Advance
+
+                    IQueryable<AcctAdvanceRequest> advR = accAdvanceRequestRepository.Where(x => x.JobId == transaction.JobNo);
+                    if(advR != null && advR.Count() > 0)
+                    {
+                        foreach (var item in advR)
+                        {
+                            item.Mbl = transaction.Mawb;
+                            item.DatetimeModified = DateTime.Now;
+                            item.UserModified = currentUser.UserID;
+
+                            accAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
+                        }
+                    }
+
+                    hsTrans = DataContext.SubmitChanges();
+
+                    if(hsTrans.Success) {
+                        accAdvanceRequestRepository.SubmitChanges();
+                    }
                 }
 
                 return hsTrans;
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_Update_CsTransaction_Log",ex.ToString());
                 return new HandleState(ex.Message);
             }
         }
