@@ -39,7 +39,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string PmVoucherNo { get; set; }
         public string Service { get; set; }
         public string UserExport { get; set; }
-        public Guid ChargeId { get; set; }
         public decimal? FinalExchangeRate { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public string CurrencyId { get; set; }
