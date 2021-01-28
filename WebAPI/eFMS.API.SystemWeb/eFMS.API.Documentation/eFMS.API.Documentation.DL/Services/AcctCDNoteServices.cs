@@ -336,16 +336,16 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
 
                         //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                        var amountOriginal = surchargeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, charge.CurrencyId);
+                        var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, charge.CurrencyId);
                         charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                         charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
                         charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                        var amountLocal = surchargeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
+                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
                         charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
                         charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
 
-                        var amountUsd = surchargeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_USD);
+                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_USD);
                         charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
                         charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
 
@@ -475,16 +475,16 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
 
                         //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                        var amountOriginal = surchargeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, charge.CurrencyId);
+                        var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, charge.CurrencyId);
                         charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                         charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
                         charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                        var amountLocal = surchargeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
+                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
                         charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
                         charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
 
-                        var amountUsd = surchargeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_USD);
+                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, null, charge.ExchangeDate, DocumentConstants.CURRENCY_USD);
                         charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
                         charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
 

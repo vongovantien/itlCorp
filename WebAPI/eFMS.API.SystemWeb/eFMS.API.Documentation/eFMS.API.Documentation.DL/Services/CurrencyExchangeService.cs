@@ -188,5 +188,53 @@ namespace eFMS.API.Documentation.DL.Services
 
             return amountResult;
         }
+
+        /// <summary>
+        /// Get NetAmount, VatAmount, ExchangeRate (to Local)
+        /// </summary>
+        /// <param name="currencyCharge"></param>
+        /// <param name="vatRate"></param>
+        /// <param name="unitPrice"></param>
+        /// <param name="quantity"></param>
+        /// <param name="finalExcRate"></param>
+        /// <param name="excDate"></param>
+        /// <param name="currencyConvert"></param>
+        /// <returns></returns>
+        public AmountResult CalculatorAmountAccountingByCurrency(string currencyCharge, decimal? vatRate, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert)
+        {
+            AmountResult amountResult = new AmountResult();
+            int _roundDecimal = currencyConvert == DocumentConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
+            decimal _netAmount = 0;
+            decimal _vatAmount = 0;
+            decimal _excRate = 0;
+
+            //Tính tỉ giá Final Exchange Rate (Tỉ giá so với LOCAL)
+            var exchangeRateToLocal = CurrencyExchangeRateConvert(finalExcRate, excDate, currencyCharge, DocumentConstants.CURRENCY_LOCAL);
+            _excRate = exchangeRateToLocal;
+
+            if (currencyCharge == currencyConvert)
+            {
+                _netAmount = NumberHelper.RoundNumber((unitPrice * quantity) ?? 0, _roundDecimal);
+                if (vatRate != null)
+                {
+                    var vatAmount = vatRate < 0 ? Math.Abs(vatRate ?? 0) : ((unitPrice * quantity * vatRate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount, _roundDecimal);
+                }
+            }
+            else
+            {
+                var exchangeRate = CurrencyExchangeRateConvert(finalExcRate, excDate, currencyCharge, currencyConvert);
+                _netAmount = NumberHelper.RoundNumber((unitPrice * quantity * exchangeRate) ?? 0, _roundDecimal);
+                if (vatRate != null)
+                {
+                    var vatAmount = vatRate < 0 ? Math.Abs(vatRate ?? 0) : ((unitPrice * quantity * vatRate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount * exchangeRate, _roundDecimal);
+                }
+            }
+            amountResult.NetAmount = _netAmount;
+            amountResult.VatAmount = _vatAmount;
+            amountResult.ExchangeRate = _excRate;
+            return amountResult;
+        }
     }
 }

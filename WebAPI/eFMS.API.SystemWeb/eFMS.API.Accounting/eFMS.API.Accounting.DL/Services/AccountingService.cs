@@ -1106,7 +1106,7 @@ namespace eFMS.API.Accounting.DL.Services
                             //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
                             foreach (var surcharge in surcharges)
                             {
-                                if (surcharge.Type == "OBH")
+                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
                                 {
                                     surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
                                     surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
@@ -1167,7 +1167,7 @@ namespace eFMS.API.Accounting.DL.Services
                             //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
                             foreach (var surcharge in surcharges)
                             {
-                                if (surcharge.Type == "OBH")
+                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
                                 {
                                     surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
                                     surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;

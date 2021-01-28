@@ -13,5 +13,7 @@ namespace eFMS.API.Accounting.DL.IService
         decimal CurrencyExchangeRateConvert(decimal? finalExchangeRate, DateTime? exchangeDate, string currencyFrom, string currencyTo);
 
         decimal CalculatorAmount(decimal? amount, decimal? finalExchangeRate, DateTime? exchangeDate, string currencyFrom, string currencyTo, int? roundCurr);
+
+        AmountResult CalculatorAmountAccountingByCurrency(string currencyCharge, decimal? vatRate, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert);
     }
 }
