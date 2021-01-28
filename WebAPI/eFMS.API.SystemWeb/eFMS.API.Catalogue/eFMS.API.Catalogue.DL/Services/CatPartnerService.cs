@@ -374,7 +374,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstToAccountant = new List<string>();
             List<string> lstCc = ListMailBCC();
             List<string> lstCcCreator = new List<string>();
-
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
             var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
@@ -418,8 +418,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "<b> eFMS System, </b>" + "</br>" +
                 "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            var urlTo = UrlClone.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", urlTo.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             lstCcCreator.Add(infoCreatetor?.Email);
             bool resultSenmail = false;
             if ((partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))

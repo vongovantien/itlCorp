@@ -1824,7 +1824,8 @@ namespace eFMS.API.Documentation.DL.Services
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             foreach (var item in dataShipment)
             {
-                foreach (var charge in detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true))
+                var chargeD = detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
+                foreach (var charge in chargeD) 
                 {
                     AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                     var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
@@ -2304,7 +2305,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
-                    foreach (var charge in detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true))
+                    var chargeD = detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
+                    foreach (var charge in chargeD)
                     {
                         AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                         var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
