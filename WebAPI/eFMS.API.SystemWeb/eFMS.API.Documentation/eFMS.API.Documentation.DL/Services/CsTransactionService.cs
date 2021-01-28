@@ -2035,6 +2035,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 string hawbCurrentMax = GetMaxHAWB();
 
+                string hawbSeaExportCurrent = string.Empty;
                 foreach (var item in detailTrans)
                 {
                     Guid oldHouseId = item.Id;
@@ -2057,6 +2058,19 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
                         hawbCurrentMax = item.Hwbno;
+                    }
+                    if(model.TransactionType == "SFE" || model.TransactionType == "SLE" && model.TransactionType == "SCE")
+                    {
+                        string podCode = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault()?.Code;
+                        if(string.IsNullOrEmpty(podCode))
+                        {
+                            item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                        }
+                        else
+                        {
+                            item.Hwbno = GenerateHBLNoSeaExport(podCode, hawbSeaExportCurrent);
+                            hawbSeaExportCurrent = item.Hwbno;
+                        }
                     }
                     else
                     {
@@ -2174,6 +2188,52 @@ namespace eFMS.API.Documentation.DL.Services
             }
             hblNo = GenerateID.GenerateHBLNo(count);
             return hblNo;
+        }
+
+        public string GenerateHBLNoSeaExport(string podCode, string currentHwbNo)
+        {
+            if (string.IsNullOrEmpty(podCode) || podCode == "null")
+            {
+                return null;
+            }
+            string keyword = ((string.IsNullOrEmpty(podCode) || podCode == "null") ? "" : podCode) + DateTime.Now.ToString("yyMM");
+            string hbl = "ITL" + keyword;
+
+            var codes = csTransactionDetailRepo.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno).ToList();
+            var oders = new List<int>();
+
+            if(!string.IsNullOrEmpty(currentHwbNo))
+            {
+                codes.Add(currentHwbNo);
+            }
+            if (codes != null & codes.Count > 0)
+            {
+                foreach (var code in codes)
+                {
+                    // Lấy 3 ký tự cuối
+                    if (code.Length > 7 && isNumeric(code.Substring(code.Length - 3)))
+                    {
+                        oders.Add(int.Parse(code.Substring(code.Length - 3)));
+                    }
+                }
+                if (oders.Count() > 0)
+                {
+                    int maxCurrentOder = oders.Max();
+
+                    hbl += (maxCurrentOder + 1).ToString("000");
+                }
+                else
+                {
+                    hbl += "001";
+                }
+
+            }
+            else
+            {
+                hbl += "001";
+            }
+
+            return hbl;
         }
 
         private bool isNumeric(string n)
