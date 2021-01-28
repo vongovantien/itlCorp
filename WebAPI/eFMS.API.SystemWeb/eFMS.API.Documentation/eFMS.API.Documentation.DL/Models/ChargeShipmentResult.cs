@@ -14,4 +14,11 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal AmountCreditUSD { get; set; }
         public decimal AmountBalanceUSD { get { return this.AmountDebitUSD - this.AmountCreditUSD; } }
     }
+
+    public class AmountResult
+    {
+        public decimal NetAmount { get; set; }
+        public decimal VatAmount { get; set; }
+        public decimal ExchangeRate { get; set; }
+    }
 }

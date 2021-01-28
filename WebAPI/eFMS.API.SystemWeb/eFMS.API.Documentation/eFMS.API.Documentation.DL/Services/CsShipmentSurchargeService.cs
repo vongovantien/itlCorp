@@ -443,14 +443,18 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Soano = string.IsNullOrEmpty(item.Soano?.Trim()) ? null : item.Soano;
                         item.PaySoano = string.IsNullOrEmpty(item.PaySoano?.Trim()) ? null : item.PaySoano;
 
-                        var netAmount = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId); //Thành tiền trước thuế (Original)                        
-                        var vatAmount = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId);
-                        item.NetAmount = netAmount;
-                        item.Total = netAmount + vatAmount; //Thành tiền sau thuế (Original)
-                        item.AmountVnd = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Thành tiền trước thuế (Local)
-                        item.VatAmountVnd = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Tiền thuế (Local)
-                        item.AmountUsd = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD); //Thành tiền trước thuế (USD)
-                        item.VatAmountUsd = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD); //Tiền thuế (USD)
+                        var amountOriginal = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId);
+                        item.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
+                        item.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
+                        item.FinalExchangeRate = item.FinalExchangeRate == null ? amountOriginal.ExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
+
+                        var amountLocal = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
+                        item.AmountVnd = item.AmountVnd == null ? amountLocal.NetAmount : item.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = item.VatAmountVnd == null ? amountLocal.VatAmount : item.VatAmountVnd; //Tiền thuế (Local)
+
+                        var amountUsd = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD);
+                        item.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                        item.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
 
                         if (item.Id == Guid.Empty)
                         {
@@ -524,64 +528,76 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public decimal CalculatorNetAmountByCurrency(string currencyCharge, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert)
+        /// <summary>
+        /// Get NetAmount, VatAmount, ExchangeRate (to Local)
+        /// </summary>
+        /// <param name="currencyCharge"></param>
+        /// <param name="vatRate"></param>
+        /// <param name="unitPrice"></param>
+        /// <param name="quantity"></param>
+        /// <param name="finalExcRate"></param>
+        /// <param name="excDate"></param>
+        /// <param name="currencyConvert"></param>
+        /// <returns></returns>
+        public AmountResult CalculatoAmountAccountingByCurrency(string currencyCharge, decimal? vatRate, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert)
         {
+            AmountResult amountResult = new AmountResult();
             int _roundDecimal = currencyConvert == DocumentConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
             decimal _netAmount = 0;
+            decimal _vatAmount = 0;
+            decimal _excRate = 0;
+
+            //Tính tỉ giá Final Exchange Rate (Tỉ giá so với LOCAL)
+            var exchangeRateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(finalExcRate, excDate, currencyCharge, DocumentConstants.CURRENCY_LOCAL);
+            _excRate = exchangeRateToLocal;
+
             if (currencyCharge == currencyConvert)
             {
                 _netAmount = NumberHelper.RoundNumber((unitPrice * quantity) ?? 0, _roundDecimal);
-            }
-            else
-            {
-                var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(finalExcRate, excDate, currencyCharge, currencyConvert);
-                _netAmount = NumberHelper.RoundNumber((unitPrice * quantity * exchangeRate) ?? 0, _roundDecimal);
-            }
-            return _netAmount;
-        }
-
-        public decimal CalculatorVatAmountByCurrency(string currencyCharge, decimal? vatRate, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert)
-        {
-            int _roundDecimal = currencyConvert == DocumentConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
-            decimal _vatAmount = 0;
-            if (currencyCharge == currencyConvert)
-            {
                 if (vatRate != null)
                 {
                     var vatAmount = vatRate < 0 ? Math.Abs(vatRate ?? 0) : ((unitPrice * quantity * vatRate) ?? 0) / 100;
                     _vatAmount = NumberHelper.RoundNumber(vatAmount, _roundDecimal);
                 }
-            } 
+            }
             else
             {
+                var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(finalExcRate, excDate, currencyCharge, currencyConvert);
+                _netAmount = NumberHelper.RoundNumber((unitPrice * quantity * exchangeRate) ?? 0, _roundDecimal);
                 if (vatRate != null)
                 {
-                    var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(finalExcRate, excDate, currencyCharge, currencyConvert);
                     var vatAmount = vatRate < 0 ? Math.Abs(vatRate ?? 0) : ((unitPrice * quantity * vatRate) ?? 0) / 100;
                     _vatAmount = NumberHelper.RoundNumber(vatAmount * exchangeRate, _roundDecimal);
                 }
             }
-            return _vatAmount;
+            amountResult.NetAmount = _netAmount;
+            amountResult.VatAmount = _vatAmount;
+            amountResult.ExchangeRate = _excRate;
+            return amountResult;
         }
-
+        
         public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
         {
             var result = new HandleState();
-            var surcharges = DataContext.Get(x => x.NetAmount == null).Take(100);
+            var surcharges = DataContext.Get(x => x.NetAmount == null).Take(500);
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
-                        var netAmount = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId); //Thành tiền trước thuế (Original)                        
-                        var vatAmount = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId);
-                        item.NetAmount = netAmount;
-                        item.Total = netAmount + vatAmount; //Thành tiền sau thuế (Original)
-                        item.AmountVnd = item.AmountVnd == null ? CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL) : item.AmountVnd; //Thành tiền trước thuế (Local)
-                        item.VatAmountVnd = item.VatAmountVnd == null ? CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL) : item.VatAmountVnd; //Tiền thuế (Local)
-                        item.AmountUsd = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD); //Thành tiền trước thuế (USD)
-                        item.VatAmountUsd = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD); //Tiền thuế (USD)
+                        var amountOriginal = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId);
+                        item.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
+                        item.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
+                        item.FinalExchangeRate = item.FinalExchangeRate == null ? amountOriginal.ExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
+
+                        var amountLocal = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
+                        item.AmountVnd = item.AmountVnd == null ? amountLocal.NetAmount : item.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = item.VatAmountVnd == null ? amountLocal.VatAmount : item.VatAmountVnd; //Tiền thuế (Local)
+
+                        var amountUsd = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD);
+                        item.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                        item.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
 
                         var d = DataContext.Update(item, x => x.Id == item.Id);
                     }
@@ -867,14 +883,20 @@ namespace eFMS.API.Documentation.DL.Services
                     Guid HblId = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim()).Select(t => t.Hblid).FirstOrDefault();
                     item.Hblid = HblId;
 
-                    var netAmount = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId); //Thành tiền trước thuế (Original)                        
-                    var vatAmount = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId);
-                    item.NetAmount = netAmount;
-                    item.Total = netAmount + vatAmount; //Thành tiền sau thuế (Original)
-                    item.AmountVnd = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Thành tiền trước thuế (Local)
-                    item.VatAmountVnd = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL); //Tiền thuế (Local)
-                    item.AmountUsd = CalculatorNetAmountByCurrency(item.CurrencyId, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD); //Thành tiền trước thuế (USD)
-                    item.VatAmountUsd = CalculatorVatAmountByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD); //Tiền thuế (USD)
+                    #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                    var amountOriginal = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId);
+                    item.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
+                    item.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
+                    item.FinalExchangeRate = item.FinalExchangeRate == null ? amountOriginal.ExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
+
+                    var amountLocal = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
+                    item.AmountVnd = item.AmountVnd == null ? amountLocal.NetAmount : item.AmountVnd; //Thành tiền trước thuế (Local)
+                    item.VatAmountVnd = item.VatAmountVnd == null ? amountLocal.VatAmount : item.VatAmountVnd; //Tiền thuế (Local)
+
+                    var amountUsd = CalculatoAmountAccountingByCurrency(item.CurrencyId, item.Vatrate, item.UnitPrice, item.Quantity, item.FinalExchangeRate, item.ExchangeDate, DocumentConstants.CURRENCY_USD);
+                    item.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                    item.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                    #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
 
                     item.Quantity = (decimal)item.Qty;
                     item.TransactionType = "CL";

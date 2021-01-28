@@ -24,8 +24,7 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
         List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
         HandleState Import(List<CsShipmentSurchargeImportModel> data);
-        decimal CalculatorNetAmountByCurrency(string currencyCharge, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert);
-        decimal CalculatorVatAmountByCurrency(string currencyCharge, decimal? vatRate, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert);
+        AmountResult CalculatoAmountAccountingByCurrency(string currencyCharge, decimal? vatRate, decimal? unitPrice, decimal quantity, decimal? finalExcRate, DateTime? excDate, string currencyConvert);
         HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD();
     }
 }

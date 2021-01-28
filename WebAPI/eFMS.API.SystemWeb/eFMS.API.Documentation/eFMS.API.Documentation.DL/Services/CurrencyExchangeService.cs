@@ -18,9 +18,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
         }
 
-        public decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
+        public decimal GetRateCurrencyExchange(IQueryable<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
         {
-            if (currencyExchange.Count == 0 || string.IsNullOrEmpty(currencyFrom) || string.IsNullOrEmpty(currencyTo)) return 0;
+            if (currencyExchange.Count() == 0 || string.IsNullOrEmpty(currencyFrom) || string.IsNullOrEmpty(currencyTo)) return 0;
 
             currencyFrom = currencyFrom.Trim();
             currencyTo = currencyTo.Trim();
@@ -68,12 +68,26 @@ namespace eFMS.API.Documentation.DL.Services
         {
             if (string.IsNullOrEmpty(currencyFrom) || string.IsNullOrEmpty(currencyTo)) return 0;
 
-            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
-            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            if (currencyExchange.Count == 0)
+            //***
+            if (currencyFrom == currencyTo)
             {
-                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                return 1;
+            }
+            if (finalExchangeRate != null)
+            {
+                if (currencyFrom != DocumentConstants.CURRENCY_LOCAL && currencyTo == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    return finalExchangeRate.Value;
+                }
+            }
+            //***
+            
+            var exchargeDateSurcharge = exchangeDate == null ? DataContext.Get().Max(s => s.DatetimeCreated).Value.Date : exchangeDate.Value.Date;
+            IQueryable<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge);
+            if (currencyExchange.Count() == 0)
+            {
+                DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date);
             }
 
             decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, DocumentConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
@@ -82,18 +96,19 @@ namespace eFMS.API.Documentation.DL.Services
             decimal _exchangeRate = 0;
             if (finalExchangeRate != null)
             {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
+                //if (currencyFrom == currencyTo)
+                //{
+                //    _exchangeRate = 1;
+                //}
+                //else 
+                if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }
-                else if (currencyFrom != DocumentConstants.CURRENCY_LOCAL && currencyTo == DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = finalExchangeRate.Value;
-                }
+                //else if (currencyFrom != DocumentConstants.CURRENCY_LOCAL && currencyTo == DocumentConstants.CURRENCY_LOCAL)
+                //{
+                //    _exchangeRate = finalExchangeRate.Value;
+                //}
                 else
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (finalExchangeRate.Value / _exchangeRateCurrencyTo) : 0;
@@ -101,11 +116,12 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
+                //if (currencyFrom == currencyTo)
+                //{
+                //    _exchangeRate = 1;
+                //}
+                //else 
+                if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }
@@ -143,11 +159,11 @@ namespace eFMS.API.Documentation.DL.Services
                 roundCurr = 0;
             }
             DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
-            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            if (currencyExchange.Count == 0)
+            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated.Value.Date : exchangeDate.Value.Date;
+            IQueryable<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge);
+            if (currencyExchange.Count() == 0)
             {
-                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date);
             }
 
             decimal _exchangeRateCurrencyFrom = GetRateCurrencyExchange(currencyExchange, currencyFrom, DocumentConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
