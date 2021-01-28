@@ -150,16 +150,16 @@ namespace eFMS.API.Documentation.Controllers
             model.DatetimeCreated = DateTime.Now;
 
             #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-            var amountOriginal = csShipmentSurchargeService.CalculatoAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId);
+            var amountOriginal = csShipmentSurchargeService.CalculatorAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId);
             model.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
             model.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
             model.FinalExchangeRate = model.FinalExchangeRate == null ? amountOriginal.ExchangeRate : model.FinalExchangeRate; //Tỉ giá so với Local
 
-            var amountLocal = csShipmentSurchargeService.CalculatoAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
-            model.AmountVnd = model.AmountVnd == null ? amountLocal.NetAmount : model.AmountVnd; //Thành tiền trước thuế (Local)
-            model.VatAmountVnd = model.VatAmountVnd == null ? amountLocal.VatAmount : model.VatAmountVnd; //Tiền thuế (Local)
+            var amountLocal = csShipmentSurchargeService.CalculatorAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
+            model.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+            model.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
 
-            var amountUsd = csShipmentSurchargeService.CalculatoAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD);
+            var amountUsd = csShipmentSurchargeService.CalculatorAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD);
             model.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
             model.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
             #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
@@ -223,16 +223,16 @@ namespace eFMS.API.Documentation.Controllers
             model.DatetimeModified = DateTime.Now;
 
             #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-            var amountOriginal = csShipmentSurchargeService.CalculatoAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId);
+            var amountOriginal = csShipmentSurchargeService.CalculatorAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, model.CurrencyId);
             model.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
             model.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
             model.FinalExchangeRate = model.FinalExchangeRate == null ? amountOriginal.ExchangeRate : model.FinalExchangeRate; //Tỉ giá so với Local
 
-            var amountLocal = csShipmentSurchargeService.CalculatoAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
-            model.AmountVnd = model.AmountVnd == null ? amountLocal.NetAmount : model.AmountVnd; //Thành tiền trước thuế (Local)
-            model.VatAmountVnd = model.VatAmountVnd == null ? amountLocal.VatAmount : model.VatAmountVnd; //Tiền thuế (Local)
+            var amountLocal = csShipmentSurchargeService.CalculatorAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_LOCAL);
+            model.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+            model.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
 
-            var amountUsd = csShipmentSurchargeService.CalculatoAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD);
+            var amountUsd = csShipmentSurchargeService.CalculatorAmountAccountingByCurrency(model.CurrencyId, model.Vatrate, model.UnitPrice, model.Quantity, model.FinalExchangeRate, model.ExchangeDate, DocumentConstants.CURRENCY_USD);
             model.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
             model.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
             #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --

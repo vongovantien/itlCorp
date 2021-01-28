@@ -68,11 +68,25 @@ namespace eFMS.API.Accounting.DL.Services
         {
             if (string.IsNullOrEmpty(currencyFrom) || string.IsNullOrEmpty(currencyTo)) return 0;
 
-            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
-            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            if (currencyExchange.Count == 0)
+            //***
+            if (currencyFrom == currencyTo)
             {
+                return 1;
+            }
+            if (finalExchangeRate != null)
+            {
+                if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    return finalExchangeRate.Value;
+                }
+            }
+            //***
+
+            var exchargeDateSurcharge = exchangeDate == null ? DataContext.Get().Max(s => s.DatetimeCreated).Value.Date : exchangeDate.Value.Date;
+            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
+            if (currencyExchange.Count() == 0)
+            {
+                DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
@@ -82,18 +96,19 @@ namespace eFMS.API.Accounting.DL.Services
             decimal _exchangeRate = 0;
             if (finalExchangeRate != null)
             {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
+                //if (currencyFrom == currencyTo)
+                //{
+                //    _exchangeRate = 1;
+                //}
+                //else 
+                if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }
-                else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = finalExchangeRate.Value;
-                }
+                //else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
+                //{
+                //    _exchangeRate = finalExchangeRate.Value;
+                //}
                 else
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (finalExchangeRate.Value / _exchangeRateCurrencyTo) : 0;
@@ -101,11 +116,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
+                //if (currencyFrom == currencyTo)
+                //{
+                //    _exchangeRate = 1;
+                //}
+                //else 
+                if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }

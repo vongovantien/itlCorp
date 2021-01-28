@@ -126,67 +126,47 @@ namespace eFMS.API.Accounting.DL.Services
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
-                    {
-                        //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào Final Exchange Rate, Exchange Date của charge)
-                        var amountDebitCreditShipment = GetDebitCreditAmountAndTotalShipment(model);
-                        model.TotalShipment = amountDebitCreditShipment.TotalShipment;
-                        model.DebitAmount = amountDebitCreditShipment.DebitAmount;
-                        model.CreditAmount = amountDebitCreditShipment.CreditAmount;
-
+                    {                      
                         var soa = mapper.Map<AcctSoa>(model);
                         soa.Soano = model.Soano = CreateSoaNo();
 
-                        var hs = DataContext.Add(soa, false);
-                        if (hs.Success)
+                        //List charge of SOA
+                        var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
+                        
+                        if (surcharges != null)
                         {
-                            //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
-                            var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id)
-                                                                           && (x.Type == "BUY" || (x.Type == "OBH" && x.PayerId == model.Customer))
-                                                                           );
-
-                            //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
-                            var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                           && model.Surcharges.Any(c => c.surchargeId == x.Id)
-                                                                           && (x.Type == "SELL" || (x.Type == "OBH" && x.PaymentObjectId == model.Customer))
-                                                                           );
-
-                            if (surchargeCredit != null)
+                            foreach(var surcharge in surcharges)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
-                                //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
-                                foreach (var item in surchargeCredit)
+                                if (surcharge.Type == "BUY" || (surcharge.Type == "OBH" && surcharge.PayerId == model.Customer))
                                 {
-                                    item.PaySoano = soa.Soano;
-                                    item.UserModified = userCurrent;
-                                    item.DatetimeModified = model.DatetimeCreated;
-                                    if (string.IsNullOrEmpty(item.CreditNo) && string.IsNullOrEmpty(item.DebitNo))
-                                    {
-                                        //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
-                                        item.ExchangeDate = model.DatetimeCreated;
-                                    }
-                                    var hsUpdateSurchargeCredit = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
+                                    surcharge.PaySoano = soa.Soano;
                                 }
-                            }
-
-                            if (surchargeDebit != null)
-                            {
                                 //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
-                                //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
-                                foreach (var item in surchargeDebit)
+                                if (surcharge.Type == "SELL" || (surcharge.Type == "OBH" && surcharge.PaymentObjectId == model.Customer))
                                 {
-                                    item.Soano = soa.Soano;
-                                    item.UserModified = userCurrent;
-                                    item.DatetimeModified = model.DatetimeCreated;
-                                    if (string.IsNullOrEmpty(item.CreditNo) && string.IsNullOrEmpty(item.DebitNo))
-                                    {
-                                        //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
-                                        item.ExchangeDate = model.DatetimeCreated;
-                                    }
-                                    var hsUpdateSurChargeDebit = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
+                                    surcharge.Soano = soa.Soano;
                                 }
+                                surcharge.UserModified = userCurrent;
+                                surcharge.DatetimeModified = model.DatetimeCreated;
+                                if (string.IsNullOrEmpty(surcharge.CreditNo) && string.IsNullOrEmpty(surcharge.DebitNo))
+                                {
+                                    //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
+                                    surcharge.ExchangeDate = model.DatetimeCreated;
+                                }
+
+
+                                var hsUpdateSurchargeCredit = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
                         }
+                        
+                        //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào Final Exchange Rate, Exchange Date mới nhất của charge)
+                        var amountDebitCreditShipment = GetDebitCreditAmountAndTotalShipment(model);
+                        soa.TotalShipment = amountDebitCreditShipment.TotalShipment;
+                        soa.DebitAmount = amountDebitCreditShipment.DebitAmount;
+                        soa.CreditAmount = amountDebitCreditShipment.CreditAmount;
+                        var hs = DataContext.Add(soa, false);
+
                         csShipmentSurchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
@@ -234,7 +214,7 @@ namespace eFMS.API.Accounting.DL.Services
                             else
                             {
                                 item.PaySoano = null;
-                            }                                                       
+                            }
                             item.UserModified = currentUser.UserID;
                             item.DatetimeModified = DateTime.Now;
                             var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
@@ -263,7 +243,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //Check exists OBH Debit Charge
                         var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
                                                                        && model.Surcharges.Any(c => c.surchargeId == x.Id)
-                                                                       && x.Type == "OBH" 
+                                                                       && x.Type == "OBH"
                                                                        && x.PaymentObjectId == model.Customer).Any();
                         if (isExistObhDebitCharge)
                         {
@@ -612,7 +592,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         #endregion -- Get Rate Exchange --
-        
+
         private string GetTopClearanceNoByJobNo(string JobNo)
         {
             var custom = customsDeclarationRepo.Get();
@@ -622,9 +602,9 @@ namespace eFMS.API.Accounting.DL.Services
                 .FirstOrDefault()?.ClearanceNo;
             return clearanceNo;
         }
-        
+
         #region -- Get List Charges Shipment By Criteria --
-        
+
         private IQueryable<ChargeShipmentModel> GetChargeForIssueSoaByCriteria(ChargeShipmentCriteria criteria)
         {
             IQueryable<ChargeShipmentModel> charges = null;
@@ -1152,7 +1132,7 @@ namespace eFMS.API.Accounting.DL.Services
             #region -- Shipment (JobNo, MBL, HBL)
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
-                if(surcharges != null)
+                if (surcharges != null)
                 {
                     surcharges = surcharges.Where(x => x.JobNo == criteria.JobId);
                     if (criteria.IsOBH) //**
@@ -2223,7 +2203,7 @@ namespace eFMS.API.Accounting.DL.Services
         public IQueryable<ChargeSOAResult> GetChargeExportForSOA(AcctSoa soa)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surCharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soa.Soano : x.PaySoano == soa.Soano);                    
+            var surCharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soa.Soano : x.PaySoano == soa.Soano);
             // BUY & SELL
             var result = new List<ChargeSOAResult>();
             foreach (var sur in surCharges)
@@ -2250,7 +2230,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _packageContainer = string.Empty;
                     _packageQty = opst?.SumPackages;
                     _grossWeight = opst?.SumGrossWeight;
-                    _chargeWeight = opst ?.SumChargeWeight;
+                    _chargeWeight = opst?.SumChargeWeight;
                     _cbm = opst?.SumCbm;
                     _customNo = customsDeclarationRepo.Get().Where(x => x.JobNo == opst.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
                 }
