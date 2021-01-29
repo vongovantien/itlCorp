@@ -216,14 +216,17 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (currency == DocumentConstants.CURRENCY_LOCAL)
                 {
-                    var v1 = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 0);
-                    var v2 = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100) ,0);
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 0);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100) ,0);
 
-                    totalAmount = v1 + v2;
+                    totalAmount = netAmount + vatAmount;
                 }
                 else
                 {
-                    totalAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 2) + NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 2) * (vatrate / 100);
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 2);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100), 2);
+
+                    totalAmount = netAmount + vatAmount;
                 }
             }
 
