@@ -238,7 +238,6 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
 
     checkDuplicate() {
         let valid: boolean = true;
-        console.log("con: ", this.initContainers);
 
         if (this.type === 'import') {
             this.utility.checkDuplicateInObjectByKeys(this.initContainers, ['containerNo', 'sealNo'], 2);
