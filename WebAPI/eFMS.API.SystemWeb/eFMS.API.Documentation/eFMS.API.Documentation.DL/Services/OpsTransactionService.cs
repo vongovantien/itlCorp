@@ -18,6 +18,7 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.API.Common.Models;
 using eFMS.API.Common;
+using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -1064,52 +1065,64 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public HandleState Update(OpsTransactionModel model)
         {
-            var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-            var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId,  OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
-            if (code == 403) return new HandleState(403);
-            model.UserModified = currentUser.UserID;
-            model.DatetimeModified = DateTime.Now;
-            if (model.SalemanId != detail.SalemanId)
+            try
             {
-                var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
-                if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+                var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+                int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+                if (code == 403) return new HandleState(403);
+                model.UserModified = currentUser.UserID;
+                model.DatetimeModified = DateTime.Now;
+                if (model.SalemanId != detail.SalemanId)
                 {
-                    var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
-                    if (dataGroup.Any())
+                    var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+                    if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                     {
-                        model.SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
-                        model.SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
-                        model.SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
-                        model.SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
-                    }
-                    else
-                    {
-                        model.SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
-                        model.SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
-                        model.SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
-                        model.SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                        var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                        if (dataGroup.Any())
+                        {
+                            model.SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                            model.SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                            model.SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                            model.SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                        }
+                        else
+                        {
+                            model.SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                            model.SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                            model.SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                            model.SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                        }
                     }
                 }
-            }
-            else
-            {
-                model.SalesGroupId = detail.SalesGroupId;
-                model.SalesDepartmentId = detail.SalesDepartmentId;
-                model.SalesOfficeId = detail.SalesOfficeId;
-                model.SalesCompanyId = detail.SalesCompanyId;
-            }
-            var hs = Update(model, x => x.Id == model.Id);
-            if (hs.Success)
-            {
-                if (model.CsMawbcontainers != null)
+                else
                 {
-                    var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+                    model.SalesGroupId = detail.SalesGroupId;
+                    model.SalesDepartmentId = detail.SalesDepartmentId;
+                    model.SalesOfficeId = detail.SalesOfficeId;
+                    model.SalesCompanyId = detail.SalesCompanyId;
                 }
-                //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
-                var hsSurcharge = UpdateSurchargeOfHousebill(model);
+                var hs = Update(model, x => x.Id == model.Id);
+                if (hs.Success)
+                {
+                    if (model.CsMawbcontainers != null)
+                    {
+                        var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+                    }
+                    //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
+                    var hsSurcharge = UpdateSurchargeOfHousebill(model);
+
+                    // Cập nhật MBL, HBL cho các phiếu tạm ứng
+                    HandleState hsAdvanceRq = UpdateMblHblAdvanceRequest(model);
+                }
+                return hs;
             }
-            return hs;
+            catch (Exception ex )
+            {
+                new LogHelper("eFMS_Update_OpsTransaction_Log", ex.ToString());
+                return new HandleState(ex.Message);
+            }
+           
         }
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange)
         {
@@ -1295,6 +1308,39 @@ namespace eFMS.API.Documentation.DL.Services
             }
             catch (Exception ex)
             {
+                string logErr = String.Format("Có lỗi khi cập nhật JobNo {0}, MBLNo {1}, HBLNo {2} trong CsShipmentSurcharge by {3} at {4} \n {5}", model.JobNo, model.Mblno, model.Hwbno,currentUser.UserName, DateTime.Now, ex.ToString());
+                new LogHelper("eFMS_Update_CsShipmentSurcharge_Log", logErr);
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState UpdateMblHblAdvanceRequest(OpsTransactionModel model)
+        {
+            HandleState hs = new HandleState();
+            try
+            {
+                IQueryable<AcctAdvanceRequest> advR = accAdvanceRequestRepository.Get(x => x.Hblid == model.Hblid);
+                if(advR != null)
+                {
+                    foreach (var item in advR)
+                    {
+                        item.Mbl = model.Mblno;
+                        item.Hbl = model.Hwbno;
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = currentUser.UserID;
+
+                        accAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
+                    }
+
+                    hs = accAdvanceRequestRepository.SubmitChanges();
+                }
+                return hs;
+
+            }
+            catch (Exception ex)
+            {
+                string logErr = String.Format("Có lỗi khi cập nhật MBLNo {0}, HBLNo {1} trong acctAdvanceRequest by {2} at {3} \n {4}", model.Mblno, model.Hwbno, currentUser.UserName, DateTime.Now, ex.ToString());
+                new LogHelper("eFMS_Update_Advance_Log", logErr);
                 return new HandleState(ex.Message);
             }
         }

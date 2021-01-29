@@ -693,7 +693,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if(!unitRepository.Any(x=>x.UnitNameEn.Trim() == item.Unit.Trim()))
                     {
-                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_NOT_EXIST]);
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_NOT_EXIST], item.Unit);
                         item.IsValid = false;
                     }
                 }
