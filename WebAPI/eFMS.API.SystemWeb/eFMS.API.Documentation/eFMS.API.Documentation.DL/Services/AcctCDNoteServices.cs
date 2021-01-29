@@ -304,9 +304,12 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 #endregion  --- Set Currency For CD Note ---
 
-                //Quy đổi tỉ giá CD Note so về currency Local
+                //Quy đổi tỉ giá currency CD Note về currency Local
                 var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 model.ExchangeRate = _exchangeRate;
+                //Quy đổi tỉ giá USD to Local dựa vào ngày tạo CDNote
+                var _excRateUsdToLocal = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                model.ExcRateUsdToLocal = _excRateUsdToLocal;
 
                 decimal _totalCdNote = 0;
                 foreach (var c in model.listShipmentSurcharge)
@@ -333,10 +336,15 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.CreditNo = model.Code;
                             }
                         }
-                        charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
 
-                        //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                        charge.FinalExchangeRate = null;
+                        if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
+                        {
+                            //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
+                            charge.ExchangeDate = model.DatetimeCreated;
+                            //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                            charge.FinalExchangeRate = null;
+                        }
+
                         var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
                         charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                         charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
@@ -426,9 +434,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 #endregion  --- Set Currency For CD Note ---
 
-                //Quy đổi tỉ giá CD Note so về currency Local
-                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, entity.DatetimeCreated, entity.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-                entity.ExchangeRate = _exchangeRate;
+                //Note: Khi update CD Note thì không cần cập nhật tỷ giá của ExchangeRate, ExcRateUsdToLocal của CDNote
 
                 decimal _totalCdNote = 0;
 
@@ -473,10 +479,15 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.CreditNo = model.Code;
                             }
                         }
-                        charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
 
-                        //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                        charge.FinalExchangeRate = null;
+                        if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
+                        {
+                            //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
+                            charge.ExchangeDate = model.DatetimeCreated;
+                            //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                            charge.FinalExchangeRate = null;
+                        }
+
                         var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
                         charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                         charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)

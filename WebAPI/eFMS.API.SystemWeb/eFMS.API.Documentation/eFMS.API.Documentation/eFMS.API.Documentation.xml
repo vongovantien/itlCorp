@@ -447,7 +447,7 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Add(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.AddAndUpdate(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
             <summary>
             add list surcharge
             </summary>

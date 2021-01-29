@@ -443,25 +443,31 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Soano = string.IsNullOrEmpty(item.Soano?.Trim()) ? null : item.Soano;
                         item.PaySoano = string.IsNullOrEmpty(item.PaySoano?.Trim()) ? null : item.PaySoano;
 
-                        var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, item.CurrencyId);
-                        item.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                        item.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-                        item.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
+                        if (string.IsNullOrEmpty(item.SettlementCode)
+                            && (item.AcctManagementId == Guid.Empty || item.AcctManagementId == null)
+                            && (string.IsNullOrEmpty(item.Soano) && string.IsNullOrEmpty(item.PaySoano))
+                            && (string.IsNullOrEmpty(item.DebitNo) && string.IsNullOrEmpty(item.CreditNo)))
+                        {
+                            var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, item.CurrencyId);
+                            item.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
+                            item.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
+                            item.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_LOCAL);
-                        item.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                        item.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                            var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_LOCAL);
+                            item.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                            item.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
 
-                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_USD);
-                        item.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                        item.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_USD);
+                            item.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                            item.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                        }
 
                         if (item.Id == Guid.Empty)
                         {
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = currentUser.UserID;
                             item.Id = Guid.NewGuid();
-                            item.ExchangeDate = DateTime.Now;
+                            //item.ExchangeDate = DateTime.Now; ??? - Rule lạ
 
                             item.TransactionType = GetTransactionType(item.JobNo);
                             if (item.Hblid != Guid.Empty)

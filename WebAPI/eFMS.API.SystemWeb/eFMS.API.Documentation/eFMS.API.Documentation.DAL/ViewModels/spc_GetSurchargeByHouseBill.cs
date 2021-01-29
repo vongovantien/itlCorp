@@ -78,6 +78,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Guid? CompanyId { get; set; }
         public string PaySyncedFrom { get; set; }
         public string SyncedFrom { get; set; }
+        public string ReferenceNo { get; set; }
 
     }
 }

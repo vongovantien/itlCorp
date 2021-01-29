@@ -187,7 +187,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("AddAndUpdate")]
         [Authorize]
-        public IActionResult Add([FromBody]List<CsShipmentSurchargeModel> list)
+        public IActionResult AddAndUpdate([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
 
