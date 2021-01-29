@@ -133,7 +133,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
                 }
             });
             const packages = this.getPackages(lstPackages);
-
+            this.billSIComponent.shippingInstruction.packagesNote = packages;
             this.setFormRefresh({
                 containerSealNo: "",
                 containerNote: "A PART Of CONTAINER",

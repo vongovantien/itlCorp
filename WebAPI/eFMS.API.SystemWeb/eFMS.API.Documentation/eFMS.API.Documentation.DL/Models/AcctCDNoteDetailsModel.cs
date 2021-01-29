@@ -63,5 +63,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string CreditPayment { get; set; }
         public bool IsExistChgCurrDiffLocalCurr { get; set; }
         public string PackageUnit { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
     }
 }
