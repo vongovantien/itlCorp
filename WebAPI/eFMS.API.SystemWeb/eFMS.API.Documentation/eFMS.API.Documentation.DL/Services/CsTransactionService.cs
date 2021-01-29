@@ -1045,7 +1045,8 @@ namespace eFMS.API.Documentation.DL.Services
                         PODName = pod.NameEn,
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
-                        PackageQty = masterBill.PackageQty
+                        PackageQty = masterBill.PackageQty,
+                        BookingNo = masterBill.BookingNo
                     };
 
             return query;
@@ -1448,6 +1449,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
+                    && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
@@ -1470,6 +1472,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
                            (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1628,6 +1631,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     &&
                     (
                            (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1649,6 +1653,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
                            (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
