@@ -1032,4 +1032,8 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    getListAdvanceSettlement(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/AdvanceSettlement`, { jobId: jobId });
+    }
 }

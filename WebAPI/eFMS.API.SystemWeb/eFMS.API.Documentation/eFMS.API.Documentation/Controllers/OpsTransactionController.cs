@@ -307,8 +307,8 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-        [HttpGet("AdavanceSettlement")]
-        [Authorize]
+        [HttpGet("AdvanceSettlement")]
+        //[Authorize]
         public IActionResult opsAdvanceSettlements(Guid JobID)
         {
             var job =  transactionService.opsAdvanceSettlements(JobID);

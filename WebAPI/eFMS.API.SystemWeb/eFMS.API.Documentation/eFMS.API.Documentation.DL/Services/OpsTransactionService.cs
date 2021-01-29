@@ -49,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
+        private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePayment;
         private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
@@ -75,7 +76,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo,
             IContextBase<AcctAdvancePayment> _acctAdvancePayment,
-            IContextBase<AcctSettlementPayment> _acctSettlementPayment
+            IContextBase<AcctSettlementPayment> _acctSettlementPayment,
+            IContextBase<OpsTransaction> _opsTransactionRepository,
+            IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -104,6 +107,8 @@ namespace eFMS.API.Documentation.DL.Services
             accAdvanceRequestRepository = accAdvanceRequestRepo;
             acctAdvancePayment = _acctAdvancePayment;
             acctSettlementPayment = _acctSettlementPayment;
+            opsTransactionRepository = _opsTransactionRepository;
+            accAdvancePaymentRepository = _accAdvancePaymentRepository;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1464,28 +1469,61 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
         {
-            var query = from ss in surchargeRepository.Get()
-                        join ap in acctAdvancePayment.Get() on ss.AdvanceNo equals ap.AdvanceNo
-                        join sp in acctSettlementPayment.Get() on ss.SettlementCode equals sp.SettlementNo
-                        join user in userRepository.Get() on ss.UserCreated equals user.UserCreated
-                        where ss.Id == JobID && ap.StatusApproval =="Done"
-                        select new { rqA = ap.RequestDate, rqS = sp.RequestDate, ap.AdvanceNo, ap.AdvanceCurrency, statusAdvance = ap.StatusApproval, sp.SettlementCurrency,  sp.SettlementNo, statusSettlemet = sp.StatusApproval , user.Username};
-            if(query == null)
+            var query = (from SC in surchargeRepository.Get()
+                        join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
+                        join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
+
+                        join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
+                        join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
+
+                        where OP.Id == JobID && SC.SettlementCode != null
+                        group SC by new { SC.Hblno, SC.Mblno, ADR.Hblid, 
+                            adNo = ADP.AdvanceNo,
+                            adcurrency = ADP.AdvanceCurrency,
+                            adDate = ADP.RequestDate,
+                            adStatus = ADP.StatusApproval,
+                            rqt = ADP.Requester,
+                            smDate = SMP.RequestDate,
+                            smNo = SMP.SettlementNo,
+                            smcurrency = SMP.SettlementCurrency,
+                            smStatus = SMP.StatusApproval,
+                            adAmount= ADR.Amount,
+                            smAmount= SMP.Amount
+
+                        } into g select new {
+                            advanNo = g.Key.adNo,
+                            advanCurren =g.Key.adcurrency,
+                            advanDate = g.Key.adDate,
+                            advanStatus = g.Key.adStatus,
+                            rqter = g.Key.rqt , settmDate = g.Key.smDate, settmNo = g.Key.smNo, smCurren = g.Key.smcurrency , settmStatus = g.Key.smStatus,
+                            advanAmount =g.Key.adAmount , settmAmount = g.Key.smAmount
+                        }).ToList();
+                    
+                        //select new { adNo = ADP.AdvanceNo, adAmount =ADP.AdvanceCurrency, adDate = ADP.RequestDate, adStatus = ADP.StatusApproval,
+                        //rqt = ADP.Requester , smDate = SMP.RequestDate, smNo = SMP.SettlementNo, smAmount = SMP.SettlementCurrency , smStatus = SMP.StatusApproval,
+                        //amount = ADR.Amount , smAmount2 = SMP.Amount 
+                        //};
+                         // where SC.Hblid == (from OP in opsTransactionRepository.Get()  where OP.Id == JobID ) && SC.SettlementCode != null
+                         //group ADR by ADR.Amount into newAdr
+                         //orderby newAdr.Key
+                         //select newAdr
+                         //  select OP.Hblid;
+            if (query == null)
             {
                 return null;
             }
             var data =  query.Select(x => new OpsAdvanceSettlementModel()
                 {
-                    AdvanceNo = x.AdvanceNo,
-                    AdvanceAmount = Convert.ToDecimal(x.AdvanceCurrency),
-                    AdvanceDate = x.rqA,
-                    Requester = x.Username,
-                    SettlemenDate = x.rqS,
-                    SettlementAmount = Convert.ToDecimal(x.SettlementCurrency),
-                    SettlementNo = x.SettlementNo,
-                    Balance = Convert.ToDecimal(x.AdvanceCurrency) - Convert.ToDecimal(x.SettlementCurrency),
-                SettleStatusApproval = x.statusAdvance,
-                StatusApproval = x.statusSettlemet,
+                AdvanceNo = x.advanNo,
+                AdvanceAmount =x.advanAmount + x.advanCurren,
+                AdvanceDate = x.advanDate,
+                Requester = x.rqter,
+                SettlemenDate = x.settmDate,
+                SettlementAmount = x.settmAmount + x.smCurren,
+                SettlementNo = x.settmNo,
+                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount) ,
+                SettleStatusApproval = x.advanStatus,
+                StatusApproval = x.settmStatus,
             }).ToList();
             return data;
         }
