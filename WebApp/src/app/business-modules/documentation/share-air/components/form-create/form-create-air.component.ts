@@ -231,9 +231,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
+                // * 15375
                 // Validators.pattern(/^(.{3}-\d{4} \d{4}|XXX-XXXX XXXX)$/)
-                Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                FormValidators.validateMAWB,
+                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                // FormValidators.validateMAWB,
 
             ])],
             flightVesselName: [],

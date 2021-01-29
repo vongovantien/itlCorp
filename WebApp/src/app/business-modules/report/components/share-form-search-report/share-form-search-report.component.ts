@@ -186,11 +186,11 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
-        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[0].id];
+        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
-                startDate: this.createMoment().startOf('month').toDate(),
-                endDate: this.createMoment().endOf('month').toDate(),
+                startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             }],
             dateType: [this.dateTypeList[0].id],
             customer: this.isCommissionIncentive ? [null, Validators.compose([
@@ -793,8 +793,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         }
 
         this.serviceDate.setValue({
-            startDate: this.createMoment().startOf('month').toDate(),
-            endDate: this.createMoment().endOf('month').toDate(),
+            startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
         });
 
         if (this.isCommissionIncentive) {

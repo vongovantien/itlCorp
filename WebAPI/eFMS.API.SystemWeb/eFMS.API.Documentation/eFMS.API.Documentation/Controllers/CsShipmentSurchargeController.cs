@@ -451,20 +451,24 @@ namespace eFMS.API.Documentation.Controllers
                     }
 
                     string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
-                    DateTime? dateToPaseInvoice = null;
-                    if (DateTime.TryParse(InvoiceDate, out temp))
+                    if(!string.IsNullOrEmpty(InvoiceDate))
                     {
-                        CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPaseInvoice = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
-                    }
-                    else
-                    {
-                        CultureInfo culture = new CultureInfo("es-ES");
-                        if (ExchangeDate != null)
+                        DateTime? dateToPaseInvoice = null;
+                        if (DateTime.TryParse(InvoiceDate, out temp))
                         {
-                            dateToPaseInvoice = DateTime.Parse(InvoiceDate, culture);
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            dateToPaseInvoice = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                        }
+                        else
+                        {
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            if (ExchangeDate != null)
+                            {
+                                dateToPaseInvoice = DateTime.Parse(InvoiceDate, culture);
+                            }
                         }
                     }
+              
                     double? UnitPrice = worksheet.Cells[row, 8].Value != null ? (double?)worksheet.Cells[row, 8].Value : (double?)null;
                     double? Vatrate = worksheet.Cells[row, 10].Value != null ? (double?)worksheet.Cells[row, 10].Value : (double?)null;
                     double? TotalAmount = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;

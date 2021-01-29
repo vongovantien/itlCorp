@@ -1221,7 +1221,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = ApiUrl.Value.Url;
+            string path = this.ApiUrl.Value.Url;
             try
             {
                 var list = new List<SysImage>();

@@ -714,6 +714,7 @@ namespace eFMS.API.Documentation.DL.Services
                 cdNoteDetails.MbLadingNo = opsTransaction?.Mblno;
                 cdNoteDetails.SumContainers = opsTransaction?.SumContainers;
                 cdNoteDetails.SumPackages = opsTransaction?.SumPackages;
+                cdNoteDetails.NW = opsTransaction?.SumNetWeight;
             }
             var hbConstainers = string.Empty;
             var hbPackages = string.Empty;
@@ -830,6 +831,7 @@ namespace eFMS.API.Documentation.DL.Services
             cdNoteDetails.Note = cdNote.Note;
             cdNoteDetails.ReasonReject = cdNote.ReasonReject;
             cdNoteDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
+            cdNoteDetails.DatetimeCreated = cdNote.DatetimeCreated;
             return cdNoteDetails;
         }
         
@@ -1136,7 +1138,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Description = item.NameEn,
                         Quantity = item.Quantity + _decimalNumber,
                         QUnit = "N/A",
-                        UnitPrice = item.UnitPrice ?? 0,
+                        UnitPrice = (item.UnitPrice ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         VAT = (_vatAmount ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         Debit = model.TotalDebit + _decimalNumber, //Cộng thêm phần thập phân
                         Credit = model.TotalCredit + _decimalNumber, //Cộng thêm phần thập phân
@@ -1704,8 +1706,8 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Currency = isOriginCurr ? DocumentConstants.CURRENCY_LOCAL : criteria.Currency;
             parameter.HBLList = _hbllist?.ToUpper();
             parameter.DecimalNo = 2;
-            //Exchange Rate USD to VND
-            var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+            //Exchange Rate USD to VND (Lấy tỷ giá theo ngày tạo CDNote)
+            var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == data.DatetimeCreated.Value.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
             parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;
 
             result = new Crystal
