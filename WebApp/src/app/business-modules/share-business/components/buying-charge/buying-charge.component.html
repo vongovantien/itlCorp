@@ -234,7 +234,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.unitPrice || charge.unitPrice ==='')}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (((!(+charge.unitPrice)) && charge.isFromShipment) || charge.unitPrice === '')}">
                                     <ng-container *ngIf="!!charge.creditNo 
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
