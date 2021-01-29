@@ -1057,11 +1057,11 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
 
                             #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
-                            var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId);
+                            var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
                             charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                             charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
 
-                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, charge.FinalExchangeRate, charge.ExchangeDate, AccountingConstants.CURRENCY_USD);
+                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
                             charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
                             charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
                             #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
@@ -1100,7 +1100,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 UpdateStatusSOA(soa, accounting.Type);
                             }
 
-                            _totalAmount += CalculatorAmountChargeByCurrency(charge, accounting.Currency);
+                            _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, accounting.Currency);
                         }
                         // Cập nhật Settlement: VoucherNo, VoucherDate
                         if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
@@ -1226,11 +1226,11 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
 
                             #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
-                            var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId);
+                            var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
                             charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                             charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
 
-                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge.CurrencyId, charge.Vatrate, charge.UnitPrice, charge.Quantity, charge.FinalExchangeRate, charge.ExchangeDate, AccountingConstants.CURRENCY_USD);
+                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
                             charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
                             charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
                             #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
@@ -1266,7 +1266,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 UpdateStatusSOA(soa, accounting.Type);
                             }
 
-                            _totalAmount += CalculatorAmountChargeByCurrency(charge, accounting.Currency);
+                            _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, accounting.Currency);
                         }
 
                         // Cập nhật Settlement: VoucherNo, VoucherDate
@@ -1392,26 +1392,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return total;
         }
-
-        private decimal CalculatorAmountChargeByCurrency(CsShipmentSurcharge charge, string currencyInvoice)
-        {
-            decimal _totalAmount = 0;
-            if (currencyInvoice == AccountingConstants.CURRENCY_LOCAL)
-            {
-                _totalAmount = (charge.AmountVnd + charge.VatAmountVnd) ?? 0;
-            }
-            else if (currencyInvoice == AccountingConstants.CURRENCY_USD)
-            {
-                _totalAmount = (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
-            }
-            else //SOA ngoại tệ khác
-            {
-                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currencyInvoice);
-                _totalAmount = charge.Total * _exchangeRate;
-            }
-            return _totalAmount;
-        }
-
+        
         /// <summary>
         /// Generate Voucher ID
         /// </summary>
