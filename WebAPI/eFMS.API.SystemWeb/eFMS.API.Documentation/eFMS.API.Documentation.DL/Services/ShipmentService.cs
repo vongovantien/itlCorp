@@ -1962,7 +1962,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         Hblid = house.Id,
                                         Hbl = house.Hwbno,
                                         PaymentMethodTerm = master.PaymentTerm,
-                                        ServiceDate = master.ServiceDate,
+                                        ServiceDate = master.TransactionType.Contains("E") ? master.Etd : master.Eta,
                                         Service = master.TransactionType
                                     };
                 return queryShipment;
@@ -1979,7 +1979,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         Hblid = house.Id,
                                         Hbl = house.Hwbno,
                                         PaymentMethodTerm = master.PaymentTerm,
-                                        ServiceDate = master.ServiceDate,
+                                        ServiceDate = master.TransactionType.Contains("E") ? master.Etd : master.Eta,
                                         Service = master.TransactionType
                                     };
                 return queryShipment;
