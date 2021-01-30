@@ -57,6 +57,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOPSCDNoteWithCurrency(eFMS.API.Documentation.DL.Models.PreviewCdNoteCriteria)">
+            <summary>
+            Preview CD Note Local and USD currency
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
             <summary>
             check allow delete an existed item

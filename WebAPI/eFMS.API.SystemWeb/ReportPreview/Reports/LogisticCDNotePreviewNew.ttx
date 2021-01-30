@@ -1,0 +1,50 @@
+SortIndex	Number		
+Subject	String	255	
+PartnerID	String	50	
+PartnerName	String	150	
+PersonalContact	String	150	
+Address	String	255	
+Taxcode	String	50	
+Workphone	String	255	
+Fax	String	255	
+TransID	String	50	
+TransDate	Date		
+LoadingDate	DateTime		
+LocalVessel	String	150	
+OceanVessel	String	150	
+MAWB	String	50	
+PortofLading	String	150	
+PortofUnlading	String	150	
+HWBNO	String	50	
+DepartureAirport	String	150	
+PlaceDelivery	String	150	
+ContainerSize	String	150	
+ItemNo	String	150	
+Movement	String	50	
+GrossWeight	Number		
+WChargeable	Number		
+CBM	Number		
+NoPieces	String	150	
+GoodsDelivery	String	255	
+Consignee	String	250	
+ATTN	String	255	
+Description	String	255	
+Quantity	Number		
+QUnit	String	50	
+UnitPrice	Number		
+Unit	String	50	
+VAT	Number		
+Debit	Number		
+Credit	Number		
+Notes	String	255	
+InputData	String	50	
+SealNo	String	255	
+Deposit	Number		
+DepositCurr	String	255	
+Commodity	String	255	
+DecimalSymbol	String	255	
+DigitSymbol	String	255	
+DecimalNo	Number		
+CurrDecimalNo	Number		
+ExtVND	Number		
+ETA	DateTime			

@@ -26,5 +26,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
         HandleState RejectCreditNote(RejectCreditNoteModel model);
         AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList);
+        Crystal PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria);
     }
 }

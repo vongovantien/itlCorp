@@ -25,6 +25,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string SoaNo { get; set; }
         public string ColoaderId { get; set; }
         public string AgentId { get; set; }
+        public string BookingNo { get; set; }
         public string UserCreated { get; set; }
         public PermissionRange RangeSearch { get; set; }
         public DateTime? FromServiceDate { get; set; }
