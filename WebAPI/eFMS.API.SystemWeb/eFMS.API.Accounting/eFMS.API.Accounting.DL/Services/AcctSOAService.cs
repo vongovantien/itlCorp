@@ -168,13 +168,29 @@ namespace eFMS.API.Accounting.DL.Services
                                     surcharge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
                                     surcharge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                                    var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_LOCAL);
-                                    surcharge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                                    surcharge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                                    {
+                                        surcharge.AmountVnd = amountOriginal.NetAmount;
+                                        surcharge.VatAmountVnd = amountOriginal.VatAmount;                                        
+                                    }
+                                    else
+                                    {
+                                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_LOCAL);
+                                        surcharge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                                        surcharge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                                    }
 
-                                    var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_USD);
-                                    surcharge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                                    surcharge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                                    {
+                                        surcharge.AmountUsd = amountOriginal.NetAmount;
+                                        surcharge.VatAmountUsd = amountOriginal.VatAmount;
+                                    }
+                                    else
+                                    {
+                                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_USD);
+                                        surcharge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                                        surcharge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                                    }
                                     #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                 }
 
@@ -319,13 +335,29 @@ namespace eFMS.API.Accounting.DL.Services
                                     surcharge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
                                     surcharge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                                    var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_LOCAL);
-                                    surcharge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                                    surcharge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                                    {
+                                        surcharge.AmountVnd = amountOriginal.NetAmount;
+                                        surcharge.VatAmountVnd = amountOriginal.VatAmount;
+                                    }
+                                    else
+                                    {
+                                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_LOCAL);
+                                        surcharge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                                        surcharge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                                    }
 
-                                    var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_USD);
-                                    surcharge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                                    surcharge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                                    {
+                                        surcharge.AmountUsd = amountOriginal.NetAmount;
+                                        surcharge.VatAmountUsd = amountOriginal.VatAmount;
+                                    }
+                                    else
+                                    {
+                                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_USD);
+                                        surcharge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                                        surcharge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                                    }
                                     #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                 }
 

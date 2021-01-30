@@ -1061,9 +1061,17 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                             charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
 
-                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
-                            charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                            if (charge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                            {
+                                charge.AmountUsd = amountOriginal.NetAmount;
+                                charge.VatAmountUsd = amountOriginal.VatAmount;
+                            }
+                            else
+                            {
+                                var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
+                                charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                                charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                            }
                             #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
 
                             // CR: 14405
@@ -1230,9 +1238,17 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
                             charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
 
-                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
-                            charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                            if (charge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                            {
+                                charge.AmountUsd = amountOriginal.NetAmount;
+                                charge.VatAmountUsd = amountOriginal.VatAmount;
+                            }
+                            else
+                            {
+                                var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
+                                charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                                charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                            }
                             #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
 
                             // CR: 14405

@@ -350,24 +350,40 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
                         charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_LOCAL);
-                        charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                        charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            charge.AmountVnd = amountOriginal.NetAmount;
+                            charge.VatAmountVnd = amountOriginal.VatAmount;
+                        }
+                        else
+                        {
+                            var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_LOCAL);
+                            charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                            charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                        }
 
-                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_USD);
-                        charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                        charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            charge.AmountUsd = amountOriginal.NetAmount;
+                            charge.VatAmountUsd = amountOriginal.VatAmount;
+                        }
+                        else
+                        {
+                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_USD);
+                            charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                            charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                        }
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
 
                         if (model.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
                         {
-                            _totalCdNote += amountLocal.NetAmount + amountLocal.VatAmount;
+                            _totalCdNote += (charge.AmountVnd + charge.VatAmountVnd) ?? 0;
                         }
                         if (model.CurrencyId == DocumentConstants.CURRENCY_USD)
                         {
-                            _totalCdNote += amountUsd.NetAmount + amountUsd.VatAmount;
+                            _totalCdNote += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
                         }
                     }
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
@@ -493,13 +509,29 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
                         charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_LOCAL);
-                        charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                        charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            charge.AmountVnd = amountOriginal.NetAmount;
+                            charge.VatAmountVnd = amountOriginal.VatAmount;
+                        }
+                        else
+                        {
+                            var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_LOCAL);
+                            charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                            charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                        }
 
-                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_USD);
-                        charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                        charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            charge.AmountUsd = amountOriginal.NetAmount;
+                            charge.VatAmountUsd = amountOriginal.VatAmount;
+                        }
+                        else
+                        {
+                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_USD);
+                            charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                            charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                        }
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
@@ -507,11 +539,11 @@ namespace eFMS.API.Documentation.DL.Services
 
                         if (model.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
                         {
-                            _totalCdNote += amountLocal.NetAmount + amountLocal.VatAmount;
+                            _totalCdNote += (charge.AmountVnd + charge.VatAmountVnd) ?? 0;
                         }
                         if (model.CurrencyId == DocumentConstants.CURRENCY_USD)
                         {
-                            _totalCdNote += amountUsd.NetAmount + amountUsd.VatAmount;
+                            _totalCdNote += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
                         }
                     }
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);

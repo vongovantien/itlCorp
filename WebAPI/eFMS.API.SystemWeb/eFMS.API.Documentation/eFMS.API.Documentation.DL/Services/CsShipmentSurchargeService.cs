@@ -453,13 +453,29 @@ namespace eFMS.API.Documentation.DL.Services
                             item.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
                             item.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
 
-                            var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_LOCAL);
-                            item.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                            item.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                            if (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                item.AmountVnd = amountOriginal.NetAmount;
+                                item.VatAmountVnd = amountOriginal.VatAmount;
+                            }
+                            else
+                            {
+                                var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_LOCAL);
+                                item.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                                item.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+                            }
 
-                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_USD);
-                            item.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                            item.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                            if (item.CurrencyId == DocumentConstants.CURRENCY_USD)
+                            {
+                                item.AmountUsd = amountOriginal.NetAmount;
+                                item.VatAmountUsd = amountOriginal.VatAmount;
+                            }
+                            else
+                            {
+                                var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(item, DocumentConstants.CURRENCY_USD);
+                                item.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                                item.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+                            }
                         }
 
                         if (item.Id == Guid.Empty)
