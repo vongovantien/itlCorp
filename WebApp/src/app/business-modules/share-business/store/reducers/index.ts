@@ -54,7 +54,7 @@ export const getHBLSState = createSelector(shareBussinessState, (state: IShareBu
 export const getDetailHBlState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.hbl);
 export const getDetailHBlPermissionState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.hbl.permission);
 export const getHBLLoadingState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.isLoading);
-export const getHBLContainersState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.houseBill && state.houseBill.containers);
+export const getHBLContainersState = createSelector(shareBussinessState, (state: IShareBussinessState) => state?.houseBill?.containers);
 
 // * Demension
 export const getDimensionState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.dimensions);
