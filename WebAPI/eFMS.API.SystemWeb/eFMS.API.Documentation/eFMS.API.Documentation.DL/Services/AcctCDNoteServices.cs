@@ -894,6 +894,10 @@ namespace eFMS.API.Documentation.DL.Services
             cdNoteDetails.Volum = volum;
             cdNoteDetails.ListSurcharges = listSurcharges;
             cdNoteDetails.CDNote = cdNote;
+            if (opsTransaction != null)
+            {
+                cdNoteDetails.CDNote.InvoiceNo = opsTransaction.InvoiceNo;
+            }
             cdNoteDetails.ProductService = opsTransaction?.ProductService;
             cdNoteDetails.ServiceMode = opsTransaction?.ServiceMode;
             cdNoteDetails.SoaNo = string.Join(", ", charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
@@ -1406,7 +1410,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
             parameter.IssueInv = string.Empty; //Tạm thời để trống
-            parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
+            parameter.InvoiceInfo = data.CDNote.InvoiceNo;
             parameter.OtherRef = string.Empty;//Tạm thời để trống
             parameter.PackageUnit = data.PackageUnit;
 
