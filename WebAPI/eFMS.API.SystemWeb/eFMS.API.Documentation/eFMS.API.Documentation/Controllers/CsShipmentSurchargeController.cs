@@ -203,7 +203,10 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            
+            list.ForEach(fe => {
+                fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
+                // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
+            });
             var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -212,6 +215,43 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private decimal CalculateTotal(decimal? unitPrice, decimal quantity, decimal? vat, string currency)
+        {
+            decimal? totalAmount = 0;
+            decimal vatrate = vat ?? 0;
+            if (vat < 0)
+            {
+                if(currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                   
+                    totalAmount = NumberHelper.RoundNumber(unitPrice * quantity ?? 0) + NumberHelper.RoundNumber(Math.Abs(vatrate), 0);
+                }
+                else
+                {
+                    totalAmount = NumberHelper.RoundNumber(unitPrice * quantity ?? 0) + NumberHelper.RoundNumber(Math.Abs(vatrate), 2);
+                }
+            }
+            else
+            {
+                if (currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 0);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100) ,0);
+
+                    totalAmount = netAmount + vatAmount;
+                }
+                else
+                {
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 2);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100), 2);
+
+                    totalAmount = netAmount + vatAmount;
+                }
+            }
+
+            return totalAmount ?? 0;
         }
 
         /// <summary>

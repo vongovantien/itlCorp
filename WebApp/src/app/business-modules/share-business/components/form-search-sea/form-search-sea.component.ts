@@ -111,6 +111,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
         } else {
             this.filterTypes = [
                 { title: 'Job ID', value: 'jobNo' },
+                { title: 'Booking No', value: 'bookingNo' },
                 { title: 'MBL No', value: 'mawb' },
                 { title: 'HBL No', value: 'hwbno' },
                 { title: 'Cont No', value: 'containerNo' },
@@ -187,6 +188,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
             markNo: this.filterType.value.value === 'markNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             creditDebitNo: this.filterType.value.value === 'creditDebitNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             soaNo: this.filterType.value.value === 'soaNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            bookingNo: this.filterType.value.value === 'bookingNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             customerId: this.customer.value,
             coloaderId: this.supplier.value,
             agentId: this.agent.value,
@@ -271,4 +273,5 @@ interface ISearchDataShipment {
     transactionType: Number;
     fromServiceDate: string;
     toServiceDate: string;
+    bookingNo: string;
 }
