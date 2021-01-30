@@ -659,7 +659,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!listPartner.Any(x => x.TaxCode == item.PartnerCode))
+                    if (!listPartner.Any(x => x.AccountNo.Trim() == item.PartnerCode.Replace("'","").Trim()))
                     {
                         item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST],item.PartnerCode);
                         item.IsValid = false;
@@ -737,7 +737,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "sell" && item.Type.ToLower() != "obh")
                     {
-                        item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_NOT_VALID]);
+                        item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_NOT_VALID], item.Type);
                         item.IsValid = false;
                     }
                 }
@@ -761,7 +761,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.IsValid)
                 {
-                    string PartnerId = listPartner.Where(x => x.TaxCode == item.PartnerCode).Select(t => t.Id).FirstOrDefault();
+                    string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
                     Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
                     item.ChargeId = ChargeId;
                     short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
