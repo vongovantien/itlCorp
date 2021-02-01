@@ -17,5 +17,7 @@ namespace eFMS.API.Accounting.DL.IService
         AmountResult CalculatorAmountAccountingByCurrency(CsShipmentSurcharge surcharge, string currencyConvert);
 
         decimal ConvertAmountChargeToAmountObj(CsShipmentSurcharge surcharge, string currencyObject);
+
+        AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge);
     }
 }

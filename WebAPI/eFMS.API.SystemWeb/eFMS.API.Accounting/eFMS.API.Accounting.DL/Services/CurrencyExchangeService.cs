@@ -195,12 +195,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <summary>
         /// Get NetAmount, VatAmount, ExchangeRate (to Local)
         /// </summary>
-        /// <param name="currencyCharge"></param>
-        /// <param name="vatRate"></param>
-        /// <param name="unitPrice"></param>
-        /// <param name="quantity"></param>
-        /// <param name="finalExcRate"></param>
-        /// <param name="excDate"></param>
+        /// <param name="surcharge"></param>
         /// <param name="currencyConvert"></param>
         /// <returns></returns>
         public AmountResult CalculatorAmountAccountingByCurrency(CsShipmentSurcharge surcharge, string currencyConvert)
@@ -255,12 +250,59 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 _totalAmount = surcharge.Total;
             }
-            else //SOA ngoại tệ khác
+            else //Ngoại tệ khác
             {
-                var _exchangeRate = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyObject);
-                _totalAmount = surcharge.Total * _exchangeRate;
+                decimal _exchangeRate = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyObject);
+                decimal _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * _exchangeRate) ?? 0, 2);
+                decimal _vatAmount = 0;
+                if (surcharge.Vatrate != null)
+                {
+                    decimal vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount * _exchangeRate, 2);
+                }
+                _totalAmount = _netAmount + _vatAmount;
             }
             return _totalAmount;
+        }
+
+        /// <summary>
+        /// Tính toán giá trị các field: NetAmount, Total, FinalExchangeRate, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd
+        /// </summary>
+        /// <param name="surcharge"></param>
+        /// <returns></returns>
+        public AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge)
+        {
+            AmountSurchargeResult result = new AmountSurchargeResult();
+            var amountOriginal = CalculatorAmountAccountingByCurrency(surcharge, surcharge.CurrencyId);
+            result.NetAmountOrig = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
+            result.VatAmountOrig = amountOriginal.VatAmount; //Tiền thuế (Original)
+            result.GrossAmountOrig = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
+            result.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
+
+            if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+            {
+                result.AmountVnd = amountOriginal.NetAmount;
+                result.VatAmountVnd = amountOriginal.VatAmount;
+            }
+            else
+            {
+                var amountLocal = CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_LOCAL);
+                result.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                result.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+            }
+
+            if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+            {
+                result.AmountUsd = amountOriginal.NetAmount;
+                result.VatAmountUsd = amountOriginal.VatAmount;
+            }
+            else
+            {
+                var amountUsd = CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_USD);
+                result.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                result.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+            }
+            return result;
         }
     }
 }

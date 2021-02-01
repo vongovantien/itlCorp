@@ -340,39 +340,19 @@ namespace eFMS.API.Documentation.DL.Services
                         if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
                         {
                             //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
-                            charge.ExchangeDate = model.DatetimeCreated;
+                            charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
                             //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             charge.FinalExchangeRate = null;
                         }
-
-                        var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
-                        charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                        charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-                        charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
-
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            charge.AmountVnd = amountOriginal.NetAmount;
-                            charge.VatAmountVnd = amountOriginal.VatAmount;
-                        }
-                        else
-                        {
-                            var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_LOCAL);
-                            charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                            charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
-                        }
-
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                        {
-                            charge.AmountUsd = amountOriginal.NetAmount;
-                            charge.VatAmountUsd = amountOriginal.VatAmount;
-                        }
-                        else
-                        {
-                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_USD);
-                            charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
-                        }
+                        
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                        charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                        charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                        charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
@@ -499,39 +479,19 @@ namespace eFMS.API.Documentation.DL.Services
                         if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
                         {
                             //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
-                            charge.ExchangeDate = model.DatetimeCreated;
+                            charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
                             //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             charge.FinalExchangeRate = null;
                         }
 
-                        var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
-                        charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                        charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-                        charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
-
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            charge.AmountVnd = amountOriginal.NetAmount;
-                            charge.VatAmountVnd = amountOriginal.VatAmount;
-                        }
-                        else
-                        {
-                            var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_LOCAL);
-                            charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                            charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
-                        }
-
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                        {
-                            charge.AmountUsd = amountOriginal.NetAmount;
-                            charge.VatAmountUsd = amountOriginal.VatAmount;
-                        }
-                        else
-                        {
-                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, DocumentConstants.CURRENCY_USD);
-                            charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
-                        }
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                        charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                        charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                        charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;

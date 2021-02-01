@@ -228,33 +228,13 @@ namespace eFMS.API.ForPartner.DL.Service
                                     surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency); //debitCharge.ExchangeRate;
 
                                     #region -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                    var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surchargeDebit, surchargeDebit.CurrencyId);
-                                    surchargeDebit.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                                    surchargeDebit.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-
-                                    if (surchargeDebit.CurrencyId == ForPartnerConstants.CURRENCY_LOCAL)
-                                    {
-                                        surchargeDebit.AmountVnd = amountOriginal.NetAmount;
-                                        surchargeDebit.VatAmountVnd = amountOriginal.VatAmount;
-                                    }
-                                    else
-                                    {
-                                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surchargeDebit, ForPartnerConstants.CURRENCY_LOCAL);
-                                        surchargeDebit.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                                        surchargeDebit.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
-                                    }
-
-                                    if (surchargeDebit.CurrencyId == ForPartnerConstants.CURRENCY_USD)
-                                    {
-                                        surchargeDebit.AmountUsd = amountOriginal.NetAmount;
-                                        surchargeDebit.VatAmountUsd = amountOriginal.VatAmount;
-                                    }
-                                    else
-                                    {
-                                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(surchargeDebit, ForPartnerConstants.CURRENCY_USD);
-                                        surchargeDebit.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                                        surchargeDebit.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
-                                    }
+                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeDebit);
+                                    surchargeDebit.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                    surchargeDebit.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                    surchargeDebit.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                    surchargeDebit.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                    surchargeDebit.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                    surchargeDebit.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                                     #endregion -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
 
                                     surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
@@ -284,33 +264,13 @@ namespace eFMS.API.ForPartner.DL.Service
                                         surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
 
                                         #region -- Tính lại giá trị các field dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                        var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surchargeObh, surchargeObh.CurrencyId);
-                                        surchargeObh.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                                        surchargeObh.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-
-                                        if (surchargeObh.CurrencyId == ForPartnerConstants.CURRENCY_LOCAL)
-                                        {
-                                            surchargeObh.AmountVnd = amountOriginal.NetAmount;
-                                            surchargeObh.VatAmountVnd = amountOriginal.VatAmount;
-                                        }
-                                        else
-                                        {
-                                            var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(surchargeObh, ForPartnerConstants.CURRENCY_LOCAL);
-                                            surchargeObh.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                                            surchargeObh.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
-                                        }
-
-                                        if (surchargeObh.CurrencyId == ForPartnerConstants.CURRENCY_USD)
-                                        {
-                                            surchargeObh.AmountUsd = amountOriginal.NetAmount;
-                                            surchargeObh.VatAmountUsd = amountOriginal.VatAmount;
-                                        }
-                                        else
-                                        {
-                                            var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(surchargeObh, ForPartnerConstants.CURRENCY_USD);
-                                            surchargeObh.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                                            surchargeObh.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
-                                        }
+                                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeObh);
+                                        surchargeObh.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                        surchargeObh.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                        surchargeObh.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                        surchargeObh.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                        surchargeObh.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                        surchargeObh.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                                         #endregion -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
 
                                         surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
@@ -695,15 +655,27 @@ namespace eFMS.API.ForPartner.DL.Service
         private decimal? CalculatorTotalAmount(List<ChargeInvoice> charges, string currencyInvoice)
         {
             decimal? total = 0;
+            int _roundDecimal = currencyInvoice == ForPartnerConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
             if (!string.IsNullOrEmpty(currencyInvoice))
             {
                 charges.ForEach(fe =>
                 {
                     var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
-                    //Tỷ giá của Currency Charge so với Local
-                    var _exchangeForLocal = CalculatorExchangeRate(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
-                    decimal? exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(_exchangeForLocal, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
-                    total += exchangeRate * surcharge.Total;
+                    if (surcharge != null)
+                    {
+                        //Tỷ giá của Currency Charge so với Local
+                        var _exchangeForLocal = CalculatorExchangeRate(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
+                        decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(_exchangeForLocal, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
+
+                        decimal _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * exchangeRate) ?? 0, _roundDecimal);
+                        decimal _vatAmount = 0;
+                        if (surcharge.Vatrate != null)
+                        {
+                            decimal vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
+                            _vatAmount = NumberHelper.RoundNumber(vatAmount * exchangeRate, _roundDecimal);
+                        }
+                        total += _netAmount + _vatAmount;
+                    }
                 });
             }
             return total;

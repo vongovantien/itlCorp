@@ -1451,34 +1451,14 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.ExchangeDate = DateTime.Now;
 
                                 #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
-                                charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                                charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-                                charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
-
-                                if (charge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                                {
-                                    charge.AmountVnd = amountOriginal.NetAmount;
-                                    charge.VatAmountVnd = amountOriginal.VatAmount;
-                                }
-                                else
-                                {
-                                    var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_LOCAL);
-                                    charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                                    charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
-                                }
-
-                                if (charge.CurrencyId == AccountingConstants.CURRENCY_USD)
-                                {
-                                    charge.AmountUsd = amountOriginal.NetAmount;
-                                    charge.VatAmountUsd = amountOriginal.VatAmount;
-                                }
-                                else
-                                {
-                                    var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
-                                    charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                                    charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
-                                }
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                                charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                                charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                charge.VatAmountVnd =amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                                 #endregion -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
 
                                 _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, settlement.SettlementCurrency);
@@ -1657,34 +1637,14 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.CompanyId = currentUser.CompanyID;
 
                                 #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, charge.CurrencyId);
-                                charge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                                charge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-                                charge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
-
-                                if (charge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                                {
-                                    charge.AmountVnd = amountOriginal.NetAmount;
-                                    charge.VatAmountVnd = amountOriginal.VatAmount;
-                                }
-                                else
-                                {
-                                    var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_LOCAL);
-                                    charge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                                    charge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
-                                }
-
-                                if (charge.CurrencyId == AccountingConstants.CURRENCY_USD)
-                                {
-                                    charge.AmountUsd = amountOriginal.NetAmount;
-                                    charge.VatAmountUsd = amountOriginal.VatAmount;
-                                }
-                                else
-                                {
-                                    var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(charge, AccountingConstants.CURRENCY_USD);
-                                    charge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                                    charge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
-                                }
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                                charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                                charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                                 #endregion -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
 
                                 _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, settlement.SettlementCurrency);
@@ -1752,34 +1712,14 @@ namespace eFMS.API.Accounting.DL.Services
                                     sceneCharge.DatetimeModified = DateTime.Now;
 
                                     #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                    var amountOriginal = currencyExchangeService.CalculatorAmountAccountingByCurrency(sceneCharge, sceneCharge.CurrencyId);
-                                    sceneCharge.NetAmount = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
-                                    sceneCharge.Total = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
-                                    sceneCharge.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
-
-                                    if (sceneCharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        sceneCharge.AmountVnd = amountOriginal.NetAmount;
-                                        sceneCharge.VatAmountVnd = amountOriginal.VatAmount;
-                                    }
-                                    else
-                                    {
-                                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(sceneCharge, AccountingConstants.CURRENCY_LOCAL);
-                                        sceneCharge.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
-                                        sceneCharge.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
-                                    }
-
-                                    if (sceneCharge.CurrencyId == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        sceneCharge.AmountUsd = amountOriginal.NetAmount;
-                                        sceneCharge.VatAmountUsd = amountOriginal.VatAmount;
-                                    }
-                                    else
-                                    {
-                                        var amountUsd = currencyExchangeService.CalculatorAmountAccountingByCurrency(sceneCharge, AccountingConstants.CURRENCY_USD);
-                                        sceneCharge.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
-                                        sceneCharge.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
-                                    }
+                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(sceneCharge);
+                                    sceneCharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                    sceneCharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                    sceneCharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                                    sceneCharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                    sceneCharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                    sceneCharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                    sceneCharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                                     #endregion -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
 
                                     _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(sceneCharge, settlement.SettlementCurrency);
