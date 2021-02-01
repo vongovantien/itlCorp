@@ -452,13 +452,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled [ngModel]="charge.voucherIdre">
-                                </div>
-                            </td>
-                            <td class="disabled">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" disabled
-                                        [value]="charge.voucherIdredate | date: 'dd/MM/yyyy'">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.netAmount" readonly
+                                        disabled currencyMask placeholder="Net Amount">
                                 </div>
                             </td>
                         </tr>

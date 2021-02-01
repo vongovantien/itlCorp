@@ -13,9 +13,13 @@ using System.Linq;
 namespace eFMS.API.Accounting.DL.Services
 {
     public class CurrencyExchangeService : RepositoryBase<CatCurrencyExchange, CatCurrencyExchangeModel>, ICurrencyExchangeService
-    {        
-        public CurrencyExchangeService(IContextBase<CatCurrencyExchange> repository, IMapper mapper) : base(repository, mapper)
+    {
+        readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
+        public CurrencyExchangeService(IContextBase<CatCurrencyExchange> repository, 
+            IMapper mapper, 
+            IContextBase<CsShipmentSurcharge> surchargeRepo) : base(repository, mapper)
         {
+            surchargeRepository = surchargeRepo;
         }
 
         public decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
@@ -68,11 +72,25 @@ namespace eFMS.API.Accounting.DL.Services
         {
             if (string.IsNullOrEmpty(currencyFrom) || string.IsNullOrEmpty(currencyTo)) return 0;
 
-            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
-            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            if (currencyExchange.Count == 0)
+            //***
+            if (currencyFrom == currencyTo)
             {
+                return 1;
+            }
+            if (finalExchangeRate != null)
+            {
+                if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    return finalExchangeRate.Value;
+                }
+            }
+            //***
+
+            var exchargeDateSurcharge = exchangeDate == null ? DataContext.Get().Max(s => s.DatetimeCreated).Value.Date : exchangeDate.Value.Date;
+            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
+            if (currencyExchange.Count() == 0)
+            {
+                DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
@@ -82,18 +100,19 @@ namespace eFMS.API.Accounting.DL.Services
             decimal _exchangeRate = 0;
             if (finalExchangeRate != null)
             {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
+                //if (currencyFrom == currencyTo)
+                //{
+                //    _exchangeRate = 1;
+                //}
+                //else 
+                if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }
-                else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = finalExchangeRate.Value;
-                }
+                //else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
+                //{
+                //    _exchangeRate = finalExchangeRate.Value;
+                //}
                 else
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (finalExchangeRate.Value / _exchangeRateCurrencyTo) : 0;
@@ -101,11 +120,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
+                //if (currencyFrom == currencyTo)
+                //{
+                //    _exchangeRate = 1;
+                //}
+                //else 
+                if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
                 {
                     _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }
@@ -170,6 +190,119 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return amountResult;
+        }
+
+        /// <summary>
+        /// Get NetAmount, VatAmount, ExchangeRate (to Local)
+        /// </summary>
+        /// <param name="surcharge"></param>
+        /// <param name="currencyConvert"></param>
+        /// <returns></returns>
+        public AmountResult CalculatorAmountAccountingByCurrency(CsShipmentSurcharge surcharge, string currencyConvert)
+        {
+            AmountResult amountResult = new AmountResult();
+            int _roundDecimal = currencyConvert == AccountingConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
+            decimal _netAmount = 0;
+            decimal _vatAmount = 0;
+            decimal _excRate = 0;
+
+            //Tính tỉ giá Final Exchange Rate (Tỉ giá so với LOCAL)
+            var exchangeRateToLocal = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
+            _excRate = exchangeRateToLocal;
+
+            if (surcharge.CurrencyId == currencyConvert)
+            {
+                _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity) ?? 0, _roundDecimal);
+                if (surcharge.Vatrate != null)
+                {
+                    var vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount, _roundDecimal);
+                }
+            }
+            else
+            {
+                var exchangeRate = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyConvert);
+                _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * exchangeRate) ?? 0, _roundDecimal);
+                if (surcharge.Vatrate != null)
+                {
+                    var vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount * exchangeRate, _roundDecimal);
+                }
+            }
+            amountResult.NetAmount = _netAmount;
+            amountResult.VatAmount = _vatAmount;
+            amountResult.ExchangeRate = _excRate;
+            return amountResult;
+        }
+
+        public decimal ConvertAmountChargeToAmountObj(CsShipmentSurcharge surcharge, string currencyObject)
+        {
+            decimal _totalAmount = 0;
+            if (currencyObject == AccountingConstants.CURRENCY_LOCAL)
+            {
+                _totalAmount = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+            }
+            else if (currencyObject == AccountingConstants.CURRENCY_USD)
+            {
+                _totalAmount = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+            }
+            else if (currencyObject == surcharge.CurrencyId)
+            {
+                _totalAmount = surcharge.Total;
+            }
+            else //Ngoại tệ khác
+            {
+                decimal _exchangeRate = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyObject);
+                decimal _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * _exchangeRate) ?? 0, 2);
+                decimal _vatAmount = 0;
+                if (surcharge.Vatrate != null)
+                {
+                    decimal vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount * _exchangeRate, 2);
+                }
+                _totalAmount = _netAmount + _vatAmount;
+            }
+            return _totalAmount;
+        }
+
+        /// <summary>
+        /// Tính toán giá trị các field: NetAmount, Total, FinalExchangeRate, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd
+        /// </summary>
+        /// <param name="surcharge"></param>
+        /// <returns></returns>
+        public AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge)
+        {
+            AmountSurchargeResult result = new AmountSurchargeResult();
+            var amountOriginal = CalculatorAmountAccountingByCurrency(surcharge, surcharge.CurrencyId);
+            result.NetAmountOrig = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
+            result.VatAmountOrig = amountOriginal.VatAmount; //Tiền thuế (Original)
+            result.GrossAmountOrig = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
+            result.FinalExchangeRate = amountOriginal.ExchangeRate; //Tỉ giá so với Local
+
+            if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+            {
+                result.AmountVnd = amountOriginal.NetAmount;
+                result.VatAmountVnd = amountOriginal.VatAmount;
+            }
+            else
+            {
+                var amountLocal = CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_LOCAL);
+                result.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
+                result.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
+            }
+
+            if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+            {
+                result.AmountUsd = amountOriginal.NetAmount;
+                result.VatAmountUsd = amountOriginal.VatAmount;
+            }
+            else
+            {
+                var amountUsd = CalculatorAmountAccountingByCurrency(surcharge, AccountingConstants.CURRENCY_USD);
+                result.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
+                result.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
+            }
+            return result;
         }
     }
 }

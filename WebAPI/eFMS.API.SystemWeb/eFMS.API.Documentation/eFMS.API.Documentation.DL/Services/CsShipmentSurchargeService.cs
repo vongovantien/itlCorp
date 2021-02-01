@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -352,26 +351,35 @@ namespace eFMS.API.Documentation.DL.Services
             if (!surcharges.Any()) return result;
             foreach (var item in surcharges)
             {
-                decimal _rateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-                decimal _rateToUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                //decimal _rateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                //decimal _rateToUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
 
-                decimal totalLocal = item.Quantity * (item.UnitPrice ?? 0) * _rateToLocal; // without vat - 15305
-                decimal totalUSD = item.Quantity * (item.UnitPrice ?? 0) * _rateToUSD; // without vat - 15305
+                //decimal totalLocal = item.Quantity * (item.UnitPrice ?? 0) * _rateToLocal; // without vat - 15305
+                //decimal totalUSD = item.Quantity * (item.UnitPrice ?? 0) * _rateToUSD; // without vat - 15305
 
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
-                    result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
-                    result.HouseBillTotalCharge.TotalBuyingUSD = result.HouseBillTotalCharge.TotalBuyingUSD + totalUSD;
+                    //result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
+                    //result.HouseBillTotalCharge.TotalBuyingUSD = result.HouseBillTotalCharge.TotalBuyingUSD + totalUSD;
+
+                    result.HouseBillTotalCharge.TotalBuyingLocal += item.AmountVnd ?? 0;
+                    result.HouseBillTotalCharge.TotalBuyingUSD += item.AmountUsd ?? 0;
                 }
                 else if (item.Type == DocumentConstants.CHARGE_SELL_TYPE)
                 {
-                    result.HouseBillTotalCharge.TotalSellingLocal = result.HouseBillTotalCharge.TotalSellingLocal + totalLocal;
-                    result.HouseBillTotalCharge.TotalSellingUSD = result.HouseBillTotalCharge.TotalSellingUSD + totalUSD;
+                    //result.HouseBillTotalCharge.TotalSellingLocal = result.HouseBillTotalCharge.TotalSellingLocal + totalLocal;
+                    //result.HouseBillTotalCharge.TotalSellingUSD = result.HouseBillTotalCharge.TotalSellingUSD + totalUSD;
+
+                    result.HouseBillTotalCharge.TotalSellingLocal += item.AmountVnd ?? 0;
+                    result.HouseBillTotalCharge.TotalSellingUSD += item.AmountUsd ?? 0;
                 }
                 else
                 {
-                    result.HouseBillTotalCharge.TotalOBHLocal = result.HouseBillTotalCharge.TotalOBHLocal + totalLocal;
-                    result.HouseBillTotalCharge.TotalOBHUSD = result.HouseBillTotalCharge.TotalOBHUSD + totalUSD;
+                    //result.HouseBillTotalCharge.TotalOBHLocal = result.HouseBillTotalCharge.TotalOBHLocal + totalLocal;
+                    //result.HouseBillTotalCharge.TotalOBHUSD = result.HouseBillTotalCharge.TotalOBHUSD + totalUSD;
+
+                    result.HouseBillTotalCharge.TotalOBHLocal += item.AmountVnd ?? 0;
+                    result.HouseBillTotalCharge.TotalOBHUSD += item.AmountUsd ?? 0;
                 }
             }
 
@@ -433,12 +441,28 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Soano = string.IsNullOrEmpty(item.Soano?.Trim()) ? null : item.Soano;
                         item.PaySoano = string.IsNullOrEmpty(item.PaySoano?.Trim()) ? null : item.PaySoano;
 
+                        //Chỉ tính lại giá trị cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
+                        if (string.IsNullOrEmpty(item.SettlementCode)
+                            && (item.AcctManagementId == Guid.Empty || item.AcctManagementId == null)
+                            && (string.IsNullOrEmpty(item.Soano) && string.IsNullOrEmpty(item.PaySoano))
+                            && (string.IsNullOrEmpty(item.DebitNo) && string.IsNullOrEmpty(item.CreditNo)))
+                        {                            
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                            item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
+                            item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
+                            item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                            item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                        }
+
                         if (item.Id == Guid.Empty)
                         {
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = currentUser.UserID;
                             item.Id = Guid.NewGuid();
-                            item.ExchangeDate = DateTime.Now;
+                            //item.ExchangeDate = DateTime.Now; ??? - Rule lạ
 
                             item.TransactionType = GetTransactionType(item.JobNo);
                             if (item.Hblid != Guid.Empty)
@@ -491,6 +515,44 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+                return result;
+            }
+        }
+        
+        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
+        {
+            var result = new HandleState();
+            var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in surcharges)
+                    {
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                        item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
+                        item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                        item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+
+                        var d = DataContext.Update(item, x => x.Id == item.Id);
+                    }
+                    DataContext.SubmitChanges();
+                    trans.Commit();
+                    return new HandleState();
                 }
                 catch (Exception ex)
                 {
@@ -769,7 +831,18 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaymentObjectId = PartnerId;
                     Guid HblId = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim()).Select(t => t.Hblid).FirstOrDefault();
                     item.Hblid = HblId;
-                    item.Total =  (decimal)item.TotalAmount;
+
+                    #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
+                    item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
+                    item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
                     item.Quantity = (decimal)item.Qty;
                     item.TransactionType = "CL";
                     string jobNo = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).Select(t => t.JobNo).FirstOrDefault();

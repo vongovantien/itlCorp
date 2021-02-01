@@ -391,7 +391,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Documentation.DL.IService.ICurrencyExchangeService,AutoMapper.IMapper)">
             <summary>
             constructor
             </summary>
@@ -454,7 +454,7 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Add(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.AddAndUpdate(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
             <summary>
             add list surcharge
             </summary>
@@ -527,6 +527,12 @@
             import list partner
             </summary>
             <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField">
+            <summary>
+            Only Use for Dev
+            </summary>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShippingInstructionController.CheckExistSIExport(System.Guid)">

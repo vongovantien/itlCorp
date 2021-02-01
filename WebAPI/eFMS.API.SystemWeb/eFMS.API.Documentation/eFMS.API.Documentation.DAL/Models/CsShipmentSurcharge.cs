@@ -16,6 +16,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string CurrencyId { get; set; }
         public bool? IncludedVat { get; set; }
         public decimal? Vatrate { get; set; }
+        public decimal? NetAmount { get; set; }
         public decimal Total { get; set; }
         public string PayerId { get; set; }
         public string ObjectBePaid { get; set; }
@@ -59,6 +60,8 @@ namespace eFMS.API.Documentation.Service.Models
         public Guid? OfficeId { get; set; }
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
+        public decimal? AmountUsd { get; set; }
+        public decimal? VatAmountUsd { get; set; }
         public string ReferenceNo { get; set; }
         public Guid? CompanyId { get; set; }
         public string SyncedFrom { get; set; }

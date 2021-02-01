@@ -24,5 +24,6 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
         List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
         HandleState Import(List<CsShipmentSurchargeImportModel> data);
+        HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD();
     }
 }

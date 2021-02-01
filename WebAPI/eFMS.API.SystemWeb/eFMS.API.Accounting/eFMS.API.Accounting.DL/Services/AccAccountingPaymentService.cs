@@ -279,7 +279,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             if (data == null) return null;
-            var surcharges = surchargeRepository.Get(x => x.Type == "OBH"
+            var surcharges = surchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                                         && !string.IsNullOrEmpty(x.Soano)
                                                         && (
                                                         (criteria.ReferenceNos.Contains(x.Mblno) || criteria.ReferenceNos == null)
@@ -729,7 +729,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var group in groups)
             {
                 AcctSoa refSOA = soaRepository.Get(x => x.Id == Convert.ToInt32(group.Key)).FirstOrDefault();
-                IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get(x => x.Soano == refSOA.Soano && x.Type == "OBH");
+                IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get(x => x.Soano == refSOA.Soano && x.Type == AccountingConstants.TYPE_CHARGE_OBH);
                 IQueryable<AccAccountingPayment> existedPayments = DataContext.Get(x => x.RefId == refSOA.Id.ToString());
 
                 decimal? totalExistedPayment = 0;

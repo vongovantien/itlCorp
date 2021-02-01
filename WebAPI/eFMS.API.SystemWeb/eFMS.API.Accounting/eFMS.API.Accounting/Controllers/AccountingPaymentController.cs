@@ -350,7 +350,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 foreach (var item in list)
                 {
-                    var paymentSoaIds = accountingPaymentService.Get(x => x.Type == "OBH" && x.RefId == item.RefId).Select(s => s.RefId);
+                    var paymentSoaIds = accountingPaymentService.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.RefId == item.RefId).Select(s => s.RefId);
                     foreach (var soaId in paymentSoaIds)
                     {
                         var surchargeIds = acctSOAService.GetSurchargeIdBySoaId(Int32.Parse(soaId));
