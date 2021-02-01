@@ -307,6 +307,25 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+        private string CheckHasMBLUpdatePermitted(OpsTransactionModel model)
+        {
+            string errorMsg = string.Empty;
+            string mblNo = string.Empty;
+            List<string> advs = new List<string>();
+
+            int statusCode = transactionService.CheckUpdateMBL(model, out mblNo, out advs);
+            if (statusCode == 1)
+            {
+                errorMsg = String.Format("MBL {0} has Charges List that Synced to accounting system, Please you check Again!", mblNo);
+            }
+
+            if (statusCode == 2)
+            {
+                errorMsg = String.Format("MBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", mblNo, string.Join(",", advs.ToArray()));
+            }
+
+            return errorMsg;
+        }
         [HttpGet("AdvanceSettlement")]
         [Authorize]
         public IActionResult opsAdvanceSettlements(Guid JobID)
