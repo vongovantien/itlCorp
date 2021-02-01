@@ -1,84 +1,45 @@
-<!-- <div *ngFor="let ads of adSett">
-    {{ads.orderNumberProcessed}}
-</div> -->
-<!-- {{adSett[0].advanceNo}} -->
-
-
 <div class="adv-settle-wrapper">
     <div class="m-portlet m--margin-bottom-20">
         <div class="m-portlet__body">
-            <div *ngFor="let ads of adSett; let i = index; trackBy: trackByFn">
+            <div *ngFor="let ads of adSett ">
                 <div class=" row ">
                     <div class="col-lg-8 ">
                         <div class="adv-info ">
                             <div class="title ">
-                                <span>  {{ads.AdvanceNo}} - {{ads.Requester}}</span>
+                                <span>  {{ads.advanceNo}} - {{ads.requester}}</span>
                             </div>
                             <div class="description ">
-                                <span class="m--margin-right-20 ">{{ads.AdvanceDate | date: 'HH:mm dd/MM/yyyy'}}</span> | <span class="text-success m--margin-left-20 ">{{ads.statusApproval}}</span>
+                                <span class="m--margin-right-20 ">{{ads.advanceDate | date: 'HH:mm dd/MM/yyyy'}}</span> | <span class="text-success m--margin-left-20 ">{{ads.statusApproval}}</span>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-primary ">
-                        <div class="title text-primary "><span>{{ads.Balance}}</span></div>
+                        <div class="title text-primary "><span>{{ads.advanceAmount}}</span></div>
                     </div>
                 </div>
-            </div>
+                <div class=" row ">
+                    <div class="col-lg-8 ">
+                        <div class="adv-info ">
+                            <div class="title ">
+                                <span>  {{ads.settlementNo}} - {{ads.requester}}</span>
+                            </div>
+                            <div class="description ">
+                                <span class="m--margin-right-20 ">{{ads.settlemenDate | date: 'HH:mm dd/MM/yyyy'}}</span> | <span class="text-success m--margin-left-20 ">{{ads.settleStatusApproval}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center text-primary ">
+                        <div class="title text-primary "><span>{{ads.settlementAmount}}</span></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 "></div>
+                    <div class="col-lg-4 text-center text-primary title ">
+                        <div>{{ads.balance}}</div>
+                    </div>
+                </div>
 
-            <!-- <div class="col-lg-8 ">
-                <div class="settle-info ">
-                    <div class="title ">
-                        AD2101/00001 - Đoàn Văn Thương
-                    </div>
-                    <div class="description ">
-                        <span class="m--margin-right-20 ">01/01/2021</span> | <span class="text-success m--margin-left-20 ">DONE</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 text-center text-primary ">
-                <div class="title text-primary ">3000000 VND</div>
-            </div> -->
-            <div class="col-lg-8 "></div>
-            <div class="col-lg-4 text-center text-primary title ">
-                <div>0</div>
             </div>
         </div>
     </div>
 </div>
-<!-- <div class="m-portlet ">
-    <div class="m-portlet__body ">
-        <div class="row ">
-            <div class="col-lg-8 ">
-                <div class="adv-info ">
-                    <div class="title ">
-                        AD2101/00001 - Đoàn Văn Thương
-                    </div>
-                    <div class="description ">
-                        <span class="m--margin-right-20 ">01/01/2021</span> | <span class="text-success m--margin-left-20 ">DONE</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 text-center text-primary ">
-                <div class="title text-primary ">3000000 VND</div>
-            </div>
-            <div class="col-lg-8 ">
-                <div class="settle-info ">
-                    <div class="title ">
-                        AD2101/00001 - Đoàn Văn Thương
-                    </div>
-                    <div class="description ">
-                        <span class="m--margin-right-20 ">01/01/2021</span> | <span class="text-success m--margin-left-20 ">DONE</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 text-center text-primary ">
-                <div class="title text-primary ">3000000 VND</div>
-            </div>
-            <div class="col-lg-8 "></div>
-            <div class="col-lg-4 text-center text-primary title ">
-                <div>0</div>
-            </div>
-        </div>
-    </div> -->
-<!-- </div>
-</div> -->

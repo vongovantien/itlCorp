@@ -1,15 +1,14 @@
 export class AdvanceSettlement {
-    orderNumberProcessed: number = 0;
-    Requester: string = null;
-    AdvanceNo: string = null;
-    AdvanceAmount: number = 0;
-    StatusApproval: string = null;
-    SettlementNo: string = null;
-    SettlementAmount: number = 0;
-    SettleStatusApproval: string = null;
-    Balance: number = 0;
-    AdvanceDate: Date = null;
-    SettlemenDate: Date = null;
+    requester: string = '';
+    advanceNo: string = '';
+    advanceAmount: number = 0;
+    statusApproval: string = '';
+    settlementNo: string = '';
+    settlementAmount: number = 0;
+    settleStatusApproval: string = '';
+    balance: number = 0;
+    advanceDate: Date = null;
+    settlemenDate: Date = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

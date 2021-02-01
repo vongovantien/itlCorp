@@ -13,7 +13,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string SettlementNo { get; set; }
         public string SettlementAmount { get; set; }
         public string SettleStatusApproval { get; set; }
-        public decimal Balance { get; set; }
+        public string Balance { get; set; }
         public DateTime? AdvanceDate { get; set; }
         public DateTime? SettlemenDate { get; set; }
     }

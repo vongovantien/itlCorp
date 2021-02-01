@@ -16,41 +16,15 @@ import { SortService } from 'src/app/shared/services/sort.service';
 
 export class ShareBusinessAdvanceSettlementInforComponent extends AppList {
     adSett: AdvanceSettlement[] = [];
-    // selectAdSett: AdvanceSettlement = null;
     jobId: string = '';
-    // headers: CommonInterface.IHeaderTable[];
-    HEROES = [
-        { id: 1, name: 'Superman' },
-        { id: 2, name: 'Batman' },
-        { id: 5, name: 'BatGirl' },
-        { id: 3, name: 'Robin' },
-        { id: 4, name: 'Flash' }
-    ];
-
     constructor(
-        private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
-        private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
     ) {
         super();
-        // this.headers = [
-        //     { title: 'No', field: 'orderNumberProcessed', width: 10 },
-        //     { title: 'Requester', field: 'requester', sortable: true },
-        //     { title: 'Advance No', field: 'advanceNo', sortable: true },
-        //     { title: 'Advance Amount', field: 'advanceAmount', sortable: true },
-        //     { title: 'Status Approval', field: 'statusApproval', sortable: true },
-        //     { title: 'Settlement Amount', field: 'settlementAmount', sortable: true },
-        //     { title: 'Settlement Status Approval', field: 'settlementStatusAproval', sortable: true },
-        //     { title: 'Balance', field: 'balance', sortable: true },
-        //     { title: 'Settlement No', field: 'settlementNo', sortable: true },
-        //     { title: 'Advance Date', field: 'advanceDate', sortable: true },
-        //     { title: 'Settlement Date', field: 'settlementDate', sortable: true },
-        // ];
         this._progressRef = this._ngProgressService.ref();
-        // this.requestList = this.getListAdvanceSettlement;
-        // this.requestSort = this.sortAdSettList;
+
     }
     ngOnInit() {
         this._activedRouter.params.subscribe((param: any) => {
@@ -64,9 +38,6 @@ export class ShareBusinessAdvanceSettlementInforComponent extends AppList {
         });
 
     }
-    // ngAfterContentInit() {
-    //     this.getListAdvanceSettlement(this.jobId);
-    // }
     getListAdvanceSettlement(id: any) {
         this._documentRepo.getListAdvanceSettlement(id)
             .pipe(
@@ -75,17 +46,8 @@ export class ShareBusinessAdvanceSettlementInforComponent extends AppList {
             ).subscribe(
                 (res: AdvanceSettlement[]) => {
                     console.log(res);
-                    if (res instanceof Error) {
-
-                    } else {
-                        this.adSett = this._sortService.sort(res.map((item: any) => new AdvanceSettlement(item)), 'orderNumberProcessed', true);
-                    }
+                    this.adSett = res;
                 },
             );
     }
-
-    // sortAdSettList(sortField: string, order: boolean) {
-    //     this.adSett = this._sortService.sort(this.adSett, sortField, order);
-    // }
-
 }

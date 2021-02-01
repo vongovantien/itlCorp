@@ -1472,7 +1472,7 @@ namespace eFMS.API.Documentation.DL.Services
             var query = (from SC in surchargeRepository.Get()
                         join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
                         join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
-
+                        join US in userRepository.Get() on OP.UserCreated equals US.Id
                         join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
                         join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
 
@@ -1482,7 +1482,7 @@ namespace eFMS.API.Documentation.DL.Services
                             adcurrency = ADP.AdvanceCurrency,
                             adDate = ADP.RequestDate,
                             adStatus = ADP.StatusApproval,
-                            rqt = ADP.Requester,
+                            rqt = US.Username,
                             smDate = SMP.RequestDate,
                             smNo = SMP.SettlementNo,
                             smcurrency = SMP.SettlementCurrency,
@@ -1498,16 +1498,7 @@ namespace eFMS.API.Documentation.DL.Services
                             rqter = g.Key.rqt , settmDate = g.Key.smDate, settmNo = g.Key.smNo, smCurren = g.Key.smcurrency , settmStatus = g.Key.smStatus,
                             advanAmount =g.Key.adAmount , settmAmount = g.Key.smAmount
                         }).ToList();
-                    
-                        //select new { adNo = ADP.AdvanceNo, adAmount =ADP.AdvanceCurrency, adDate = ADP.RequestDate, adStatus = ADP.StatusApproval,
-                        //rqt = ADP.Requester , smDate = SMP.RequestDate, smNo = SMP.SettlementNo, smAmount = SMP.SettlementCurrency , smStatus = SMP.StatusApproval,
-                        //amount = ADR.Amount , smAmount2 = SMP.Amount 
-                        //};
-                         // where SC.Hblid == (from OP in opsTransactionRepository.Get()  where OP.Id == JobID ) && SC.SettlementCode != null
-                         //group ADR by ADR.Amount into newAdr
-                         //orderby newAdr.Key
-                         //select newAdr
-                         //  select OP.Hblid;
+                                      
             if (query == null)
             {
                 return null;
@@ -1521,7 +1512,7 @@ namespace eFMS.API.Documentation.DL.Services
                 SettlemenDate = x.settmDate,
                 SettlementAmount = x.settmAmount + x.smCurren,
                 SettlementNo = x.settmNo,
-                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount) ,
+                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount) +  x.advanCurren,
                 SettleStatusApproval = x.advanStatus,
                 StatusApproval = x.settmStatus,
             }).ToList();
