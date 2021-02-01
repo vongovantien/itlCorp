@@ -1547,6 +1547,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
             var dataShipment = QueryDataOperation(criteria);
+            var LstSurcharge = surCharge.Get();
+            var LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
             foreach (var item in dataShipment)
             {
                 GeneralReportResult data = new GeneralReportResult();
@@ -1567,7 +1569,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 #region -- Phí Selling trước thuế --
                 decimal _revenue = 0;
-                var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
+                // var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
+                var _chargeSell = LookupSurchage[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
                 foreach (var charge in _chargeSell)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
@@ -1580,7 +1583,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 #region -- Phí Buying trước thuế --
                 decimal _cost = 0;
-                var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.Hblid);
+                // var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.Hblid);
+                var _chargeBuy = LookupSurchage[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                 foreach (var charge in _chargeBuy)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
@@ -1595,7 +1599,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 #region -- Phí OBH sau thuế --
                 decimal _obh = 0;
-                var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.Hblid);
+                //var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.Hblid);
+                var _chargeObh = LookupSurchage[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                 foreach (var charge in _chargeObh)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
@@ -1687,6 +1692,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataShipment = QueryDataDocumentation(criteria);
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
+            var LstSurcharge = surCharge.Get();
+            var LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
             foreach (var item in dataShipment)
             {
                 GeneralReportResult data = new GeneralReportResult();
@@ -1709,7 +1716,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 #region -- Phí Selling trước thuế --
                 decimal _revenue = 0;
-                var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
+                //var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
+                var _chargeSell = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
                 foreach (var charge in _chargeSell)
                 {
                     decimal UnitPrice = charge.UnitPrice ?? 0;
@@ -1722,7 +1730,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 #region -- Phí Buying trước thuế --
                 decimal _cost = 0;
-                var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
+                //var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
+                var _chargeBuy = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                 foreach (var charge in _chargeBuy)
                 {
                     decimal UnitPrice = charge.UnitPrice ?? 0;
@@ -1737,7 +1746,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 #region -- Phí OBH sau thuế --
                 decimal _obh = 0;
-                var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.HblId);
+                //var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.HblId);
+                var _chargeObh = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                 foreach (var charge in _chargeObh)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
