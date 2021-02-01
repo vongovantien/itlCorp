@@ -20,6 +20,7 @@ using eFMS.API.Common.Models;
 using eFMS.API.Common;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -1581,6 +1582,50 @@ namespace eFMS.API.Documentation.DL.Services
             }).ToList();
             return data;
         }
-  
+
+        public int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs)
+        {
+            mblNo = string.Empty;
+            advs = new List<string>();
+            int errorCode = 0;  // 1|2
+            bool hasChargeSynced = false;
+            bool hasAdvanceRequest = false;
+
+            if (DataContext.Any(x => x.Id == model.Id
+            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+            && ((x.Mblno ?? "").ToLower() != (model.Mblno ?? "") || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))
+            {
+                OpsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
+                if (shipment != null)
+                {
+                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                }
+
+                if (hasChargeSynced)
+                {
+                    errorCode = 1;
+                    mblNo = shipment.Mblno;
+                }
+                else
+                {
+                    var query = from advR in accAdvanceRequestRepository.Get(x => x.JobId == shipment.JobNo)
+                                join adv in accAdvancePaymentRepository.Get(x => x.SyncStatus == "Synced") on advR.AdvanceNo equals adv.AdvanceNo
+                                select adv.AdvanceNo;
+
+                    if (query != null && query.Count() > 0)
+                    {
+                        hasAdvanceRequest = true;
+                        advs = query.Distinct().ToList();
+                    }
+                    if (hasAdvanceRequest)
+                    {
+                        errorCode = 2;
+                        mblNo = shipment.Mblno;
+                    }
+                }
+            }
+
+            return errorCode;
+        }
     }
 }
