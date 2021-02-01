@@ -251,7 +251,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (containers: Container[]) => {
                     this.containers = containers;
-                    console.log(this.containers);
                 }
             );
     }
@@ -714,6 +713,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             charge.duplicateInvoice = false;
             if (this.checkSpecialCaseCharge(charge)) {
                 valid = true;
+                continue;
             }
             if (
                 !charge.paymentObjectId
@@ -770,7 +770,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     c.duplicateInvoice = false;
                 }
             });
-            console.log(arrayDuplicates);
         } else valid = true;
 
         return valid;

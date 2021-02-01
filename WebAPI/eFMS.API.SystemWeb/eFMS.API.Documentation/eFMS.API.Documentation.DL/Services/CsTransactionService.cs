@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -402,13 +403,33 @@ namespace eFMS.API.Documentation.DL.Services
                         var hsSurcharge = transactionDetailService.UpdateSurchargeOfHousebill(modelHouse);
                     }
 
-                    DataContext.SubmitChanges();
+                    // Update MBL Advance
+
+                    IQueryable<AcctAdvanceRequest> advR = accAdvanceRequestRepository.Where(x => x.JobId == transaction.JobNo);
+                    if(advR != null && advR.Count() > 0)
+                    {
+                        foreach (var item in advR)
+                        {
+                            item.Mbl = transaction.Mawb;
+                            item.DatetimeModified = DateTime.Now;
+                            item.UserModified = currentUser.UserID;
+
+                            accAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
+                        }
+                    }
+
+                    hsTrans = DataContext.SubmitChanges();
+
+                    if(hsTrans.Success) {
+                        accAdvanceRequestRepository.SubmitChanges();
+                    }
                 }
 
                 return hsTrans;
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_Update_CsTransaction_Log",ex.ToString());
                 return new HandleState(ex.Message);
             }
         }
@@ -1024,7 +1045,8 @@ namespace eFMS.API.Documentation.DL.Services
                         PODName = pod.NameEn,
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
-                        PackageQty = masterBill.PackageQty
+                        PackageQty = masterBill.PackageQty,
+                        BookingNo = masterBill.BookingNo
                     };
 
             return query;
@@ -1427,6 +1449,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
+                    && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
@@ -1449,6 +1472,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
                            (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1607,6 +1631,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     &&
                     (
                            (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1628,6 +1653,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
                            (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -2035,6 +2061,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 string hawbCurrentMax = GetMaxHAWB();
 
+                string hawbSeaExportCurrent = string.Empty;
                 foreach (var item in detailTrans)
                 {
                     Guid oldHouseId = item.Id;
@@ -2057,6 +2084,19 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
                         hawbCurrentMax = item.Hwbno;
+                    }
+                    if(model.TransactionType == "SFE" || model.TransactionType == "SLE" && model.TransactionType == "SCE")
+                    {
+                        string podCode = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault()?.Code;
+                        if(string.IsNullOrEmpty(podCode))
+                        {
+                            item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                        }
+                        else
+                        {
+                            item.Hwbno = GenerateHBLNoSeaExport(podCode, hawbSeaExportCurrent);
+                            hawbSeaExportCurrent = item.Hwbno;
+                        }
                     }
                     else
                     {
@@ -2174,6 +2214,52 @@ namespace eFMS.API.Documentation.DL.Services
             }
             hblNo = GenerateID.GenerateHBLNo(count);
             return hblNo;
+        }
+
+        public string GenerateHBLNoSeaExport(string podCode, string currentHwbNo)
+        {
+            if (string.IsNullOrEmpty(podCode) || podCode == "null")
+            {
+                return null;
+            }
+            string keyword = ((string.IsNullOrEmpty(podCode) || podCode == "null") ? "" : podCode) + DateTime.Now.ToString("yyMM");
+            string hbl = "ITL" + keyword;
+
+            var codes = csTransactionDetailRepo.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno).ToList();
+            var oders = new List<int>();
+
+            if(!string.IsNullOrEmpty(currentHwbNo))
+            {
+                codes.Add(currentHwbNo);
+            }
+            if (codes != null & codes.Count > 0)
+            {
+                foreach (var code in codes)
+                {
+                    // Lấy 3 ký tự cuối
+                    if (code.Length > 7 && isNumeric(code.Substring(code.Length - 3)))
+                    {
+                        oders.Add(int.Parse(code.Substring(code.Length - 3)));
+                    }
+                }
+                if (oders.Count() > 0)
+                {
+                    int maxCurrentOder = oders.Max();
+
+                    hbl += (maxCurrentOder + 1).ToString("000");
+                }
+                else
+                {
+                    hbl += "001";
+                }
+
+            }
+            else
+            {
+                hbl += "001";
+            }
+
+            return hbl;
         }
 
         private bool isNumeric(string n)

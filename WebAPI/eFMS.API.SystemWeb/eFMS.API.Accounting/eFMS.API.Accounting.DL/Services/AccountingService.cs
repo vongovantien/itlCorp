@@ -977,8 +977,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     foreach (var surcharge in surcharges)
                                     {
-                                        surcharge.PaySyncedFrom = "SETTLEMENT";
-                                        surcharge.SyncedFrom = "SETTLEMENT";
+                                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                        {
+                                            //Charge OBH sẽ lưu vào PaySyncedFrom
+                                            surcharge.PaySyncedFrom = "SETTLEMENT";
+                                        }
+                                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                                        {
+                                            //Charge BUY sẽ lưu vào SyncedFrom
+                                            surcharge.SyncedFrom = "SETTLEMENT";
+                                        }
                                         surcharge.UserModified = currentUser.UserID;
                                         surcharge.DatetimeModified = DateTime.Now;
 
