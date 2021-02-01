@@ -155,6 +155,11 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
+            string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
+            if (msgCheckUpdateMawb.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
 
             var hs = transactionService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
