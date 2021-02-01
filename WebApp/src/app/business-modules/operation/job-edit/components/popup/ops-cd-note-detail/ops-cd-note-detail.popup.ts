@@ -317,4 +317,19 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                 }
             );
     }
+
+    previewCdNote(data: string) {
+        this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (res != null && res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
 }

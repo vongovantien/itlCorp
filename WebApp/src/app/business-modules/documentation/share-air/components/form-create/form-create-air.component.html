@@ -15,14 +15,14 @@
                             <label required>MAWB No </label>
                             <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)"
                                 placeholder="xxx-xxxxxxxx">
-                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidMawb' 
+                            <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidMawb' 
                             ">
                                 MAWB inputted is not correct format
-                            </div>
-                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
+                            </div> -->
+                            <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
                             mawb.errors | equalError:'pattern':''">
                                 MAWB must be xxx-xxxxxxxx
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div class="col-md-4">

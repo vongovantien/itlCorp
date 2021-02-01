@@ -183,7 +183,8 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
             list.ForEach(fe => {
-                fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
+                fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
+                // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
             });
             var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -193,6 +194,43 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private decimal CalculateTotal(decimal? unitPrice, decimal quantity, decimal? vat, string currency)
+        {
+            decimal? totalAmount = 0;
+            decimal vatrate = vat ?? 0;
+            if (vat < 0)
+            {
+                if(currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                   
+                    totalAmount = NumberHelper.RoundNumber(unitPrice * quantity ?? 0) + NumberHelper.RoundNumber(Math.Abs(vatrate), 0);
+                }
+                else
+                {
+                    totalAmount = NumberHelper.RoundNumber(unitPrice * quantity ?? 0) + NumberHelper.RoundNumber(Math.Abs(vatrate), 2);
+                }
+            }
+            else
+            {
+                if (currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 0);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100) ,0);
+
+                    totalAmount = netAmount + vatAmount;
+                }
+                else
+                {
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 2);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100), 2);
+
+                    totalAmount = netAmount + vatAmount;
+                }
+            }
+
+            return totalAmount ?? 0;
         }
 
         /// <summary>
@@ -394,20 +432,24 @@ namespace eFMS.API.Documentation.Controllers
                     }
 
                     string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
-                    DateTime? dateToPaseInvoice = null;
-                    if (DateTime.TryParse(InvoiceDate, out temp))
+                    if(!string.IsNullOrEmpty(InvoiceDate))
                     {
-                        CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPaseInvoice = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
-                    }
-                    else
-                    {
-                        CultureInfo culture = new CultureInfo("es-ES");
-                        if (ExchangeDate != null)
+                        DateTime? dateToPaseInvoice = null;
+                        if (DateTime.TryParse(InvoiceDate, out temp))
                         {
-                            dateToPaseInvoice = DateTime.Parse(InvoiceDate, culture);
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            dateToPaseInvoice = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                        }
+                        else
+                        {
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            if (ExchangeDate != null)
+                            {
+                                dateToPaseInvoice = DateTime.Parse(InvoiceDate, culture);
+                            }
                         }
                     }
+              
                     double? UnitPrice = worksheet.Cells[row, 8].Value != null ? (double?)worksheet.Cells[row, 8].Value : (double?)null;
                     double? Vatrate = worksheet.Cells[row, 10].Value != null ? (double?)worksheet.Cells[row, 10].Value : (double?)null;
                     double? TotalAmount = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;

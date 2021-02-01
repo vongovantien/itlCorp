@@ -181,6 +181,19 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Preview CD Note Local and USD currency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewOPSCDNoteWithCurrency")]
+        public IActionResult PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria)
+        {
+            var result = cdNoteServices.PreviewOPSCDNoteWithCurrency(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// check allow delete an existed item
         /// </summary>
         /// <param name="cdNoteId"></param>

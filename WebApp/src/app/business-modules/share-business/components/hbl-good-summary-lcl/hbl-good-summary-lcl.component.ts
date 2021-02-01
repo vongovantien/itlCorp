@@ -63,16 +63,6 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                 }
             }
         );
-
-        this._store.select(fromStore.getHBLContainersState)
-            .pipe(skip(1))
-            .subscribe(
-                (containers: Container[]) => {
-                    console.log("list container hbl", containers);
-                    this.containers = containers;
-                }
-            );
-
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
 
         this._store.select(fromStore.getDetailHBlState)
