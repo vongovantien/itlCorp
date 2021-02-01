@@ -548,7 +548,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                         item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
-                        var d = DataContext.Update(item, x => x.Id == item.Id);
+                        var d = DataContext.Update(item, x => x.Id == item.Id, false);
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
