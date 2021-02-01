@@ -1,29 +1,31 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef, ComponentFactoryResolver } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
-import { NgForm, AbstractControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
-import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
+
+import { DocumentationRepo } from '@repositories';
+import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 import { ConfirmPopupComponent, InfoPopupComponent, SubHeaderComponent } from '@common';
 import { OpsTransaction, CsTransactionDetail, CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
-import * as fromShareBussiness from './../../share-business/store';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
+import { InjectViewContainerRefDirective } from '@directives';
+import { RoutingConstants } from '@constants';
+import { ICanComponentDeactivate } from '@core';
+import { AppForm } from '@app';
 
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
-import { AppForm } from 'src/app/app.form';
-import { ICanComponentDeactivate } from '@core';
-import { combineLatest, Observable, of } from 'rxjs';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
 import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
-import _groupBy from 'lodash/groupBy';
-import { RoutingConstants } from '@constants';
+import { combineLatest, Observable, of } from 'rxjs';
+import * as fromShareBussiness from './../../share-business/store';
 
+import _groupBy from 'lodash/groupBy';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -32,19 +34,14 @@ import { RoutingConstants } from '@constants';
 export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit, ICanComponentDeactivate {
 
     @ViewChild(PlSheetPopupComponent) plSheetPopup: PlSheetPopupComponent;
-    @ViewChild('confirmCancelUpdate') confirmCancelJobPopup: ConfirmPopupComponent;
-    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild('confirmDelete') confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild('confirmLockShipment') confirmLockShipmentPopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessSellingChargeComponent) sellingChargeComponent: ShareBussinessSellingChargeComponent;
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
 
     @ViewChild(JobManagementFormEditComponent) editForm: JobManagementFormEditComponent;
-    @ViewChild('addOpsForm') formOps: NgForm;
-    @ViewChild('notAllowUpdate') infoPoup: InfoPopupComponent;
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
 
+    @ViewChild(InjectViewContainerRefDirective) public confirmContainerRef: InjectViewContainerRefDirective;
+    @ViewChild('advSettleContainer', { read: ViewContainerRef }) public advSettleContainerRef: ViewContainerRef;
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];
 
@@ -72,6 +69,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
+        private readonly _viewContainerRef: ViewContainerRef,
     ) {
         super();
 
@@ -172,9 +170,15 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (respone: boolean) => {
                     if (respone === true) {
                         this.deleteMessage = `Do you want to delete job No <span class="font-weight-bold">${this.opsTransaction.jobNo}</span>?`;
-                        this.confirmDeleteJobPopup.show();
+
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                            body: this.deleteMessage
+                        }, () => { this.onDeleteJob(); })
                     } else {
-                        this.canNotDeleteJobPopup.show();
+
+                        this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                            body: 'You are not allow to delete this job',
+                        })
                     }
                 }
             );
@@ -185,7 +189,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             .subscribe(
                 (response: CommonInterface.IResult) => {
                     if (response.status) {
-                        this.confirmDeleteJobPopup.hide();
                         this.router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
                     }
                 }
@@ -197,7 +200,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     confirmCancelJob() {
-        this.confirmCancelJobPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'Unsaved data will be lost. Are you sure want to leave?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.confirmCancel();
+        })
     }
 
     saveShipment() {
@@ -209,7 +217,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.editForm.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPoup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                body: this.invalidFormText,
+                title: 'Cannot Create Job'
+            })
             return;
         }
 
@@ -345,15 +356,18 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     lockShipment() {
-        this.confirmLockShipmentPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent,
+            this.confirmContainerRef.viewContainerRef,
+            {
+                body: 'Do you want to lock this shipment ?',
+                labelConfirm: 'Yes'
+            },
+            () => {
+                this.opsTransaction.isLocked = true;
+                this.updateShipment();
+            })
     }
 
-    onLockShipment() {
-        this.opsTransaction.isLocked = true;
-        this.confirmLockShipmentPopup.hide();
-
-        this.updateShipment();
-    }
 
     showListContainer() {
         this.containerPopup.mblid = this.jobId;
@@ -434,6 +448,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             this.getShipmentDetails(this.jobId);
             this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
         }
+
+        if (tabName === 'advance-settle') {
+            this.getAdvanceSettleInfoComponent();
+        } else {
+            this._viewContainerRef.clear();
+        }
     }
 
     onOpePLPrint() {
@@ -467,7 +487,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
         if (isEdited) {
-            this.confirmCancelJobPopup.show();
+            this.confirmCancelJob();
         } else {
             this.isCancelFormPopupSuccess = true;
             this.gotoList();
@@ -475,7 +495,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     confirmCancel() {
-        this.confirmCancelJobPopup.hide();
         this.isCancelFormPopupSuccess = true;
 
         if (this.nextState) {
@@ -492,18 +511,25 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             return of(true);
         }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
-        if (this.isCancelFormPopupSuccess || !this.isDuplicate) {
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
         if (isEdited && !this.isCancelFormPopupSuccess) {
-            this.confirmCancelJobPopup.show();
+            this.confirmCancelJob();
             return;
         }
         return of(!isEdited);
     }
 
     confirmDuplicate() {
-        this.confirmDuplicatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'The system will open the Job Create Screen. Do you want to leave ?',
+            title: 'Duplicate OPS detail',
+            labelConfirm: 'Yes'
+        },
+            () => {
+                this.onSubmitDuplicateConfirm();
+            })
     }
 
     onSubmitDuplicateConfirm() {
@@ -512,6 +538,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'job-edit' }, this.action)
         });
-        this.confirmDuplicatePopup.hide();
+    }
+
+    async getAdvanceSettleInfoComponent() {
+        const { ShareBusinessAdvanceSettlementInforComponent } = await import('./../../share-business/components/advance-settlement-info/advance-settlement-info.component');
+        this.renderDynamicComponent(ShareBusinessAdvanceSettlementInforComponent, this.advSettleContainerRef)
     }
 }
