@@ -24,7 +24,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
     @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-    
+
     jobId: string = null;
     cdNote: string = null;
     confirmMessage: string = '';
@@ -207,7 +207,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                 this.reportContainerRef.viewContainerRef.clear();
             });
     }
-    
+
     preview(isOrigin: boolean) {
         this.CdNoteDetail.totalCredit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
         this.CdNoteDetail.totalDebit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
@@ -319,7 +319,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     }
 
     previewCdNote(data: string) {
-        this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
+        this._documentationRepo.previewCDNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data }, false)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
