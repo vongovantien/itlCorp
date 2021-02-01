@@ -73,6 +73,7 @@ import { AppComboGridComponent } from '@common';
 import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
 import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ShareBusinessAdvanceSettlementInforComponent } from './components/advance-settlement-info/advance-settlement-info.component';
 
 
 
@@ -120,7 +121,8 @@ const COMPONENTS = [
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     ShareBusinessAttachListHouseBillComponent,
     ShareBussinessInputDailyExportPopupComponent,
-    ShareBussinessPaymentMethodPopupComponent
+    ShareBussinessPaymentMethodPopupComponent,
+    ShareBusinessAdvanceSettlementInforComponent
 ];
 
 

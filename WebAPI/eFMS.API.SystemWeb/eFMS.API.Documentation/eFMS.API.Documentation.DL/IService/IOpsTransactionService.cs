@@ -8,6 +8,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -34,5 +35,7 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle ImportDuplicateJob(OpsTransactionModel model);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
         int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
+        List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID);
+       
     }
 }

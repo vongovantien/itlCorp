@@ -18,6 +18,8 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.API.Common.Models;
 using eFMS.API.Common;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -48,8 +50,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
+        private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
-
+        private readonly IContextBase<AcctAdvancePayment> acctAdvancePayment;
+        private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -71,8 +75,12 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysOffice> sysOffice,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
-            IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<AcctAdvancePayment> _acctAdvancePayment,
+            IContextBase<AcctSettlementPayment> _acctSettlementPayment,
+            IContextBase<OpsTransaction> _opsTransactionRepository,
+            IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository
+            ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -98,7 +106,10 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             userlevelRepository = userlevelRepo;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
-            accAdvancePaymentRepository = accAdvancePaymentRepo;
+            acctAdvancePayment = _acctAdvancePayment;
+            acctSettlementPayment = _acctSettlementPayment;
+            opsTransactionRepository = _opsTransactionRepository;
+            accAdvancePaymentRepository = _accAdvancePaymentRepository;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1518,6 +1529,60 @@ namespace eFMS.API.Documentation.DL.Services
             return containers;
         }
 
+        public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
+        {
+            var query = (from SC in surchargeRepository.Get()
+                        join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
+                        join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
+                        join US in userRepository.Get() on OP.UserCreated equals US.Id
+                        join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
+                        join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
+
+                        where OP.Id == JobID && SC.SettlementCode != null
+                        group SC by new { SC.Hblno, SC.Mblno, ADR.Hblid, 
+                            adNo = ADP.AdvanceNo,
+                            adcurrency = ADP.AdvanceCurrency,
+                            adDate = ADP.RequestDate,
+                            adStatus = ADP.StatusApproval,
+                            rqt = US.Username,
+                            smDate = SMP.RequestDate,
+                            smNo = SMP.SettlementNo,
+                            smcurrency = SMP.SettlementCurrency,
+                            smStatus = SMP.StatusApproval,
+                            adAmount= ADR.Amount,
+                            smAmount= SMP.Amount
+
+                        } into g select new {
+                            advanNo = g.Key.adNo,
+                            advanCurren =g.Key.adcurrency,
+                            advanDate = g.Key.adDate,
+                            advanStatus = g.Key.adStatus,
+                            rqter = g.Key.rqt , settmDate = g.Key.smDate, settmNo = g.Key.smNo, smCurren = g.Key.smcurrency , settmStatus = g.Key.smStatus,
+                            advanAmount =g.Key.adAmount , settmAmount = g.Key.smAmount
+                        }).ToList();
+                                      
+            if (query == null)
+            {
+                return null;
+            }
+            var data =  query.Select(x => new OpsAdvanceSettlementModel()
+                {
+                AdvanceNo = x.advanNo,
+                AdvanceAmount = Convert.ToDecimal(x.advanAmount),
+                adCurrency = x.advanCurren,
+                AdvanceDate = x.advanDate,
+                Requester = x.rqter,
+                SettlemenDate = x.settmDate,
+                SettlementAmount = Convert.ToDecimal(x.settmAmount),
+                setCurrency = x.smCurren,
+                SettlementNo = x.settmNo,
+                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount),
+                SettleStatusApproval = x.advanStatus,
+                StatusApproval = x.settmStatus,
+            }).ToList();
+            return data;
+        }
+
         public int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs)
         {
             mblNo = string.Empty;
@@ -1526,14 +1591,14 @@ namespace eFMS.API.Documentation.DL.Services
             bool hasChargeSynced = false;
             bool hasAdvanceRequest = false;
 
-            if (DataContext.Any(x => x.Id == model.Id 
-            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED 
-            && ( (x.Mblno ?? "").ToLower() != (model.Mblno ?? "")  || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))    
+            if (DataContext.Any(x => x.Id == model.Id
+            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+            && ((x.Mblno ?? "").ToLower() != (model.Mblno ?? "") || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))
             {
                 OpsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
                 if (shipment != null)
                 {
-                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo  && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
                 }
 
                 if (hasChargeSynced)

@@ -1033,9 +1033,7 @@ export class DocumentationRepo {
         );
     }
 
-    previewOPSCdNote(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOPSCDNoteWithCurrency`, body).pipe(
-            map((data: any) => data)
-        );
+    getListAdvanceSettlement(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/AdvanceSettlement`, { jobId: jobId });
     }
 }
