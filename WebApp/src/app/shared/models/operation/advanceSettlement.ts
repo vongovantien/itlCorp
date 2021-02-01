@@ -9,6 +9,8 @@ export class AdvanceSettlement {
     balance: number = 0;
     advanceDate: Date = null;
     settlemenDate: Date = null;
+    adCurrency: string = '';
+    setCurrency: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

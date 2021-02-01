@@ -1506,13 +1506,15 @@ namespace eFMS.API.Documentation.DL.Services
             var data =  query.Select(x => new OpsAdvanceSettlementModel()
                 {
                 AdvanceNo = x.advanNo,
-                AdvanceAmount =x.advanAmount + x.advanCurren,
+                AdvanceAmount = Convert.ToDecimal(x.advanAmount),
+                adCurrency = x.advanCurren,
                 AdvanceDate = x.advanDate,
                 Requester = x.rqter,
                 SettlemenDate = x.settmDate,
-                SettlementAmount = x.settmAmount + x.smCurren,
+                SettlementAmount = Convert.ToDecimal(x.settmAmount),
+                setCurrency = x.smCurren,
                 SettlementNo = x.settmNo,
-                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount) +  x.advanCurren,
+                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount),
                 SettleStatusApproval = x.advanStatus,
                 StatusApproval = x.settmStatus,
             }).ToList();
