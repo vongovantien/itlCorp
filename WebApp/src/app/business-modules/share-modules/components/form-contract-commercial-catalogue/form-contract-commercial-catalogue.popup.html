@@ -413,7 +413,7 @@
                         </span>
                     </button>
                     <button
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                        *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                         type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
                         (click)="showRejectCommentPopup()">
                         <span>

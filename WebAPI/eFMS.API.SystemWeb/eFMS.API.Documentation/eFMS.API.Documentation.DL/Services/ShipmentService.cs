@@ -756,7 +756,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
-        private Expression<Func<OpsTransaction, bool>> GetQueryOPSTransactionOperation(GeneralReportCriteria criteria)
+        private Expression<Func<OpsTransaction, bool>> GetQueryOPSTransactionOperation(GeneralReportCriteria criteria, bool? fromCost)
         {
             Expression<Func<OpsTransaction, bool>> queryOpsTrans = q => true;
             // ServiceDate/DatetimeCreated Search
@@ -773,7 +773,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
             // Search Customer
-            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost != true)
             {
                 queryOpsTrans = queryOpsTrans.And(q => q.CustomerId == criteria.CustomerId);
             }
@@ -1537,7 +1537,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria,null);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -1790,11 +1790,20 @@ namespace eFMS.API.Documentation.DL.Services
             // Filter data without customerId
             //var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             //criteriaNoCustomer.CustomerId = null;
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria,null);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
         }
+
+        private IQueryable<OpsTransaction> QueryDataOperationCost(GeneralReportCriteria criteria, bool fromCost)
+        {
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, true);
+
+            var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
+            return queryShipment;
+        }
+
 
         public List<JobProfitAnalysisExportResult> GetDataJobProfitAnalysis(GeneralReportCriteria criteria)
         {
@@ -2433,22 +2442,22 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- Export Summary Of Costs Incurred
         private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurredOperation(GeneralReportCriteria criteria)
         {
-            var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            var dataShipment = QueryDataOperationCost(criteria, true);
             if (dataShipment == null) return null;
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
-            var detailLookupSur = chargeData.ToLookup(q => q.JobId);
+            var detailLookupSur = chargeData.ToLookup(q => q.HBLID);
             var dataCustom = customsDeclarationRepo.Get().ToList();
             var partnerData = catPartnerRepo.Get();
             var detailLookupPartner = partnerData.ToLookup(q => q.Id);
             var DetailLookupPort = port.ToLookup(q => q.Id);
             foreach (var item in dataShipment)
             {
-                if (!string.IsNullOrEmpty(item.JobNo))
+                if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
-                    foreach (var charge in detailLookupSur[item.JobNo])
+                    foreach (var charge in detailLookupSur[item.Hblid])
                     {
                         SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
                         var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
@@ -2460,22 +2469,25 @@ namespace eFMS.API.Documentation.DL.Services
                         data.PackageContainer = charge.PackageContainer;
                         var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         decimal? percent = 0;
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                         if (charge.VATRate > 0)
                         {
-                            percent = (charge.VATRate * 10) / 100;
-                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
-                            if (charge.Currency != "VND")
+                            percent = charge.VATRate / 100;
+                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                            if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
-                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 3);
+                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 2);
+
+                            }
+                            else
+                            {
+                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0);
                             }
                         }
                         else
                         {
-                            charge.VATAmount = charge.VATRate;
+                            charge.VATAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(charge.VATRate ?? 0) : NumberHelper.RoundNumber(charge.VATRate ?? 0, 2));
                         }
-                        charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
+                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0, 2));
                         foreach (var partner in detailLookupPartner[_partnerId])
                         {
                             data.SupplierCode = partner?.AccountNo;
@@ -2532,8 +2544,7 @@ namespace eFMS.API.Documentation.DL.Services
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
-            query = chg => chg.Service == criteria.Service;
-            var chargeData = GetChargeOBHSellPayee(query, null);
+            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId)? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
             var detailLookupSur = chargeData.ToLookup(q => q.HBLID);
             var dataCustom = customsDeclarationRepo.Get().ToList();
             var partnerData = catPartnerRepo.Get();
@@ -2553,28 +2564,27 @@ namespace eFMS.API.Documentation.DL.Services
                         data.GrossWeight = charge.GrossWeight;
                         data.CBM = charge.CBM;
                         data.PackageContainer = charge.PackageContainer;
-                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        //charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
-                        charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
-                        if (charge.Currency != "VND")
-                        {
-                            charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 2);
-                        }
-                        else
-                        {
-                            charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 0);
-                        }
+                        decimal? percent = 0;
                         if (charge.VATRate > 0)
                         {
-                            charge.VATAmount = (charge.VATRate * charge.NetAmount) / 100;
+                            percent = charge.VATRate / 100;
+                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                            if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 2);
+
+                            }
+                            else
+                            {
+                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0);
+                            }
                         }
                         else
                         {
-                            charge.VATAmount = charge.VATRate != null ? Math.Abs(charge.VATRate.Value) : 0;
-                            charge.VATAmount = charge.VATAmount * _exchangeRate;
+                            charge.VATAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(charge.VATRate ?? 0) : NumberHelper.RoundNumber(charge.VATRate ?? 0, 2));
                         }
-                 
+                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0, 2));
+
                         foreach (var partner in detailLookupPartner[_partnerId])
                         {
                             data.SupplierCode = partner?.AccountNo;
@@ -2673,7 +2683,7 @@ namespace eFMS.API.Documentation.DL.Services
                                            Currency = sur.CurrencyId,
                                            InvoiceNo = sur.InvoiceNo,
                                            Note = sur.Notes,
-                                           CustomerID = sur.PaymentObjectId,
+                                           CustomerID = sur.Type =="OBH" ? sur.PayerId : sur.PaymentObjectId,
                                            ServiceDate = ops.ServiceDate,
                                            CreatedDate = ops.DatetimeCreated,
                                            TransactionType = null,
@@ -2692,7 +2702,7 @@ namespace eFMS.API.Documentation.DL.Services
                                        };
             if (query != null)
             {
-                queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+                queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.CustomerID)).Where(query);
             }
             if (isOBH != null)
             {
@@ -2720,7 +2730,7 @@ namespace eFMS.API.Documentation.DL.Services
                                           Currency = sur.CurrencyId,
                                           InvoiceNo = sur.InvoiceNo,
                                           Note = sur.Notes,
-                                          CustomerID = sur.PaymentObjectId,
+                                          CustomerID = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
                                           ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
                                           CreatedDate = cst.DatetimeCreated,
                                           TransactionType = cst.TransactionType,
@@ -2749,7 +2759,6 @@ namespace eFMS.API.Documentation.DL.Services
                                       };
             if (query != null)
             {
-                queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
                 queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.CustomerID)).Where(query);
             }
             if (isOBH != null)
@@ -2895,7 +2904,6 @@ namespace eFMS.API.Documentation.DL.Services
             SummaryOfRevenueModel ObjectSummaryRevenue = new SummaryOfRevenueModel();
             List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
-            query = chg => chg.Service == criteria.Service;
             var chargeData = GetChargeOBHSellPayer(query, null);
             var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
             var lookupResults = results.ToLookup(q => q.Key.HBLID);
