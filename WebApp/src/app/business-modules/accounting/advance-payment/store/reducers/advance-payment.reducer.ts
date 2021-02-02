@@ -1,8 +1,5 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as Types from '../actions/';
-
-
-
 export interface AdvancePaymentListState {
     advances: any
     isLoading: boolean;
@@ -24,7 +21,7 @@ export const initialState: AdvancePaymentListState = {
 const advancePaymentReducer = createReducer(
     initialState,
     on(Types.SearchListAdvancePayment, (state: AdvancePaymentListState, payload: any) => {
-        return { ...state, dataSearch: payload }
+        return { ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 } }
     }),
     on(
         Types.LoadListAdvancePayment, (state: AdvancePaymentListState, payload: CommonInterface.IParamPaging) => {
