@@ -27,8 +27,6 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from '../compo
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 import { catchError, finalize, map, } from 'rxjs/operators';
-
-
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
@@ -132,7 +130,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         this.dataSearch = data; // Object.assign({}, data, { requester: this.userLogged.id });
         this.getListSettlePayment();
     }
-
 
     sortByCustomClearance(sortData: CommonInterface.ISortData): void {
         if (!!sortData.sortField) {

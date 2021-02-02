@@ -54,6 +54,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePayment;
         private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
+        private readonly IContextBase<CatContract> catContractRepository;
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -79,7 +80,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> _acctAdvancePayment,
             IContextBase<AcctSettlementPayment> _acctSettlementPayment,
             IContextBase<OpsTransaction> _opsTransactionRepository,
-            IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository
+            IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository,
+            IContextBase<CatContract> catContractRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -110,6 +112,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctSettlementPayment = _acctSettlementPayment;
             opsTransactionRepository = _opsTransactionRepository;
             accAdvancePaymentRepository = _accAdvancePaymentRepository;
+            catContractRepository = catContractRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -699,7 +702,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (customer != null)
             {
                 opsTransaction.CustomerId = customer.Id;
-                opsTransaction.SalemanId = customer.SalePersonId;
+
             }
             var port = placeRepository.Get(x => x.Code == model.Gateway).FirstOrDefault();
             if (port != null)
@@ -778,6 +781,7 @@ namespace eFMS.API.Documentation.DL.Services
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403);
             var result = new HandleState();
+
             try
             {
                 int i = 0;
@@ -785,6 +789,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     // Check if customer existed
                     var customer = new CatPartner();
+                    CatContract customerContract = new CatContract();
+
                     if (item.AccountNo == null)
                     {
                         customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
@@ -799,7 +805,19 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(notFoundPartnerTaxCodeMessages);
                     }
 
-                    var existedMessage = CheckExist(null, item.Mblid, item.Hblid);
+                    // Check contract for that customer.
+                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId 
+                    && x.SaleService.Contains("CL") 
+                    && x.Active == true 
+                    && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                    if(customerContract == null )
+                    {
+                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
+
+                    string existedMessage = CheckExist(null, item.Mblid, item.Hblid);
                     if (existedMessage != null)
                     {
                         return new HandleState(existedMessage);
@@ -816,6 +834,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var code = PermissionExtention.GetPermissionCommonItem(model, permissionRange, currentUser);
                         if (code == 403) return new HandleState(403);
                         string productService = SetProductServiceShipment(item);
+
                         if (item.CargoType == null && item.ServiceType == "Sea")
                         {
                             result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
@@ -826,20 +845,28 @@ namespace eFMS.API.Documentation.DL.Services
                             result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                             return result;
                         }
-                        var opsTransaction = GetNewShipmentToConvert(productService, item);
+
+                        OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
                         opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
-                        DataContext.Add(opsTransaction);
+                        opsTransaction.SalemanId = customerContract.SaleManId;
+
+                        DataContext.Add(opsTransaction, false);
+
                         CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
+
                         clearance.JobNo = opsTransaction.JobNo;
-                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
+                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+
                         i = i + 1;
                     }
                 }
+
                 DataContext.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_CONVERT_CLEARANCE_LOG", ex.ToString());
                 result = new HandleState(ex.Message);
             }
             return result;
