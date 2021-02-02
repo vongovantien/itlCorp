@@ -43,6 +43,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     currencies: Observable<Currency[]>;
     requesters: Observable<User[]>;
 
+    isUpdateRequesterFromRedux: boolean = false;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -54,18 +56,16 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
     ngOnInit() {
         this.initForm();
-        this.getUserLogged();
-
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.statusApprovals = this.getStatusApproval();
         this.statusPayments = this.getStatusPayment();
         this.paymentMethods = this.getMethod();
-
         this.currencies = this._catalogueRepo.getListCurrency()
 
         this.requesters = this._systemRepo.getListSystemUser().pipe(
             tap((d: User[]) => {
                 const rqter = d.find(x => x.id == this.userLogged.id);
-                rqter && this.requester.setValue(rqter.id)
+                !this.isUpdateRequesterFromRedux && rqter && this.requester.setValue(rqter.id)
             })
         );
 
@@ -81,6 +81,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             .subscribe(
                 (data: any) => {
                     if (data) {
+                        this.isUpdateRequesterFromRedux = true;
+
                         let formData: any = {
                             referenceNo: data?.referenceNos?.toString().replace(/[,]/g, "\n") || null,
                             requester: data.requester,
@@ -149,10 +151,6 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             requester: !!this.requester.value ? this.requester.value : this.userLogged.id
         };
         this._store.dispatch(SearchListAdvancePayment(body));
-    }
-
-    getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
 
     getStatusApproval(): CommonInterface.ICommonTitleValue[] {
