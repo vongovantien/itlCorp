@@ -1,30 +1,32 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
-import { NgForm, AbstractControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
-import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
+
+import { DocumentationRepo } from '@repositories';
+import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 import { ConfirmPopupComponent, InfoPopupComponent, SubHeaderComponent } from '@common';
 import { OpsTransaction, CsTransactionDetail, CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
-import * as fromShareBussiness from './../../share-business/store';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
+import { InjectViewContainerRefDirective } from '@directives';
+import { RoutingConstants } from '@constants';
+import { ICanComponentDeactivate } from '@core';
+import { AppForm } from '@app';
 
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
-import { AppForm } from 'src/app/app.form';
-import { ICanComponentDeactivate } from '@core';
-import { combineLatest, Observable, of } from 'rxjs';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, tap, switchMap } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
+import * as fromShareBussiness from './../../share-business/store';
+
+
 import _groupBy from 'lodash/groupBy';
-import { RoutingConstants } from '@constants';
-
-
+import isUUID from 'validator/lib/isUUID';
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
@@ -32,18 +34,14 @@ import { RoutingConstants } from '@constants';
 export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit, ICanComponentDeactivate {
 
     @ViewChild(PlSheetPopupComponent) plSheetPopup: PlSheetPopupComponent;
-    @ViewChild('confirmCancelUpdate') confirmCancelJobPopup: ConfirmPopupComponent;
-    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild('confirmDelete') confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild('confirmLockShipment') confirmLockShipmentPopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessSellingChargeComponent) sellingChargeComponent: ShareBussinessSellingChargeComponent;
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
 
     @ViewChild(JobManagementFormEditComponent) editForm: JobManagementFormEditComponent;
-    @ViewChild('addOpsForm') formOps: NgForm;
-    @ViewChild('notAllowUpdate') infoPoup: InfoPopupComponent;
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+
+    @ViewChild(InjectViewContainerRefDirective) public confirmContainerRef: InjectViewContainerRefDirective;
+    @ViewChild('advSettleContainer', { read: ViewContainerRef }) public advSettleContainerRef: ViewContainerRef;
 
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];
@@ -59,10 +57,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
     selectedTabSurcharge: string = 'BUY';
-    action: any = {};
 
     constructor(
-        private _spinner: NgxSpinnerService,
         private route: ActivatedRoute,
         private router: Router,
         private _ngProgressService: NgProgress,
@@ -72,6 +68,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
+        private readonly _viewContainerRef: ViewContainerRef,
     ) {
         super();
 
@@ -79,26 +76,40 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     ngOnInit() {
+        this.subscriptionParamURLChange();
+
+        this.subscriptionSaveContainerChange();
+
+    }
+
+    subscriptionParamURLChange() {
         combineLatest([
             this.route.params,
             this.route.queryParams
         ]).pipe(
-            map(([params, qParams]) => ({ ...params, ...qParams }))
-        )
-            .subscribe((params: any) => {
-                this.tab = !!params.tab ? params.tab : 'job-edit';
-                this.tabCharge = 'buying';
-                if (!!params) {
-                    this.jobId = params.id;
-                    if (!!params.action) {
-                        this.isDuplicate = params.action.toUpperCase() === 'COPY';
-                        this.selectedTabSurcharge = 'BUY';
-                    }
-                    this.getShipmentDetails(params.id);
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+            tap((param) => {
+                this.jobId = param.id;
+                this.tab = !!param.tab ? param.tab : 'job-edit';
+                if (param.action) {
+                    this.isDuplicate = param.action.toUpperCase() === 'COPY';
+                    this.selectedTabSurcharge = 'BUY';
+                } else {
+                    this.isDuplicate = false;
                 }
+            }),
+            switchMap(() => of(this.jobId))
+        ).subscribe((jobId: string) => {
+            if (isUUID(jobId)) {
+                this.tabCharge = 'buying';
+                this.getShipmentDetails(jobId);
+            } else {
+                this.gotoList();
+            }
+        });
+    }
 
-            });
-
+    subscriptionSaveContainerChange() {
         this._actionStoreSubject
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -172,9 +183,15 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (respone: boolean) => {
                     if (respone === true) {
                         this.deleteMessage = `Do you want to delete job No <span class="font-weight-bold">${this.opsTransaction.jobNo}</span>?`;
-                        this.confirmDeleteJobPopup.show();
+
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                            body: this.deleteMessage
+                        }, () => { this.onDeleteJob(); })
                     } else {
-                        this.canNotDeleteJobPopup.show();
+
+                        this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                            body: 'You are not allow to delete this job',
+                        })
                     }
                 }
             );
@@ -185,7 +202,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             .subscribe(
                 (response: CommonInterface.IResult) => {
                     if (response.status) {
-                        this.confirmDeleteJobPopup.hide();
                         this.router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
                     }
                 }
@@ -197,7 +213,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     confirmCancelJob() {
-        this.confirmCancelJobPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'Unsaved data will be lost. Are you sure want to leave?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.confirmCancel();
+        })
     }
 
     saveShipment() {
@@ -209,7 +230,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.editForm.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPoup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                body: this.invalidFormText,
+                title: 'Cannot Create Job'
+            })
             return;
         }
 
@@ -283,7 +307,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     updateShipment() {
-        this._spinner.show();
         if (this.isSaveLink) {
             this._documentRepo.getASTransactionInfo(this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
                 .pipe(catchError(this.catchError))
@@ -292,7 +315,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this.opsTransaction.serviceNo = res.jobNo;
                         this.opsTransaction.serviceHblId = res.id;
                         this._documentRepo.updateShipment(this.opsTransaction)
-                            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                            .pipe(catchError(this.catchError))
                             .subscribe(
                                 (res: CommonInterface.IResult) => {
                                     if (res.status) {
@@ -307,7 +330,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 });
         } else {
             this._documentRepo.updateShipment(this.opsTransaction)
-                .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -322,21 +345,20 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     insertDuplicateJob() {
-        this._spinner.show();
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
-            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
                         this.jobId = res.data.id;
                         this.opsTransaction.hblid = res.data.hblid;
-                        this.isDuplicate = false;
+                        // this.isDuplicate = false;
                         this.headerComponent.resetBreadcrumb("Detail Job");
                         this.editForm.isSubmitted = false;
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId], {
-                            queryParams: Object.assign({}, { tab: 'job-edit' })
-                        });
+
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
                     } else {
                         this._toastService.warning(res.message);
                     }
@@ -345,14 +367,16 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     lockShipment() {
-        this.confirmLockShipmentPopup.show();
-    }
-
-    onLockShipment() {
-        this.opsTransaction.isLocked = true;
-        this.confirmLockShipmentPopup.hide();
-
-        this.updateShipment();
+        this.showPopupDynamicRender(ConfirmPopupComponent,
+            this.confirmContainerRef.viewContainerRef,
+            {
+                body: 'Do you want to lock this shipment ?',
+                labelConfirm: 'Yes'
+            },
+            () => {
+                this.opsTransaction.isLocked = true;
+                this.updateShipment();
+            })
     }
 
     showListContainer() {
@@ -434,6 +458,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             this.getShipmentDetails(this.jobId);
             this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
         }
+
+        if (tabName === 'advance-settle') {
+            this.getAdvanceSettleInfoComponent();
+        } else {
+            this._viewContainerRef.clear();
+        }
     }
 
     onOpePLPrint() {
@@ -467,7 +497,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
         if (isEdited) {
-            this.confirmCancelJobPopup.show();
+            this.confirmCancelJob();
         } else {
             this.isCancelFormPopupSuccess = true;
             this.gotoList();
@@ -475,7 +505,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     confirmCancel() {
-        this.confirmCancelJobPopup.hide();
         this.isCancelFormPopupSuccess = true;
 
         if (this.nextState) {
@@ -492,26 +521,36 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             return of(true);
         }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
-        if (this.isCancelFormPopupSuccess || !this.isDuplicate) {
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
         if (isEdited && !this.isCancelFormPopupSuccess) {
-            this.confirmCancelJobPopup.show();
+            this.confirmCancelJob();
             return;
         }
         return of(!isEdited);
     }
 
     confirmDuplicate() {
-        this.confirmDuplicatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'The system will open the Job Create Screen. Do you want to leave ?',
+            title: 'Duplicate OPS detail',
+            labelConfirm: 'Yes'
+        },
+            () => {
+                this.onSubmitDuplicateConfirm();
+            })
     }
 
     onSubmitDuplicateConfirm() {
-        this.action = { action: 'copy' };
         this.editForm.isSubmitted = false;
         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'job-edit' }, this.action)
+            queryParams: { action: 'copy' }
         });
-        this.confirmDuplicatePopup.hide();
+    }
+
+    async getAdvanceSettleInfoComponent() {
+        const { ShareBusinessAdvanceSettlementInforComponent } = await import('./../../share-business/components/advance-settlement-info/advance-settlement-info.component');
+        this.renderDynamicComponent(ShareBusinessAdvanceSettlementInforComponent, this.advSettleContainerRef)
     }
 }

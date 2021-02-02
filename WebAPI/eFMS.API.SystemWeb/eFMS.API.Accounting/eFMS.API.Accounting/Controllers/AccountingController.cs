@@ -12,6 +12,7 @@ using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -326,10 +327,12 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
 
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -413,10 +416,12 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -500,10 +505,12 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -665,11 +672,13 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(result);
                     }
                 }
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
 
@@ -831,10 +840,12 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(result);
                     }
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -1052,11 +1063,13 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(result);
                     }
                 }
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
 

@@ -18,6 +18,8 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.API.Common.Models;
 using eFMS.API.Common;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -48,8 +50,11 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
+        private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
-
+        private readonly IContextBase<AcctAdvancePayment> acctAdvancePayment;
+        private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
+        private readonly IContextBase<CatContract> catContractRepository;
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -71,8 +76,13 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysOffice> sysOffice,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
-            IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<AcctAdvancePayment> _acctAdvancePayment,
+            IContextBase<AcctSettlementPayment> _acctSettlementPayment,
+            IContextBase<OpsTransaction> _opsTransactionRepository,
+            IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository,
+            IContextBase<CatContract> catContractRepo
+            ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -98,12 +108,19 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             userlevelRepository = userlevelRepo;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
-            accAdvancePaymentRepository = accAdvancePaymentRepo;
+            acctAdvancePayment = _acctAdvancePayment;
+            acctSettlementPayment = _acctSettlementPayment;
+            opsTransactionRepository = _opsTransactionRepository;
+            accAdvancePaymentRepository = _accAdvancePaymentRepository;
+            catContractRepository = catContractRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403);
+
+            HandleState result = new HandleState();
+
             model.Id = Guid.NewGuid();
             model.DatetimeCreated = DateTime.Now;
             model.UserCreated = currentUser.UserID;
@@ -114,12 +131,14 @@ namespace eFMS.API.Documentation.DL.Services
             model.DepartmentId = currentUser.DepartmentId;
             model.OfficeId = currentUser.OfficeID;
             model.CompanyId = currentUser.CompanyID;
+
             var customer = partnerRepository.Get(x => x.Id == model.CustomerId).FirstOrDefault();
             var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
             string SalesGroupId = string.Empty;
             string SalesDepartmentId = string.Empty;
             string SalesOfficeId = string.Empty;
             string SalesCompanyId = string.Empty;
+
             if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
             {
                 var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
@@ -157,10 +176,31 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.CurrentStatus = TermData.Processing;
             }
-            
-            model.JobNo = CreateJobNoOps();
-            var entity = mapper.Map<OpsTransaction>(model);
-            return DataContext.Add(entity);
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    model.JobNo = CreateJobNoOps();
+                    var entity = mapper.Map<OpsTransaction>(model);
+
+                    result = DataContext.Add(entity);
+
+                    trans.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+
+            return result;
         }
 
         public string CreateJobNoOps()
@@ -688,7 +728,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (customer != null)
             {
                 opsTransaction.CustomerId = customer.Id;
-                opsTransaction.SalemanId = customer.SalePersonId;
+
             }
             var port = placeRepository.Get(x => x.Code == model.Gateway).FirstOrDefault();
             if (port != null)
@@ -767,6 +807,7 @@ namespace eFMS.API.Documentation.DL.Services
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403);
             var result = new HandleState();
+
             try
             {
                 int i = 0;
@@ -774,6 +815,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     // Check if customer existed
                     var customer = new CatPartner();
+                    CatContract customerContract = new CatContract();
+
                     if (item.AccountNo == null)
                     {
                         customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
@@ -788,7 +831,19 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(notFoundPartnerTaxCodeMessages);
                     }
 
-                    var existedMessage = CheckExist(null, item.Mblid, item.Hblid);
+                    // Check contract for that customer.
+                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId 
+                    && x.SaleService.Contains("CL") 
+                    && x.Active == true 
+                    && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                    if(customerContract == null )
+                    {
+                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
+
+                    string existedMessage = CheckExist(null, item.Mblid, item.Hblid);
                     if (existedMessage != null)
                     {
                         return new HandleState(existedMessage);
@@ -805,6 +860,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var code = PermissionExtention.GetPermissionCommonItem(model, permissionRange, currentUser);
                         if (code == 403) return new HandleState(403);
                         string productService = SetProductServiceShipment(item);
+
                         if (item.CargoType == null && item.ServiceType == "Sea")
                         {
                             result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
@@ -815,20 +871,28 @@ namespace eFMS.API.Documentation.DL.Services
                             result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                             return result;
                         }
-                        var opsTransaction = GetNewShipmentToConvert(productService, item);
+
+                        OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
                         opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
-                        DataContext.Add(opsTransaction);
+                        opsTransaction.SalemanId = customerContract.SaleManId;
+
+                        DataContext.Add(opsTransaction, false);
+
                         CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
+
                         clearance.JobNo = opsTransaction.JobNo;
-                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
+                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+
                         i = i + 1;
                     }
                 }
+
                 DataContext.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_CONVERT_CLEARANCE_LOG", ex.ToString());
                 result = new HandleState(ex.Message);
             }
             return result;
@@ -1358,88 +1422,102 @@ namespace eFMS.API.Documentation.DL.Services
 
             List<CsMawbcontainer> newContainers = new List<CsMawbcontainer>();
             List<CsShipmentSurcharge> newSurcharges = new List<CsShipmentSurcharge>();
+       
 
-            // Create model import
-            Guid _hblId = model.Hblid;
-            model.Hblid = Guid.NewGuid();
-            model.JobNo = CreateJobNoOps();
-            model.UserModified = currentUser.UserID;
-            model.DatetimeModified = DateTime.Now;
-            model.UserCreated = currentUser.UserID;
-            model.GroupId = currentUser.GroupId;
-            model.DepartmentId = currentUser.DepartmentId;
-            model.OfficeId = currentUser.OfficeID;
-            model.CompanyId = currentUser.CompanyID;
-
-            List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
-            if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
-                if (dataGroup.Any())
+                try
                 {
-                    model.SalesGroupId = string.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
-                    model.SalesDepartmentId = string.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
-                    model.SalesOfficeId = string.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
-                    model.SalesCompanyId = string.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
-                }
-                else
-                {
-                    model.SalesGroupId = string.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
-                    model.SalesDepartmentId = string.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
-                    model.SalesOfficeId = string.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
-                    model.SalesCompanyId = string.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
-                }
-            }
-            int dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
-            if (dayStatus > 0)
-            {
-                model.CurrentStatus = TermData.InSchedule;
-            }
-            else
-            {
-                model.CurrentStatus = TermData.Processing;
-            }
+                    // Create model import
+                    Guid _hblId = model.Hblid;
+                    model.Hblid = Guid.NewGuid();
+                    model.JobNo = CreateJobNoOps();
+                    model.UserModified = currentUser.UserID;
+                    model.DatetimeModified = DateTime.Now;
+                    model.UserCreated = currentUser.UserID;
+                    model.GroupId = currentUser.GroupId;
+                    model.DepartmentId = currentUser.DepartmentId;
+                    model.OfficeId = currentUser.OfficeID;
+                    model.CompanyId = currentUser.CompanyID;
 
-            // Update list Container
-            List<CsMawbcontainerModel> listContainerOld = model.CsMawbcontainers;
-            if (listContainerOld != null)
-            {
-                List<CsMawbcontainer> masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
-                newContainers.AddRange(masterContainers);
-            }
-            // Update list SurCharge
-            List<CsShipmentSurcharge> listSurCharge = CopySurChargeToNewJob(_hblId, model);
-            if (listSurCharge?.Count() > 0)
-            {
-                newSurcharges.AddRange(listSurCharge);
-            }
-
-            try
-            {
-                OpsTransaction entity = mapper.Map<OpsTransaction>(model);
-                HandleState hs = DataContext.Add(entity);
-
-                if (hs.Success)
-                {
-                    if (newContainers.Count > 0)
+                    List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+                    if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                     {
-                        var hsContainer = csMawbcontainerRepository.Add(newContainers, false);
-                        csMawbcontainerRepository.SubmitChanges();
+                        var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                        if (dataGroup.Any())
+                        {
+                            model.SalesGroupId = string.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                            model.SalesDepartmentId = string.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                            model.SalesOfficeId = string.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                            model.SalesCompanyId = string.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                        }
+                        else
+                        {
+                            model.SalesGroupId = string.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                            model.SalesDepartmentId = string.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                            model.SalesOfficeId = string.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                            model.SalesCompanyId = string.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                        }
+                    }
+                    int dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+                    if (dayStatus > 0)
+                    {
+                        model.CurrentStatus = TermData.InSchedule;
+                    }
+                    else
+                    {
+                        model.CurrentStatus = TermData.Processing;
                     }
 
-                    if (newSurcharges.Count() > 0)
+                    // Update list Container
+                    List<CsMawbcontainerModel> listContainerOld = model.CsMawbcontainers;
+                    if (listContainerOld != null)
                     {
-                        HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
-                        surchargeRepository.SubmitChanges();
+                        List<CsMawbcontainer> masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
+                        newContainers.AddRange(masterContainers);
                     }
-                    return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
+                    // Update list SurCharge
+                    List<CsShipmentSurcharge> listSurCharge = CopySurChargeToNewJob(_hblId, model);
+                    if (listSurCharge?.Count() > 0)
+                    {
+                        newSurcharges.AddRange(listSurCharge);
+                    }
+
+                    OpsTransaction entity = mapper.Map<OpsTransaction>(model);
+                    HandleState hs = DataContext.Add(entity);
+
+                    if (hs.Success)
+                    {
+                        if (newContainers.Count > 0)
+                        {
+                            var hsContainer = csMawbcontainerRepository.Add(newContainers, false);
+                            csMawbcontainerRepository.SubmitChanges();
+                        }
+
+                        if (newSurcharges.Count() > 0)
+                        {
+                            HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
+                            surchargeRepository.SubmitChanges();
+                        }
+
+                        trans.Commit();
+                        return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
+                    }
+                    trans.Rollback();
+                    return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
                 }
-                return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    new LogHelper("eFMS_DUPLICATE_JOB_LOG", ex.ToString());
+                    return new ResultHandle { Status = false, Message = "Job can't be saved!" };
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            catch (Exception ex)
-            {
-                return new ResultHandle { Status = false, Message = "Job can't be saved!" };
-            }
+            
         }
 
         /// <summary>
@@ -1479,9 +1557,21 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
                     item.ExchangeDate = DateTime.Now;
+
+                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                    //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                     item.FinalExchangeRate = null;
-                    item.AmountVnd = null;
-                    item.VatAmountVnd = null;
+
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
                     item.ClearanceNo = null;
                     item.AdvanceNo = null;
 
@@ -1518,6 +1608,60 @@ namespace eFMS.API.Documentation.DL.Services
             return containers;
         }
 
+        public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
+        {
+            var query = (from SC in surchargeRepository.Get()
+                        join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
+                        join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
+                        join US in userRepository.Get() on OP.UserCreated equals US.Id
+                        join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
+                        join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
+
+                        where OP.Id == JobID && SC.SettlementCode != null
+                        group SC by new { SC.Hblno, SC.Mblno, ADR.Hblid, 
+                            adNo = ADP.AdvanceNo,
+                            adcurrency = ADP.AdvanceCurrency,
+                            adDate = ADP.RequestDate,
+                            adStatus = ADP.StatusApproval,
+                            rqt = US.Username,
+                            smDate = SMP.RequestDate,
+                            smNo = SMP.SettlementNo,
+                            smcurrency = SMP.SettlementCurrency,
+                            smStatus = SMP.StatusApproval,
+                            adAmount= ADR.Amount,
+                            smAmount= SMP.Amount
+
+                        } into g select new {
+                            advanNo = g.Key.adNo,
+                            advanCurren =g.Key.adcurrency,
+                            advanDate = g.Key.adDate,
+                            advanStatus = g.Key.adStatus,
+                            rqter = g.Key.rqt , settmDate = g.Key.smDate, settmNo = g.Key.smNo, smCurren = g.Key.smcurrency , settmStatus = g.Key.smStatus,
+                            advanAmount =g.Key.adAmount , settmAmount = g.Key.smAmount
+                        }).ToList();
+                                      
+            if (query == null)
+            {
+                return null;
+            }
+            var data =  query.Select(x => new OpsAdvanceSettlementModel()
+                {
+                AdvanceNo = x.advanNo,
+                AdvanceAmount = Convert.ToDecimal(x.advanAmount),
+                adCurrency = x.advanCurren,
+                AdvanceDate = x.advanDate,
+                Requester = x.rqter,
+                SettlemenDate = x.settmDate,
+                SettlementAmount = Convert.ToDecimal(x.settmAmount),
+                setCurrency = x.smCurren,
+                SettlementNo = x.settmNo,
+                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount),
+                SettleStatusApproval = x.advanStatus,
+                StatusApproval = x.settmStatus,
+            }).ToList();
+            return data;
+        }
+
         public int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs)
         {
             mblNo = string.Empty;
@@ -1526,14 +1670,14 @@ namespace eFMS.API.Documentation.DL.Services
             bool hasChargeSynced = false;
             bool hasAdvanceRequest = false;
 
-            if (DataContext.Any(x => x.Id == model.Id 
-            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED 
-            && ( (x.Mblno ?? "").ToLower() != (model.Mblno ?? "")  || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))    
+            if (DataContext.Any(x => x.Id == model.Id
+            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+            && ((x.Mblno ?? "").ToLower() != (model.Mblno ?? "") || (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? ""))))
             {
                 OpsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
                 if (shipment != null)
                 {
-                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo  && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
                 }
 
                 if (hasChargeSynced)

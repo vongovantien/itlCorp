@@ -4,10 +4,10 @@ import { Params, ActivatedRoute } from '@angular/router';
 
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Unit, HouseBill } from 'src/app/shared/models';
+import { Unit } from 'src/app/shared/models';
 
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, skip } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
 
 import * as fromStore from '../../store';
@@ -78,23 +78,12 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             }
         );
 
-        this._store.select(fromStore.getHBLContainersState)
-            .pipe(skip(1))
-            .subscribe(
-                (containers: Container[]) => {
-                    this.containers = containers || [];
-                    this.containers.forEach((c: Container) => {
-                        this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
-                    });
-                }
-            );
-
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
 
         this._store.select(fromStore.getDetailHBlState)
-            .pipe(skip(1))
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (res: HouseBill) => {
+                (res: any) => {
                     if (!!res.id) {
                         this.totalCBM = res.cbm;
                         this.netWeight = res.netWeight;
@@ -105,6 +94,8 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                         this.description = res.desOfGoods;
                         this.selectedPackage = res.packageType;
                         this.packageQty = res.packageQty;
+                        this.containerDescription = res.contSealNo;
+
 
                     }
                 }

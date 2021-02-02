@@ -21,7 +21,14 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import {
+    LoadListAdvancePayment,
+    getAdvancePaymentListState,
+    getAdvancePaymentSearchParamsState,
+    getAdvancePaymentListLoadingState,
+    getAdvancePaymentListPagingState
+} from './store';
 
 @Component({
     selector: 'app-advance-payment',
@@ -64,7 +71,7 @@ export class AdvancePaymentComponent extends AppList {
         private _spinner: NgxSpinnerService,
     ) {
         super();
-        this.requestList = this.getListAdvancePayment;
+        this.requestList = this.requestLoadListAdvancePayment;
         this.requestSort = this.sortAdvancePayment;
         this._progressRef = this._progressService.ref();
     }
@@ -102,22 +109,39 @@ export class AdvancePaymentComponent extends AppList {
 
         this.getUserLogged();
 
+
+        this.getListAdvancePayment();
+
+        this._store.select(getAdvancePaymentSearchParamsState)
+            .pipe(
+                withLatestFrom(this._store.select(getAdvancePaymentListPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+
+                    this.requestLoadListAdvancePayment();
+                }
+            );
+
+        this.isLoading = this._store.select(getAdvancePaymentListLoadingState);
     }
 
-    onSearchAdvPayment(data: any) {
-        this.page = 1;
-        this.dataSearch = data; // Object.assign({}, data, { requester: this.userLogged.id });
-        this.getListAdvancePayment();
+    requestLoadListAdvancePayment() {
+        this._store.dispatch(LoadListAdvancePayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     getListAdvancePayment() {
-        this.isLoading = true;
-        this._progressRef.start();
-
-        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
+        this._store.select(getAdvancePaymentListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
                         data: !!data.data ? data.data.map((item: any) => new AdvancePayment(item)) : [],
@@ -157,7 +181,7 @@ export class AdvancePaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, 'Delete Success');
-                        this.getListAdvancePayment();
+                        this.requestLoadListAdvancePayment();
                     }
                 },
             );
@@ -188,12 +212,11 @@ export class AdvancePaymentComponent extends AppList {
         if (!!this.advancePayments[index].advanceRequests.length) {
             this.groupRequest = this.advancePayments[index].advanceRequests;
         } else {
-            this.isLoading = true;
             this._progressRef.start();
             this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
                 .pipe(
                     catchError(this.catchError),
-                    finalize(() => { this._progressRef.complete(); this.isLoading = false; })
+                    finalize(() => { this._progressRef.complete(); })
                 )
                 .subscribe(
                     (res: any) => {
@@ -360,7 +383,7 @@ export class AdvancePaymentComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this.isCheckAll = false;
-                        this.getListAdvancePayment();
+                        this.requestLoadListAdvancePayment();
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -428,7 +451,7 @@ export class AdvancePaymentComponent extends AppList {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
 
-                        this.getListAdvancePayment();
+                        this.requestLoadListAdvancePayment();
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
@@ -440,9 +463,10 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     denyAdvance() {
-        const advancesDenyList = this.advancePayments.filter(x => x.isChecked && x.statusApproval === 'Done' && x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED);
+        const advancesDenyList = this.advancePayments.filter(x => x.isChecked && x.statusApproval !== AccountingConstants.STATUS_APPROVAL.NEW
+            && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED);
         if (!advancesDenyList.length) {
-            this._toastService.warning("Please select advance payment was rejected to deny");
+            this._toastService.warning("Please select correct advance payment to deny");
             return;
         }
 
@@ -472,7 +496,8 @@ export class AdvancePaymentComponent extends AppList {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this.getListAdvancePayment();
+                        this._toastService.success(res.message);
+                        this.requestLoadListAdvancePayment();
                     }
                 },
                 (error) => {

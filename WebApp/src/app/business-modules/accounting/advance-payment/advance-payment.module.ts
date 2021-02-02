@@ -1,3 +1,5 @@
+import { advanceEffects } from './store/effects/index';
+import { EffectsModule } from '@ngrx/effects';
 import { NgModule } from '@angular/core';
 import { AdvancePaymentComponent } from './advance-payment.component';
 import { Routes, RouterModule } from '@angular/router';
@@ -86,7 +88,8 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,
         StoreModule.forFeature('advance-payment', reducers),
-        NgSelectModule
+        NgSelectModule,
+        EffectsModule.forFeature(advanceEffects)
 
     ],
     declarations: [

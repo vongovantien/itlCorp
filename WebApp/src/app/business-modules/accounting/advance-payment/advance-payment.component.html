@@ -7,7 +7,7 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-        <adv-payment-form-search (onSearch)="onSearchAdvPayment($event)"></adv-payment-form-search>
+        <adv-payment-form-search></adv-payment-form-search>
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="m-form">
@@ -206,7 +206,8 @@
                                                         (onClick)="sortByCollapse($event)">
                                                     </thead>
                                                     <tbody>
-                                                        <ng-container *ngIf="!isLoading && !!groupRequest.length">
+                                                        <ng-container
+                                                            *ngIf="!(isLoading | async)  && !!groupRequest.length">
                                                             <tr class=""
                                                                 *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
                                                                 <td>{{request.jobId}}</td>
@@ -234,7 +235,7 @@
                                                                 </td>
                                                             </tr>
                                                         </ng-container>
-                                                        <tr *ngIf="!isLoading && !groupRequest.length"
+                                                        <tr *ngIf="!(isLoading | async) && !groupRequest.length"
                                                             app-table-none-record>
                                                         </tr>
                                                     </tbody>
@@ -243,10 +244,10 @@
                                         </ng-container>
 
                                     </ng-container>
-                                    <tr *ngIf="!isLoading && !advancePayments.length" app-table-none-record
+                                    <tr *ngIf="!(isLoading | async)  && !advancePayments.length" app-table-none-record
                                         [colspan]="headers.length + 1">
                                     </tr>
-                                    <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
+                                    <tr class="loading-wrapper" *ngIf="(isLoading | async) " app-table-row-loading>
                                     </tr>
                                 </tbody>
                             </table>

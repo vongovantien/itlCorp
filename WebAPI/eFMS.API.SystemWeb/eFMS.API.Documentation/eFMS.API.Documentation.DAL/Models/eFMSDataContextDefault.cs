@@ -315,6 +315,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
@@ -1863,6 +1865,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
+                entity.Property(e => e.AmountUsd)
+                    .HasColumnName("AmountUSD")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.AmountVnd)
                     .HasColumnName("AmountVND")
                     .HasColumnType("decimal(18, 4)");
@@ -1916,8 +1922,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
 
-                entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
-
                 entity.Property(e => e.InvoiceNo).HasMaxLength(50);
 
                 entity.Property(e => e.IsFromShipment).HasDefaultValueSql("((1))");
@@ -1930,6 +1934,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("MBLNo")
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.NetAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Notes).HasMaxLength(500);
 
@@ -2021,6 +2027,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VatAmountUsd)
+                    .HasColumnName("VatAmountUSD")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.VatAmountVnd)
                     .HasColumnName("VatAmountVND")

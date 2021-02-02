@@ -190,8 +190,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
-            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
-            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
+            { title: 'Net Amount', field: 'netAmount', sortable: true },
         ];
     }
 
@@ -251,7 +250,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (containers: Container[]) => {
                     this.containers = containers;
-                    console.log(this.containers);
                 }
             );
     }
@@ -771,7 +769,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     c.duplicateInvoice = false;
                 }
             });
-            console.log(arrayDuplicates);
         } else valid = true;
 
         return valid;

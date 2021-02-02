@@ -1,22 +1,23 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { User, Currency } from 'src/app/shared/models';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { combineLatest } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
-import { getSettlementPaymentSearchParamsState, ISettlementPaymentState, SearchList } from '../store';
+import { Observable } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
+import { getSettlementPaymentSearchParamsState, ISettlementPaymentState, SearchListSettlePayment } from '../store';
 import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'settle-payment-form-search',
-    templateUrl: './form-search-settlement.component.html'
+    templateUrl: './form-search-settlement.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 
 export class SettlementFormSearchComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISearchSettlePayment> = new EventEmitter<ISearchSettlePayment>();
 
     formSearch: FormGroup;
     referenceNo: AbstractControl;
@@ -33,8 +34,11 @@ export class SettlementFormSearchComponent extends AppForm {
 
     userLogged: User;
 
-    currencies: Currency[] = [];
-    requesters: User[] = [];
+    currencies: Observable<Currency[]>;
+    requesters: Observable<User[]>;
+
+    isUpdateRequesterFromRedux: boolean = false;
+
 
     constructor(
         private _fb: FormBuilder,
@@ -48,65 +52,46 @@ export class SettlementFormSearchComponent extends AppForm {
 
     ngOnInit() {
         this.initForm();
-        this.initDataInform();
+        this.statusApprovals = this.getStatusApproval();
+        this.statusPayments = this.getStatusPayment();
+        this.paymentMethods = this.getMethod();
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
+        this.currencies = this._catalogueRepo.getListCurrency();
+        this.requesters = this._systemRepo.getListSystemUser().pipe(
+            tap((d) => {
+                const rq = d.find(stf => stf.id === this.userLogged.id);
+                !this.isUpdateRequesterFromRedux && rq && this.requester.setValue(!!rq ? rq.id : null);
+            })
+        );
 
         this._store.select(getSettlementPaymentSearchParamsState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )
-            .subscribe((res: any) => {
-                if (Object.keys(res).length === 0 && res.constructor === Object) {
-                    this.onSearch.emit(<any>{ requester: this.userLogged.id });
-                } else {
-                    this.onSearch.emit(res);
-                    this.setDataFormSearchFromStore(res);
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.isUpdateRequesterFromRedux = true;
+                        this.setDataFormSearchFromStore(res);
+                    }
                 }
-
-            });
-    }
-
-    getCurrencyAndUsers() {
-        combineLatest([
-            this._catalogueRepo.getListCurrency(),
-            this._systemRepo.getSystemUsers({}),
-            this._store.select(getSettlementPaymentSearchParamsState)
-        ]).pipe(
-            map((cur, param) => ({ ...cur, param }))
-        ).subscribe(
-            (res) => {
-                this.currencies = res[0] || [];
-                this.requesters = res[1];
-
-                if (Object.keys(res[2]).length === 0 && res[2].constructor === Object) {
-                    const rq = this.requesters.find(stf => stf.id === this.userLogged.id);
-                    this.requester.setValue(!!rq ? rq.id : null);
-                    this.currencyId.setValue(null);
-                } else {
-                    const requesterTemp = this.requesters.find(e => e.id === res[2].requester);
-                    const currencyTemp = this.currencies.find(e => e.id === res[2].currencyId);
-                    this.requester.setValue(requesterTemp.id);
-                    this.currencyId.setValue(currencyTemp);
-
-                }
-            }
-        );
+            );
     }
 
     setDataFormSearchFromStore(data: ISearchSettlePayment) {
         this.formSearch.patchValue({
             referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
-            requestDate: !!data.requestDateFrom && !!data.requestDateTo ? { startDate: new Date(data.requestDateFrom), endDate: new Date(data.requestDateTo) } : null,
-            statusApproval: !!data.statusApproval && data.statusApproval !== 'All' ? this.statusApprovals.filter(e => e.value === data.statusApproval)[0] : null,
-            paymentMethod: !!data.paymentMethod && data.paymentMethod !== 'All' ? this.paymentMethods.filter(e => e.value === data.paymentMethod)[0] : null,
+            requestDate: !!data.requestDateFrom && !!data.requestDateTo ?
+                { startDate: new Date(data.requestDateFrom), endDate: new Date(data.requestDateTo) } : null,
+            statusApproval: !!data.statusApproval && data.statusApproval !== 'All' ? data.statusApproval : null,
+            paymentMethod: !!data.paymentMethod && data.paymentMethod !== 'All' ? data.paymentMethod : null,
             requester: !!data.requester ? data.requester : null
         });
     }
 
     initForm() {
         this.formSearch = this._fb.group({
-            // referenceNo: [, Validators.compose([
-            //     Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
-            // ])],
             referenceNo: [],
             requester: [],
             requestDate: [],
@@ -126,15 +111,6 @@ export class SettlementFormSearchComponent extends AppForm {
         this.currencyId = this.formSearch.controls['currencyId'];
     }
 
-    initDataInform() {
-        this.statusApprovals = this.getStatusApproval();
-        this.statusPayments = this.getStatusPayment();
-        this.paymentMethods = this.getMethod();
-        this.getCurrencyAndUsers();
-        this.getUserLogged();
-
-    }
-
     onSubmit() {
         const body: ISearchSettlePayment = {
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
@@ -142,16 +118,12 @@ export class SettlementFormSearchComponent extends AppForm {
             advanceModifiedDateTo: !!this.modifiedDate.value && !!this.modifiedDate.value.endDate ? formatDate(this.modifiedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             requestDateFrom: !!this.requestDate.value && !!this.requestDate.value.startDate ? formatDate(this.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             requestDateTo: !!this.requestDate.value && !!this.requestDate.value.endDate ? formatDate(this.requestDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : 'All',
-            statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
-            currencyId: !!this.currencyId.value ? this.currencyId.value.id : 'All',
+            paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value : 'All',
+            statusApproval: !!this.statusApproval.value ? this.statusApproval.value : 'All',
+            currencyId: !!this.currencyId.value ? this.currencyId.value : 'All',
             requester: !!this.requester.value ? this.requester.value : this.userLogged.id
         };
-        this._store.dispatch(SearchList({ payload: body }));
-    }
-
-    getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this._store.dispatch(SearchListSettlePayment(body));
     }
 
     getStatusApproval(): CommonInterface.ICommonTitleValue[] {
@@ -181,12 +153,7 @@ export class SettlementFormSearchComponent extends AppForm {
         ];
     }
 
-    search() {
-        this.onSubmit();
-    }
-
     reset() {
-        this.initDataInform();
         this.resetFormControl(this.requestDate);
         this.resetFormControl(this.modifiedDate);
         this.resetFormControl(this.referenceNo);
@@ -194,11 +161,11 @@ export class SettlementFormSearchComponent extends AppForm {
         this.resetFormControl(this.statusApproval);
         this.resetFormControl(this.currencyId);
 
-        this.onSearch.emit(<any>{ requester: this.userLogged.id });
+        this._store.dispatch(SearchListSettlePayment({ requester: this.userLogged.id }));
     }
 }
 
-interface ISearchSettlePayment {
+export interface ISearchSettlePayment {
     referenceNos: string[];
     requester: string;
     requestDateFrom: string;
