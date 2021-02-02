@@ -118,6 +118,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403);
+
+            HandleState result = new HandleState();
+
             model.Id = Guid.NewGuid();
             model.DatetimeCreated = DateTime.Now;
             model.UserCreated = currentUser.UserID;
@@ -128,12 +131,14 @@ namespace eFMS.API.Documentation.DL.Services
             model.DepartmentId = currentUser.DepartmentId;
             model.OfficeId = currentUser.OfficeID;
             model.CompanyId = currentUser.CompanyID;
+
             var customer = partnerRepository.Get(x => x.Id == model.CustomerId).FirstOrDefault();
             var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
             string SalesGroupId = string.Empty;
             string SalesDepartmentId = string.Empty;
             string SalesOfficeId = string.Empty;
             string SalesCompanyId = string.Empty;
+
             if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
             {
                 var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
@@ -171,10 +176,31 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.CurrentStatus = TermData.Processing;
             }
-            
-            model.JobNo = CreateJobNoOps();
-            var entity = mapper.Map<OpsTransaction>(model);
-            return DataContext.Add(entity);
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    model.JobNo = CreateJobNoOps();
+                    var entity = mapper.Map<OpsTransaction>(model);
+
+                    result = DataContext.Add(entity);
+
+                    trans.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+
+            return result;
         }
 
         public string CreateJobNoOps()
