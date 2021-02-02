@@ -1,10 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef, ComponentFactoryResolver } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo } from '@repositories';
@@ -21,12 +20,13 @@ import { AppForm } from '@app';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, tap, switchMap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
 import * as fromShareBussiness from './../../share-business/store';
 
-import _groupBy from 'lodash/groupBy';
 
+import _groupBy from 'lodash/groupBy';
+import isUUID from 'validator/lib/isUUID';
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
@@ -42,6 +42,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     @ViewChild(InjectViewContainerRefDirective) public confirmContainerRef: InjectViewContainerRefDirective;
     @ViewChild('advSettleContainer', { read: ViewContainerRef }) public advSettleContainerRef: ViewContainerRef;
+
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];
 
@@ -56,10 +57,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
     selectedTabSurcharge: string = 'BUY';
-    action: any = {};
 
     constructor(
-        private _spinner: NgxSpinnerService,
         private route: ActivatedRoute,
         private router: Router,
         private _ngProgressService: NgProgress,
@@ -77,26 +76,40 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     ngOnInit() {
+        this.subscriptionParamURLChange();
+
+        this.subscriptionSaveContainerChange();
+
+    }
+
+    subscriptionParamURLChange() {
         combineLatest([
             this.route.params,
             this.route.queryParams
         ]).pipe(
-            map(([params, qParams]) => ({ ...params, ...qParams }))
-        )
-            .subscribe((params: any) => {
-                this.tab = !!params.tab ? params.tab : 'job-edit';
-                this.tabCharge = 'buying';
-                if (!!params) {
-                    this.jobId = params.id;
-                    if (!!params.action) {
-                        this.isDuplicate = params.action.toUpperCase() === 'COPY';
-                        this.selectedTabSurcharge = 'BUY';
-                    }
-                    this.getShipmentDetails(params.id);
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+            tap((param) => {
+                this.jobId = param.id;
+                this.tab = !!param.tab ? param.tab : 'job-edit';
+                if (param.action) {
+                    this.isDuplicate = param.action.toUpperCase() === 'COPY';
+                    this.selectedTabSurcharge = 'BUY';
+                } else {
+                    this.isDuplicate = false;
                 }
+            }),
+            switchMap(() => of(this.jobId))
+        ).subscribe((jobId: string) => {
+            if (isUUID(jobId)) {
+                this.tabCharge = 'buying';
+                this.getShipmentDetails(jobId);
+            } else {
+                this.gotoList();
+            }
+        });
+    }
 
-            });
-
+    subscriptionSaveContainerChange() {
         this._actionStoreSubject
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -294,7 +307,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     updateShipment() {
-        this._spinner.show();
         if (this.isSaveLink) {
             this._documentRepo.getASTransactionInfo(this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
                 .pipe(catchError(this.catchError))
@@ -303,7 +315,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this.opsTransaction.serviceNo = res.jobNo;
                         this.opsTransaction.serviceHblId = res.id;
                         this._documentRepo.updateShipment(this.opsTransaction)
-                            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                            .pipe(catchError(this.catchError))
                             .subscribe(
                                 (res: CommonInterface.IResult) => {
                                     if (res.status) {
@@ -318,7 +330,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 });
         } else {
             this._documentRepo.updateShipment(this.opsTransaction)
-                .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -333,21 +345,20 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     insertDuplicateJob() {
-        this._spinner.show();
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
-            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
                         this.jobId = res.data.id;
                         this.opsTransaction.hblid = res.data.hblid;
-                        this.isDuplicate = false;
+                        // this.isDuplicate = false;
                         this.headerComponent.resetBreadcrumb("Detail Job");
                         this.editForm.isSubmitted = false;
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId], {
-                            queryParams: Object.assign({}, { tab: 'job-edit' })
-                        });
+
+                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
                     } else {
                         this._toastService.warning(res.message);
                     }
@@ -367,7 +378,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 this.updateShipment();
             })
     }
-
 
     showListContainer() {
         this.containerPopup.mblid = this.jobId;
@@ -533,10 +543,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     onSubmitDuplicateConfirm() {
-        this.action = { action: 'copy' };
         this.editForm.isSubmitted = false;
         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'job-edit' }, this.action)
+            queryParams: { action: 'copy' }
         });
     }
 
