@@ -1,5 +1,5 @@
 import { SearchListAdvancePayment } from './../../store/actions/advance-payment.action';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
@@ -18,11 +18,11 @@ import { getAdvancePaymentSearchParamsState, IAdvancePaymentState } from '../../
 
 @Component({
     selector: 'adv-payment-form-search',
-    templateUrl: './form-search-advance-payment.component.html'
+    templateUrl: './form-search-advance-payment.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class AdvancePaymentFormsearchComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISearchAdvancePayment> = new EventEmitter<ISearchAdvancePayment>();
 
     formSearch: FormGroup;
     referenceNo: AbstractControl;

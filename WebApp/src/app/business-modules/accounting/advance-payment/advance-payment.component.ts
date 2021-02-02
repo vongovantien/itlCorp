@@ -138,10 +138,6 @@ export class AdvancePaymentComponent extends AppList {
         this._store.dispatch(LoadListAdvancePayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
-    onSearchAdvPayment(data: any) {
-        this.page = 1;
-    }
-
     getListAdvancePayment() {
         this._store.select(getAdvancePaymentListState)
             .pipe(
