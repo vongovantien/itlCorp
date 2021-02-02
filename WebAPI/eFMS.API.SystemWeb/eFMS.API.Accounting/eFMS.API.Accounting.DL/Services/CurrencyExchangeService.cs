@@ -31,21 +31,24 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (currencyFrom != currencyTo)
             {
-                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
+                //Order giảm dần theo ngày tạo
+                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
                 if (get1 != null)
                 {
                     return get1.Rate;
                 }
                 else
                 {
-                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
+                    //Order giảm dần theo ngày tạo
+                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
                     if (get2 != null)
                     {
                         return 1 / get2.Rate;
                     }
                     else
                     {
-                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.Rate).ToList();
+                        //Order giảm dần theo ngày tạo
+                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.DatetimeCreated).ToList();
                         if (get3.Count > 1)
                         {
                             if (get3[0].CurrencyFromId.Trim() == currencyFrom && get3[1].CurrencyFromId.Trim() == currencyTo)
