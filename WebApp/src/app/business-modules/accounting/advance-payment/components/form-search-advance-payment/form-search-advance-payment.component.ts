@@ -1,3 +1,4 @@
+import { SearchListAdvancePayment } from './../../store/actions/advance-payment.action';
 import { Component, Output, EventEmitter } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -8,12 +9,11 @@ import { formatDate } from '@angular/common';
 import { SystemConstants } from '@constants';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 
-import { map, takeUntil } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 
 import { getAdvancePaymentSearchParamsState, IAdvancePaymentState } from '../../store/reducers';
-import { SearchList } from '../../store/actions';
 
 
 @Component({
@@ -40,8 +40,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
     userLogged: User;
 
-    currencies: Currency[] = [];
-    requesters: Currency[] = [];
+    currencies: Observable<Currency[]>;
+    requesters: Observable<User[]>;
 
     constructor(
         private _fb: FormBuilder,
@@ -54,18 +54,47 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
     ngOnInit() {
         this.initForm();
-        this.initDataInform();
+        this.getUserLogged();
+
+        this.statusApprovals = this.getStatusApproval();
+        this.statusPayments = this.getStatusPayment();
+        this.paymentMethods = this.getMethod();
+
+        this.currencies = this._catalogueRepo.getListCurrency()
+
+        this.requesters = this._systemRepo.getListSystemUser().pipe(
+            tap((d: User[]) => {
+                const rqter = d.find(x => x.id == this.userLogged.id);
+                rqter && this.requester.setValue(rqter.id)
+            })
+        );
+
+        this.subscriptionSearchParamState();
+
+    }
+
+    subscriptionSearchParamState() {
         this._store.select(getAdvancePaymentSearchParamsState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (data: any) => {
-                    if (Object.keys(data).length === 0 && data.constructor === Object) {
-                        this.onSearch.emit(<any>{ requester: this.userLogged.id });
-                    } else {
-                        this.onSearch.emit(data);
-                        this.setDataSearchFromRedux(data);
+                    if (data) {
+                        let formData: any = {
+                            referenceNo: data?.referenceNos?.toString().replace(/[,]/g, "\n") || null,
+                            requester: data.requester,
+                            requestDate: (!!data?.requestDateFrom && !!data?.requestDateTo) ?
+                                { startDate: new Date(data?.requestDateFrom), endDate: new Date(data?.requestDateTo) } : null,
+                            modifiedDate: (!!data?.advanceModifiedDateFrom && !!data?.advanceModifiedDateTo) ?
+                                { startDate: new Date(data?.advanceModifiedDateFrom), endDate: new Date(data?.advanceModifiedDateTo) } : null,
+                            statusApproval: data?.statusApproval === 'All' ? null : data?.statusApproval,
+                            statusPayment: data?.statusPayment === 'All' ? null : data?.statusPayment,
+                            paymentMethod: data?.paymentMethod === 'All' ? null : data?.paymentMethod,
+                            currencyId: data?.currencyId || null,
+                        };
+
+                        this.formSearch.patchValue(formData);
                     }
                 }
             );
@@ -73,9 +102,6 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
     initForm() {
         this.formSearch = this._fb.group({
-            // referenceNo: [, Validators.compose([
-            //     Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
-            // ])],
             referenceNo: [],
             requester: [],
             requestDate: [],
@@ -97,15 +123,6 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
     }
 
-    initDataInform() {
-        this.statusApprovals = this.getStatusApproval();
-        this.statusPayments = this.getStatusPayment();
-        this.paymentMethods = this.getMethod();
-
-        this.getUserLogged();
-        this.getCurrencyAndUsers();
-    }
-
     setDataSearchFromRedux(data: ISearchAdvancePayment) {
         this.formSearch.patchValue({
             referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
@@ -125,13 +142,13 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             advanceModifiedDateTo: !!this.modifiedDate.value && !!this.modifiedDate.value.endDate ? formatDate(this.modifiedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             requestDateFrom: !!this.requestDate.value && !!this.requestDate.value.startDate ? formatDate(this.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             requestDateTo: !!this.requestDate.value && !!this.requestDate.value.endDate ? formatDate(this.requestDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : 'All',
-            statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
-            statusPayment: !!this.statusPayment.value ? this.statusPayment.value.value : 'All',
-            currencyId: !!this.currencyId.value ? this.currencyId.value.id : 'All',
+            paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value : 'All',
+            statusApproval: !!this.statusApproval.value ? this.statusApproval.value : 'All',
+            statusPayment: !!this.statusPayment.value ? this.statusPayment.value : 'All',
+            currencyId: !!this.currencyId.value ? this.currencyId.value : 'All',
             requester: !!this.requester.value ? this.requester.value : this.userLogged.id
         };
-        this._store.dispatch(SearchList({ payload: body }));
+        this._store.dispatch(SearchListAdvancePayment(body));
     }
 
     getUserLogged() {
@@ -165,40 +182,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         ];
     }
 
-    getCurrencyAndUsers() {
-        combineLatest([
-            this._catalogueRepo.getListCurrency(),
-            this._systemRepo.getSystemUsers({}),
-            this._store.select(getAdvancePaymentSearchParamsState)
-        ]).pipe(
-            map((cur, param) => ({ ...cur, param }))
-        ).subscribe(
-            (res) => {
-                this.currencies = res[0] || [];
-                this.requesters = res[1];
-
-                if (Object.keys(res[2]).length === 0 && res[2].constructor === Object) {
-                    this.requester.setValue(this.userLogged.id);
-                    this.currencyId.setValue(null);
-                } else {
-                    const requesterTemp = this.requesters.find(e => e.id === res[2].requester);
-                    const currencyTemp = !this.currencies.find(e => e.id === res[2].currencyId) ? null
-                        : this.currencies.find(e => e.id === res[2].currencyId);
-
-                    this.requester.setValue(requesterTemp.id);
-                    this.currencyId.setValue(currencyTemp);
-
-                }
-            }
-        );
-    }
-
-    search() {
-        this.onSubmit();
-    }
-
     reset() {
-        this.initDataInform();
         this.resetFormControl(this.requestDate);
         this.resetFormControl(this.modifiedDate);
         this.resetFormControl(this.referenceNo);
@@ -207,12 +191,11 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.resetFormControl(this.statusPayment);
         this.resetFormControl(this.currencyId);
 
-        // this._store.dispatch(SearchList({ payload: {} }));
-        this.onSearch.emit(<any>{ requester: this.userLogged.id });
+        this._store.dispatch(SearchListAdvancePayment({ requester: this.userLogged.id }));
     }
 }
 
-interface ISearchAdvancePayment {
+export interface ISearchAdvancePayment {
     referenceNos: string[];
     requester: string;
     requestDateFrom: string;
