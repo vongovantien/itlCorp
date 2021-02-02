@@ -32,6 +32,15 @@ export class AccountingConstants {
         CANCEL: 'Cancel'
     };
 
+    public static STATUS_APPROVAL = {
+        NEW: 'New',
+        REQUEST_APPROVAL: 'Request Approval',
+        LEADER_APPROVED: 'Leader Approved',
+        DEPARTMENT_MANAGER_APPROVED: 'Department Manager Approved',
+        ACCOUNTANT_MANAGER_APPROVED: 'Accountant Manager Approved',
+        DONE: 'Done',
+        DENIED: 'Denied'
+    }
 
     public static DATE_TYPE: string[] = <string[]>['All', 'Create Date', 'Paid Date', 'Last Sync'];
     public static PAYMENT_TYPE: string[] = <string[]>['All', 'Payment', 'Invoice'];
