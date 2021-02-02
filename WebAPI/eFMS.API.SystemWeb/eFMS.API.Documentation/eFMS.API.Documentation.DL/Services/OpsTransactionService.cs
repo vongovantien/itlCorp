@@ -1396,88 +1396,102 @@ namespace eFMS.API.Documentation.DL.Services
 
             List<CsMawbcontainer> newContainers = new List<CsMawbcontainer>();
             List<CsShipmentSurcharge> newSurcharges = new List<CsShipmentSurcharge>();
+       
 
-            // Create model import
-            Guid _hblId = model.Hblid;
-            model.Hblid = Guid.NewGuid();
-            model.JobNo = CreateJobNoOps();
-            model.UserModified = currentUser.UserID;
-            model.DatetimeModified = DateTime.Now;
-            model.UserCreated = currentUser.UserID;
-            model.GroupId = currentUser.GroupId;
-            model.DepartmentId = currentUser.DepartmentId;
-            model.OfficeId = currentUser.OfficeID;
-            model.CompanyId = currentUser.CompanyID;
-
-            List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
-            if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
-                if (dataGroup.Any())
+                try
                 {
-                    model.SalesGroupId = string.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
-                    model.SalesDepartmentId = string.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
-                    model.SalesOfficeId = string.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
-                    model.SalesCompanyId = string.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
-                }
-                else
-                {
-                    model.SalesGroupId = string.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
-                    model.SalesDepartmentId = string.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
-                    model.SalesOfficeId = string.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
-                    model.SalesCompanyId = string.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
-                }
-            }
-            int dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
-            if (dayStatus > 0)
-            {
-                model.CurrentStatus = TermData.InSchedule;
-            }
-            else
-            {
-                model.CurrentStatus = TermData.Processing;
-            }
+                    // Create model import
+                    Guid _hblId = model.Hblid;
+                    model.Hblid = Guid.NewGuid();
+                    model.JobNo = CreateJobNoOps();
+                    model.UserModified = currentUser.UserID;
+                    model.DatetimeModified = DateTime.Now;
+                    model.UserCreated = currentUser.UserID;
+                    model.GroupId = currentUser.GroupId;
+                    model.DepartmentId = currentUser.DepartmentId;
+                    model.OfficeId = currentUser.OfficeID;
+                    model.CompanyId = currentUser.CompanyID;
 
-            // Update list Container
-            List<CsMawbcontainerModel> listContainerOld = model.CsMawbcontainers;
-            if (listContainerOld != null)
-            {
-                List<CsMawbcontainer> masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
-                newContainers.AddRange(masterContainers);
-            }
-            // Update list SurCharge
-            List<CsShipmentSurcharge> listSurCharge = CopySurChargeToNewJob(_hblId, model);
-            if (listSurCharge?.Count() > 0)
-            {
-                newSurcharges.AddRange(listSurCharge);
-            }
-
-            try
-            {
-                OpsTransaction entity = mapper.Map<OpsTransaction>(model);
-                HandleState hs = DataContext.Add(entity);
-
-                if (hs.Success)
-                {
-                    if (newContainers.Count > 0)
+                    List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+                    if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                     {
-                        var hsContainer = csMawbcontainerRepository.Add(newContainers, false);
-                        csMawbcontainerRepository.SubmitChanges();
+                        var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                        if (dataGroup.Any())
+                        {
+                            model.SalesGroupId = string.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                            model.SalesDepartmentId = string.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                            model.SalesOfficeId = string.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                            model.SalesCompanyId = string.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                        }
+                        else
+                        {
+                            model.SalesGroupId = string.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                            model.SalesDepartmentId = string.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                            model.SalesOfficeId = string.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                            model.SalesCompanyId = string.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                        }
+                    }
+                    int dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+                    if (dayStatus > 0)
+                    {
+                        model.CurrentStatus = TermData.InSchedule;
+                    }
+                    else
+                    {
+                        model.CurrentStatus = TermData.Processing;
                     }
 
-                    if (newSurcharges.Count() > 0)
+                    // Update list Container
+                    List<CsMawbcontainerModel> listContainerOld = model.CsMawbcontainers;
+                    if (listContainerOld != null)
                     {
-                        HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
-                        surchargeRepository.SubmitChanges();
+                        List<CsMawbcontainer> masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
+                        newContainers.AddRange(masterContainers);
                     }
-                    return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
+                    // Update list SurCharge
+                    List<CsShipmentSurcharge> listSurCharge = CopySurChargeToNewJob(_hblId, model);
+                    if (listSurCharge?.Count() > 0)
+                    {
+                        newSurcharges.AddRange(listSurCharge);
+                    }
+
+                    OpsTransaction entity = mapper.Map<OpsTransaction>(model);
+                    HandleState hs = DataContext.Add(entity);
+
+                    if (hs.Success)
+                    {
+                        if (newContainers.Count > 0)
+                        {
+                            var hsContainer = csMawbcontainerRepository.Add(newContainers, false);
+                            csMawbcontainerRepository.SubmitChanges();
+                        }
+
+                        if (newSurcharges.Count() > 0)
+                        {
+                            HandleState hsSurcharges = surchargeRepository.Add(newSurcharges, false);
+                            surchargeRepository.SubmitChanges();
+                        }
+
+                        trans.Commit();
+                        return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
+                    }
+                    trans.Rollback();
+                    return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
                 }
-                return new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    new LogHelper("eFMS_DUPLICATE_JOB_LOG", ex.ToString());
+                    return new ResultHandle { Status = false, Message = "Job can't be saved!" };
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            catch (Exception ex)
-            {
-                return new ResultHandle { Status = false, Message = "Job can't be saved!" };
-            }
+            
         }
 
         /// <summary>
