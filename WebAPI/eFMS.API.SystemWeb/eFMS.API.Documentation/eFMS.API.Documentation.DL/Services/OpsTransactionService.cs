@@ -663,19 +663,19 @@ namespace eFMS.API.Documentation.DL.Services
                 
                 var opsTransaction = GetNewShipmentToConvert(productService, model);
                 opsTransaction.JobNo = CreateJobNoOps();
-                DataContext.Add(opsTransaction, false);
+                DataContext.Add(opsTransaction);
 
                 if (model.Id > 0)
                 {
                     var clearance = UpdateInfoConvertClearance(model);
                     clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+                    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                 }
                 else
                 {
                     var clearance = GetNewClearanceModel(model);
                     clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Add(clearance, false);
+                    customDeclarationRepository.Add(clearance);
                 }
                 DataContext.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
