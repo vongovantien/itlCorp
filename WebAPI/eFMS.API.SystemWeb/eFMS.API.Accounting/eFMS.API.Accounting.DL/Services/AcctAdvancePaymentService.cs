@@ -3476,7 +3476,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         {
                             AcctAdvancePayment adv = DataContext.First(x => x.Id == Id);
-                            if (adv != null && adv.SyncStatus == AccountingConstants.STATUS_REJECTED)
+                            if (adv != null && adv.SyncStatus != AccountingConstants.STATUS_SYNCED && adv.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW)
                             {
                                 adv.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                                 adv.UserModified = currentUser.UserID;

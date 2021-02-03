@@ -64,5 +64,6 @@ namespace eFMS.API.Documentation.DL.Models
         public bool IsExistChgCurrDiffLocalCurr { get; set; }
         public string PackageUnit { get; set; }
         public DateTime? DatetimeCreated { get; set; }
+        public decimal? ExcRateUsdToLocal { get; set; }
     }
 }
