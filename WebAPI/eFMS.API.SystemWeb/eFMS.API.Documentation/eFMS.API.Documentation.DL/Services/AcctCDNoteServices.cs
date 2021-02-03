@@ -343,16 +343,16 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
                             //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             charge.FinalExchangeRate = null;
+
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                         }
-                        
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
-                        charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                        charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                        charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                        charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                        charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                        charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                        charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
@@ -482,16 +482,17 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
                             //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             charge.FinalExchangeRate = null;
+
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                         }
 
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
-                        charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                        charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                        charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                        charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                        charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                        charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                        charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;

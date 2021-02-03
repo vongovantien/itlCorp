@@ -148,7 +148,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     surcharge.PaySoano = soa.Soano;
                                 }
                                 //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
+                                else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
                                 {
                                     surcharge.Soano = soa.Soano;
                                 }
@@ -159,11 +159,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
                                     surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-
-                                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                     //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                                     surcharge.FinalExchangeRate = null;
-                                   
+
+                                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
                                     surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                     surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
@@ -250,7 +249,7 @@ namespace eFMS.API.Accounting.DL.Services
                         model.DatetimeModified = DateTime.Now;
                         model.UserModified = userCurrent;
                         model.Currency = model.Currency.Trim();
-                        
+
                         var soa = mapper.Map<AcctSoa>(model);
                         var soaCurrent = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
                         soa.GroupId = soaCurrent.GroupId;
@@ -277,7 +276,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             soa.PaymentStatus = (soa.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID) ? null : soa.PaymentStatus;
                         }
-                        
+
                         //List charge of SOA
                         var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
 
@@ -296,7 +295,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     surcharge.PaySoano = soa.Soano;
                                 }
                                 //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
+                                else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
                                 {
                                     surcharge.Soano = soa.Soano;
                                 }
@@ -307,11 +306,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
                                     surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-
-                                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                     //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                                     surcharge.FinalExchangeRate = null;
 
+                                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
                                     surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                     surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
@@ -364,7 +362,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return hs;
             }
         }
-        
+
         public bool CheckUpdatePermission(string soaNo)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
@@ -466,7 +464,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return hs;
             }
         }
-        
+
         private string CreateSoaNo()
         {
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
