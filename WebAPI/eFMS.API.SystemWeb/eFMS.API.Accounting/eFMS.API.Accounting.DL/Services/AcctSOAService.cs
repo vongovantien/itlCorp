@@ -1012,15 +1012,13 @@ namespace eFMS.API.Accounting.DL.Services
                 //Get charge by: Customer, loại phí
                 surcharges = csShipmentSurchargeRepo.Get(x => x.Type == typeCharge
                                                              && x.PaymentObjectId == criteria.CustomerID
-                                                             && string.IsNullOrEmpty(x.SyncedFrom)
-                                                             && (x.Type == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano)));
+                                                             && string.IsNullOrEmpty(x.SyncedFrom));
                 if (criteria.IsOBH) //**
                 {
                     //SELL ~ PaymentObjectID, SOANo
                     obhSurcharges = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                                                   && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? x.PaymentObjectId : x.PayerId) == criteria.CustomerID
-                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL) ? string.IsNullOrEmpty(x.SyncedFrom) : string.IsNullOrEmpty(x.PaySyncedFrom)
-                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano)));
+                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL) ? string.IsNullOrEmpty(x.SyncedFrom) : string.IsNullOrEmpty(x.PaySyncedFrom));
                 }
             }
             #endregion -- Search by Customer --
