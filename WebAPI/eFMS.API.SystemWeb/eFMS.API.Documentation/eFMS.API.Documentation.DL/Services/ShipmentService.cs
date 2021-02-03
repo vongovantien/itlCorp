@@ -1599,15 +1599,30 @@ namespace eFMS.API.Documentation.DL.Services
             var dataShipment = QueryDataOperation(criteria);
             var LstSurcharge = surCharge.Get();
             var LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
+            var PartnerList = catPartnerRepo.Get();
+            var LookupPartner = PartnerList.ToLookup(x => x.Id);
+            var PlaceList = catPlaceRepo.Get();
             foreach (var item in dataShipment)
             {
                 GeneralReportResult data = new GeneralReportResult();
                 data.JobId = item.JobNo;
                 data.Mawb = item.Mblno;
                 data.Hawb = item.Hwbno;
-                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn;
-                data.CarrierName = catPartnerRepo.Get(x => x.Id == item.SupplierId).FirstOrDefault()?.PartnerNameEn;
-                data.AgentName = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn;
+                foreach (var partner in LookupPartner[item.CustomerId])
+                {
+                    data.CustomerName = partner?.PartnerNameEn;
+                    break;
+                }
+                foreach (var partner in LookupPartner[item.SupplierId])
+                {
+                    data.CarrierName = partner?.PartnerNameEn;
+                    break;
+                }
+                foreach (var partner in LookupPartner[item.AgentId])
+                {
+                    data.AgentName = partner?.PartnerNameEn;
+                    break;
+                }
                 data.ServiceDate = item.ServiceDate;
 
                 var _polCode = catPlaceRepo.Get(x => x.Id == item.Pol).FirstOrDefault()?.Code;
@@ -1767,19 +1782,35 @@ namespace eFMS.API.Documentation.DL.Services
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
             var LstSurcharge = surCharge.Get();
             var LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
+            var PartnerList = catPartnerRepo.Get();
+            var LookupPartner = PartnerList.ToLookup(x => x.Id);
+            var PlaceList = catPlaceRepo.Get();
             foreach (var item in dataShipment)
             {
                 GeneralReportResult data = new GeneralReportResult();
                 data.JobId = item.JobId;
                 data.Mawb = item.Mawb;
                 data.Hawb = item.Hawb;
-                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn;
-                data.CarrierName = catPartnerRepo.Get(x => x.Id == item.CarrierId).FirstOrDefault()?.PartnerNameEn;
-                data.AgentName = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn;
+                foreach(var partner in LookupPartner[item.CustomerId])
+                {
+                    data.CustomerName = partner?.PartnerNameEn;
+                    break;
+                }
+                foreach (var partner in LookupPartner[item.CarrierId])
+                {
+                    data.CarrierName = partner?.PartnerNameEn;
+                    break;
+                }
+                foreach (var partner in LookupPartner[item.AgentId])
+                {
+                    data.AgentName = partner?.PartnerNameEn;
+                    break;
+                }
+
                 data.ServiceDate = item.ServiceDate;
 
-                var _polCode = catPlaceRepo.Get(x => x.Id == item.Pol).FirstOrDefault()?.Code;
-                var _podCode = catPlaceRepo.Get(x => x.Id == item.Pod).FirstOrDefault()?.Code;
+                var _polCode = PlaceList.Where(x => x.Id == item.Pol).FirstOrDefault()?.Code;
+                var _podCode = PlaceList.Where(x => x.Id == item.Pod).FirstOrDefault()?.Code;
                 data.Route = _polCode + "/" + _podCode;
 
                 //Qty lấy theo Housebill
@@ -2573,27 +2604,6 @@ namespace eFMS.API.Documentation.DL.Services
                         data.GrossWeight = charge.GrossWeight;
                         data.CBM = charge.CBM;
                         data.PackageContainer = charge.PackageContainer;
-                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
-                        decimal? percent = 0;
-                        if (charge.VATRate > 0)
-                        {
-                            percent = charge.VATRate / 100;
-                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity * _exchangeRate);
-                            if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 2);
-
-                            }
-                            else
-                            {
-                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0);
-                            }
-                        }
-                        else
-                        {
-                            charge.VATAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(charge.VATRate ?? 0) : NumberHelper.RoundNumber(charge.VATRate ?? 0, 2));
-                        }
-                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0, 2));
                         foreach (var partner in detailLookupPartner[_partnerId])
                         {
                             data.SupplierCode = partner?.AccountNo;
@@ -2607,6 +2617,16 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         data.ChargeName = charge.ChargeName;
+                        if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            charge.NetAmount = charge.AmountUSD;
+                            charge.VATAmount = charge.VATAmountUSD;
+                        }
+                        else
+                        {
+                            charge.NetAmount = charge.AmountVND;
+                            charge.VATAmount = charge.VATAmountVND;
+                        }
                         data.NetAmount = charge.NetAmount;
                         data.VATAmount = charge.VATAmount;
                         data.Type = charge.Type;
@@ -2670,27 +2690,16 @@ namespace eFMS.API.Documentation.DL.Services
                         data.GrossWeight = charge.GrossWeight;
                         data.CBM = charge.CBM;
                         data.PackageContainer = charge.PackageContainer;
-                        decimal? percent = 0;
-                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
-                        if (charge.VATRate > 0)
+                        if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
                         {
-                            percent = charge.VATRate / 100;
-                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity * _exchangeRate);
-                            if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 2);
-
-                            }
-                            else
-                            {
-                                charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0);
-                            }
+                            charge.NetAmount = charge.AmountUSD;
+                            charge.VATAmount = charge.VATAmountUSD;
                         }
                         else
                         {
-                            charge.VATAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(charge.VATRate ?? 0) : NumberHelper.RoundNumber(charge.VATRate ?? 0, 2));
+                            charge.NetAmount = charge.AmountVND;
+                            charge.VATAmount = charge.VATAmountVND;
                         }
-                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0, 2));
 
                         foreach (var partner in detailLookupPartner[_partnerId])
                         {
@@ -2737,7 +2746,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Service = master.TransactionType,
                                         HBLID = house.Id,
                                         PurchaseOrderNo = master.Pono,
-                                        AOL = master.Pol
+                                        AOL = master.Pol,
+
                                     };
 
                 return queryShipment.AsQueryable();
@@ -2805,7 +2815,12 @@ namespace eFMS.API.Documentation.DL.Services
                                            ExchangeDate = sur.ExchangeDate,
                                            FinalExchangeRate = sur.FinalExchangeRate,
                                            TypeCharge = chg.Type,
-                                           PayerId = sur.PayerId
+                                           PayerId = sur.PayerId,
+                                           VATAmountUSD = sur.VatAmountUsd,
+                                           VATAmountVND = sur.VatAmountVnd,
+                                           AmountUSD = sur.AmountUsd,
+                                           AmountVND = sur.AmountVnd
+                                           
                                        };
             if (query != null)
             {
@@ -2862,7 +2877,11 @@ namespace eFMS.API.Documentation.DL.Services
                                           ExchangeDate = sur.ExchangeDate,
                                           PackageContainer = cstd.PackageContainer,
                                           TypeCharge = chg.Type,
-                                          PayerId = sur.PayerId
+                                          PayerId = sur.PayerId,
+                                          VATAmountUSD = sur.VatAmountUsd,
+                                          VATAmountVND = sur.VatAmountVnd,
+                                          AmountUSD = sur.AmountUsd,
+                                          AmountVND = sur.AmountVnd
                                       };
             if (query != null)
             {
