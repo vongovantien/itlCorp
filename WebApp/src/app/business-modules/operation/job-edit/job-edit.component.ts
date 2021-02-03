@@ -431,10 +431,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this.editForm.setFormValue();
                     }
 
-                    if (this.isDuplicate) {
-                        this.editForm.getBillingOpsId();
-                        this.headerComponent.resetBreadcrumb("Create Job");
-                    }
+                    // if (this.isDuplicate) {
+                    //     this.editForm.getBillingOpsId();
+                    //     this.headerComponent.resetBreadcrumb("Create Job");
+                    // }
                 },
             );
     }
@@ -544,9 +544,18 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     onSubmitDuplicateConfirm() {
         this.editForm.isSubmitted = false;
-        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
-            queryParams: { action: 'copy' }
-        });
+        // this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
+        //     queryParams: { action: 'copy' }
+        // });
+        this.tab = 'job-edit'
+        this.isDuplicate = true;
+        this.editForm.isJobCopy = this.isDuplicate;
+        this.editForm.setFormValue();
+
+        if (this.isDuplicate) {
+            this.editForm.getBillingOpsId();
+            this.headerComponent.resetBreadcrumb("Create Job");
+        }
     }
 
     async getAdvanceSettleInfoComponent() {

@@ -319,7 +319,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     }
 
     previewCdNote(data: string) {
-        this._documentationRepo.previewCDNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data }, false)
+        this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
