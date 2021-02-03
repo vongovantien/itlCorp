@@ -38,8 +38,10 @@
                         <div>{{ads.balance}} {{ads.adCurrency}}</div>
                     </div>
                 </div>
-
+                <div class="hr"></div>
             </div>
+            <tr app-table-none-record *ngIf="!adSett.length">
+            </tr>
         </div>
     </div>
 </div>

@@ -1611,13 +1611,13 @@ namespace eFMS.API.Documentation.DL.Services
         public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
         {
             var query = (from SC in surchargeRepository.Get()
-                        join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
-                        join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
-                        join US in userRepository.Get() on OP.UserCreated equals US.Id
-                        join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
-                        join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
+                         join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
+                         join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
+                         join US in userRepository.Get() on OP.UserCreated equals US.Id
+                         join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
+                         join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
 
-                        where OP.Id == JobID && SC.SettlementCode != null
+                         where OP.Id == JobID && SC.SettlementCode != null && ADR.AdvanceNo == ADP.AdvanceNo && SC.AdvanceNo ==ADR.AdvanceNo
                         group SC by new { SC.Hblno, SC.Mblno, ADR.Hblid, 
                             adNo = ADP.AdvanceNo,
                             adcurrency = ADP.AdvanceCurrency,
