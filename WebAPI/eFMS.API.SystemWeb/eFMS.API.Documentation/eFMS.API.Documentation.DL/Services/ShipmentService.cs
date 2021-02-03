@@ -1271,29 +1271,57 @@ namespace eFMS.API.Documentation.DL.Services
                     //BUY
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    /*if (_rate == null)
-                    {
-                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
-                    }*/
                     // tinh total phi chargeGroup freight
                     if (ChargeGroupModel?.Name == "Freight")
                     {
-                        _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountFreight = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
+
                     }
                     if (ChargeGroupModel?.Name == "Trucking")
                     {
-                        _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountTrucking = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        }
+
                     }
                     if (ChargeGroupModel?.Name == "Handling")
                     {
-                        _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountHandling = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
                     }
-                    if (ChargeGroupModel?.Name == "Other")
+                    if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com")
                     {
-                        _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountOther = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
                     }
-                    if (charge.KickBack == true)
+                    if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                     {
                         _totalBuyAmountKB += charge.Quantity * charge.UnitPrice * _rate ?? 0;
                     }
@@ -2482,7 +2510,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (charge.VATRate > 0)
                         {
                             percent = charge.VATRate / 100;
-                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity * _exchangeRate);
                             if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
                                 charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 2);
@@ -2497,7 +2525,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             charge.VATAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(charge.VATRate ?? 0) : NumberHelper.RoundNumber(charge.VATRate ?? 0, 2));
                         }
-                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0, 2));
+                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0, 2));
                         foreach (var partner in detailLookupPartner[_partnerId])
                         {
                             data.SupplierCode = partner?.AccountNo;
@@ -2575,10 +2603,11 @@ namespace eFMS.API.Documentation.DL.Services
                         data.CBM = charge.CBM;
                         data.PackageContainer = charge.PackageContainer;
                         decimal? percent = 0;
+                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                         if (charge.VATRate > 0)
                         {
                             percent = charge.VATRate / 100;
-                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                            charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity * _exchangeRate);
                             if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
                                 charge.VATAmount = NumberHelper.RoundNumber(charge.VATAmount ?? 0, 2);
@@ -2593,7 +2622,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             charge.VATAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(charge.VATRate ?? 0) : NumberHelper.RoundNumber(charge.VATRate ?? 0, 2));
                         }
-                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity) ?? 0, 2));
+                        charge.NetAmount = (charge.Currency == DocumentConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0) : NumberHelper.RoundNumber((charge.UnitPrice * charge.Quantity * _exchangeRate) ?? 0, 2));
 
                         foreach (var partner in detailLookupPartner[_partnerId])
                         {
