@@ -1067,7 +1067,6 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                         }
-                        //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
                         decimal UnitPrice = charge.UnitPrice ?? 0;
                         charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
                         //BUY
@@ -1164,11 +1163,6 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                         var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        /*if (_rate == null)
-                        {
-                            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                            _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
-                        }*/
                         _obh += charge.Total * _rate; // Phí OBH sau thuế
                     }
                 }
