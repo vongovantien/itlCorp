@@ -1618,31 +1618,41 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ChargeWeight = item.SumChargeWeight ?? 0;
 
                 #region -- Phí Selling trước thuế --
-                decimal _revenue = 0;
-                // var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
-                var _chargeSell = LookupSurchage[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
-                foreach (var charge in _chargeSell)
+                decimal? _revenue = 0;
+                if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
-                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    decimal UnitPrice = charge.UnitPrice ?? 0;
-                    _revenue += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
+                    var _chargeSell = LookupSurchage[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                    foreach (var charge in _chargeSell)
+                    {
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _revenue += charge.AmountVnd;
+                        }
+                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _revenue += charge.AmountUsd;
+                        }
+                    }
+                    data.Revenue = _revenue;
                 }
-                data.Revenue = _revenue;
                 #endregion -- Phí Selling trước thuế --
 
                 #region -- Phí Buying trước thuế --
-                decimal _cost = 0;
-                // var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.Hblid);
+                decimal? _cost = 0;
+                //var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
                     var _chargeBuy = LookupSurchage[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                     foreach (var charge in _chargeBuy)
                     {
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        _cost += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _cost += charge.AmountVnd;
+                        }
+                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _cost += charge.AmountUsd;
+                        }
                     }
                     data.Cost = _cost;
                 }
@@ -1652,16 +1662,22 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Profit = data.Revenue - data.Cost;
 
                 #region -- Phí OBH sau thuế --
-                decimal _obh = 0;
-                //var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.Hblid);
+                decimal? _obh = 0;
+                //var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.HblId);
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
                     var _chargeObh = LookupSurchage[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        _obh += charge.Total * _rate; // Phí OBH sau thuế
+                        // Phí OBH sau thuế
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _obh += charge.VatAmountVnd + charge.AmountVnd;
+                        }
+                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _obh += charge.VatAmountUsd + charge.VatAmountUsd;
+                        }
                     }
                     data.Obh = _obh;
                 }
@@ -1772,35 +1788,41 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ChargeWeight = houseBill?.ChargeWeight ?? 0;
 
                 #region -- Phí Selling trước thuế --
-                decimal _revenue = 0;
-                //var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
+                decimal? _revenue = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeSell = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
                     foreach (var charge in _chargeSell)
                     {
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        _revenue += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
+                        if(criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _revenue += charge.AmountVnd;
+                        }
+                        else if(criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _revenue += charge.AmountUsd;
+                        }
                     }
+                    data.Revenue = _revenue;
                 }
-                
-                data.Revenue = _revenue;
+
                 #endregion -- Phí Selling trước thuế --
 
                 #region -- Phí Buying trước thuế --
-                decimal _cost = 0;
-                //var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
+                decimal? _cost = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeBuy = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                     foreach (var charge in _chargeBuy)
                     {
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        _cost += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _cost += charge.AmountVnd;
+                        }
+                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _cost += charge.AmountUsd;
+                        }
                     }
                     data.Cost = _cost;
                 }
@@ -1810,16 +1832,21 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Profit = data.Revenue - data.Cost;
 
                 #region -- Phí OBH sau thuế --
-                decimal _obh = 0;
-                //var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.HblId);
+                decimal? _obh = 0;
                 if(item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeObh = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        _obh += charge.Total * _rate; // Phí OBH sau thuế
+                        // Phí OBH sau thuế
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _obh += charge.VatAmountVnd + charge.AmountVnd;
+                        }
+                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _obh += charge.VatAmountUsd + charge.VatAmountUsd;
+                        }
                     }
                     data.Obh = _obh;
                 }
