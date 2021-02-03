@@ -2617,7 +2617,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         data.ChargeName = charge.ChargeName;
-                        if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
+                        if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                         {
                             charge.NetAmount = charge.AmountUSD;
                             charge.VATAmount = charge.VATAmountUSD;
@@ -2690,7 +2690,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.GrossWeight = charge.GrossWeight;
                         data.CBM = charge.CBM;
                         data.PackageContainer = charge.PackageContainer;
-                        if (charge.Currency != DocumentConstants.CURRENCY_LOCAL)
+                        if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                         {
                             charge.NetAmount = charge.AmountUSD;
                             charge.VATAmount = charge.VATAmountUSD;
