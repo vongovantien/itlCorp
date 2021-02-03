@@ -632,11 +632,16 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 if (criteria.CustomerId == null) return null;
-                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
-                if (shipment == null) return null;
+                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId);
+                IQueryable<CsTransaction> shipmentQuery = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).Take(1);
+                if (shipmentQuery == null) return null;
 
                 // Chỉ lấy house
-                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))).Select(x => x.Id).ToList();
+                foreach (var shipment in shipmentQuery)
+                {
+                    var houseId = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.CustomerId == criteria.CustomerId && x.Id != criteria.HblId).Select(x => x.Id).ToList();
+                    houseIds.AddRange(houseId);
+                }
             }
 
             if (houseIds.Count == 0) return null;

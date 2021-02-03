@@ -663,19 +663,19 @@ namespace eFMS.API.Documentation.DL.Services
                 
                 var opsTransaction = GetNewShipmentToConvert(productService, model);
                 opsTransaction.JobNo = CreateJobNoOps();
-                DataContext.Add(opsTransaction, false);
+                DataContext.Add(opsTransaction);
 
                 if (model.Id > 0)
                 {
                     var clearance = UpdateInfoConvertClearance(model);
                     clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+                    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                 }
                 else
                 {
                     var clearance = GetNewClearanceModel(model);
                     clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Add(clearance, false);
+                    customDeclarationRepository.Add(clearance);
                 }
                 DataContext.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
@@ -872,18 +872,37 @@ namespace eFMS.API.Documentation.DL.Services
                             return result;
                         }
 
-                        OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
-                        opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
-                        opsTransaction.SalemanId = customerContract.SaleManId;
+                        using (var trans = DataContext.DC.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
+                                opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+                                opsTransaction.SalemanId = customerContract.SaleManId;
 
-                        DataContext.Add(opsTransaction, false);
+                                DataContext.Add(opsTransaction);
 
-                        CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
+                                CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
 
-                        clearance.JobNo = opsTransaction.JobNo;
-                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+                                clearance.JobNo = opsTransaction.JobNo;
+                                customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
 
-                        i = i + 1;
+                                i = i + 1;
+
+                                trans.Commit();
+                            }
+                            catch (Exception)
+                            {
+
+                                throw;
+                            }
+                            finally
+                            {
+                                trans.Dispose();
+                            }
+                        }
+
+                       
                     }
                 }
 
