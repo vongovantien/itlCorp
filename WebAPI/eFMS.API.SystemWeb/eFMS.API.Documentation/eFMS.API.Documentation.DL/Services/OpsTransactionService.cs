@@ -1696,7 +1696,7 @@ namespace eFMS.API.Documentation.DL.Services
                 OpsTransaction shipment = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
                 if (shipment != null)
                 {
-                    hasChargeSynced = surchargeRepository.Any(x => x.JobNo == shipment.JobNo && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                    hasChargeSynced = surchargeRepository.Any(x => x.Hblid == shipment.Hblid && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
                 }
 
                 if (hasChargeSynced)
