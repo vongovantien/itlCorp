@@ -2116,7 +2116,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         item.Active = true;
                         item.UserCreated = transaction.UserCreated;
-                        item.DatetimeCreated = DateTime.Now;
+                        item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                         item.GroupId = currentUser.GroupId;
                         item.DepartmentId = currentUser.DepartmentId;
                         item.OfficeId = currentUser.OfficeID;

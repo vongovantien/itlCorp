@@ -1452,7 +1452,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.Hblid = Guid.NewGuid();
                     model.JobNo = CreateJobNoOps();
                     model.UserModified = currentUser.UserID;
-                    model.DatetimeModified = DateTime.Now;
+                    model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                     model.UserCreated = currentUser.UserID;
                     model.GroupId = currentUser.GroupId;
                     model.DepartmentId = currentUser.DepartmentId;
