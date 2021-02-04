@@ -4627,7 +4627,7 @@ namespace eFMS.API.Accounting.DL.Services
             return transactionType;
         }
 
-        public HandleState DenyAdvancePayments(List<Guid> Ids)
+        public HandleState DenySettlePayments(List<Guid> Ids)
         {
             HandleState result = new HandleState();
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -4638,7 +4638,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         {
                             AcctSettlementPayment settle = DataContext.First(x => x.Id == Id);
-                            if (settle != null && settle.SyncStatus == AccountingConstants.STATUS_REJECTED)
+                            if (settle != null && settle.SyncStatus != AccountingConstants.STATUS_SYNCED && settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW)
                             {
                                 settle.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
                                 settle.UserModified = currentUser.UserID;
