@@ -18,6 +18,10 @@ namespace eFMS.API.Accounting.DL.Models
         public string Type { get; set; }
         public decimal? Debit { get; set; }
         public decimal? Credit { get; set; }
+        public decimal? DebitLocal { get; set; }
+        public decimal? CreditLocal { get; set; }
+        public decimal? DebitUSD { get; set; }
+        public decimal? CreditUSD { get; set; }
         public string SOANo { get; set; }
         public bool IsOBH { get; set; } 
         public string Currency { get; set; }
@@ -60,6 +64,8 @@ namespace eFMS.API.Accounting.DL.Models
         public string PackageContainer { get; set; }
         public string TypeCharge { get; set; }
         public decimal? VATAmount { get; set; }
+        public decimal? VATAmountLocal { get; set; }
+        public decimal? VATAmountUSD { get; set; }
         public decimal? NetAmount { get; set; }
         public string PIC { get; set; }
         public bool IsSynced { get; set; }
