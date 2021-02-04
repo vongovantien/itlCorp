@@ -20,7 +20,8 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                     [dataSources]="configShipment.dataSource"
                                     [displayFields]="configShipment.displayFields"
-                                    [selectedDisplayFields]="configShipment.selectedDisplayFields">
+                                    [selectedDisplayFields]="configShipment.selectedDisplayFields"
+                                    (remove)="selectedShipmentData = null">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
