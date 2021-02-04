@@ -235,6 +235,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var creatorObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             string address = webUrl.Value.Url + "/en/#/" + "home/catalogue/partner-data/detail/" + partner.Id;
             subject = "Reject Partner - " + partner.PartnerNameVn;
@@ -253,8 +254,8 @@ namespace eFMS.API.Catalogue.DL.Services
                   "</br>"
                   + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            string UrlImage = UrlClone.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", UrlImage.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> lstCc = ListMailBCC();
             List<string> lstTo = new List<string>();

@@ -68,5 +68,9 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? VATAmount { get; set; }
         public decimal? NetAmount { get; set; }
         public string SoaNo { get; set; }
+        public decimal? AmountUSD { get; set; }
+        public decimal? AmountVND { get; set; }
+        public decimal? VATAmountUSD { get; set; }
+        public decimal? VATAmountVND { get; set; }
     }
 }
