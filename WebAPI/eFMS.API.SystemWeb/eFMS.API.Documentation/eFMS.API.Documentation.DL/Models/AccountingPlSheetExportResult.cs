@@ -42,5 +42,10 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? FinalExchangeRate { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public string CurrencyId { get; set; }
+        public decimal? AmountUSD { get; set; }
+        public decimal? AmountVND { get; set; }
+        public decimal? VATAmountUSD { get; set; }
+        public decimal? VATAmountVND { get; set; }
+        public string CdNote { get; set; }
     }
 }

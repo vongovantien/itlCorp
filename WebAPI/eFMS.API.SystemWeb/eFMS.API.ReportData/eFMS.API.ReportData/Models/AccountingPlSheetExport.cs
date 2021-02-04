@@ -38,5 +38,6 @@ namespace eFMS.API.ReportData.Models
         public string PmVoucherNo { get; set; }
         public string Service { get; set; }
         public string UserExport { get; set; }
+        public string CdNote { get; set; }
     }
 }
