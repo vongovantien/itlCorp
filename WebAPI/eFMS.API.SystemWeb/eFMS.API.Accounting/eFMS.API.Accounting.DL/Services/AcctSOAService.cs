@@ -1872,8 +1872,6 @@ namespace eFMS.API.Accounting.DL.Services
                     air.Pcs = chargeData.PackageQty;
                     air.CW = chargeData.ChargeWeight;
                     air.GW = chargeData.GrossWeight;
-                    var chargeAF = charge.Where(x => x.HBL == item && x.ChargeName.ToUpper() == AccountingConstants.CHARGE_AIR_FREIGHT.ToUpper());
-                    air.Rate = chargeAF.FirstOrDefault()?.UnitPrice;
 
                     air.TotalAmount = 0;
                     // Airfrieght
@@ -1882,9 +1880,9 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         lstAirfrieght = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.AirFreight = null;
                     if (lstAirfrieght.Count() > 0)
                     {
+                        air.Rate = NumberHelper.RoundNumber(lstAirfrieght.Select(t => t.UnitPrice ?? 0).Sum(), 2);
                         air.AirFreight = NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.DebitUSD).Sum(), 2);
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.DebitLocal).Sum());
                     }
