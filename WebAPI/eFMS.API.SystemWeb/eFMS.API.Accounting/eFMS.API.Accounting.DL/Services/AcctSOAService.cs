@@ -2493,13 +2493,11 @@ namespace eFMS.API.Accounting.DL.Services
                                  ChargeCode = chg.ChargeCode,
                                  OriginalCurrency = chg.Currency,
                                  OriginalAmount = chg.Debit - chg.Credit,
-                                 //CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                                 //?
-                                 //    GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                                 //:
-                                 //    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                                 CreditExchange = chg.Currency == AccountingConstants.CURRENCY_USD ? NumberHelper.RoundNumber((chg.CreditUSD ?? 0), 0)
-                                 : NumberHelper.RoundNumber((chg.CreditLocal ?? 0), 2),
+                                 CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 ?
+                                     GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 :
+                                     GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
                                  AmountVND = chg.Credit * (chg.Debit - chg.Credit),
                                  VAT = chg.VATRate,
                                  AccountDebitNoVAT = cd.DebitAccountNo,
