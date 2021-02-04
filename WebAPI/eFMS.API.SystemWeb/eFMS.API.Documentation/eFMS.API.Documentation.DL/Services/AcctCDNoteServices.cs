@@ -406,6 +406,8 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.LastSyncDate = cdNote.LastSyncDate;
                 entity.SyncStatus = cdNote.SyncStatus;
                 entity.ReasonReject = cdNote.ReasonReject;
+                entity.ExchangeRate = cdNote.ExchangeRate;
+                entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
 
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
@@ -2221,10 +2223,11 @@ namespace eFMS.API.Documentation.DL.Services
                     var cdNote = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                     if (cdNote == null) return new HandleState((object)"Not found Credit Note");
 
-                    cdNote.SyncStatus = "Rejected";
+                    cdNote.SyncStatus = "";
                     cdNote.UserModified = currentUser.UserID;
                     cdNote.DatetimeModified = DateTime.Now;
                     cdNote.ReasonReject = model.Reason;
+                    cdNote.Note += " Rejected from Accountant";
 
                     HandleState hs = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
                     if (hs.Success)

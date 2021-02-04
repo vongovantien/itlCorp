@@ -264,6 +264,7 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.SyncStatus = soaCurrent.SyncStatus;
                         soa.LastSyncDate = soaCurrent.LastSyncDate;
                         soa.ReasonReject = soaCurrent.ReasonReject;
+                        soa.ExcRateUsdToLocal = soaCurrent.ExcRateUsdToLocal;
 
                         //Check exists OBH Debit Charge
                         var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
@@ -2807,10 +2808,11 @@ namespace eFMS.API.Accounting.DL.Services
                     var soa = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                     if (soa == null) return new HandleState((object)"Not found SOA");
 
-                    soa.SyncStatus = "Rejected";
+                    soa.SyncStatus = "";
                     soa.UserModified = currentUser.UserID;
                     soa.DatetimeModified = DateTime.Now;
                     soa.ReasonReject = model.Reason;
+                    soa.Note += " Rejected from Accountant";
 
                     HandleState hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
                     if (hs.Success)
