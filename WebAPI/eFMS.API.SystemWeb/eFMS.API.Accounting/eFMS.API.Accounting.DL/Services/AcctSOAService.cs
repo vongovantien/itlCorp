@@ -109,6 +109,8 @@ namespace eFMS.API.Accounting.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
+                var _excRateUsdToLocal = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
+                model.ExcRateUsdToLocal = _excRateUsdToLocal;
 
                 //Check exists OBH Debit Charge
                 var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
@@ -137,9 +139,11 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _amount = 0;
                         decimal _debitAmount = 0;
                         decimal _creditAmount = 0;
+                        int _totalCharge = 0;
                         if (surcharges != null)
                         {
                             _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
+                            _totalCharge = surcharges.Count();
                             foreach (var surcharge in surcharges)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
@@ -191,6 +195,7 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.TotalShipment = _totalShipment;
                         soa.DebitAmount = _debitAmount;
                         soa.CreditAmount = _creditAmount;
+                        soa.TotalCharge = _totalCharge;
                         var hs = DataContext.Add(soa, false);
 
                         csShipmentSurchargeRepo.SubmitChanges();
@@ -284,9 +289,11 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _amount = 0;
                         decimal _debitAmount = 0;
                         decimal _creditAmount = 0;
+                        int _totalCharge = 0;
                         if (surcharges != null)
                         {
                             _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
+                            _totalCharge = surcharges.Count();
                             foreach (var surcharge in surcharges)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
@@ -306,8 +313,19 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
                                     surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-                                    //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                                    surcharge.FinalExchangeRate = null;
+                                    
+                                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                                    {
+                                        surcharge.FinalExchangeRate = soaCurrent.ExcRateUsdToLocal;
+                                    }
+                                    else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                                    {
+                                        surcharge.FinalExchangeRate = 1;
+                                    }
+                                    else
+                                    {
+                                        surcharge.FinalExchangeRate = null;
+                                    }
 
                                     #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
@@ -338,6 +356,7 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.TotalShipment = _totalShipment;
                         soa.DebitAmount = _debitAmount;
                         soa.CreditAmount = _creditAmount;
+                        soa.TotalCharge = _totalCharge;
 
                         var hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
                         csShipmentSurchargeRepo.SubmitChanges();
@@ -738,21 +757,59 @@ namespace eFMS.API.Accounting.DL.Services
 
             #endregion -- Search by Created Date or Service Date --
 
-            #region -- Search by Creator of Job --
+            #region -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
             if (!string.IsNullOrEmpty(criteria.StrCreators))
             {
-                var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                if (criteria.StrServices.Contains("CL"))
+                if (string.IsNullOrEmpty(criteria.StaffType) || criteria.StaffType == "Creator")
                 {
-                    operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
-                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                    var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        }
+                    }
+                    else
                     {
                         transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
                     }
                 }
-                else
+
+                if (criteria.StaffType == "PersonInCharge")
                 {
-                    transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                    var personInCharges = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => personInCharges.Where(w => w == x.BillingOpsId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                    }
+                }
+
+                if (criteria.StaffType == "Salesman")
+                {
+                    var salesMans = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    var jobIdTrans = csTransactionDetailRepo.Get(x => salesMans.Where(w => w == x.SaleManId).Any()).Select(s => s.JobId).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => salesMans.Where(w => w == x.SalemanId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                    }
                 }
 
                 var creatorJobNos = new List<string>();
@@ -778,7 +835,7 @@ namespace eFMS.API.Accounting.DL.Services
                     obhSurcharges = null;
                 }
             }
-            #endregion -- Search by Creator of Job --
+            #endregion -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
 
             #region -- Search by ChargeId --
             if (!string.IsNullOrEmpty(criteria.StrCharges))
@@ -1021,6 +1078,17 @@ namespace eFMS.API.Accounting.DL.Services
             }
             #endregion -- Search by Customer --
 
+            #region -- Search by Services --
+            if (!string.IsNullOrEmpty(criteria.StrServices))
+            {
+                surcharges = surcharges.Where(x => criteria.StrServices.Contains(x.TransactionType));
+                if (criteria.IsOBH) //**
+                {
+                    obhSurcharges = obhSurcharges.Where(x => criteria.StrServices.Contains(x.TransactionType));
+                }
+            }
+            #endregion -- Search by Services --
+
             #region -- Search by Created Date or Service Date --
             //Created Date of Job
             if (criteria.DateType == "CreatedDate")
@@ -1095,21 +1163,59 @@ namespace eFMS.API.Accounting.DL.Services
 
             #endregion -- Search by Created Date or Service Date --
 
-            #region -- Search by Creator of Job --
+            #region -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
             if (!string.IsNullOrEmpty(criteria.StrCreators))
             {
-                var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                if (criteria.StrServices.Contains("CL"))
+                if (string.IsNullOrEmpty(criteria.StaffType) || criteria.StaffType == "Creator")
                 {
-                    operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
-                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                    var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        }
+                    }
+                    else
                     {
                         transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
                     }
                 }
-                else
+
+                if (criteria.StaffType == "PersonInCharge")
                 {
-                    transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                    var personInCharges = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => personInCharges.Where(w => w == x.BillingOpsId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                    }
+                }
+
+                if (criteria.StaffType == "Salesman")
+                {
+                    var salesMans = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    var jobIdTrans = csTransactionDetailRepo.Get(x => salesMans.Where(w => w == x.SaleManId).Any()).Select(s => s.JobId).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => salesMans.Where(w => w == x.SalemanId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                    }
                 }
 
                 var creatorJobNos = new List<string>();
@@ -1135,7 +1241,7 @@ namespace eFMS.API.Accounting.DL.Services
                     obhSurcharges = null;
                 }
             }
-            #endregion -- Search by Creator of Job --
+            #endregion -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
 
             #region -- Shipment (JobNo, MBL, HBL)
             if (!string.IsNullOrEmpty(criteria.JobId))
@@ -1398,7 +1504,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  PaymentStatus = s.PaymentStatus,
                                  SyncStatus = s.SyncStatus,
                                  LastSyncDate = s.LastSyncDate,
-                                 ReasonReject = s.ReasonReject
+                                 ReasonReject = s.ReasonReject,
+                                 TotalCharge = s.TotalCharge
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
@@ -1570,6 +1677,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  Id = s.Id,
                                  Soano = s.Soano,
                                  Shipment = s.TotalShipment,
+                                 TotalCharge = s.TotalCharge ?? 0,
                                  PartnerName = pat.PartnerNameEn,
                                  Currency = s.Currency,
                                  CreditAmount = s.CreditAmount,
@@ -1588,13 +1696,15 @@ namespace eFMS.API.Accounting.DL.Services
                                  ServiceTypeId = s.ServiceTypeId,
                                  Customer = s.Customer,
                                  DateType = s.DateType,
+                                 StaffType = s.StaffType,
                                  CreatorShipment = s.CreatorShipment,
                                  PaymentStatus = s.PaymentStatus,
                                  PaymentDueDate = s.PaymentDueDate,
                                  SyncStatus = s.SyncStatus,
                                  LastSyncDate = s.LastSyncDate,
                                  ReasonReject = s.ReasonReject,
-                                 CreditPayment = pat.CreditPayment
+                                 CreditPayment = pat.CreditPayment,
+                                 ExcRateUsdToLocal = s.ExcRateUsdToLocal
                              };
             var result = resultData.FirstOrDefault();
             if (result != null)
@@ -1731,6 +1841,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chg.CDNote = _cdNote;
                     chg.IsSynced = _isSynced;
                     chg.SyncedFromBy = _syncedFromBy;
+                    chg.ExchangeRate = surcharge.FinalExchangeRate;
 
                     data.Add(chg);
                 }

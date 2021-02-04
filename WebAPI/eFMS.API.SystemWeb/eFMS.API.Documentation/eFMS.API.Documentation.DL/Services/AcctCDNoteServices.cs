@@ -480,8 +480,19 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
                             charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-                            //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                            charge.FinalExchangeRate = null;
+
+                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                            {
+                                charge.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
+                            }
+                            else if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                charge.FinalExchangeRate = 1;
+                            }
+                            else
+                            {
+                                charge.FinalExchangeRate = null;
+                            }
 
                             var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
                             charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
@@ -492,7 +503,6 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                             charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                         }
-
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
