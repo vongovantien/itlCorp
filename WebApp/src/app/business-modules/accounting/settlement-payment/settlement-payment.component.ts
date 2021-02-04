@@ -423,7 +423,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     denySettle() {
-        const settlesDenyList = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done' && x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED);
+        const settlesDenyList = this.settlements.filter(x => x.isSelected && x.statusApproval !== AccountingConstants.STATUS_APPROVAL.NEW
+            && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED);
         if (!settlesDenyList.length) {
             this._toastService.warning("Please select settle payment was rejected to deny");
             return;
