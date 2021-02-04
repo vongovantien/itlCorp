@@ -19,6 +19,7 @@ export class SOASearchCharge {
     hbls: any[] = [];
     mbls: any[] = [];
     customNo?: string[] = [];
+    staffType: string = '';
 
     // * Custom
     airlineCode?: string = '';  // * để lọc phí theo job có 3 ký tự đầu MAWB.

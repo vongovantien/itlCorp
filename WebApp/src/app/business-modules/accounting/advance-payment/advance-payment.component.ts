@@ -5,7 +5,6 @@ import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { RoutingConstants } from '@constants';
 import { NgProgress } from '@ngx-progressbar/core';
-import { NgxSpinnerService } from 'ngx-spinner';
 
 import { AppList } from '@app';
 import { AccountingRepo, ExportRepo } from '@repositories';
@@ -68,7 +67,6 @@ export class AdvancePaymentComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _router: Router,
         private _store: Store<IAppState>,
-        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestList = this.requestLoadListAdvancePayment;
@@ -440,10 +438,8 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     onSyncBravo(advIds: AccountingInterface.IRequestGuid[]) {
-        this._spinner.show();
         this._accoutingRepo.syncAdvanceToAccountant(advIds)
             .pipe(
-                finalize(() => this._spinner.hide()),
                 catchError(this.catchError)
             )
             .subscribe(

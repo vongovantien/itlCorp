@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { Charge, SOASearchCharge, User } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil, take, skip } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
@@ -77,6 +77,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     numberOfShipment: number = 0;
     airlineCode: string = '';
 
+    userLogged: any;
+
+    staffTypes: any = [];
+    selectedStaffType: any = null;
+
     constructor(
         private _toastService: ToastrService,
         private _dataService: DataService,
@@ -89,37 +94,50 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     ngOnInit() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.initBasicData();
+        this.getUserLevel();
         this.getPartner();
         this.getCurrency();
-        this.getUser();
+        //this.getUser();
         this.getCharge();
         this.getService();
         this.getCommondity();
-        this.getUserLevel();
     }
 
     getUserLevel() {
         this._store.select(getMenuUserPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
+            .pipe(takeUntil(this.ngUnsubscribe), skip(1)) //* skip(1) - tránh case load 2 lần */
             .subscribe((menuPermission: SystemInterface.IUserPermission) => {
                 if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
                     console.log(menuPermission);
                     if (menuPermission.list !== 'None') {
-                        if (menuPermission.list === 'Company') {
-
+                        if (menuPermission.list === 'All') {
+                            this.getUserLevelByType({});
+                        } else if (menuPermission.list === 'Company') {
+                            this.getUserLevelByType({ type: 'company', companyId: this.userLogged.companyId });
                         } else if (menuPermission.list === 'Office') {
-
+                            this.getUserLevelByType({ type: 'office', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId });
                         } else if (menuPermission.list === 'Department') {
-
+                            this.getUserLevelByType({ type: 'department', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId });
                         } else if (menuPermission.list === 'Group') {
-
+                            this.getUserLevelByType({ type: 'group', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId });
                         } else {
-
+                            this.getUserLevelByType({ type: 'owner', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId, userId: this.userLogged.id });
                         }
                     }
                 }
             });
+    }
+
+    getUserLevelByType(body: any) {
+        this._sysRepo.getUserLevelByType(body).pipe(catchError(this.catchError))
+            .subscribe(
+                (dataUser: any) => {
+                    this.getCurrencyUser(dataUser);
+                    console.log(dataUser)
+                },
+            );
     }
 
     getCommondity() {
@@ -167,8 +185,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCurrencyUser(data: any) {
-        this.users = (data || []).map((item: User) => ({ id: item.id, text: item.username }));
-
+        //this.users = (data || []).map((item: User) => ({ id: item.id, text: item.username }));
+        this.users = (data || []).map((item: any) => ({ id: item.userId, text: item.userName })).filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct Users
         const userLogged: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.selectedUser = [this.users.filter((i: CommonInterface.INg2Select) => i.text.toLowerCase() === userLogged.userName.toLowerCase())[0]];
 
@@ -274,6 +292,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             { title: 'No', value: false }
         ];
         this.selectedObh = this.obhs[0];
+
+        this.staffTypes = [
+            { value: 'PersonInCharge', title: 'Person In Charge' },
+            { value: 'Salesman', title: 'Salesman' },
+            { value: 'Creator', title: 'Creator' }
+        ];
+        this.selectedStaffType = this.staffTypes[0];
+
         this.updateDataSearch('isOBH', this.selectedObh.value);
         this.updateDataSearch('dateType', this.selectedDateMode.value);
         this.updateDataSearch('type', this.selectedType.value);
@@ -301,6 +327,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             case 'obh':
                 this.selectedObh = data;
                 this.updateDataSearch('isOBH', this.selectedObh.value);
+                break;
+            case 'staff-style':
+                this.selectedStaffType = data;
+                this.updateDataSearch('staffType', this.selectedStaffType.value);
                 break;
             case 'currency':
                 this.selectedCurrency = data;
@@ -407,7 +437,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 hbls: this.mapShipment("HBL"),
                 mbls: this.mapShipment("MBL"),
                 customNo: this.mapShipment("CustomNo"),
-                airlineCode: this.airlineCode
+                airlineCode: this.airlineCode,
+                staffType: this.selectedStaffType.value
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
