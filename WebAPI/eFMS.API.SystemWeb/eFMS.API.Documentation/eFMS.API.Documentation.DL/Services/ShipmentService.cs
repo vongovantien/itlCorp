@@ -927,6 +927,26 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
             var dataShipment = QueryDataShipmentOverview(criteria);
+            if (!dataShipment.Any()) return lstShipment.AsQueryable();
+            var lstSurchage = surCharge.Get();
+            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var dataOpertation = QueryDataOperation(criteria);
+            var PlaceList = catPlaceRepo.Get();
+            var PartnerList = catPartnerRepo.Get();
+            var LookupPartner = PartnerList.ToLookup(x => x.Id);
+            var LookupPlace = PlaceList.ToLookup(x => x.Id);
+            var ChargeList = catChargeRepo.Get();
+            var LookupCharge = ChargeList.ToLookup(x => x.Id);
+            var UserList = sysUserRepo.Get();
+            var LookupUser = UserList.ToLookup(x => x.Id);
+            var ChargeGroupList = catChargeGroupRepo.Get();
+            var ChargeGroupLookup = ChargeGroupList.ToLookup(x => x.Id);
+            var OfficeList = sysOfficeRepo.Get();
+            var LookupOffice = OfficeList.ToLookup(x => x.Id);
+            var UserLevelList = sysUserLevelRepo.Get();
+            var LookupUserLevelList = UserLevelList.ToLookup(x => x.UserId);
+            var UnitList = catUnitRepo.Get();
+            var LookupUnitList = UnitList.ToLookup(x => x.Id);
             foreach (var item in dataShipment)
             {
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
@@ -972,8 +992,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.MblMawb;
                 data.HblHawb = item.HblHawb;
-                data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
-                data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
+                data.PolPod = item.Pol != null && item.Pol != Guid.Empty ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty
+                    + "/" + (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
+                data.Carrier = !string.IsNullOrEmpty(item.Carrier) ? LookupPartner[item.Carrier].FirstOrDefault()?.ShortName : string.Empty;
                 data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
                 var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
                 data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
@@ -982,7 +1003,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
                 data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
-                data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault()?.Username;
+                data.Salesman = !string.IsNullOrEmpty(item.Salesman) ? LookupUser[item.Salesman].FirstOrDefault()?.Username : string.Empty;
                 data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
                 data.GW = item.GW;
                 data.CW = item.CW;
@@ -993,54 +1014,68 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Cont45 = item.Cont45;
                 data.QTy = item.QTy;
                 #region -- Phí Selling trước thuế --
-                decimal _totalSellAmountFreight = 0;
-                decimal _totalSellAmountTrucking = 0;
-                decimal _totalSellAmountHandling = 0;
-                decimal _totalSellAmountOther = 0;
-                if(item.HblId != null && item.HblId != Guid.Empty)
+                decimal? _totalSellAmountFreight = 0;
+                decimal? _totalSellAmountTrucking = 0;
+                decimal? _totalSellAmountHandling = 0;
+                decimal? _totalSellAmountOther = 0;
+                if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
-
+                    var _chargeSell = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
                     foreach (var charge in _chargeSell)
                     {
-
-                        var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
                         }
-                        //var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
-                        //SELL
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        /*if (_rate == null)
-                        {
-                            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                            _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
-                        }*/
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
                         {
-                            _totalSellAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountFreight += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountFreight += charge.AmountVnd; // Phí Selling trước thuế
+                            }
                         }
                         if (ChargeGroupModel?.Name == "Trucking")
                         {
-                            _totalSellAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountTrucking += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountTrucking += charge.AmountVnd;  // Phí Selling trước thuế
+                            }
                         }
                         if (ChargeGroupModel?.Name == "Handling")
                         {
-                            _totalSellAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountHandling += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountHandling += charge.AmountVnd;  // Phí Selling trước thuế
+                            }
                         }
                         if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight")
                         {
-                            _totalSellAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                            }
                         }
-                        //END SELL
-
+                        //END SEL
                     }
                 }
                 data.TotalSellFreight = _totalSellAmountFreight;
@@ -1050,33 +1085,23 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers;
                 #endregion
                 #region -- Phí Buying trước thuế --
-                decimal _totalBuyAmountFreight = 0;
-                decimal _totalBuyAmountTrucking = 0;
-                decimal _totalBuyAmountHandling = 0;
-                decimal _totalBuyAmountOther = 0;
-                decimal _totalBuyAmountKB = 0;
-                var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
+                decimal? _totalBuyAmountFreight = 0;
+                decimal? _totalBuyAmountTrucking = 0;
+                decimal? _totalBuyAmountHandling = 0;
+                decimal? _totalBuyAmountOther = 0;
+                decimal? _totalBuyAmountKB = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
+                    var _chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                     foreach (var charge in _chargeBuy)
                     {
-                        var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
                         }
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        charge.UnitPrice = NumberHelper.RoundNumber(UnitPrice, 3);
-                        //BUY
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        /*if (_rate == null)
-                        {
-                            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                            _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
-                        }*/
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
                         {
@@ -1086,8 +1111,14 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountFreight += charge.AmountUsd; // Phí Selling trước thuế
+                                }
+                                else
+                                {
+                                    _totalBuyAmountFreight += charge.AmountVnd;
+                                }
                             }
 
                         }
@@ -1099,7 +1130,14 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountTrucking += charge.AmountUsd;
+                                }
+                                else
+                                {
+                                    _totalBuyAmountTrucking += charge.AmountVnd; // Phí Selling trước thuế
+                                }
                             }
 
                         }
@@ -1111,8 +1149,14 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountHandling += charge.AmountUsd;
+                                }
+                                else
+                                {
+                                    _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
+                                }
                             }
                         }
                         if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com")
@@ -1123,59 +1167,61 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountOther += charge.AmountUsd;
+                                }
+                                else
+                                {
+                                    _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                                }
                             }
                         }
                         if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                         {
-                            _totalBuyAmountKB += charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountKB += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountKB += charge.AmountVnd;
+                            }
                         }
 
                         //END BUY
                     }
                 }
-                
+
                 data.TotalBuyFreight = _totalBuyAmountFreight;
                 data.TotalBuyTrucking = _totalBuyAmountTrucking;
                 data.TotalBuyHandling = _totalBuyAmountHandling;
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
-                //if (data.TotalBuyKB > 0)
-                //{
-                //    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyKB + ;
-                //    //data.TotalBuyOthers = 0;
-                //}
-                //else
-                //{
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB;
-                //}
-                //data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalSellOthers + _totalBuyAmountKB;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
 
                 #region -- Phí OBH sau thuế --
-                decimal _obh = 0;
+                decimal? _obh = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.HblId);
+                    var _chargeObh = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        _obh += charge.Total * _rate; // Phí OBH sau thuế
+                        _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);
                     }
                 }
-            
+
                 data.AmountOBH = _obh;
                 #endregion -- Phí OBH sau thuế --
-                data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
+                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.NameVn).FirstOrDefault() : string.Empty;
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
-                data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
-                var OfficeSaleman = sysUserLevelRepo.Get(x => x.UserId == item.Salesman).Select(t => t.OfficeId).FirstOrDefault();
-                data.SalesOffice = sysOfficeRepo.Get(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault();
-                data.Creator = sysUserRepo.Get(x => x.Id == item.Creator).Select(t => t.Username).FirstOrDefault();
+                data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? LookupOffice[(Guid)item.OfficeId].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                var OfficeSaleman = LookupUserLevelList[item.Salesman].Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? LookupOffice[(Guid)OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.Creator = LookupUser[item.Creator].Select(t => t.Username).FirstOrDefault();
                 data.POINV = item.POINV;
                 data.BKRefNo = item.JobNo;
                 data.Commodity = item.Commodity;
@@ -1183,9 +1229,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.PMTerm = item.PMTerm;
                 data.ShipmentNotes = item.ShipmentNotes;
                 data.Created = item.Created;
-                data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
-                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
-                string Code = catUnitRepo.Get(x => x.Id == item.PackageQty).Select(t => t.Code).FirstOrDefault();
+                data.CustomerId = LookupPartner[item.CustomerId].Select(t => t.AccountNo).FirstOrDefault();
+                data.CustomerName = LookupPartner[item.CustomerId].Select(t => t.ShortName).FirstOrDefault();
+                string Code = item.PackageQty != null ? LookupUnitList[(short)item.PackageQty].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.QTy = item.QTy + " " + Code;
                 lstShipment.Add(data);
             }
@@ -1196,65 +1242,105 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
             var dataOpertation = QueryDataOperation(criteria);
+            if (!dataOpertation.Any()) return lstShipment.AsQueryable();
+            var lstSurchage = surCharge.Get();
+            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var PlaceList = catPlaceRepo.Get();
+            var PartnerList = catPartnerRepo.Get();
+            var LookupPartner = PartnerList.ToLookup(x => x.Id);
+            var LookupPlace = PlaceList.ToLookup(x => x.Id);
+            var ChargeList = catChargeRepo.Get();
+            var LookupCharge = ChargeList.ToLookup(x => x.Id);
+            var UserList = sysUserRepo.Get();
+            var LookupUser = UserList.ToLookup(x => x.Id);
+            var ChargeGroupList = catChargeGroupRepo.Get();
+            var ChargeGroupLookup = ChargeGroupList.ToLookup(x => x.Id);
+            var OfficeList = sysOfficeRepo.Get();
+            var LookupOffice = OfficeList.ToLookup(x => x.Id);
+            var UserLevelList = sysUserLevelRepo.Get();
+            var LookupUserLevelList = UserLevelList.ToLookup(x => x.UserId);
             foreach (var item in dataOpertation)
             {
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
                 data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                 data.JobNo = item.JobNo;
-                data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
-                data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
+                data.PolPod = item.Pol != null && item.Pol != Guid.Empty ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty
+                    + "/" +  (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
+                data.Shipper = LookupPartner[item.Shipper].Select(t => t.PartnerNameEn).FirstOrDefault();
                 data.Consignee = item.Consignee;
                 data.MblMawb = item.Mblno;
                 data.HblHawb = item.Hwbno;
-                data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
+                data.CustomerId = !string.IsNullOrEmpty(item.CustomerId) ?  LookupPartner[item.CustomerId].Select(t=>t.AccountNo).FirstOrDefault() : string.Empty;
                 #region -- Phí Selling trước thuế --
-                decimal _totalSellAmountFreight = 0;
-                decimal _totalSellAmountTrucking = 0;
-                decimal _totalSellAmountHandling = 0;
-                decimal _totalSellAmountOther = 0;
-                if(item.Hblid != null && item.Hblid != Guid.Empty)
+                decimal? _totalSellAmountFreight = 0;
+                decimal? _totalSellAmountTrucking = 0;
+                decimal? _totalSellAmountHandling = 0;
+                decimal? _totalSellAmountOther = 0;
+                if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
-                    var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
+                    var _chargeSell = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+
                     foreach (var charge in _chargeSell)
                     {
 
-                        var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t=>t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ?  ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty?  ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
                         }
                         //SELL
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        /*if (_rate == null)
-                        {
-                            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                            _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
-                        }*/
+
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
                         {
-                            _totalSellAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountFreight += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountFreight += charge.AmountVnd; // Phí Selling trước thuế
+                            }
                         }
                         if (ChargeGroupModel?.Name == "Trucking")
                         {
-                            _totalSellAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountTrucking += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountTrucking += charge.AmountVnd;  // Phí Selling trước thuế
+                            }
                         }
                         if (ChargeGroupModel?.Name == "Handling")
                         {
-                            _totalSellAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountHandling += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountHandling += charge.AmountVnd;  // Phí Selling trước thuế
+                            }
                         }
-                        if (ChargeGroupModel?.Name == "Other")
+                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight")
                         {
-                            _totalSellAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                            }
                         }
-                        //END SELL
-
+                        //END SEL
                     }
                 }
-              
+
                 data.TotalSellFreight = _totalSellAmountFreight;
                 data.TotalSellTrucking = _totalSellAmountTrucking;
                 data.TotalSellHandling = _totalSellAmountHandling;
@@ -1262,26 +1348,23 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers;
                 #endregion
                 #region -- Phí Buying trước thuế --
-                decimal _totalBuyAmountFreight = 0;
-                decimal _totalBuyAmountTrucking = 0;
-                decimal _totalBuyAmountHandling = 0;
-                decimal _totalBuyAmountOther = 0;
-                decimal _totalBuyAmountKB = 0;
+                decimal? _totalBuyAmountFreight = 0;
+                decimal? _totalBuyAmountTrucking = 0;
+                decimal? _totalBuyAmountHandling = 0;
+                decimal? _totalBuyAmountOther = 0;
+                decimal? _totalBuyAmountKB = 0;
+                var _chargeBuy = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
-                    var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.Hblid);
                     foreach (var charge in _chargeBuy)
                     {
-                        var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == charge.ChargeGroup).FirstOrDefault();
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
                         }
-                        //BUY
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
                         {
@@ -1291,8 +1374,14 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountFreight += charge.AmountUsd; // Phí Selling trước thuế
+                                }
+                                else
+                                {
+                                    _totalBuyAmountFreight += charge.AmountVnd;
+                                }
                             }
 
                         }
@@ -1304,7 +1393,14 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountTrucking += charge.AmountUsd;
+                                }
+                                else
+                                {
+                                    _totalBuyAmountTrucking += charge.AmountVnd; // Phí Selling trước thuế
+                                }
                             }
 
                         }
@@ -1316,8 +1412,14 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountHandling += charge.AmountUsd;
+                                }
+                                else
+                                {
+                                    _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
+                                }
                             }
                         }
                         if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com")
@@ -1328,13 +1430,26 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-
+                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                                {
+                                    _totalBuyAmountOther += charge.AmountUsd;
+                                }
+                                else
+                                {
+                                    _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                                }
                             }
                         }
                         if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                         {
-                            _totalBuyAmountKB += charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountKB += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountKB += charge.AmountVnd;
+                            }
                         }
 
                         //END BUY
@@ -1351,44 +1466,44 @@ namespace eFMS.API.Documentation.DL.Services
                 #endregion -- Phí Buying trước thuế --
 
                 #region -- Phí OBH sau thuế --
-                decimal _obh = 0;
+                decimal? _obh = 0;
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
-                    var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.Hblid);
+                    var _chargeObh = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        /*if (_rate == null)
+                        if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                         {
-                            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
-                            _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
-                        }*/
-                        _obh += charge.Total * _rate; // Phí OBH sau thuế
+                            _obh += charge.AmountUsd + charge.VatAmountUsd;
+                        }
+                        else
+                        {
+                            _obh += charge.AmountVnd + charge.VatAmountVnd;
+                        }
                     }
-                    data.AmountOBH = _obh;
-                    #endregion -- Phí OBH sau thuế --
-                    data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
-                    data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
-                    data.RalatedHblHawb = string.Empty;// tạm thời để trống
-                    data.RalatedJobNo = string.Empty;// tạm thời để trống
-                    data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
-                    var OfficeSaleman = sysUserLevelRepo.Get(x => x.UserId == item.SalemanId).Select(t => t.OfficeId).FirstOrDefault();
-                    data.SalesOffice = sysOfficeRepo.Get(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault();
-                    data.BKRefNo = item.JobNo;
-                    data.ServiceMode = item.ServiceMode;//chua co thong tin
-                    data.ProductService = item.ProductService;
-                    data.etd = item.ServiceDate;
-                    data.Creator = sysUserRepo.Get(x => x.Id == item.BillingOpsId).Select(t => t.Username).FirstOrDefault();
-                    data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
-                    data.Created = item.DatetimeCreated;
-                    data.Salesman = sysUserRepo.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.Username;
-                    data.AgentName = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameVn;
-                    data.Agent = catPartnerRepo.Get(x => x.Id == item.AgentId).FirstOrDefault()?.ShortName;
-                    data.Carrier = catPartnerRepo.Get(x => x.Id == item.SupplierId).FirstOrDefault()?.ShortName;
-                    lstShipment.Add(data);
                 }
-        
+                data.AmountOBH = _obh;
+                #endregion -- Phí OBH sau thuế --
+                
+                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t=>t.NameVn).FirstOrDefault() : string.Empty;
+                data.CustomerName = LookupPartner[item.CustomerId].Select(t=>t.ShortName).FirstOrDefault();
+                data.RalatedHblHawb = string.Empty;// tạm thời để trống
+                data.RalatedJobNo = string.Empty;// tạm thời để trống
+                data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? LookupOffice[(Guid)item.OfficeId].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                var OfficeSaleman =  LookupUserLevelList[item.SalemanId].Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null? LookupOffice[(Guid) OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty ;
+                data.BKRefNo = item.JobNo;
+                data.ServiceMode = item.ServiceMode;//chua co thong tin
+                data.ProductService = item.ProductService;
+                data.etd = item.ServiceDate;
+                data.Creator = LookupUser[item.BillingOpsId].Select(t=>t.Username).FirstOrDefault();
+                data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
+                data.Created = item.DatetimeCreated;
+                data.Salesman = LookupUser[item.SalemanId].FirstOrDefault()?.Username;
+                data.AgentName = LookupPartner[item.AgentId].Select(t => t.PartnerNameVn).FirstOrDefault();
+                data.Agent = LookupPartner[item.AgentId].Select(t => t.ShortName).FirstOrDefault();
+                data.Carrier = LookupPartner[item.SupplierId].Select(t => t.ShortName).FirstOrDefault();
+                lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
         }
@@ -1412,10 +1527,6 @@ namespace eFMS.API.Documentation.DL.Services
                 var queryShipment = from master in masterBills
                                     join house in houseBills on master.Id equals house.JobId into housebill
                                     from house in housebill.DefaultIfEmpty()
-                                        //join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
-                                        //from unit in units.DefaultIfEmpty()
-                                        //join partner in dataPartner on house.CustomerId equals partner.Id into Partner
-                                        //from partner in Partner.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1581,7 +1692,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria,null);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -1785,7 +1896,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.JobId = item.JobId;
                 data.Mawb = item.Mawb;
                 data.Hawb = item.Hawb;
-                foreach(var partner in LookupPartner[item.CustomerId])
+                foreach (var partner in LookupPartner[item.CustomerId])
                 {
                     data.CustomerName = partner?.PartnerNameEn;
                     break;
@@ -1819,11 +1930,11 @@ namespace eFMS.API.Documentation.DL.Services
                     var _chargeSell = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
                     foreach (var charge in _chargeSell)
                     {
-                        if(criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
                         {
                             _revenue += charge.AmountVnd;
                         }
-                        else if(criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
                         {
                             _revenue += charge.AmountUsd;
                         }
@@ -1851,14 +1962,14 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     data.Cost = _cost;
                 }
-               
+
                 #endregion -- Phí Buying trước thuế --
 
                 data.Profit = data.Revenue - data.Cost;
 
                 #region -- Phí OBH sau thuế --
                 decimal? _obh = 0;
-                if(item.HblId != null && item.HblId != Guid.Empty)
+                if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeObh = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
@@ -1875,7 +1986,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     data.Obh = _obh;
                 }
-             
+
                 #endregion -- Phí OBH sau thuế --
 
                 var _empPic = sysUserRepo.Get(j => j.Id == item.PicId).FirstOrDefault()?.EmployeeId;
@@ -1921,7 +2032,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Filter data without customerId
             //var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             //criteriaNoCustomer.CustomerId = null;
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria,null);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -1965,7 +2076,7 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in dataShipment)
             {
                 var chargeD = detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
-                foreach (var charge in chargeD) 
+                foreach (var charge in chargeD)
                 {
                     AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                     var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
@@ -2442,7 +2553,7 @@ namespace eFMS.API.Documentation.DL.Services
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
-            foreach(var item in dataShipment)
+            foreach (var item in dataShipment)
             {
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
@@ -2664,7 +2775,7 @@ namespace eFMS.API.Documentation.DL.Services
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
-            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId)? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
+            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
             var detailLookupSur = chargeData.ToLookup(q => q.HBLID);
             var dataCustom = customsDeclarationRepo.Get().ToList();
             var partnerData = catPartnerRepo.Get();
@@ -2732,7 +2843,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var houseBills = detailRepository.Get();
                 var queryShipment = from master in masterBills
-                                    join house in houseBills on master.Id equals house.JobId 
+                                    join house in houseBills on master.Id equals house.JobId
                                     select new SummaryOfCostsIncurredExportResult
                                     {
                                         JobId = master.JobNo,
@@ -2794,7 +2905,7 @@ namespace eFMS.API.Documentation.DL.Services
                                            Currency = sur.CurrencyId,
                                            InvoiceNo = sur.InvoiceNo,
                                            Note = sur.Notes,
-                                           CustomerID = sur.Type =="OBH" ? sur.PayerId : sur.PaymentObjectId,
+                                           CustomerID = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
                                            ServiceDate = ops.ServiceDate,
                                            CreatedDate = ops.DatetimeCreated,
                                            TransactionType = null,
@@ -2814,7 +2925,7 @@ namespace eFMS.API.Documentation.DL.Services
                                            VATAmountVND = sur.VatAmountVnd,
                                            AmountUSD = sur.AmountUsd,
                                            AmountVND = sur.AmountVnd
-                                           
+
                                        };
             if (query != null)
             {
@@ -3171,7 +3282,7 @@ namespace eFMS.API.Documentation.DL.Services
                                            Unit = uni.UnitNameEn,
                                            InvoiceDate = sur.InvoiceDate,
                                            CBM = ops.SumCbm,
-                                           GrossWeight = ops.SumGrossWeight, 
+                                           GrossWeight = ops.SumGrossWeight,
                                            PackageContainer = ops.ContainerDescription,
                                            PackageQty = ops.SumPackages,
 
