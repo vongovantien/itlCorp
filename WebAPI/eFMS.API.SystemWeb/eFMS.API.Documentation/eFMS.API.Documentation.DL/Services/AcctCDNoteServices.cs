@@ -1372,9 +1372,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
             parameter.IssueInv = string.Empty; //Tạm thời để trống
-            parameter.InvoiceInfo = data.CDNote.InvoiceNo;
+            parameter.InvoiceInfo = data.CDNote.InvoiceNo == null ? string.Empty : data.CDNote.InvoiceNo;
             parameter.OtherRef = string.Empty;//Tạm thời để trống
-            parameter.PackageUnit = data.PackageUnit;
+            parameter.PackageUnit = data.PackageUnit == null ? string.Empty : data.PackageUnit;
 
             // Lấy thông tin Office của Creator
             var officeOfUser = GetInfoOfficeOfUser(data.CDNote.OfficeId);
