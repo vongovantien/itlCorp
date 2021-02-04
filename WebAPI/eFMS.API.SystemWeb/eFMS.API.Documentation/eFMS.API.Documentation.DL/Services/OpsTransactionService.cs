@@ -663,19 +663,19 @@ namespace eFMS.API.Documentation.DL.Services
                 
                 var opsTransaction = GetNewShipmentToConvert(productService, model);
                 opsTransaction.JobNo = CreateJobNoOps();
-                DataContext.Add(opsTransaction, false);
+                DataContext.Add(opsTransaction);
 
                 if (model.Id > 0)
                 {
                     var clearance = UpdateInfoConvertClearance(model);
                     clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+                    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                 }
                 else
                 {
                     var clearance = GetNewClearanceModel(model);
                     clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Add(clearance, false);
+                    customDeclarationRepository.Add(clearance);
                 }
                 DataContext.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
@@ -872,18 +872,37 @@ namespace eFMS.API.Documentation.DL.Services
                             return result;
                         }
 
-                        OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
-                        opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
-                        opsTransaction.SalemanId = customerContract.SaleManId;
+                        using (var trans = DataContext.DC.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
+                                opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+                                opsTransaction.SalemanId = customerContract.SaleManId;
 
-                        DataContext.Add(opsTransaction, false);
+                                DataContext.Add(opsTransaction);
 
-                        CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
+                                CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
 
-                        clearance.JobNo = opsTransaction.JobNo;
-                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+                                clearance.JobNo = opsTransaction.JobNo;
+                                customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
 
-                        i = i + 1;
+                                i = i + 1;
+
+                                trans.Commit();
+                            }
+                            catch (Exception)
+                            {
+
+                                throw;
+                            }
+                            finally
+                            {
+                                trans.Dispose();
+                            }
+                        }
+
+                       
                     }
                 }
 
@@ -1433,7 +1452,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.Hblid = Guid.NewGuid();
                     model.JobNo = CreateJobNoOps();
                     model.UserModified = currentUser.UserID;
-                    model.DatetimeModified = DateTime.Now;
+                    model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                     model.UserCreated = currentUser.UserID;
                     model.GroupId = currentUser.GroupId;
                     model.DepartmentId = currentUser.DepartmentId;
@@ -1611,13 +1630,13 @@ namespace eFMS.API.Documentation.DL.Services
         public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
         {
             var query = (from SC in surchargeRepository.Get()
-                        join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
-                        join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
-                        join US in userRepository.Get() on OP.UserCreated equals US.Id
-                        join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
-                        join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
+                         join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
+                         join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
+                         join US in userRepository.Get() on OP.UserCreated equals US.Id
+                         join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
+                         join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
 
-                        where OP.Id == JobID && SC.SettlementCode != null
+                         where OP.Id == JobID && SC.SettlementCode != null && ADR.AdvanceNo == ADP.AdvanceNo && SC.AdvanceNo ==ADR.AdvanceNo
                         group SC by new { SC.Hblno, SC.Mblno, ADR.Hblid, 
                             adNo = ADP.AdvanceNo,
                             adcurrency = ADP.AdvanceCurrency,

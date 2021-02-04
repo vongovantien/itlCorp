@@ -888,7 +888,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult DenySettlePayments(List<Guid> Ids)
         {
-            HandleState hs = acctSettlementPaymentService.DenyAdvancePayments(Ids);
+            HandleState hs = acctSettlementPaymentService.DenySettlePayments(Ids);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
