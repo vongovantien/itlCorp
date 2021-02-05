@@ -89,12 +89,13 @@ namespace eFMS.API.Accounting.DL.Services
             }
             //***
 
-            var exchargeDateSurcharge = exchangeDate == null ? DataContext.Get().Max(s => s.DatetimeCreated).Value.Date : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
+            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
+            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated.Value.Date : exchangeDate.Value.Date;
+            var LookupCurrentExchange = DataContext.Get().ToLookup(x => x.DatetimeCreated.Value.Date);
+            List<CatCurrencyExchange> currencyExchange = LookupCurrentExchange[exchargeDateSurcharge].ToList();
             if (currencyExchange.Count() == 0)
             {
-                DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
-                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                currencyExchange = LookupCurrentExchange[maxDateCreated.Value.Date].ToList();
             }
 
             decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
@@ -164,12 +165,14 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 roundCurr = 0;
             }
+
             DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
-            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            if (currencyExchange.Count == 0)
+            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated.Value.Date : exchangeDate.Value.Date;
+            var LookupCurrentExchange = DataContext.Get().ToLookup(x => x.DatetimeCreated.Value.Date);
+            List<CatCurrencyExchange> currencyExchange = LookupCurrentExchange[exchargeDateSurcharge].ToList();
+            if (currencyExchange.Count() == 0)
             {
-                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                currencyExchange = LookupCurrentExchange[maxDateCreated.Value.Date].ToList();
             }
 
             decimal _exchangeRateCurrencyFrom = GetRateCurrencyExchange(currencyExchange, currencyFrom, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi

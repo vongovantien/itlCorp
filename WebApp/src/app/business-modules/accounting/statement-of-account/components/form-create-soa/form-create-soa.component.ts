@@ -111,16 +111,16 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             .subscribe((menuPermission: SystemInterface.IUserPermission) => {
                 if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
                     console.log(menuPermission);
-                    if (menuPermission.list !== 'None') {
-                        if (menuPermission.list === 'All') {
+                    if (menuPermission.detail !== 'None') {
+                        if (menuPermission.detail === 'All') {
                             this.getUserLevelByType({});
-                        } else if (menuPermission.list === 'Company') {
+                        } else if (menuPermission.detail === 'Company') {
                             this.getUserLevelByType({ type: 'company', companyId: this.userLogged.companyId });
-                        } else if (menuPermission.list === 'Office') {
+                        } else if (menuPermission.detail === 'Office') {
                             this.getUserLevelByType({ type: 'office', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId });
-                        } else if (menuPermission.list === 'Department') {
+                        } else if (menuPermission.detail === 'Department') {
                             this.getUserLevelByType({ type: 'department', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId });
-                        } else if (menuPermission.list === 'Group') {
+                        } else if (menuPermission.detail === 'Group') {
                             this.getUserLevelByType({ type: 'group', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId });
                         } else {
                             this.getUserLevelByType({ type: 'owner', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId, userId: this.userLogged.id });
