@@ -951,6 +951,12 @@ namespace eFMS.API.Documentation.DL.Services
                 result = DataContext.Update(job, x => x.Id == id,false);
                 if (result.Success)
                 {
+                    //Xóa Job OPS xóa luôn surcharge [Andy - 05/02/2021]
+                    var charges = surchargeRepository.Get(x => x.Hblid == job.Hblid);
+                    foreach (var item in charges)
+                    {
+                        surchargeRepository.Delete(x => x.Id == item.Id, false);
+                    }
                     var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);
                     if (clearances != null)
                     {
@@ -964,6 +970,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             DataContext.SubmitChanges();
+            surchargeRepository.SubmitChanges();
             customDeclarationRepository.SubmitChanges();
             return result;
         }
