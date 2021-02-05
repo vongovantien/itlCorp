@@ -129,7 +129,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.selectedIndexSurcharge = -1;
             const hblIds: string[] = charges.map(x => x.hblid);
 
-
             if (charges[0].isChangeShipment) {
                 this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && x.isChangeShipment === false);
             } else {

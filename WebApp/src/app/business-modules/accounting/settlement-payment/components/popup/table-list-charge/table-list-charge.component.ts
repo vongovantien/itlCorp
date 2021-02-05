@@ -282,6 +282,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     if (this.charges[0].hblid !== data.hblid) {
                         this.charges.forEach((charge: Surcharge) => {
                             charge.isChangeShipment = true;
+                            charge.id = SystemConstants.EMPTY_GUID;
                         });
                     }
                     for (const charge of this.charges) {
@@ -301,15 +302,24 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     this.shipment.setValue(_shipments[0].hblid);
                     this.selectedShipment = _shipments[0];
 
-                    if (!!this.charges.length && this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
-                        this.getMasterCharges(this.serviceTypeId, true);
+                    if (!!this.charges.length) {
+                        if (this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
+                            this.getMasterCharges(this.serviceTypeId, true);
+                        }
 
                         for (const charge of this.charges) {
                             charge.jobId = this.selectedShipment.jobId;
                             charge.jobNo = this.selectedShipment.jobId;
                             charge.clearanceNo = data.clearanceNo
                         }
+                        if (this.charges[0].hblid !== data.hblid) {
+                            this.charges.forEach((charge: Surcharge) => {
+                                charge.isChangeShipment = true;
+                                charge.id = SystemConstants.EMPTY_GUID;
+                            });
+                        }
                     }
+
                     this.getAdvances(data.jobNo, true, this.settlementCode);
 
                 } else {
