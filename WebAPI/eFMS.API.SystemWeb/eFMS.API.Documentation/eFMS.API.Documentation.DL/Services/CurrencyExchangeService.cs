@@ -87,7 +87,7 @@ namespace eFMS.API.Documentation.DL.Services
             //***
             
             var exchargeDateSurcharge = exchangeDate == null ? DataContext.Get().Max(s => s.DatetimeCreated).Value.Date : exchangeDate.Value.Date;
-            IQueryable<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge);
+            IQueryable<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).OrderBy(x=>x.DatetimeCreated);
             if (currencyExchange.Count() == 0)
             {
                 DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
