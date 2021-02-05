@@ -630,6 +630,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
@@ -896,6 +898,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
@@ -928,6 +932,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.SoatoDate)
                     .HasColumnName("SOAToDate")
                     .HasColumnType("datetime");
+
+                entity.Property(e => e.StaffType).HasMaxLength(50);
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)

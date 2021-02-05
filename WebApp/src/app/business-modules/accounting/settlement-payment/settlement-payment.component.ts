@@ -6,7 +6,6 @@ import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
-import { NgxSpinnerService } from 'ngx-spinner';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
@@ -63,7 +62,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         private _router: Router,
         private _exportRepo: ExportRepo,
         private _store: Store<IAppState>,
-        private _spinner: NgxSpinnerService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -209,12 +207,9 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     deleteSettlement(settlementNo: string) {
-        this.isLoading = true;
-        this._progressRef.start();
         this._accoutingRepo.deleteSettlement(settlementNo)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -400,10 +395,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     onSyncBravo(Ids: AccountingInterface.IRequestGuid[]) {
-        this._spinner.show();
         this._accoutingRepo.syncSettleToAccountant(Ids)
             .pipe(
-                finalize(() => this._spinner.hide()),
                 catchError(this.catchError)
             )
             .subscribe(
