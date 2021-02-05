@@ -2688,7 +2688,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalKickBack = charge.AmountUsd;
                     }
                 }
-                //data.ExchangeRate = (decimal)_exchangeRate;
+                data.ExchangeRate = (decimal)_exchangeRate;
                 data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
                 data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
