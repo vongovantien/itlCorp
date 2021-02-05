@@ -1902,7 +1902,8 @@ namespace eFMS.API.ReportData.FormatExcel
                "Paid Date", //29
                "A/C Voucher No.", //30
                "P/M Voucher No.", //31
-               "Service" //32
+               "Service" ,//32
+                "Cd Note" //33
             };
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
