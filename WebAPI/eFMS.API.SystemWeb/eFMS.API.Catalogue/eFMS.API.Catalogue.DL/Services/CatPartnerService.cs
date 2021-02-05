@@ -357,7 +357,7 @@ namespace eFMS.API.Catalogue.DL.Services
             lstCc.Add(objInfoSalesman?.Email);
             lstCc.Add(objInfoCreator?.Email);
             lstCc.Add(objInfoModified?.Email);
-            if (listEmailAccoutant.Any())
+            if (lstToAcc.Any())
             {
                 lstTo.AddRange(lstToAcc);
             }
