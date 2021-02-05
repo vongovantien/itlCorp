@@ -1265,12 +1265,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                 data.JobNo = item.JobNo;
                 data.PolPod = item.Pol != null && item.Pol != Guid.Empty ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty
-                    + "/" +  (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
+                    + "/" + (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
                 data.Shipper = LookupPartner[item.Shipper].Select(t => t.PartnerNameEn).FirstOrDefault();
                 data.Consignee = item.Consignee;
                 data.MblMawb = item.Mblno;
                 data.HblHawb = item.Hwbno;
-                data.CustomerId = !string.IsNullOrEmpty(item.CustomerId) ?  LookupPartner[item.CustomerId].Select(t=>t.AccountNo).FirstOrDefault() : string.Empty;
+                data.CustomerId = !string.IsNullOrEmpty(item.CustomerId) ? LookupPartner[item.CustomerId].Select(t => t.AccountNo).FirstOrDefault() : string.Empty;
                 #region -- Phí Selling trước thuế --
                 decimal? _totalSellAmountFreight = 0;
                 decimal? _totalSellAmountTrucking = 0;
@@ -1283,12 +1283,12 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var charge in _chargeSell)
                     {
 
-                        var chargeObj = LookupCharge[charge.ChargeId].Select(t=>t).FirstOrDefault();
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ?  ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty?  ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
                         }
                         //SELL
 
@@ -1472,31 +1472,24 @@ namespace eFMS.API.Documentation.DL.Services
                     var _chargeObh = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
-                        if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _obh += charge.AmountUsd + charge.VatAmountUsd;
-                        }
-                        else
-                        {
-                            _obh += charge.AmountVnd + charge.VatAmountVnd;
-                        }
+                        _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);
                     }
                 }
                 data.AmountOBH = _obh;
                 #endregion -- Phí OBH sau thuế --
-                
-                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t=>t.NameVn).FirstOrDefault() : string.Empty;
-                data.CustomerName = LookupPartner[item.CustomerId].Select(t=>t.ShortName).FirstOrDefault();
+
+                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.NameVn).FirstOrDefault() : string.Empty;
+                data.CustomerName = LookupPartner[item.CustomerId].Select(t => t.ShortName).FirstOrDefault();
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
                 data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? LookupOffice[(Guid)item.OfficeId].Select(t => t.Code).FirstOrDefault() : string.Empty;
-                var OfficeSaleman =  LookupUserLevelList[item.SalemanId].Select(t => t.OfficeId).FirstOrDefault();
-                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null? LookupOffice[(Guid) OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty ;
+                var OfficeSaleman = LookupUserLevelList[item.SalemanId].Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? LookupOffice[(Guid)OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.BKRefNo = item.JobNo;
                 data.ServiceMode = item.ServiceMode;//chua co thong tin
                 data.ProductService = item.ProductService;
                 data.etd = item.ServiceDate;
-                data.Creator = LookupUser[item.BillingOpsId].Select(t=>t.Username).FirstOrDefault();
+                data.Creator = LookupUser[item.BillingOpsId].Select(t => t.Username).FirstOrDefault();
                 data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
                 data.Created = item.DatetimeCreated;
                 data.Salesman = LookupUser[item.SalemanId].FirstOrDefault()?.Username;
@@ -2067,6 +2060,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
             var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            if (!dataShipment.Any()) return dataList.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
             var lstSurchage = surCharge.Get();
@@ -2079,14 +2073,13 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in chargeD)
                 {
                     AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
+                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
                     data.ServiceDate = item.ServiceDate;
                     data.JobId = item.JobNo;
                     data.Hblid = charge.Hblid;
                     data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
-                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    decimal UnitPrice = charge.UnitPrice ?? 0;
-                    decimal? _amount = charge.Quantity * UnitPrice;
+                    decimal? _exchangeRate = charge.CurrencyId != criteria.Currency
+                        ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                     var _taxInvNoRevenue = string.Empty;
                     var _voucherRevenue = string.Empty;
                     decimal? _usdRevenue = 0;
@@ -2096,28 +2089,21 @@ namespace eFMS.API.Documentation.DL.Services
                     if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                     {
                         _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
-                        _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
+                        _usdRevenue = charge.AmountUsd;
+                        _vndRevenue = charge.AmountVnd;
+                        if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _taxOut = charge.VatAmountUsd;
+                            _totalRevenue = charge.AmountUsd + _taxOut;
 
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                        {
-                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
-                            _vndRevenue = _amount * _exchangeRateToVnd;
                         }
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
                         {
-                            _vndRevenue = _amount;
-                        }
-
-                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
-                        {
-                            _taxOut = (_amount * _exchangeRate * charge.Vatrate) / 100;
-                        }
-                        else
-                        {
-                            _taxOut = Math.Abs(charge.Vatrate ?? 0);
+                            _taxOut = charge.VatAmountVnd;
+                            _totalRevenue = charge.AmountVnd + _taxOut;
                         }
                         _voucherRevenue = charge.VoucherId;
-                        _totalRevenue = (_amount * _exchangeRate) + _taxOut;
+                        data.CdNote = charge.DebitNo;
                     }
                     data.TaxInvNoRevenue = _taxInvNoRevenue;
                     data.VoucherIdRevenue = _voucherRevenue;
@@ -2135,28 +2121,22 @@ namespace eFMS.API.Documentation.DL.Services
                     if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                     {
                         _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
-                        _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
+                        _vndCost = charge.AmountVnd;
+                        _usdCost = charge.AmountUsd;
+                        if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            _taxIn = charge.VatAmountUsd;
+                            _totalCost = charge.AmountUsd + _taxIn;
 
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                        {
-                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
-                            _vndCost = _amount * _exchangeRateToVnd;
-                        }
-                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _vndCost = _amount;
-                        }
 
-                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
-                        {
-                            _taxIn = (_amount * _exchangeRate * charge.Vatrate) / 100;
                         }
-                        else
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
                         {
-                            _taxIn = Math.Abs(charge.Vatrate ?? 0);
+                            _taxIn = charge.VatAmountVnd;
+                            _totalCost = charge.AmountVnd + _taxIn;
                         }
                         _voucherCost = charge.VoucherId;
-                        _totalCost = (_amount * _exchangeRate) + _taxIn;
+                        data.CdNote = charge.CreditNo;
                     }
                     data.TaxInvNoCost = _taxInvNoCost;
                     data.VoucherIdCost = _voucherCost;
@@ -2164,12 +2144,28 @@ namespace eFMS.API.Documentation.DL.Services
                     data.VndCost = _vndCost;
                     data.TaxIn = _taxIn;
                     data.TotalCost = _totalCost;
-
-                    data.TotalKickBack = (charge.KickBack == true) ? _amount * _exchangeRate : 0;
-                    data.ExchangeRate = _exchangeRate;
+                    if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                    {
+                        if (charge.KickBack == true)
+                        {
+                            data.TotalKickBack = charge.AmountVnd;
+                        }
+                    }
+                    if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                    {
+                        if (charge.KickBack == true)
+                        {
+                            data.TotalKickBack = charge.AmountUsd;
+                        }
+                    }
+                    data.ExchangeRate = (decimal)_exchangeRate;
                     data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
                     data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
-                    data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
+                    if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                    {
+                        data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency); //Amount sau thuế của phí OBH
+                        data.CdNote = charge.DebitNo;
+                    }
                     data.AcVoucherNo = string.Empty;
                     data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
                     data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
@@ -2179,17 +2175,12 @@ namespace eFMS.API.Documentation.DL.Services
                     data.FinalExchangeRate = charge.FinalExchangeRate;
                     data.Mbl = item.Mblno;
                     data.Hbl = item.Hwbno;
-                    foreach (var partner in detailLookupPartner[_partnerId])
-                    {
-                        data.PartnerCode = partner?.AccountNo;
-                        data.PartnerName = partner?.PartnerNameEn;
-                        data.PartnerTaxCode = partner?.TaxCode;
-                    }
-                    foreach (var ch in detailLookupCharge[charge.ChargeId])
-                    {
-                        data.ChargeCode = ch?.Code;
-                        data.ChargeName = ch?.ChargeNameEn;
-                    }
+                    data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
+                    data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
+                    data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
+
+                    data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
+                    data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                     dataList.Add(data);
                 }
             }
@@ -2546,6 +2537,7 @@ namespace eFMS.API.Documentation.DL.Services
             var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
             var dataShipment = QueryDataDocumentationAcctPLSheet(criteriaNoCustomer);
+            if (!dataShipment.Any()) return dataShipment.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
             var lstSurchage = surCharge.Get();
@@ -2561,13 +2553,11 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var charge in chargeD)
                     {
                         AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-                        var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
+                        var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
                         data.ServiceDate = item.ServiceDate;
                         data.JobId = item.JobId;
                         data.Hblid = charge.Hblid;
-                        var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                        decimal UnitPrice = charge.UnitPrice ?? 0;
-                        decimal? _amount = charge.Quantity * UnitPrice;
+                        decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                         var _taxInvNoRevenue = string.Empty;
                         var _voucherRevenue = string.Empty;
                         decimal? _usdRevenue = 0;
@@ -2577,28 +2567,21 @@ namespace eFMS.API.Documentation.DL.Services
                         if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                         {
                             _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
-                            _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
+                            _usdRevenue = charge.AmountUsd;
+                            _vndRevenue = charge.AmountVnd;
+                            if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                            {
+                                _taxOut = charge.VatAmountUsd;
+                                _totalRevenue = charge.AmountUsd + _taxOut;
 
-                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                            {
-                                var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
-                                _vndRevenue = _amount * _exchangeRateToVnd;
                             }
-                            if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                            if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _vndRevenue = _amount;
+                                _taxOut = charge.VatAmountVnd;
+                                _totalRevenue = charge.AmountVnd + _taxOut;
                             }
-
-                            if (charge.Vatrate > 0 && charge.Vatrate < 101)
-                            {
-                                _taxOut = (_amount * _exchangeRate * charge.Vatrate) / 100;
-                            }
-                            else
-                            {
-                                _taxOut = Math.Abs(charge.Vatrate ?? 0);
-                            }
+                            data.CdNote = charge.DebitNo;
                             _voucherRevenue = charge.VoucherId;
-                            _totalRevenue = (_amount * _exchangeRate) + _taxOut;
                         }
                         data.TaxInvNoRevenue = _taxInvNoRevenue;
                         data.VoucherIdRevenue = _voucherRevenue;
@@ -2616,28 +2599,22 @@ namespace eFMS.API.Documentation.DL.Services
                         if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
                             _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
-                            _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
+                            _vndCost = charge.AmountVnd;
+                            _usdCost = charge.AmountUsd;
+                            if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                            {
+                                _taxIn = charge.VatAmountUsd;
+                                _totalCost = charge.AmountUsd + _taxIn;
 
-                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                            {
-                                var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
-                                _vndCost = _amount * _exchangeRateToVnd;
-                            }
-                            if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _vndCost = _amount;
-                            }
 
-                            if (charge.Vatrate > 0 && charge.Vatrate < 101)
-                            {
-                                _taxIn = (_amount * _exchangeRate * charge.Vatrate) / 100;
                             }
-                            else
+                            if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _taxIn = Math.Abs(charge.Vatrate ?? 0);
+                                _taxIn = charge.VatAmountVnd;
+                                _totalCost = charge.AmountVnd + _taxIn;
                             }
+                            data.CdNote = charge.CreditNo;
                             _voucherCost = charge.VoucherId;
-                            _totalCost = (_amount * _exchangeRate) + _taxIn;
                         }
                         data.TaxInvNoCost = _taxInvNoCost;
                         data.VoucherIdCost = _voucherCost;
@@ -2646,11 +2623,29 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TaxIn = _taxIn;
                         data.TotalCost = _totalCost;
 
-                        data.TotalKickBack = (charge.KickBack == true) ? _amount * _exchangeRate : 0;
-                        data.ExchangeRate = _exchangeRate;
+                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            if (charge.KickBack == true)
+                            {
+                                data.TotalKickBack = charge.AmountVnd;
+                            }
+                        }
+                        if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                        {
+                            if (charge.KickBack == true)
+                            {
+                                data.TotalKickBack = charge.AmountUsd;
+                            }
+                        }
+                        data.ExchangeRate = (decimal)_exchangeRate;
                         data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
                         data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
-                        data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
+
+                        if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                        {
+                            data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency); //Amount sau thuế của phí OBH
+                            data.CdNote = charge.DebitNo;
+                        }
                         data.AcVoucherNo = string.Empty;
                         data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
                         data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
@@ -2660,17 +2655,13 @@ namespace eFMS.API.Documentation.DL.Services
                         data.FinalExchangeRate = charge.FinalExchangeRate;
                         data.Mbl = item.Mbl;
                         data.Hbl = item.Hbl;
-                        foreach (var partner in detailLookupPartner[_partnerId])
-                        {
-                            data.PartnerCode = partner?.AccountNo;
-                            data.PartnerName = partner?.PartnerNameEn;
-                            data.PartnerTaxCode = partner?.TaxCode;
-                        }
-                        foreach (var ch in detailLookupCharge[charge.ChargeId])
-                        {
-                            data.ChargeCode = ch?.Code;
-                            data.ChargeName = ch?.ChargeNameEn;
-                        }
+                        data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
+                        data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
+                        data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
+
+                        data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
+                        data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
+
                         dataList.Add(data);
                     }
                 }
