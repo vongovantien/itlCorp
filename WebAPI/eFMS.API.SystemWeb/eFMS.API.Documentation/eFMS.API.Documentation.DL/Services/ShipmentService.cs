@@ -1503,6 +1503,13 @@ namespace eFMS.API.Documentation.DL.Services
                 data.AgentName = LookupPartner[item.AgentId].Select(t => t.PartnerNameVn).FirstOrDefault();
                 data.Agent = LookupPartner[item.AgentId].Select(t => t.ShortName).FirstOrDefault();
                 data.Carrier = LookupPartner[item.SupplierId].Select(t => t.ShortName).FirstOrDefault();
+                data.GW = item.SumGrossWeight;
+                data.CW = item.SumChargeWeight;
+                data.CBM = item.SumCbm;
+                data.Cont20 = !string.IsNullOrEmpty(item.ContainerDescription) ? Regex.Matches(item.ContainerDescription, "20").Count : 0;
+                data.Cont40 = !string.IsNullOrEmpty(item.ContainerDescription) ? Regex.Matches(item.ContainerDescription, "40´HC").Count > 0 ? Regex.Matches(item.ContainerDescription, "40´HC").Count : Regex.Matches(item.ContainerDescription, "40").Count : 0;
+                data.Cont40HC = !string.IsNullOrEmpty(item.ContainerDescription) ? Regex.Matches(item.ContainerDescription, "40´HC").Count : 0;
+                data.Cont45 = !string.IsNullOrEmpty(item.ContainerDescription) ? Regex.Matches(item.ContainerDescription, "45").Count : 0;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
