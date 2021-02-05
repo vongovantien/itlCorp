@@ -9,11 +9,13 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2071,126 +2073,147 @@ namespace eFMS.API.Documentation.DL.Services
             if (!dataShipment.Any()) return dataList.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
-            var lstSurchage = surCharge.Get();
+            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
             var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
-            foreach (var item in dataShipment)
+            var DataCharge = (from d in dataShipment
+                              join sur in lstSurchage on d.Hblid equals sur.Hblid
+                              select new DataSurchargeResult
+                              {
+                                  JobId = d.JobNo,
+                                  ServiceDate = d.ServiceDate,
+                                  Hblid = sur.Hblid,
+                                  InvoiceNo = sur.InvoiceNo,
+                                  DebitNo = sur.DebitNo,
+                                  AmountUsd = sur.AmountUsd,
+                                  AmountVnd = sur.AmountVnd,
+                                  VatAmountUsd = sur.VatAmountUsd,
+                                  VatAmountVnd = sur.VatAmountVnd,
+                                  VoucherId = sur.VoucherId,
+                                  Type = sur.Type,
+                                  KickBack = sur.KickBack,
+                                  CurrencyId = sur.CurrencyId,
+                                  ExchangeDate = sur.ExchangeDate,
+                                  Mblno = d.Mblno,
+                                  Hblno = d.Hwbno,
+                                  ChargeId = sur.ChargeId,
+                                  PaymentObjectId = sur.PaymentObjectId,
+                                  CreditNo = sur.CreditNo,
+                                  FinalExchangeRate = sur.FinalExchangeRate
+                              });
+            foreach (var charge in DataCharge)
             {
-                var chargeD = detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
-                foreach (var charge in chargeD)
+                AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
+                var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
+                data.ServiceDate = charge.ServiceDate;
+                data.JobId = charge.JobId;
+                data.Hblid = charge.Hblid;
+                decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
+                var _taxInvNoRevenue = string.Empty;
+                var _voucherRevenue = string.Empty;
+                decimal? _usdRevenue = 0;
+                decimal? _vndRevenue = 0;
+                decimal? _taxOut = 0;
+                decimal? _totalRevenue = 0;
+                if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                 {
-                    AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
-                    data.ServiceDate = item.ServiceDate;
-                    data.JobId = item.JobNo;
-                    data.Hblid = charge.Hblid;
-                    data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
-                    decimal? _exchangeRate = charge.CurrencyId != criteria.Currency
-                        ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
-                    var _taxInvNoRevenue = string.Empty;
-                    var _voucherRevenue = string.Empty;
-                    decimal? _usdRevenue = 0;
-                    decimal? _vndRevenue = 0;
-                    decimal? _taxOut = 0;
-                    decimal? _totalRevenue = 0;
-                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                    {
-                        _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
-                        _usdRevenue = charge.AmountUsd;
-                        _vndRevenue = charge.AmountVnd;
-                        if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                        {
-                            _taxOut = charge.VatAmountUsd;
-                            _totalRevenue = charge.AmountUsd + _taxOut;
-
-                        }
-                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _taxOut = charge.VatAmountVnd;
-                            _totalRevenue = charge.AmountVnd + _taxOut;
-                        }
-                        _voucherRevenue = charge.VoucherId;
-                        data.CdNote = charge.DebitNo;
-                    }
-                    data.TaxInvNoRevenue = _taxInvNoRevenue;
-                    data.VoucherIdRevenue = _voucherRevenue;
-                    data.UsdRevenue = _usdRevenue;
-                    data.VndRevenue = _vndRevenue;
-                    data.TaxOut = _taxOut;
-                    data.TotalRevenue = _totalRevenue;
-
-                    var _taxInvNoCost = string.Empty;
-                    var _voucherCost = string.Empty;
-                    decimal? _usdCost = 0;
-                    decimal? _vndCost = 0;
-                    decimal? _taxIn = 0;
-                    decimal? _totalCost = 0;
-                    if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                    {
-                        _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
-                        _vndCost = charge.AmountVnd;
-                        _usdCost = charge.AmountUsd;
-                        if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                        {
-                            _taxIn = charge.VatAmountUsd;
-                            _totalCost = charge.AmountUsd + _taxIn;
-
-
-                        }
-                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _taxIn = charge.VatAmountVnd;
-                            _totalCost = charge.AmountVnd + _taxIn;
-                        }
-                        _voucherCost = charge.VoucherId;
-                        data.CdNote = charge.CreditNo;
-                    }
-                    data.TaxInvNoCost = _taxInvNoCost;
-                    data.VoucherIdCost = _voucherCost;
-                    data.UsdCost = _usdCost;
-                    data.VndCost = _vndCost;
-                    data.TaxIn = _taxIn;
-                    data.TotalCost = _totalCost;
-                    if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                    {
-                        if (charge.KickBack == true)
-                        {
-                            data.TotalKickBack = charge.AmountVnd;
-                        }
-                    }
+                    _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
+                    _usdRevenue = charge.AmountUsd;
+                    _vndRevenue = charge.AmountVnd;
                     if (criteria.Currency == DocumentConstants.CURRENCY_USD)
                     {
-                        if (charge.KickBack == true)
-                        {
-                            data.TotalKickBack = charge.AmountUsd;
-                        }
-                    }
-                    data.ExchangeRate = (decimal)_exchangeRate;
-                    data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
-                    data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
-                    if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
-                    {
-                        data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency); //Amount sau thuế của phí OBH
-                        data.CdNote = charge.DebitNo;
-                    }
-                    data.AcVoucherNo = string.Empty;
-                    data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
-                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
-                    data.UserExport = currentUser.UserName;
-                    data.CurrencyId = charge.CurrencyId;
-                    data.ExchangeDate = charge.ExchangeDate;
-                    data.FinalExchangeRate = charge.FinalExchangeRate;
-                    data.Mbl = item.Mblno;
-                    data.Hbl = item.Hwbno;
-                    data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
-                    data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
-                    data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
+                        _taxOut = charge.VatAmountUsd;
+                        _totalRevenue = charge.AmountUsd + _taxOut;
 
-                    data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
-                    data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
-                    dataList.Add(data);
+                    }
+                    if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                    {
+                        _taxOut = charge.VatAmountVnd;
+                        _totalRevenue = charge.AmountVnd + _taxOut;
+                    }
+                    data.CdNote = charge.DebitNo;
+                    _voucherRevenue = charge.VoucherId;
                 }
+                data.TaxInvNoRevenue = _taxInvNoRevenue;
+                data.VoucherIdRevenue = _voucherRevenue;
+                data.UsdRevenue = _usdRevenue;
+                data.VndRevenue = _vndRevenue;
+                data.TaxOut = _taxOut;
+                data.TotalRevenue = _totalRevenue;
+
+                var _taxInvNoCost = string.Empty;
+                var _voucherCost = string.Empty;
+                decimal? _usdCost = 0;
+                decimal? _vndCost = 0;
+                decimal? _taxIn = 0;
+                decimal? _totalCost = 0;
+                if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                {
+                    _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
+                    _vndCost = charge.AmountVnd;
+                    _usdCost = charge.AmountUsd;
+                    if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                    {
+                        _taxIn = charge.VatAmountUsd;
+                        _totalCost = charge.AmountUsd + _taxIn;
+
+
+                    }
+                    if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                    {
+                        _taxIn = charge.VatAmountVnd;
+                        _totalCost = charge.AmountVnd + _taxIn;
+                    }
+                    data.CdNote = charge.CreditNo;
+                    _voucherCost = charge.VoucherId;
+                }
+                data.TaxInvNoCost = _taxInvNoCost;
+                data.VoucherIdCost = _voucherCost;
+                data.UsdCost = _usdCost;
+                data.VndCost = _vndCost;
+                data.TaxIn = _taxIn;
+                data.TotalCost = _totalCost;
+
+                if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    if (charge.KickBack == true)
+                    {
+                        data.TotalKickBack = charge.AmountVnd;
+                    }
+                }
+                if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                {
+                    if (charge.KickBack == true)
+                    {
+                        data.TotalKickBack = charge.AmountUsd;
+                    }
+                }
+                data.ExchangeRate = (decimal)_exchangeRate;
+                data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
+                data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
+
+                if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                {
+                    var _mapCharge = mapper.Map<CsShipmentSurcharge>(charge);
+                    data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(_mapCharge, criteria.Currency); //Amount sau thuế của phí OBH
+                    data.CdNote = charge.DebitNo;
+                }
+                data.AcVoucherNo = string.Empty;
+                data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
+                data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
+                data.UserExport = currentUser.UserName;
+                data.CurrencyId = charge.CurrencyId;
+                data.ExchangeDate = charge.ExchangeDate;
+                data.FinalExchangeRate = charge.FinalExchangeRate;
+                data.Mbl = charge.Mblno;
+                data.Hbl = charge.Hblno;
+                data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
+                data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
+                data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
+                data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
+                data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
+                dataList.Add(data);
             }
             return dataList.AsQueryable();
         }
@@ -2548,132 +2571,148 @@ namespace eFMS.API.Documentation.DL.Services
             if (!dataShipment.Any()) return dataShipment.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
-            var lstSurchage = surCharge.Get();
-            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
-            foreach (var item in dataShipment)
+            var DataCharge = (from d in dataShipment
+                         join sur in lstSurchage on d.Hblid equals sur.Hblid
+                         select new DataSurchargeResult
+                         {
+                             JobId = d.JobId,
+                             ServiceDate = d.ServiceDate,
+                             Hblid = sur.Hblid,
+                             InvoiceNo = sur.InvoiceNo,
+                             DebitNo = sur.DebitNo,
+                             AmountUsd = sur.AmountUsd,
+                             AmountVnd = sur.AmountVnd,
+                             VatAmountUsd = sur.VatAmountUsd,
+                             VatAmountVnd = sur.VatAmountVnd,
+                             VoucherId = sur.VoucherId,
+                             Type = sur.Type,
+                             KickBack = sur.KickBack,
+                             CurrencyId = sur.CurrencyId,
+                             ExchangeDate = sur.ExchangeDate,
+                             Mblno = d.Mbl,
+                             Hblno = d.Hbl,
+                             ChargeId = sur.ChargeId,
+                             Service = d.Service,
+                             PaymentObjectId = sur.PaymentObjectId,
+                             CreditNo = sur.CreditNo,
+                             FinalExchangeRate = sur.FinalExchangeRate
+                         });
+            foreach (var charge in DataCharge)
             {
-                if (item.Hblid != null && item.Hblid != Guid.Empty)
+                AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
+                var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
+                data.ServiceDate = charge.ServiceDate;
+                data.JobId = charge.JobId;
+                data.Hblid = charge.Hblid;
+                decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
+                var _taxInvNoRevenue = string.Empty;
+                var _voucherRevenue = string.Empty;
+                decimal? _usdRevenue = 0;
+                decimal? _vndRevenue = 0;
+                decimal? _taxOut = 0;
+                decimal? _totalRevenue = 0;
+                if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                 {
-                    var chargeD = detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
-                    foreach (var charge in chargeD)
+                    _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
+                    _usdRevenue = charge.AmountUsd;
+                    _vndRevenue = charge.AmountVnd;
+                    if (criteria.Currency == DocumentConstants.CURRENCY_USD)
                     {
-                        AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-                        var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
-                        data.ServiceDate = item.ServiceDate;
-                        data.JobId = item.JobId;
-                        data.Hblid = charge.Hblid;
-                        decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
-                        var _taxInvNoRevenue = string.Empty;
-                        var _voucherRevenue = string.Empty;
-                        decimal? _usdRevenue = 0;
-                        decimal? _vndRevenue = 0;
-                        decimal? _taxOut = 0;
-                        decimal? _totalRevenue = 0;
-                        if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                        {
-                            _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
-                            _usdRevenue = charge.AmountUsd;
-                            _vndRevenue = charge.AmountVnd;
-                            if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                            {
-                                _taxOut = charge.VatAmountUsd;
-                                _totalRevenue = charge.AmountUsd + _taxOut;
+                        _taxOut = charge.VatAmountUsd;
+                        _totalRevenue = charge.AmountUsd + _taxOut;
 
-                            }
-                            if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _taxOut = charge.VatAmountVnd;
-                                _totalRevenue = charge.AmountVnd + _taxOut;
-                            }
-                            data.CdNote = charge.DebitNo;
-                            _voucherRevenue = charge.VoucherId;
-                        }
-                        data.TaxInvNoRevenue = _taxInvNoRevenue;
-                        data.VoucherIdRevenue = _voucherRevenue;
-                        data.UsdRevenue = _usdRevenue;
-                        data.VndRevenue = _vndRevenue;
-                        data.TaxOut = _taxOut;
-                        data.TotalRevenue = _totalRevenue;
+                    }
+                    if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                    {
+                        _taxOut = charge.VatAmountVnd;
+                        _totalRevenue = charge.AmountVnd + _taxOut;
+                    }
+                    data.CdNote = charge.DebitNo;
+                    _voucherRevenue = charge.VoucherId;
+                }
+                data.TaxInvNoRevenue = _taxInvNoRevenue;
+                data.VoucherIdRevenue = _voucherRevenue;
+                data.UsdRevenue = _usdRevenue;
+                data.VndRevenue = _vndRevenue;
+                data.TaxOut = _taxOut;
+                data.TotalRevenue = _totalRevenue;
 
-                        var _taxInvNoCost = string.Empty;
-                        var _voucherCost = string.Empty;
-                        decimal? _usdCost = 0;
-                        decimal? _vndCost = 0;
-                        decimal? _taxIn = 0;
-                        decimal? _totalCost = 0;
-                        if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                        {
-                            _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
-                            _vndCost = charge.AmountVnd;
-                            _usdCost = charge.AmountUsd;
-                            if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                            {
-                                _taxIn = charge.VatAmountUsd;
-                                _totalCost = charge.AmountUsd + _taxIn;
+                var _taxInvNoCost = string.Empty;
+                var _voucherCost = string.Empty;
+                decimal? _usdCost = 0;
+                decimal? _vndCost = 0;
+                decimal? _taxIn = 0;
+                decimal? _totalCost = 0;
+                if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                {
+                    _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
+                    _vndCost = charge.AmountVnd;
+                    _usdCost = charge.AmountUsd;
+                    if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                    {
+                        _taxIn = charge.VatAmountUsd;
+                        _totalCost = charge.AmountUsd + _taxIn;
 
 
-                            }
-                            if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _taxIn = charge.VatAmountVnd;
-                                _totalCost = charge.AmountVnd + _taxIn;
-                            }
-                            data.CdNote = charge.CreditNo;
-                            _voucherCost = charge.VoucherId;
-                        }
-                        data.TaxInvNoCost = _taxInvNoCost;
-                        data.VoucherIdCost = _voucherCost;
-                        data.UsdCost = _usdCost;
-                        data.VndCost = _vndCost;
-                        data.TaxIn = _taxIn;
-                        data.TotalCost = _totalCost;
+                    }
+                    if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                    {
+                        _taxIn = charge.VatAmountVnd;
+                        _totalCost = charge.AmountVnd + _taxIn;
+                    }
+                    data.CdNote = charge.CreditNo;
+                    _voucherCost = charge.VoucherId;
+                }
+                data.TaxInvNoCost = _taxInvNoCost;
+                data.VoucherIdCost = _voucherCost;
+                data.UsdCost = _usdCost;
+                data.VndCost = _vndCost;
+                data.TaxIn = _taxIn;
+                data.TotalCost = _totalCost;
 
-                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            if (charge.KickBack == true)
-                            {
-                                data.TotalKickBack = charge.AmountVnd;
-                            }
-                        }
-                        if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                        {
-                            if (charge.KickBack == true)
-                            {
-                                data.TotalKickBack = charge.AmountUsd;
-                            }
-                        }
-                        data.ExchangeRate = (decimal)_exchangeRate;
-                        data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
-                        data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
-
-                        if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
-                        {
-                            data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency); //Amount sau thuế của phí OBH
-                            data.CdNote = charge.DebitNo;
-                        }
-                        data.AcVoucherNo = string.Empty;
-                        data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
-                        data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
-                        data.UserExport = currentUser.UserName;
-                        data.CurrencyId = charge.CurrencyId;
-                        data.ExchangeDate = charge.ExchangeDate;
-                        data.FinalExchangeRate = charge.FinalExchangeRate;
-                        data.Mbl = item.Mbl;
-                        data.Hbl = item.Hbl;
-                        data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
-                        data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
-                        data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
-
-                        data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
-                        data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
-
-                        dataList.Add(data);
+                if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    if (charge.KickBack == true)
+                    {
+                        data.TotalKickBack = charge.AmountVnd;
                     }
                 }
+                if (criteria.Currency == DocumentConstants.CURRENCY_USD)
+                {
+                    if (charge.KickBack == true)
+                    {
+                        data.TotalKickBack = charge.AmountUsd;
+                    }
+                }
+                data.ExchangeRate = (decimal)_exchangeRate;
+                data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
+                data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
+                if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                {
+                    var _mapCharge = mapper.Map<CsShipmentSurcharge>(charge);
+                    data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(_mapCharge, criteria.Currency); //Amount sau thuế của phí OBH
+                    data.CdNote = charge.DebitNo;
+                }
+                data.AcVoucherNo = string.Empty;
+                data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
+                data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == charge.Service).FirstOrDefault()?.DisplayName;
+                data.UserExport = currentUser.UserName;
+                data.CurrencyId = charge.CurrencyId;
+                data.ExchangeDate = charge.ExchangeDate;
+                data.FinalExchangeRate = charge.FinalExchangeRate;
+                data.Mbl = charge.Mblno;
+                data.Hbl = charge.Hblno;
+                data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
+                data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
+                data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
+                data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
+                data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
+                dataList.Add(data);
             }
             return dataList.AsQueryable();
         }

@@ -464,11 +464,11 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 if (item.TransactionType != "CL")
                                 {
-                                    CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                    CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
                                 }
-                                if (item.TransactionType == "CL")
+                                else
                                 {
                                     OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
@@ -484,7 +484,7 @@ namespace eFMS.API.Documentation.DL.Services
                             string _hblNo = string.Empty;
                             if (item.TransactionType != "CL")
                             {
-                                var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                                 _hblNo = houseBill?.Hwbno;
                                 if (houseBill != null)
                                 {
@@ -536,7 +536,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                                 surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
-                                if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                                //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
+                                if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
                                 {
                                     surcharge.InvoiceNo = item.InvoiceNo;
                                     surcharge.InvoiceDate = item.InvoiceDate;
@@ -951,8 +952,8 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 item.UserCreated = currentUser.UserID;
                 item.Id = Guid.NewGuid();
-                item.ExchangeDate = DateTime.Now;
-                item.DatetimeCreated = DateTime.Now;
+                item.ExchangeDate = DateTime.Now.Date;
+                item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                 OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                 item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                 item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
@@ -991,14 +992,14 @@ namespace eFMS.API.Documentation.DL.Services
             string transactionType = null;
             if (!string.IsNullOrEmpty(jobNo))
             {
-                IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get(x => x.JobNo == jobNo);
+                IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                 if (docTransaction != null && docTransaction.Count() > 0)
                 {
                     transactionType = docTransaction?.FirstOrDefault()?.TransactionType;
                 }
                 else
                 {
-                    IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get(x => x.JobNo == jobNo);
+                    IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                     if (opsTransaction != null && opsTransaction.Count() > 0)
                     {
                         transactionType = "CL";
