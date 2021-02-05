@@ -9,11 +9,13 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2531,7 +2533,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return queryShipment;
             }
         }
-        private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria)
+        private  IQueryable<AccountingPlSheetExportResult>AcctPLSheetDocumentation(GeneralReportCriteria criteria)
         {
             // Filter data without customerId
             var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
@@ -2545,17 +2547,44 @@ namespace eFMS.API.Documentation.DL.Services
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
-            foreach (var item in dataShipment)
-            {
-                if (item.Hblid != null && item.Hblid != Guid.Empty)
-                {
-                    var chargeD = detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
-                    foreach (var charge in chargeD)
+            var  data1 = (from d in dataShipment
+                        join sur in lstSurchage on d.Hblid equals sur.Hblid
+                        select new 
+                        {
+                            JobId = d.JobId,
+                            ServiceDate = d.ServiceDate,
+                            Hblid = sur.Hblid,
+                            InvoiceNo = sur.InvoiceNo,
+                            DebitNo = sur.DebitNo,
+                            AmountUsd = sur.AmountUsd,
+                            AmountVnd = sur.AmountVnd,
+                            VatAmountUsd = sur.VatAmountUsd,
+                            VatAmountVnd = sur.VatAmountVnd,
+                            VoucherId = sur.VoucherId,
+                            Type = sur.Type,
+                            KickBack = sur.KickBack,
+                            CurrencyId = sur.CurrencyId,
+                            ExchangeDate = sur.ExchangeDate,
+                            Mblno = d.Mbl,
+                            Hblno = d.Hbl,
+                            ChargeId = sur.ChargeId,
+                            Service = d.Service,
+                            PaymentObjectId = sur.PaymentObjectId,
+                            CreditNo = sur.CreditNo, 
+                            FinalExchangeRate = sur.FinalExchangeRate
+                        }).ToArray();
+            //foreach (var item in dataShipment)
+            //{
+            //    if (item.Hblid != null && item.Hblid != Guid.Empty)
+            //    {
+            //var chargeD = detailLookupSur[(Guid)item.Hblid].Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
+                for (int i =0; i < data1.Length; i++)
                     {
+                var charge = data1[i];
                         AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                         var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
-                        data.ServiceDate = item.ServiceDate;
-                        data.JobId = item.JobId;
+                        data.ServiceDate = charge.ServiceDate;
+                        data.JobId = charge.JobId;
                         data.Hblid = charge.Hblid;
                         decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                         var _taxInvNoRevenue = string.Empty;
@@ -2643,18 +2672,18 @@ namespace eFMS.API.Documentation.DL.Services
 
                         if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                         {
-                            data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency); //Amount sau thuế của phí OBH
+                            //data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency); //Amount sau thuế của phí OBH
                             data.CdNote = charge.DebitNo;
                         }
                         data.AcVoucherNo = string.Empty;
                         data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
-                        data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
+                        data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value ==charge.Service).FirstOrDefault()?.DisplayName;
                         data.UserExport = currentUser.UserName;
                         data.CurrencyId = charge.CurrencyId;
                         data.ExchangeDate = charge.ExchangeDate;
                         data.FinalExchangeRate = charge.FinalExchangeRate;
-                        data.Mbl = item.Mbl;
-                        data.Hbl = item.Hbl;
+                        data.Mbl = charge.Mblno;
+                        data.Hbl = charge.Hblno;
                         data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
                         data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
                         data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
@@ -2664,9 +2693,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                         dataList.Add(data);
                     }
-                }
+                //}
 
-            }
+            //}
             return dataList.AsQueryable();
         }
         #endregion -- Export Accounting PL Sheet --
