@@ -203,7 +203,7 @@ namespace eFMS.API.Operation.DL.Services
                 ImportCountryCode = clearance.NUOC_NK,
                 Pcs = (int?)clearance.SO_KIEN ?? null,
                 UnitCode = clearance.DVT_KIEN,
-                QtyCont = clearance.SO_CONTAINER == null ? (int?)clearance.SO_CONTAINER : null,
+                QtyCont = (int?)clearance.SO_CONTAINER ?? null,
                 GrossWeight = clearance.TR_LUONG,
                 Route = route,
                 Type = type,
