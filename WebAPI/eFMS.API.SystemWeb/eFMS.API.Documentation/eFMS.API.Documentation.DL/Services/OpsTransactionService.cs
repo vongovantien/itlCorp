@@ -1548,7 +1548,7 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId,  OpsTransactionModel shipment)
         {
             List<CsShipmentSurcharge> surCharges = null;
-            var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId);
+            var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true);
             if (charges.Select(x => x.Id).Count() != 0)
             {
                 surCharges = new List<CsShipmentSurcharge>();
