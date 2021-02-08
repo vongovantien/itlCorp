@@ -441,15 +441,10 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Soano = string.IsNullOrEmpty(item.Soano?.Trim()) ? null : item.Soano;
                         item.PaySoano = string.IsNullOrEmpty(item.PaySoano?.Trim()) ? null : item.PaySoano;
 
-                        //Chỉ tính lại giá trị cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
-                        if (string.IsNullOrEmpty(item.SettlementCode)
-                            && (item.AcctManagementId == Guid.Empty || item.AcctManagementId == null)
-                            && (string.IsNullOrEmpty(item.Soano) && string.IsNullOrEmpty(item.PaySoano))
-                            && (string.IsNullOrEmpty(item.DebitNo) && string.IsNullOrEmpty(item.CreditNo)))
+                        if (item.Id == Guid.Empty)
                         {
                             //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             item.FinalExchangeRate = null;
-
                             var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
                             item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
@@ -458,10 +453,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                             item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                             item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                        }
 
-                        if (item.Id == Guid.Empty)
-                        {
                             item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                             item.UserCreated = currentUser.UserID;
                             item.Id = Guid.NewGuid();
@@ -472,11 +464,11 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 if (item.TransactionType != "CL")
                                 {
-                                    CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                    CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
                                 }
-                                if (item.TransactionType == "CL")
+                                else
                                 {
                                     OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
@@ -492,7 +484,7 @@ namespace eFMS.API.Documentation.DL.Services
                             string _hblNo = string.Empty;
                             if (item.TransactionType != "CL")
                             {
-                                var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                                 _hblNo = houseBill?.Hwbno;
                                 if (houseBill != null)
                                 {
@@ -508,12 +500,57 @@ namespace eFMS.API.Documentation.DL.Services
                                 _mblNo = masterBill?.Mblno;
                                 _hblNo = masterBill?.Hwbno;
                             }
-                            item.JobNo = _jobNo;
-                            item.Mblno = _mblNo;
-                            item.Hblno = _hblNo;
-                            item.DatetimeModified = DateTime.Now;
-                            item.UserModified = currentUser.UserID;
-                            var d = DataContext.Update(item, x => x.Id == item.Id, true);
+                            var surcharge = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
+                            if (surcharge != null)
+                            {
+                                surcharge.PaymentObjectId = item.PaymentObjectId;
+                                surcharge.PayerId = item.PayerId;
+                                surcharge.ChargeId = item.ChargeId;
+                                surcharge.ChargeGroup = item.ChargeGroup;
+                                surcharge.Quantity = item.Quantity;
+                                surcharge.UnitId = item.UnitId;
+                                surcharge.UnitPrice = item.UnitPrice;
+                                surcharge.Vatrate = item.Vatrate;
+                                surcharge.CurrencyId = item.CurrencyId;
+                                surcharge.Notes = item.Notes;
+                                surcharge.KickBack = item.KickBack;
+                                surcharge.QuantityType = item.QuantityType;
+
+                                //Chỉ tính lại giá trị cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
+                                if (string.IsNullOrEmpty(surcharge.SettlementCode)
+                                    && (surcharge.AcctManagementId == Guid.Empty || surcharge.AcctManagementId == null)
+                                    && (string.IsNullOrEmpty(surcharge.Soano) && string.IsNullOrEmpty(surcharge.PaySoano))
+                                    && (string.IsNullOrEmpty(surcharge.DebitNo) && string.IsNullOrEmpty(surcharge.CreditNo)))
+                                {
+                                    //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                                    surcharge.FinalExchangeRate = null;
+                                    surcharge.ExchangeDate = item.ExchangeDate;
+                                }
+
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                                surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                                surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+
+                                //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
+                                if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
+                                {
+                                    surcharge.InvoiceNo = item.InvoiceNo;
+                                    surcharge.InvoiceDate = item.InvoiceDate;
+                                    surcharge.SeriesNo = item.SeriesNo;
+                                }
+
+                                surcharge.JobNo = _jobNo;
+                                surcharge.Mblno = _mblNo;
+                                surcharge.Hblno = _hblNo;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                surcharge.UserModified = currentUser.UserID;
+                                var d = DataContext.Update(surcharge, x => x.Id == surcharge.Id, true);
+                            }
                         }
                     }
                     DataContext.SubmitChanges();
@@ -531,7 +568,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return result;
             }
         }
-        
+
         public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
         {
             var result = new HandleState();
@@ -704,10 +741,10 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (!opsTransRepository.Any(x => x.Hwbno == item.Hblno.Trim()))
                     {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST],item.Hblno);
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
                         item.IsValid = false;
                     }
-                    
+
                 }
                 if (string.IsNullOrEmpty(item.Mblno))
                 {
@@ -729,9 +766,9 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!listPartner.Any(x => x.AccountNo.Trim() == item.PartnerCode.Replace("'","").Trim()))
+                    if (!listPartner.Any(x => x.AccountNo.Trim() == item.PartnerCode.Replace("'", "").Trim()))
                     {
-                        item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST],item.PartnerCode);
+                        item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST], item.PartnerCode);
                         item.IsValid = false;
                     }
                 }
@@ -742,9 +779,9 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if(!catChargeRepository.Any(x=>x.Code == item.ChargeCode.Trim()))
+                    if (!catChargeRepository.Any(x => x.Code == item.ChargeCode.Trim()))
                     {
-                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_NOT_EXIST],item.ChargeCode);
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_NOT_EXIST], item.ChargeCode);
                         item.IsValid = false;
                     }
                 }
@@ -761,7 +798,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if(!unitRepository.Any(x=>x.UnitNameEn.Trim() == item.Unit.Trim()))
+                    if (!unitRepository.Any(x => x.UnitNameEn.Trim() == item.Unit.Trim()))
                     {
                         item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_NOT_EXIST], item.Unit);
                         item.IsValid = false;
@@ -813,7 +850,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (!string.IsNullOrEmpty(item.Hblno))
                 {
-               
+
                     if (!opsTransRepository.Any(x => x.Mblno == item.Mblno && x.Hwbno == item.Hblno))
                     {
                         item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
@@ -825,7 +862,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (!opsTransRepository.Any(x => x.Mblno.Trim() == item.Mblno.Trim()))
                     {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST],item.Mblno);
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
                         item.IsValid = false;
                     }
                 }
@@ -862,9 +899,9 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.Type = "BUY";
                     }
-                    if (listChargeOps.Any(x=>x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == item.Type))
+                    if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == item.Type))
                     {
-                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE],item.ChargeCode, jobNo);
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
                         item.IsValid = false;
                     }
                     if (!string.IsNullOrEmpty(item.SeriesNo))
@@ -899,21 +936,24 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState Import(List<CsShipmentSurchargeImportModel> list)
         {
-            foreach(var item in list)
+            foreach (var item in list)
             {
                 switch (item.Type.ToLower())
                 {
-                    case "buying": item.Type = "BUY";
+                    case "buying":
+                        item.Type = "BUY";
                         break;
-                    case "obh": item.Type = item.Type.ToUpper();
+                    case "obh":
+                        item.Type = item.Type.ToUpper();
                         break;
-                    case "sell": item.Type = item.Type.ToUpper();
+                    case "sell":
+                        item.Type = item.Type.ToUpper();
                         break;
                 }
                 item.UserCreated = currentUser.UserID;
                 item.Id = Guid.NewGuid();
-                item.ExchangeDate = DateTime.Now;
-                item.DatetimeCreated = DateTime.Now;
+                item.ExchangeDate = DateTime.Now.Date;
+                item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                 OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                 item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                 item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
@@ -952,14 +992,14 @@ namespace eFMS.API.Documentation.DL.Services
             string transactionType = null;
             if (!string.IsNullOrEmpty(jobNo))
             {
-                IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get(x => x.JobNo == jobNo);
+                IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                 if (docTransaction != null && docTransaction.Count() > 0)
                 {
                     transactionType = docTransaction?.FirstOrDefault()?.TransactionType;
                 }
                 else
                 {
-                    IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get(x => x.JobNo == jobNo);
+                    IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                     if (opsTransaction != null && opsTransaction.Count() > 0)
                     {
                         transactionType = "CL";

@@ -31,5 +31,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string Service { get; set; }
         public string ServiceName { get; set; }
         public decimal? ChargeWeight { get; set; }
+        public decimal? AmountUSD { get; set; }
+        public decimal? AmountVND { get; set; }
+
     }
 }

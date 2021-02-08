@@ -133,7 +133,8 @@ export class StatementOfAccountEditComponent extends AppList {
                         strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ","),
                         jobIds: [],
                         hbls: [],
-                        mbls: []
+                        mbls: [],
+                        staffType: this.soa.staffType
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
                 },
@@ -247,7 +248,8 @@ export class StatementOfAccountEditComponent extends AppList {
                 obh: this.soa.obh,
                 creatorShipment: this.soa.creatorShipment,
                 customer: this.soa.customer,
-                commodityGroupId: this.soa.commodityGroupId
+                commodityGroupId: this.soa.commodityGroupId,
+                staffType: this.soa.staffType
             };
             this._progressRef.start();
             this._accoutingRepo.updateSOA(body)
@@ -286,6 +288,8 @@ export class StatementOfAccountEditComponent extends AppList {
             type: this.soa.type,
             isOBH: this.soa.obh,
             strServices: this.soa.serviceTypeId.replace(';', ','),
+            strCreators: this.soa.creatorShipment.replace(';', ','),
+            staffType: this.soa.staffType
         };
         this.dataSearch = new SOASearchCharge(body);
         this.addChargePopup.searchInfo = this.dataSearch;

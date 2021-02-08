@@ -1949,7 +1949,8 @@ namespace eFMS.API.ReportData.FormatExcel
                "Paid Date", //29
                "A/C Voucher No.", //30
                "P/M Voucher No.", //31
-               "Service" //32
+               "Service" ,//32
+               "Cd Note" //33
             };
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -2064,7 +2065,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AE7"].Value = headers[31]; //P/M Voucher No.
 
             workSheet.Cells["AF7:AF8"].Merge = true;
+            workSheet.Cells["AG7:AG8"].Merge = true;
             workSheet.Cells["AF7"].Value = headers[32]; //Service
+            workSheet.Cells["AG7"].Value = headers[33]; //CD NOTE
             //Header table
 
             int rowStart = 9;
@@ -2168,7 +2171,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 30].Value = listData[i].AcVoucherNo;
                 workSheet.Cells[rowStart, 31].Value = listData[i].PmVoucherNo;
                 workSheet.Cells[rowStart, 32].Value = listData[i].Service;
-
+                workSheet.Cells[rowStart, 33].Value = listData[i].CdNote;
                 rowStart += 1;
 
             }
@@ -2201,9 +2204,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            workSheet.Cells[6, 1, 6, 32].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 32].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 32].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, 6, 33].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 33].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 33].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[rowStart + 2, 1, rowStart + 2, 32].Merge = true;
             workSheet.Cells[rowStart + 2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;

@@ -46,6 +46,7 @@ export class Surcharge {
     mblno: string = null;
     hblno: string = null;
     advanceNo: string = null;
+    chargeGroup: string = null;
 
     shipmentId: string = SystemConstants.EMPTY_GUID; // * Id trong OpsTransation,CsTransation.
     typeService: string = null; // * "DOC | OPS"
@@ -53,8 +54,9 @@ export class Surcharge {
     // * Custom
     obhId: string = null;
     isDuplicate: boolean = false;
+    isChangeShipment: boolean = null;
 
-    chargeGroup: string = null;
+
 
     constructor(object?: any) {
         const self = this;

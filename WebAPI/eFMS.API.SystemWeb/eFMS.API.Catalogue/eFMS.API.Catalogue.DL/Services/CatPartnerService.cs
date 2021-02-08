@@ -235,6 +235,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var creatorObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             string address = webUrl.Value.Url + "/en/#/" + "home/catalogue/partner-data/detail/" + partner.Id;
             subject = "Reject Partner - " + partner.PartnerNameVn;
@@ -253,8 +254,8 @@ namespace eFMS.API.Catalogue.DL.Services
                   "</br>"
                   + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            string UrlImage = UrlClone.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", UrlImage.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> lstCc = ListMailBCC();
             List<string> lstTo = new List<string>();
@@ -286,15 +287,23 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
             List<string> lstTo = new List<string>();
+            List<string> lstToAcc = new List<string>();
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAccoutant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null && listEmailAR.Any())
             {
                 lstTo = listEmailAR.Split(";").ToList();
             }
+
+            if (listEmailAccoutant != null && listEmailAccoutant.Any())
+            {
+                lstToAcc = listEmailAccoutant.Split(";").ToList(); 
+            }
+
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoSalesman = sysEmployeeRepository.Get(e => e.Id == employeeIdSalemans)?.FirstOrDefault();
@@ -348,6 +357,10 @@ namespace eFMS.API.Catalogue.DL.Services
             lstCc.Add(objInfoSalesman?.Email);
             lstCc.Add(objInfoCreator?.Email);
             lstCc.Add(objInfoModified?.Email);
+            if (lstToAcc.Any())
+            {
+                lstTo.AddRange(lstToAcc);
+            }
             bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
