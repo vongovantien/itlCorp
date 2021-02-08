@@ -481,8 +481,12 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.NotifyParty = resultNoti?.PartnerNameEn;
                     detail.POLName = pol?.NameEn;
                     detail.PODName = pod?.NameEn;
+                    detail.POLCode = pol?.Code;
+                    detail.PODCode = pod?.Code;
                     detail.ShipmentEta = shipment.Eta;
                     detail.TransactionType = shipment.TransactionType;
+                    detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
+                    detail.DeliveryPlace = shipment.DeliveryPlace == null ? string.Empty : catPlaceRepo.Get(x => x.Id == shipment.DeliveryPlace)?.FirstOrDefault()?.NameEn;
                     return detail;
                 }
             }
