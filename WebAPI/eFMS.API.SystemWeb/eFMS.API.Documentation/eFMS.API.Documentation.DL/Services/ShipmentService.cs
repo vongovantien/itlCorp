@@ -2100,7 +2100,8 @@ namespace eFMS.API.Documentation.DL.Services
                                   ChargeId = sur.ChargeId,
                                   PaymentObjectId = sur.PaymentObjectId,
                                   CreditNo = sur.CreditNo,
-                                  FinalExchangeRate = sur.FinalExchangeRate
+                                  FinalExchangeRate = sur.FinalExchangeRate,
+                                  ClearanceNo = sur.ClearanceNo
                               });
             foreach (var charge in DataCharge)
             {
@@ -2109,6 +2110,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
+                data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(charge.JobId); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
                 decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;

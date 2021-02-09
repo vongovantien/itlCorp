@@ -31,5 +31,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? VatAmountUsd { get; set; }
         public Guid ChargeId { get; set; }
         public string Service { get; set; }
+        public string ClearanceNo { get; set; }
     }
 }
