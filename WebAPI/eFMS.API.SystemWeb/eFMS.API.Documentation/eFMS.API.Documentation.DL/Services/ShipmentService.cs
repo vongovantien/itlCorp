@@ -2191,8 +2191,8 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalKickBack = charge.AmountUsd;
                     }
                 }
-                data.ExchangeRate = (decimal)_exchangeRate;
-                data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
+                data.ExchangeRate = (decimal)(_exchangeRate ?? 0);
+                data.Balance = _totalRevenue - _totalCost - (data.TotalKickBack ?? 0);
                 data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
@@ -2690,8 +2690,8 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalKickBack = charge.AmountUsd;
                     }
                 }
-                data.ExchangeRate = (decimal)_exchangeRate;
-                data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
+                data.ExchangeRate = (decimal)(_exchangeRate ?? 0);
+                data.Balance = _totalRevenue - _totalCost - (data.TotalKickBack ?? 0);
                 data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
