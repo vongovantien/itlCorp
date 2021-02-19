@@ -1121,13 +1121,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
-                        HandleState hs = DataContext.Add(accounting, false);
+                        HandleState hs = DataContext.Add(accounting);
 
                         surchargeRepo.SubmitChanges();
                         soaRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
-
                         return hs;
                     }
                     catch (Exception ex)
@@ -1288,10 +1286,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
-                        var hs = DataContext.Update(accounting, x => x.Id == accounting.Id, false);
+                        var hs = DataContext.Update(accounting, x => x.Id == accounting.Id);
                         surchargeRepo.SubmitChanges();
                         soaRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
 
                         return hs;
