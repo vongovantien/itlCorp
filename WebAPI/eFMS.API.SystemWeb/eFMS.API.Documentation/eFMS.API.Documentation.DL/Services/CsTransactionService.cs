@@ -258,7 +258,6 @@ namespace eFMS.API.Documentation.DL.Services
                     return checkDuplicateCont;
                 }
             }
-            transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
             transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
             transaction.Active = true;
             transaction.UserModified = transaction.UserCreated;
@@ -273,6 +272,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
+                    transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
                     var hsTrans = DataContext.Add(transaction);
                     if (hsTrans.Success)
                     {
