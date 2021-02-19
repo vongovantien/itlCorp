@@ -167,14 +167,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     string message = string.Format(@"Charge type DEBIT không có cùng số ReferenceNo hoặc Currency. Vui lòng kiểm tra lại");
                     return new HandleState((object)message);
                 }
-
-                //var matchedChargeObh = CheckMatchedCharge(obhCharges);
-                //if (matchedChargeObh)
-                //{
-                //    string message = string.Format(@"Charge type OBH không có cùng số ReferenceNo hoặc Currency. Vui lòng kiểm tra lại");
-                //    return new HandleState((object)message);
-                //}
-
+                
                 var partner = partnerRepo.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefault();
                 if (partner == null)
                 {
@@ -203,13 +196,13 @@ namespace eFMS.API.ForPartner.DL.Service
                         if (invoiceDebit != null)
                         {
                             //Insert Invoice (Invoice Debit)
-                            hsDebit = DataContext.Add(invoiceDebit, false);
+                            hsDebit = DataContext.Add(invoiceDebit);
                         }
                         HandleState hsObh = new HandleState();
                         if (invoicesObh != null)
                         {
                             //Insert list Invoice Temp (Invoice OBH)
-                            hsObh = DataContext.Add(invoicesObh, false);
+                            hsObh = DataContext.Add(invoicesObh);
                         }
 
                         if (hsDebit.Success)
@@ -240,7 +233,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
                                     surchargeDebit.DatetimeModified = DateTime.Now;
                                     surchargeDebit.UserModified = _currentUser.UserID;
-                                    var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id, false);
+                                    var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id);
                                 }
                             }
                         }
@@ -276,14 +269,13 @@ namespace eFMS.API.ForPartner.DL.Service
                                         surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
                                         surchargeObh.DatetimeModified = DateTime.Now;
                                         surchargeObh.UserModified = _currentUser.UserID;
-                                        var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id, false);
+                                        var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id);
                                     }
                                 }
                             }
                         }
 
                         var smSurcharge = surchargeRepo.SubmitChanges();
-                        var sm = DataContext.SubmitChanges();
                         trans.Commit();
 
                         if (!hsDebit.Success)
