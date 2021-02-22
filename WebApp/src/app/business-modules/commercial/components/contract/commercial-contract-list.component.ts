@@ -258,7 +258,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             }
         }
         this.formContractPopup.contracts = this.contracts;
-        this.onActiveContract.emit(this.contract.partnerStatus);
+        this.onActiveContract.emit(this.selectedContract);
     }
 
 

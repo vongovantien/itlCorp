@@ -1672,7 +1672,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         else
                         {
                             workSheet.Cells[i + addressStartContent, 12].Value = itemCharge.VATAmount;
-                            workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormatUSD;
+                            workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
                         }
                         workSheet.Cells[i + addressStartContent, 13].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
                         workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
@@ -1684,7 +1684,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 16].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
                             workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
                             workSheet.Cells[i + addressStartContent, 15].Value = itemCharge.VATAmount;
-                            workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormatUSD;
+                            workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
                             workSheet.Cells[i + addressStartContent, 11].Value = null;
                             workSheet.Cells[i + addressStartContent, 12].Value = null;
                             workSheet.Cells[i + addressStartContent, 13].Value = null;

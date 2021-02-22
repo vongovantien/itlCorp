@@ -20,6 +20,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public List<string> Hbls { get; set; }
         public List<string> Mbls { get; set; }
         public List<string> CustomNo { get; set; }
-
+        public string StaffType { get; set; }
     }
 }

@@ -109,6 +109,8 @@ namespace eFMS.API.Accounting.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
+                var _excRateUsdToLocal = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
+                model.ExcRateUsdToLocal = _excRateUsdToLocal;
 
                 //Check exists OBH Debit Charge
                 var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
@@ -137,9 +139,11 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _amount = 0;
                         decimal _debitAmount = 0;
                         decimal _creditAmount = 0;
+                        int _totalCharge = 0;
                         if (surcharges != null)
                         {
                             _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
+                            _totalCharge = surcharges.Count();
                             foreach (var surcharge in surcharges)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
@@ -184,17 +188,16 @@ namespace eFMS.API.Accounting.DL.Services
                                     _creditAmount += _amount;
                                 }
 
-                                var hsUpdateSurchargeCredit = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
                             }
                         }
 
                         soa.TotalShipment = _totalShipment;
                         soa.DebitAmount = _debitAmount;
                         soa.CreditAmount = _creditAmount;
-                        var hs = DataContext.Add(soa, false);
-
+                        soa.TotalCharge = _totalCharge;
+                        var hs = DataContext.Add(soa);
                         csShipmentSurchargeRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -243,7 +246,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             surchargeOld.UserModified = currentUser.UserID;
                             surchargeOld.DatetimeModified = DateTime.Now;
-                            var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(surchargeOld, x => x.Id == surchargeOld.Id, false);
+                            var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(surchargeOld, x => x.Id == surchargeOld.Id);
                         }
 
                         model.DatetimeModified = DateTime.Now;
@@ -259,6 +262,7 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.SyncStatus = soaCurrent.SyncStatus;
                         soa.LastSyncDate = soaCurrent.LastSyncDate;
                         soa.ReasonReject = soaCurrent.ReasonReject;
+                        soa.ExcRateUsdToLocal = soaCurrent.ExcRateUsdToLocal;
 
                         //Check exists OBH Debit Charge
                         var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
@@ -284,9 +288,11 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _amount = 0;
                         decimal _debitAmount = 0;
                         decimal _creditAmount = 0;
+                        int _totalCharge = 0;
                         if (surcharges != null)
                         {
                             _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
+                            _totalCharge = surcharges.Count();
                             foreach (var surcharge in surcharges)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
@@ -306,8 +312,19 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
                                     surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-                                    //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                                    surcharge.FinalExchangeRate = null;
+                                    
+                                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                                    {
+                                        surcharge.FinalExchangeRate = soaCurrent.ExcRateUsdToLocal;
+                                    }
+                                    else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                                    {
+                                        surcharge.FinalExchangeRate = 1;
+                                    }
+                                    else
+                                    {
+                                        surcharge.FinalExchangeRate = null;
+                                    }
 
                                     #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
@@ -331,17 +348,17 @@ namespace eFMS.API.Accounting.DL.Services
                                     _creditAmount += _amount;
                                 }
 
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
                             }
                         }
 
                         soa.TotalShipment = _totalShipment;
                         soa.DebitAmount = _debitAmount;
                         soa.CreditAmount = _creditAmount;
+                        soa.TotalCharge = _totalCharge;
 
-                        var hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
+                        var hs = DataContext.Update(soa, x => x.Id == soa.Id);
                         csShipmentSurchargeRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -738,21 +755,59 @@ namespace eFMS.API.Accounting.DL.Services
 
             #endregion -- Search by Created Date or Service Date --
 
-            #region -- Search by Creator of Job --
+            #region -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
             if (!string.IsNullOrEmpty(criteria.StrCreators))
             {
-                var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                if (criteria.StrServices.Contains("CL"))
+                if (string.IsNullOrEmpty(criteria.StaffType) || criteria.StaffType == "Creator")
                 {
-                    operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
-                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                    var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        }
+                    }
+                    else
                     {
                         transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
                     }
                 }
-                else
+
+                if (criteria.StaffType == "PersonInCharge")
                 {
-                    transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                    var personInCharges = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => personInCharges.Where(w => w == x.BillingOpsId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                    }
+                }
+
+                if (criteria.StaffType == "Salesman")
+                {
+                    var salesMans = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    var jobIdTrans = csTransactionDetailRepo.Get(x => salesMans.Where(w => w == x.SaleManId).Any()).Select(s => s.JobId).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => salesMans.Where(w => w == x.SalemanId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                    }
                 }
 
                 var creatorJobNos = new List<string>();
@@ -778,7 +833,7 @@ namespace eFMS.API.Accounting.DL.Services
                     obhSurcharges = null;
                 }
             }
-            #endregion -- Search by Creator of Job --
+            #endregion -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
 
             #region -- Search by ChargeId --
             if (!string.IsNullOrEmpty(criteria.StrCharges))
@@ -1021,6 +1076,17 @@ namespace eFMS.API.Accounting.DL.Services
             }
             #endregion -- Search by Customer --
 
+            #region -- Search by Services --
+            if (!string.IsNullOrEmpty(criteria.StrServices))
+            {
+                surcharges = surcharges.Where(x => criteria.StrServices.Contains(x.TransactionType));
+                if (criteria.IsOBH) //**
+                {
+                    obhSurcharges = obhSurcharges.Where(x => criteria.StrServices.Contains(x.TransactionType));
+                }
+            }
+            #endregion -- Search by Services --
+
             #region -- Search by Created Date or Service Date --
             //Created Date of Job
             if (criteria.DateType == "CreatedDate")
@@ -1095,21 +1161,59 @@ namespace eFMS.API.Accounting.DL.Services
 
             #endregion -- Search by Created Date or Service Date --
 
-            #region -- Search by Creator of Job --
+            #region -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
             if (!string.IsNullOrEmpty(criteria.StrCreators))
             {
-                var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                if (criteria.StrServices.Contains("CL"))
+                if (string.IsNullOrEmpty(criteria.StaffType) || criteria.StaffType == "Creator")
                 {
-                    operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
-                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                    var creators = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                        }
+                    }
+                    else
                     {
                         transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
                     }
                 }
-                else
+
+                if (criteria.StaffType == "PersonInCharge")
                 {
-                    transactions = transactions.Where(x => creators.Where(w => w == x.UserCreated).Any());
+                    var personInCharges = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => personInCharges.Where(w => w == x.BillingOpsId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => personInCharges.Where(w => w == x.PersonIncharge).Any());
+                    }
+                }
+
+                if (criteria.StaffType == "Salesman")
+                {
+                    var salesMans = criteria.StrCreators.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                    var jobIdTrans = csTransactionDetailRepo.Get(x => salesMans.Where(w => w == x.SaleManId).Any()).Select(s => s.JobId).ToList();
+                    if (criteria.StrServices.Contains("CL"))
+                    {
+                        operations = operations.Where(x => salesMans.Where(w => w == x.SalemanId).Any());
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        {
+                            transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                        }
+                    }
+                    else
+                    {
+                        transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
+                    }
                 }
 
                 var creatorJobNos = new List<string>();
@@ -1135,7 +1239,7 @@ namespace eFMS.API.Accounting.DL.Services
                     obhSurcharges = null;
                 }
             }
-            #endregion -- Search by Creator of Job --
+            #endregion -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
 
             #region -- Shipment (JobNo, MBL, HBL)
             if (!string.IsNullOrEmpty(criteria.JobId))
@@ -1398,7 +1502,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  PaymentStatus = s.PaymentStatus,
                                  SyncStatus = s.SyncStatus,
                                  LastSyncDate = s.LastSyncDate,
-                                 ReasonReject = s.ReasonReject
+                                 ReasonReject = s.ReasonReject,
+                                 TotalCharge = s.TotalCharge
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
@@ -1570,6 +1675,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  Id = s.Id,
                                  Soano = s.Soano,
                                  Shipment = s.TotalShipment,
+                                 TotalCharge = s.TotalCharge ?? 0,
                                  PartnerName = pat.PartnerNameEn,
                                  Currency = s.Currency,
                                  CreditAmount = s.CreditAmount,
@@ -1588,13 +1694,15 @@ namespace eFMS.API.Accounting.DL.Services
                                  ServiceTypeId = s.ServiceTypeId,
                                  Customer = s.Customer,
                                  DateType = s.DateType,
+                                 StaffType = s.StaffType,
                                  CreatorShipment = s.CreatorShipment,
                                  PaymentStatus = s.PaymentStatus,
                                  PaymentDueDate = s.PaymentDueDate,
                                  SyncStatus = s.SyncStatus,
                                  LastSyncDate = s.LastSyncDate,
                                  ReasonReject = s.ReasonReject,
-                                 CreditPayment = pat.CreditPayment
+                                 CreditPayment = pat.CreditPayment,
+                                 ExcRateUsdToLocal = s.ExcRateUsdToLocal
                              };
             var result = resultData.FirstOrDefault();
             if (result != null)
@@ -1731,6 +1839,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chg.CDNote = _cdNote;
                     chg.IsSynced = _isSynced;
                     chg.SyncedFromBy = _syncedFromBy;
+                    chg.ExchangeRate = surcharge.FinalExchangeRate;
 
                     data.Add(chg);
                 }
@@ -1856,7 +1965,11 @@ namespace eFMS.API.Accounting.DL.Services
                 result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
                 foreach (var item in results.Select(x => x.Key))
                 {
-                    var chargeData = charge.Where(x => x.HBL == item).FirstOrDefault();
+                    var chargeData = charge.Where(x => x.HBL == item && x.Currency == AccountingConstants.CURRENCY_USD).FirstOrDefault();
+                    if(chargeData == null)
+                    {
+                        chargeData = charge.Where(x => x.HBL == item).FirstOrDefault();
+                    }
                     HawbAirFrieghtModel air = new HawbAirFrieghtModel();
                     air.JobNo = chargeData.JobId;
                     air.FlightNo = chargeData.FlightNo;
@@ -1868,60 +1981,92 @@ namespace eFMS.API.Accounting.DL.Services
                     air.Pcs = chargeData.PackageQty;
                     air.CW = chargeData.ChargeWeight;
                     air.GW = chargeData.GrossWeight;
-                    var chargeAF = charge.Where(x => x.HBL == item && x.ChargeName.ToUpper() == AccountingConstants.CHARGE_AIR_FREIGHT.ToUpper());
-                    air.Rate = chargeAF.FirstOrDefault()?.UnitPrice;
 
+                    air.TotalAmount = 0;
+                    // Airfrieght
                     var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAirfrieght.Count() == 0)
                     {
                         lstAirfrieght = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Debit).Sum() : null;
-
+                    if (lstAirfrieght.Count() > 0)
+                    {
+                        air.Rate = NumberHelper.RoundNumber(lstAirfrieght.Select(t => t.UnitPrice ?? 0).Sum(), 2);
+                        air.AirFreight = NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.DebitLocal).Sum());
+                    }
+                    // FuelSurcharge
                     var lstFuelSurcharge = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstFuelSurcharge.Count() == 0)
                     {
-                        lstFuelSurcharge = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstFuelSurcharge = charge.Where(x => x.HBL == item &&
+                                                        (x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.FuelSurcharge = lstFuelSurcharge.Count() > 0 ? lstFuelSurcharge.Select(t => t.Debit).Sum() : null;
-
-
+                    if (lstFuelSurcharge.Count() > 0)
+                    {
+                        air.FuelSurcharge = NumberHelper.RoundNumber((decimal)lstFuelSurcharge.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstFuelSurcharge.Select(t => t.DebitLocal).Sum());
+                    }
+                    // WariskSurcharge
                     var lstWariskSurcharge = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstWariskSurcharge.Count() == 0)
                     {
                         lstWariskSurcharge = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.WarriskSurcharge = lstWariskSurcharge.Count() > 0 ? lstWariskSurcharge.Select(t => t.Debit).Sum() : null;
-
+                    if(lstWariskSurcharge.Count() > 0)
+                    {
+                        air.WarriskSurcharge = NumberHelper.RoundNumber((decimal)lstWariskSurcharge.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstWariskSurcharge.Select(t => t.DebitLocal).Sum());
+                    }
+                    // ScreeningFee
                     var lstScreeningFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SCREENING_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstScreeningFee.Count() == 0)
                     {
-                        lstScreeningFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == "x-ray charge") && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstScreeningFee = charge.Where(x => x.HBL == item &&
+                                                        (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_X_RAY.ToLower()) &&
+                                                        x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.ScreeningFee = lstScreeningFee.Count() > 0 ? lstScreeningFee.Select(t => t.Debit).Sum() : null;
-
+                    if (lstScreeningFee.Count() > 0)
+                    {
+                        air.ScreeningFee = NumberHelper.RoundNumber((decimal)lstScreeningFee.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstScreeningFee.Select(t => t.DebitLocal).Sum());
+                    }
+                    // AWBFee
                     var lstAWBFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AWB_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAWBFee.Count() == 0)
                     {
-                        lstAWBFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == "air waybill") && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstAWBFee = charge.Where(x => x.HBL == item &&
+                                                (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB.ToLower()) &&
+                                                x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.AWB = lstAWBFee.Count() > 0 ? lstAWBFee.Select(t => t.Debit).Sum() : null;
-
-
+                    if (lstAWBFee.Count() > 0)
+                    {
+                        air.AWB = NumberHelper.RoundNumber((decimal)lstAWBFee.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAWBFee.Select(t => t.DebitLocal).Sum());
+                    }
+                    // AMSFee
                     var lstAMSFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AMS_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAMSFee.Count() == 0)
                     {
                         lstAMSFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.AMS = lstAMSFee.Count() > 0 ? lstAMSFee.Select(t => t.Debit).Sum() : null;
-
+                    if (lstAMSFee.Count() > 0)
+                    {
+                        air.AMS = NumberHelper.RoundNumber((decimal)lstAMSFee.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAMSFee.Select(t => t.DebitLocal).Sum());
+                    }
+                    // Dangerous fee
                     var lstDANFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SA_DAN_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstDANFee.Count() == 0)
                     {
                         lstDANFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-                    air.DAN = lstDANFee.Count() > 0 ? lstDANFee.Select(t => t.Debit).Sum() : null;
-
+                    if (lstDANFee.Count() > 0)
+                    {
+                        air.DAN = NumberHelper.RoundNumber((decimal)lstDANFee.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstDANFee.Select(t => t.DebitLocal).Sum());
+                    }
+                    // Other fee
                     var lstOTHFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstOTHFee.Count() == 0)
                     {
@@ -1947,11 +2092,18 @@ namespace eFMS.API.Accounting.DL.Services
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_HANDLING_FEE.ToLower()
                         ) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
-
-                    air.OTH = lstOTHFee.Count() > 0 ? lstOTHFee.Select(t => t.Debit).Sum() : null;
-
+                    if (lstOTHFee.Count() > 0)
+                    {
+                        air.OTH = NumberHelper.RoundNumber((decimal)lstOTHFee.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstOTHFee.Select(t => t.DebitLocal).Sum());
+                    }
+                    // HandlingFee
                     var lstHandlingFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_HANDLING_FEE) && x.Currency == AccountingConstants.CURRENCY_USD);
-                    air.HandlingFee = lstHandlingFee.Count() > 0 ? lstHandlingFee.Select(t => t.Debit).Sum() : null;
+                    if (lstHandlingFee.Count() > 0)
+                    {
+                        air.HandlingFee = NumberHelper.RoundNumber((decimal)lstHandlingFee.Select(t => t.DebitUSD).Sum(), 2);
+                        air.TotalAmount += NumberHelper.RoundNumber((decimal)lstHandlingFee.Select(t => t.DebitLocal).Sum());
+                    }
 
                     air.NetAmount = 0;
                     if (air.AirFreight.HasValue)
@@ -1992,31 +2144,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     // get exchange rate(vnd)
-                    var _exchangeRateVND = currencyExchangeService.CurrencyExchangeRateConvert(chargeData.FinalExchangeRate, chargeData.ExchangeDate, chargeData.Currency, AccountingConstants.CURRENCY_LOCAL);
-                    air.ExchangeRate = _exchangeRateVND;
-                    //var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
-                    //if (dataCharge.Any())
-                    //{
-                    //    if (chargeData.FinalExchangeRate != null)
-                    //    {
-                    //        air.ExchangeRate = chargeData.FinalExchangeRate;
-                    //    }
-                    //    else
-                    //    {
-                    //        var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
-                    //        var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
-                    //        air.ExchangeRate = dataObjectCurrencyExchange.Rate;
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
-                    //    var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
-                    //    air.ExchangeRate = dataObjectCurrencyExchange.Rate;
-                    //}
-
-                    air.TotalAmount = NumberHelper.RoundNumber((air.NetAmount * air.ExchangeRate) ?? 0);
-
+                    //var _exchangeRateVND = currencyExchangeService.CurrencyExchangeRateConvert(chargeData.FinalExchangeRate, chargeData.ExchangeDate, chargeData.Currency, AccountingConstants.CURRENCY_LOCAL);
+                    air.ExchangeRate = chargeData.FinalExchangeRate;
                     result.HawbAirFrieghts.Add(air);
                 }
             }
@@ -2066,7 +2195,11 @@ namespace eFMS.API.Accounting.DL.Services
                 result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
                 foreach (var item in results.Select(x => x.Key))
                 {
-                    var chargeData = charge.Where(x => x.JobId == item).FirstOrDefault();
+                    var chargeData = charge.Where(x => x.JobId == item && x.Currency == AccountingConstants.CURRENCY_USD).FirstOrDefault();
+                    if (chargeData == null)
+                    {
+                        chargeData = charge.Where(x => x.JobId == item).FirstOrDefault();
+                    }
                     HawbAirFrieghtModel air = new HawbAirFrieghtModel();
                     var cstrans = csTrans.Where(k => k.JobNo == chargeData.JobId).FirstOrDefault();
                     var transDetail = csTransDe.Where(x => x.JobId == cstrans.Id).FirstOrDefault();
@@ -2083,45 +2216,46 @@ namespace eFMS.API.Accounting.DL.Services
                     var lstAirfrieght = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE ||
                                         (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())));
                     // Rate
-                    air.Rate = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.UnitPrice).Sum() : null;
+                    air.Rate = lstAirfrieght.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.UnitPrice).Sum(), 2) : (decimal?)null;
+                    air.NetAmount = 0;
                     // Air Freight
-                    air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Credit).Sum() : null;
+                    air.AirFreight = lstAirfrieght.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // Fuel Surcharge
                     var lstFuelSurcharge = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_FUEL_SURCHARGE_CODE ||
                                             (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower())));
-                    air.FuelSurcharge = lstFuelSurcharge.Count() > 0 ? lstFuelSurcharge.Select(t => t.Credit).Sum() : null;
+                    air.FuelSurcharge = lstFuelSurcharge.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstFuelSurcharge.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // War risk Surcharge
                     var lstWariskSurcharge = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_WAR_RISK_SURCHARGE_CODE ||
                                             (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower())));
-                    air.WarriskSurcharge = lstWariskSurcharge.Count() > 0 ? lstWariskSurcharge.Select(t => t.Credit).Sum() : null;
+                    air.WarriskSurcharge = lstWariskSurcharge.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstWariskSurcharge.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // Screening Fee
                     var lstScreeningFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_SCREENING_CODE ||
                                         (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
                                         (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_X_RAY.ToLower()))));
-                    air.ScreeningFee = lstScreeningFee.Count() > 0 ? lstScreeningFee.Select(t => t.Credit).Sum() : null;
+                    air.ScreeningFee = lstScreeningFee.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstScreeningFee.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // AWB
                     var lstAWBFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AWB_FEE_CODE ||
                                     (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
                                     (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB.ToLower()))));
-                    air.AWB = lstAWBFee.Count() > 0 ? lstAWBFee.Select(t => t.Credit).Sum() : null;
+                    air.AWB = lstAWBFee.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstAWBFee.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // AMS
                     var lstAMS = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AMS_FEE_CODE ||
                                 (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower())));
-                    air.AMS = lstAMS.Count() > 0 ? lstAMS.Select(t => t.Credit).Sum() : null;
+                    air.AMS = lstAMS.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstAMS.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // Dangerous Fee
                     var lstDangerousFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_DAN_AIR_CODE ||
                                             (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower())));
-                    air.DAN = lstDangerousFee.Count() > 0 ? lstDangerousFee.Select(t => t.Credit).Sum() : null;
+                    air.DAN = lstDangerousFee.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstDangerousFee.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // Handling fee
                     var lstHandlingFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_DHL_AIR_CODE || x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_HANDLING_FEE)));
-                    air.HandlingFee = lstHandlingFee.Count() > 0 ? lstHandlingFee.Select(t => t.Credit).Sum() : null;
+                    air.HandlingFee = lstHandlingFee.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstHandlingFee.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // Other Charges
                     var lstOtherChrg = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_OTH_AIR_CODE ||
@@ -2137,7 +2271,7 @@ namespace eFMS.API.Accounting.DL.Services
                         lstOtherChrg = lstOtherChrg.Except(lstDangerousFee);
                         lstOtherChrg = lstOtherChrg.Except(lstHandlingFee);
                     }
-                    air.OTH = lstOtherChrg.Count() > 0 ? lstOtherChrg.Select(t => t.Credit).Sum() : null;
+                    air.OTH = lstOtherChrg.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstOtherChrg.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
 
                     // Net Amount
                     air.NetAmount = 0;
@@ -2178,21 +2312,9 @@ namespace eFMS.API.Accounting.DL.Services
                         air.NetAmount += air.HandlingFee;
                     }
 
-                    var _exchangeRateUSD = 0m;
                     if (chargeData.Currency != AccountingConstants.CURRENCY_USD)
                     {
-                        _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(chargeData.FinalExchangeRate, chargeData.ExchangeDate, chargeData.Currency, AccountingConstants.CURRENCY_USD);
-                        air.ExchangeRate = _exchangeRateUSD;
-                        air.AirFreight = air.AirFreight * _exchangeRateUSD;
-                        air.FuelSurcharge = air.FuelSurcharge * _exchangeRateUSD;
-                        air.WarriskSurcharge = air.WarriskSurcharge * _exchangeRateUSD;
-                        air.ScreeningFee = air.ScreeningFee * _exchangeRateUSD;
-                        air.AWB = air.AWB * _exchangeRateUSD;
-                        air.AMS = air.AMS * _exchangeRateUSD;
-                        air.DAN = air.DAN * _exchangeRateUSD;
-                        air.OTH = air.OTH * _exchangeRateUSD;
-                        air.HandlingFee = air.HandlingFee * _exchangeRateUSD;
-                        air.NetAmount = air.NetAmount * _exchangeRateUSD;
+                        air.ExchangeRate = chargeData.FinalExchangeRate;
                     }
                     result.HawbAirFrieghts.Add(air);
                 }
@@ -2302,6 +2424,10 @@ namespace eFMS.API.Accounting.DL.Services
                     CustomNo = _customNo,
                     Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || (sur.PaymentObjectId == soa.Customer && sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)sur.Total : null,
                     Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || (sur.PayerId == soa.Customer && sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)sur.Total : null,
+                    DebitLocal = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || (sur.PaymentObjectId == soa.Customer && sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0) : (decimal?)null,
+                    CreditLocal = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || (sur.PayerId == soa.Customer && sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0) : (decimal?)null,
+                    DebitUSD = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || (sur.PaymentObjectId == soa.Customer && sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0) : (decimal?)null,
+                    CreditUSD = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || (sur.PayerId == soa.Customer && sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0) : (decimal?)null,
                     SOANo = soa.Type == "Debit" ? sur.Soano : sur.PaySoano,
                     IsOBH = false,
                     Currency = sur.CurrencyId,
@@ -2323,6 +2449,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Unit = unit?.UnitNameEn,
                     UnitPrice = sur.UnitPrice,
                     VATRate = sur.Vatrate,
+                    VATAmountLocal = sur.VatAmountVnd,
+                    VATAmountUSD = sur.VatAmountUsd,
                     PackageQty = _packageQty,
                     GrossWeight = _grossWeight,
                     ChargeWeight = _chargeWeight,
@@ -2337,7 +2465,8 @@ namespace eFMS.API.Accounting.DL.Services
                     ExchangeDate = sur.ExchangeDate,
                     FinalExchangeRate = sur.FinalExchangeRate,
                     PIC = null,
-                    IsSynced = _isSynced
+                    IsSynced = _isSynced,
+                    NetAmount = sur.NetAmount
                 };
                 result.Add(chg);
             }
@@ -2400,6 +2529,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var it in item.Charges)
                 {
+                    // VAT amount
                     decimal? percent = 0;
                     if (it.VATRate > 0)
                     {
@@ -2419,10 +2549,9 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
                     }
-
-                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber((it.UnitPrice * it.Quantity) ?? 0) : NumberHelper.RoundNumber((it.UnitPrice * it.Quantity) ?? 0, 2));
+                    // Net amount
+                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.NetAmount ?? 0) : NumberHelper.RoundNumber(it.NetAmount ?? 0, 2));
                 }
-
             }
 
             return opssoa;
@@ -2674,10 +2803,11 @@ namespace eFMS.API.Accounting.DL.Services
                     var soa = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                     if (soa == null) return new HandleState((object)"Not found SOA");
 
-                    soa.SyncStatus = "Rejected";
+                    soa.SyncStatus = "";
                     soa.UserModified = currentUser.UserID;
                     soa.DatetimeModified = DateTime.Now;
                     soa.ReasonReject = model.Reason;
+                    soa.Note += " Rejected from Accountant";
 
                     HandleState hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
                     if (hs.Success)

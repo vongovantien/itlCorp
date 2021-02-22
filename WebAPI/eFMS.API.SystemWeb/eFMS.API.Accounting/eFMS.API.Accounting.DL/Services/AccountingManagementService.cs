@@ -1121,13 +1121,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
-                        HandleState hs = DataContext.Add(accounting, false);
+                        HandleState hs = DataContext.Add(accounting);
 
                         surchargeRepo.SubmitChanges();
                         soaRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
-
                         return hs;
                     }
                     catch (Exception ex)
@@ -1288,10 +1286,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
-                        var hs = DataContext.Update(accounting, x => x.Id == accounting.Id, false);
+                        var hs = DataContext.Update(accounting, x => x.Id == accounting.Id);
                         surchargeRepo.SubmitChanges();
                         soaRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
 
                         return hs;
@@ -1563,51 +1560,58 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- EXPORT ---
         private string GetCustomNoOldOfShipment(string jobNo)
         {
-            var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
-            return customNos.FirstOrDefault();
+            var LookupCustomDeclaration = customsDeclarationRepo.Get().ToLookup(x => x.JobNo);
+            var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo).FirstOrDefault();
+            return customNos;
         }
 
         public List<AccountingManagementExport> GetDataAcctMngtExport(AccAccountingManagementCriteria criteria)
         {
             var query = ExpressionQuery(criteria);
             var accountings = GetAcctMngtPermission().Where(query);
-            var partners = partnerRepo.Get();
             var data = new List<AccountingManagementExport>();
+            var partners = partnerRepo.Get();
+            var LookupPartner = partners.ToLookup(x => x.Id);
+            var charges = chargeRepo.Get();
+            var LookupCharge = charges.ToLookup(x => x.Id);
+            var surchargeList = surchargeRepo.Get();
+            var LookupSurcharge = surchargeList.ToLookup(x => x.AcctManagementId);
+            var chargeDefaultList = chargeDefaultRepo.Get();
+            var LookupChargeDefault = chargeDefaultList.ToLookup(x => x.ChargeId);
+            var unitList = unitRepo.Get();
+            var LookupUnit = unitList.ToLookup(x => x.Id);
             foreach (var acct in accountings)
             {
-                Expression<Func<ChargeOfAccountingManagementModel, bool>> expressionQuery = chg => chg.AcctManagementId == acct.Id;
-                var charges = new List<ChargeOfAccountingManagementModel>();
-                if (acct.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                var surcharges = LookupSurcharge[acct.Id];
+                var partnerAcct = LookupPartner[acct.PartnerId].FirstOrDefault();
+
+                foreach (var surcharge in surcharges)
                 {
-                    charges = GetChargeSellForInvoice(expressionQuery);
-                }
-                else
-                {
-                    charges = GetChargeForVoucher(expressionQuery); ;
-                }
-                foreach (var charge in charges)
-                {
+                    var _charge = LookupCharge[surcharge.ChargeId].FirstOrDefault();
+                    var _chargeId = _charge?.Id ?? Guid.Empty;
+                    var _productDept = _charge?.ProductDept;
+                    var _chargeDefault = LookupChargeDefault[_chargeId].FirstOrDefault();
                     string _deptCode = string.Empty;
-                    var _productDept = chargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault()?.ProductDept;
+                    
                     if (!string.IsNullOrEmpty(_productDept))
                     {
                         _deptCode = _productDept;
                     }
                     else
                     {
-                        if (!string.IsNullOrEmpty(charge.JobNo))
+                        if (!string.IsNullOrEmpty(surcharge.JobNo))
                         {
-                            if (charge.JobNo.Contains("LOG"))
+                            if (surcharge.JobNo.Contains("LOG"))
                             {
                                 //_deptCode = "OPS";
                                 _deptCode = "ITLOPS";
                             }
-                            else if (charge.JobNo.Contains("A"))
+                            else if (surcharge.JobNo.Contains("A"))
                             {
                                 //_deptCode = "AIR";
                                 _deptCode = "ITLAIR";
                             }
-                            else if (charge.JobNo.Contains("S"))
+                            else if (surcharge.JobNo.Contains("S"))
                             {
                                 //_deptCode = "SEA";
                                 _deptCode = "ITLCS";
@@ -1638,10 +1642,76 @@ namespace eFMS.API.Accounting.DL.Services
                             _statusInvoice = "Đã phát hành";
                         }
                     }
-                    var vatPartner = partners.Where(x => x.Id == charge.VatPartnerId).FirstOrDefault();
-                    var partnerAcct = partners.Where(x => x.Id == acct.PartnerId).FirstOrDefault();
                     var item = new AccountingManagementExport();
-                    item = mapper.Map<AccountingManagementExport>(charge);
+                    item.SurchargeId = surcharge.Id;
+                    item.ChargeId = surcharge.ChargeId;
+                    item.ChargeCode = _charge.Code;
+                    item.ChargeName = _charge.ChargeNameVn;
+                    item.JobNo = surcharge.JobNo;
+                    item.Hbl = surcharge.Hblno;
+                    item.OrgAmount = surcharge.NetAmount;
+                    item.Vat = surcharge.Vatrate;
+                    item.OrgVatAmount = surcharge.Total - surcharge.NetAmount;
+
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL)
+                    {
+                        item.VatAccount = _chargeDefault?.CreditVat;
+                    }
+                    else if(surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                    {
+                        item.VatAccount = _chargeDefault?.DebitVat;
+                    } else
+                    {
+                        item.VatAccount = _chargeDefault?.CreditVat ?? _chargeDefault?.DebitVat;
+                    }
+
+                    item.Currency = surcharge.CurrencyId;
+                    item.ExchangeDate = surcharge.ExchangeDate;
+                    item.FinalExchangeRate = surcharge.FinalExchangeRate;
+                    item.ExchangeRate = surcharge.FinalExchangeRate;
+                    item.AmountVnd = surcharge.AmountVnd;
+                    item.VatAmountVnd = surcharge.VatAmountVnd;
+
+                    string _vatPartnerId = null;
+                    CatPartner _obhPartner = null;
+                    string _cdNoteCode = string.Empty;
+                    string _soaNo = string.Empty;
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        _vatPartnerId = surcharge.PayerId;
+                        _obhPartner = LookupPartner[surcharge.PaymentObjectId].FirstOrDefault();
+                        _cdNoteCode = surcharge.CreditNo;
+                        _soaNo = surcharge.PaySoano;
+                    }
+                    else
+                    {
+                        _vatPartnerId = surcharge.PaymentObjectId;
+                        _cdNoteCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? surcharge.DebitNo : surcharge.CreditNo;
+                        _soaNo = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? surcharge.Soano : surcharge.PaySoano;
+                    }
+                    var _vatPartner = LookupPartner[_vatPartnerId].FirstOrDefault();
+
+                    item.VatPartnerId = _vatPartnerId;
+                    item.VatPartnerCode = _vatPartner?.TaxCode; //Taxcode
+                    item.VatPartnerName = _vatPartner?.ShortName;
+                    item.VatPartnerAddress = _vatPartner?.AddressVn;
+                    item.ObhPartnerCode = _obhPartner?.TaxCode; //Taxcode ObhPartner
+                    item.ObhPartner = _obhPartner?.ShortName; //Abbr ObhPartner
+                    item.InvoiceNo = surcharge.InvoiceNo;
+                    item.Serie = surcharge.SeriesNo;
+                    item.InvoiceDate = surcharge.InvoiceDate;
+                    item.CdNoteNo = _cdNoteCode;
+                    item.Qty = surcharge.Quantity;
+
+                    var _unit = LookupUnit[surcharge.UnitId].FirstOrDefault();
+                    item.UnitName = _unit?.UnitNameVn;
+
+                    item.UnitPrice = surcharge.UnitPrice;
+                    item.Mbl = surcharge.Mblno;
+                    item.SoaNo = _soaNo;
+                    item.SettlementCode = surcharge.SettlementCode;
+                    item.AcctManagementId = surcharge.AcctManagementId;
+
                     item.Date = acct.Date; //Date trên VAT Invoice Or Voucher
                     item.VoucherId = acct.VoucherId; //VoucherId trên VAT Invoice Or Voucher
                     item.PartnerId = partnerAcct?.AccountNo; //Partner ID trên VAT Invoice Or Voucher
@@ -1650,31 +1720,31 @@ namespace eFMS.API.Accounting.DL.Services
                     item.ContraAccount = string.Empty;
                     item.TkNoVat = string.Empty;
                     item.TkCoVat = string.Empty;
-                    if (charge.ChargeType == AccountingConstants.TYPE_CHARGE_SELL) //Debit charge
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL) //Debit charge
                     {
                         item.AccountNo = acct.AccountNo;
-                        item.ContraAccount = charge.ContraAccount;
+                        item.ContraAccount = _chargeDefault?.CreditAccountNo;
                         item.TkNoVat = acct.AccountNo;
-                        item.TkCoVat = charge.VatAccount;
+                        item.TkCoVat = item.VatAccount;
                     }
                     else //Credit hoặc OBH charge
                     {
-                        item.AccountNo = charge.ContraAccount;
+                        item.AccountNo = _chargeDefault?.DebitAccountNo;
                         item.ContraAccount = acct.AccountNo;
-                        item.TkNoVat = charge.VatAccount;
+                        item.TkNoVat = item.VatAccount;
                         item.TkCoVat = acct.AccountNo;
                     }
 
-                    item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
-                    item.VatPartnerNameVn = vatPartner?.PartnerNameVn; //Partner Name Local của Charge
+                    item.VatPartnerNameEn = _vatPartner?.PartnerNameEn; //Partner Name En của Charge
+                    item.VatPartnerNameVn = _vatPartner?.PartnerNameVn; //Partner Name Local của Charge
                     item.Description = acct.Description;
                     item.IsTick = true; //Default is True
                     item.PaymentTerm = acct.PaymentTerm ?? 0; //Default is 0                    
                     item.DepartmentCode = _deptCode;
-                    item.CustomNo = GetCustomNoOldOfShipment(charge.JobNo);
+                    item.CustomNo = surcharge.ClearanceNo;//GetCustomNoOldOfShipment(surcharge.JobNo); //Xem xét sau
                     item.PaymentMethod = _paymentMethod;
                     item.StatusInvoice = _statusInvoice; //Tình trạng hóa đơn (Dùng cho Invoice)
-                    item.VatPartnerEmail = vatPartner?.Email; //Email Partner của charge
+                    item.VatPartnerEmail = _vatPartner?.Email; //Email Partner của charge
                     item.ReleaseDateEInvoice = null;
                     item.Vat = item.Vat ?? 0;
 

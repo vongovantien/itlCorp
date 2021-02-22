@@ -37,7 +37,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         return this._readonly;
     }
 
-
     private _readonly: boolean = false;
 
     @ViewChild(SettlementExistingChargePopupComponent) existingChargePopup: SettlementExistingChargePopupComponent;
@@ -130,8 +129,16 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.selectedIndexSurcharge = -1;
             const hblIds: string[] = charges.map(x => x.hblid);
 
-            this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
+            if (charges[0].isChangeShipment) {
+                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && x.isChangeShipment === false);
+            } else {
+                const jobNos: string[] = charges.map(x => x.jobNo);
+
+                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && jobNos.indexOf(x.jobId));
+            }
+
             this.surcharges = [...charges, ...this.surcharges];
+            this.surcharges.forEach(c => c.isChangeShipment = undefined)
 
         }
     }
@@ -293,8 +300,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             return;
         }
         if (charge.isFromShipment) {
-
             const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isFromShipment);
+
             this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
             this.listChargeFromShipmentPopup.show();
         } else {
@@ -306,10 +313,19 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 // * Filter charge with hblID.
                 const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
                 if (!!surcharges.length) {
+                    const hblIds: string[] = surcharges.map(x => x.hblid);
+
+                    this.surcharges.forEach(x => {
+                        if (hblIds.indexOf(x.hblid)) {
+                            x.isChangeShipment = false; //  * Mark item is editing.
+                        }
+                    });
+
                     this.tableListChargePopup.charges = cloneDeep(surcharges);
 
                     this.tableListChargePopup.charges.forEach(item => {
                         item.isDuplicate = false; // * Reset duplicate state
+
                         if (item.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
                             // get partner theo payerId.
                             const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.payerId);

@@ -80,6 +80,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
             { title: 'Synced From', field: 'syncedFromBy', sortable: true },
+            { title: 'ExcRate to Local', field: 'exchangeRate', sortable: true },
         ];
         this._activedRoute.queryParams.subscribe((params: any) => {
             if (!!params.no && params.currency) {

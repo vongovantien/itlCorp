@@ -2207,7 +2207,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CsTransactionDetail houseBill = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
                 if (houseBill != null)
                 {
-                    hasChargeSynced = surchareRepository.Any(x => x.Hblno == houseBill.Hwbno && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                    hasChargeSynced = surchareRepository.Any(x => x.Hblid == houseBill.Id && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
                 }
 
                 if (hasChargeSynced)

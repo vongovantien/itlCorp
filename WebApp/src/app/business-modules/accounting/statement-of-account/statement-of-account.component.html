@@ -62,10 +62,11 @@
                                             </td>
                                             <td class="text-right">
                                                 <span *ngIf="soa.totalAmount >= 0">{{soa.totalAmount | number: '.0-2' }}
-                                                    {{soa.currency}}</span>
-                                                <span
-                                                    *ngIf="soa.totalAmount < 0">({{soa.totalAmount | abs | number: '.0-2' }})
-                                                    {{soa.currency}}</span>
+                                                    {{soa.currency}}
+                                                </span>
+                                                <span *ngIf="soa.totalAmount < 0">
+                                                    ({{soa.totalAmount | abs | number:'.0-2' }}) {{soa.currency}}
+                                                </span>
                                             </td>
                                             <td [ngSwitch]="soa.status">
                                                 <span *ngSwitchCase="'New'" class="text-danger">
@@ -93,15 +94,15 @@
                                                 <span *ngSwitchCase="'Synced'" class="text-success">
                                                     {{soa.syncStatus}}</span>
                                                 <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                    {{soa.syncStatus}}{{soa.reasonReject ? ' - ' + soa.reasonReject : ''}}
+                                                    {{soa.syncStatus}}{{soa.reasonReject ? ' - ' + soa.reasonReject :
+                                                    ''}}
                                                 </span>
                                                 <span *ngSwitchDefault>
                                                     {{soa.syncStatus}}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span
-                                                    class="text-info">{{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm'}}</span>
+                                                <span class="text-info">{{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm'}}</span>
                                             </td>
                                         </tr>
                                         <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
