@@ -506,31 +506,47 @@
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.EndCol">
             <summary>End of column in excel</summary>
         </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.GroupRowCopy">
+            <summary>Row of group copied</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.DetailRowCopy">
+            <summary>Row of detail copied</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartDetailTable">
+            <summary>Start index of table</summary>
+        </member>
+        <member name="F:eFMS.API.ReportData.FormatExcel.ExcelExport._groupRowValue">
+            <summary>Values of group copied</summary>
+        </member>
+        <member name="F:eFMS.API.ReportData.FormatExcel.ExcelExport._detailRowValue">
+            <summary>Values of detail copied</summary>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.#ctor(System.String)">
             <summary>
-            
+            Init for excel file to export
             </summary>
             <param name="fileName"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.String,System.Object,System.Boolean)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.String,System.Object)">
             <summary>
             Set data for cell
             </summary>
             <param name="name">name of cell to set value</param>
             <param name="value">value set to cell</param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetDataTable(System.String,System.Object,System.Int32,System.Boolean)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetGroupsTable">
             <summary>
-            Set data for table
+            Set Group Headers/Footers Of Table (use if have multigroup)
             </summary>
-            <param name="name"></param>
-            <param name="value"></param>
-            <param name="rowNumber"></param>
-            <param name="isWraptext"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetDataTable">
+            <summary>
+            Set detail data for table
+            </summary>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.ExcelStream">
             <summary>
-            
+            Save excel and return file stream
             </summary>
             <returns></returns>
         </member>

@@ -26,7 +26,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsTransaction> csTransactionRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<CatCountry> countryRepo;
-
+        readonly IContextBase<CatUnit> unitRepository;
 
         public CsAirWayBillService(IContextBase<CsAirWayBill> repository, 
             IMapper mapper,
@@ -36,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPlace> catPlace,
             IContextBase<CsTransaction> csTransaction,
             IContextBase<CatPartner> catPartner,
+            IContextBase<CatUnit> unitRepo,
             IContextBase<CatCountry> catCountry) : base(repository, mapper)
         {
             dimensionDetailService = dimensionService;
@@ -45,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
             csTransactionRepo = csTransaction;
             catPartnerRepo = catPartner;
             countryRepo = catCountry;
+            unitRepository = unitRepo;
         }
 
         public CsAirWayBillModel GetBy(Guid jobId)
@@ -190,7 +192,10 @@ namespace eFMS.API.Documentation.DL.Services
             result.IssuranceAmount = masterbill.IssuranceAmount;
             result.HandingInfo = masterbill.HandingInformation;
             result.Pieces = masterbill.PackageQty;
-            result.PackageUnit = shipment?.PackageType;
+            if (!string.IsNullOrEmpty(shipment?.PackageType))
+            {
+                result.PackageUnit = unitRepository.Get(x => x.Id == Convert.ToInt32(shipment.PackageType)).FirstOrDefault()?.Code;
+            }
             result.Gw = masterbill.GrossWeight;
             result.Cw = masterbill.ChargeWeight;
             result.RateCharge = masterbill.RateCharge;

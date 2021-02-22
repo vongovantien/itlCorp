@@ -1,10 +1,7 @@
 ﻿using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace eFMS.API.ReportData.FormatExcel
 {
@@ -13,14 +10,26 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <summary>Excel worksheet</summary>
         public ExcelWorksheet Worksheet { get; set; }
         public ExcelPackage PackageExcel { get; set; }
+
         /// <summary>Start of row in excel</summary>
-        public static int StartRow { get; set; }
+        private static int StartRow { get; set; }
         /// <summary>End of row in excel</summary>
-        public static int EndRow { get; set; }
+        private static int EndRow { get; set; }
         /// <summary>Start of column in excel</summary>
-        public static int StartCol { get; set; }
+        private static int StartCol { get; set; }
         /// <summary>End of column in excel</summary>
-        public static int EndCol { get; set; }
+        private static int EndCol { get; set; }
+        /// <summary>Row of group copied</summary>
+        protected ExcelRange GroupRowCopy { get; set; }
+        /// <summary>Row of detail copied</summary>
+        protected ExcelRange DetailRowCopy { get; set; }
+
+        /// <summary>Start index of table</summary>
+        public int StartDetailTable { get; set; }
+        /// <summary>Values of group copied</summary>
+        private object _groupRowValue;
+        /// <summary>Values of detail copied</summary>
+        private object _detailRowValue;
 
         /// <summary>
         /// Init for excel file to export
@@ -44,7 +53,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             catch(Exception ex)
             {
-
+                PackageExcel.Dispose();
             }
         }
 
@@ -53,8 +62,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// </summary>
         /// <param name="name">name of cell to set value</param>
         /// <param name="value">value set to cell</param>
-        /// <param name="isWraptext">use if wraptext for cell</param>
-        public void SetData(string name, object value, bool isWraptext = false)
+        public void SetData(string name, object value)
         {
             name = string.Format("{{{0}}}", name);
             var result = from cell in Worksheet.Cells[StartRow, StartCol, EndRow, EndCol]
@@ -71,9 +79,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     if (value.ToString().Contains("\n"))
                     {
-                        if (isWraptext)
+                        if (Worksheet.Cells[address].Style.WrapText)
                         {
-                            Worksheet.Cells[address].Style.WrapText = isWraptext;
                             Worksheet.Cells[address].Value = value;
                         }
                         else
@@ -97,31 +104,45 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         /// <summary>
-        /// Set data for table
+        /// Set Group Headers/Footers Of Table (use if have multigroup)
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <param name="rowNumber"></param>
-        /// <param name="isWraptext"></param>
-        public void SetDataTable(string name, object value, int rowNumber, bool isWraptext = false)
+        public void SetGroupsTable()
         {
-            name = string.Format("{{{0}}}", name);
-            var result = from cell in Worksheet.Cells[StartRow, StartCol, EndRow, EndCol]
-                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
-                         select cell;
-            if (result.Count() > 0)
+            if (GroupRowCopy == null)
             {
-                var address = ExcelCellBase.TranslateFromR1C1(ExcelCellBase.TranslateToR1C1(result.FirstOrDefault().ToString(), -rowNumber, 0), 0, 0);
-                if (value == null)
-                {
-                    Worksheet.Cells[address].Value = string.Empty;
-                }
-                else
-                {
-                    Worksheet.Cells[address].Style.WrapText = isWraptext;
-                    Worksheet.Cells[address].Value = value;
-                }
+                _groupRowValue = new object();
+                GroupRowCopy = Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol];
+                _groupRowValue = GroupRowCopy.Value;
             }
+            else
+            {
+                Worksheet.InsertRow(StartDetailTable, 1);
+                GroupRowCopy.Copy(Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol]);
+                Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol].Value = _groupRowValue;
+            }
+            StartRow = StartDetailTable;
+            StartDetailTable++;
+        }
+
+        /// <summary>
+        /// Set detail data for table
+        /// </summary>
+        public void SetDataTable()
+        {
+            if (DetailRowCopy == null)
+            {
+                _detailRowValue = new object();
+                DetailRowCopy = Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol];
+                _detailRowValue = DetailRowCopy.Value;
+            }
+            else
+            {
+                Worksheet.InsertRow(StartDetailTable, 1);
+                DetailRowCopy.Copy(Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol]);
+                Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol].Value = _detailRowValue;
+            }
+            StartRow = StartDetailTable;
+            StartDetailTable++;
         }
 
         /// <summary>
