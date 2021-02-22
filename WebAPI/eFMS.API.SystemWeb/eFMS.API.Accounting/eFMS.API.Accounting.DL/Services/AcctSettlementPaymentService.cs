@@ -46,6 +46,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
@@ -74,6 +75,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartner> catPartner,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
             IContextBase<SysOffice> sysOffice,
+            IContextBase<SysAuthorizedApproval> authourizedApproval,
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
             IUserBaseService userBase) : base(repository, mapper)
@@ -101,6 +103,7 @@ namespace eFMS.API.Accounting.DL.Services
             userBaseService = userBase;
             sentEmailHistoryRepo = sentEmailHistory;
             sysOfficeRepo = sysOffice;
+            authourizedApprovalRepo = authourizedApproval;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -168,6 +171,11 @@ namespace eFMS.API.Accounting.DL.Services
             var permissionRangeRequester = GetPermissionRangeOfRequester();
             var settlementPayments = DataContext.Get();
             var settlementPaymentAprs = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
+            var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
+            var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
+
+            var userCurrent = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+
             var data = from settlementPayment in settlementPayments
                        join settlementPaymentApr in settlementPaymentAprs on settlementPayment.SettlementNo equals settlementPaymentApr.SettlementNo into settlementPaymentApr2
                        from settlementPaymentApr in settlementPaymentApr2.DefaultIfEmpty()
@@ -200,7 +208,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.settlementPaymentApr != null && (x.settlementPaymentApr.Leader == currentUser.UserID
                   || x.settlementPaymentApr.LeaderApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Leader, x.settlementPayment.GroupId, x.settlementPayment.DepartmentId, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Leader, x.settlementPayment.GroupId, x.settlementPayment.DepartmentId, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.settlementPaymentApr.Leader && w.OfficeCommissioner == x.settlementPayment.OfficeId).Any()
                 )
                 && x.settlementPayment.GroupId == currentUser.GroupId
                 && x.settlementPayment.DepartmentId == currentUser.DepartmentId
@@ -213,7 +222,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.settlementPaymentApr != null && (x.settlementPaymentApr.Manager == currentUser.UserID
                   || x.settlementPaymentApr.ManagerApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Manager, null, x.settlementPayment.DepartmentId, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Manager, null, x.settlementPayment.DepartmentId, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.settlementPaymentApr.Manager && w.OfficeCommissioner == x.settlementPayment.OfficeId).Any()
                   )
                 && x.settlementPayment.DepartmentId == currentUser.DepartmentId
                 && x.settlementPayment.OfficeId == currentUser.OfficeID
@@ -226,8 +236,9 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.settlementPaymentApr != null && (x.settlementPaymentApr.Accountant == currentUser.UserID
                   || x.settlementPaymentApr.AccountantApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Accountant, null, null, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
-                  || userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId)
+                  //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Accountant, null, null, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.settlementPaymentApr.Accountant && w.OfficeCommissioner == x.settlementPayment.OfficeId).Any()
+                  || isAccountantDept
                   )
                 && x.settlementPayment.OfficeId == currentUser.OfficeID
                 && x.settlementPayment.CompanyId == currentUser.CompanyID
@@ -238,7 +249,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.settlementPaymentApr != null && (x.settlementPaymentApr.Buhead == currentUser.UserID
                   || x.settlementPaymentApr.BuheadApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Buhead ?? null, null, null, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Buhead ?? null, null, null, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.settlementPaymentApr.Buhead && w.OfficeCommissioner == x.settlementPayment.OfficeId).Any()
                   )
                 && x.settlementPayment.OfficeId == currentUser.OfficeID
                 && x.settlementPayment.CompanyId == currentUser.CompanyID
@@ -248,7 +260,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ) //BOD AND DEPUTY OF BOD   
                 ||
                 (
-                 userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId) // Is User Admin
+                 //userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId) // Is User Admin
+                 (userCurrent.UserType == "Super Admin" || (userCurrent.UserType == "Local Admin" && currentUser.OfficeID == x.settlementPayment.OfficeId && currentUser.CompanyID == x.settlementPayment.CompanyId))
                  &&
                  (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //[CR: 09/01/2021]
@@ -272,8 +285,6 @@ namespace eFMS.API.Accounting.DL.Services
                          from ops in grpOps.DefaultIfEmpty()
                          join cus in custom on ops.JobNo equals cus.JobNo into grpCus
                          from cus in grpCus.DefaultIfEmpty()
-                         join adv in advPayment on sur.AdvanceNo equals adv.AdvanceNo into grpAdv
-                         from adv in grpAdv.DefaultIfEmpty()
                          where
                          (
                               criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
@@ -318,17 +329,14 @@ namespace eFMS.API.Accounting.DL.Services
             settlementPayments = QueryWithShipment(settlementPayments, criteria);
             if (settlementPayments == null) return null;
 
-            var approveSettlePayment = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
             var users = sysUserRepo.Get();
             IQueryable<CatPartner> partners = catPartnerRepo.Get();
-
+            
             var data = from settlePayment in settlementPayments
                        join p in partners on settlePayment.Payee equals p.Id into partnerGrps
                        from partnerGrp in partnerGrps.DefaultIfEmpty()
                        join user in users on settlePayment.Requester equals user.Id into user2
                        from user in user2.DefaultIfEmpty()
-                       join aproveSettlement in approveSettlePayment on settlePayment.SettlementNo equals aproveSettlement.SettlementNo into aproveSettlement2
-                       from aproveSettlement in aproveSettlement2.DefaultIfEmpty()
                        select new AcctSettlementPaymentResult
                        {
                            Id = settlePayment.Id,
