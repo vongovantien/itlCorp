@@ -22,6 +22,8 @@
                         "main": "src/main.ts",
                         "polyfills": "src/polyfills.ts",
                         "tsConfig": "src/tsconfig.app.json",
+                        "aot": false,
+                        "sourceMap":false,
                         "assets": [
                             "src/favicon.ico",
                             "src/assets",
@@ -322,7 +324,6 @@
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
-                    "sourceMap": false,
                     "options": {
                         "browserTarget": "eFMS-Web:build"
                     },
