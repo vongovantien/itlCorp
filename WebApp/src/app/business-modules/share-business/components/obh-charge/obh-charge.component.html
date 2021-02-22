@@ -138,8 +138,7 @@
                                         <input type="text" class="dropdown-toggle form-control" readonly
                                             [(ngModel)]="charge.receiverName" placeholder="Partner Name"
                                             [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                            (click)="loadDynamicComoGrid(charge,i)"
-                                            [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
+                                            (click)="loadDynamicComoGrid(charge,i)">
                                         <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                             charge.receiverName = null" (onDropdown)="loadDynamicComoGrid(charge,i)"
                                             [showDelete]="!!charge.receiverName 
