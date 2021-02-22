@@ -2692,8 +2692,10 @@ namespace eFMS.API.Accounting.DL.Services
                 #endregion -- Info CD Note --
 
                 // Exchange Rate from currency charge to current soa
-                var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, soa.Currency?.Trim());
-                var _amount = charge.Total * exchangeRate;
+                //var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, soa.Currency?.Trim());
+                //var _amount = charge.Total * exchangeRate;
+                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, soa.Currency);
+
                 var soaCharge = new AccountStatementFullReport();
                 soaCharge.PartnerID = partner?.Id;
                 soaCharge.PartnerName = partner?.PartnerNameEn?.ToUpper(); //Name En
