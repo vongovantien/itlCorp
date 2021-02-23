@@ -24,5 +24,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string SyncStatus { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public Guid? AcctManagementId { get; set; }
     }
 }
