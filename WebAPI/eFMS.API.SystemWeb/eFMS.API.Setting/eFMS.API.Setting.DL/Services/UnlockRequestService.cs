@@ -473,7 +473,6 @@ namespace eFMS.API.Setting.DL.Services
                   || x.unlockRequestApr.ManagerApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Manager, null, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
                   )
-                // && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
@@ -486,13 +485,12 @@ namespace eFMS.API.Setting.DL.Services
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Accountant == currentUser.UserID
                   || x.unlockRequestApr.AccountantApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  || userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId)
                   )
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
                 && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
@@ -500,17 +498,18 @@ namespace eFMS.API.Setting.DL.Services
                   || x.unlockRequestApr.BuheadApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Buhead ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
                   )
-                // && x.unlockRequest.GroupId == currentUser.GroupId
-                // && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Accountant) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED : true)
                 && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
-                ) //BOD AND DEPUTY OF BOD                
+                ) //BOD AND DEPUTY OF BOD    
+                ||
+                (
+                 userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId) // Is User Admin
+                 &&
+                 (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //[CR: 22/02/2021]
             ).Select(s => s.unlockRequest);
 
             return result;
