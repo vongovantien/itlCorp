@@ -2080,7 +2080,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && string.IsNullOrEmpty(criteria.Status))
             {
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddDays(-15); //15 ngày trước
+                var minDate = maxDate.AddMonths(-1); //1 tháng trước
                 query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
             }
 
