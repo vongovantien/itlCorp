@@ -751,7 +751,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
         const listChargeToDectect = this.charges.filter(c => !this.checkSpecialCaseCharge(c));
         const chargeInvoiceGrps = listChargeToDectect.map(c => {
-            if (!!c.invoiceNo) return c.chargeId + c.invoiceNo;
+            if (!!c.invoiceNo && c.notes) return c.chargeId + c.invoiceNo + c.notes;
             return null;
         }).filter(x => Boolean(x));
 
@@ -761,7 +761,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             valid = false;
             const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeInvoiceGrps))];
             this.charges.filter(c => !this.checkSpecialCaseCharge(c)).forEach((c: CsShipmentSurcharge) => {
-                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo)) {
+                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo + c.notes)) {
                     c.duplicateCharge = true;
                     c.duplicateInvoice = true;
                 } else {
