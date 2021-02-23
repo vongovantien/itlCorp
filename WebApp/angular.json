@@ -39,8 +39,7 @@
                             "src/assets/external-libraries/js/popper.min.js",
                             "node_modules/bootstrap/dist/js/bootstrap.min.js",
                             "src/assets/external-libraries/js/editor.pkgd.min.js"
-                        ],
-                        "serviceWorker": true
+                        ]
                     },
                     "configurations": {
                         "design": {},
