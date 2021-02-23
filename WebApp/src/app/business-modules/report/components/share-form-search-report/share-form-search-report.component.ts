@@ -97,7 +97,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET, text: 'Accountant P/L Sheet' },
         { id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS, text: 'Job Profit Analysis' },
         { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST, text: 'Summary Of Costs Incurred' },
-        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' }
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' },
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.COSTS_BY_PARTNER, text: 'Costs By Partner' }
     ];
 
     typeReportList: ReportInterface.INg2Select[] = [
@@ -166,7 +167,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
-        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
+        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[0].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
                 startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
