@@ -39,6 +39,7 @@ namespace eFMS.API.Setting.Service.Models
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
+        public virtual DbSet<SysSentEmailHistory> SysSentEmailHistory { get; set; }
         public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
@@ -805,6 +806,10 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
+                entity.Property(e => e.AmountUsd)
+                    .HasColumnName("AmountUSD")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.AmountVnd)
                     .HasColumnName("AmountVND")
                     .HasColumnType("decimal(18, 4)");
@@ -858,8 +863,6 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
 
-                entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
-
                 entity.Property(e => e.InvoiceNo).HasMaxLength(50);
 
                 entity.Property(e => e.IsFromShipment).HasDefaultValueSql("((1))");
@@ -872,6 +875,8 @@ namespace eFMS.API.Setting.Service.Models
                     .HasColumnName("MBLNo")
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.NetAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Notes).HasMaxLength(500);
 
@@ -963,6 +968,10 @@ namespace eFMS.API.Setting.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VatAmountUsd)
+                    .HasColumnName("VatAmountUSD")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.VatAmountVnd)
                     .HasColumnName("VatAmountVND")
@@ -2560,6 +2569,41 @@ namespace eFMS.API.Setting.Service.Models
                     .HasForeignKey(d => d.Buid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_sysBranch_sysBU");
+            });
+
+            modelBuilder.Entity<SysSentEmailHistory>(entity =>
+            {
+                entity.ToTable("sysSentEmailHistory");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Bccs)
+                    .HasColumnName("BCCs")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Ccs)
+                    .HasColumnName("CCs")
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Description).HasMaxLength(4000);
+
+                entity.Property(e => e.Receivers)
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SentDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.SentUser)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Subject).HasMaxLength(4000);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysSettingFlow>(entity =>

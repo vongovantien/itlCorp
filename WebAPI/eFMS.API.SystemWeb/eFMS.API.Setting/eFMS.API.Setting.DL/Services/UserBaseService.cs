@@ -212,7 +212,7 @@ namespace eFMS.API.Setting.DL.Services
         {
             var userDeputies = new List<string>();
             if (string.IsNullOrEmpty(userId)) return userDeputies;
-            var _typeAuthApr = (type == "Change Service Date") ? "Shipment" : type;
+            var _typeAuthApr = (type == "Change Service Date" ||  type == "Shipment") ? "Unlock Shipment" : type;
             //Get list user authorized of user by type & office
             var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(_typeAuthApr, userId, officeId);
             foreach (var userAuth in userAuthorizedApprovals)
@@ -245,5 +245,49 @@ namespace eFMS.API.Setting.DL.Services
         }
 
         #endregion -- DEPUTY USER --
+
+        /// <summary>
+        /// Kiểm tra Department của user có phải là department Accountant hay không theo office ID & department ID
+        /// </summary>
+        /// <param name="officeId">Office ID của User</param>
+        /// <param name="deptId">Department ID của User</param>
+        /// <returns></returns>
+        public bool CheckIsAccountantByOfficeDept(Guid? officeId, int? deptId)
+        {
+            var isDeptAccountant = catDepartmentRepo.Get(x => x.DeptType == SettingConstants.DeptTypeAccountant
+                                                           && x.Id == deptId
+                                                           && x.BranchId == officeId).Any();
+            return isDeptAccountant;
+        }
+
+        /// <summary>
+        /// Check is User Admin
+        /// </summary>
+        /// <param name="currUserId">ID of Current User</param>
+        /// <param name="currOfficeId">Office ID of Current User</param>
+        /// <param name="currCompanyId">Company ID of Current User</param>
+        /// <param name="objOfficeId">Office ID of Object</param>
+        /// <param name="objCompanyId">Company ID of Object</param>
+        /// <returns></returns>
+        public bool CheckIsUserAdmin(string currUserId, Guid currOfficeId, Guid currCompanyId, Guid? objOfficeId, Guid? objCompanyId)
+        {
+            var result = false;
+            var user = DataContext.Get(x => x.Id == currUserId).FirstOrDefault();
+            if (user != null)
+            {
+                if (user.UserType == "Super Admin")
+                {
+                    result = true;
+                }
+                if (objOfficeId != null && objCompanyId != null)
+                {
+                    if (user.UserType == "Local Admin" && currOfficeId == objOfficeId && currCompanyId == objCompanyId)
+                    {
+                        result = true;
+                    }
+                }
+            }
+            return result;
+        }
     }
 }

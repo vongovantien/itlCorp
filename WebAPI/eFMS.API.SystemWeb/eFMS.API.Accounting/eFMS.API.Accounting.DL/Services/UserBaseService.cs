@@ -267,8 +267,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public bool CheckIsUserDeputy(string type, string commissioner, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
-            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId).Where(x => x == commissioner);
-            return deputies.Any();
+            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId).Any(x => x == commissioner);
+            return deputies;
         }
 
         #endregion -- DEPUTY USER --

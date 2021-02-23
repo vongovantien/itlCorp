@@ -798,20 +798,29 @@ namespace eFMS.API.ForPartner.DL.Service
             HandleState result = new HandleState();
             try
             {
-                var adv = acctAdvanceRepository.Get(x => x.VoucherNo == voucherNo).FirstOrDefault();
-                if (adv == null)
+                var advs = acctAdvanceRepository.Get(x => x.VoucherNo == voucherNo);
+                if (advs != null && advs.Count() > 0)
+                {
+                    foreach (var adv in advs)
+                    {
+
+                        adv.VoucherNo = null;
+                        adv.VoucherDate = null;
+                        adv.PaymentTerm = null;
+                        adv.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+
+                        adv.UserModified = _currentUser.UserID;
+                        adv.DatetimeModified = DateTime.Now;
+
+                        acctAdvanceRepository.Update(adv, x => x.Id == adv.Id, false);
+                    }
+
+                    result = acctAdvanceRepository.SubmitChanges();
+                }
+                else
                 {
                     return new HandleState((object)"Không tìm thấy phiếu chi");
                 }
-
-                adv.VoucherNo = null;
-                adv.VoucherDate = null;
-                adv.PaymentTerm = null;
-
-                adv.UserModified = _currentUser.UserID;
-                adv.DatetimeModified = DateTime.Now;
-
-                result = acctAdvanceRepository.Update(adv, x => x.Id == adv.Id);
 
                 if (!result.Success)
                 {
