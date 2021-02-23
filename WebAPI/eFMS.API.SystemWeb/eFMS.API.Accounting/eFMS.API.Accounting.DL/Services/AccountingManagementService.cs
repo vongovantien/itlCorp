@@ -135,7 +135,13 @@ namespace eFMS.API.Accounting.DL.Services
                             item.VoucherIddate = null;
                             item.SeriesNo = null;
 
-                            item.AmountVnd = item.VatAmountVnd = null;
+                            // item.AmountVnd = item.VatAmountVnd = null;
+                            // Tính lại do 2 field kế toán edit
+                            AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                          
+                            item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
 
