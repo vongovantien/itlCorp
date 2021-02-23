@@ -310,9 +310,10 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     onRemoveDataFormInfo(data: any, type: string) {
-        if (type === 'service') {
-            this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === data.id), 1);
-        }
+        // if (type === 'service') {
+        //     const id = !!data.id ? data.id : data.value.id;
+        //     this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === id), 1);
+        // }
         if (type === 'office') {
             this.officeActive.splice(this.officeActive.findIndex((item) => item.id === data.id), 1);
             if (this.officeActive.length === 0) {
