@@ -369,24 +369,22 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
                 model.Total = _totalCdNote;
-                var hs = DataContext.Add(model, false);
+                var hs = DataContext.Add(model);
 
                 UpdateJobModifyTime(model.JobId);
-                var sc = DataContext.SubmitChanges();
-                if (sc.Success)
+                if (hs.Success)
                 {
                     var hsSc = surchargeRepository.SubmitChanges();
                     var hsOt = opstransRepository.SubmitChanges();
                     var hsCt = cstransRepository.SubmitChanges();
                 }
-                return sc;
+                return hs;
             }
             catch (Exception ex)
             {
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
-
         }
 
         public HandleState UpdateCDNote(AcctCdnoteModel model)
@@ -406,7 +404,6 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.LastSyncDate = cdNote.LastSyncDate;
                 entity.SyncStatus = cdNote.SyncStatus;
                 entity.ReasonReject = cdNote.ReasonReject;
-                entity.ExchangeRate = cdNote.ExchangeRate;
                 entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
 
                 #region --- Set Currency For CD Note ---
@@ -432,7 +429,18 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 #endregion  --- Set Currency For CD Note ---
 
-                //Note: Khi update CD Note thì không cần cập nhật tỷ giá của ExchangeRate, ExcRateUsdToLocal của CDNote
+                if (cdNote.CurrencyId != entity.CurrencyId)
+                {
+                    //Quy đổi tỉ giá currency CD Note về currency Local
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    entity.ExchangeRate = _exchangeRate;
+                }
+                else
+                {
+                    entity.ExchangeRate = cdNote.ExchangeRate;
+                }
+
+                //***Note: Khi update CD Note thì không cần cập nhật tỷ giá ExcRateUsdToLocal của CDNote
 
                 decimal _totalCdNote = 0;
 
@@ -522,23 +530,21 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
                 entity.Total = _totalCdNote;
-                var stt = DataContext.Update(entity, x => x.Id == cdNote.Id, false);
+                var stt = DataContext.Update(entity, x => x.Id == cdNote.Id);
 
                 UpdateJobModifyTime(model.Id);
 
-                var hsSc = DataContext.SubmitChanges();
                 var hsSurSc = surchargeRepository.SubmitChanges();
                 var hsOtSc = opstransRepository.SubmitChanges();
                 var hsCtSc = cstransRepository.SubmitChanges();
 
-                return hsSc;
+                return stt;
             }
             catch (Exception ex)
             {
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
-
         }
 
         public List<object> GroupCDNoteByPartner(Guid id, bool IsShipmentOperation)

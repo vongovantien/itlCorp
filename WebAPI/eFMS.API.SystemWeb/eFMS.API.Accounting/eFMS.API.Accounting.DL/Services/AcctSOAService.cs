@@ -188,7 +188,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     _creditAmount += _amount;
                                 }
 
-                                var hsUpdateSurchargeCredit = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
                             }
                         }
 
@@ -196,10 +196,8 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.DebitAmount = _debitAmount;
                         soa.CreditAmount = _creditAmount;
                         soa.TotalCharge = _totalCharge;
-                        var hs = DataContext.Add(soa, false);
-
+                        var hs = DataContext.Add(soa);
                         csShipmentSurchargeRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -248,7 +246,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             surchargeOld.UserModified = currentUser.UserID;
                             surchargeOld.DatetimeModified = DateTime.Now;
-                            var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(surchargeOld, x => x.Id == surchargeOld.Id, false);
+                            var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(surchargeOld, x => x.Id == surchargeOld.Id);
                         }
 
                         model.DatetimeModified = DateTime.Now;
@@ -350,7 +348,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     _creditAmount += _amount;
                                 }
 
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
                             }
                         }
 
@@ -359,9 +357,8 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.CreditAmount = _creditAmount;
                         soa.TotalCharge = _totalCharge;
 
-                        var hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
+                        var hs = DataContext.Update(soa, x => x.Id == soa.Id);
                         csShipmentSurchargeRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -2695,8 +2692,10 @@ namespace eFMS.API.Accounting.DL.Services
                 #endregion -- Info CD Note --
 
                 // Exchange Rate from currency charge to current soa
-                var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, soa.Currency?.Trim());
-                var _amount = charge.Total * exchangeRate;
+                //var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, soa.Currency?.Trim());
+                //var _amount = charge.Total * exchangeRate;
+                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, soa.Currency);
+
                 var soaCharge = new AccountStatementFullReport();
                 soaCharge.PartnerID = partner?.Id;
                 soaCharge.PartnerName = partner?.PartnerNameEn?.ToUpper(); //Name En

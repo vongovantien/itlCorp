@@ -177,6 +177,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryOpsTrans = queryOpsTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date);
             }
+            // Search Customer
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                queryOpsTrans = x => x.CustomerId == criteria.CustomerId;
+            }
             var data = opsRepository.Get(queryOpsTrans);
             var shipmentList = new List<OpsTransaction>();
             if (hasSalesman)
