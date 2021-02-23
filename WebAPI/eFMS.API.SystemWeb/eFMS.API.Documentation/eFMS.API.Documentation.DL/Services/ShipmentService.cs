@@ -1030,6 +1030,7 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal? _totalSellAmountTrucking = 0;
                 decimal? _totalSellAmountHandling = 0;
                 decimal? _totalSellAmountOther = 0;
+                decimal? _totalSellCustom = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeSell = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
@@ -1087,6 +1088,18 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
                             }
                         }
+                        // bổ sung total custom sell
+                        if(chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
+                        {
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellCustom += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellCustom += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
                         //END SEL
                     }
                 }
@@ -1094,7 +1107,8 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellTrucking = _totalSellAmountTrucking;
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
-                data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers;
+                data.TotalCustomSell = _totalSellCustom;
+                data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
                 decimal? _totalBuyAmountFreight = 0;
@@ -1102,6 +1116,7 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal? _totalBuyAmountHandling = 0;
                 decimal? _totalBuyAmountOther = 0;
                 decimal? _totalBuyAmountKB = 0;
+                decimal? _totalBuyCustom = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
@@ -1201,6 +1216,19 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
+                        // bổ sung total custom buy
+                        if (chargeObj.Type == "CREDIT" && ChargeGroupModel?.Name == "Logistics")
+                        {
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyCustom += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyCustom += charge.AmountVnd; // Phí buying trước thuế
+                            }
+                        }
+
                         //END BUY
                     }
                 }
@@ -1210,7 +1238,8 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyHandling = _totalBuyAmountHandling;
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
-                data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB;
+                data.TotalCustomBuy = _totalBuyCustom;
+                data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
 
@@ -1288,6 +1317,7 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal? _totalSellAmountTrucking = 0;
                 decimal? _totalSellAmountHandling = 0;
                 decimal? _totalSellAmountOther = 0;
+                decimal? _totalSellCustom = 0;
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
                     var _chargeSell = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
@@ -1349,7 +1379,21 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
                             }
                         }
+
+                        // bổ sung total custom sell
+                        if (chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
+                        {
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellCustom += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellCustom += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
                         //END SEL
+
                     }
                 }
 
@@ -1357,7 +1401,8 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellTrucking = _totalSellAmountTrucking;
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
-                data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers;
+                data.TotalCustomSell = _totalSellCustom;
+                data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
                 decimal? _totalBuyAmountFreight = 0;
@@ -1365,6 +1410,7 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal? _totalBuyAmountHandling = 0;
                 decimal? _totalBuyAmountOther = 0;
                 decimal? _totalBuyAmountKB = 0;
+                decimal? _totalBuyCustom = 0;
                 var _chargeBuy = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
@@ -1464,6 +1510,19 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
+                        // bổ sung total custom buy
+                        if (chargeObj.Type == "CREDIT" && ChargeGroupModel?.Name == "Logistics")
+                        {
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyCustom += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyCustom += charge.AmountVnd; // Phí buying trước thuế
+                            }
+                        }
+
                         //END BUY
                     }
                 }
@@ -1473,8 +1532,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyHandling = _totalBuyAmountHandling;
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
-                data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB;
+                data.TotalCustomBuy = _totalBuyCustom;
+                data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
+                
                 #endregion -- Phí Buying trước thuế --
 
                 #region -- Phí OBH sau thuế --
