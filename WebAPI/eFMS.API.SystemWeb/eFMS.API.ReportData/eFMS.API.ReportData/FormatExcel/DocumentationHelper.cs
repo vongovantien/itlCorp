@@ -60,6 +60,7 @@ namespace eFMS.API.ReportData.FormatExcel
             };
 
             Color colTitleFromHex = System.Drawing.ColorTranslator.FromHtml("#00b0f0");
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 12));
             workSheet.Cells["A1"].Value = headers[0];
             FormatTitleHeader(workSheet, "A1", "Times New Roman");
             workSheet.Cells[1, 1, 1, 8].Merge = true;
@@ -71,7 +72,6 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[2, 1, 2, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
             workSheet.Cells[2, 1, 2, 8].Style.Fill.BackgroundColor.SetColor(colTitleFromHex);
             workSheet.Cells[2, 1, 2, 8].Merge = true;
-            workSheet.Cells["A2"].Style.WrapText = true;
 
             List<TitleModel> houseTitles = new List<TitleModel>()
             {
@@ -210,7 +210,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 workSheet.Cells[7, 8].Value = "Container List or List of Goods";
             }
-            workSheet.SelectedRange.Style.Font.SetFromFont(new Font("Times New Roman", 12));
         }
 
         internal Stream CreateDangerousGoods(CsTransactionDetailModel transactionDetail, Stream stream = null)
