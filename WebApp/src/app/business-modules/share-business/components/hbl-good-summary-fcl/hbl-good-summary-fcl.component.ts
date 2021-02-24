@@ -80,26 +80,26 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
 
-        this._store.select(fromStore.getDetailHBlState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    if (!!res.id) {
-                        this.totalCBM = res.cbm;
-                        this.netWeight = res.netWeight;
-                        this.totalChargeWeight = res.chargeWeight;
-                        this.grossWeight = res.grossWeight;
-                        this.containerDetail = res.packageContainer;
-                        this.commodities = res.commodity;
-                        this.description = res.desOfGoods;
-                        this.selectedPackage = res.packageType;
-                        this.packageQty = res.packageQty;
-                        this.containerDescription = res.contSealNo;
-
-
+        if (!!this.hblid) {
+            this._store.select(fromStore.getDetailHBlState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: any) => {
+                        if (!!res.id) {
+                            this.totalCBM = res.cbm;
+                            this.netWeight = res.netWeight;
+                            this.totalChargeWeight = res.chargeWeight;
+                            this.grossWeight = res.grossWeight;
+                            this.containerDetail = res.packageContainer;
+                            this.commodities = res.commodity;
+                            this.description = res.desOfGoods;
+                            this.selectedPackage = res.packageType;
+                            this.packageQty = res.packageQty;
+                            this.containerDescription = res.contSealNo;
+                        }
                     }
-                }
-            );
+                );
+        }
     }
 
     mapObjectData(containers: Container[]) {
