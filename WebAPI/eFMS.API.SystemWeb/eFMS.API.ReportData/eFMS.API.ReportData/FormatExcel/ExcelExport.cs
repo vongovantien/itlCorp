@@ -7,8 +7,9 @@ namespace eFMS.API.ReportData.FormatExcel
 {
     public class ExcelExport
     {
-        /// <summary>Excel worksheet</summary>
+        /// <summary>Excel Worksheet</summary>
         public ExcelWorksheet Worksheet { get; set; }
+        /// <summary>Excel Package</summary>
         public ExcelPackage PackageExcel { get; set; }
 
         /// <summary>Start of row in excel</summary>
@@ -62,7 +63,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// </summary>
         /// <param name="name">name of cell to set value</param>
         /// <param name="value">value set to cell</param>
-        public void SetData(string name, object value)
+        public void SetData(string name, object value, string numberFormat = null)
         {
             name = string.Format("{{{0}}}", name);
             var result = from cell in Worksheet.Cells[StartRow, StartCol, EndRow, EndCol]
@@ -98,6 +99,10 @@ namespace eFMS.API.ReportData.FormatExcel
                     else
                     {
                         Worksheet.Cells[address].Value = value;
+                    }
+                    if (!string.IsNullOrEmpty(numberFormat))
+                    {
+                        Worksheet.Cells[address].Style.Numberformat.Format = numberFormat;
                     }
                 }
             }
