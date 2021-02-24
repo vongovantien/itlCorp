@@ -92,6 +92,8 @@ namespace eFMS.API.ReportData.Models.Documentation
         public string SaleManNameVn { get; set; }
         public string ForwardingAgentName { get; set; }
         public string NotifyParty { get; set; }
+        public string POLCode { get; set; }
+        public string PODCode { get; set; }
         public string PODName { get; set; }
         public string POLName { get; set; }
         public string ContainerNames { get; set; }
@@ -101,5 +103,7 @@ namespace eFMS.API.ReportData.Models.Documentation
         public decimal? GW { get; set; }
         public string Packages { get; set; }
         public string Containers { get; set; }
+        public int? PackageQty { get; set; }
+        public string PackageTypeName { get; set; }
     }
 }
