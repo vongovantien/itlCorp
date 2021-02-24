@@ -499,7 +499,10 @@
             
         </member>
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.Worksheet">
-            <summary>Excel worksheet</summary>
+            <summary>Excel Worksheet</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.PackageExcel">
+            <summary>Excel Package</summary>
         </member>
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartRow">
             <summary>Start of row in excel</summary>
@@ -534,7 +537,7 @@
             </summary>
             <param name="fileName"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.String,System.Object)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.String,System.Object,System.String)">
             <summary>
             Set data for cell
             </summary>
