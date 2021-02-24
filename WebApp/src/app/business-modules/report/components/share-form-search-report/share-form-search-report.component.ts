@@ -167,7 +167,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
-        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[0].id];
+        const staffTypeInit = this.isGeneralReport || this.isSheetDebitRpt  ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
                 startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
