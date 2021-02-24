@@ -180,7 +180,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
-                queryOpsTrans = x => x.CustomerId == criteria.CustomerId;
+                queryOpsTrans = queryOpsTrans.And( x => x.CustomerId == criteria.CustomerId);
             }
             var data = opsRepository.Get(queryOpsTrans);
             var shipmentList = new List<OpsTransaction>();
