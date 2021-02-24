@@ -2080,7 +2080,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && string.IsNullOrEmpty(criteria.Status))
             {
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-1); //1 tháng trước
+                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
                 query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
             }
 
@@ -2119,6 +2119,122 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         public List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+        {
+            List<CDNoteModel> results = null;
+            var cdNotes = Query(criteria).Select(s => new AcctCdnote
+            {
+                Id = s.Id,
+                Code = s.Code,
+                JobId = s.JobId,
+                PartnerId = s.PartnerId,
+                UserCreated = s.UserCreated,
+                DatetimeCreated = s.DatetimeCreated,
+                DatetimeModified = s.DatetimeModified,
+                LastSyncDate = s.LastSyncDate,
+                SyncStatus = s.SyncStatus
+            }).ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
+            
+            if (cdNotes == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
+            
+            var charges = surchargeRepository.Get().Select(s => new CsShipmentSurcharge
+            {
+                CurrencyId = s.CurrencyId,
+                Total = s.Total,
+                JobNo = s.JobNo,
+                InvoiceNo = s.InvoiceNo,
+                VoucherId = s.VoucherId,
+                AcctManagementId = s.AcctManagementId,
+                Hblno = s.Hblno,
+                CreditNo = s.CreditNo,
+                DebitNo = s.DebitNo
+            });
+            
+            var query = from cdnote in cdNotes
+                        join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
+                        select new { cdnote, charge };
+
+            var grpQuery = query.GroupBy(g => new {
+                ReferenceNo = g.charge.DebitNo ?? g.charge.CreditNo,
+                Currency = g.charge.CurrencyId
+            }).Select(se => new {
+                ReferenceNo = se.Key.ReferenceNo,
+                Currency = se.Key.Currency,
+                CdNote = se.Select(s => s.cdnote),
+                Charge = se.Select(s => s.charge)
+            });
+
+            var selectData = grpQuery.Select(se => new CDNoteModel
+            {
+                Id = se.CdNote.FirstOrDefault().Id,
+                JobId = se.CdNote.FirstOrDefault().JobId,
+                PartnerId = se.CdNote.FirstOrDefault().PartnerId,
+                PartnerName = string.Empty,
+                ReferenceNo = se.ReferenceNo,
+                JobNo = se.Charge.FirstOrDefault().JobNo,
+                HBLNo = string.Join("; ", se.Charge.Select(s => s.Hblno).Distinct()),
+                Total = se.Charge.Sum(x => x.Total),
+                Currency = se.Currency,
+                IssuedDate = se.CdNote.FirstOrDefault().DatetimeCreated,
+                Creator = se.CdNote.FirstOrDefault().UserCreated,
+                Status = se.Charge.FirstOrDefault().AcctManagementId != null ? "Issued" : "New",
+                InvoiceNo = se.Charge.FirstOrDefault().InvoiceNo,
+                VoucherId = se.Charge.FirstOrDefault().VoucherId,
+                IssuedStatus = se.Charge.Any(y => !string.IsNullOrEmpty(y.InvoiceNo) && y.AcctManagementId != null) ? "Issued Invoice" : se.Charge.Any(y => !string.IsNullOrEmpty(y.VoucherId) && y.AcctManagementId != null) ? "Issued Voucher" : "New",
+                SyncStatus = se.CdNote.FirstOrDefault().SyncStatus,
+                LastSyncDate = se.CdNote.FirstOrDefault().LastSyncDate,
+                DatetimeModified = se.CdNote.FirstOrDefault().DatetimeModified
+            });
+
+            var _resultDatas = GetByStatus(criteria.Status, selectData).ToArray();
+
+            rowsCount = _resultDatas.ToArray().Count();
+
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                var take = _resultDatas.Skip((page - 1) * size).Take(size).AsQueryable();
+
+                //Join to get info PartnerName, Username create CDNote
+                var joinData = from cd in take
+                               join partner in partnerRepositoty.Get() on cd.PartnerId equals partner.Id into partnerGrp
+                               from partner in partnerGrp.DefaultIfEmpty()
+                               join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
+                               from creator in creatorGrp.DefaultIfEmpty()
+                               select new CDNoteModel
+                               {
+                                   Id = cd.Id,
+                                   JobId = cd.JobId,
+                                   PartnerId = cd.PartnerId,
+                                   PartnerName = partner.PartnerNameEn,
+                                   ReferenceNo = cd.ReferenceNo,
+                                   JobNo = cd.JobNo,
+                                   HBLNo = cd.HBLNo,
+                                   Total = cd.Total,
+                                   Currency = cd.Currency,
+                                   IssuedDate = cd.IssuedDate,
+                                   Creator = creator.Username,
+                                   Status = cd.Status,
+                                   InvoiceNo = cd.InvoiceNo,
+                                   VoucherId = cd.VoucherId,
+                                   IssuedStatus = cd.IssuedStatus,
+                                   SyncStatus = cd.SyncStatus,
+                                   LastSyncDate = cd.LastSyncDate,
+                                   DatetimeModified = cd.DatetimeModified
+                               };
+
+                results = joinData.ToList();
+            }
+            return results;
+        }
+
+        /*public List<CDNoteModel> Paging1(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CDNoteModel> results = null;
             List<CDNoteModel> resultDatas = new List<CDNoteModel>();
@@ -2190,9 +2306,9 @@ namespace eFMS.API.Documentation.DL.Services
                 results = _resultDatas.Skip((page - 1) * size).Take(size).ToList();
             }
             return results;
-        }
+        }*/
 
-        public List<CDNoteModel> Paging2(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+        /*public List<CDNoteModel> Paging2(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CDNoteModel> results = null;
             var data = Query(criteria);
@@ -2249,7 +2365,7 @@ namespace eFMS.API.Documentation.DL.Services
                 results = results.Skip((page - 1) * size).Take(size).ToList();
             }
             return results;
-        }
+        }*/
 
         private IQueryable<CDNoteModel> GetByStatus(string status, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
         {
@@ -2268,7 +2384,7 @@ namespace eFMS.API.Documentation.DL.Services
             return cdNotesGroupByCurrency;
         }
 
-        private List<CDNoteModel> GetCDNotes(List<CDNoteModel> cdNotes, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
+        /*private List<CDNoteModel> GetCDNotes(List<CDNoteModel> cdNotes, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
         {
             var data = (from cd in cdNotes
                         join charge in cdNotesGroupByCurrency on cd.ReferenceNo equals charge.ReferenceNo
@@ -2310,7 +2426,7 @@ namespace eFMS.API.Documentation.DL.Services
                 results.Add(item);
             }
             return results;
-        }
+        }*/
 
         public HandleState RejectCreditNote(RejectCreditNoteModel model)
         {

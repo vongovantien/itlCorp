@@ -249,7 +249,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 foreach (var invoiceObh in invoicesObh)
                                 {
                                     //Cập nhật số RefNo cho phí OBH
-                                    foreach (var obhCharge in obhCharges)
+                                    var _obhCharges = obhCharges.Where(x => x.ReferenceNo == invoiceObh.ReferenceNo);
+                                    foreach (var obhCharge in _obhCharges)
                                     {
                                         CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
                                         surchargeObh.AcctManagementId = invoiceObh.Id;
