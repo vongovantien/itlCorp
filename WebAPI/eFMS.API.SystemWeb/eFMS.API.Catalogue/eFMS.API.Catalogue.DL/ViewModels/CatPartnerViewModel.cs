@@ -32,5 +32,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public bool? Active { get; set; }
         public string PartnerType { get; set; }
         public string CountryShippingName { get; set; }
+        public string TaxCodeAbbrName { get; set; }
     }
 }
