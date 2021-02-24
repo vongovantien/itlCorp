@@ -15,6 +15,7 @@ using eFMS.API.Common;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -196,13 +197,16 @@ namespace eFMS.API.ForPartner.DL.Service
                         if (invoiceDebit != null)
                         {
                             //Insert Invoice (Invoice Debit)
-                            hsDebit = DataContext.Add(invoiceDebit);
+                            hsDebit = DataContext.Add(invoiceDebit, false);
                         }
                         HandleState hsObh = new HandleState();
                         if (invoicesObh != null)
                         {
                             //Insert list Invoice Temp (Invoice OBH)
-                            hsObh = DataContext.Add(invoicesObh);
+                            foreach (var invoiceObh in invoicesObh)
+                            {
+                                hsObh = DataContext.Add(invoiceObh, false);
+                            }
                         }
 
                         if (hsDebit.Success)
@@ -233,7 +237,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
                                     surchargeDebit.DatetimeModified = DateTime.Now;
                                     surchargeDebit.UserModified = _currentUser.UserID;
-                                    var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id);
+                                    var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id, false);
                                 }
                             }
                         }
@@ -269,13 +273,14 @@ namespace eFMS.API.ForPartner.DL.Service
                                         surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
                                         surchargeObh.DatetimeModified = DateTime.Now;
                                         surchargeObh.UserModified = _currentUser.UserID;
-                                        var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id);
+                                        var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id, false);
                                     }
                                 }
                             }
                         }
 
                         var smSurcharge = surchargeRepo.SubmitChanges();
+                        DataContext.SubmitChanges();
                         trans.Commit();
 
                         if (!hsDebit.Success)
@@ -291,6 +296,14 @@ namespace eFMS.API.ForPartner.DL.Service
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        string logErr = string.Format("Lỗi InsertInvoice {0} \n Message: {1} \n invoiceDebit: {2} \n debitCharges: {3} \n obhCharges: {4}", 
+                            currentUser.UserID, 
+                            ex.ToString(),
+                            JsonConvert.SerializeObject(invoiceDebit),
+                            JsonConvert.SerializeObject(invoicesObh),
+                            JsonConvert.SerializeObject(debitCharges),
+                            JsonConvert.SerializeObject(obhCharges));
+                        new LogHelper("InsertInvoice", logErr);
                         return new HandleState((object)ex.Message);
                     }
                     finally

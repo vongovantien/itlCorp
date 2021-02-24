@@ -50,6 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysNotifications> sysNotificationRepository;
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
+        IContextBase<AccAccountingManagement> accountingManagementRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -78,7 +79,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContract,
             IContextBase<SysNotifications> sysNotifyRepo,
             IContextBase<SysUserNotification> sysUsernotifyRepo,
-            IContextBase<CatCommodityGroup> catCommodityGroupRepo
+            IContextBase<CatCommodityGroup> catCommodityGroupRepo,
+            IContextBase<AccAccountingManagement> accountingManagementRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -107,6 +109,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysNotificationRepository = sysNotifyRepo;
             sysUserNotificationRepository = sysUsernotifyRepo;
             catCommodityGroupRepository = catCommodityGroupRepo;
+            accountingManagementRepository = accountingManagementRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -2057,17 +2060,31 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
             }
+
             if (perQuery != null)
             {
                 query = query.And(perQuery);
             }
-            var results = DataContext.Get(query);
-            if (results == null) return results;
+
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                results = results.Where(x => refNos.Contains(x.Code));
+                query = query.And(x => refNos.Any(a => a == x.Code));
             }
+
+            if (string.IsNullOrEmpty(criteria.ReferenceNos)
+                && string.IsNullOrEmpty(criteria.PartnerId)
+                && criteria.IssuedDate == null
+                && string.IsNullOrEmpty(criteria.CreatorId)
+                && string.IsNullOrEmpty(criteria.Type)
+                && string.IsNullOrEmpty(criteria.Status))
+            {
+                var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
+                var minDate = maxDate.AddMonths(-1); //1 tháng trước
+                query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
+            }
+
+            var results = DataContext.Get(query);
             return results;
         }
 
@@ -2104,6 +2121,80 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CDNoteModel> results = null;
+            List<CDNoteModel> resultDatas = new List<CDNoteModel>();
+            var cdNotes = Query(criteria).ToArray().OrderByDescending(o => o.DatetimeModified).ToArray();
+            if (cdNotes == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
+
+            var charges = surchargeRepository.Get();
+            var surchargeDebits = charges.Where(w => !string.IsNullOrEmpty(w.DebitNo) && cdNotes.Any(a => a.Code == w.DebitNo)).ToLookup(x => x.DebitNo);
+            var surchargeCredits = charges.Where(w => !string.IsNullOrEmpty(w.CreditNo) && cdNotes.Any(a => a.Code == w.CreditNo)).ToLookup(x => x.CreditNo);
+            var partnersLookup = partnerRepositoty.Get().ToLookup(x => x.Id);
+            var usersLookup = sysUserRepo.Get().ToLookup(x => x.Id);
+
+            IQueryable<CsShipmentSurcharge> surcharges = null;
+            foreach(var cdNote in cdNotes)
+            {
+                if (cdNote.Type == "CREDIT")
+                {
+                    surcharges = surchargeCredits[cdNote.Code].AsQueryable();               
+                }
+                else
+                {
+                    surcharges = surchargeDebits[cdNote.Code].AsQueryable();
+                }
+
+                if (surcharges != null)
+                {                    
+                    var _partnerName = partnersLookup[cdNote.PartnerId].FirstOrDefault()?.PartnerNameEn;
+                    var _creatorCdNote = usersLookup[cdNote.UserCreated].FirstOrDefault()?.Username;
+                    
+                    var chargeGrps = surcharges.GroupBy(x => new { ReferenceNo = (cdNote.Type == "CREDIT") ? x.CreditNo : x.DebitNo, Currency = x.CurrencyId }).Select(se => new CDNoteModel
+                    {
+                        Id = cdNote.Id,
+                        JobId = cdNote.JobId,
+                        PartnerId = cdNote.PartnerId,
+                        PartnerName = _partnerName,
+                        ReferenceNo = se.Key.ReferenceNo,
+                        JobNo = se.FirstOrDefault().JobNo,
+                        HBLNo = string.Join("; ", se.Select(s => s.Hblno).Distinct()),
+                        Total = se.Sum(x => x.Total),
+                        Currency = se.Key.Currency,
+                        IssuedDate = cdNote.DatetimeCreated,
+                        Creator = _creatorCdNote,
+                        Status = se.FirstOrDefault().AcctManagementId != null ? "Issued" : "New",
+                        InvoiceNo = se.FirstOrDefault().InvoiceNo,
+                        VoucherId = se.FirstOrDefault().VoucherId,
+                        IssuedStatus = se.Any(y => !string.IsNullOrEmpty(y.InvoiceNo) && y.AcctManagementId != null) ? "Issued Invoice" : se.Any(y => !string.IsNullOrEmpty(y.VoucherId) && y.AcctManagementId != null) ? "Issued Voucher" : "New",
+                        SyncStatus = cdNote.SyncStatus,
+                        LastSyncDate = cdNote.LastSyncDate,
+                        DatetimeModified = cdNote.DatetimeModified
+                    });
+                    resultDatas.AddRange(chargeGrps);
+                }
+            }
+
+            var _resultDatas = GetByStatus(criteria.Status, resultDatas.AsQueryable()).ToArray();
+
+            rowsCount = _resultDatas.ToArray().Count();
+
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                results = _resultDatas.Skip((page - 1) * size).Take(size).ToList();
+            }
+            return results;
+        }
+
+        public List<CDNoteModel> Paging2(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+        {
+            List<CDNoteModel> results = null;
             var data = Query(criteria);
             if (data == null) { rowsCount = 0; return results; }
             var cdNotes = Query(criteria)?.ToArray().OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
@@ -2132,15 +2223,16 @@ namespace eFMS.API.Documentation.DL.Services
                     x.Total,
                     x.VoucherId,
                     x.InvoiceNo,
-                    x.Type
+                    x.Type,
+                    x.AcctManagementId
                 }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel
                 {
                     Currency = x.Key.Currency,
                     ReferenceNo = x.Key.ReferenceNo,
                     HBLNo = string.Join("; ", x.Select(i => i.HBLNo).Distinct()),
                     Total = x.Sum(y => y.Total),
-                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
-                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId)) ? "Issued Voucher" : "New",
+                    Status = x.FirstOrDefault().AcctManagementId != null ? "Issued" : "New",//x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
+                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo) && y.AcctManagementId != null) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId) && y.AcctManagementId != null) ? "Issued Voucher" : "New",
                     VoucherId = x.FirstOrDefault().VoucherId
                 });
             cdNotesGroupByCurrency = GetByStatus(criteria.Status, cdNotesGroupByCurrency);
