@@ -314,6 +314,9 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
                         var hsSurcharge = UpdateSurchargeOfHousebill(model);
+
+                        // Cập nhật MBL, HBL cho các phiếu tạm ứng
+                        HandleState hsAdvanceRq = UpdateHblAdvanceRequest(model);
                     }
                     trans.Commit();
                     return isUpdateDone;
@@ -321,6 +324,7 @@ namespace eFMS.API.Documentation.DL.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    new LogHelper("eFMS_Update_CsTrasactionDetail_Log", ex.ToString());
                     return new HandleState(ex.Message);
                 }
                 finally
@@ -477,8 +481,12 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.NotifyParty = resultNoti?.PartnerNameEn;
                     detail.POLName = pol?.NameEn;
                     detail.PODName = pod?.NameEn;
+                    detail.POLCode = pol?.Code;
+                    detail.PODCode = pod?.Code;
                     detail.ShipmentEta = shipment.Eta;
                     detail.TransactionType = shipment.TransactionType;
+                    detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
+                    detail.DeliveryPlace = shipment.DeliveryPlace == null ? string.Empty : catPlaceRepo.Get(x => x.Id == shipment.DeliveryPlace)?.FirstOrDefault()?.NameEn;
                     return detail;
                 }
             }
@@ -2160,6 +2168,36 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public HandleState UpdateHblAdvanceRequest(CsTransactionDetailModel model)
+        {
+            HandleState hs = new HandleState();
+            try
+            {
+                IQueryable<AcctAdvanceRequest> advR = acctAdvanceRequestRepository.Get(x => x.Hblid == model.Id);
+                if (advR != null)
+                {
+                    foreach (var item in advR)
+                    {
+                        item.Hbl = model.Hwbno;
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = currentUser.UserID;
+
+                        acctAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
+                    }
+
+                    hs = acctAdvanceRequestRepository.SubmitChanges();
+                }
+                return hs;
+
+            }
+            catch (Exception ex)
+            {
+                string logErr = String.Format("Có lỗi khi cập nhật HBLNo {0} trong acctAdvanceRequest by {1} at {2} \n {3}",model.Hwbno, currentUser.UserName, DateTime.Now, ex.ToString());
+                new LogHelper("eFMS_Update_Advance_Log", logErr);
+                return new HandleState(ex.Message);
+            }
+        }
+
         public int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs)
         {
             hblNo = string.Empty;
@@ -2173,7 +2211,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CsTransactionDetail houseBill = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
                 if (houseBill != null)
                 {
-                    hasChargeSynced = surchareRepository.Any(x => x.Hblno == houseBill.Hwbno && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                    hasChargeSynced = surchareRepository.Any(x => x.Hblid == houseBill.Id && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
                 }
 
                 if (hasChargeSynced)

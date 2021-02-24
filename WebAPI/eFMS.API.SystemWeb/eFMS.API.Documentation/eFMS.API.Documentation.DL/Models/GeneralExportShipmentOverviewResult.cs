@@ -67,8 +67,11 @@ namespace eFMS.API.Documentation.DL.Models
         public Guid? HblId { get; set; }
         public string ProductService { get; set; }
         public string CustomNo { get; set; }
-
-
-
+        public decimal? AmountUSD { get; set; }
+        public decimal? AmountVND { get; set; }
+        public decimal? VATAmountUSD { get; set; }
+        public decimal? VATAmountVND { get; set; }
+        public decimal? TotalCustomSell { get; set; }
+        public decimal? TotalCustomBuy { get; set; }
     }
 }

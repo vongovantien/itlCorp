@@ -10,6 +10,8 @@ import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.p
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AccountingConstants } from '@constants';
 import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
+import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
@@ -17,10 +19,11 @@ import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modu
 export class OpsCdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent) confirmCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
-    @ViewChild(OpsCdNoteAddPopupComponent) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent; @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(OpsCdNoteAddPopupComponent) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent;
+    @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
     @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = null;
     cdNote: string = null;
@@ -185,6 +188,26 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         }
     }
 
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.reportContainerRef.viewContainerRef.clear();
+            });
+    }
+
     preview(isOrigin: boolean) {
         this.CdNoteDetail.totalCredit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
         this.CdNoteDetail.totalDebit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
@@ -197,10 +220,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                 (res: any) => {
                     if (res != null && res.dataSource.length > 0) {
                         this.dataReport = res;
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -295,6 +315,21 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                 (error) => {
                     console.log(error);
                 }
+            );
+    }
+
+    previewCdNote(data: string) {
+        this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (res != null && res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
             );
     }
 }

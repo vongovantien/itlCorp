@@ -50,6 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysNotifications> sysNotificationRepository;
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
+        IContextBase<AccAccountingManagement> accountingManagementRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -78,7 +79,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContract,
             IContextBase<SysNotifications> sysNotifyRepo,
             IContextBase<SysUserNotification> sysUsernotifyRepo,
-            IContextBase<CatCommodityGroup> catCommodityGroupRepo
+            IContextBase<CatCommodityGroup> catCommodityGroupRepo,
+            IContextBase<AccAccountingManagement> accountingManagementRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -107,6 +109,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysNotificationRepository = sysNotifyRepo;
             sysUserNotificationRepository = sysUsernotifyRepo;
             catCommodityGroupRepository = catCommodityGroupRepo;
+            accountingManagementRepository = accountingManagementRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -304,69 +307,87 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 #endregion  --- Set Currency For CD Note ---
 
-                //Quy đổi tỉ giá CD Note so về currency Local
+                //Quy đổi tỉ giá currency CD Note về currency Local
                 var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 model.ExchangeRate = _exchangeRate;
+                //Quy đổi tỉ giá USD to Local dựa vào ngày tạo CDNote
+                var _excRateUsdToLocal = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                model.ExcRateUsdToLocal = _excRateUsdToLocal;
 
-                decimal _total = 0;
-                foreach (var charge in model.listShipmentSurcharge)
+                decimal _totalCdNote = 0;
+                foreach (var c in model.listShipmentSurcharge)
                 {
-                    var _exchangeRateCharge = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, model.CurrencyId);
-                    _total += charge.Total * _exchangeRateCharge;
-                }
-                model.Total = _total;
-
-                var hs = DataContext.Add(model, false);
-
-                if (hs.Success)
-                {
-                    foreach (var c in model.listShipmentSurcharge)
+                    var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
+                    if (charge != null)
                     {
-                        var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
-                        if (charge != null)
+                        if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
-                            if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                            {
-                                charge.CreditNo = model.Code;
-                            }
-                            else if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                            charge.CreditNo = model.Code;
+                        }
+                        else if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                        {
+                            charge.DebitNo = model.Code;
+                        }
+                        else
+                        {
+                            if (model.PartnerId == charge.PaymentObjectId)
                             {
                                 charge.DebitNo = model.Code;
                             }
-                            else
+                            if (model.PartnerId == charge.PayerId)
                             {
-                                if (model.PartnerId == charge.PaymentObjectId)
-                                {
-                                    charge.DebitNo = model.Code;
-                                }
-                                if (model.PartnerId == charge.PayerId)
-                                {
-                                    charge.CreditNo = model.Code;
-                                }
+                                charge.CreditNo = model.Code;
                             }
-                            charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
-                            charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = currentUser.UserID;
                         }
-                        var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
+
+                        if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
+                        {
+                            //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
+                            charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
+                            //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                            charge.FinalExchangeRate = null;
+
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                        }
+
+                        charge.DatetimeModified = DateTime.Now;
+                        charge.UserModified = currentUser.UserID;
+
+                        if (model.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _totalCdNote += (charge.AmountVnd + charge.VatAmountVnd) ?? 0;
+                        }
+                        if (model.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            _totalCdNote += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
+                        }
                     }
+                    var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
+                model.Total = _totalCdNote;
+                var hs = DataContext.Add(model);
+
                 UpdateJobModifyTime(model.JobId);
-                var sc = DataContext.SubmitChanges();
-                if (sc.Success)
+                if (hs.Success)
                 {
                     var hsSc = surchargeRepository.SubmitChanges();
                     var hsOt = opstransRepository.SubmitChanges();
                     var hsCt = cstransRepository.SubmitChanges();
                 }
-                return sc;
+                return hs;
             }
             catch (Exception ex)
             {
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
-
         }
 
         public HandleState UpdateCDNote(AcctCdnoteModel model)
@@ -386,6 +407,7 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.LastSyncDate = cdNote.LastSyncDate;
                 entity.SyncStatus = cdNote.SyncStatus;
                 entity.ReasonReject = cdNote.ReasonReject;
+                entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
 
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
@@ -410,85 +432,122 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 #endregion  --- Set Currency For CD Note ---
 
-                //Quy đổi tỉ giá CD Note so về currency Local
-                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, entity.DatetimeCreated, entity.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-                entity.ExchangeRate = _exchangeRate;
-
-                decimal _total = 0;
-                foreach (var charge in model.listShipmentSurcharge)
+                if (cdNote.CurrencyId != entity.CurrencyId)
                 {
-                    var _exchangeRateCharge = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, entity.CurrencyId);
-                    _total += charge.Total * _exchangeRateCharge;
+                    //Quy đổi tỉ giá currency CD Note về currency Local
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    entity.ExchangeRate = _exchangeRate;
                 }
-                entity.Total = _total;
-
-                var stt = DataContext.Update(entity, x => x.Id == cdNote.Id, false);
-                if (stt.Success)
+                else
                 {
-                    var chargeOfCdNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                    //Cập nhật các credit debit note code của của các charge thành null
-                    foreach (var item in chargeOfCdNote)
-                    {
-                        item.DatetimeModified = DateTime.Now;
-                        item.UserModified = currentUser.UserID;
-                        if (item.CreditNo == cdNote.Code)
-                        {
-                            item.CreditNo = null;
-                        }
-                        if (item.DebitNo == cdNote.Code)
-                        {
-                            item.DebitNo = null;
-                        }
-                        var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
-                    }
+                    entity.ExchangeRate = cdNote.ExchangeRate;
+                }
 
-                    foreach (var c in model.listShipmentSurcharge)
+                //***Note: Khi update CD Note thì không cần cập nhật tỷ giá ExcRateUsdToLocal của CDNote
+
+                decimal _totalCdNote = 0;
+
+                var chargeOfCdNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                //Cập nhật các credit debit note code của của các charge thành null
+                foreach (var item in chargeOfCdNote)
+                {
+                    item.DatetimeModified = DateTime.Now;
+                    item.UserModified = currentUser.UserID;
+                    if (item.CreditNo == cdNote.Code)
                     {
-                        var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
-                        if (charge != null)
+                        item.CreditNo = null;
+                    }
+                    if (item.DebitNo == cdNote.Code)
+                    {
+                        item.DebitNo = null;
+                    }
+                    var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
+                }
+
+                foreach (var c in model.listShipmentSurcharge)
+                {
+                    var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
+                    if (charge != null)
+                    {
+                        if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
-                            if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                            {
-                                charge.CreditNo = model.Code;
-                            }
-                            else if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                            charge.CreditNo = model.Code;
+                        }
+                        else if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                        {
+                            charge.DebitNo = model.Code;
+                        }
+                        else
+                        {
+                            if (model.PartnerId == charge.PaymentObjectId)
                             {
                                 charge.DebitNo = model.Code;
                             }
+                            if (model.PartnerId == charge.PayerId)
+                            {
+                                charge.CreditNo = model.Code;
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
+                        {
+                            //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
+                            charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
+
+                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                            {
+                                charge.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
+                            }
+                            else if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                charge.FinalExchangeRate = 1;
+                            }
                             else
                             {
-                                if (model.PartnerId == charge.PaymentObjectId)
-                                {
-                                    charge.DebitNo = model.Code;
-                                }
-                                if (model.PartnerId == charge.PayerId)
-                                {
-                                    charge.CreditNo = model.Code;
-                                }
+                                charge.FinalExchangeRate = null;
                             }
-                            charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
-                            charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = currentUser.UserID;
-                            charge.Cdclosed = true;
-                        }
-                        var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
-                    }
 
-                    UpdateJobModifyTime(model.Id);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                        }
+
+                        charge.DatetimeModified = DateTime.Now;
+                        charge.UserModified = currentUser.UserID;
+                        charge.Cdclosed = true;
+
+                        if (model.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _totalCdNote += (charge.AmountVnd + charge.VatAmountVnd) ?? 0;
+                        }
+                        if (model.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            _totalCdNote += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
+                        }
+                    }
+                    var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
-                var hsSc = DataContext.SubmitChanges();
+                entity.Total = _totalCdNote;
+                var stt = DataContext.Update(entity, x => x.Id == cdNote.Id);
+
+                UpdateJobModifyTime(model.Id);
+
                 var hsSurSc = surchargeRepository.SubmitChanges();
                 var hsOtSc = opstransRepository.SubmitChanges();
                 var hsCtSc = cstransRepository.SubmitChanges();
 
-                return hsSc;
+                return stt;
             }
             catch (Exception ex)
             {
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
-
         }
 
         public List<object> GroupCDNoteByPartner(Guid id, bool IsShipmentOperation)
@@ -685,7 +744,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         _syncedFromBy = charge.VoucherId;
                     }
-                }                                
+                }
                 charge.SyncedFromBy = _syncedFromBy;
 
                 listSurcharges.Add(charge);
@@ -714,6 +773,10 @@ namespace eFMS.API.Documentation.DL.Services
                 cdNoteDetails.MbLadingNo = opsTransaction?.Mblno;
                 cdNoteDetails.SumContainers = opsTransaction?.SumContainers;
                 cdNoteDetails.SumPackages = opsTransaction?.SumPackages;
+                cdNoteDetails.NW = opsTransaction?.SumNetWeight;
+                cdNoteDetails.PackageUnit = string.Concat((opsTransaction.SumPackages + _decimalNumber)?.ToString("0.000"), " "
+                , opsTransaction?.PackageTypeId == null ? string.Empty : unitRepository.Get(x => x.Id == opsTransaction.PackageTypeId).FirstOrDefault().UnitNameEn);
+                cdNoteDetails.CommodityGroupId = opsTransaction?.CommodityGroupId;
             }
             var hbConstainers = string.Empty;
             var hbPackages = string.Empty;
@@ -813,6 +876,10 @@ namespace eFMS.API.Documentation.DL.Services
             cdNoteDetails.Volum = volum;
             cdNoteDetails.ListSurcharges = listSurcharges;
             cdNoteDetails.CDNote = cdNote;
+            if (opsTransaction != null)
+            {
+                cdNoteDetails.CDNote.InvoiceNo = opsTransaction.InvoiceNo;
+            }
             cdNoteDetails.ProductService = opsTransaction?.ProductService;
             cdNoteDetails.ServiceMode = opsTransaction?.ServiceMode;
             cdNoteDetails.SoaNo = string.Join(", ", charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
@@ -830,9 +897,11 @@ namespace eFMS.API.Documentation.DL.Services
             cdNoteDetails.Note = cdNote.Note;
             cdNoteDetails.ReasonReject = cdNote.ReasonReject;
             cdNoteDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
+            cdNoteDetails.DatetimeCreated = cdNote.DatetimeCreated;
+            cdNoteDetails.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
             return cdNoteDetails;
         }
-        
+
         public HandleState DeleteCDNote(Guid idSoA)
         {
             var hs = new HandleState();
@@ -983,7 +1052,7 @@ namespace eFMS.API.Documentation.DL.Services
                     listSurcharges.Add(charge);
                 }
             }
-            if(listSurcharges.Count() > 0)
+            if (listSurcharges.Count() > 0)
             {
                 listSurcharges = listSurcharges.OrderBy(x => (firstAcctCDNote.Type == "DEBIT" ? x.DebitNo : x.CreditNo)).ThenBy(x => x.NameEn).ToList();
             }
@@ -1136,7 +1205,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Description = item.NameEn,
                         Quantity = item.Quantity + _decimalNumber,
                         QUnit = "N/A",
-                        UnitPrice = item.UnitPrice ?? 0,
+                        UnitPrice = (item.UnitPrice ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         VAT = (_vatAmount ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         Debit = model.TotalDebit + _decimalNumber, //Cộng thêm phần thập phân
                         Credit = model.TotalCredit + _decimalNumber, //Cộng thêm phần thập phân
@@ -1190,6 +1259,186 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
 
+        }
+
+        /// <summary>
+        /// Preview CD Note with Local or USD Currency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public Crystal PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria)
+        {
+            Crystal result = null;
+            var _currentUser = currentUser.UserName;
+            var listCharge = new List<LogisticCDNoteReport>();
+            var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
+
+            if (data != null)
+            {
+                int i = 1;
+                foreach (var item in data.ListSurcharges)
+                {
+                    var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
+                    //Exchange Rate theo Currency truyền vào
+                    decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
+                    var charge = new LogisticCDNoteReport();
+
+                    //Thông tin Partner
+                    charge.PartnerID = data.PartnerId?.ToUpper();
+                    charge.PartnerName = data.PartnerNameEn?.ToUpper();
+                    charge.Address = data.PartnerShippingAddress?.ToUpper();
+                    charge.Workphone = data.PartnerTel?.ToUpper();
+                    charge.Fax = data.PartnerFax?.ToUpper();
+                    charge.Taxcode = data.PartnerTaxcode?.ToUpper();
+                    charge.PersonalContact = data.PartnerPersonalContact?.ToUpper();
+
+                    //Thông tin Shipment
+                    charge.TransID = data.JobNo?.ToUpper();
+                    charge.PortofLading = data.Pol;
+                    charge.PortofUnlading = data.Pod;
+
+                    charge.LoadingDate = data.Etd;//ETD
+                    charge.ETA = data?.Eta; //ETA
+
+                    charge.ATTN = string.Empty; //NOT USE
+                    charge.LocalVessel = data.Vessel?.ToUpper();//Flight No
+                    charge.MAWB = data.MbLadingNo?.ToUpper(); //MBLNO
+                    charge.Consignee = data.HbConsignees?.ToUpper();//Consignee -- lấy từ Housebill
+                    charge.GrossWeight = data.HbGrossweight ?? 0;//Total GW of HBL
+                    charge.CBM = data.Volum ?? 0; //Total CBM of HBL
+                    charge.HWBNO = data.HbLadingNo?.ToUpper(); //HBLNOs
+
+                    //Thông tin list charges
+                    charge.Subject = (item.Type == DocumentConstants.CHARGE_OBH_TYPE) ? "I. Chi hộ/Pay on behalf of customer" : "II. Phí dịch vụ & vận chuyển/Logistics service";
+                    charge.Description = item.NameEn;//Charge name
+                    charge.Quantity = item.Quantity + _decimalNumber; //Cộng thêm phần thập phân
+                    charge.Unit = item.UnitCode;
+                    charge.QUnit = criteria.Currency;
+
+                    var _unitPrice = (item.UnitPrice ?? 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency và không làm tròn
+                    charge.UnitPrice = _unitPrice + _decimalNumber; //cộng thêm phần thập phân
+                    //Giá trị thực tế VAT (% VAT hoặc số tiền tuyệt đối)
+                    charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+
+                    //Amount trước thuế
+                    decimal _netAmount = _unitPrice * item.Quantity;
+                    //Tiền thuế (nếu có)
+                    decimal _taxMoney = 0;
+
+                    _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
+                    _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                    _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+
+                    var _totalAmount = _netAmount + _taxMoney; //Total Amount = Amount trước thuế + Tiền thuế
+
+                    var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? _totalAmount : 0;
+                    var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
+
+                    charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
+                    charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+                    charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
+                    charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
+
+                    charge.ExtVND = 0; //NOT USE
+                    charge.Notes = item.Notes;
+
+                    charge.InputData = string.Empty; //Chưa biết
+                    charge.Deposit = 0; //NOT USE
+                    charge.DepositCurr = string.Empty; //NOT USE
+                    charge.Commodity = data.CommodityGroupId == null ? "N/A" : catCommodityGroupRepository.Get(x => x.Id == data.CommodityGroupId).Select(x => x.GroupNameEn).FirstOrDefault();
+                    charge.DecimalSymbol = ",";
+                    charge.DigitSymbol = ",";
+                    charge.DecimalNo = 0; //NOT USE
+                    charge.CurrDecimalNo = 0; //NOT USE
+                    listCharge.Add(charge);
+                }
+            }
+            var parameter = new LogisticCDNoteReportParams();
+            parameter.DebitNo = criteria.CreditDebitNo;
+            parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd MMM, yyyy") : string.Empty;//Lấy ngày tạo CDNote
+            parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
+            parameter.ReviseNotice = DateTime.Now.ToString("dd/MM/yyyy"); //Bỏ chữ Revised
+
+            var _inword = string.Empty;
+            // Preview with USD/VND
+            var _totalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(listCharge.Sum(x => x.Debit).Value, 0) : NumberHelper.RoundNumber(listCharge.Sum(x => x.Debit).Value, 2);
+            var _totalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(listCharge.Sum(x => x.Credit).Value, 0) : NumberHelper.RoundNumber(listCharge.Sum(x => x.Credit).Value, 2);
+            parameter.TotalDebit = string.Empty;
+            if (_totalDebit != 0)
+            {
+                parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n2}", _totalDebit);
+            }
+
+            parameter.TotalCredit = string.Empty;
+            if (_totalCredit != 0)
+            {
+                parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n2}", _totalCredit);
+            }
+
+            decimal _balanceAmount = Math.Abs(_totalDebit - _totalCredit);
+            parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n2}", _balanceAmount);
+
+            //Chuyển tiền Amount thành chữ
+            _balanceAmount = NumberHelper.RoundNumber(_balanceAmount, 2);
+
+            var _currency = criteria.Currency == DocumentConstants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
+                       (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
+                    :
+                    "U.S. dollar(s)";
+
+            _inword = criteria.Currency == DocumentConstants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
+                    InWordCurrency.ConvertNumberCurrencyToString(_balanceAmount, _currency)
+                :
+                    InWordCurrency.ConvertNumberCurrencyToStringUSD(_balanceAmount, _currency);
+
+            parameter.InwordVND = !string.IsNullOrEmpty(_inword) ? _inword.ToUpper() : string.Empty;
+            parameter.IssueInv = string.Empty; //Tạm thời để trống
+            parameter.InvoiceInfo = data.CDNote.InvoiceNo == null ? string.Empty : data.CDNote.InvoiceNo;
+            parameter.OtherRef = string.Empty;//Tạm thời để trống
+            parameter.PackageUnit = data.PackageUnit == null ? string.Empty : data.PackageUnit;
+
+            // Lấy thông tin Office của Creator
+            var officeOfUser = GetInfoOfficeOfUser(data.CDNote.OfficeId);
+            // Thông tin công ty
+            var companyOfUser = sysCompanyRepository.Get(x => x.Id == data.CDNote.CompanyId).FirstOrDefault();
+            parameter.CompanyName = companyOfUser?.BunameEn?.ToUpper();
+            parameter.CompanyAddress1 = officeOfUser?.AddressEn ?? string.Empty;
+            parameter.CompanyAddress2 = "Tel: " + officeOfUser?.Tel + "\nFax: " + officeOfUser?.Fax;
+            parameter.Website = companyOfUser?.Website ?? string.Empty;
+            parameter.Contact = _currentUser;//Get user name login
+            parameter.CompanyDescription = string.Empty;
+
+            // Thông tin Bank
+            var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
+            var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
+            var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
+            var _bankNameEN = officeOfUser?.BankNameEn ?? string.Empty;
+            var _bankAddress = officeOfUser?.BankAddressLocal ?? string.Empty;
+            var _bankAddressEN = officeOfUser?.BankAddressEn ?? string.Empty;
+            var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
+            var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
+            var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
+            parameter.AccountName = _accountName;
+            parameter.AccountNameEN = _accountNameEN;
+            parameter.BankName = _bankName;
+            parameter.BankNameEN = _bankNameEN;
+            parameter.BankAddress = _bankAddress;
+            parameter.BankAddressEN = _bankAddressEN;
+            parameter.SwiftAccs = _swiftAccs;
+            parameter.AccsUSD = _accsUsd;
+            parameter.AccsVND = _accsVnd;
+            parameter.Currency = criteria.Currency;
+
+            result = new Crystal
+            {
+                ReportName = "LogisticCDNotePreviewNew.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listCharge);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
         }
 
         private void UpdateJobModifyTime(Guid jobId)
@@ -1296,7 +1545,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Unit = item.UnitCode; //Unit Code
                     charge.QUnit = isOriginCurr ? item.CurrencyId : criteria.Currency;
 
-                    var _unitPrice = (item.UnitPrice ?? 0) * _exchangeRate ; //Unit Price đã được Exchange Rate theo Currency và không làm tròn
+                    var _unitPrice = (item.UnitPrice ?? 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency và không làm tròn
                     charge.UnitPrice = _unitPrice + _decimalNumber; //cộng thêm phần thập phân
                     //Giá trị thực tế VAT (% VAT hoặc số tiền tuyệt đối)
                     charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
@@ -1547,7 +1796,7 @@ namespace eFMS.API.Documentation.DL.Services
                         _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
                         _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
                         _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
-                    }                    
+                    }
 
                     var _totalAmount = _netAmount + _taxMoney; //Total Amount = Amount trước thuế + Tiền thuế
 
@@ -1704,9 +1953,17 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Currency = isOriginCurr ? DocumentConstants.CURRENCY_LOCAL : criteria.Currency;
             parameter.HBLList = _hbllist?.ToUpper();
             parameter.DecimalNo = 2;
-            //Exchange Rate USD to VND
-            var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-            parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;
+
+            if (data.ExcRateUsdToLocal != null)
+            {
+                parameter.RateUSDToVND = data.ExcRateUsdToLocal.Value;
+            }
+            else
+            {
+                //Exchange Rate USD to VND (Lấy tỷ giá theo ngày tạo CDNote)
+                var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == data.DatetimeCreated.Value.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                parameter.RateUSDToVND = _exchangeRateUSDToVND?.Rate ?? 0;
+            }
 
             result = new Crystal
             {
@@ -1803,17 +2060,31 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
             }
+
             if (perQuery != null)
             {
                 query = query.And(perQuery);
             }
-            var results = DataContext.Get(query);
-            if (results == null) return results;
+
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                results = results.Where(x => refNos.Contains(x.Code));
+                query = query.And(x => refNos.Any(a => a == x.Code));
             }
+
+            if (string.IsNullOrEmpty(criteria.ReferenceNos)
+                && string.IsNullOrEmpty(criteria.PartnerId)
+                && criteria.IssuedDate == null
+                && string.IsNullOrEmpty(criteria.CreatorId)
+                && string.IsNullOrEmpty(criteria.Type)
+                && string.IsNullOrEmpty(criteria.Status))
+            {
+                var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
+                var minDate = maxDate.AddMonths(-1); //1 tháng trước
+                query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
+            }
+
+            var results = DataContext.Get(query);
             return results;
         }
 
@@ -1850,6 +2121,80 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CDNoteModel> results = null;
+            List<CDNoteModel> resultDatas = new List<CDNoteModel>();
+            var cdNotes = Query(criteria).ToArray().OrderByDescending(o => o.DatetimeModified).ToArray();
+            if (cdNotes == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
+
+            var charges = surchargeRepository.Get();
+            var surchargeDebits = charges.Where(w => !string.IsNullOrEmpty(w.DebitNo) && cdNotes.Any(a => a.Code == w.DebitNo)).ToLookup(x => x.DebitNo);
+            var surchargeCredits = charges.Where(w => !string.IsNullOrEmpty(w.CreditNo) && cdNotes.Any(a => a.Code == w.CreditNo)).ToLookup(x => x.CreditNo);
+            var partnersLookup = partnerRepositoty.Get().ToLookup(x => x.Id);
+            var usersLookup = sysUserRepo.Get().ToLookup(x => x.Id);
+
+            IQueryable<CsShipmentSurcharge> surcharges = null;
+            foreach(var cdNote in cdNotes)
+            {
+                if (cdNote.Type == "CREDIT")
+                {
+                    surcharges = surchargeCredits[cdNote.Code].AsQueryable();               
+                }
+                else
+                {
+                    surcharges = surchargeDebits[cdNote.Code].AsQueryable();
+                }
+
+                if (surcharges != null)
+                {                    
+                    var _partnerName = partnersLookup[cdNote.PartnerId].FirstOrDefault()?.PartnerNameEn;
+                    var _creatorCdNote = usersLookup[cdNote.UserCreated].FirstOrDefault()?.Username;
+                    
+                    var chargeGrps = surcharges.GroupBy(x => new { ReferenceNo = (cdNote.Type == "CREDIT") ? x.CreditNo : x.DebitNo, Currency = x.CurrencyId }).Select(se => new CDNoteModel
+                    {
+                        Id = cdNote.Id,
+                        JobId = cdNote.JobId,
+                        PartnerId = cdNote.PartnerId,
+                        PartnerName = _partnerName,
+                        ReferenceNo = se.Key.ReferenceNo,
+                        JobNo = se.FirstOrDefault().JobNo,
+                        HBLNo = string.Join("; ", se.Select(s => s.Hblno).Distinct()),
+                        Total = se.Sum(x => x.Total),
+                        Currency = se.Key.Currency,
+                        IssuedDate = cdNote.DatetimeCreated,
+                        Creator = _creatorCdNote,
+                        Status = se.FirstOrDefault().AcctManagementId != null ? "Issued" : "New",
+                        InvoiceNo = se.FirstOrDefault().InvoiceNo,
+                        VoucherId = se.FirstOrDefault().VoucherId,
+                        IssuedStatus = se.Any(y => !string.IsNullOrEmpty(y.InvoiceNo) && y.AcctManagementId != null) ? "Issued Invoice" : se.Any(y => !string.IsNullOrEmpty(y.VoucherId) && y.AcctManagementId != null) ? "Issued Voucher" : "New",
+                        SyncStatus = cdNote.SyncStatus,
+                        LastSyncDate = cdNote.LastSyncDate,
+                        DatetimeModified = cdNote.DatetimeModified
+                    });
+                    resultDatas.AddRange(chargeGrps);
+                }
+            }
+
+            var _resultDatas = GetByStatus(criteria.Status, resultDatas.AsQueryable()).ToArray();
+
+            rowsCount = _resultDatas.ToArray().Count();
+
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                results = _resultDatas.Skip((page - 1) * size).Take(size).ToList();
+            }
+            return results;
+        }
+
+        public List<CDNoteModel> Paging2(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+        {
+            List<CDNoteModel> results = null;
             var data = Query(criteria);
             if (data == null) { rowsCount = 0; return results; }
             var cdNotes = Query(criteria)?.ToArray().OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
@@ -1878,15 +2223,16 @@ namespace eFMS.API.Documentation.DL.Services
                     x.Total,
                     x.VoucherId,
                     x.InvoiceNo,
-                    x.Type
+                    x.Type,
+                    x.AcctManagementId
                 }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel
                 {
                     Currency = x.Key.Currency,
                     ReferenceNo = x.Key.ReferenceNo,
                     HBLNo = string.Join("; ", x.Select(i => i.HBLNo).Distinct()),
                     Total = x.Sum(y => y.Total),
-                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
-                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId)) ? "Issued Voucher" : "New",
+                    Status = x.FirstOrDefault().AcctManagementId != null ? "Issued" : "New",//x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
+                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo) && y.AcctManagementId != null) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId) && y.AcctManagementId != null) ? "Issued Voucher" : "New",
                     VoucherId = x.FirstOrDefault().VoucherId
                 });
             cdNotesGroupByCurrency = GetByStatus(criteria.Status, cdNotesGroupByCurrency);
@@ -1975,10 +2321,11 @@ namespace eFMS.API.Documentation.DL.Services
                     var cdNote = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                     if (cdNote == null) return new HandleState((object)"Not found Credit Note");
 
-                    cdNote.SyncStatus = "Rejected";
+                    cdNote.SyncStatus = "";
                     cdNote.UserModified = currentUser.UserID;
                     cdNote.DatetimeModified = DateTime.Now;
                     cdNote.ReasonReject = model.Reason;
+                    cdNote.Note += " Rejected from Accountant";
 
                     HandleState hs = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
                     if (hs.Success)

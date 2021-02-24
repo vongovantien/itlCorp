@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -257,7 +258,6 @@ namespace eFMS.API.Documentation.DL.Services
                     return checkDuplicateCont;
                 }
             }
-            transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
             transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
             transaction.Active = true;
             transaction.UserModified = transaction.UserCreated;
@@ -272,6 +272,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
+                    transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
                     var hsTrans = DataContext.Add(transaction);
                     if (hsTrans.Success)
                     {
@@ -402,13 +403,34 @@ namespace eFMS.API.Documentation.DL.Services
                         var hsSurcharge = transactionDetailService.UpdateSurchargeOfHousebill(modelHouse);
                     }
 
-                    DataContext.SubmitChanges();
+                    // Update MBL Advance
+
+                    IQueryable<AcctAdvanceRequest> advR = accAdvanceRequestRepository.Where(x => x.JobId == transaction.JobNo);
+                    if (advR != null && advR.Count() > 0)
+                    {
+                        foreach (var item in advR)
+                        {
+                            item.Mbl = transaction.Mawb;
+                            item.DatetimeModified = DateTime.Now;
+                            item.UserModified = currentUser.UserID;
+
+                            accAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
+                        }
+                    }
+
+                    hsTrans = DataContext.SubmitChanges();
+
+                    if (hsTrans.Success)
+                    {
+                        accAdvanceRequestRepository.SubmitChanges();
+                    }
                 }
 
                 return hsTrans;
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_Update_CsTransaction_Log", ex.ToString());
                 return new HandleState(ex.Message);
             }
         }
@@ -1024,7 +1046,8 @@ namespace eFMS.API.Documentation.DL.Services
                         PODName = pod.NameEn,
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
-                        PackageQty = masterBill.PackageQty
+                        PackageQty = masterBill.PackageQty,
+                        BookingNo = masterBill.BookingNo
                     };
 
             return query;
@@ -1427,6 +1450,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
+                    && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
                     &&
                     (
@@ -1449,6 +1473,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
                            (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1607,6 +1632,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     &&
                     (
                            (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1628,6 +1654,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || (x.SupplierName ?? "").IndexOf(criteria.SupplierName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
                            (((x.Eta ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Eta ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -2010,92 +2037,107 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>();
             List<CsArrivalFrieghtCharge> freightCharges = new List<CsArrivalFrieghtCharge>();
 
-            if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count() > 0)
-            {
-                List<CsMawbcontainer> masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
-                containers.AddRange(masterContainers);
-            }
-            if (model.DimensionDetails != null && model.DimensionDetails.Count() > 0)
-            {
-                List<CsDimensionDetail> masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
-                dimensionDetails.AddRange(masterDimensionDetails);
-            }
-
-            if (detailTrans != null)
-            {
-                int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                                    && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
-                string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
-
-                if (csTransactionDetailRepo.Any(x => (x.Hwbno ?? "").IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
-                {
-                    generatePrefixHouse = DocumentConstants.SEF_HBL
-                        + GenerateID.GeneratePrefixHousbillNo();
-                }
-                string hawbCurrentMax = GetMaxHAWB();
-
-                foreach (var item in detailTrans)
-                {
-                    Guid oldHouseId = item.Id;
-                    item.Id = Guid.NewGuid();
-                    item.JobId = transaction.Id;
-                    item.ManifestRefNo = null;
-                    item.DeliveryOrderNo = null;
-                    item.DeliveryOrderPrintedDate = null;
-                    item.DosentTo1 = null;
-                    item.DosentTo2 = null;
-                    item.Dofooter = null;
-                    item.ArrivalNo = null;
-                    item.ArrivalFirstNotice = null;
-                    item.ArrivalSecondNotice = null;
-                    item.ArrivalHeader = null;
-                    item.ArrivalFooter = null;
-                    item.ArrivalDate = null;
-
-                    if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
-                    {
-                        item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
-                        hawbCurrentMax = item.Hwbno;
-                    }
-                    else
-                    {
-                        item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
-                    }
-                    if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
-                    {
-                        item.Mawb = model.Mawb;
-                    }
-                    if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
-                    {
-                        item.Hwbno = null;
-                    }
-
-                    item.Active = true;
-                    item.UserCreated = transaction.UserCreated;
-                    item.DatetimeCreated = DateTime.Now;
-                    item.GroupId = currentUser.GroupId;
-                    item.DepartmentId = currentUser.DepartmentId;
-                    item.OfficeId = currentUser.OfficeID;
-                    item.CompanyId = currentUser.CompanyID;
-
-                    List<CsMawbcontainer> housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
-                    if (housebillcontainers != null) containers.AddRange(housebillcontainers);
-
-                    List<CsDimensionDetail> housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
-                    if (housebillDimensions != null) dimensionDetails.AddRange(housebillDimensions);
-
-                    List<CsShipmentSurcharge> houseSurcharges = GetCharges(oldHouseId, item, transaction);
-                    if (houseSurcharges != null) surcharges.AddRange(houseSurcharges);
-
-                    List<CsArrivalFrieghtCharge> houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
-                    if (houseFreigcharges != null) freightCharges.AddRange(houseFreigcharges);
-
-                    countDetail = countDetail + 1;
-                }
-            }
             try
             {
+                if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count() > 0)
+                {
+                    List<CsMawbcontainer> masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
+                    containers.AddRange(masterContainers);
+                }
+                if (model.DimensionDetails != null && model.DimensionDetails.Count() > 0)
+                {
+                    List<CsDimensionDetail> masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
+                    dimensionDetails.AddRange(masterDimensionDetails);
+                }
+
+                if (detailTrans != null)
+                {
+                    int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                                        && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
+                    string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
+
+                    if (csTransactionDetailRepo.Any(x => (x.Hwbno ?? "").IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
+                    {
+                        generatePrefixHouse = DocumentConstants.SEF_HBL
+                            + GenerateID.GeneratePrefixHousbillNo();
+                    }
+                    string hawbCurrentMax = GetMaxHAWB();
+
+                    string hawbSeaExportCurrent = string.Empty;
+                    foreach (var item in detailTrans)
+                    {
+                        Guid oldHouseId = item.Id;
+                        item.Id = Guid.NewGuid();
+                        item.JobId = transaction.Id;
+                        item.ManifestRefNo = null;
+                        item.DeliveryOrderNo = null;
+                        item.DeliveryOrderPrintedDate = null;
+                        item.DosentTo1 = null;
+                        item.DosentTo2 = null;
+                        item.Dofooter = null;
+                        item.ArrivalNo = null;
+                        item.ArrivalFirstNotice = null;
+                        item.ArrivalSecondNotice = null;
+                        item.ArrivalHeader = null;
+                        item.ArrivalFooter = null;
+                        item.ArrivalDate = null;
+
+                        if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        {
+                            item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
+                            hawbCurrentMax = item.Hwbno;
+                        }
+                        if (model.TransactionType == "SFE" || model.TransactionType == "SLE" && model.TransactionType == "SCE")
+                        {
+                            string podCode = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault()?.Code;
+                            if (string.IsNullOrEmpty(podCode))
+                            {
+                                item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                            }
+                            else
+                            {
+                                item.Hwbno = GenerateHBLNoSeaExport(podCode, hawbSeaExportCurrent);
+                                hawbSeaExportCurrent = item.Hwbno;
+                            }
+                        }
+                        else
+                        {
+                            item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                        }
+                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        {
+                            item.Mawb = model.Mawb;
+                        }
+                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
+                        {
+                            item.Hwbno = null;
+                        }
+
+                        item.Active = true;
+                        item.UserCreated = transaction.UserCreated;
+                        item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                        item.GroupId = currentUser.GroupId;
+                        item.DepartmentId = currentUser.DepartmentId;
+                        item.OfficeId = currentUser.OfficeID;
+                        item.CompanyId = currentUser.CompanyID;
+
+                        List<CsMawbcontainer> housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
+                        if (housebillcontainers != null) containers.AddRange(housebillcontainers);
+
+                        List<CsDimensionDetail> housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
+                        if (housebillDimensions != null) dimensionDetails.AddRange(housebillDimensions);
+
+                        List<CsShipmentSurcharge> houseSurcharges = GetCharges(oldHouseId, item, transaction);
+                        if (houseSurcharges != null) surcharges.AddRange(houseSurcharges);
+
+                        List<CsArrivalFrieghtCharge> houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
+                        if (houseFreigcharges != null) freightCharges.AddRange(houseFreigcharges);
+
+                        countDetail = countDetail + 1;
+                    }
+                }
+
                 HandleState hsTrans = transactionRepository.Add(transaction);
                 if (hsTrans.Success)
                 {
@@ -2129,15 +2171,19 @@ namespace eFMS.API.Documentation.DL.Services
                         freighchargesRepository.SubmitChanges();
                     }
 
-
                     return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
                 }
+
                 return new ResultHandle { Status = hsTrans.Success, Message = hsTrans.Message.ToString() };
             }
             catch (Exception ex)
             {
+
+                new LogHelper("eFMS_DUPLICATE_JOB_LOG", ex.ToString());
                 return new ResultHandle { Status = false, Message = ex.Message };
             }
+
+
         }
 
         public string GetMaxHAWB()
@@ -2174,6 +2220,52 @@ namespace eFMS.API.Documentation.DL.Services
             }
             hblNo = GenerateID.GenerateHBLNo(count);
             return hblNo;
+        }
+
+        public string GenerateHBLNoSeaExport(string podCode, string currentHwbNo)
+        {
+            if (string.IsNullOrEmpty(podCode) || podCode == "null")
+            {
+                return null;
+            }
+            string keyword = ((string.IsNullOrEmpty(podCode) || podCode == "null") ? "" : podCode) + DateTime.Now.ToString("yyMM");
+            string hbl = "ITL" + keyword;
+
+            var codes = csTransactionDetailRepo.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno).ToList();
+            var oders = new List<int>();
+
+            if (!string.IsNullOrEmpty(currentHwbNo))
+            {
+                codes.Add(currentHwbNo);
+            }
+            if (codes != null & codes.Count > 0)
+            {
+                foreach (var code in codes)
+                {
+                    // Lấy 3 ký tự cuối
+                    if (code.Length > 7 && isNumeric(code.Substring(code.Length - 3)))
+                    {
+                        oders.Add(int.Parse(code.Substring(code.Length - 3)));
+                    }
+                }
+                if (oders.Count() > 0)
+                {
+                    int maxCurrentOder = oders.Max();
+
+                    hbl += (maxCurrentOder + 1).ToString("000");
+                }
+                else
+                {
+                    hbl += "001";
+                }
+
+            }
+            else
+            {
+                hbl += "001";
+            }
+
+            return hbl;
         }
 
         private bool isNumeric(string n)
@@ -2251,9 +2343,21 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
                     item.ExchangeDate = DateTime.Now;
+
+                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                    //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                     item.FinalExchangeRate = null;
-                    item.AmountVnd = null;
-                    item.VatAmountVnd = null;
+
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
                     item.ClearanceNo = null;
                     item.AdvanceNo = null;
 
@@ -2991,7 +3095,7 @@ namespace eFMS.API.Documentation.DL.Services
                     hasChargeSynced = csShipmentSurchargeRepo.Any(x => x.JobNo == shipment.JobNo && x.Mblno == shipment.Mawb && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
                 }
 
-                if(hasChargeSynced)
+                if (hasChargeSynced)
                 {
                     errorCode = 1;
                     mblNo = shipment.Mawb;
@@ -3002,12 +3106,12 @@ namespace eFMS.API.Documentation.DL.Services
                                 join adv in accAdvancePaymentRepository.Get(x => x.SyncStatus == "Synced") on advR.AdvanceNo equals adv.AdvanceNo
                                 select adv.AdvanceNo;
 
-                    if(query != null && query.Count() > 0)
+                    if (query != null && query.Count() > 0)
                     {
                         hasAdvanceRequest = true;
                         advs = query.Distinct().ToList();
                     }
-                    if(hasAdvanceRequest)
+                    if (hasAdvanceRequest)
                     {
                         errorCode = 2;
                         mblNo = shipment.Mawb;

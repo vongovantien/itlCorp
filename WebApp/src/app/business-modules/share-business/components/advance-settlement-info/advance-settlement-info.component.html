@@ -1,0 +1,47 @@
+<div class="adv-settle-wrapper">
+    <div class="m-portlet m--margin-bottom-20">
+        <div class="m-portlet__body">
+            <div *ngFor="let ads of adSett ">
+                <div class=" row ">
+                    <div class="col-lg-8 ">
+                        <div class="adv-info ">
+                            <div class="title ">
+                                <span>  {{ads.advanceNo}} - {{ads.requester}}</span>
+                            </div>
+                            <div class="description ">
+                                <span class="m--margin-right-20 ">{{ads.advanceDate | date: 'HH:mm dd/MM/yyyy'}}</span> | <span class="text-success m--margin-left-20 ">{{ads.statusApproval}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center text-primary ">
+                        <div class="title text-primary "><span>{{ads.advanceAmount}} {{ads.adCurrency}}</span></div>
+                    </div>
+                </div>
+                <div class=" row ">
+                    <div class="col-lg-8 ">
+                        <div class="adv-info ">
+                            <div class="title ">
+                                <span>  {{ads.settlementNo}} - {{ads.requester}}</span>
+                            </div>
+                            <div class="description ">
+                                <span class="m--margin-right-20 ">{{ads.settlemenDate | date: 'HH:mm dd/MM/yyyy'}}</span> | <span class="text-success m--margin-left-20 ">{{ads.settleStatusApproval}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center text-primary ">
+                        <div class="title text-primary "><span>{{ads.settlementAmount}} {{ads.setCurrency}}</span></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 "></div>
+                    <div class="col-lg-4 text-center text-primary title ">
+                        <div>{{ads.balance}} {{ads.adCurrency}}</div>
+                    </div>
+                </div>
+                <div class="hr"></div>
+            </div>
+            <tr app-table-none-record *ngIf="!adSett.length">
+            </tr>
+        </div>
+    </div>
+</div>

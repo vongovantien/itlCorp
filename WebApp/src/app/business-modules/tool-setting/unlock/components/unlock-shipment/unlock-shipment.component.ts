@@ -128,10 +128,10 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
                     }
 
                     if (this.lockHistory.length === 0) {
-                        if(!this.shipmentUnlock){
+                        if (!this.shipmentUnlock) {
                             this._toastService.warning("Unlock failed, Reference No not found!");
                         } else {
-                        this.onUnlockShipment($event);
+                            this.onUnlockShipment($event);
                         }
                     }
                 }
@@ -146,7 +146,7 @@ export class UnlockShipmentComponent extends AppForm implements OnInit {
                 .subscribe(
                     (res: any) => {
                         if (res.success) {
-                            this._toastService.success("Unlock Successful");
+                            this._toastService.success(res.message);
                         } else {
                             this._toastService.error("Unlock failed, Please check again!");
                         }

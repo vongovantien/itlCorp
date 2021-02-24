@@ -1,9 +1,11 @@
+import { LoadListSettlePayment } from './components/store/actions/settlement-payment.action';
+import { takeUntil, withLatestFrom } from 'rxjs/operators';
+import { getSettlementPaymentListState, getSettlementPaymentSearchParamsState, getSettlementPaymentListPagingState, getSettlementPaymentListLoadingState } from './components/store/reducers/index';
 import { InjectViewContainerRefDirective } from './../../../shared/directives/inject-view-container-ref.directive';
 import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
-import { NgxSpinnerService } from 'ngx-spinner';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
@@ -27,8 +29,6 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from '../compo
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 import { catchError, finalize, map, } from 'rxjs/operators';
-
-
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
@@ -62,12 +62,11 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         private _router: Router,
         private _exportRepo: ExportRepo,
         private _store: Store<IAppState>,
-        private _spinner: NgxSpinnerService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
 
-        this.requestList = this.getListSettlePayment;
+        this.requestList = this.requestSettlePaymentList;
         this.requestSort = this.sortSettlementPayment;
     }
 
@@ -101,9 +100,43 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
+        this.getUserLogged();
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
+        this.getListSettlePayment();
+
+
+        this._store.select(getSettlementPaymentSearchParamsState)
+            .pipe(
+                withLatestFrom(this._store.select(getSettlementPaymentListPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+
+                    this.requestSettlePaymentList();
+                }
+            );
+
+        this.isLoading = this._store.select(getSettlementPaymentListLoadingState);
+
+    }
+
+    requestSettlePaymentList() {
+        this._store.dispatch(LoadListSettlePayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    getUserLogged() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.dataSearch = { requester: this.userLogged.id };
     }
 
     showSurcharge(settlementNo: string, indexsSettle: number) {
@@ -127,13 +160,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     }
 
-    onSearchSettlement(data: any) {
-        this.page = 1;
-        this.dataSearch = data; // Object.assign({}, data, { requester: this.userLogged.id });
-        this.getListSettlePayment();
-    }
-
-
     sortByCustomClearance(sortData: CommonInterface.ISortData): void {
         if (!!sortData.sortField) {
             this.customClearances = this._sortService.sort(this.customClearances, sortData.sortField, sortData.order);
@@ -141,12 +167,10 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     getListSettlePayment() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._accoutingRepo.getListSettlementPayment(this.page, this.pageSize, this.dataSearch)
+        this._store.select(getSettlementPaymentListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+                takeUntil(this.ngUnsubscribe),
                 map((data: any) => {
                     return {
                         data: !!data.data ? data.data.map((item: any) => new SettlementPayment(item)) : [],
@@ -183,17 +207,14 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     deleteSettlement(settlementNo: string) {
-        this.isLoading = true;
-        this._progressRef.start();
         this._accoutingRepo.deleteSettlement(settlementNo)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.getListSettlePayment();
+                        this.requestSettlePaymentList();
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
@@ -374,10 +395,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     onSyncBravo(Ids: AccountingInterface.IRequestGuid[]) {
-        this._spinner.show();
         this._accoutingRepo.syncSettleToAccountant(Ids)
             .pipe(
-                finalize(() => this._spinner.hide()),
                 catchError(this.catchError)
             )
             .subscribe(
@@ -385,7 +404,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
 
-                        this.getListSettlePayment();
+                        this.requestSettlePaymentList();
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
@@ -397,7 +416,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     denySettle() {
-        const settlesDenyList = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done' && x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED);
+        const settlesDenyList = this.settlements.filter(x => x.isSelected && x.statusApproval !== AccountingConstants.STATUS_APPROVAL.NEW
+            && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED);
         if (!settlesDenyList.length) {
             this._toastService.warning("Please select settle payment was rejected to deny");
             return;
@@ -429,7 +449,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this.getListSettlePayment();
+                        this.requestSettlePaymentList();
                     }
                 },
                 (error) => {

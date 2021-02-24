@@ -97,7 +97,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET, text: 'Accountant P/L Sheet' },
         { id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS, text: 'Job Profit Analysis' },
         { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST, text: 'Summary Of Costs Incurred' },
-        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' }
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' },
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.COSTS_BY_PARTNER, text: 'Costs By Partner' }
     ];
 
     typeReportList: ReportInterface.INg2Select[] = [
@@ -166,11 +167,11 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
-        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[0].id];
+        const staffTypeInit = this.isGeneralReport || this.isSheetDebitRpt  ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
-                startDate: this.createMoment().startOf('month').toDate(),
-                endDate: this.createMoment().endOf('month').toDate(),
+                startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             }],
             dateType: [this.dateTypeList[0].id],
             customer: [],
@@ -310,9 +311,10 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     onRemoveDataFormInfo(data: any, type: string) {
-        if (type === 'service') {
-            this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === data.id), 1);
-        }
+        // if (type === 'service') {
+        //     const id = !!data.id ? data.id : data.value.id;
+        //     this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === id), 1);
+        // }
         if (type === 'office') {
             this.officeActive.splice(this.officeActive.findIndex((item) => item.id === data.id), 1);
             if (this.officeActive.length === 0) {
@@ -726,8 +728,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         }
 
         this.serviceDate.setValue({
-            startDate: this.createMoment().startOf('month').toDate(),
-            endDate: this.createMoment().endOf('month').toDate(),
+            startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
         });
     }
 

@@ -1,4 +1,4 @@
-<div class="m-portlet" [ngClass]="{'margin-bottom-100': !isGeneralReport}">
+<div class="m-portlet" [ngClass]="{'margin-bottom-100': !isGeneralReport}" style="padding-bottom:20px;">
     <div class="m-portlet__body">
         <!--begin::Form-->
         <form class="m-form m-form--state" [formGroup]="formSearch" (ngSubmit)="searchReport()">
@@ -90,7 +90,7 @@
                                 </label>
                                 <ng-select [multiple]='true' formControlName="office" class="custom"
                                     (change)="detectChangeDataInfo($event, 'office')" [items]="officeList" [(ngModel)]="officeActive"
-                                    [disabled]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    [readonly]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
@@ -102,7 +102,7 @@
                                 </label>
                                 <ng-select [multiple]='true' formControlName="department" class="custom"
                                     (change)="detectChangeDataInfo($event, 'department')" [items]="departmentList" [(ngModel)]="departmentActive"
-                                    [disabled]="menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    [readonly]="menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
@@ -114,7 +114,7 @@
                                 </label>
                                 <ng-select [multiple]='true' formControlName="group" class="custom"
                                     (change)="detectChangeDataInfo($event, 'group')" [items]="groupList" [(ngModel)]="groupActive"
-                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    [readonly]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
@@ -128,7 +128,7 @@
                                 </label>
                                 <ng-select [multiple]='true' formControlName="staff" class="custom"
                                     (change)="detectChangeDataInfo($event, 'staff')" [items]="staffList" [(ngModel)]="staffActive"
-                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
+                                    [readonly]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>

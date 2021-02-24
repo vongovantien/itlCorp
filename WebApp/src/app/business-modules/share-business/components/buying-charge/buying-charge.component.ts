@@ -190,8 +190,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
-            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
-            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
+            { title: 'Net Amount', field: 'netAmount', sortable: true },
         ];
     }
 
@@ -251,7 +250,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (containers: Container[]) => {
                     this.containers = containers;
-                    console.log(this.containers);
                 }
             );
     }
@@ -714,6 +712,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             charge.duplicateInvoice = false;
             if (this.checkSpecialCaseCharge(charge)) {
                 valid = true;
+                continue;
             }
             if (
                 !charge.paymentObjectId
@@ -752,7 +751,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
         const listChargeToDectect = this.charges.filter(c => !this.checkSpecialCaseCharge(c));
         const chargeInvoiceGrps = listChargeToDectect.map(c => {
-            if (!!c.invoiceNo) return c.chargeId + c.invoiceNo;
+            if (!!c.invoiceNo && c.notes) return c.chargeId + c.invoiceNo + c.notes;
             return null;
         }).filter(x => Boolean(x));
 
@@ -762,7 +761,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             valid = false;
             const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeInvoiceGrps))];
             this.charges.filter(c => !this.checkSpecialCaseCharge(c)).forEach((c: CsShipmentSurcharge) => {
-                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo)) {
+                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo + c.notes)) {
                     c.duplicateCharge = true;
                     c.duplicateInvoice = true;
                 } else {
@@ -770,7 +769,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     c.duplicateInvoice = false;
                 }
             });
-            console.log(arrayDuplicates);
         } else valid = true;
 
         return valid;

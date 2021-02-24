@@ -9,8 +9,8 @@
 					<label class="form-control-label" for="">
 						Job ID
 					</label>
-					<input type="text" class="form-control m-input m-input--square" placeholder="Job ID"
-						name="jobNo" disabled=true formControlName="jobNo">
+					<input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo"
+						disabled=true formControlName="jobNo">
 
 				</div>
 			</div>
@@ -104,16 +104,16 @@
 				<div class="form-group"
 					[ngClass]="{'m-form__group has-danger': (shipmentMode.dirty && !shipmentMode.valid) || (isSubmitted && !shipmentMode.valid)}">
 					<div class="row">
-							<div class="col-lg-4">
-								<label class="form-control-label" required>
-									Shipment Mode
-								</label>
-							</div>
-							<div class="col-lg-8" *ngIf="shipmentMode.value === 'Internal'" style="text-align: right;">
-								<a class="pointer" style="text-decoration: underline;"
-                                    (click)="getASInfoToLink()">Link Air/Sea </a>&nbsp;&nbsp;
-                                <span class="text-warning">{{shipmentInfo}}</span>
-							</div>
+						<div class="col-lg-4">
+							<label class="form-control-label" required>
+								Shipment Mode
+							</label>
+						</div>
+						<div class="col-lg-8" *ngIf="shipmentMode.value === 'Internal'" style="text-align: right;">
+							<a class="pointer" style="text-decoration: underline;" (click)="getASInfoToLink()">Link
+								Air/Sea </a>&nbsp;&nbsp;
+							<span class="text-warning">{{shipmentInfo}}</span>
+						</div>
 					</div>
 					<ng-select class="custom" [clearable]="false" [items]="shipmentModes" placeholder="Please select"
 						formControlName="shipmentMode">
@@ -278,9 +278,9 @@
 						Salesman
 					</label>
 					<app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value: salemansId.value}"
-						(itemSelected)="onSelectDataFormInfo($event, 'salesman')" [selectedDisplayFields]="['employeeNameEn']"
-						[dataSources]="salesmans | async" size="15" [displayFields]="displayFieldSalesman"
-						(remove)="resetFormControl(salemansId)">
+						(itemSelected)="onSelectDataFormInfo($event, 'salesman')"
+						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async" size="15"
+						[displayFields]="displayFieldSalesman" (remove)="resetFormControl(salemansId)">
 					</app-combo-grid-virtual-scroll>
 					<div class="form-control-feedback" *ngIf="isSubmitted && !salemansId.value">
 						Salesman is required!
@@ -359,15 +359,17 @@
 		<div class="row" *ngIf="opsTransaction && !isJobCopy">
 			<div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
 				<span class="m--font-bolder">Created:</span>
-				<span
-					class="m--font-success m--margin-left-5">{{ opsTransaction.datetimeCreated | date : "dd/MM/yyyy HH:mm:ss" }}</span>
+				<span class="m--font-success m--margin-left-5">
+					{{ opsTransaction.datetimeCreated | date : "dd/MM/yyyy HH:mm:ss" }}
+				</span>
 				<span class="m--font-bolder m--margin-left-5">by</span>
 				<span class="m--font-success m--margin-left-5">{{ opsTransaction.userCreatedName }}</span>
 			</div>
 			<div class="col-md-8 m--margin-top-10 m--margin-bottom-5">
 				<span class="m--font-bolder">Modified:</span>
-				<span
-					class="m--font-success m--margin-left-5">{{ opsTransaction.datetimeModified | date : "dd/MM/yyyy HH:mm:ss" }}</span>
+				<span class="m--font-success m--margin-left-5">
+					{{ opsTransaction.datetimeModified | date : "dd/MM/yyyy HH:mm:ss" }}
+				</span>
 				<span class="m--font-bolder m--margin-left-5">by</span>
 				<span class="m--font-success m--margin-left-5">{{ opsTransaction.userModifiedName }}</span>
 			</div>
@@ -384,8 +386,7 @@
 						GW (kg)
 					</label>
 					<input type="number" autocomplete="nope" class="form-control m-input m-input--square"
-						placeholder="Enter number" name="sumGrossWeight" min="0.01" decimalNumberGreaterThan0
-						formControlName="sumGrossWeight">
+						placeholder="Enter number" name="sumGrossWeight" min="0.01" formControlName="sumGrossWeight">
 				</div>
 			</div>
 			<div class="col-lg-4">
@@ -394,8 +395,7 @@
 						NW (kg)
 					</label>
 					<input type="number" autocomplete="nope" class="form-control m-input m-input--square"
-						placeholder="Enter number" name="sumNetWeight" min="0.01" decimalNumberGreaterThan0
-						formControlName="sumNetWeight">
+						placeholder="Enter number" name="sumNetWeight" min="0.01" formControlName="sumNetWeight">
 				</div>
 			</div>
 			<div class="col-lg-4">
@@ -435,7 +435,7 @@
 						CBM
 					</label>
 					<input type="number" autocomplete="nope" class="form-control m-input m-input--square" min="0.01"
-						placeholder="Enter number" name="sumCbm" formControlName="sumCbm" decimalNumberGreaterThan0>
+						placeholder="Enter number" name="sumCbm" formControlName="sumCbm">
 				</div>
 			</div>
 
@@ -466,8 +466,7 @@
 					<label class="form-control-label" for="">
 						Note
 					</label>
-					<textarea formControlName="note" name="note" placeholder="Note"
-						class="form-control"></textarea>
+					<textarea formControlName="note" name="note" placeholder="Note" class="form-control"></textarea>
 				</div>
 			</div>
 			<div class="col-4" *ngIf="opsTransaction">

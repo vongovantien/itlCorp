@@ -377,8 +377,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     objUpdate.CreditLimitRate = credit.CreditRate;
                 }
-                isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
                 objUpdate.DatetimeModified = DateTime.Now;
+                objUpdate.UserModified = currentUser.UserID;
+                isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
             }
             if (isUpdateDone.Success)
             {
@@ -791,13 +792,19 @@ namespace eFMS.API.Catalogue.DL.Services
 
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
-
+            List<string> lstAccountant = new List<string>();
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null && listEmailAR.Any())
             {
                 lstTo = listEmailAR.Split(";").ToList();
+            }
+
+            if(listEmailAccountant != null && listEmailAccountant.Any())
+            {
+                lstAccountant = listEmailAccountant.Split(";").ToList();
             }
 
             string emailCreator = objInfoCreator?.Email;
@@ -897,6 +904,10 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 urlToSend = UrlClone.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
+                if (lstAccountant.Any())
+                {
+                    lstTo.AddRange(lstAccountant);
+                }
 
                 lstCc.Add(objInfoSalesman?.Email);
                 lstCc.Add(objInfoCreatorPartner?.Email);
@@ -1157,7 +1168,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = ApiUrl.Value.Url;
+            string path = this.ApiUrl.Value.Url;
             try
             {
                 var list = new List<SysImage>();

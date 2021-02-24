@@ -319,6 +319,14 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportCostsByPartner(body: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfCostsPartner`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportAccountingManagement(body: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingManagement`, body).pipe(
             catchError((error) => throwError(error)),

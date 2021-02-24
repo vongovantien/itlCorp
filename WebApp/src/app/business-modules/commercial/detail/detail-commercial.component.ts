@@ -232,8 +232,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     updateStatusPartner($event) {
-        if (this.partner.active === false) {
-            this.partner.active = $event;
+        const obj = $event;
+        if (obj.partnerStatus === true && (obj.isRequestApproval === false || obj.isRequestApproval === null)) {
+            this.partner.active = true;
         }
     }
 

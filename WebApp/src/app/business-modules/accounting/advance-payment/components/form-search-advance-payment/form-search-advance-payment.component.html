@@ -16,7 +16,7 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="">Requester</label>
-                                <ng-select formControlName="requester" [items]="requesters" class="custom"
+                                <ng-select formControlName="requester" [items]="requesters | async" class="custom"
                                     bindLabel="username" bindValue="id">
                                 </ng-select>
                             </div>
@@ -24,31 +24,25 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="">Status Approval</label>
-                                <select class="form-control" formControlName="statusApproval">
-                                    <option [ngValue]="null">All</option>
-                                    <option *ngFor="let status of statusApprovals; let i = index" [ngValue]="status">
-                                        {{status.title}}</option>
-                                </select>
+                                <ng-select formControlName="statusApproval" [items]="statusApprovals" class="custom"
+                                    bindLabel="title" bindValue="value" placeholder="All">
+                                </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="">Status Payment</label>
-                                <select class="form-control" formControlName="statusPayment">
-                                    <option [ngValue]="null">All</option>
-                                    <option *ngFor="let status of statusPayments; let i = index" [ngValue]="status">
-                                        {{status.title}}</option>
-                                </select>
+                                <ng-select formControlName="statusPayment" [items]="statusPayments" class="custom"
+                                    bindLabel="title" bindValue="value" placeholder="All">
+                                </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="">Currency</label>
-                                <select class="form-control" formControlName="currencyId">
-                                    <option [ngValue]="null">All</option>
-                                    <option *ngFor="let currency of currencies" [ngValue]="currency">{{currency.id}}
-                                    </option>
-                                </select>
+                                <ng-select formControlName="currencyId" [items]="currencies | async" class="custom"
+                                    bindLabel="id" bindValue="id" placeholder="All">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
@@ -62,7 +56,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
                                         name="daterange" readonly formControlName="requestDate" [ranges]="ranges"
-                                        [alwaysShowCalendars]="true" />
+                                        [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -78,7 +72,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
                                         name="daterange" readonly formControlName="modifiedDate" [ranges]="ranges"
-                                        [alwaysShowCalendars]="true" />
+                                        [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -90,11 +84,9 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Payment Method</label>
-                                <select class="form-control" formControlName="paymentMethod">
-                                    <option [ngValue]="null">All</option>
-                                    <option *ngFor="let method of paymentMethods" [ngValue]="method">{{method.title}}
-                                    </option>
-                                </select>
+                                <ng-select formControlName="paymentMethod" [items]="paymentMethods" class="custom"
+                                    bindLabel="title" bindValue="value" placeholder="All">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
@@ -104,7 +96,7 @@
                 <div class="row">
                     <div class="col-lg-6"></div>
                     <div class="col-lg-6 m--align-right">
-                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="search()">
+                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                             <span>
                                 <i class="la la-search"></i>
                                 <span>
