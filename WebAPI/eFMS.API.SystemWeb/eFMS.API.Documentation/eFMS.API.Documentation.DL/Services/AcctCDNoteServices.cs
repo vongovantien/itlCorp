@@ -372,14 +372,34 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
                 model.Total = _totalCdNote;
-                var hs = DataContext.Add(model);
 
-                UpdateJobModifyTime(model.JobId);
-                if (hs.Success)
+                var hs = new HandleState();
+                using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    var hsSc = surchargeRepository.SubmitChanges();
-                    var hsOt = opstransRepository.SubmitChanges();
-                    var hsCt = cstransRepository.SubmitChanges();
+                    try
+                    {
+                        hs = DataContext.Add(model, false);
+                        var sc = DataContext.SubmitChanges();
+
+                        UpdateJobModifyTime(model.JobId);
+
+                        if (hs.Success)
+                        {
+                            var hsSc = surchargeRepository.SubmitChanges();
+                            var hsOt = opstransRepository.SubmitChanges();
+                            var hsCt = cstransRepository.SubmitChanges();
+                        }
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        hs = new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
                 }
                 return hs;
             }
@@ -533,15 +553,34 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
                 entity.Total = _totalCdNote;
-                var stt = DataContext.Update(entity, x => x.Id == cdNote.Id);
 
-                UpdateJobModifyTime(model.Id);
+                var hs = new HandleState();
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        hs = DataContext.Update(entity, x => x.Id == cdNote.Id, false);
+                        var sc = DataContext.SubmitChanges();
 
-                var hsSurSc = surchargeRepository.SubmitChanges();
-                var hsOtSc = opstransRepository.SubmitChanges();
-                var hsCtSc = cstransRepository.SubmitChanges();
+                        UpdateJobModifyTime(model.Id);
 
-                return stt;
+                        var hsSurSc = surchargeRepository.SubmitChanges();
+                        var hsOtSc = opstransRepository.SubmitChanges();
+                        var hsCtSc = cstransRepository.SubmitChanges();
+
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        hs = new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+                return hs;
             }
             catch (Exception ex)
             {
