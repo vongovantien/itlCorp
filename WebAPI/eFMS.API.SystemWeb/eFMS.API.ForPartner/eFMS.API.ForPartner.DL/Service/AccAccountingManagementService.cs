@@ -246,11 +246,11 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             CsShipmentSurcharge surchargeObh = surchargesLookupId[obhCharge.ChargeId].FirstOrDefault();
                             surchargeObh.AcctManagementId = invoiceObh.Id;
-                            surchargeObh.InvoiceNo = null; //CR: 07/12/2020
-                            surchargeObh.InvoiceDate = null; //CR: 07/12/2020
+                            //surchargeObh.InvoiceNo = null; //CR: 07/12/2020; đã change [25/02/2021]
+                            //surchargeObh.InvoiceDate = null; //CR: 07/12/2020; đã change [25/02/2021]
                             surchargeObh.VoucherId = invoiceObh.VoucherId;
                             surchargeObh.VoucherIddate = invoiceObh.Date;
-                            surchargeObh.SeriesNo = null; //CR: 07/12/2020
+                            //surchargeObh.SeriesNo = null; //CR: 07/12/2020; đã change [25/02/2021]
                             surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
 
                             if (surchargeObh.FinalExchangeRate != obhCharge.ExchangeRate)
