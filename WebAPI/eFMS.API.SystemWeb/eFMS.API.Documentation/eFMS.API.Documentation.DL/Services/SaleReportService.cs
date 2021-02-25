@@ -180,7 +180,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
-                queryOpsTrans = queryOpsTrans.And( x => x.CustomerId == criteria.CustomerId);
+                queryOpsTrans = queryOpsTrans.And( x => criteria.CustomerId.Contains(x.CustomerId));
             }
             var data = opsRepository.Get(queryOpsTrans);
             var shipmentList = new List<OpsTransaction>();
@@ -301,7 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
-                queryTranDetail = x => x.CustomerId == criteria.CustomerId;
+                queryTranDetail = x => criteria.CustomerId.Contains(x.CustomerId);
             }
             // Search Hawb
             if (!string.IsNullOrEmpty(criteria.Hawb))
