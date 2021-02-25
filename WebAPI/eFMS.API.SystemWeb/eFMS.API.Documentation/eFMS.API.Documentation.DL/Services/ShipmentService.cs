@@ -720,7 +720,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
-                queryTranDetail = q => q.CustomerId == criteria.CustomerId;
+                queryTranDetail = q => criteria.CustomerId.Contains(q.CustomerId);
             }
             // Search Hawb
             if (!string.IsNullOrEmpty(criteria.Hawb))
@@ -787,7 +787,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost != true)
             {
-                queryOpsTrans = queryOpsTrans.And(q => q.CustomerId == criteria.CustomerId);
+                queryOpsTrans = queryOpsTrans.And(q => criteria.CustomerId.Contains(q.CustomerId));
             }
             // Search JobId
             if (!string.IsNullOrEmpty(criteria.JobId))
@@ -2172,12 +2172,12 @@ namespace eFMS.API.Documentation.DL.Services
                                   PaymentObjectId = sur.PaymentObjectId,
                                   CreditNo = sur.CreditNo,
                                   FinalExchangeRate = sur.FinalExchangeRate,
-                                  ClearanceNo = sur.ClearanceNo
+                                  ClearanceNo = sur.ClearanceNo,
+                                  CustomerId = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId
                               });
             foreach (var charge in DataCharge)
             {
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-                var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
@@ -2281,9 +2281,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FinalExchangeRate = charge.FinalExchangeRate;
                 data.Mbl = charge.Mblno;
                 data.Hbl = charge.Hblno;
-                data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
-                data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
-                data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
+                data.PartnerCode = detailLookupPartner[charge.CustomerId].FirstOrDefault()?.AccountNo;
+                data.PartnerName = detailLookupPartner[charge.CustomerId].FirstOrDefault()?.PartnerNameEn;
+                data.PartnerTaxCode = detailLookupPartner[charge.CustomerId].FirstOrDefault()?.TaxCode;
                 data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                 dataList.Add(data);
@@ -2644,7 +2644,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!dataShipment.Any()) return dataShipment.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
-            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
+            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId.Contains(x.PaymentObjectId) || criteria.CustomerId.Contains (x.PayerId) : true);
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
@@ -2672,12 +2672,13 @@ namespace eFMS.API.Documentation.DL.Services
                              Service = d.Service,
                              PaymentObjectId = sur.PaymentObjectId,
                              CreditNo = sur.CreditNo,
-                             FinalExchangeRate = sur.FinalExchangeRate
+                             FinalExchangeRate = sur.FinalExchangeRate,
+                             CustomerId = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId
+
                          });
             foreach (var charge in DataCharge)
             {
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
-                var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId;
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
@@ -2780,9 +2781,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FinalExchangeRate = charge.FinalExchangeRate;
                 data.Mbl = charge.Mblno;
                 data.Hbl = charge.Hblno;
-                data.PartnerCode = detailLookupPartner[_partnerId].FirstOrDefault()?.AccountNo;
-                data.PartnerName = detailLookupPartner[_partnerId].FirstOrDefault()?.PartnerNameEn;
-                data.PartnerTaxCode = detailLookupPartner[_partnerId].FirstOrDefault()?.TaxCode;
+                data.PartnerCode = detailLookupPartner[charge.CustomerId].FirstOrDefault()?.AccountNo;
+                data.PartnerName = detailLookupPartner[charge.CustomerId].FirstOrDefault()?.PartnerNameEn;
+                data.PartnerTaxCode = detailLookupPartner[charge.CustomerId].FirstOrDefault()?.TaxCode;
                 data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                 dataList.Add(data);
@@ -2799,7 +2800,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (dataShipment == null) return null;
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
-            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => criteria.CustomerId.Contains(chg.CustomerID);
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
             var detailLookupSur = chargeData.ToLookup(q => q.HBLID);
             var dataCustom = customsDeclarationRepo.Get().ToList();
@@ -2872,7 +2873,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria)
         {
-            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => criteria.CustomerId.Contains(chg.CustomerID);
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHPayee(query, null) : GetChargeOBHPayee(null, null);
             var dataDocumentation = SummaryOfCostsByPartner(criteria, chargeData);
             SummaryOfRevenueModel obj = new SummaryOfRevenueModel();
@@ -3006,7 +3007,7 @@ namespace eFMS.API.Documentation.DL.Services
             var port = catPlaceRepo.Get();
             SummaryOfRevenueModel ObjectSummaryRevenue = new SummaryOfRevenueModel();
             List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
-            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => criteria.CustomerId.Contains(chg.CustomerID);
             var results = chargeData.AsEnumerable().GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
 
             var lookupReuslts = results.ToLookup(q => q.Key.JobId);
@@ -3122,7 +3123,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (dataShipment == null) return null;
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
-            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => criteria.CustomerId.Contains(chg.CustomerID);
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
             var detailLookupSur = chargeData.ToLookup(q => q.HBLID);
             var dataCustom = customsDeclarationRepo.Get().ToList();
@@ -3485,7 +3486,7 @@ namespace eFMS.API.Documentation.DL.Services
             var port = catPlaceRepo.Get();
             SummaryOfRevenueModel ObjectSummaryRevenue = new SummaryOfRevenueModel();
             List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
-            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => criteria.CustomerId.Contains(chg.CustomerID);
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayerJob(query, null) : GetChargeOBHSellPayerJob(null, null);
             var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
 
@@ -3611,7 +3612,7 @@ namespace eFMS.API.Documentation.DL.Services
             var port = catPlaceRepo.Get();
             SummaryOfRevenueModel ObjectSummaryRevenue = new SummaryOfRevenueModel();
             List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
-            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => criteria.CustomerId.Contains(chg.CustomerID);
             var chargeData = GetChargeOBHSellPayer(query, null);
             var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
             var lookupResults = results.ToLookup(q => q.Key.HBLID);
