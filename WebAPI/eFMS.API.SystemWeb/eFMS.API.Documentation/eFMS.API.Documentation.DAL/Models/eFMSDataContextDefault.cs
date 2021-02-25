@@ -127,7 +127,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
-                entity.Property(e => e.ServiceType).HasMaxLength(10);
+                entity.Property(e => e.ServiceType).HasMaxLength(100);
 
                 entity.Property(e => e.SourceCreated)
                     .HasMaxLength(50)

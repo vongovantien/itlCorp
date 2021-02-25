@@ -88,12 +88,17 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             //***
 
+            var currencyExcLookup = DataContext.Get().ToLookup(x => x.DatetimeCreated.Value.Date);
+
             DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
             var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
+            //List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
+            var currencyExchange = currencyExcLookup[exchargeDateSurcharge.Value.Date].ToList();
+
             if (currencyExchange.Count == 0)
             {
-                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                //currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                currencyExchange = currencyExcLookup[maxDateCreated.Value.Date].ToList();
             }
 
             decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, ForPartnerConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
