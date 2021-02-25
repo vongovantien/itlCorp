@@ -1685,34 +1685,52 @@ namespace eFMS.API.Documentation.DL.Services
                                    grps.Key.StatusApproval,
                                    Requester = grps.Key.Username
                                };
-            var queryJoin = from s in querySettle
-                            join q2 in queryAdvance on s.AdvanceNo equals q2.AdvanceNo into grps
-                            from grp in grps.DefaultIfEmpty()
-                            where s.JobID == opsJob.JobNo
-                            select new OpsAdvanceSettlementModel
-                            {
-                                JobNo = grp.JobID,
-                                SettlementNo = s.SettlementCode,
-                                SettlemenDate = s.RequestDate,
-                                SettlementCurrency = s.SettlementCurrency,
-                                SettlementAmount = s.Total,
-                                SettleStatusApproval = s.StatusApproval,
 
-                                AdvanceNo = grp.AdvanceNo,
-                                AdvanceDate = grp.RequestDate,
-                                AdvanceCurrency = grp.AdvanceCurrency,
-                                AdvanceAmount = grp.Total ?? 0,
-                                AdvanceStatusApproval = grp.StatusApproval,
-                                Balance = s.Total - (grp.Total ?? 0),
-
-                                RequesterAdvance = grp.Requester,
-                                RequesterSettle = s.Requester,
-                                
-                            };
-            if(queryJoin != null)
+            if (querySettle != null && querySettle.Count() > 0)
             {
-                results = queryJoin.ToList();
+                 var queryJoin = from s in querySettle
+                                join q2 in queryAdvance on s.AdvanceNo equals q2.AdvanceNo into grps
+                                from grp in grps.DefaultIfEmpty()
+                                where s.JobID == opsJob.JobNo
+                                select new OpsAdvanceSettlementModel
+                                {
+                                    JobNo = grp.JobID,
+                                    SettlementNo = s.SettlementCode,
+                                    SettlemenDate = s.RequestDate,
+                                    SettlementCurrency = s.SettlementCurrency,
+                                    SettlementAmount = s.Total,
+                                    SettleStatusApproval = s.StatusApproval,
+
+                                    AdvanceNo = grp.AdvanceNo,
+                                    AdvanceDate = grp.RequestDate,
+                                    AdvanceCurrency = grp.AdvanceCurrency,
+                                    AdvanceAmount = grp.Total ?? 0,
+                                    AdvanceStatusApproval = grp.StatusApproval,
+                                    Balance = s.Total - (grp.Total ?? 0),
+
+                                    RequesterAdvance = grp.Requester,
+                                    RequesterSettle = s.Requester,
+
+                                };
+                if (queryJoin != null)
+                {
+                    results = queryJoin.ToList();
+                }
             }
+            else
+            {
+                results = queryAdvance.Select(x => new OpsAdvanceSettlementModel
+                {
+                    AdvanceNo = x.AdvanceNo,
+                    AdvanceDate = x.RequestDate,
+                    AdvanceCurrency = x.AdvanceCurrency,
+                    AdvanceAmount = x.Total ?? 0,
+                    AdvanceStatusApproval = x.StatusApproval,
+                    Balance = (x.Total ?? 0),
+                    RequesterAdvance = x.Requester,
+                }).ToList();
+            }
+           
             return results;
         }
 
