@@ -2979,6 +2979,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
 
+                entity.Property(e => e.ObjectResponse).HasColumnType("ntext");
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);

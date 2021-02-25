@@ -147,20 +147,21 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
                 var obhCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
+                var surchargesLookupId = surchargeRepo.Get().ToLookup(x => x.Id);
 
-                var chargeNotExistsInSurcharge = GetChargeNotExistsInSurcharge(model.Charges);
+                /*var chargeNotExistsInSurcharge = GetChargeNotExistsInSurcharge(model.Charges, surchargesLookupId);
                 if (!string.IsNullOrEmpty(chargeNotExistsInSurcharge))
                 {
                     string message = string.Format(@"ChargeId: {0} không tồn tại. Vui lòng kiểm tra lại", chargeNotExistsInSurcharge);
                     return new HandleState((object)message);
                 }
 
-                var chargeObhNotMatchCurrency = GetChargeNotMatchCurrencyInSurcharge(obhCharges);
+                var chargeObhNotMatchCurrency = GetChargeNotMatchCurrencyInSurcharge(obhCharges, surchargesLookupId);
                 if (!string.IsNullOrEmpty(chargeObhNotMatchCurrency))
                 {
                     string message = string.Format(@"ChargeId: {0} có currency không hợp lệ. Vui lòng kiểm tra lại", chargeObhNotMatchCurrency);
                     return new HandleState((object)message);
-                }
+                }*/
 
                 var matchedChargeDebit = CheckMatchedCharge(debitCharges);
                 if (matchedChargeDebit)
@@ -185,9 +186,100 @@ namespace eFMS.API.ForPartner.DL.Service
                         return new HandleState((object)message);
                     }
                 }
+
+                var invoiceDebit = debitCharges.Count > 0 ? ModelInvoiceDebit(model, partner, debitCharges, _currentUser, surchargesLookupId) : null;
+                var invoicesObh = obhCharges.Count > 0 ? ModelInvoicesObh(model, partner, obhCharges, _currentUser, surchargesLookupId) : null;
                 
-                var invoiceDebit = debitCharges.Count > 0 ? ModelInvoiceDebit(model, partner, debitCharges, _currentUser) : null;
-                var invoicesObh = obhCharges.Count > 0 ? ModelInvoicesObh(model, partner, obhCharges, _currentUser) : null;
+                var debitChargesUpdate = new List<CsShipmentSurcharge>();
+                var obhChargesUpdate = new List<CsShipmentSurcharge>();
+                
+                if (invoiceDebit != null)
+                {
+                    decimal _totalAmountInvoiceDebit = 0;
+                    foreach (var debitCharge in debitCharges)
+                    {
+                        CsShipmentSurcharge surchargeDebit = surchargesLookupId[debitCharge.ChargeId].FirstOrDefault();
+                        surchargeDebit.AcctManagementId = invoiceDebit.Id;
+                        surchargeDebit.InvoiceNo = invoiceDebit.InvoiceNoReal;
+                        surchargeDebit.InvoiceDate = invoiceDebit.Date;
+                        surchargeDebit.VoucherId = invoiceDebit.VoucherId;
+                        surchargeDebit.VoucherIddate = invoiceDebit.Date;
+                        surchargeDebit.SeriesNo = invoiceDebit.Serie;
+
+                        if (surchargeDebit.FinalExchangeRate != debitCharge.ExchangeRate)
+                        {
+                            surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency);
+
+                            #region -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeDebit);
+                            surchargeDebit.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            surchargeDebit.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            surchargeDebit.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            surchargeDebit.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            surchargeDebit.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            surchargeDebit.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                            #endregion -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                        }
+
+                        surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
+                        surchargeDebit.DatetimeModified = DateTime.Now;
+                        surchargeDebit.UserModified = _currentUser.UserID;
+
+                        debitChargesUpdate.Add(surchargeDebit);
+
+                        _totalAmountInvoiceDebit += currencyExchangeService.ConvertAmountChargeToAmountObj(surchargeDebit, invoiceDebit.Currency);
+                    }
+
+                    invoiceDebit.TotalAmount = invoiceDebit.UnpaidAmount = _totalAmountInvoiceDebit;
+                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                    invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+                }
+
+                if (invoicesObh != null)
+                {
+                    foreach (var invoiceObh in invoicesObh)
+                    {
+                        decimal _totalAmountInvoiceObh = 0;
+                        //Cập nhật số RefNo cho phí OBH
+                        var _obhCharges = obhCharges.Where(x => x.ReferenceNo == invoiceObh.ReferenceNo);
+                        foreach (var obhCharge in _obhCharges)
+                        {
+                            CsShipmentSurcharge surchargeObh = surchargesLookupId[obhCharge.ChargeId].FirstOrDefault();
+                            surchargeObh.AcctManagementId = invoiceObh.Id;
+                            surchargeObh.InvoiceNo = null; //CR: 07/12/2020
+                            surchargeObh.InvoiceDate = null; //CR: 07/12/2020
+                            surchargeObh.VoucherId = invoiceObh.VoucherId;
+                            surchargeObh.VoucherIddate = invoiceObh.Date;
+                            surchargeObh.SeriesNo = null; //CR: 07/12/2020
+                            surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
+
+                            if (surchargeObh.FinalExchangeRate != obhCharge.ExchangeRate)
+                            {
+                                #region -- Tính lại giá trị các field dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeObh);
+                                surchargeObh.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                surchargeObh.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                surchargeObh.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                surchargeObh.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                surchargeObh.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                surchargeObh.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                                #endregion -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                            }
+
+                            surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
+                            surchargeObh.DatetimeModified = DateTime.Now;
+                            surchargeObh.UserModified = _currentUser.UserID;
+
+                            obhChargesUpdate.Add(surchargeObh);
+
+                            _totalAmountInvoiceObh += currencyExchangeService.ConvertAmountChargeToAmountObj(surchargeObh, invoiceDebit.Currency);
+                        }
+
+                        invoiceObh.TotalAmount = invoiceObh.UnpaidAmount = _totalAmountInvoiceObh;
+                        var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                        invoiceObh.ServiceType = string.Join(";", _transactionTypes);
+                    }
+                }
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -213,31 +305,9 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             if (invoiceDebit != null)
                             {
-                                foreach (var debitCharge in debitCharges)
+                                foreach (var debitCharge in debitChargesUpdate)
                                 {
-                                    CsShipmentSurcharge surchargeDebit = surchargeRepo.Get(x => x.Id == debitCharge.ChargeId).FirstOrDefault();
-                                    surchargeDebit.AcctManagementId = invoiceDebit.Id;
-                                    surchargeDebit.InvoiceNo = invoiceDebit.InvoiceNoReal;
-                                    surchargeDebit.InvoiceDate = invoiceDebit.Date;
-                                    surchargeDebit.VoucherId = invoiceDebit.VoucherId;
-                                    surchargeDebit.VoucherIddate = invoiceDebit.Date;
-                                    surchargeDebit.SeriesNo = invoiceDebit.Serie;
-                                    surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency); //debitCharge.ExchangeRate;
-
-                                    #region -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeDebit);
-                                    surchargeDebit.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                                    surchargeDebit.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                                    surchargeDebit.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                                    surchargeDebit.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                                    surchargeDebit.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                                    surchargeDebit.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                                    #endregion -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-
-                                    surchargeDebit.ReferenceNo = debitCharge.ReferenceNo;
-                                    surchargeDebit.DatetimeModified = DateTime.Now;
-                                    surchargeDebit.UserModified = _currentUser.UserID;
-                                    var updateSurchargeDebit = surchargeRepo.Update(surchargeDebit, x => x.Id == surchargeDebit.Id, false);
+                                    var updateSurchargeDebit = surchargeRepo.Update(debitCharge, x => x.Id == debitCharge.Id, false);
                                 }
                             }
                         }
@@ -246,36 +316,9 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             if (invoicesObh != null)
                             {
-                                foreach (var invoiceObh in invoicesObh)
+                                foreach (var obhCharge in obhChargesUpdate)
                                 {
-                                    //Cập nhật số RefNo cho phí OBH
-                                    var _obhCharges = obhCharges.Where(x => x.ReferenceNo == invoiceObh.ReferenceNo);
-                                    foreach (var obhCharge in _obhCharges)
-                                    {
-                                        CsShipmentSurcharge surchargeObh = surchargeRepo.Get(x => x.Id == obhCharge.ChargeId).FirstOrDefault();
-                                        surchargeObh.AcctManagementId = invoiceObh.Id;
-                                        surchargeObh.InvoiceNo = null; //CR: 07/12/2020
-                                        surchargeObh.InvoiceDate = null; //CR: 07/12/2020
-                                        surchargeObh.VoucherId = invoiceObh.VoucherId;
-                                        surchargeObh.VoucherIddate = invoiceObh.Date;
-                                        surchargeObh.SeriesNo = null; //CR: 07/12/2020
-                                        surchargeObh.FinalExchangeRate = obhCharge.ExchangeRate; //Lấy exchangeRate từ Bravo trả về
-
-                                        #region -- Tính lại giá trị các field dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeObh);
-                                        surchargeObh.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                                        surchargeObh.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                                        surchargeObh.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                                        surchargeObh.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                                        surchargeObh.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                                        surchargeObh.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                                        #endregion -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-
-                                        surchargeObh.ReferenceNo = obhCharge.ReferenceNo;
-                                        surchargeObh.DatetimeModified = DateTime.Now;
-                                        surchargeObh.UserModified = _currentUser.UserID;
-                                        var updateSurchargeObh = surchargeRepo.Update(surchargeObh, x => x.Id == surchargeObh.Id, false);
-                                    }
+                                    var updateSurchargeObh = surchargeRepo.Update(obhCharge, x => x.Id == obhCharge.Id, false);
                                 }
                             }
                         }
@@ -283,13 +326,15 @@ namespace eFMS.API.ForPartner.DL.Service
                         var smSurcharge = surchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
-
+                        
                         if (!hsDebit.Success)
                         {
+                            WriteLogInsertInvoiceFail(invoiceDebit, invoicesObh, debitCharges, obhCharges, hsDebit.Message.ToString());
                             return hsDebit;
                         }
                         if (!hsObh.Success)
                         {
+                            WriteLogInsertInvoiceFail(invoiceDebit, invoicesObh, debitCharges, obhCharges, hsObh.Message.ToString());
                             return hsObh;
                         }
                         return hsDebit;
@@ -297,14 +342,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     catch (Exception ex)
                     {
                         trans.Rollback();
-                        string logErr = string.Format("Lỗi InsertInvoice {0} \n Message: {1} \n invoiceDebit: {2} \n debitCharges: {3} \n obhCharges: {4}", 
-                            currentUser.UserID, 
-                            ex.ToString(),
-                            JsonConvert.SerializeObject(invoiceDebit),
-                            JsonConvert.SerializeObject(invoicesObh),
-                            JsonConvert.SerializeObject(debitCharges),
-                            JsonConvert.SerializeObject(obhCharges));
-                        new LogHelper("InsertInvoice", logErr);
+                        WriteLogInsertInvoiceFail(invoiceDebit, invoicesObh, debitCharges, obhCharges, ex.ToString());
                         return new HandleState((object)ex.Message);
                     }
                     finally
@@ -319,6 +357,18 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
+        private void WriteLogInsertInvoiceFail(AccAccountingManagement invoiceDebit, List<AccAccountingManagement> invoicesObh, List<ChargeInvoice> debitCharges, List<ChargeInvoice> obhCharges, string message)
+        {
+            string logErr = string.Format("Lỗi InsertInvoice by {0} \n Message: {1} \n invoiceDebit: {2} \n invoicesObh: {3} \n debitCharges: {4} \n obhCharges: {5}",
+                            currentUser.UserID,
+                            message,
+                            JsonConvert.SerializeObject(invoiceDebit),
+                            JsonConvert.SerializeObject(invoicesObh),
+                            JsonConvert.SerializeObject(debitCharges),
+                            JsonConvert.SerializeObject(obhCharges));
+            new LogHelper("InsertInvoice_Fail", logErr);
+        }
+
         /// <summary>
         /// Get model Invoice Debit
         /// </summary>
@@ -327,9 +377,10 @@ namespace eFMS.API.ForPartner.DL.Service
         /// <param name="debitCharges"></param>
         /// <param name="_currentUser"></param>
         /// <returns></returns>
-        private AccAccountingManagement ModelInvoiceDebit(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> debitCharges, ICurrentUser _currentUser)
+        private AccAccountingManagement ModelInvoiceDebit(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> debitCharges, ICurrentUser _currentUser, ILookup<Guid, CsShipmentSurcharge> surchargeLookupId)
         {
             var debitChargeFirst = debitCharges[0];
+
             AccAccountingManagement invoice = new AccAccountingManagement();
             invoice.Id = Guid.NewGuid();
             invoice.PartnerId = partner?.Id;
@@ -342,13 +393,13 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.VoucherId = GenerateVoucherId(invoice.Type, string.Empty); //Auto Gen VoucherId
             invoice.ReferenceNo = debitChargeFirst?.ReferenceNo; //Cập nhật Reference No cho Invoice
             invoice.Currency = debitChargeFirst?.Currency ?? model.Currency; //Currency of Invoice
-            invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(debitCharges, invoice.Currency); // Calculator Total Amount
+            invoice.TotalAmount = invoice.UnpaidAmount = 0; //TÍNH TOÁN BÊN NGOÀI
             invoice.UserCreated = invoice.UserModified = _currentUser.UserID;
             invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
             invoice.GroupId = _currentUser.GroupId;
             invoice.DepartmentId = _currentUser.DepartmentId;
 
-            var firstCharge = surchargeRepo.Get(x => x.Id == debitChargeFirst.ChargeId).Select(s => new { s.OfficeId, s.CompanyId }).FirstOrDefault();
+            var firstCharge = surchargeLookupId[debitChargeFirst.ChargeId].FirstOrDefault();
             invoice.OfficeId = firstCharge?.OfficeId ?? Guid.Empty; //Lấy OfficeId của first charge
             invoice.CompanyId = firstCharge?.CompanyId ?? Guid.Empty; //Lấy CompanyId của first charge
 
@@ -356,8 +407,8 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
             invoice.AccountNo = !string.IsNullOrEmpty(debitChargeFirst.AccountNo) ? debitChargeFirst.AccountNo : SetAccountNoForInvoice(partner?.PartnerMode, model.Currency);
             invoice.Description = model.Description;
-            var _serviceTypeCharge = surchargeRepo.Get(x => debitCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
-            invoice.ServiceType = string.Format(";", _serviceTypeCharge);
+            invoice.ServiceType = string.Empty; //TÍNH TOÁN BÊN NGOÀI
+
             return invoice;
         }
 
@@ -369,10 +420,11 @@ namespace eFMS.API.ForPartner.DL.Service
         /// <param name="obhCharges"></param>
         /// <param name="_currentUser"></param>
         /// <returns></returns>
-        private List<AccAccountingManagement> ModelInvoicesObh(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> obhCharges, ICurrentUser _currentUser)
+        private List<AccAccountingManagement> ModelInvoicesObh(InvoiceCreateInfo model, CatPartner partner, List<ChargeInvoice> obhCharges, ICurrentUser _currentUser, ILookup<Guid, CsShipmentSurcharge> surchargeLookupId)
         {
             List<AccAccountingManagement> invoices = new List<AccAccountingManagement>();
             var grpObhCharges = obhCharges.GroupBy(x => x.ReferenceNo).Select(se => new { ReferenceNo = se.Key, Charges = se.ToList() });
+            
             foreach (var grpObhCharge in grpObhCharges)
             {
                 var _obhCharges = grpObhCharge.Charges;
@@ -389,13 +441,13 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.VoucherId = grpObhCharge?.ReferenceNo; //Lấy số referenceNo
                 invoice.ReferenceNo = grpObhCharge?.ReferenceNo; //Cập nhật Reference No cho Invoice
                 invoice.Currency = obhChargeFirst?.Currency ?? model.Currency; //Currency of Invoice
-                invoice.TotalAmount = invoice.UnpaidAmount = CalculatorTotalAmount(_obhCharges, invoice.Currency); // Calculator Total Amount
+                invoice.TotalAmount = invoice.UnpaidAmount = 0; //TÍNH TOÁN BÊN NGOÀI
                 invoice.UserCreated = invoice.UserModified = _currentUser.UserID;
                 invoice.DatetimeCreated = invoice.DatetimeModified = DateTime.Now;
                 invoice.GroupId = _currentUser.GroupId;
                 invoice.DepartmentId = _currentUser.DepartmentId;
 
-                var firstCharge = surchargeRepo.Get(x => x.Id == obhChargeFirst.ChargeId).Select(s => new { s.OfficeId, s.CompanyId }).FirstOrDefault();
+                var firstCharge = surchargeLookupId[obhChargeFirst.ChargeId].FirstOrDefault();
                 invoice.OfficeId = firstCharge?.OfficeId ?? Guid.Empty; //Lấy OfficeId của first charge
                 invoice.CompanyId = firstCharge?.CompanyId ?? Guid.Empty; //Lấy CompanyId của first charge
 
@@ -403,8 +455,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.PaymentMethod = ForPartnerConstants.PAYMENT_METHOD_BANK_OR_CASH; //Set default "Bank Transfer / Cash"
                 invoice.AccountNo = obhChargeFirst.AccountNo;
                 invoice.Description = model.Description;
-                var _serviceTypeCharge = surchargeRepo.Get(x => _obhCharges.Select(se => se.ChargeId).Contains(x.Id)).Select(s => s.TransactionType).Distinct().ToList();
-                invoice.ServiceType = string.Format(";", _serviceTypeCharge);
+                invoice.ServiceType = string.Empty; //TÍNH TOÁN BÊN NGOÀI
 
                 invoices.Add(invoice);
             }
@@ -523,12 +574,13 @@ namespace eFMS.API.ForPartner.DL.Service
         /// </summary>
         /// <param name="charges"></param>
         /// <returns></returns>
-        private string GetChargeNotExistsInSurcharge(List<ChargeInvoice> charges)
+        private string GetChargeNotExistsInSurcharge(List<ChargeInvoice> charges, ILookup<Guid, CsShipmentSurcharge> surchargeLookupId)
         {
             string message = string.Empty;
+            //var surchargeLookupId = surchargeRepo.Get().ToLookup(x => x.Id);
             foreach (var charge in charges)
             {
-                var surcharge = surchargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                var surcharge = surchargeLookupId[charge.ChargeId].FirstOrDefault();
                 if (surcharge == null)
                 {
                     message += (!string.IsNullOrEmpty(message) ? ", " : string.Empty) + charge.ChargeId.ToString();
@@ -542,12 +594,13 @@ namespace eFMS.API.ForPartner.DL.Service
         /// </summary>
         /// <param name="charges"></param>
         /// <returns></returns>
-        private string GetChargeNotMatchCurrencyInSurcharge(List<ChargeInvoice> charges)
+        private string GetChargeNotMatchCurrencyInSurcharge(List<ChargeInvoice> charges, ILookup<Guid, CsShipmentSurcharge> surchargeLookupId)
         {
             string message = string.Empty;
+            //var surchargeLookupId = surchargeRepo.Get().ToLookup(x => x.Id);
             foreach (var charge in charges)
             {
-                var surcharge = surchargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                var surcharge = surchargeLookupId[charge.ChargeId].FirstOrDefault();
                 if (surcharge != null)
                 {
                     if (surcharge.CurrencyId != charge.Currency)
@@ -662,11 +715,12 @@ namespace eFMS.API.ForPartner.DL.Service
         {
             decimal? total = 0;
             int _roundDecimal = currencyInvoice == ForPartnerConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
+            var surchargesLookupId = surchargeRepo.Get().ToLookup(x => x.Id);
             if (!string.IsNullOrEmpty(currencyInvoice))
             {
                 charges.ForEach(fe =>
                 {
-                    var surcharge = surchargeRepo.Get(x => x.Id == fe.ChargeId).FirstOrDefault();
+                    var surcharge = surchargesLookupId[fe.ChargeId].FirstOrDefault();
                     if (surcharge != null)
                     {
                         //Tỷ giá của Currency Charge so với Local
@@ -726,11 +780,13 @@ namespace eFMS.API.ForPartner.DL.Service
         {
             if (currencyFrom == currencyTo) return exchangeRateNew;
 
-            var currencyExchanges = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == exchangeDate.Value.Date).ToList();
+            var currencyExcLookup = currencyExchangeRepo.Get().ToLookup(x => x.DatetimeCreated.Value.Date);
+
+            var currencyExchanges = currencyExcLookup[exchangeDate.Value.Date].ToList();
             if (currencyExchanges.Count == 0)
             {
                 DateTime? maxDateCreated = currencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-                currencyExchanges = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                currencyExchanges = currencyExcLookup[maxDateCreated.Value.Date].ToList();
             }
             var exchangeFrom = currencyFrom != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyFrom).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyFrom so với VND
             var exchangeTo = currencyTo != ForPartnerConstants.CURRENCY_LOCAL ? currencyExchanges.Where(x => x.CurrencyFromId == currencyTo).FirstOrDefault()?.Rate : 1; //Lấy tỉ giá currencyTo so với VND
