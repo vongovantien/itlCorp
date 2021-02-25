@@ -5,6 +5,8 @@ export * from './operation/stage';
 export * from './operation/surcharge';
 export * from './operation/custom-declaration';
 export * from './operation/shipment';
+export * from './operation/advanceSettlement';
+
 export * from './catalogue/partner.model';
 export * from './catalogue/catCurrency.model';
 export * from './catalogue/catUnit.model';
