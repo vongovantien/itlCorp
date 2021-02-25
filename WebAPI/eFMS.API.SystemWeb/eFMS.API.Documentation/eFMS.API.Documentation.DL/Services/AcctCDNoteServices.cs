@@ -389,6 +389,7 @@ namespace eFMS.API.Documentation.DL.Services
                             var hsOt = opstransRepository.SubmitChanges();
                             var hsCt = cstransRepository.SubmitChanges();
                         }
+                        trans.Commit();
                     }
                     catch (Exception ex)
                     {
@@ -565,7 +566,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                         var hsSurSc = surchargeRepository.SubmitChanges();
                         var hsOtSc = opstransRepository.SubmitChanges();
-                        var hsCtSc = cstransRepository.SubmitChanges();                       
+                        var hsCtSc = cstransRepository.SubmitChanges();
+
+                        trans.Commit();
                     }
                     catch (Exception ex)
                     {
