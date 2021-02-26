@@ -2173,7 +2173,8 @@ namespace eFMS.API.Documentation.DL.Services
                                   CreditNo = sur.CreditNo,
                                   FinalExchangeRate = sur.FinalExchangeRate,
                                   ClearanceNo = sur.ClearanceNo,
-                                  CustomerId = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId
+                                  CustomerId = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
+                                  PayerId = sur.PayerId
                               });
             foreach (var charge in DataCharge)
             {
@@ -2181,7 +2182,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
-                var partnerId = criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
+                var partnerId = charge.PayerId != null && criteria.CustomerId != null && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
                 data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(charge.JobId); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
                 decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                 var _taxInvNoRevenue = string.Empty;
@@ -2282,9 +2283,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FinalExchangeRate = charge.FinalExchangeRate;
                 data.Mbl = charge.Mblno;
                 data.Hbl = charge.Hblno;
-                data.PartnerCode = detailLookupPartner[partnerId].FirstOrDefault()?.AccountNo;
-                data.PartnerName = detailLookupPartner[partnerId].FirstOrDefault()?.PartnerNameEn;
-                data.PartnerTaxCode = detailLookupPartner[partnerId].FirstOrDefault()?.TaxCode;
+                data.PartnerCode = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.AccountNo;
+                data.PartnerName = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.PartnerNameEn;
+                data.PartnerTaxCode = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.TaxCode;
                 data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                 dataList.Add(data);
@@ -2685,7 +2686,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
-                var partnerId = charge.PayerId != null && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
+                var partnerId = charge.PayerId != null && criteria.CustomerId != null && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
                 decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;
@@ -2785,9 +2786,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FinalExchangeRate = charge.FinalExchangeRate;
                 data.Mbl = charge.Mblno;
                 data.Hbl = charge.Hblno;
-                data.PartnerCode = detailLookupPartner[partnerId].FirstOrDefault()?.AccountNo;
-                data.PartnerName = detailLookupPartner[partnerId].FirstOrDefault()?.PartnerNameEn;
-                data.PartnerTaxCode = detailLookupPartner[partnerId].FirstOrDefault()?.TaxCode;
+                data.PartnerCode = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.AccountNo;
+                data.PartnerName = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.PartnerNameEn;
+                data.PartnerTaxCode = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.TaxCode;
                 data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                 dataList.Add(data);
