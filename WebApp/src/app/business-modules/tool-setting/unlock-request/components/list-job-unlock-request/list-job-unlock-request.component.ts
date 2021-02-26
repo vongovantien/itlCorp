@@ -47,12 +47,18 @@ export class UnlockRequestListJobComponent extends AppList implements OnInit {
 
     onAddDetail(jobs: SetUnlockRequestJobModel[]) {
         console.log(jobs);
+        if (!this.dataJobs.length) {
+            this.dataJobs = [...jobs];
+            return;
+        }
         if (!this.detectDuplicateCharge([...this.dataJobs, ...jobs])) {
             this.dataJobs = [...this.dataJobs, ...jobs];
             this.inputSearchSettlementAdvancePopup.hide();
             this.inputSearchJobPopup.hide();
         } else {
-            this._toastService.warning("Job/Advance/Settlement has existed in list");
+            const jobArray = [...this.dataJobs, ...jobs].map(m => m.job);
+            const jobDuplicate = this.utility.findDuplicates(jobArray);
+            this._toastService.warning("Job/Advance/Settlement " + jobDuplicate.toString() + " has existed in list");
             return;
         }
     }
