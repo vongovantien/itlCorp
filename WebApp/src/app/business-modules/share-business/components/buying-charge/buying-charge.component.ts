@@ -751,7 +751,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
         const listChargeToDectect = this.charges.filter(c => !this.checkSpecialCaseCharge(c));
         const chargeInvoiceGrps = listChargeToDectect.map(c => {
-            if (!!c.invoiceNo && c.notes) return c.chargeId + c.invoiceNo + c.notes;
+            if (!!c.invoiceNo) {
+                if (!!c.notes) {
+                    return c.chargeId + c.invoiceNo + c.notes;
+                }
+                return c.chargeId + c.invoiceNo;
+            }
             return null;
         }).filter(x => Boolean(x));
 
@@ -760,13 +765,18 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         if (isDuplicate) {
             valid = false;
             const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeInvoiceGrps))];
+            let isDup: boolean = false;
+
             this.charges.filter(c => !this.checkSpecialCaseCharge(c)).forEach((c: CsShipmentSurcharge) => {
-                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo + c.notes)) {
-                    c.duplicateCharge = true;
-                    c.duplicateInvoice = true;
+                if (!!c.notes) {
+                    isDup = arrayDuplicates.includes(c.chargeId + c.invoiceNo + c.notes);
                 } else {
-                    c.duplicateCharge = false;
-                    c.duplicateInvoice = false;
+                    isDup = arrayDuplicates.includes(c.chargeId + c.invoiceNo);
+                }
+                if (isDup) {
+                    [c.duplicateCharge, c.duplicateInvoice] = [true, true];
+                } else {
+                    [c.duplicateCharge, c.duplicateInvoice] = [false, false];
                 }
             });
         } else valid = true;
