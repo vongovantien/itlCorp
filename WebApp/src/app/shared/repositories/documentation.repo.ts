@@ -646,6 +646,15 @@ export class DocumentationRepo {
         );
     }
 
+    previewASCdNoteList(data: any[], currency: string, serviceType: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewASCdNoteList`, data, { currency: currency, service: serviceType }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     getShipmentDemensionDetail(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetByMasterBill`, { mblId: jobId }).pipe(
             map((data: any) => data)
