@@ -2466,7 +2466,9 @@ namespace eFMS.API.Accounting.DL.Services
                     FinalExchangeRate = sur.FinalExchangeRate,
                     PIC = null,
                     IsSynced = _isSynced,
-                    NetAmount = sur.NetAmount
+                    NetAmount = sur.NetAmount,
+                    AmountVND = sur.AmountVnd,
+                    AmountUSD = sur.AmountUsd
                 };
                 result.Add(chg);
             }
@@ -2530,27 +2532,16 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var it in item.Charges)
                 {
                     // VAT amount
-                    decimal? percent = 0;
                     if (it.VATRate > 0)
                     {
-                        percent = it.VATRate / 100;
-                        it.VATAmount = percent * (it.UnitPrice * it.Quantity);
-                        if (it.Currency != AccountingConstants.CURRENCY_LOCAL)
-                        {
-                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 2);
-
-                        }
-                        else
-                        {
-                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0);
-                        }
+                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATAmountLocal ?? 0) : NumberHelper.RoundNumber(it.VATAmountUSD ?? 0, 2));
                     }
                     else
                     {
                         it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
                     }
                     // Net amount
-                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.NetAmount ?? 0) : NumberHelper.RoundNumber(it.NetAmount ?? 0, 2));
+                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.AmountVND ?? 0) : NumberHelper.RoundNumber(it.AmountUSD ?? 0, 2));
                 }
             }
 
