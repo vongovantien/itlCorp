@@ -2144,7 +2144,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!dataShipment.Any()) return dataList.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
-            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId : true);
+            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId.Contains(x.PaymentObjectId) || criteria.CustomerId.Contains(x.PayerId) : true);
             var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
