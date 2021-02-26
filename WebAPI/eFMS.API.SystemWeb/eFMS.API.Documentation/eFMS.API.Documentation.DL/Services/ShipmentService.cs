@@ -1089,7 +1089,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         // bổ sung total custom sell
-                        if(chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
+                        if (chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1535,7 +1535,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalCustomBuy = _totalBuyCustom;
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
-                
+
                 #endregion -- Phí Buying trước thuế --
 
                 #region -- Phí OBH sau thuế --
@@ -1576,7 +1576,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Cont40 = !string.IsNullOrEmpty(item.ContainerDescription) ? Regex.Matches(item.ContainerDescription, "40´HC").Count > 0 ? Regex.Matches(item.ContainerDescription, "40´HC").Count : Regex.Matches(item.ContainerDescription, "40").Count : 0;
                 data.Cont40HC = !string.IsNullOrEmpty(item.ContainerDescription) ? Regex.Matches(item.ContainerDescription, "40´HC").Count : 0;
                 data.Cont45 = !string.IsNullOrEmpty(item.ContainerDescription) ? Regex.Matches(item.ContainerDescription, "45").Count : 0;
-                data.QTy = item.SumContainers != null ?  item.SumContainers.ToString() : string.Empty;
+                data.QTy = item.SumContainers != null ? item.SumContainers.ToString() : string.Empty;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -2144,7 +2144,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!dataShipment.Any()) return dataList.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
-            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId.Contains(x.PaymentObjectId) || criteria.CustomerId.Contains(x.PayerId) : true);
+            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? (!string.IsNullOrEmpty(x.PaymentObjectId) && criteria.CustomerId.Contains(x.PaymentObjectId) || !string.IsNullOrEmpty(x.PayerId) && criteria.CustomerId.Contains(x.PayerId)) : true);
             var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
@@ -2182,7 +2182,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
-                var partnerId = charge.PayerId != null && criteria.CustomerId != null && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
+                var partnerId = !string.IsNullOrEmpty(charge.PayerId) && !string.IsNullOrEmpty(criteria.CustomerId) && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
                 data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(charge.JobId); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
                 decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                 var _taxInvNoRevenue = string.Empty;
@@ -2646,47 +2646,45 @@ namespace eFMS.API.Documentation.DL.Services
             if (!dataShipment.Any()) return dataShipment.AsQueryable();
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
-            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId.Contains(x.PaymentObjectId) || criteria.CustomerId.Contains (x.PayerId) : true);
+            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? ((!string.IsNullOrEmpty(x.PaymentObjectId) && criteria.CustomerId.Contains(x.PaymentObjectId)) || (!string.IsNullOrEmpty(x.PayerId) && criteria.CustomerId.Contains(x.PayerId))) : true);
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
             var DataCharge = (from d in dataShipment
-                         join sur in lstSurchage on d.Hblid equals sur.Hblid
-                         select new DataSurchargeResult
-                         {
-                             JobId = d.JobId,
-                             ServiceDate = d.ServiceDate,
-                             Hblid = sur.Hblid,
-                             InvoiceNo = sur.InvoiceNo,
-                             DebitNo = sur.DebitNo,
-                             AmountUsd = sur.AmountUsd,
-                             AmountVnd = sur.AmountVnd,
-                             VatAmountUsd = sur.VatAmountUsd,
-                             VatAmountVnd = sur.VatAmountVnd,
-                             VoucherId = sur.VoucherId,
-                             Type = sur.Type,
-                             KickBack = sur.KickBack,
-                             CurrencyId = sur.CurrencyId,
-                             ExchangeDate = sur.ExchangeDate,
-                             Mblno = d.Mbl,
-                             Hblno = d.Hbl,
-                             ChargeId = sur.ChargeId,
-                             Service = d.Service,
-                             PaymentObjectId = sur.PaymentObjectId,
-                             CreditNo = sur.CreditNo,
-                             FinalExchangeRate = sur.FinalExchangeRate,
-                             CustomerId = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
-                             PayerId = sur.PayerId
-                             
-
-                         });
+                              join sur in lstSurchage on d.Hblid equals sur.Hblid
+                              select new DataSurchargeResult
+                              {
+                                  JobId = d.JobId,
+                                  ServiceDate = d.ServiceDate,
+                                  Hblid = sur.Hblid,
+                                  InvoiceNo = sur.InvoiceNo,
+                                  DebitNo = sur.DebitNo,
+                                  AmountUsd = sur.AmountUsd,
+                                  AmountVnd = sur.AmountVnd,
+                                  VatAmountUsd = sur.VatAmountUsd,
+                                  VatAmountVnd = sur.VatAmountVnd,
+                                  VoucherId = sur.VoucherId,
+                                  Type = sur.Type,
+                                  KickBack = sur.KickBack,
+                                  CurrencyId = sur.CurrencyId,
+                                  ExchangeDate = sur.ExchangeDate,
+                                  Mblno = d.Mbl,
+                                  Hblno = d.Hbl,
+                                  ChargeId = sur.ChargeId,
+                                  Service = d.Service,
+                                  PaymentObjectId = sur.PaymentObjectId,
+                                  CreditNo = sur.CreditNo,
+                                  FinalExchangeRate = sur.FinalExchangeRate,
+                                  CustomerId = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
+                                  PayerId = sur.PayerId
+                              });
             foreach (var charge in DataCharge)
             {
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
-                var partnerId = charge.PayerId != null && criteria.CustomerId != null && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
+                var partnerId = !string.IsNullOrEmpty(charge.PayerId) && !string.IsNullOrEmpty(criteria.CustomerId) && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
                 decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;
