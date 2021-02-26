@@ -223,7 +223,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity) ?? 0, _roundDecimal);
                 if (surcharge.Vatrate != null)
                 {
-                    var vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
+                    var vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((_netAmount * surcharge.Vatrate) ?? 0) / 100;
                     _vatAmount = NumberHelper.RoundNumber(vatAmount, _roundDecimal);
                 }
             }
@@ -233,8 +233,8 @@ namespace eFMS.API.ForPartner.DL.Service
                 _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * exchangeRate) ?? 0, _roundDecimal);
                 if (surcharge.Vatrate != null)
                 {
-                    var vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
-                    _vatAmount = NumberHelper.RoundNumber(vatAmount * exchangeRate, _roundDecimal);
+                    var vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((_netAmount * surcharge.Vatrate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount, _roundDecimal);
                 }
             }
             amountResult.NetAmount = _netAmount;
@@ -265,8 +265,8 @@ namespace eFMS.API.ForPartner.DL.Service
                 decimal _vatAmount = 0;
                 if (surcharge.Vatrate != null)
                 {
-                    decimal vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
-                    _vatAmount = NumberHelper.RoundNumber(vatAmount * _exchangeRate, 2);
+                    decimal vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((_netAmount * surcharge.Vatrate) ?? 0) / 100;
+                    _vatAmount = NumberHelper.RoundNumber(vatAmount, 2);
                 }
                 _totalAmount = _netAmount + _vatAmount;
             }
