@@ -2181,7 +2181,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
-                var partnerId = criteria.CustomerId == charge.PayerId ? charge.PayerId : charge.PaymentObjectId;
+                var partnerId = criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
                 data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(charge.JobId); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
                 decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                 var _taxInvNoRevenue = string.Empty;
@@ -2685,7 +2685,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobId;
                 data.Hblid = charge.Hblid;
-                var partnerId = criteria.CustomerId == charge.PayerId ? charge.PayerId : charge.PaymentObjectId;
+                var partnerId = charge.PayerId != null && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
                 decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;

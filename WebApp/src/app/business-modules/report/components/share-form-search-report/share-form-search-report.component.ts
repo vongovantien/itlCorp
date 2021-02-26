@@ -650,7 +650,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customerActive.length > 0 ? this.customerActive.join(";") : null,
+            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
             currency: this.currency.value, // ---**
             jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
