@@ -1466,6 +1466,8 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OfficeId = currentUser.OfficeID;
                     model.CompanyId = currentUser.CompanyID;
 
+                    model.IsLocked = false; // Luôn luôn mở job khi duplicate.
+                  
                     List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
                     if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                     {
