@@ -54,7 +54,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':   (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.valid)}">
+                            [ngClass]="{'m-form__group has-danger': (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.value)}">
                             <label required>MBL Type</label>
                             <ng-select class="custom" [items]="ladingTypes" formControlName="mbltype"
                                 placeholder="Please Select" [clearable]="false"></ng-select>
@@ -86,7 +86,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.valid)}">
+                            [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.value)}">
                             <label required>Services Type</label>
                             <ng-select class="custom" [items]="serviceTypes" formControlName="typeOfService"
                                 placeholder="Please Select" [clearable]="false"></ng-select>

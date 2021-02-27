@@ -185,9 +185,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             pod: [],
             agent: [],
 
-            mbltype: [], // * select
+            mbltype: [null, Validators.required], // * select
             shipmentType: [this.shipmentTypes[0], Validators.required], // * select
-            typeOfService: [], // * select
+            typeOfService: [null, Validators.required], // * select
             personalIncharge: [],  // * select
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
