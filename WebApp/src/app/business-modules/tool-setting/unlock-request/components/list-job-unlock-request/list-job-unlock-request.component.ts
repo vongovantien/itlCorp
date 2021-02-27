@@ -49,15 +49,33 @@ export class UnlockRequestListJobComponent extends AppList implements OnInit {
         console.log(jobs);
         if (!this.dataJobs.length) {
             this.dataJobs = [...jobs];
+            this.inputSearchSettlementAdvancePopup.hide();
+            this.inputSearchJobPopup.hide();
             return;
         }
-        if (!this.detectDuplicateCharge([...this.dataJobs, ...jobs])) {
-            this.dataJobs = [...this.dataJobs, ...jobs];
+        // if (!this.detectDuplicateCharge([...this.dataJobs, ...jobs])) {
+        //     this.dataJobs = [...this.dataJobs, ...jobs];
+        //     this.inputSearchSettlementAdvancePopup.hide();
+        //     this.inputSearchJobPopup.hide();
+        // } else {
+        //     const jobArray = [...this.dataJobs, ...jobs].map(m => m.job);
+        //     const jobDuplicate = this.utility.findDuplicates(jobArray);
+        //     this._toastService.warning("Job/Advance/Settlement " + jobDuplicate.toString() + " has existed in list");
+        //     return;
+        // }
+        var dataJobsTmp = this.dataJobs;
+        var _dataJobsMerge = [...dataJobsTmp, ...jobs];
+        const jobArray = _dataJobsMerge.map(m => m.job);
+        const jobDuplicate = this.utility.findDuplicates(jobArray).filter((o, i, arr) => arr.findIndex(t => t === o) === i);;
+        console.log(jobDuplicate);
+        console.log(dataJobsTmp);
+        if (!jobDuplicate.length) {
+            this.dataJobs = [...dataJobsTmp, ...jobs];
+            console.log(this.dataJobs);
             this.inputSearchSettlementAdvancePopup.hide();
             this.inputSearchJobPopup.hide();
         } else {
-            const jobArray = [...this.dataJobs, ...jobs].map(m => m.job);
-            const jobDuplicate = this.utility.findDuplicates(jobArray);
+            dataJobsTmp = [];
             this._toastService.warning("Job/Advance/Settlement " + jobDuplicate.toString() + " has existed in list");
             return;
         }
