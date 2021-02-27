@@ -4690,6 +4690,25 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+
+        public bool CheckValidateDeleteSettle(string settlementNo)
+        {
+            bool isValidate = true;
+
+            if(csShipmentSurchargeRepo.Any(x => x.SettlementCode == settlementNo && x.Type == "OBH" && 
+            (!string.IsNullOrEmpty(x.Soano) 
+            || !string.IsNullOrEmpty(x.PaySoano) 
+            || !string.IsNullOrEmpty(x.VoucherId)
+            || !string.IsNullOrEmpty(x.CreditNo)
+            || !string.IsNullOrEmpty(x.DebitNo)
+            )
+            ))
+            {
+                isValidate = false;
+            }
+
+            return isValidate;
+        }
     }
 }
 

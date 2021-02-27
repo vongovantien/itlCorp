@@ -139,5 +139,8 @@
   "MSG_CURRENCY_ACCOUNTING_PAYMENT_EMPTY": "Currency not allow empty",
   "MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_EMPTY": "Payment method not allow empty",
   "MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_INVALID": "Payment method {0} invalid",
-  "MSG_EXCHANGE_RATE_ACCOUNTING_PAYMENT_INVALID": "Exchange rate {0} invalid"
+  "MSG_EXCHANGE_RATE_ACCOUNTING_PAYMENT_INVALID": "Exchange rate {0} invalid",
+
+  // -----------------start Settlement
+  "MSG_SETTLE_NOT_ALLOW_DELETE": "Settlement {0} have OBH charge has issued CDNote/SOA/VOucher"
 }
