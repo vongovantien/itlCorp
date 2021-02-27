@@ -176,6 +176,16 @@ export namespace CommonEnum {
         Guarantee = 2,
         Other = 3,
     }
+
+    export enum ClassColor {
+        PRIMARY = 'primary',
+        SUCCESS = 'success',
+        DANGER = 'danger',
+        INFO = 'info',
+        SECONDARY = 'secondary',
+        MUTED = 'muted',
+        DARK = 'dark',
+    }
 }
 
 

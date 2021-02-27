@@ -2193,7 +2193,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             }
 
-            workSheet.Cells[rowStart, 1, rowStart, 32].Style.Font.Bold = true;
+            workSheet.Cells[rowStart, 1, rowStart, 33].Style.Font.Bold = true;
             workSheet.Cells[rowStart, 1, rowStart, 11].Merge = true;
             workSheet.Cells[rowStart, 1, rowStart, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[rowStart, 1].Value = headers[19];

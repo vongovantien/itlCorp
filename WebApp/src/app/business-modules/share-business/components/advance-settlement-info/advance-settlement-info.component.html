@@ -1,47 +1,79 @@
 <div class="adv-settle-wrapper">
-    <div class="m-portlet m--margin-bottom-20">
-        <div class="m-portlet__body">
-            <div *ngFor="let ads of adSett ">
-                <div class=" row ">
+    <ng-container *ngIf="(adSetInfos | async)?.length;else norecord">
+        <div class="m-portlet m--margin-bottom-20" *ngFor="let data of (adSetInfos | async); let i = index">
+            <div class="m-portlet__body item-wrapper">
+                <div class="row" *ngIf="!!data.advanceNo">
                     <div class="col-lg-8 ">
                         <div class="adv-info ">
                             <div class="title ">
-                                <span>  {{ads.advanceNo}} - {{ads.requester}}</span>
+                                <span> {{data.advanceNo}} - {{data.requesterAdvance}}</span>
                             </div>
                             <div class="description ">
-                                <span class="m--margin-right-20 ">{{ads.advanceDate | date: 'HH:mm dd/MM/yyyy'}}</span> | <span class="text-success m--margin-left-20 ">{{ads.statusApproval}}</span>
+                                <span class="m--margin-right-30 ">
+                                    {{data.advanceDate | date: 'dd/MM/yyyy'}}
+                                </span>
+                                | <span
+                                    class="text-{{data.advanceStatusApproval | classStatusApproval}} m--margin-left-20 ">
+                                    {{data.advanceStatusApproval}}
+                                </span>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-primary ">
-                        <div class="title text-primary "><span>{{ads.advanceAmount}} {{ads.adCurrency}}</span></div>
+                        <div class="title text-primary ">
+                            <span>
+                                {{data.advanceAmount | number: '.0-3'}}
+                                {{data.advanceCurrency}}
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <div class=" row ">
+                <div class=" row " *ngIf="!!data.settlementNo">
                     <div class="col-lg-8 ">
                         <div class="adv-info ">
                             <div class="title ">
-                                <span>  {{ads.settlementNo}} - {{ads.requester}}</span>
+                                <span> {{data.settlementNo}} - {{data.requesterSettle}}</span>
                             </div>
                             <div class="description ">
-                                <span class="m--margin-right-20 ">{{ads.settlemenDate | date: 'HH:mm dd/MM/yyyy'}}</span> | <span class="text-success m--margin-left-20 ">{{ads.settleStatusApproval}}</span>
+                                <span class="m--margin-right-30">
+                                    {{data.settlemenDate | date: 'dd/MM/yyyy'}}</span> |
+                                <span
+                                    class="text-{{data.settleStatusApproval | classStatusApproval}} m--margin-left-20 ">
+                                    {{data.settleStatusApproval}}
+                                </span>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 text-center text-primary ">
-                        <div class="title text-primary "><span>{{ads.settlementAmount}} {{ads.setCurrency}}</span></div>
+                        <div class="title text-primary ">
+                            <span>
+                                {{data.settlementAmount | number: '.0-3'}}
+                                {{data.settlementCurrency}}
+                            </span>
+                        </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-lg-8 "></div>
-                    <div class="col-lg-4 text-center text-primary title ">
-                        <div>{{ads.balance}} {{ads.adCurrency}}</div>
+                    <div class="col-lg-4 text-center text-dark title ">
+                        <div class="balance">
+                            <span class="font-weight-bold font-14">Balance:</span>
+                            &nbsp;
+                            <ng-container *ngIf="data.balance >= 0 ; else negativeBalance">
+                                <span class="text-white"> {{data.balance | negativeNumber | number: '.0-3'}} </span>
+                            </ng-container>
+                            <ng-template #negativeBalance>
+                                <span class="text-white"> ({{data.balance | abs | number: '.0-3'}}) </span>
+                            </ng-template>
+                        </div>
                     </div>
                 </div>
-                <div class="hr"></div>
             </div>
-            <tr app-table-none-record *ngIf="!adSett.length">
-            </tr>
         </div>
-    </div>
+    </ng-container>
 </div>
+
+<ng-template #norecord>
+    <none-record-placeholder></none-record-placeholder>
+</ng-template>

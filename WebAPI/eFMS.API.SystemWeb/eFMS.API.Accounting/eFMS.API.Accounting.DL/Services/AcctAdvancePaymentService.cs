@@ -211,7 +211,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Leader == currentUser.UserID
                   || x.advancePaymentApr.LeaderApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Leader, x.advancePayment.GroupId, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Leader && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Leader && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                 )
                 && x.advancePayment.GroupId == currentUser.GroupId
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
@@ -225,7 +225,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Manager == currentUser.UserID
                   || x.advancePaymentApr.ManagerApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Manager, null, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Manager && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Manager && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                   )
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
                 && x.advancePayment.OfficeId == currentUser.OfficeID
@@ -239,7 +239,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
                   || x.advancePaymentApr.AccountantApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Accountant && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Accountant && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                   || isAccountantDept
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
@@ -252,7 +252,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Buhead == currentUser.UserID
                   || x.advancePaymentApr.BuheadApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Buhead ?? null, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Buhead && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Buhead && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
                 && x.advancePayment.CompanyId == currentUser.CompanyID
