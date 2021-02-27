@@ -19,6 +19,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string SaleManNameVn { get; set; }
         public string ForwardingAgentName { get; set; }
         public string NotifyParty { get; set; }
+        public string POLCode { get; set; }
+        public string PODCode { get; set; }
         public string PODName { get; set; }
         public string POLName { get; set; }
         public string ContainerNames { get; set; }
@@ -32,7 +34,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string TransactionType { get; set; }
         public DateTime? ShipmentEtd { get; set; }
         public string ShipmentMawb { get; set; }
-
+        public string PackageTypeName { get; set; }
 
         public PermissionAllowBase Permission { get; set; }
     }

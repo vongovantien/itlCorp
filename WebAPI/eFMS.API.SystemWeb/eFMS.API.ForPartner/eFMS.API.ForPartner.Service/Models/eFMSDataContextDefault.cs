@@ -510,6 +510,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
@@ -542,6 +544,8 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.SoatoDate)
                     .HasColumnName("SOAToDate")
                     .HasColumnType("datetime");
+
+                entity.Property(e => e.StaffType).HasMaxLength(50);
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
@@ -1021,6 +1025,8 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.Major).HasMaxLength(100);
 
                 entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
+
+                entity.Property(e => e.ObjectResponse).HasColumnType("ntext");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
