@@ -144,7 +144,12 @@ namespace eFMS.API.Accounting.Controllers
             var isAllowDelete = acctSettlementPaymentService.CheckDeletePermissionBySettlementNo(settlementNo);
             if (isAllowDelete == false)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+               return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE,settlementNo].Value });
             }
 
             HandleState hs = acctSettlementPaymentService.DeleteSettlementPayment(settlementNo);

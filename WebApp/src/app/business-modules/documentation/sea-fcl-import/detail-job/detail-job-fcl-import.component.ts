@@ -75,8 +75,10 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
+                    this.isDuplicate = this.ACTION === 'COPY';
                 } else {
                     this.ACTION = null;
+                    this.isDuplicate = false;
                 }
 
                 this.cdr.detectChanges();
@@ -112,6 +114,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     if (this.ACTION === "COPY") {
                         this.formCreateComponent.getUserLogged();
                         this.headerComponent.resetBreadcrumb("Create Job");
+                    } else {
+                        this.headerComponent.resetBreadcrumb("Job Detail");
                     }
                 },
             );
@@ -219,7 +223,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                 break;
             case 'cdNote':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
