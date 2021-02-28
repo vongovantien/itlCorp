@@ -22,14 +22,16 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser = currUser;
         }
 
-        public HandleState AddActionFuncLog(string funcLocal, string objectRequest, string objectResponse, string major)
+        public HandleState AddActionFuncLog(string funcLocal, string objectRequest, string objectResponse, string major, DateTime startDateProgress, DateTime endDateProgress)
         {
             var modelLog = new SysActionFuncLogModel
             {
                 FuncLocal = funcLocal,
                 ObjectRequest = objectRequest,
                 ObjectResponse = objectResponse,
-                Major = major
+                Major = major,
+                StartDateProgress = startDateProgress,
+                EndDateProgress = endDateProgress
             };
             var hsAddLog = AddActionFuncLog(modelLog);
             return hsAddLog;

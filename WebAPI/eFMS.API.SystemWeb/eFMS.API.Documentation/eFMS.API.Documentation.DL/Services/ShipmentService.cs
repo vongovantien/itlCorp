@@ -1108,6 +1108,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
                 data.TotalCustomSell = _totalSellCustom;
+                if(data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
+                {
+                    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
+                }
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
@@ -1239,6 +1243,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
                 data.TotalCustomBuy = _totalBuyCustom;
+                if (data.TotalBuyOthers > 0 && data.TotalCustomBuy > 0)
+                {
+                    data.TotalBuyOthers = data.TotalBuyOthers - data.TotalCustomBuy;
+                }
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
@@ -1402,6 +1410,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
                 data.TotalCustomSell = _totalSellCustom;
+                if (data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
+                {
+                    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
+                }
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
@@ -1533,6 +1545,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
                 data.TotalCustomBuy = _totalBuyCustom;
+                if (data.TotalBuyOthers > 0 && data.TotalCustomBuy > 0)
+                {
+                    data.TotalBuyOthers = data.TotalBuyOthers - data.TotalCustomBuy;
+                }
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
 

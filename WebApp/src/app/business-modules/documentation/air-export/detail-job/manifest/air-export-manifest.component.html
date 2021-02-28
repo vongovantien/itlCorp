@@ -25,12 +25,16 @@
                             </span>
                         </span>
                     </button>
-                    <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
+                    <!-- <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
                         [dataTarget]="saveButtonSetting.dataTarget">
-                    </app-default-button>
+                    </app-default-button> -->
                 </ng-container>
             </ng-container>
-
+            <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
+                <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
+                    [dataTarget]="saveButtonSetting.dataTarget">
+                </app-default-button>
+            </ng-container>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </div>

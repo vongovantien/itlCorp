@@ -34,10 +34,12 @@
                         </span>
                     </span>
                 </button>
-                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="save()"></app-default-button>
             </ng-container>
         </ng-container>
 
+        <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="save()"></app-default-button>
+        </ng-container>
         <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()"></app-default-button>
 
     </div>

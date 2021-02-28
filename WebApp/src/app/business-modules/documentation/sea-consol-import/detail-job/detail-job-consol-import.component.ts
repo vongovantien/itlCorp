@@ -76,8 +76,10 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
+                    this.isDuplicate = this.ACTION === 'COPY';
                 } else {
                     this.ACTION = null;
+                    this.isDuplicate = false;
                 }
 
                 this.cdr.detectChanges();
@@ -113,6 +115,8 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                     if (this.ACTION === "COPY") {
                         this.formCreateComponent.getUserLogged();
                         this.headerComponent.resetBreadcrumb("Create Job");
+                    } else {
+                        this.headerComponent.resetBreadcrumb("Job Detail");
                     }
                 },
             );
@@ -219,7 +223,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                 break;
             case 'cdNote':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
@@ -300,6 +304,8 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
                         this._toastService.success(r.message);
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
                     } else {
                         this._toastService.error(r.message);
                     }
