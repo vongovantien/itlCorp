@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 
@@ -213,7 +215,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("PreviewSIFCdNote")]
         public IActionResult PreviewSIFCdNote(PreviewCdNoteCriteria criteria)
         {
-            var result = cdNoteServices.PreviewSIF(criteria);
+            var data = cdNoteServices.GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
+            var result = cdNoteServices.PreviewSIF(data, criteria.Currency);
             return Ok(result);
         }
 
@@ -226,8 +229,37 @@ namespace eFMS.API.Documentation.Controllers
         [Route("PreviewAirCdNote")]
         public IActionResult PreviewAirCdNote(PreviewCdNoteCriteria criteria)
         {
-            var result = cdNoteServices.PreviewAir(criteria);
+            var data = cdNoteServices.GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
+            var result = cdNoteServices.PreviewAir(data, criteria.Currency);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Preview CD Note (OPS) Combine
+        /// </summary>
+        /// <param name="model">AcctCDNoteDetailsModel List</param>
+        /// <param name="currency"></param>
+        /// <param name="service"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewASCdNoteList")]
+        public IActionResult PreviewASCdNoteList(object model, string currency, string service)
+        {
+            var data = JsonConvert.SerializeObject(model, Formatting.Indented);
+            List<AcctCdnoteModel> acctCdNoteList = JsonConvert.DeserializeObject<List<AcctCdnoteModel>>(data);
+            var jobId = acctCdNoteList.FirstOrDefault() == null ? Guid.Empty : acctCdNoteList.FirstOrDefault().JobId;
+            var cdNoteModel = cdNoteServices.GetCDNoteDetails(jobId, string.Empty, acctCdNoteList);
+            if (service == DocumentConstants.AI_SHIPMENT)
+            {
+                var result = cdNoteServices.PreviewAir(cdNoteModel, currency);
+                return Ok(result);
+            }
+            else
+            {
+                var result = cdNoteServices.PreviewSIF(cdNoteModel, currency);
+                return Ok(result);
+            }
+            
         }
 
         /// <summary>
