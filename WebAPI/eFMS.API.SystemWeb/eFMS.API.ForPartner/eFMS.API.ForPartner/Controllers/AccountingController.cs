@@ -78,6 +78,7 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpPut("UpdateVoucherAdvance")]
         public IActionResult UpdateVoucherAdvance(VoucherAdvance model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
@@ -98,11 +99,13 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hs.Success ? "Cập nhật phiếu chi thành công" : string.Format("{0}. Cập nhật phiếu chi thất bại", hs.Message.ToString());
             var result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
+            var _endDateProgress = DateTime.Now;
+
             #region -- Ghi Log --
             string _funcLocal = "UpdateVoucherAdvance";
             string _objectRequest = JsonConvert.SerializeObject(model);
             string _major = "Cập nhật thông tin Advance (Phiếu chi)";
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
             if (!hs.Success)
@@ -120,6 +123,8 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpPut("RemoveVoucherAdvance")]
         public IActionResult RemoveVoucherAdvance(RemoveVoucherAdvModel model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
+
             if (!ModelState.IsValid) return BadRequest();
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
@@ -139,11 +144,13 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hs.Success ? "Hủy phiếu chi thành công" : string.Format("{0}. Hủy phiếu chi thất bại", hs.Message.ToString());
             var result = new ResultHandle { Status = hs.Success, Message = _message, Data = model.VoucherNo };
 
+            var _endDateProgress = DateTime.Now;
+
             #region -- Ghi Log --
             string _funcLocal = "RemoveVoucherAdvance";
             string _objectRequest = JsonConvert.SerializeObject(model);
             string _major = "Hủy Phiếu Chi";
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
             if (!hs.Success)
@@ -161,6 +168,7 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpPost("CreateInvoiceData")]
         public IActionResult CreateInvoiceData(InvoiceCreateInfo model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
@@ -197,11 +205,13 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hs.Success ? "Tạo mới hóa đơn thành công" : string.Format("{0}. Tạo mới hóa đơn thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
+            var _endDateProgress = DateTime.Now;
+
             #region -- Ghi Log --
             string _funcLocal = "CreateInvoiceData";
             string _objectRequest = JsonConvert.SerializeObject(model);
             string _major = "Tạo Hóa Đơn";
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
             if (!hs.Success)
@@ -219,6 +229,7 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpPut("ReplaceInvoiceData")]
         public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
@@ -260,7 +271,7 @@ namespace eFMS.API.ForPartner.Controllers
             if (!hsDeleteInvoice.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = string.Format("{0}. Xóa hóa đơn cũ thất bại", hsDeleteInvoice.Message.ToString()), Data = model };
-                actionFuncLogService.AddActionFuncLog("DeleteInvoice (ReplaceInvoiceData)", JsonConvert.SerializeObject(model), JsonConvert.SerializeObject(_result), "Xóa Hóa Đơn");
+                actionFuncLogService.AddActionFuncLog("DeleteInvoice (ReplaceInvoiceData)", JsonConvert.SerializeObject(model), JsonConvert.SerializeObject(_result), "Xóa Hóa Đơn", _startDateProgress, DateTime.Now);
                 return BadRequest(_result);
             }
             #endregion --- Delete Invoice Old by PreReferenceNo ---
@@ -286,11 +297,13 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hsInsertInvoice.Success ? "Thay thế hóa đơn thành công" : string.Format("{0}. Thay thế hóa đơn thất bại", hsInsertInvoice.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hsInsertInvoice.Success, Message = _message, Data = model };
 
+            var _endDateProgress = DateTime.Now;
+
             #region -- Ghi Log --
             string _funcLocal = "InsertInvoice (ReplaceInvoiceData)";
             string _objectRequest = JsonConvert.SerializeObject(hsInsertInvoice);
             string _major = "Tạo Hóa Đơn";
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
             if (!hsInsertInvoice.Success)
@@ -308,6 +321,8 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpPut("CancellingInvoice")]
         public IActionResult CancellingInvoice(InvoiceInfo model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
+
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
@@ -322,11 +337,13 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hs.Success ? "Hủy hóa đơn thành công" : string.Format("{0}. Hủy hóa đơn thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
+            var _endDateProgress = DateTime.Now;
+
             #region -- Ghi Log --
             string _funcLocal = "DeleteInvoice (CancellingInvoice)";
             string _objectRequest = JsonConvert.SerializeObject(model);
             string _major = "Xóa Hóa Đơn";
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
             if (!hs.Success)
@@ -344,6 +361,8 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpPut("RejectData")]
         public IActionResult RejectData(RejectData model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
+
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
@@ -358,11 +377,13 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hs.Success ? string.Format("Reject {0} thành công", model.Type?.ToUpper()) : string.Format("{0}. Reject data thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
+            var _endDateProgress = DateTime.Now;
+
             #region -- Ghi Log --
             string _funcLocal = "RejectData";
             string _objectRequest = JsonConvert.SerializeObject(model);
             string _major = string.Format("Reject {0}", model.Type?.ToUpper());
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
             if (!hs.Success)
@@ -380,6 +401,7 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpPut("RemoveVoucher")]
         public IActionResult RemoveVoucher(RejectData model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
@@ -394,11 +416,13 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hs.Success ? "Remove voucher thành công" : string.Format("{0}. Remove voucher thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
+            var _endDateProgress = DateTime.Now;
+
             #region -- Ghi Log --
             string _funcLocal = "RemoveVoucher";
             string _objectRequest = JsonConvert.SerializeObject(model);
             string _major = string.Format("Remove Voucher {0}", model.Type?.ToUpper());
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
             if (!hs.Success)
