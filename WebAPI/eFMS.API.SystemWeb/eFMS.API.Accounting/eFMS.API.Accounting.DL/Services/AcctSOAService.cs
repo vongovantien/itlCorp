@@ -479,6 +479,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.PaySoano = null;
                                 item.UserModified = currentUser.UserID;
                                 item.DatetimeModified = DateTime.Now;
+                                if (item.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                {
+                                    item.PaySyncedFrom = (soaNo == item.PaySoano) ? null : item.PaySyncedFrom;
+                                    item.SyncedFrom = (soaNo == item.Soano) ? null : item.SyncedFrom;
+                                }
+                                else
+                                {
+                                    item.SyncedFrom = null;
+                                }
+
                                 var hsUpdateSOANoSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                             }
                         }
