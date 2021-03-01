@@ -33,15 +33,14 @@
                 <i class="fa fa-lock text-danger fa-3x"></i>
             </span>
 
-            <ng-container *ngIf="(isLocked | async) === false">
-                <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
-                    <app-default-button (click)="onSaveMAWB()" [buttonSetting]="saveButtonSetting">
-                    </app-default-button>
-                </ng-container>
+
+            <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
+                <app-default-button (click)="onSaveMAWB()" [buttonSetting]="saveButtonSetting">
+                </app-default-button>
             </ng-container>
-            <ng-container *ngIf="dataReport">
-                <app-report-preview [data]="dataReport"></app-report-preview>
-            </ng-container>
+
+
+
             <app-default-button (click)="cf.show()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </div>
@@ -491,12 +490,12 @@
                                         <label>Volume</label>
                                         <div class="row align-items-center">
                                             <div class="col-md-4">
-                                                VW: <span
-                                                    class="text-primary text-underline">{{totalHW | number: '.0-2' }}</span>
+                                                VW: <span class="text-primary text-underline">{{totalHW | number: '.0-2'
+                                                    }}</span>
                                             </div>
                                             <div class="col-md-4">
-                                                CBM: <span
-                                                    class="text-primary text-underline">{{totalCbm | number: '.0-2'}}</span>
+                                                CBM: <span class="text-primary text-underline">{{totalCbm | number:
+                                                    '.0-2'}}</span>
                                             </div>
                                             <div class="col-md-4 text-right">
                                                 <app-switch size="sm" [toggle]="formMAWB.controls['showDim'].value"
@@ -626,3 +625,7 @@ Are you sure you want to leave?" (onSubmit)="cf.hide(); back()"></confirm-popup>
 
 <info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB'"></info-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

@@ -84,8 +84,10 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
+                    this.isDuplicate = this.ACTION === 'COPY';
                 } else {
                     this.ACTION = null;
+                    this.isDuplicate = false;
                 }
 
                 this._cd.detectChanges();
@@ -96,8 +98,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 if (isUUID(jobId)) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
-
-                    // this._store.dispatch(new fromShareBussiness.GetDimensionAction(jobId));
 
                     this.getDetailShipment();
                 } else {
@@ -132,6 +132,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         if (this.ACTION === "COPY") {
                             this.formCreateComponent.getUserLogged();
                             this.headerComponent.resetBreadcrumb("Create Job");
+                        } else {
+                            this.headerComponent.resetBreadcrumb("Job Detail");
                         }
                     }
                 },
@@ -234,7 +236,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                 break;
             case 'cdNote':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });

@@ -67,6 +67,8 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? VATAmountLocal { get; set; }
         public decimal? VATAmountUSD { get; set; }
         public decimal? NetAmount { get; set; }
+        public decimal? AmountVND { get; set; }
+        public decimal? AmountUSD { get; set; }
         public string PIC { get; set; }
         public bool IsSynced { get; set; }
     }

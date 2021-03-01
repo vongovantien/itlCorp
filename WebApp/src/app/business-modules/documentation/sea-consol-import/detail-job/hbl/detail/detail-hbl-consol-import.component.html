@@ -44,7 +44,7 @@
                 </ul>
             </div>
             <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"
-                *ngIf="!(isLocked | async) && (permissionHblDetail | async)?.allowUpdate"></app-default-button>
+                *ngIf=" (permissionHblDetail | async)?.allowUpdate"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>

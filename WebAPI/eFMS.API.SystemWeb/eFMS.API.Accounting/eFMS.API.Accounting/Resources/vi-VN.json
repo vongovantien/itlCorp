@@ -135,5 +135,8 @@
   "MSG_CURRENCY_ACCOUNTING_PAYMENT_EMPTY": "Currency không được để trống",
   "MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_EMPTY": "Phương thức thanh toán không được để trống",
   "MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_INVALID": "Phương thức thanh toán {0} không hợp lệ",
-  "MSG_EXCHANGE_RATE_ACCOUNTING_PAYMENT_INVALID": "Tỷ giá {0} không hợp lệ"
+  "MSG_EXCHANGE_RATE_ACCOUNTING_PAYMENT_INVALID": "Tỷ giá {0} không hợp lệ",
+
+  // -----------------start Settlement
+  "MSG_SETTLE_NOT_ALLOW_DELETE":  "Phiếu thanh toán {0} có phí OBH đã được issue CDNote/SOA/Voucher"
 }
