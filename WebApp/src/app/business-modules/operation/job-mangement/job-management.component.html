@@ -75,7 +75,7 @@
                                                         </button>
 
                                                         <app-permission-button (onClick)="showDetail(item.id)"
-                                                            type="detail">
+                                                            type="detail" [user]="item.userCreated">
                                                         </app-permission-button>
 
                                                         <button type="button" *ngIf="item.isLocked"
@@ -84,7 +84,6 @@
                                                         </button>
 
                                                         <ng-container *ngIf="!item.isLocked">
-
                                                             <app-permission-button (onClick)="deleteSipment(item)"
                                                                 type="delete" [user]="item.userCreated">
                                                             </app-permission-button>
