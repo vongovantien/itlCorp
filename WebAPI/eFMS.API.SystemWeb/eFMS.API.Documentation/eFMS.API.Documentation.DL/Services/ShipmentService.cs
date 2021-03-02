@@ -784,11 +784,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
-            // Search Customer
-            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost != true)
-            {
-                queryOpsTrans = queryOpsTrans.And(q => criteria.CustomerId.Contains(q.CustomerId));
-            }
+            //// Search Customer
+            //if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost != true)
+            //{
+            //    queryOpsTrans = queryOpsTrans.And(q => criteria.CustomerId.Contains(q.CustomerId));
+            //}
             // Search JobId
             if (!string.IsNullOrEmpty(criteria.JobId))
             {
