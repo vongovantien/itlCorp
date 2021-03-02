@@ -21,6 +21,8 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormats = "#,##0";
         const string CURRENCY_LOCAL = "VND";
         const string CURRENCY_USD = "USD";
+        const string _formatNew = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+        const string _formatVNDNew = "_(* #,##0.000_);_(* (#,##0.000);_(* \"-\"??_);_(@_)";
 
         public Stream CreateEManifestExcelFile(CsTransactionDetailModel transactionDetail, Stream stream = null)
         {
@@ -2173,7 +2175,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (listData[i].Balance != null && listData[i].Balance != 0)
                 {
                     workSheet.Cells[rowStart, 26].Value = listData[i].Balance;
-                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatNew : _formatVNDNew;
                 }
 
                 workSheet.Cells[rowStart, 27].Value = listData[i].InvNoObh;
@@ -2217,7 +2219,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
 
             workSheet.Cells[rowStart, 26].Value = listData.Select(s => s.Balance).Sum(); // Sum Total Balance
-            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatNew : _formatVNDNew;
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
