@@ -16,6 +16,12 @@ using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using eFMS.API.ForPartner.Service.Contexts;
+using ITL.NetCore.Connection;
+using System.Data.SqlClient;
+using eFMS.API.ForPartner.Service.ViewModels;
+using System.Data;
+using eFMS.API.ForPartner.DL.ViewModel;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -143,6 +149,10 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState InsertInvoice(InvoiceCreateInfo model, ICurrentUser _currentUser)
         {
+            var chargeInvoiceDebitUpdate = new List<ChargeInvoiceUpdateTable>();
+            var chargeInvoiceObhUpdate = new List<ChargeInvoiceUpdateTable>();
+            var invoiceDebit = new AccAccountingManagement();
+            var invoicesObh = new List<AccAccountingManagement>();
             try
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
@@ -187,8 +197,8 @@ namespace eFMS.API.ForPartner.DL.Service
                     }
                 }
 
-                var invoiceDebit = debitCharges.Count > 0 ? ModelInvoiceDebit(model, partner, debitCharges, _currentUser, surchargesLookupId) : null;
-                var invoicesObh = obhCharges.Count > 0 ? ModelInvoicesObh(model, partner, obhCharges, _currentUser, surchargesLookupId) : null;
+                invoiceDebit = debitCharges.Count > 0 ? ModelInvoiceDebit(model, partner, debitCharges, _currentUser, surchargesLookupId) : null;
+                invoicesObh = obhCharges.Count > 0 ? ModelInvoicesObh(model, partner, obhCharges, _currentUser, surchargesLookupId) : null;
                 
                 var debitChargesUpdate = new List<CsShipmentSurcharge>();
                 var obhChargesUpdate = new List<CsShipmentSurcharge>();
@@ -287,92 +297,111 @@ namespace eFMS.API.ForPartner.DL.Service
                     }
                 }
 
-                using (var trans = DataContext.DC.Database.BeginTransaction())
+                if (invoiceDebit != null)
                 {
-                    try
+                    //Update Charge Debit (if valuable)
+                    chargeInvoiceDebitUpdate = mapper.Map<List<ChargeInvoiceUpdateTable>>(debitChargesUpdate);
+                    var updateSurchargeDebit = UpdateSurchargeForInvoice(chargeInvoiceDebitUpdate);
+                    if (!updateSurchargeDebit.Status)
                     {
-                        HandleState hsDebit = new HandleState();
-                        if (invoiceDebit != null)
-                        {
-                            //Insert Invoice (Invoice Debit)
-                            hsDebit = DataContext.Add(invoiceDebit, false);
-                        }
-                        HandleState hsObh = new HandleState();
-                        if (invoicesObh != null)
-                        {
-                            //Insert list Invoice Temp (Invoice OBH)
-                            foreach (var invoiceObh in invoicesObh)
-                            {
-                                hsObh = DataContext.Add(invoiceObh, false);
-                            }
-                        }
-
-                        if (hsDebit.Success)
-                        {
-                            if (invoiceDebit != null)
-                            {
-                                foreach (var debitCharge in debitChargesUpdate)
-                                {
-                                    var updateSurchargeDebit = surchargeRepo.Update(debitCharge, x => x.Id == debitCharge.Id, false);
-                                }
-                            }
-                        }
-
-                        if (hsObh.Success)
-                        {
-                            if (invoicesObh != null)
-                            {
-                                foreach (var obhCharge in obhChargesUpdate)
-                                {
-                                    var updateSurchargeObh = surchargeRepo.Update(obhCharge, x => x.Id == obhCharge.Id, false);
-                                }
-                            }
-                        }
-
-                        var smSurcharge = surchargeRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
-                        trans.Commit();
-                        
-                        if (!hsDebit.Success)
-                        {
-                            WriteLogInsertInvoiceFail(invoiceDebit, invoicesObh, debitCharges, obhCharges, hsDebit.Message.ToString());
-                            return hsDebit;
-                        }
-                        if (!hsObh.Success)
-                        {
-                            WriteLogInsertInvoiceFail(invoiceDebit, invoicesObh, debitCharges, obhCharges, hsObh.Message.ToString());
-                            return hsObh;
-                        }
-                        return hsDebit;
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        WriteLogInsertInvoiceFail(invoiceDebit, invoicesObh, debitCharges, obhCharges, ex.ToString());
-                        return new HandleState((object)ex.Message);
-                    }
-                    finally
-                    {
-                        trans.Dispose();
+                        return new HandleState((object)updateSurchargeDebit.Message);
                     }
                 }
+                
+                if (invoicesObh != null)
+                {
+                    //Update Charge OBH (if valuable)
+                    chargeInvoiceObhUpdate = mapper.Map<List<ChargeInvoiceUpdateTable>>(obhChargesUpdate);
+                    var updateSurchargeObh = UpdateSurchargeForInvoice(chargeInvoiceObhUpdate);
+                    if (!updateSurchargeObh.Status)
+                    {
+                        return new HandleState((object)updateSurchargeObh.Message);
+                    }
+                }
+
+                HandleState hsDebit = new HandleState();
+                if (invoiceDebit != null)
+                {
+                    //Insert Invoice Debit (if valuable)
+                    hsDebit = DataContext.Add(invoiceDebit);
+                }
+
+                HandleState hsObh = new HandleState();
+                if (invoicesObh != null)
+                {
+                    //Insert list Invoice Temp (Invoice OBH)
+                    var invoiceObhListAdd = mapper.Map<List<InvoiceTable>>(invoicesObh);
+                    var addInvoiceObh = InsertInvoiceList(invoiceObhListAdd);
+                    if (!addInvoiceObh.Status)
+                    {
+                        hsObh = new HandleState((object)addInvoiceObh.Message);
+                    }
+                }
+
+                if (!hsDebit.Success)
+                {
+                    WriteLogInsertInvoice(hsDebit.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, hsDebit.Message.ToString());
+                    return hsDebit;
+                }
+                if (!hsObh.Success)
+                {
+                    WriteLogInsertInvoice(hsObh.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, hsObh.Message.ToString());
+                    return hsObh;
+                }
+                WriteLogInsertInvoice(hsDebit.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, "Create Invoice Successful");
+                return hsDebit;
+                
             }
             catch (Exception ex)
             {
+                WriteLogInsertInvoice(false, model.InvoiceNo,invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
 
-        private void WriteLogInsertInvoiceFail(AccAccountingManagement invoiceDebit, List<AccAccountingManagement> invoicesObh, List<ChargeInvoice> debitCharges, List<ChargeInvoice> obhCharges, string message)
+        private sp_UpdateChargeInvoiceUpdate UpdateSurchargeForInvoice(List<ChargeInvoiceUpdateTable> surcharges)
+        {            
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(surcharges),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[ChargeInvoiceUpdateTable]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateChargeInvoiceUpdate>(parameters);
+            return result.FirstOrDefault();
+        }
+
+        private sp_InsertListInvoice InsertInvoiceList(List<InvoiceTable> invoices)
         {
-            string logErr = string.Format("Lỗi InsertInvoice by {0} \n Message: {1} \n invoiceDebit: {2} \n invoicesObh: {3} \n debitCharges: {4} \n obhCharges: {5}",
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Invoices",
+                    Value = DataHelper.ToDataTable(invoices),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[InvoiceTable]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_InsertListInvoice>(parameters);
+            return result.FirstOrDefault();
+        }
+
+        private void WriteLogInsertInvoice(bool status, string invoiceNo, AccAccountingManagement invoiceDebit, List<AccAccountingManagement> invoicesObh, List<ChargeInvoiceUpdateTable> debitCharges, List<ChargeInvoiceUpdateTable> obhCharges, string message)
+        {
+            string logMessage = string.Format("InsertInvoice by {0} \n ** Message: {1} \n ** InvoiceDebit: {2} \n ** InvoicesObh: {3} \n ** DebitCharges: {4} \n ** ObhCharges: {5} \n\n---------------------------\n\n",
                             currentUser.UserID,
                             message,
-                            JsonConvert.SerializeObject(invoiceDebit),
-                            JsonConvert.SerializeObject(invoicesObh),
-                            JsonConvert.SerializeObject(debitCharges),
-                            JsonConvert.SerializeObject(obhCharges));
-            new LogHelper("InsertInvoice_Fail", logErr);
+                            invoiceDebit != null ? JsonConvert.SerializeObject(invoiceDebit) : "[]",
+                            invoicesObh != null ? JsonConvert.SerializeObject(invoicesObh) : "[]",
+                            debitCharges !=null ? JsonConvert.SerializeObject(debitCharges) : "[]",
+                            obhCharges != null ? JsonConvert.SerializeObject(obhCharges) : "[]");
+            string logName = string.Format("InsertInvoice_{0}_{1}", (status ? "Success" : "Fail"), invoiceNo);
+            new LogHelper(logName, logMessage);
         }
 
         /// <summary>
@@ -1010,20 +1039,20 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectAdvance(string id, string reason)
         {
+            var _id = Guid.Empty;
+            Guid.TryParse(id, out _id);
+            AcctAdvancePayment advance = acctAdvanceRepository.Get(x => x.Id == _id).FirstOrDefault();
+            if (advance == null) return new HandleState((object)"Không tìm thấy advance");
+
+            advance.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+            advance.UserModified = currentUser.UserID;
+            advance.DatetimeModified = DateTime.Now;
+            advance.ReasonReject = reason;
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
-                {
-                    var _id = Guid.Empty;
-                    Guid.TryParse(id, out _id);
-                    AcctAdvancePayment advance = acctAdvanceRepository.Get(x => x.Id == _id).FirstOrDefault();
-                    if (advance == null) return new HandleState((object)"Không tìm thấy advance");
-
-                    advance.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-                    advance.UserModified = currentUser.UserID;
-                    advance.DatetimeModified = DateTime.Now;
-                    advance.ReasonReject = reason;
-
+                {                    
                     HandleState hs = acctAdvanceRepository.Update(advance, x => x.Id == advance.Id, false);
                     if (hs.Success)
                     {
@@ -1080,20 +1109,22 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectSettlement(string id, string reason)
         {
+            var _id = Guid.Empty;
+            Guid.TryParse(id, out _id);
+            AcctSettlementPayment settlement = acctSettlementRepo.Get(x => x.Id == _id).FirstOrDefault();
+            if (settlement == null) return new HandleState((object)"Không tìm thấy settlement");
+
+            settlement.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+            settlement.UserModified = currentUser.UserID;
+            settlement.DatetimeModified = DateTime.Now;
+            settlement.ReasonReject = reason;
+
+            IQueryable<CsShipmentSurcharge> surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var _id = Guid.Empty;
-                    Guid.TryParse(id, out _id);
-                    AcctSettlementPayment settlement = acctSettlementRepo.Get(x => x.Id == _id).FirstOrDefault();
-                    if (settlement == null) return new HandleState((object)"Không tìm thấy settlement");
-
-                    settlement.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-                    settlement.UserModified = currentUser.UserID;
-                    settlement.DatetimeModified = DateTime.Now;
-                    settlement.ReasonReject = reason;
-
                     HandleState hs = acctSettlementRepo.Update(settlement, x => x.Id == settlement.Id, false);
                     if (hs.Success)
                     {
@@ -1132,8 +1163,6 @@ namespace eFMS.API.ForPartner.DL.Service
                             };
                             sysUserNotificationRepository.AddAsync(sysUserNotify);
 
-                            IQueryable<CsShipmentSurcharge> surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
-
                             if(surcharges != null && surcharges.Count() > 0)
                             {
                                 foreach (var item in surcharges)
@@ -1143,7 +1172,6 @@ namespace eFMS.API.ForPartner.DL.Service
 
                                     var hsUpdateSurcharge = surchargeRepo.Update(item, x => x.Id == item.Id, false);
                                 }
-
                                 surchargeRepo.SubmitChanges();
                             }
                         }
@@ -1165,20 +1193,30 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectSoa(string id, string reason)
         {
+            var _id = 0;
+            int.TryParse(id, out _id);
+            var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
+            if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
+
+            soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+            soa.UserModified = currentUser.UserID;
+            soa.DatetimeModified = DateTime.Now;
+            soa.ReasonReject = reason;
+
+            IQueryable<CsShipmentSurcharge> surcharges = null;
+            if (soa.Type == "Credit")
+            {
+                surcharges = surchargeRepo.Get(x => x.PaySoano == soa.Soano);
+            }
+            if (soa.Type == "Debit")
+            {
+                surcharges = surchargeRepo.Get(x => x.Soano == soa.Soano);
+            }
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var _id = 0;
-                    int.TryParse(id, out _id);
-                    var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
-                    if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
-
-                    soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-                    soa.UserModified = currentUser.UserID;
-                    soa.DatetimeModified = DateTime.Now;
-                    soa.ReasonReject = reason;
-
                     HandleState hs = acctSOARepository.Update(soa, x => x.Id == soa.Id, false);
                     if (hs.Success)
                     {
@@ -1219,23 +1257,25 @@ namespace eFMS.API.ForPartner.DL.Service
                             sysUserNotificationRepository.Add(sysUserNotify);
 
                             //Update PaySyncedFrom or SyncedFrom equal NULL by SoaNo
-                            var surcharges = surchargeRepo.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                            foreach (var surcharge in surcharges)
+                            if (surcharges != null)
                             {
-                                if (surcharge.Type == "OBH")
+                                foreach (var surcharge in surcharges)
                                 {
-                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? null : surcharge.PaySyncedFrom;
-                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? null : surcharge.SyncedFrom;
+                                    if (surcharge.Type == "OBH")
+                                    {
+                                        surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? null : surcharge.PaySyncedFrom;
+                                        surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? null : surcharge.SyncedFrom;
+                                    }
+                                    else
+                                    {
+                                        surcharge.SyncedFrom = null;
+                                    }
+                                    surcharge.UserModified = currentUser.UserID;
+                                    surcharge.DatetimeModified = DateTime.Now;
+                                    var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                                 }
-                                else
-                                {
-                                    surcharge.SyncedFrom = null;
-                                }
-                                surcharge.UserModified = currentUser.UserID;
-                                surcharge.DatetimeModified = DateTime.Now;
-                                var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                var smSurcharge = surchargeRepo.SubmitChanges();
                             }
-                            var smSurcharge = surchargeRepo.SubmitChanges();
                         }
                         trans.Commit();
                     }
@@ -1255,20 +1295,22 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectCdNote(string id, string reason)
         {
+            var _id = Guid.Empty;
+            Guid.TryParse(id, out _id);
+            var cdNote = acctCdNoteRepo.Get(x => x.Id == _id).FirstOrDefault();
+            if (cdNote == null) return new HandleState((object)"Không tìm thấy CDNote");
+
+            cdNote.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+            cdNote.UserModified = currentUser.UserID;
+            cdNote.DatetimeModified = DateTime.Now;
+            cdNote.ReasonReject = reason;
+
+            var surcharges = surchargeRepo.Get(x => (cdNote.Code == "CREDIT" ? x.CreditNo : x.DebitNo) == cdNote.Code);
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var _id = Guid.Empty;
-                    Guid.TryParse(id, out _id);
-                    var cdNote = acctCdNoteRepo.Get(x => x.Id == _id).FirstOrDefault();
-                    if (cdNote == null) return new HandleState((object)"Không tìm thấy CDNote");
-
-                    cdNote.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-                    cdNote.UserModified = currentUser.UserID;
-                    cdNote.DatetimeModified = DateTime.Now;
-                    cdNote.ReasonReject = reason;
-
                     HandleState hs = acctCdNoteRepo.Update(cdNote, x => x.Id == cdNote.Id, false);
                     if (hs.Success)
                     {
@@ -1308,7 +1350,6 @@ namespace eFMS.API.ForPartner.DL.Service
                             var hsUserNotifi = sysUserNotificationRepository.Add(sysUserNotify);
 
                             //Update PaySyncedFrom or SyncedFrom equal NULL CDNote Code
-                            var surcharges = surchargeRepo.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                             foreach (var surcharge in surcharges)
                             {
                                 if (surcharge.Type == "OBH")
@@ -1344,20 +1385,23 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectVoucher(string id, string reason)
         {
+            var _id = Guid.Empty;
+            Guid.TryParse(id, out _id);
+            var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
+            if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
+
+            voucher.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+            voucher.UserModified = currentUser.UserID;
+            voucher.DatetimeModified = DateTime.Now;
+            voucher.ReasonReject = reason;
+
+            var surcharges = surchargeRepo.Get(x => x.AcctManagementId == voucher.Id);
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var _id = Guid.Empty;
-                    Guid.TryParse(id, out _id);
-                    var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
-                    if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
-
-                    voucher.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-                    voucher.UserModified = currentUser.UserID;
-                    voucher.DatetimeModified = DateTime.Now;
-                    voucher.ReasonReject = reason;
-
+                    
                     HandleState hs = DataContext.Update(voucher, x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {
@@ -1397,7 +1441,6 @@ namespace eFMS.API.ForPartner.DL.Service
                             sysUserNotificationRepository.Add(sysUserNotify);
 
                             //Update SyncedFrom equal NULL by Id of Voucher
-                            var surcharges = surchargeRepo.Get(x => x.AcctManagementId == voucher.Id);
                             foreach (var surcharge in surcharges)
                             {
                                 surcharge.SyncedFrom = null;
@@ -1539,14 +1582,14 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState DeleteVoucher(string id, string reason)
         {
+            var _id = Guid.Empty;
+            Guid.TryParse(id, out _id);
+            var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
+            if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var _id = Guid.Empty;
-                    Guid.TryParse(id, out _id);
-                    var voucher = DataContext.Get(x => x.Id == _id).FirstOrDefault();
-                    if (voucher == null) return new HandleState((object)"Không tìm thấy voucher");
                     HandleState hs = DataContext.Delete(x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {
