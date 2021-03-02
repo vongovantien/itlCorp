@@ -616,29 +616,31 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         let valid: boolean = true;
         const chargeIdInvoiceGroup = this.charges.map(c => {
             if (!!c.invoiceNo) {
+                if (!!c.notes) {
+                    return c.chargeId + c.invoiceNo + c.notes;
+                }
                 return c.chargeId + c.invoiceNo;
             }
             return null;
         }).filter(x => Boolean(x));   // * charge + Invoice
 
-        const isDup: boolean = new Set(chargeIdInvoiceGroup).size !== chargeIdInvoiceGroup.length;
+        const hasDuplicate: boolean = new Set(chargeIdInvoiceGroup).size !== chargeIdInvoiceGroup.length;
 
-        if (isDup) {
+        if (hasDuplicate) {
             const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeIdInvoiceGroup))];
-            const chargeMatchId: any[] = arrayDuplicates.map((c: string) => c.match(SystemConstants.CPATTERN.GUID));
+            // const chargeMatchId: any[] = arrayDuplicates.map((c: string) => c.match(SystemConstants.CPATTERN.GUID));
 
-            const chargeIds: string[] = [].concat.apply([], chargeMatchId);
-
+            // const chargeIds: string[] = [].concat.apply([], chargeMatchId);
+            let isDup: boolean = false;
             this.charges.forEach((c: Surcharge) => {
-                if (chargeIds.includes(c.chargeId)) {
-                    c.isDuplicate = true;
-                } else {
-                    c.isDuplicate = false;
-                }
+                isDup = !!c.notes ? arrayDuplicates.includes(c.chargeId + c.invoiceNo + c.notes) : arrayDuplicates.includes(c.chargeId + c.invoiceNo);
+
+                c.isDuplicate = isDup;
             });
             valid = false;
         } else {
             valid = true;
+            this.charges.forEach((c: Surcharge) => { c.isDuplicate = false });
         }
 
         return valid;

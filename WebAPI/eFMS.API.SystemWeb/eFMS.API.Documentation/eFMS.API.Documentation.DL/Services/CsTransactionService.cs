@@ -54,6 +54,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
+        private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -2606,8 +2607,8 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
                         charge.SalesProfit = charge.SalesProfit + _decimalNumber; //Cộng thêm phần thập phân
                         charge.Quantity = surcharge.Quantity + _decimalNumber; //Cộng thêm phần thập phân
-                        charge.UnitPrice = (surcharge.UnitPrice ?? 0);
-                        charge.UnitPrice = charge.UnitPrice + _decimalNumber; //Cộng thêm phần thập phân
+                        // charge.UnitPrice = (surcharge.UnitPrice ?? 0);
+                        charge.UnitPrice = (surcharge.UnitPrice ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân nhỏ riêng trường hợp này
                         charge.Unit = unitCode;
                         charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;

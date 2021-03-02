@@ -785,7 +785,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
             // Search Customer
-            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost != true)
+            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost == true)
             {
                 queryOpsTrans = queryOpsTrans.And(q => criteria.CustomerId.Contains(q.CustomerId));
             }
@@ -1782,7 +1782,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, true);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -2128,9 +2128,9 @@ namespace eFMS.API.Documentation.DL.Services
             return queryShipment;
         }
 
-        private IQueryable<OpsTransaction> QueryDataOperationCost(GeneralReportCriteria criteria, bool fromCost)
+        private IQueryable<OpsTransaction> QueryDataOperationCost(GeneralReportCriteria criteria, bool? fromCost)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, true);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -2815,7 +2815,7 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- Export Summary Of Costs Incurred
         private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurredOperation(GeneralReportCriteria criteria)
         {
-            var dataShipment = QueryDataOperationCost(criteria, true);
+            var dataShipment = QueryDataOperationCost(criteria, null);
             if (dataShipment == null) return null;
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
