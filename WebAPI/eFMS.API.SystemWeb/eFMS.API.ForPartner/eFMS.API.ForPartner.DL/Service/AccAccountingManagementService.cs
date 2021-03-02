@@ -153,6 +153,9 @@ namespace eFMS.API.ForPartner.DL.Service
             var chargeInvoiceObhUpdate = new List<ChargeInvoiceUpdateTable>();
             var invoiceDebit = new AccAccountingManagement();
             var invoicesObh = new List<AccAccountingManagement>();
+
+            HandleState hsDebit = new HandleState();
+            HandleState hsObh = new HandleState();
             try
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
@@ -304,6 +307,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     var updateSurchargeDebit = UpdateSurchargeForInvoice(chargeInvoiceDebitUpdate);
                     if (!updateSurchargeDebit.Status)
                     {
+                        WriteLogInsertInvoice(updateSurchargeDebit.Status, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, updateSurchargeDebit.Message.ToString());
                         return new HandleState((object)updateSurchargeDebit.Message);
                     }
                 }
@@ -315,18 +319,17 @@ namespace eFMS.API.ForPartner.DL.Service
                     var updateSurchargeObh = UpdateSurchargeForInvoice(chargeInvoiceObhUpdate);
                     if (!updateSurchargeObh.Status)
                     {
+                        WriteLogInsertInvoice(updateSurchargeObh.Status, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, updateSurchargeObh.Message.ToString());
                         return new HandleState((object)updateSurchargeObh.Message);
                     }
                 }
-
-                HandleState hsDebit = new HandleState();
+                
                 if (invoiceDebit != null)
                 {
                     //Insert Invoice Debit (if valuable)
                     hsDebit = DataContext.Add(invoiceDebit);
                 }
-
-                HandleState hsObh = new HandleState();
+                
                 if (invoicesObh != null)
                 {
                     //Insert list Invoice Temp (Invoice OBH)
@@ -349,8 +352,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     return hsObh;
                 }
                 WriteLogInsertInvoice(hsDebit.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, "Create Invoice Successful");
-                return hsDebit;
-                
+                return hsDebit;                
             }
             catch (Exception ex)
             {
@@ -393,17 +395,18 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private void WriteLogInsertInvoice(bool status, string invoiceNo, AccAccountingManagement invoiceDebit, List<AccAccountingManagement> invoicesObh, List<ChargeInvoiceUpdateTable> debitCharges, List<ChargeInvoiceUpdateTable> obhCharges, string message)
         {
-            string logMessage = string.Format("InsertInvoice by {0} \n ** Message: {1} \n ** InvoiceDebit: {2} \n ** InvoicesObh: {3} \n ** DebitCharges: {4} \n ** ObhCharges: {5} \n\n---------------------------\n\n",
+            string logMessage = string.Format("InsertInvoice by {0} at {1} \n ** Message: {2} \n ** InvoiceDebit: {3} \n ** InvoicesObh: {4} \n ** DebitCharges: {5} \n ** ObhCharges: {6} \n\n---------------------------\n\n",
                             currentUser.UserID,
+                            DateTime.Now.ToString("dd/MM/yyyy HH:ss:mm"),
                             message,
-                            invoiceDebit != null ? JsonConvert.SerializeObject(invoiceDebit) : "[]",
+                            invoiceDebit != null ? JsonConvert.SerializeObject(invoiceDebit) : "{}",
                             invoicesObh != null ? JsonConvert.SerializeObject(invoicesObh) : "[]",
                             debitCharges !=null ? JsonConvert.SerializeObject(debitCharges) : "[]",
                             obhCharges != null ? JsonConvert.SerializeObject(obhCharges) : "[]");
             string logName = string.Format("InsertInvoice_{0}_{1}", (status ? "Success" : "Fail"), invoiceNo);
             new LogHelper(logName, logMessage);
         }
-
+        
         /// <summary>
         /// Get model Invoice Debit
         /// </summary>
