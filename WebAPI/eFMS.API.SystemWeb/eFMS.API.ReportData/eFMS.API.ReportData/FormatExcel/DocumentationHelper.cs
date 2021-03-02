@@ -1756,6 +1756,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(30).Width = 19; //Cột AD
             workSheet.Column(31).Width = 19; //Cột AE
             workSheet.Column(32).Width = 24; //Cột AF
+            workSheet.Column(33).Width = 25; //Cột AF
         }
         /// <summary>
         /// 
@@ -2003,9 +2004,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             //Header table
-            workSheet.Cells["A7:AF8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7:AF8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7:AF8"].Style.Font.Bold = true;
+            workSheet.Cells["A7:AG8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AG8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AG8"].Style.Font.Bold = true;
 
             workSheet.Cells["A7:A8"].Merge = true;
             workSheet.Cells["A7"].Value = headers[3]; // Date
