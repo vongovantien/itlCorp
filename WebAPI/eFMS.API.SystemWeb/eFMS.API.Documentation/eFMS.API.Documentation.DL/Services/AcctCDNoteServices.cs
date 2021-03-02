@@ -1413,7 +1413,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
 
                     charge.ExtVND = 0; //NOT USE
-                    charge.Notes = item.Notes;
+                    charge.Notes = string.IsNullOrEmpty(item.Notes) ? "" : "(" + item.Notes + ")";
 
                     charge.InputData = string.Empty; //Chưa biết
                     charge.Deposit = 0; //NOT USE
