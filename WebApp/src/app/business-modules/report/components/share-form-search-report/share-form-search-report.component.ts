@@ -107,7 +107,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         { id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT, text: 'Sale Report By Department' },
         { id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER, text: 'Sale Report By Quarter' },
         { id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY, text: 'Summary Sale Report' },
-        { id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION, text: 'Combination Statistic Report' }
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION, text: 'Combination Statistic Report' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_KICKBACK, text: 'Sale KickBack Report' }
     ];
 
     typeReportActive: any[] = [];
