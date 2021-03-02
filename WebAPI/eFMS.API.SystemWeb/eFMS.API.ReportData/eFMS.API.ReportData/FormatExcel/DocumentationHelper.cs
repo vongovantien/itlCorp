@@ -21,6 +21,8 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormats = "#,##0";
         const string CURRENCY_LOCAL = "VND";
         const string CURRENCY_USD = "USD";
+        const string _formatVNDNew = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)"; // format number VND with brackets if neg
+        const string _formatNew = "_(* #,##0.000_);_(* (#,##0.000);_(* \"-\"??_);_(@_)"; // format number diff VND with brackets if neg
 
         public Stream CreateEManifestExcelFile(CsTransactionDetailModel transactionDetail, Stream stream = null)
         {
@@ -1756,6 +1758,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(30).Width = 19; //Cột AD
             workSheet.Column(31).Width = 19; //Cột AE
             workSheet.Column(32).Width = 24; //Cột AF
+            workSheet.Column(33).Width = 25; //Cột AF
         }
         /// <summary>
         /// 
@@ -2003,9 +2006,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             //Header table
-            workSheet.Cells["A7:AF8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7:AF8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7:AF8"].Style.Font.Bold = true;
+            workSheet.Cells["A7:AG8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AG8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AG8"].Style.Font.Bold = true;
 
             workSheet.Cells["A7:A8"].Merge = true;
             workSheet.Cells["A7"].Value = headers[3]; // Date
@@ -2173,7 +2176,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (listData[i].Balance != null && listData[i].Balance != 0)
                 {
                     workSheet.Cells[rowStart, 26].Value = listData[i].Balance;
-                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
                 }
 
                 workSheet.Cells[rowStart, 27].Value = listData[i].InvNoObh;
@@ -2217,7 +2220,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
 
             workSheet.Cells[rowStart, 26].Value = listData.Select(s => s.Balance).Sum(); // Sum Total Balance
-            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 

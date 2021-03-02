@@ -185,7 +185,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             );
     }
 
-    prepareDeleteAdvance(settlement: SettlementPayment) {
+    prepareDeleteSettle(settlement: SettlementPayment) {
         this._accoutingRepo.checkAllowDeleteSettlement(settlement.id)
             .subscribe((value: boolean) => {
                 if (value) {

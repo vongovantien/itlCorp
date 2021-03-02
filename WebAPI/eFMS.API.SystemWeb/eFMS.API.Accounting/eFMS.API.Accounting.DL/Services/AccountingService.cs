@@ -686,7 +686,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     charges.Add(charge);
                 }
-                sync.Details = charges;
+                sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList(); // Sắp xếp theo số job giảm dần
 
                 data.Add(sync);
             }
@@ -772,7 +772,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charges.Add(charge);
                     }
-                    sync.Details = charges;
+                    sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList();  // Sắp xếp theo số job giảm dần
 
                     data.Add(sync);
                 }
