@@ -27,5 +27,6 @@ namespace eFMS.API.Documentation.DL.IService
         SummaryOfRevenueModel GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria);
         IQueryable<Shipments> GetShipmentAssignPIC();
         SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria);
+        HandleState LockShipmentList(List<string> JobIds);
     }
 }
