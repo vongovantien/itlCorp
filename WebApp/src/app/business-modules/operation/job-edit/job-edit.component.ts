@@ -266,6 +266,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.serviceDate = !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.finishDate = !!form.finishDate && !!form.finishDate.startDate ? formatDate(form.finishDate.startDate, 'yyyy-MM-dd', 'en') : null;
 
+
         this.opsTransaction.hwbno = form.hwbno;
         this.opsTransaction.mblno = form.mblno;
         this.opsTransaction.customerId = form.customerId;
@@ -393,6 +394,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: any) => {
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
+                        console.log(this.opsTransaction);
+
                         this.hblid = this.opsTransaction.hblid;
 
                         this.getListContainersOfJob();

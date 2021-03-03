@@ -3474,7 +3474,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var shipment in criteria.shipments)
             {
                 //Lấy ra advance cũ nhất chưa có settlement của shipment(JobId)
-                var advance = acctAdvancePaymentService.GetAdvancesOfShipment().Where(x => x.JobId == shipment.JobId).FirstOrDefault()?.AdvanceNo;
+                var advance = acctAdvancePaymentService.GetAdvancesOfShipment(shipment.JobId).Where(x => x.JobId == shipment.JobId).FirstOrDefault()?.AdvanceNo;
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();
@@ -4689,6 +4689,25 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public bool CheckValidateDeleteSettle(string settlementNo)
+        {
+            bool isValidate = true;
+
+            if(csShipmentSurchargeRepo.Any(x => x.SettlementCode == settlementNo && x.Type == "OBH" && 
+            (!string.IsNullOrEmpty(x.Soano) 
+            || !string.IsNullOrEmpty(x.PaySoano) 
+            || !string.IsNullOrEmpty(x.VoucherId)
+            || !string.IsNullOrEmpty(x.CreditNo)
+            || !string.IsNullOrEmpty(x.DebitNo)
+            )
+            ))
+            {
+                isValidate = false;
+            }
+
+            return isValidate;
         }
     }
 }

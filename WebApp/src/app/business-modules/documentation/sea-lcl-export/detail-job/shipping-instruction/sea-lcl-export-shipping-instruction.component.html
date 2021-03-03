@@ -33,9 +33,13 @@
                         </span>
                     </span>
                 </button>
-                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="save()"></app-default-button>
             </ng-container>
         </ng-container>
+
+        <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="save()"></app-default-button>
+        </ng-container>
+
         <button type="button" class="btn  m-btn--icon m-btn--uppercase" (click)="back()">
             <span>
                 <i class="la la-ban"></i>

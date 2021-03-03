@@ -785,7 +785,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
             // Search Customer
-            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost != true)
+            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost == true)
             {
                 queryOpsTrans = queryOpsTrans.And(q => criteria.CustomerId.Contains(q.CustomerId));
             }
@@ -1004,8 +1004,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.MblMawb;
                 data.HblHawb = item.HblHawb;
-                data.PolPod = item.Pol != null && item.Pol != Guid.Empty ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty
-                    + "/" + (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
+                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
+
+                data.PolPod = ( item.Pod != null && item.Pod != Guid.Empty) ?  pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
                 data.Carrier = !string.IsNullOrEmpty(item.Carrier) ? LookupPartner[item.Carrier].FirstOrDefault()?.ShortName : string.Empty;
                 data.Agent = LookupPartner[item.Agent].FirstOrDefault()?.ShortName;
                 var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
@@ -1108,6 +1109,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
                 data.TotalCustomSell = _totalSellCustom;
+                if(data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
+                {
+                    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
+                }
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
@@ -1239,6 +1244,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
                 data.TotalCustomBuy = _totalBuyCustom;
+                if (data.TotalBuyOthers > 0 && data.TotalCustomBuy > 0)
+                {
+                    data.TotalBuyOthers = data.TotalBuyOthers - data.TotalCustomBuy;
+                }
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
@@ -1305,8 +1314,8 @@ namespace eFMS.API.Documentation.DL.Services
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
                 data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                 data.JobNo = item.JobNo;
-                data.PolPod = item.Pol != null && item.Pol != Guid.Empty ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty
-                    + "/" + (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
+                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
                 data.Shipper = LookupPartner[item.Shipper].Select(t => t.PartnerNameEn).FirstOrDefault();
                 data.Consignee = item.Consignee;
                 data.MblMawb = item.Mblno;
@@ -1402,6 +1411,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
                 data.TotalCustomSell = _totalSellCustom;
+                if (data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
+                {
+                    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
+                }
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
@@ -1533,6 +1546,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
                 data.TotalCustomBuy = _totalBuyCustom;
+                if (data.TotalBuyOthers > 0 && data.TotalCustomBuy > 0)
+                {
+                    data.TotalBuyOthers = data.TotalBuyOthers - data.TotalCustomBuy;
+                }
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
 
@@ -1766,7 +1783,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, true);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -2112,9 +2129,9 @@ namespace eFMS.API.Documentation.DL.Services
             return queryShipment;
         }
 
-        private IQueryable<OpsTransaction> QueryDataOperationCost(GeneralReportCriteria criteria, bool fromCost)
+        private IQueryable<OpsTransaction> QueryDataOperationCost(GeneralReportCriteria criteria, bool? fromCost)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, true);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -2799,7 +2816,7 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- Export Summary Of Costs Incurred
         private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurredOperation(GeneralReportCriteria criteria)
         {
-            var dataShipment = QueryDataOperationCost(criteria, true);
+            var dataShipment = QueryDataOperationCost(criteria, null);
             if (dataShipment == null) return null;
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();

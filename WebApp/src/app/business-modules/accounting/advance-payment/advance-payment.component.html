@@ -127,11 +127,16 @@
                                                         </button>
                                                         <ng-container
                                                             *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
-                                                            <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
+                                                            <!-- <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                                 title="Delete advance payment"
                                                                 (click)="prepareDeleteAdvance(advancePayment)">
                                                                 <i class="la la-trash text-danger"></i>
-                                                            </button>
+                                                            </button> -->
+                                                            <app-permission-button type="delete"
+                                                                (onClick)="prepareDeleteAdvance(advancePayment)"
+                                                                [user]="advancePayment.userCreated" class="icon"
+                                                                icon="la la-trash text-danger">
+                                                            </app-permission-button>
                                                         </ng-container>
                                                     </div>
                                                 </td>

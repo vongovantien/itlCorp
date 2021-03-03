@@ -638,6 +638,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<OpsTransaction> data = QueryOpsSaleReport(criteria);
             if (data == null) return null;
             results = new List<QuaterSaleReportResult>();
+            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             foreach (var item in data)
             {
                 string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
@@ -691,10 +692,10 @@ namespace eFMS.API.Documentation.DL.Services
                     _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                 }
                 #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
-
+                string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
                 var report = new QuaterSaleReportResult
                 {
-                    Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
+                    Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
                     ContactName = _contactName, // Sale Full Name
                     SalesManager = _saleManager, // Sale Manager
                     PartnerName = string.Empty,
@@ -739,7 +740,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
             if (shipments == null) return null;
             IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
-
+            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             var data = (from shipment in shipments
                         join housebill in housebills on shipment.Id equals housebill.JobId
                         select new
@@ -765,7 +766,8 @@ namespace eFMS.API.Documentation.DL.Services
                             shipment.Etd,
                             housebill.OfficeId,
                             housebill.CompanyId,
-                            DepartmentIdHbl = housebill.DepartmentId
+                            DepartmentIdHbl = housebill.DepartmentId,
+                            housebill.SalesDepartmentId
                         });
             if (data == null) return null;
             var results = new List<QuaterSaleReportResult>();
@@ -822,10 +824,10 @@ namespace eFMS.API.Documentation.DL.Services
                     _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                 }
                 #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
-
+                string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
                 var report = new QuaterSaleReportResult
                 {
-                    Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
+                    Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
                     ContactName = _contactName, // Sale Full Name
                     SalesManager = _saleManager, // Sale Manager
                     PartnerName = string.Empty,

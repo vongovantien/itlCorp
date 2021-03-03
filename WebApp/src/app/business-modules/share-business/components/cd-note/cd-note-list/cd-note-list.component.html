@@ -17,6 +17,16 @@
                         </div>
                     </div>
                     <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                        <div class="dropdown m-dropdown m-dropdown--inline">
+                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                <i class="la la-print"></i>Print Combine<span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu" role="menu" aria-labelledby="button-nested">
+                                <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
+                            </div>
+                        </div>
                         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                             (click)="openPopupAdd()">
                             <span>
@@ -112,6 +122,11 @@
                                                         *ngFor="let cdNote of cdNoteGroup.listCDNote; let j = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions">
+                                                                <label class="m-checkbox" style="display: inline;">
+                                                                    <input type="checkbox"
+                                                                        [(ngModel)]="cdNote.isSelected">
+                                                                    <span></span>
+                                                                </label>
                                                                 <button type="button"
                                                                     class="btn btn-brand btn-sm  m-btn--icon m-btn--icon-only"
                                                                     title="Edit"
@@ -195,3 +210,5 @@
 
 <info-popup [body]="'You can not delete this C/D Note, because it was issued SOA/Voucher/VAT Invoice. Please recheck!'">
 </info-popup>
+
+<ng-template inject></ng-template>
