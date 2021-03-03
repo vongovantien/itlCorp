@@ -212,7 +212,6 @@
                                     "with": "src/environments/environment.uat.ts"
                                 }
                             ],
-                            "serviceWorker": false,
                             "budgets": [
                                 {
                                     "type": "bundle",
@@ -220,7 +219,9 @@
                                     "maximumWarning": "2mb",
                                     "maximumError": "5mb"
                                 }
-                            ]
+                            ],
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json"
                         },
                         "uat-vi": {
                             "optimization": true,
@@ -240,7 +241,6 @@
                                     "with": "src/environments/environment.uat.ts"
                                 }
                             ],
-                            "serviceWorker": true,
                             "budgets": [
                                 {
                                     "type": "bundle",
@@ -248,7 +248,9 @@
                                     "maximumWarning": "2mb",
                                     "maximumError": "5mb"
                                 }
-                            ]
+                            ],
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json"
                         },
                         "prod-en": {
                             "fileReplacements": [
