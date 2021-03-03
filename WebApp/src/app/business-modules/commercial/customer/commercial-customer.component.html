@@ -55,16 +55,13 @@
                                                 title="Collapse">
                                                 <i class="la la-angle-up"></i>
                                             </button>
-                                            <button (click)="showDetail(customer)"
-                                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
-                                                title="Edit">
-                                                <i class="la la-edit"></i>
-                                            </button>
+
+                                            <app-permission-button type="detail" [user]="customer.userCreated"
+                                                (onClick)="showDetail(customer)"></app-permission-button>
+
                                             <ng-container *ngIf="!customer.active">
-                                                <button (click)="showConfirmDelete(customer)"
-                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-trash"></i>
-                                                </button>
+                                                <app-permission-button type="delete" [user]="customer.userCreated"
+                                                    (onClick)="showConfirmDelete(customer)"></app-permission-button>
                                             </ng-container>
                                         </div>
                                     </td>
