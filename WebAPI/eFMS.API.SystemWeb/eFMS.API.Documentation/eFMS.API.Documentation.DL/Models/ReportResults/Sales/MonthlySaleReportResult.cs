@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults.Sales
     public class SaleKickBackReportResult
     {
         public string TransID { get; set; }
+        public Guid HBLID { get; set; }
         public DateTime? LoadingDate { get; set; }
         public string HAWBNO { get; set; }
         public string PartnerName { get; set; }

@@ -24,5 +24,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults.Sales
         public string Website { get; set; }
         public string Contact { get; set; }
         public string Currency { get; set; }
+        public decimal TotalIncomes { get; set; }
+        public decimal TotalCosts { get; set; }
+        public decimal TotalProfit { get; set; }
     }
 }
