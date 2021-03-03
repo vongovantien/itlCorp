@@ -1,53 +1,36 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NgProgress } from '@ngx-progressbar/core';
-import { ToastrService } from 'ngx-toastr';
-import { catchError, takeUntil } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
-import { AdvanceSettlement } from 'src/app/shared/models/operation/advanceSettlement';
-import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
-import { SortService } from 'src/app/shared/services/sort.service';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+
+import { DocumentationRepo } from '@repositories';
+import { AdvanceSettlementInfo } from '@models';
+
+import { switchMap, takeUntil, shareReplay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { DestroyService } from '@services';
 
 @Component({
     selector: 'advance-settlement-info',
     templateUrl: './advance-settlement-info.component.html',
-    styleUrls: ['./advance-settlement-info.component.scss']
+    styleUrls: ['./advance-settlement-info.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DestroyService]
 })
 
-export class ShareBusinessAdvanceSettlementInforComponent extends AppList {
-    adSett: AdvanceSettlement[] = [];
-    jobId: string = '';
+export class ShareBusinessAdvanceSettlementInforComponent {
+
+    adSetInfos: Observable<AdvanceSettlementInfo[]>;
+
     constructor(
         private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress,
         private _activedRouter: ActivatedRoute,
-    ) {
-        super();
-        this._progressRef = this._ngProgressService.ref();
+        private readonly _destroy$: DestroyService
+    ) { }
 
-    }
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            console.log(param);
-            if (param.id) {
-                this.jobId = param.id;
-                this.getListAdvanceSettlement(this.jobId);
-            }
-            console.log(this.jobId);
-
-        });
-
-    }
-    getListAdvanceSettlement(id: any) {
-        this._documentRepo.getListAdvanceSettlement(id)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError),
-            ).subscribe(
-                (res: AdvanceSettlement[]) => {
-                    console.log(res);
-                    this.adSett = res;
-                },
-            );
+        this.adSetInfos = this._activedRouter.params.pipe(
+            switchMap((param: Params) => this._documentRepo.getListAdvanceSettlement(param.id)),
+            takeUntil(this._destroy$),
+            shareReplay()
+        ) as Observable<AdvanceSettlementInfo[]>;
     }
 }

@@ -32,5 +32,7 @@ namespace eFMS.API.Documentation.DL.Models
         public Guid ChargeId { get; set; }
         public string Service { get; set; }
         public string ClearanceNo { get; set; }
+        public string CustomerId { get; set; }
+        public string PayerId { get; set; }
     }
 }

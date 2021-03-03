@@ -441,8 +441,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     objUpdate.CreditLimitRate = credit.CreditRate;
                 }
-                isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
                 objUpdate.DatetimeModified = DateTime.Now;
+                objUpdate.UserModified = currentUser.UserID;
+                isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
             }
             if (isUpdateDone.Success)
             {

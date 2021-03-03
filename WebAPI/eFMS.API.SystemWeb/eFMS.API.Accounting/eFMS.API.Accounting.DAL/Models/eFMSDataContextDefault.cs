@@ -199,7 +199,7 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
-                entity.Property(e => e.ServiceType).HasMaxLength(10);
+                entity.Property(e => e.ServiceType).HasMaxLength(100);
 
                 entity.Property(e => e.SourceCreated)
                     .HasMaxLength(50)
@@ -2967,6 +2967,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
+                entity.Property(e => e.EndDateProgress).HasColumnType("datetime");
+
                 entity.Property(e => e.FuncLocal)
                     .HasMaxLength(255)
                     .IsUnicode(false);
@@ -2978,6 +2980,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Major).HasMaxLength(100);
 
                 entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
+
+                entity.Property(e => e.ObjectResponse).HasColumnType("ntext");
+
+                entity.Property(e => e.StartDateProgress).HasColumnType("datetime");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

@@ -21,7 +21,7 @@
             </div>
 
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
-                *ngIf="!(isLocked | async) && (permissionHblDetail | async)?.allowUpdate"></app-default-button>
+                *ngIf="(permissionHblDetail | async)?.allowUpdate"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>

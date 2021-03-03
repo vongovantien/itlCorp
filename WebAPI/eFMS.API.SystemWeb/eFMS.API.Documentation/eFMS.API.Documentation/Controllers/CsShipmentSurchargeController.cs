@@ -190,7 +190,7 @@ namespace eFMS.API.Documentation.Controllers
             string type = list.Select(t => t.Type).FirstOrDefault();
             if(type == DocumentConstants.CHARGE_BUY_TYPE || type == DocumentConstants.CHARGE_OBH_TYPE)
             {
-                var query = list.Where(x => !isSurchargeSpecialCase(x) && !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
+                var query = list.Where(x => !isSurchargeSpecialCase(x) && !string.IsNullOrEmpty(x.InvoiceNo) && !string.IsNullOrEmpty(x.Notes)).GroupBy(x => new { x.InvoiceNo, x.ChargeId, x.Notes })
                              .Where(g => g.Count() > 1)
                              .Select(y => y.Key);
 

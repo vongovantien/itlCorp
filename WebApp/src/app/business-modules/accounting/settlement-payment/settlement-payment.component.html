@@ -99,11 +99,16 @@
                                                         </button>
                                                         <ng-container
                                                             *ngIf="settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied'">
-                                                            <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
+                                                            <!-- <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                                 title="Delete"
                                                                 (click)="prepareDeleteAdvance(settlePayment)">
                                                                 <i class="la la-trash text-danger"></i>
-                                                            </button>
+                                                            </button> -->
+                                                            <app-permission-button type="delete"
+                                                                (onClick)="prepareDeleteSettle(settlePayment)"
+                                                                [user]="settlePayment.userCreated" class="icon"
+                                                                icon="la la-trash text-danger">
+                                                            </app-permission-button>
                                                         </ng-container>
                                                         <span>
                                                             <a title="Preview" class="pointer"

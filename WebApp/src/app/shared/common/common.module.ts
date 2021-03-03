@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SubHeaderComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, SearchOptionsComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, AppComboGridIconComponent } from '.';
+import { SubHeaderComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, SearchOptionsComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, AppComboGridIconComponent, NoneRecordPlaceholderComponent } from '.';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
@@ -40,7 +40,8 @@ const COMPONENTS = [
     AppPermissionButtonComponent,
     Permission403PopupComponent,
     AppComboGridIconComponent,
-    AppCombogridItemComponent
+    AppCombogridItemComponent,
+    NoneRecordPlaceholderComponent
 ];
 
 @NgModule({

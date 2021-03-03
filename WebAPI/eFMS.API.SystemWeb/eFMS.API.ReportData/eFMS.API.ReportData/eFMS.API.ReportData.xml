@@ -301,6 +301,13 @@
             <param name="criteria">Id of shipment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSummaryOfCostsPartner(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Export Shipment Overview
+            </summary>
+            <param name="criteria">Id of shipment</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportOpsCdNote(System.Guid,System.String,System.Guid)">
             <summary>
             Export Ops Debit Note

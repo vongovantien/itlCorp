@@ -683,7 +683,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetAdvancesOfShipment(string jobId, string settleCode = null)
         {
-            var data = acctAdvancePaymentService.GetAdvancesOfShipment(settleCode).Where(x => x.JobId == jobId && x.Requester == currentUser.UserID);
+            var data = acctAdvancePaymentService.GetAdvancesOfShipment(jobId, settleCode).Where(x => x.Requester == currentUser.UserID);
             return Ok(data);
         }
 

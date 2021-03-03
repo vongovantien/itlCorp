@@ -1917,8 +1917,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo
-            });
-            return results;
+            }).ToList();
+            results.ForEach(item => item.TaxCodeAbbrName = item.TaxCode + " - " + item.ShortName);
+            return results.AsQueryable();
         }
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
@@ -1949,8 +1950,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo
-            });
-            return results;
+            }).ToList();
+            results.ForEach(item => item.TaxCodeAbbrName = item.TaxCode + " - " + item.ShortName);
+            return results.AsQueryable();
         }
 
         /// <summary>

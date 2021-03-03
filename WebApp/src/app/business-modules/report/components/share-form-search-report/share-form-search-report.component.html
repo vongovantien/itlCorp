@@ -1,4 +1,4 @@
-<div class="m-portlet" [ngClass]="{'margin-bottom-100': !isGeneralReport}">
+<div class="m-portlet" [ngClass]="{'margin-bottom-100': !isGeneralReport}" style="padding-bottom:20px;">
     <div class="m-portlet__body">
         <!--begin::Form-->
         <form class="m-form m-form--state" [formGroup]="formSearch" (ngSubmit)="searchReport()">
@@ -26,20 +26,20 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !customer.valid)}">
+                        [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !customer.valid)}">
                         <label class="form-control-label">
                             {{ isSheetDebitRpt ? "Partner": "Customer" }}
                         </label>
-                        <label *ngIf="isCommissionIncentive" required></label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: customer.value}"
+                        <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: customer.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             [displayFields]="displayFieldsCustomer" [height]="150"
                             (remove)="resetFormControl(customer)">
-                        </app-combo-grid-virtual-scroll>
-                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !customer.valid">
-                            Please select customer
-                        </div>
+                        </app-combo-grid-virtual-scroll> -->
+                        <ng-select formControlName="customer" [items]="customers | async" [(ngModel)]="customerActive"
+                            [virtualScroll]='true' [multiple]='true' [clearable]='true' class="custom"
+                            bindLabel="taxCodeAbbrName" bindValue="id">
+                        </ng-select>
                     </div>
                 </div>
             </div>
@@ -51,7 +51,8 @@
                         </label>
                         <ng-select [multiple]='true' class="custom" formControlName="service"
                             (remove)="onRemoveDataFormInfo($event, 'service')" [items]="serviceList"
-                            (add)="onSelectDataFormInfo($event, 'service')" [(ngModel)]="serviceActive" bindLabel="text" bindValue="id">
+                            (add)="onSelectDataFormInfo($event, 'service')" [(ngModel)]="serviceActive" bindLabel="text"
+                            bindValue="id">
                         </ng-select>
                     </div>
                 </div>
@@ -60,7 +61,8 @@
                         <label class="form-control-label">
                             Currency
                         </label>
-                        <ng-select formControlName="currency" class="custom" [clearable]="false" [items]="currencyList" bindLabel="id" bindValue="id">
+                        <ng-select formControlName="currency" class="custom" [clearable]="false" [items]="currencyList"
+                            bindLabel="id" bindValue="id">
                         </ng-select>
                     </div>
                     <div class="form-group" *ngIf="isCommissionIncentive">
@@ -121,7 +123,8 @@
                                     Office
                                 </label>
                                 <ng-select [multiple]='true' formControlName="office" class="custom"
-                                    (change)="detectChangeDataInfo($event, 'office')" [items]="officeList" [(ngModel)]="officeActive"
+                                    (change)="detectChangeDataInfo($event, 'office')" [items]="officeList"
+                                    [(ngModel)]="officeActive"
                                     [readonly]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
@@ -133,7 +136,8 @@
                                     Department
                                 </label>
                                 <ng-select [multiple]='true' formControlName="department" class="custom"
-                                    (change)="detectChangeDataInfo($event, 'department')" [items]="departmentList" [(ngModel)]="departmentActive"
+                                    (change)="detectChangeDataInfo($event, 'department')" [items]="departmentList"
+                                    [(ngModel)]="departmentActive"
                                     [readonly]="menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
@@ -145,7 +149,8 @@
                                     Group
                                 </label>
                                 <ng-select [multiple]='true' formControlName="group" class="custom"
-                                    (change)="detectChangeDataInfo($event, 'group')" [items]="groupList" [(ngModel)]="groupActive"
+                                    (change)="detectChangeDataInfo($event, 'group')" [items]="groupList"
+                                    [(ngModel)]="groupActive"
                                     [readonly]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
@@ -159,7 +164,8 @@
                                     Staff Name
                                 </label>
                                 <ng-select [multiple]='true' formControlName="staff" class="custom"
-                                    (change)="detectChangeDataInfo($event, 'staff')" [items]="staffList" [(ngModel)]="staffActive"
+                                    (change)="detectChangeDataInfo($event, 'staff')" [items]="staffList"
+                                    [(ngModel)]="staffActive"
                                     [readonly]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>

@@ -22,6 +22,7 @@
                         "main": "src/main.ts",
                         "polyfills": "src/polyfills.ts",
                         "tsConfig": "src/tsconfig.app.json",
+                        "aot": false,
                         "assets": [
                             "src/favicon.ico",
                             "src/assets",
@@ -38,8 +39,7 @@
                             "src/assets/external-libraries/js/popper.min.js",
                             "node_modules/bootstrap/dist/js/bootstrap.min.js",
                             "src/assets/external-libraries/js/editor.pkgd.min.js"
-                        ],
-                        "serviceWorker": true
+                        ]
                     },
                     "configurations": {
                         "design": {},
@@ -322,7 +322,6 @@
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
-                    "sourceMap": false,
                     "options": {
                         "browserTarget": "eFMS-Web:build"
                     },

@@ -97,7 +97,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
-                entity.Property(e => e.ServiceType).HasMaxLength(10);
+                entity.Property(e => e.ServiceType).HasMaxLength(100);
 
                 entity.Property(e => e.SourceCreated)
                     .HasMaxLength(50)
@@ -510,6 +510,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
@@ -542,6 +544,8 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.SoatoDate)
                     .HasColumnName("SOAToDate")
                     .HasColumnType("datetime");
+
+                entity.Property(e => e.StaffType).HasMaxLength(50);
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
@@ -1010,6 +1014,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
+                entity.Property(e => e.EndDateProgress).HasColumnType("datetime");
+
                 entity.Property(e => e.FuncLocal)
                     .HasMaxLength(255)
                     .IsUnicode(false);
@@ -1021,6 +1027,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.Major).HasMaxLength(100);
 
                 entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
+
+                entity.Property(e => e.ObjectResponse).HasColumnType("ntext");
+
+                entity.Property(e => e.StartDateProgress).HasColumnType("datetime");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

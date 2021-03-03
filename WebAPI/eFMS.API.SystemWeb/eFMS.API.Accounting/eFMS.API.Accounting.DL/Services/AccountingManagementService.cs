@@ -15,6 +15,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,7 +136,13 @@ namespace eFMS.API.Accounting.DL.Services
                             item.VoucherIddate = null;
                             item.SeriesNo = null;
 
-                            item.AmountVnd = item.VatAmountVnd = null;
+                            // item.AmountVnd = item.VatAmountVnd = null;
+                            // Tính lại do 2 field kế toán edit
+                            AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                          
+                            item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
 
@@ -1121,10 +1128,12 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
-                        HandleState hs = DataContext.Add(accounting);
 
-                        surchargeRepo.SubmitChanges();
-                        soaRepo.SubmitChanges();
+                        HandleState hs = DataContext.Add(accounting, false);
+
+                        var surSc = surchargeRepo.SubmitChanges();
+                        var soaSc = soaRepo.SubmitChanges();
+                        var sc = DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }

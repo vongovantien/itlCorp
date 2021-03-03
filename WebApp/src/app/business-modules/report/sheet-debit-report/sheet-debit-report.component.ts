@@ -38,6 +38,9 @@ export class SheetDebitReportComponent extends AppList {
             case CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE:
                 this.exportSummaryOfRevenueIncurred(data);
                 break;
+            case CommonEnum.SHEET_DEBIT_REPORT_TYPE.COSTS_BY_PARTNER:
+                this.exportSummaryOfCostsPartner(data);
+                break;
         }
     }
 
@@ -106,6 +109,24 @@ export class SheetDebitReportComponent extends AppList {
                 (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
                         this.downLoadFile(response, "application/ms-excel", 'Summary of revenue incurred.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
+
+    exportSummaryOfCostsPartner(data) {
+        this._progressRef.start();
+        this._exportRepo.exportCostsByPartner(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Costs By Partner.xlsx');
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }

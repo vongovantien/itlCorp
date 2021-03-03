@@ -135,8 +135,8 @@ export namespace CommonEnum {
     export enum SHEET_DEBIT_REPORT_TYPE {
         ACCNT_PL_SHEET = 'ACCNT_PL_SHEET',
         SUMMARY_OF_COST = 'SUMMARY_OF_COST',
-        SUMMARY_OF_REVENUE = 'SUMMARY_OF_REVENUE'
-
+        SUMMARY_OF_REVENUE = 'SUMMARY_OF_REVENUE',
+        COSTS_BY_PARTNER = 'COSTS_BY_PARTNER'
     }
 
     export enum JOB_PROFIT_ANALYSIS_TYPE {
@@ -181,6 +181,16 @@ export namespace CommonEnum {
         TrialOrOffical = 1,
         Guarantee = 2,
         Other = 3,
+    }
+
+    export enum ClassColor {
+        PRIMARY = 'primary',
+        SUCCESS = 'success',
+        DANGER = 'danger',
+        INFO = 'info',
+        SECONDARY = 'secondary',
+        MUTED = 'muted',
+        DARK = 'dark',
     }
 }
 
