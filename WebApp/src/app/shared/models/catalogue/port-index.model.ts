@@ -18,6 +18,8 @@ export class PortIndex {
     warehouseNameEn: string = null;
     warehouseNameVn: string = null;
     countryNameEN: string = null;
+    userCreated: string = null;
+    userModified: string = null;
 
     constructor(object?: any) {
         const self = this;

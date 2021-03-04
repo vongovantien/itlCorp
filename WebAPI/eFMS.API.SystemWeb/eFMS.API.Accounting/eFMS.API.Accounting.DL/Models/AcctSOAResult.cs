@@ -8,5 +8,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string PartnerName { get; set; }
         public int? Shipment { get; set; }
         public decimal? TotalAmount { get; set; }
+        public string UserNameCreated { get; set; }
+        public string UserNameModified { get; set; }
     }
 }

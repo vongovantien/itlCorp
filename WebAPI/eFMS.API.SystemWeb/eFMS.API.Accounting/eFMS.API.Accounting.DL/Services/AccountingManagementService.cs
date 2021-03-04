@@ -336,7 +336,9 @@ namespace eFMS.API.Accounting.DL.Services
                            LastSyncDate = acc.LastSyncDate,
                            SyncStatus = acc.SyncStatus,
                            ReferenceNo = acc.ReferenceNo,
-                           ReasonReject = acc.ReasonReject
+                           ReasonReject = acc.ReasonReject,
+                           UserCreated = acc.UserCreated,
+                           UserModified = acc.UserModified
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }

@@ -34,12 +34,13 @@
                                             [class.invalid-row]="soa.syncStatus === 'Rejected'">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
-                                                    <button type="button"
-                                                        class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                        title="Remove" (click)="prepareDeleteSOA(soa)"
-                                                        *ngIf="(soa.status === 'New' || soa.status === 'Need Revise') && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part' && soa.syncStatus !== 'Synced'">
-                                                        <i class="la la-trash"></i>
-                                                    </button>
+                                                    <ng-container *ngIf="(soa.status === 'New' || soa.status === 'Need Revise') 
+                                                    && soa.paymentStatus !== 'Paid' 
+                                                    && soa.paymentStatus !== 'Paid A Part' 
+                                                    && soa.syncStatus !== 'Synced'">
+                                                        <app-permission-button type="delete" [user]="soa.userCreated"
+                                                            (onClick)="prepareDeleteSOA(soa)"></app-permission-button>
+                                                    </ng-container>
                                                 </div>
                                             </td>
                                             <td class="text-underline">
@@ -85,7 +86,7 @@
                                                 <span>{{soa.datetimeCreated | date :'dd/MM/yyyy HH:mm'}}</span>
                                             </td>
                                             <td>
-                                                <span class="text-primary">{{soa.userCreated}}</span>
+                                                <span class="text-primary">{{soa.userNameCreated}}</span>
                                             </td>
                                             <td>
                                                 <span>{{soa.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
@@ -102,7 +103,9 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="text-info">{{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm'}}</span>
+                                                <span class="text-info">
+                                                    {{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm'}}
+                                                </span>
                                             </td>
                                         </tr>
                                         <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
