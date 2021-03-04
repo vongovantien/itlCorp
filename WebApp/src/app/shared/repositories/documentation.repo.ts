@@ -1058,4 +1058,10 @@ export class DocumentationRepo {
         );
     }
 
+    lockShipmentList(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/LockShipmentList`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }

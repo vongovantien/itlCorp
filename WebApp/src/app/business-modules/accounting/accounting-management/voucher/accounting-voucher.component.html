@@ -45,7 +45,8 @@
                                                         <ng-container
                                                             *ngIf="!voucher.syncStatus || voucher.syncStatus !== 'Synced'">
                                                             <app-permission-button
-                                                                (onClick)="prepareDeleteVoucher(voucher)" type="delete">
+                                                                (onClick)="prepareDeleteVoucher(voucher)" type="delete"
+                                                                [user]="voucher.userCreated">
                                                             </app-permission-button>
                                                         </ng-container>
                                                     </div>

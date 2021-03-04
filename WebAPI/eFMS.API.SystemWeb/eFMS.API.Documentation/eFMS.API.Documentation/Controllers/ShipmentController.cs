@@ -2,6 +2,7 @@
 using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -152,6 +153,21 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpPost("LockShipmentList")]
+        [Authorize]
+        public IActionResult LockShipmentList([FromBody]List<string> JobIds)
+        {
+            HandleState hs = shipmentService.LockShipmentList(JobIds);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
         /// <summary>
         /// Get data for general report
         /// </summary>
