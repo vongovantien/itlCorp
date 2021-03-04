@@ -1308,7 +1308,7 @@ namespace eFMS.API.ForPartner.DL.Service
             cdNote.DatetimeModified = DateTime.Now;
             cdNote.ReasonReject = reason;
 
-            var surcharges = surchargeRepo.Get(x => (cdNote.Code == "CREDIT" ? x.CreditNo : x.DebitNo) == cdNote.Code);
+            var surcharges = surchargeRepo.Get(x => (cdNote.Type == "CREDIT" ? x.CreditNo : x.DebitNo) == cdNote.Code);
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
