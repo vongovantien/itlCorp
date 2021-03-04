@@ -1,7 +1,7 @@
 Generate datacontext:
 
 * Identity server:
-Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.IdentityServer.Service -Force -Tables sysUser, sysEmployee, sysUserLevel, sysBU, sysDepartment, sysGroup, sysMenu, sysRole, sysUserLog, catDepartment, sysOffice, sysUserPermission, sysUserPermissionGeneral, sysUserPermissionSpecial, sysAuthorization
+Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.IdentityServer.Service -Force -Tables sysUser, sysEmployee, sysUserLevel, sysBU, sysDepartment, sysGroup, sysMenu, sysRole, sysUserLog, catDepartment, sysOffice, sysUserPermission, sysUserPermissionGeneral, sysUserPermissionSpecial, sysAuthorization, sysCompany
 
 * System server
  Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.System.Service -Force -Table sysUser, sysEmployee, sysUserLevel, sysOffice, sysCompany, catDepartment, sysGroup, sysMenu, sysRole,  sysImage, sysPermissionSample, sysPermissionSampleGeneral,sysPermissionSampleSpecial, sysMenu, sysPermissionSpecialAction, sysUserPermissionGeneral, sysUserPermissionSpecial, sysAuthorization, sysUserPermission,sysAuthorizedApproval, sysSettingFlow, setLockingDateShipment, sysPartnerAPI, sysNotifications, sysUserNotification

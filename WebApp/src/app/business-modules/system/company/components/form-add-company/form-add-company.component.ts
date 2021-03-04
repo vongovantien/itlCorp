@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -21,6 +21,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
     bunameAbbr: AbstractControl;
     website: AbstractControl;
     active: AbstractControl;
+    kbExchangeRate: AbstractControl;
 
     types: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -31,16 +32,13 @@ export class CompanyInformationFormAddComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _ele: ElementRef,
         private _toastService: ToastrService,
         private _zone: NgZone,
-        private _render: Renderer2
     ) {
         super();
     }
 
     ngOnInit(): void {
-
         this.initForm();
     }
 
@@ -60,6 +58,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
             ])],
             website: [],
             active: [this.types[0]],
+            kbExchangeRate: [],
         });
 
         this.code = this.formGroup.controls['code'];
@@ -68,6 +67,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
         this.bunameAbbr = this.formGroup.controls['bunameAbbr'];
         this.website = this.formGroup.controls['website'];
         this.active = this.formGroup.controls['active'];
+        this.kbExchangeRate = this.formGroup.controls['kbExchangeRate'];
     }
 
     ngAfterViewInit() {
@@ -126,4 +126,5 @@ export interface IFormAddCompany {
     bunameAbbr: string;
     website: string;
     active: boolean;
+    kbExchangeRate: number;
 }
