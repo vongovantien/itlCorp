@@ -139,7 +139,6 @@
                                     "with": "src/environments/environment.test.ts"
                                 }
                             ],
-                            "serviceWorker": false,
                             "budgets": [
                                 {
                                     "type": "bundle",
@@ -147,7 +146,9 @@
                                     "maximumWarning": "2mb",
                                     "maximumError": "5mb"
                                 }
-                            ]
+                            ],
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json"
                         },
                         "staging-en": {
                             "optimization": true,
@@ -211,7 +212,6 @@
                                     "with": "src/environments/environment.uat.ts"
                                 }
                             ],
-                            "serviceWorker": false,
                             "budgets": [
                                 {
                                     "type": "bundle",
@@ -219,7 +219,9 @@
                                     "maximumWarning": "2mb",
                                     "maximumError": "5mb"
                                 }
-                            ]
+                            ],
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json"
                         },
                         "uat-vi": {
                             "optimization": true,
@@ -239,7 +241,6 @@
                                     "with": "src/environments/environment.uat.ts"
                                 }
                             ],
-                            "serviceWorker": true,
                             "budgets": [
                                 {
                                     "type": "bundle",
@@ -247,7 +248,9 @@
                                     "maximumWarning": "2mb",
                                     "maximumError": "5mb"
                                 }
-                            ]
+                            ],
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json"
                         },
                         "prod-en": {
                             "fileReplacements": [
@@ -274,7 +277,8 @@
                                     "maximumError": "5mb"
                                 }
                             ],
-                            "serviceWorker": true
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json"
                         },
                         "prod-vi": {
                             "baseHref": "/vi/",
@@ -308,7 +312,8 @@
                                     "maximumError": "5mb"
                                 }
                             ],
-                            "serviceWorker": true
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json"
                         },
                         "prod-debug": {
                             "fileReplacements": [

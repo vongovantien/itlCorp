@@ -36,6 +36,7 @@ import { environment } from "src/environments/environment";
 import { reducers, effects } from "./store";
 import { ForbiddenPageComponent } from "./403/403.component";
 import { DEFAULT_TIMEOUT } from "./core/inject/default-timeout.token";
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 const authConfig: AuthConfig = {
     issuer: environment.HOST.INDENTITY_SERVER_URL,
@@ -90,6 +91,7 @@ const authConfig: AuthConfig = {
             maxAge: 25, // Retains last 25 states
             logOnly: !environment.production, // Restrict extension to log-only mode
         }),
+        ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
 
     ],
     providers: [

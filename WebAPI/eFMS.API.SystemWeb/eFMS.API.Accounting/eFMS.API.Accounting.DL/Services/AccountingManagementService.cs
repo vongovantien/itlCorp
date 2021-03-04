@@ -15,6 +15,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -335,7 +336,9 @@ namespace eFMS.API.Accounting.DL.Services
                            LastSyncDate = acc.LastSyncDate,
                            SyncStatus = acc.SyncStatus,
                            ReferenceNo = acc.ReferenceNo,
-                           ReasonReject = acc.ReasonReject
+                           ReasonReject = acc.ReasonReject,
+                           UserCreated = acc.UserCreated,
+                           UserModified = acc.UserModified
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
@@ -1127,10 +1130,12 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
-                        HandleState hs = DataContext.Add(accounting);
 
-                        surchargeRepo.SubmitChanges();
-                        soaRepo.SubmitChanges();
+                        HandleState hs = DataContext.Add(accounting, false);
+
+                        var surSc = surchargeRepo.SubmitChanges();
+                        var soaSc = soaRepo.SubmitChanges();
+                        var sc = DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }

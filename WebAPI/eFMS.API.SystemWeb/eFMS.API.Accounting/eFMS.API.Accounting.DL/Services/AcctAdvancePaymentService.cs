@@ -211,7 +211,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Leader == currentUser.UserID
                   || x.advancePaymentApr.LeaderApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Leader, x.advancePayment.GroupId, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Leader && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Leader && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                 )
                 && x.advancePayment.GroupId == currentUser.GroupId
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
@@ -225,7 +225,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Manager == currentUser.UserID
                   || x.advancePaymentApr.ManagerApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Manager, null, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Manager && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Manager && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                   )
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
                 && x.advancePayment.OfficeId == currentUser.OfficeID
@@ -239,7 +239,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
                   || x.advancePaymentApr.AccountantApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Accountant && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Accountant && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                   || isAccountantDept
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
@@ -252,7 +252,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Buhead == currentUser.UserID
                   || x.advancePaymentApr.BuheadApr == currentUser.UserID
                   //|| userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Buhead ?? null, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
-                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Commissioner == x.advancePaymentApr.Buhead && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.advancePaymentApr.Buhead && w.OfficeCommissioner == x.advancePayment.OfficeId).Any()
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
                 && x.advancePayment.CompanyId == currentUser.CompanyID
@@ -2961,12 +2961,13 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion -- Check Exist, Check Is Manager, Is Approved --
 
-        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string settlementCode)
+        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string jobId, string settlementCode)
         {
             //Advance Payment has Status Approve is Done
-            IQueryable<AcctAdvanceRequest> request = from ar in acctAdvanceRequestRepo.Get()
-                                                     join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
-                                                     select ar;
+            var request = from ar in acctAdvanceRequestRepo.Get()
+                          join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
+                          where ar.JobId == jobId
+                          select new { ar.AdvanceNo, ar.Hbl, ar.Amount,ar.RequestCurrency,ar.JobId,ar.Hblid,ar.Mbl };
 
             IQueryable<OpsTransaction> opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             IQueryable<CsTransaction> docShipment = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
@@ -2984,50 +2985,98 @@ namespace eFMS.API.Accounting.DL.Services
                 Mbl = s.First().Mbl
             });
 
-            //So sánh bằng
-            IQueryable<AcctAdvanceRequestModel> queryOps = from req in requestOrder
-                                                           join ops in opsShipment on req.JobId equals ops.JobNo into ops2
-                                                           from ops in ops2
-                                                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
-                                                           from adv in adv2
-                                                           join user in sysUsers on adv.Requester equals user.Id
-                                                           select new AcctAdvanceRequestModel
-                                                           {
-                                                               Id = req.Id,
-                                                               JobId = req.JobId,
-                                                               Hbl = req.Hbl,
-                                                               Hblid = req.Hblid,
-                                                               Mbl = req.Mbl,
-                                                               RequestDate = adv.RequestDate,
-                                                               Amount = req.Amount,
-                                                               AdvanceNo = req.AdvanceNo,
-                                                               RequestCurrency = req.RequestCurrency,
-                                                               Requester = user.Id,
-                                                               RequesterName = user.Username
-                                                           };
+            IQueryable<AcctAdvanceRequestModel> query = null;
+            if (jobId.Contains("LOG"))
+            {
+                query = from req in requestOrder
+                        join ops in opsShipment on req.JobId equals ops.JobNo into ops2
+                        from ops in ops2
+                        join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                        from adv in adv2
+                        join user in sysUsers on adv.Requester equals user.Id
+                        select new AcctAdvanceRequestModel
+                        {
+                            Id = req.Id,
+                            JobId = req.JobId,
+                            Hbl = req.Hbl,
+                            Hblid = req.Hblid,
+                            Mbl = req.Mbl,
+                            RequestDate = adv.RequestDate,
+                            Amount = req.Amount,
+                            AdvanceNo = req.AdvanceNo,
+                            RequestCurrency = req.RequestCurrency,
+                            Requester = user.Id,
+                            RequesterName = user.Username
+                        };
+            }
+            else
+            {
+                query = from req in requestOrder
+                        join doc in docShipment on req.JobId equals doc.JobNo into doc2
+                        from doc in doc2
+                        join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+                        from adv in adv2
+                        join user in sysUsers on adv.Requester equals user.Id
+                        select new AcctAdvanceRequestModel
+                        {
+                            Id = req.Id,
+                            JobId = req.JobId,
+                            Hbl = req.Hbl,
+                            Hblid = req.Hblid,
+                            Mbl = req.Mbl,
+                            RequestDate = adv.RequestDate,
+                            Amount = req.Amount,
+                            AdvanceNo = req.AdvanceNo,
+                            RequestCurrency = req.RequestCurrency,
+                            Requester = user.Id,
+                            RequesterName = user.Username
+                        };
+            }
+            ////So sánh bằng
+            //IQueryable<AcctAdvanceRequestModel> queryOps = from req in requestOrder
+            //                                               join ops in opsShipment on req.JobId equals ops.JobNo into ops2
+            //                                               from ops in ops2
+            //                                               join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+            //                                               from adv in adv2
+            //                                               join user in sysUsers on adv.Requester equals user.Id
+            //                                               select new AcctAdvanceRequestModel
+            //                                               {
+            //                                                   Id = req.Id,
+            //                                                   JobId = req.JobId,
+            //                                                   Hbl = req.Hbl,
+            //                                                   Hblid = req.Hblid,
+            //                                                   Mbl = req.Mbl,
+            //                                                   RequestDate = adv.RequestDate,
+            //                                                   Amount = req.Amount,
+            //                                                   AdvanceNo = req.AdvanceNo,
+            //                                                   RequestCurrency = req.RequestCurrency,
+            //                                                   Requester = user.Id,
+            //                                                   RequesterName = user.Username
+            //                                               };
 
-            //So sánh bằng
-            IQueryable<AcctAdvanceRequestModel> queryDoc = from req in requestOrder
-                                                           join doc in docShipment on req.JobId equals doc.JobNo into doc2
-                                                           from doc in doc2
-                                                           join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
-                                                           from adv in adv2
-                                                           join user in sysUsers on adv.Requester equals user.Id
-                                                           select new AcctAdvanceRequestModel
-                                                           {
-                                                               Id = req.Id,
-                                                               JobId = req.JobId,
-                                                               Hbl = req.Hbl,
-                                                               Hblid = req.Hblid,
-                                                               Mbl = req.Mbl,
-                                                               RequestDate = adv.RequestDate,
-                                                               Amount = req.Amount,
-                                                               AdvanceNo = req.AdvanceNo,
-                                                               RequestCurrency = req.RequestCurrency,
-                                                               Requester = user.Id,
-                                                               RequesterName = user.Username
-                                                           };
-            IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = queryOps.Union(queryDoc);
+            ////So sánh bằng
+            //IQueryable<AcctAdvanceRequestModel> queryDoc = from req in requestOrder
+            //                                               join doc in docShipment on req.JobId equals doc.JobNo into doc2
+            //                                               from doc in doc2
+            //                                               join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
+            //                                               from adv in adv2
+            //                                               join user in sysUsers on adv.Requester equals user.Id
+            //                                               select new AcctAdvanceRequestModel
+            //                                               {
+            //                                                   Id = req.Id,
+            //                                                   JobId = req.JobId,
+            //                                                   Hbl = req.Hbl,
+            //                                                   Hblid = req.Hblid,
+            //                                                   Mbl = req.Mbl,
+            //                                                   RequestDate = adv.RequestDate,
+            //                                                   Amount = req.Amount,
+            //                                                   AdvanceNo = req.AdvanceNo,
+            //                                                   RequestCurrency = req.RequestCurrency,
+            //                                                   Requester = user.Id,
+            //                                                   RequesterName = user.Username
+            //                                               };
+            //IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = queryOps.Union(queryDoc);
+            IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = query;
 
             //Get advance theo shipment và advance chưa làm settlement ngoại trừ settle đang xét; order tăng dần theo ngày request date
             IOrderedEnumerable<AcctAdvanceRequestModel> data = null;

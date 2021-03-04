@@ -646,6 +646,15 @@ export class DocumentationRepo {
         );
     }
 
+    previewASCdNoteList(data: any[], currency: string, serviceType: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewASCdNoteList`, data, { currency: currency, service: serviceType }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     getShipmentDemensionDetail(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsDimensionDetail/GetByMasterBill`, { mblId: jobId }).pipe(
             map((data: any) => data)
@@ -991,6 +1000,12 @@ export class DocumentationRepo {
         );
     }
 
+    previewSaleKickBackReport(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/SaleKickBackReport`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkExistSIExport(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction/CheckExistSIExport`, { jobId: id }).pipe(
             catchError((error) => throwError(error)),
@@ -1039,6 +1054,12 @@ export class DocumentationRepo {
 
     previewOPSCdNote(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOPSCDNoteWithCurrency`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    lockShipmentList(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/LockShipmentList`, body).pipe(
             map((data: any) => data)
         );
     }

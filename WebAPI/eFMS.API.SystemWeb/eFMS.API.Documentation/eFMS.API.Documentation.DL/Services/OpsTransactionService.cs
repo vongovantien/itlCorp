@@ -21,6 +21,10 @@ using eFMS.API.Common;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using eFMS.API.Common.Helpers;
+using System.Data.Common;
+using eFMS.API.Documentation.Service.Contexts;
+using eFMS.API.Documentation.Service.ViewModels;
+using ITL.NetCore.Connection;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -1466,6 +1470,8 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OfficeId = currentUser.OfficeID;
                     model.CompanyId = currentUser.CompanyID;
 
+                    model.IsLocked = false; // Luôn luôn mở job khi duplicate.
+                  
                     List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
                     if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                     {
@@ -1636,56 +1642,134 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
         {
-            var query = (from SC in surchargeRepository.Get()
-                         join ADR in accAdvanceRequestRepository.Get() on SC.Hblid equals ADR.Hblid
-                         join OP in opsTransactionRepository.Get() on ADR.Hblid equals OP.Hblid
-                         join US in userRepository.Get() on OP.UserCreated equals US.Id
-                         join ADP in accAdvancePaymentRepository.Get() on ADR.AdvanceNo equals ADP.AdvanceNo
-                         join SMP in acctSettlementPayment.Get() on SC.SettlementCode equals SMP.SettlementNo
+            List<OpsAdvanceSettlementModel> results = new List<OpsAdvanceSettlementModel>();
 
-                         where OP.Id == JobID && SC.SettlementCode != null && ADR.AdvanceNo == ADP.AdvanceNo && SC.AdvanceNo ==ADR.AdvanceNo
-                        group SC by new { SC.Hblno, SC.Mblno, ADR.Hblid, 
-                            adNo = ADP.AdvanceNo,
-                            adcurrency = ADP.AdvanceCurrency,
-                            adDate = ADP.RequestDate,
-                            adStatus = ADP.StatusApproval,
-                            rqt = US.Username,
-                            smDate = SMP.RequestDate,
-                            smNo = SMP.SettlementNo,
-                            smcurrency = SMP.SettlementCurrency,
-                            smStatus = SMP.StatusApproval,
-                            adAmount= ADR.Amount,
-                            smAmount= SMP.Amount
+            IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get();
+            IQueryable<AcctSettlementPayment> settlements = acctSettlementPayment.Get();
+            IQueryable<SysUser> users = userRepository.Get();
 
-                        } into g select new {
-                            advanNo = g.Key.adNo,
-                            advanCurren =g.Key.adcurrency,
-                            advanDate = g.Key.adDate,
-                            advanStatus = g.Key.adStatus,
-                            rqter = g.Key.rqt , settmDate = g.Key.smDate, settmNo = g.Key.smNo, smCurren = g.Key.smcurrency , settmStatus = g.Key.smStatus,
-                            advanAmount =g.Key.adAmount , settmAmount = g.Key.smAmount
-                        }).ToList();
-                                      
-            if (query == null)
+            OpsTransaction opsJob = DataContext.Get(x => x.Id == JobID)?.FirstOrDefault();
+            if(opsJob == null)
             {
-                return null;
+                return results;
             }
-            var data =  query.Select(x => new OpsAdvanceSettlementModel()
+
+            //var querySettle = from sur in surcharges
+            //            join s in settlements on sur.SettlementCode equals s.SettlementNo
+            //            join u in users on s.Requester equals u.Id
+            //            where sur.JobNo == opsJob.JobNo
+            //            group sur by new { sur.JobNo, sur.SettlementCode, s.SettlementCurrency, s.RequestDate, sur.AdvanceNo, s.StatusApproval, u.Username } into grps                    
+            //            select new
+            //            {
+            //                JobID = grps.Key.JobNo,
+            //                grps.Key.SettlementCode,
+            //                grps.Key.SettlementCurrency,
+            //                grps.Key.RequestDate,                            
+            //                Total = grps.Sum(x => x.Total),
+            //                grps.Key.StatusApproval,
+            //                Requester = grps.Key.Username,
+
+            //                grps.Key.AdvanceNo,
+
+            //            };
+
+            //IQueryable<AcctAdvancePayment> advancePayments = accAdvancePaymentRepository.Get();
+            //IQueryable<AcctAdvanceRequest> advanceRequest = accAdvanceRequestRepository.Get();
+
+            //var queryAdvance = from adv in advancePayments
+            //                   join adr in advanceRequest on adv.AdvanceNo equals adr.AdvanceNo
+            //                   join u in users on adv.Requester equals u.Id
+            //                   where adr.JobId == opsJob.JobNo
+            //                   group adr by new { adr.JobId, adv.AdvanceNo, adv.AdvanceCurrency, adv.RequestDate, adv.StatusApproval, u.Username } into grps
+            //                   select new
+            //                   {
+            //                       JobID = grps.Key.JobId,
+            //                       grps.Key.AdvanceNo,
+            //                       grps.Key.AdvanceCurrency,
+            //                       grps.Key.RequestDate,
+            //                       Total = grps.Sum(x => x.Amount),
+            //                       grps.Key.StatusApproval,
+            //                       Requester = grps.Key.Username
+            //                   };
+
+            //if (querySettle != null && querySettle.Count() > 0)
+            //{
+            //     var queryJoin = from s in querySettle
+            //                    join q2 in queryAdvance on s.AdvanceNo equals q2.AdvanceNo into grps
+            //                    from grp in grps.DefaultIfEmpty()
+            //                    where s.JobID == opsJob.JobNo
+            //                    select new OpsAdvanceSettlementModel
+            //                    {
+            //                        JobNo = grp.JobID,
+            //                        SettlementNo = s.SettlementCode,
+            //                        SettlemenDate = s.RequestDate,
+            //                        SettlementCurrency = s.SettlementCurrency,
+            //                        SettlementAmount = s.Total,
+            //                        SettleStatusApproval = s.StatusApproval,
+
+            //                        AdvanceNo = grp.AdvanceNo,
+            //                        AdvanceDate = grp.RequestDate,
+            //                        AdvanceCurrency = grp.AdvanceCurrency,
+            //                        AdvanceAmount = grp.Total ?? 0,
+            //                        AdvanceStatusApproval = grp.StatusApproval,
+            //                        Balance = s.Total - (grp.Total ?? 0),
+
+            //                        RequesterAdvance = grp.Requester,
+            //                        RequesterSettle = s.Requester,
+
+            //                    };
+            //    if (queryJoin != null)
+            //    {
+            //        results = queryJoin.ToList();
+            //    }
+            //}
+            //else
+            //{
+            //    results = queryAdvance.Select(x => new OpsAdvanceSettlementModel
+            //    {
+            //        AdvanceNo = x.AdvanceNo,
+            //        AdvanceDate = x.RequestDate,
+            //        AdvanceCurrency = x.AdvanceCurrency,
+            //        AdvanceAmount = x.Total ?? 0,
+            //        AdvanceStatusApproval = x.StatusApproval,
+            //        Balance = (x.Total ?? 0),
+            //        RequesterAdvance = x.Requester,
+            //    }).ToList();
+            //}
+
+            List<sp_GetAdvanceSettleOpsTransaction> dta = GetAdvanceSettleByJobNo(opsJob.JobNo);
+            if(dta.Count > 0)
+            {
+                results = dta.Select(s => new OpsAdvanceSettlementModel
                 {
-                AdvanceNo = x.advanNo,
-                AdvanceAmount = Convert.ToDecimal(x.advanAmount),
-                adCurrency = x.advanCurren,
-                AdvanceDate = x.advanDate,
-                Requester = x.rqter,
-                SettlemenDate = x.settmDate,
-                SettlementAmount = Convert.ToDecimal(x.settmAmount),
-                setCurrency = x.smCurren,
-                SettlementNo = x.settmNo,
-                Balance = Convert.ToDecimal(x.advanAmount - x.settmAmount),
-                SettleStatusApproval = x.advanStatus,
-                StatusApproval = x.settmStatus,
-            }).ToList();
-            return data;
+                    SettlementNo = s.SettlementCode,
+                    SettlemenDate = s.SettlementDate,
+                    SettlementCurrency = s.SettlementCurrency,
+                    SettlementAmount = s.SettlementAmount,
+                    SettleStatusApproval = s.SettleStatusApproval,
+                    RequesterSettle = s.SettleRequester,
+
+                    AdvanceNo = s.AdvanceNo,
+                    AdvanceDate = s.AdvanceDate,
+                    AdvanceCurrency = s.AdvanceCurrency,
+                    AdvanceAmount = s.AdvanceAmount,
+                    AdvanceStatusApproval = s.AdvanceStatusApproval,
+                    Balance = s.SettlementAmount - s.AdvanceAmount,
+                    RequesterAdvance = s.AdvRequester,
+
+                }).ToList();
+            }
+
+            return results;
+        }
+
+        private List<sp_GetAdvanceSettleOpsTransaction> GetAdvanceSettleByJobNo(string jobNo)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("jobNo", jobNo)
+            };
+            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAdvanceSettleOpsTransaction>(parameters);
         }
 
         public int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs)

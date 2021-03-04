@@ -7,7 +7,7 @@ import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
 import { formatDate } from "@angular/common";
-import { catchError, finalize, takeUntil } from "rxjs/operators";
+import { catchError, finalize, map, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
@@ -83,6 +83,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     ];
     serviceList: any[] = [];
     serviceActive: any[] = [];
+    customerActive: any[] = [];
     currencyList: any[] = [];
     officeList: any[] = [];
     officeActive: any[] = [];
@@ -106,7 +107,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         { id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT, text: 'Sale Report By Department' },
         { id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER, text: 'Sale Report By Quarter' },
         { id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY, text: 'Summary Sale Report' },
-        { id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION, text: 'Combination Statistic Report' }
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION, text: 'Combination Statistic Report' },
+        { id: CommonEnum.SALE_REPORT_TYPE.SR_KICKBACK, text: 'Sale KickBack Report' }
     ];
 
     typeReportActive: any[] = [];
@@ -134,7 +136,7 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.initFormSearch();
         if (this.isSheetDebitRpt) { // Partner for Accountant Report
             // Get All Partner
-            this.customers = this._catalogueRepo.getPartnerByGroups(null, null);
+            this.customers = this._catalogueRepo.getPartnerByGroups(null, null)
         } else {
             this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
             this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
@@ -167,7 +169,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
-        const staffTypeInit = this.isGeneralReport || this.isSheetDebitRpt  ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
+        const staffTypeInit = this.isGeneralReport || this.isSheetDebitRpt ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
                 startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
@@ -241,9 +243,6 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
-            case 'customer':
-                this.customer.setValue(data.id);
-                break;
             case 'carrier':
                 this.carrier.setValue(data.id);
                 break;
@@ -626,7 +625,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customer.value,
+            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
             currency: this.currency.value, // ---**
             jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
@@ -652,7 +651,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customer.value,
+            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
             currency: this.currency.value, // ---**
             jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,

@@ -10,6 +10,8 @@ import { GlobalState } from 'src/app/global-state';
 import { SignalRService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { UpdateCurrentUser } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-header',
@@ -52,7 +54,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         private _globalState: GlobalState,
         private _signalRService: SignalRService,
         private _toast: ToastrService,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private _store: Store<any>
     ) { }
 
     ngOnInit() {
@@ -70,6 +73,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                         this.currenUser.photo = user.photo;
                         this.currenUser.nameEn = user.nameEn;
                         this.currenUser.title = user.title;
+
+                        this._store.dispatch(UpdateCurrentUser(user));
 
                     }
                 }

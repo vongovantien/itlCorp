@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.ForPartner.DL.Models;
+using eFMS.API.ForPartner.DL.ViewModel;
 using eFMS.API.ForPartner.Service.Models;
 
 namespace eFMS.API.ForPartner.Infrastructure
@@ -16,6 +17,8 @@ namespace eFMS.API.ForPartner.Infrastructure
             CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
 
             CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
+            CreateMap<CsShipmentSurcharge, ChargeInvoiceUpdateTable>();
+            CreateMap<AccAccountingManagement, InvoiceTable>();
         }
     }
 }

@@ -56,7 +56,7 @@
                         </div>
                         <!--end:: Search-form-->
                         <div class="table-wrapper">
-                            <table class="table table-brand table-striped dataTable">
+                            <table class="table table-brand table-striped dataTable table-hover">
                                 <thead app-table-header [headers]="headers" (onClick)="sortBy($event)">
                                     <th class="m--w-50 first table-actions-col">
                                         Actions
@@ -120,7 +120,8 @@
                                 </div>
                             </div>
                         </div>
-
+                        <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                            (onChange)="updatePagingData($event)"></app-pagination>
 
                     </ng-container>
                 </tab>

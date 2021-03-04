@@ -125,26 +125,73 @@ namespace eFMS.API.Accounting.DL.Services
                     model.PaymentDueDate = dueDate;
                 }
 
+                var soa = mapper.Map<AcctSoa>(model);
+
+                var surchargesSoa = new List<CsShipmentSurcharge>();
+
+                //List charge of SOA
+                var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
+
+                var _totalShipment = 0;
+                decimal _amount = 0;
+                decimal _debitAmount = 0;
+                decimal _creditAmount = 0;
+                int _totalCharge = 0;
+                if (surcharges != null)
+                {
+                    _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
+                    _totalCharge = surcharges.Count();
+                    foreach (var surcharge in surcharges)
+                    {
+                        surcharge.UserModified = userCurrent;
+                        surcharge.DatetimeModified = soa.DatetimeCreated;
+                        if (string.IsNullOrEmpty(surcharge.CreditNo) && string.IsNullOrEmpty(surcharge.DebitNo))
+                        {
+                            //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
+                            surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
+                            //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                            surcharge.FinalExchangeRate = null;
+
+                            #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                            surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                            #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                        }
+
+                        _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, soa.Currency);
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                        {
+                            _debitAmount += _amount;
+                        }
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                        {
+                            _creditAmount += _amount;
+                        }
+                        surchargesSoa.Add(surcharge);
+                    }
+                }
+
+                soa.TotalShipment = _totalShipment;
+                soa.DebitAmount = _debitAmount;
+                soa.CreditAmount = _creditAmount;
+                soa.TotalCharge = _totalCharge;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        var soa = mapper.Map<AcctSoa>(model);
                         soa.Soano = model.Soano = CreateSoaNo();
+                        var hs = DataContext.Add(soa, false);
 
-                        //List charge of SOA
-                        var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
-
-                        var _totalShipment = 0;
-                        decimal _amount = 0;
-                        decimal _debitAmount = 0;
-                        decimal _creditAmount = 0;
-                        int _totalCharge = 0;
-                        if (surcharges != null)
+                        if (surchargesSoa != null)
                         {
-                            _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
-                            _totalCharge = surcharges.Count();
-                            foreach (var surcharge in surcharges)
+                            foreach (var surcharge in surchargesSoa)
                             {
                                 //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
                                 if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == model.Customer))
@@ -156,48 +203,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     surcharge.Soano = soa.Soano;
                                 }
-
-                                surcharge.UserModified = userCurrent;
-                                surcharge.DatetimeModified = model.DatetimeCreated;
-                                if (string.IsNullOrEmpty(surcharge.CreditNo) && string.IsNullOrEmpty(surcharge.DebitNo))
-                                {
-                                    //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
-                                    surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-                                    //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                                    surcharge.FinalExchangeRate = null;
-
-                                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
-                                    surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                                    surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                                    surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                                    surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                                    surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                                    surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                                    surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                                    #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                }
-
-                                _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, soa.Currency);
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                                {
-                                    _debitAmount += _amount;
-                                }
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                                {
-                                    _creditAmount += _amount;
-                                }
-
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
+                                
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
-                        }
-
-                        soa.TotalShipment = _totalShipment;
-                        soa.DebitAmount = _debitAmount;
-                        soa.CreditAmount = _creditAmount;
-                        soa.TotalCharge = _totalCharge;
-                        var hs = DataContext.Add(soa);
+                        }                      
+                        
                         csShipmentSurchargeRepo.SubmitChanges();
+                        DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -227,138 +239,147 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
+
+                //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
+                var surchargesOld = csShipmentSurchargeRepo.Get(x => (model.Type == "Debit" ? x.Soano : x.PaySoano) == model.Soano);
+                foreach (var surchargeOld in surchargesOld)
+                {
+                    //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
+                    if (model.Type == "Debit")
+                    {
+                        surchargeOld.Soano = null;
+                    }
+                    else
+                    {
+                        surchargeOld.PaySoano = null;
+                    }
+                    surchargeOld.UserModified = currentUser.UserID;
+                    surchargeOld.DatetimeModified = DateTime.Now;
+                    var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(surchargeOld, x => x.Id == surchargeOld.Id);
+                }
+
+                var soa = mapper.Map<AcctSoa>(model);
+                var soaCurrent = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
+                soa.DatetimeModified = DateTime.Now;
+                soa.UserModified = userCurrent;
+                soa.Currency = model.Currency.Trim();
+                soa.GroupId = soaCurrent.GroupId;
+                soa.DepartmentId = soaCurrent.DepartmentId;
+                soa.OfficeId = soaCurrent.OfficeId;
+                soa.CompanyId = soaCurrent.CompanyId;
+                soa.SyncStatus = soaCurrent.SyncStatus;
+                soa.LastSyncDate = soaCurrent.LastSyncDate;
+                soa.ReasonReject = soaCurrent.ReasonReject;
+                soa.ExcRateUsdToLocal = soaCurrent.ExcRateUsdToLocal;
+
+                //Check exists OBH Debit Charge
+                var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
+                                                               && model.Surcharges.Any(c => c.surchargeId == x.Id)
+                                                               && x.Type == AccountingConstants.TYPE_CHARGE_OBH
+                                                               && x.PaymentObjectId == model.Customer).Any();
+                if (isExistObhDebitCharge)
+                {
+                    soa.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                    DateTime? dueDate = null;
+                    dueDate = soaCurrent.DatetimeCreated.Value.AddDays(30);
+                    soa.PaymentDueDate = dueDate;
+                }
+                else
+                {
+                    soa.PaymentStatus = (soa.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID) ? null : soa.PaymentStatus;
+                }
+
+                var surchargesSoa = new List<CsShipmentSurcharge>();
+
+                //List charge of SOA
+                var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
+
+                var _totalShipment = 0;
+                decimal _amount = 0;
+                decimal _debitAmount = 0;
+                decimal _creditAmount = 0;
+                int _totalCharge = 0;
+                if (surcharges != null)
+                {
+                    _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
+                    _totalCharge = surcharges.Count();
+                    foreach (var surcharge in surcharges)
+                    {
+                        surcharge.UserModified = userCurrent;
+                        surcharge.DatetimeModified = model.DatetimeCreated;
+                        if (string.IsNullOrEmpty(surcharge.CreditNo) && string.IsNullOrEmpty(surcharge.DebitNo))
+                        {
+                            //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
+                            surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
+
+                            if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                            {
+                                surcharge.FinalExchangeRate = soaCurrent.ExcRateUsdToLocal;
+                            }
+                            else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                            {
+                                surcharge.FinalExchangeRate = 1;
+                            }
+                            else
+                            {
+                                surcharge.FinalExchangeRate = null;
+                            }
+
+                            #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                            surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                            #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                        }
+
+                        _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, soa.Currency);
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                        {
+                            _debitAmount += _amount;
+                        }
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                        {
+                            _creditAmount += _amount;
+                        }
+
+                        surchargesSoa.Add(surcharge);
+                    }
+                }
+
+                soa.TotalShipment = _totalShipment;
+                soa.DebitAmount = _debitAmount;
+                soa.CreditAmount = _creditAmount;
+                soa.TotalCharge = _totalCharge;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
-                        var surchargesOld = csShipmentSurchargeRepo.Get(x => (model.Type == "Debit" ? x.Soano : x.PaySoano) == model.Soano);
-                        foreach (var surchargeOld in surchargesOld)
+                        var hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
+                        
+                        foreach (var surcharge in surchargesSoa)
                         {
-                            //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
-                            if (model.Type == "Debit")
+                            //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
+                            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == model.Customer))
                             {
-                                surchargeOld.Soano = null;
+                                surcharge.PaySoano = soa.Soano;
                             }
-                            else
+                            //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
+                            else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
                             {
-                                surchargeOld.PaySoano = null;
+                                surcharge.Soano = soa.Soano;
                             }
-                            surchargeOld.UserModified = currentUser.UserID;
-                            surchargeOld.DatetimeModified = DateTime.Now;
-                            var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(surchargeOld, x => x.Id == surchargeOld.Id);
+
+                            var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                         }
 
-                        model.DatetimeModified = DateTime.Now;
-                        model.UserModified = userCurrent;
-                        model.Currency = model.Currency.Trim();
-
-                        var soa = mapper.Map<AcctSoa>(model);
-                        var soaCurrent = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
-                        soa.GroupId = soaCurrent.GroupId;
-                        soa.DepartmentId = soaCurrent.DepartmentId;
-                        soa.OfficeId = soaCurrent.OfficeId;
-                        soa.CompanyId = soaCurrent.CompanyId;
-                        soa.SyncStatus = soaCurrent.SyncStatus;
-                        soa.LastSyncDate = soaCurrent.LastSyncDate;
-                        soa.ReasonReject = soaCurrent.ReasonReject;
-                        soa.ExcRateUsdToLocal = soaCurrent.ExcRateUsdToLocal;
-
-                        //Check exists OBH Debit Charge
-                        var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                       && model.Surcharges.Any(c => c.surchargeId == x.Id)
-                                                                       && x.Type == AccountingConstants.TYPE_CHARGE_OBH
-                                                                       && x.PaymentObjectId == model.Customer).Any();
-                        if (isExistObhDebitCharge)
-                        {
-                            soa.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
-                            DateTime? dueDate = null;
-                            dueDate = soaCurrent.DatetimeCreated.Value.AddDays(30);
-                            soa.PaymentDueDate = dueDate;
-                        }
-                        else
-                        {
-                            soa.PaymentStatus = (soa.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID) ? null : soa.PaymentStatus;
-                        }
-
-                        //List charge of SOA
-                        var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
-
-                        var _totalShipment = 0;
-                        decimal _amount = 0;
-                        decimal _debitAmount = 0;
-                        decimal _creditAmount = 0;
-                        int _totalCharge = 0;
-                        if (surcharges != null)
-                        {
-                            _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
-                            _totalCharge = surcharges.Count();
-                            foreach (var surcharge in surcharges)
-                            {
-                                //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == model.Customer))
-                                {
-                                    surcharge.PaySoano = soa.Soano;
-                                }
-                                //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
-                                else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
-                                {
-                                    surcharge.Soano = soa.Soano;
-                                }
-
-                                surcharge.UserModified = userCurrent;
-                                surcharge.DatetimeModified = model.DatetimeCreated;
-                                if (string.IsNullOrEmpty(surcharge.CreditNo) && string.IsNullOrEmpty(surcharge.DebitNo))
-                                {
-                                    //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
-                                    surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-                                    
-                                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        surcharge.FinalExchangeRate = soaCurrent.ExcRateUsdToLocal;
-                                    }
-                                    else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        surcharge.FinalExchangeRate = 1;
-                                    }
-                                    else
-                                    {
-                                        surcharge.FinalExchangeRate = null;
-                                    }
-
-                                    #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
-                                    surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                                    surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                                    surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                                    surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                                    surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                                    surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                                    surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                                    #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                }
-
-                                _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, soa.Currency);
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                                {
-                                    _debitAmount += _amount;
-                                }
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                                {
-                                    _creditAmount += _amount;
-                                }
-
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
-                            }
-                        }
-
-                        soa.TotalShipment = _totalShipment;
-                        soa.DebitAmount = _debitAmount;
-                        soa.CreditAmount = _creditAmount;
-                        soa.TotalCharge = _totalCharge;
-
-                        var hs = DataContext.Update(soa, x => x.Id == soa.Id);
                         csShipmentSurchargeRepo.SubmitChanges();
+                        DataContext.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -458,6 +479,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.PaySoano = null;
                                 item.UserModified = currentUser.UserID;
                                 item.DatetimeModified = DateTime.Now;
+                                if (item.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                {
+                                    item.PaySyncedFrom = (soaNo == item.PaySoano) ? null : item.PaySyncedFrom;
+                                    item.SyncedFrom = (soaNo == item.Soano) ? null : item.SyncedFrom;
+                                }
+                                else
+                                {
+                                    item.SyncedFrom = null;
+                                }
+
                                 var hsUpdateSOANoSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                             }
                         }
@@ -1496,14 +1527,16 @@ namespace eFMS.API.Accounting.DL.Services
                                  TotalAmount = s.DebitAmount - s.CreditAmount,
                                  Status = s.Status,
                                  DatetimeCreated = s.DatetimeCreated,
-                                 UserCreated = ucreate.Username,
+                                 UserCreated = s.UserCreated,
                                  DatetimeModified = s.DatetimeModified,
-                                 UserModified = umodifies.Username,
+                                 UserModified = s.UserModified,
                                  PaymentStatus = s.PaymentStatus,
                                  SyncStatus = s.SyncStatus,
                                  LastSyncDate = s.LastSyncDate,
                                  ReasonReject = s.ReasonReject,
-                                 TotalCharge = s.TotalCharge
+                                 TotalCharge = s.TotalCharge,
+                                 UserNameCreated = ucreate.Username,
+                                 UserNameModified = umodifies.Username
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
@@ -1958,17 +1991,17 @@ namespace eFMS.API.Accounting.DL.Services
 
             // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var charge = GetChargeExportForSOA(soa.FirstOrDefault()).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
-            var results = charge.GroupBy(x => x.HBL).AsQueryable();
+            var results = charge.GroupBy(x => x.HBLID).AsQueryable();
 
             if (results.Select(x => x.Key).Count() > 0)
             {
                 result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
                 foreach (var item in results.Select(x => x.Key))
                 {
-                    var chargeData = charge.Where(x => x.HBL == item && x.Currency == AccountingConstants.CURRENCY_USD).FirstOrDefault();
+                    var chargeData = charge.Where(x => x.HBLID == item && x.Currency == AccountingConstants.CURRENCY_USD).FirstOrDefault();
                     if(chargeData == null)
                     {
-                        chargeData = charge.Where(x => x.HBL == item).FirstOrDefault();
+                        chargeData = charge.Where(x => x.HBLID == item).FirstOrDefault();
                     }
                     HawbAirFrieghtModel air = new HawbAirFrieghtModel();
                     air.JobNo = chargeData.JobId;
@@ -1984,10 +2017,10 @@ namespace eFMS.API.Accounting.DL.Services
 
                     air.TotalAmount = 0;
                     // Airfrieght
-                    var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstAirfrieght = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAirfrieght.Count() == 0)
                     {
-                        lstAirfrieght = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstAirfrieght = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
                     if (lstAirfrieght.Count() > 0)
                     {
@@ -1996,10 +2029,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.DebitLocal).Sum());
                     }
                     // FuelSurcharge
-                    var lstFuelSurcharge = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstFuelSurcharge = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstFuelSurcharge.Count() == 0)
                     {
-                        lstFuelSurcharge = charge.Where(x => x.HBL == item &&
+                        lstFuelSurcharge = charge.Where(x => x.HBLID == item &&
                                                         (x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
                     if (lstFuelSurcharge.Count() > 0)
@@ -2008,10 +2041,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstFuelSurcharge.Select(t => t.DebitLocal).Sum());
                     }
                     // WariskSurcharge
-                    var lstWariskSurcharge = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstWariskSurcharge = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstWariskSurcharge.Count() == 0)
                     {
-                        lstWariskSurcharge = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstWariskSurcharge = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
                     if(lstWariskSurcharge.Count() > 0)
                     {
@@ -2019,10 +2052,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstWariskSurcharge.Select(t => t.DebitLocal).Sum());
                     }
                     // ScreeningFee
-                    var lstScreeningFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SCREENING_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstScreeningFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SCREENING_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstScreeningFee.Count() == 0)
                     {
-                        lstScreeningFee = charge.Where(x => x.HBL == item &&
+                        lstScreeningFee = charge.Where(x => x.HBLID == item &&
                                                         (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_X_RAY.ToLower()) &&
                                                         x.Currency == AccountingConstants.CURRENCY_USD);
                     }
@@ -2032,10 +2065,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstScreeningFee.Select(t => t.DebitLocal).Sum());
                     }
                     // AWBFee
-                    var lstAWBFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AWB_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstAWBFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AWB_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAWBFee.Count() == 0)
                     {
-                        lstAWBFee = charge.Where(x => x.HBL == item &&
+                        lstAWBFee = charge.Where(x => x.HBLID == item &&
                                                 (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB.ToLower()) &&
                                                 x.Currency == AccountingConstants.CURRENCY_USD);
                     }
@@ -2045,10 +2078,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAWBFee.Select(t => t.DebitLocal).Sum());
                     }
                     // AMSFee
-                    var lstAMSFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AMS_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstAMSFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AMS_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstAMSFee.Count() == 0)
                     {
-                        lstAMSFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstAMSFee = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
                     if (lstAMSFee.Count() > 0)
                     {
@@ -2056,10 +2089,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAMSFee.Select(t => t.DebitLocal).Sum());
                     }
                     // Dangerous fee
-                    var lstDANFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SA_DAN_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstDANFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_DAN_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstDANFee.Count() == 0)
                     {
-                        lstDANFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstDANFee = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
                     if (lstDANFee.Count() > 0)
                     {
@@ -2067,14 +2100,14 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstDANFee.Select(t => t.DebitLocal).Sum());
                     }
                     // Other fee
-                    var lstOTHFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstOTHFee.Count() == 0)
                     {
-                        lstOTHFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstOTHFee = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
                     }
                     if (lstOTHFee.Count() == 0)
                     {
-                        lstOTHFee = charge.Where(x => x.HBL == item && (x.ChargeCode != AccountingConstants.CHARGE_AIR_FREIGHT_CODE
+                        lstOTHFee = charge.Where(x => x.HBLID == item && (x.ChargeCode != AccountingConstants.CHARGE_AIR_FREIGHT_CODE
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()
                                                                     && x.ChargeCode != AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()
@@ -2098,7 +2131,7 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstOTHFee.Select(t => t.DebitLocal).Sum());
                     }
                     // HandlingFee
-                    var lstHandlingFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_HANDLING_FEE) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstHandlingFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_HANDLING_FEE) && x.Currency == AccountingConstants.CURRENCY_USD);
                     if (lstHandlingFee.Count() > 0)
                     {
                         air.HandlingFee = NumberHelper.RoundNumber((decimal)lstHandlingFee.Select(t => t.DebitUSD).Sum(), 2);
@@ -2466,7 +2499,9 @@ namespace eFMS.API.Accounting.DL.Services
                     FinalExchangeRate = sur.FinalExchangeRate,
                     PIC = null,
                     IsSynced = _isSynced,
-                    NetAmount = sur.NetAmount
+                    NetAmount = sur.NetAmount,
+                    AmountVND = sur.AmountVnd,
+                    AmountUSD = sur.AmountUsd
                 };
                 result.Add(chg);
             }
@@ -2530,27 +2565,16 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var it in item.Charges)
                 {
                     // VAT amount
-                    decimal? percent = 0;
                     if (it.VATRate > 0)
                     {
-                        percent = it.VATRate / 100;
-                        it.VATAmount = percent * (it.UnitPrice * it.Quantity);
-                        if (it.Currency != AccountingConstants.CURRENCY_LOCAL)
-                        {
-                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0, 2);
-
-                        }
-                        else
-                        {
-                            it.VATAmount = NumberHelper.RoundNumber(it.VATAmount ?? 0);
-                        }
+                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATAmountLocal ?? 0) : NumberHelper.RoundNumber(it.VATAmountUSD ?? 0, 2));
                     }
                     else
                     {
                         it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
                     }
                     // Net amount
-                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.NetAmount ?? 0) : NumberHelper.RoundNumber(it.NetAmount ?? 0, 2));
+                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.AmountVND ?? 0) : NumberHelper.RoundNumber(it.AmountUSD ?? 0, 2));
                 }
             }
 
