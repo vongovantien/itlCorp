@@ -123,7 +123,8 @@ export namespace CommonEnum {
         SR_DEPARTMENT = 'SR_DEPARTMENT',
         SR_QUARTER = 'SR_QUARTER',
         SR_SUMMARY = 'SR_SUMMARY',
-        SR_COMBINATION = 'SR_COMBINATION'
+        SR_COMBINATION = 'SR_COMBINATION',
+        SR_KICKBACK = 'SR_KICKBACK'
     }
 
     export enum SHEET_DEBIT_REPORT_TYPE {

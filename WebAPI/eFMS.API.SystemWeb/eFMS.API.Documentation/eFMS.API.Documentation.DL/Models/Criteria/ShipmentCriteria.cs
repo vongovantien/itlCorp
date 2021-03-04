@@ -11,11 +11,13 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public TransactionTypeEnum TransactionType { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public List<string> OfficeIds { get; set; }
     }
     public enum ShipmentPropertySearch
     {
         JOBID = 1,
         MBL = 2,
-        HBL = 3
+        HBL = 3,
+        CD = 4
     }
 }

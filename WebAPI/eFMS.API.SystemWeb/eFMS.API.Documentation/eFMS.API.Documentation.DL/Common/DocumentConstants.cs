@@ -79,5 +79,6 @@
         public const string Sale_Report_By_Department = "Sale Report By Department";
         public const string Summary_Sale_Report = "Summary Sale Report";
         public const string Combination_Statistic_Report = "Combination Statistic Report";
+        public const string Sale_KickBack_Report = "Sale KickBack Report";
     }
 }

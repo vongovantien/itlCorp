@@ -1000,6 +1000,12 @@ export class DocumentationRepo {
         );
     }
 
+    previewSaleKickBackReport(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/SaleKickBackReport`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkExistSIExport(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction/CheckExistSIExport`, { jobId: id }).pipe(
             catchError((error) => throwError(error)),
@@ -1048,6 +1054,12 @@ export class DocumentationRepo {
 
     previewOPSCdNote(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOPSCDNoteWithCurrency`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    lockShipmentList(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/LockShipmentList`, body).pipe(
             map((data: any) => data)
         );
     }

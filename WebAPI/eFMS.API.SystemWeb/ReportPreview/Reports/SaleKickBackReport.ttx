@@ -1,0 +1,40 @@
+TransID	String	50	
+HBLID	String	150	
+LoadingDate	Date		
+HAWBNO	String	50	
+PartnerName	String	150	
+Description	String	150	
+Quantity	Number		
+Unit	String	50	
+UnitPrice	Number		
+TotalValue	Number		
+Currency	String	50	
+Status	String	255	
+UsdExt	Number		
+PaymentNo	String	50	
+MAWB	String	255	
+Shipper	String	255	
+Consignee	String	255	
+PartnerID	String	50	
+PartnerName2	String	255	
+PartnerName3	String	255	
+Address	String	255	
+Address2	String	255	
+TEL	String	255	
+Cell	String	255	
+Taxcode	String	255	
+Category	String	255	
+BankAccsNo	String	255	
+BankName	String	255	
+BankAddress	String	255	
+Customer	String	255	
+Coloader	String	255	
+Agent	String	255	
+CustomerINVUnpaid	String	255	
+CustomerINVpaid	String	255	
+AgentINVUnpaid	String	255	
+AgentINVpaid	String	255	
+CarrierINVUnpaid	String	255	
+CarrierINVpaid	String	255	
+Costs	Number		
+Incomes	Number		
