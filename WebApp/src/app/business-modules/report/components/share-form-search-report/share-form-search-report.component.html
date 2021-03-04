@@ -225,7 +225,7 @@
                             <label class="form-control-label" for="">
                                 Report Type
                             </label>
-                            <ng-select formControlName="typeReport" [clearable]="false" [items]="typeReportActive"
+                            <ng-select formControlName="typeReport" [clearable]="false" [items]="typeReportActive" appendTo="body"
                                 class="custom" (add)="onSelectDataFormInfo($event, 'typeReport')" bindLabel="text"
                                 bindValue="id">
                             </ng-select>
