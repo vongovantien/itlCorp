@@ -1536,7 +1536,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
                     var comChargeGroup = catChargeGroupRepo.Get(x => x.Name == "Com").FirstOrDefault();
-                    var surcharge = detailLookupSur[(Guid)item.Hblid].Where(x => x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id);
+                    var surcharge = detailLookupSur[item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
                     var partner = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault();
                     foreach (var charge in surcharge)
                     {
@@ -1555,8 +1555,8 @@ namespace eFMS.API.Documentation.DL.Services
                             Currency = charge.CurrencyId,
                             Status = string.Empty,
                             // Total Amount phí buying kickback
-                            UsdExt = charge.Type == DocumentConstants.CHARGE_BUY_TYPE ? criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
-                                                                                            : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2)) : 0,
+                            UsdExt = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
+                                                                                           : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2)),
                             MAWB = item.Mblno ?? string.Empty,
                             Shipper = item.Shipper ?? string.Empty,
                             Consignee = item.Consignee ?? string.Empty,
@@ -1609,7 +1609,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (item.HBLID != null && item.HBLID != Guid.Empty)
                 {
                     var comChargeGroup = catChargeGroupRepo.Get(x => x.Name == "Com").FirstOrDefault();
-                    var surcharge = detailLookupSur[(Guid)item.HBLID].Where(x => x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id);
+                    var surcharge = detailLookupSur[item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
                     var partner = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault();
                     foreach (var charge in surcharge)
                     {
@@ -1628,19 +1628,14 @@ namespace eFMS.API.Documentation.DL.Services
                             Currency = charge.CurrencyId,
                             Status = string.Empty,
                             // Total Amount phí buying kickback
-                            UsdExt = charge.Type == DocumentConstants.CHARGE_BUY_TYPE ? criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
-                                                                                            : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2)) : 0,
+                            UsdExt = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
+                                                                                           : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2)),
                             MAWB = item.MawbNo ?? string.Empty,
                             Shipper = item.ShipperDescription,
                             Consignee = item.ConsigneeDescription,
                             PartnerID = item.CustomerId,
                             Category = partner?.PartnerType,
                         };
-                        if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
-                        {
-                            report.UsdExt = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
-                                                                                            : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2));
-                        }
                         // Lấy tất cả Buying charge
                         var chargeBuy = detailLookupSur[(Guid)item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                         report.Costs = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? chargeBuy.Sum(x => x.AmountVnd ?? 0) + _decimalNumber : chargeBuy.Sum(x => x.AmountUsd ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
