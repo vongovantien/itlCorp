@@ -143,5 +143,29 @@ namespace eFMS.API.Documentation.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Preview Sale KickBack Report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("SaleKickBackReport")]
+        [Authorize]
+        public IActionResult SaleKickBackReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewSaleKickBackReport(criteria);
+
+            #region -- Ghi log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = DocumentConstants.Sale_KickBack_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = DocumentConstants.Crystal_Preview
+            };
+            reportLogService.AddNew(reportLogModel);
+            #endregion -- Ghi log Report --
+
+            return Ok(result);
+        }
     }
 }
