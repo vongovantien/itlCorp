@@ -71,11 +71,12 @@
                                     <td>{{customer.accountNo}}</td>
                                     <td>{{customer.shortName}}</td>
                                     <td>{{customer.taxCode}}</td>
-                                    <td>{{customer.userCreatedName}}</td>
-                                    <td>{{customer.addressVn}}</td>
+                                    <td> <span class="text-success">{{customer.userCreatedName}}</span></td>
+
                                     <td>{{customer.datetimeModified | date:'dd/MM/yyyy' }}</td>
                                     <td [ngClass]="customer.active ? 'text-success' : 'text-danger'">
                                         {{customer.active ? 'Active' : 'Inactive'}}</td>
+                                    <td>{{customer.addressVn}}</td>
                                 </tr>
                                 <tr class="collapse-toggle-row" class="collapse-panel-row" app-table-collapse-row
                                     [id]="'commercial-customer-00' + customer.id | removeTrim "
@@ -90,6 +91,9 @@
                                                     <td><span>{{j + 1}}</span></td>
                                                     <td>
                                                         <span>{{sale.username}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>{{sale.contractType}}</span>
                                                     </td>
                                                     <td>
                                                         <span>{{sale.saleServiceName}}</span>

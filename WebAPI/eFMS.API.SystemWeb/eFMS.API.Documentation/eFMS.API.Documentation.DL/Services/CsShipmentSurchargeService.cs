@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -19,6 +18,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysNotifications> notificationRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
         private readonly IContextBase<AccAccountReceivable> accAccountReceivableRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
         private readonly ICurrencyExchangeService currencyExchangeService;
@@ -56,6 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysNotifications> notificationRepo,
             IContextBase<SysUserNotification> sysUserNotifyRepo,
             IContextBase<AccAccountReceivable> accAccountRepo,
+            IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange
@@ -78,6 +80,7 @@ namespace eFMS.API.Documentation.DL.Services
             notificationRepository = notificationRepo;
             sysUserNotifyRepository = sysUserNotifyRepo;
             accAccountReceivableRepository = accAccountRepo;
+            unitRepository = unitRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -360,37 +363,35 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HousbillProfit GetHouseBillTotalProfit(Guid hblid)
         {
-            var result = new HousbillProfit
+            HousbillProfit result = new HousbillProfit
             {
                 HBLID = hblid,
                 HouseBillTotalCharge = new HouseBillTotalCharge()
             };
-            var surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
+            List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
             if (!surcharges.Any()) return result;
             foreach (var item in surcharges)
             {
-                decimal _rateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-                decimal _rateToUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                decimal totalLocal = item.Total * _rateToLocal; //item.RateToLocal;
-                decimal totalUSD = item.Total * _rateToUSD; //item.RateToUSD;
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
-                    result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
-                    result.HouseBillTotalCharge.TotalBuyingUSD = result.HouseBillTotalCharge.TotalBuyingUSD + totalUSD;
+                    result.HouseBillTotalCharge.TotalBuyingLocal += item.AmountVnd ?? 0;
+                    result.HouseBillTotalCharge.TotalBuyingUSD += item.AmountUsd ?? 0;
                 }
                 else if (item.Type == DocumentConstants.CHARGE_SELL_TYPE)
                 {
-                    result.HouseBillTotalCharge.TotalSellingLocal = result.HouseBillTotalCharge.TotalSellingLocal + totalLocal;
-                    result.HouseBillTotalCharge.TotalSellingUSD = result.HouseBillTotalCharge.TotalSellingUSD + totalUSD;
+                    result.HouseBillTotalCharge.TotalSellingLocal += item.AmountVnd ?? 0;
+                    result.HouseBillTotalCharge.TotalSellingUSD += item.AmountUsd ?? 0;
                 }
                 else
                 {
-                    result.HouseBillTotalCharge.TotalOBHLocal = result.HouseBillTotalCharge.TotalOBHLocal + totalLocal;
-                    result.HouseBillTotalCharge.TotalOBHUSD = result.HouseBillTotalCharge.TotalOBHUSD + totalUSD;
+                    result.HouseBillTotalCharge.TotalOBHLocal += item.AmountVnd ?? 0;
+                    result.HouseBillTotalCharge.TotalOBHUSD += item.AmountUsd ?? 0;
                 }
             }
+
             result.ProfitLocal = result.HouseBillTotalCharge.TotalSellingLocal - result.HouseBillTotalCharge.TotalBuyingLocal;
             result.ProfitUSD = result.HouseBillTotalCharge.TotalSellingUSD - result.HouseBillTotalCharge.TotalBuyingUSD;
+
             return result;
         }
 
@@ -427,51 +428,185 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public HandleState AddAndUpate(List<CsShipmentSurchargeModel> list)
+        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list)
         {
             var result = new HandleState();
             var surcharges = mapper.Map<List<CsShipmentSurcharge>>(list);
 
+            var surchargesAdd = new List<CsShipmentSurcharge>();
+            var surchargesUpdate = new List<CsShipmentSurcharge>();
+
+            foreach (var item in surcharges)
+            {
+                if (item.Id == Guid.Empty)
+                {
+                    //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                    item.FinalExchangeRate = null;
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+
+                    item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                    item.UserCreated = currentUser.UserID;
+                    item.Id = Guid.NewGuid();
+                    //item.ExchangeDate = DateTime.Now; ??? - Rule lạ
+
+                    item.TransactionType = GetTransactionType(item.JobNo);
+                    if (item.Hblid != Guid.Empty)
+                    {
+                        if (item.TransactionType != "CL")
+                        {
+                            CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
+                            item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                            item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                        }
+                        else
+                        {
+                            OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                            item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                            item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                        }
+                    }
+
+                    surchargesAdd.Add(item);
+                }
+                else
+                {
+                    string _jobNo = string.Empty;
+                    string _mblNo = string.Empty;
+                    string _hblNo = string.Empty;
+                    if (item.TransactionType != "CL")
+                    {
+                        var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
+                        _hblNo = houseBill?.Hwbno;
+                        if (houseBill != null)
+                        {
+                            var masterBill = csTransactionRepository.Get(x => x.Id == houseBill.JobId).FirstOrDefault();
+                            _jobNo = masterBill?.JobNo;
+                            _mblNo = !string.IsNullOrEmpty(masterBill?.Mawb) ? masterBill?.Mawb : houseBill.Mawb;
+                        }
+                    }
+                    else
+                    {
+                        var masterBill = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                        _jobNo = masterBill?.JobNo;
+                        _mblNo = masterBill?.Mblno;
+                        _hblNo = masterBill?.Hwbno;
+                    }
+                    var surcharge = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
+                    if (surcharge != null)
+                    {
+                        surcharge.PaymentObjectId = item.PaymentObjectId;
+                        surcharge.PayerId = item.PayerId;
+                        surcharge.ChargeId = item.ChargeId;
+                        surcharge.ChargeGroup = item.ChargeGroup;
+                        surcharge.Quantity = item.Quantity;
+                        surcharge.UnitId = item.UnitId;
+                        surcharge.UnitPrice = item.UnitPrice;
+                        surcharge.Vatrate = item.Vatrate;
+                        surcharge.CurrencyId = item.CurrencyId;
+                        surcharge.Notes = item.Notes;
+                        surcharge.KickBack = item.KickBack;
+                        surcharge.QuantityType = item.QuantityType;
+
+                        //Chỉ tính lại giá trị cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
+                        if (string.IsNullOrEmpty(surcharge.SettlementCode)
+                            && (surcharge.AcctManagementId == Guid.Empty || surcharge.AcctManagementId == null)
+                            && (string.IsNullOrEmpty(surcharge.Soano) && string.IsNullOrEmpty(surcharge.PaySoano))
+                            && (string.IsNullOrEmpty(surcharge.DebitNo) && string.IsNullOrEmpty(surcharge.CreditNo)))
+                        {
+                            //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                            surcharge.FinalExchangeRate = null;
+                            surcharge.ExchangeDate = item.ExchangeDate;
+                        }
+
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                        surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                        surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                        surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+
+                        //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
+                        if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
+                        {
+                            surcharge.InvoiceNo = item.InvoiceNo;
+                            surcharge.InvoiceDate = item.InvoiceDate;
+                            surcharge.SeriesNo = item.SeriesNo;
+                        }
+
+                        surcharge.JobNo = _jobNo;
+                        surcharge.Mblno = _mblNo;
+                        surcharge.Hblno = _hblNo;
+                        surcharge.DatetimeModified = DateTime.Now;
+                        surcharge.UserModified = currentUser.UserID;
+
+                        surchargesUpdate.Add(surcharge);
+                    }
+                }
+            }
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach(var surchargeAdd in surchargesAdd)
+                    {
+                        var hsAdd = DataContext.Add(surchargeAdd, false);
+                    }
+
+                    foreach(var surchargeUpdate in surchargesUpdate)
+                    {
+                        var hsUpdate = DataContext.Update(surchargeUpdate, x => x.Id == surchargeUpdate.Id, false);
+                    }
+
+                    result = DataContext.SubmitChanges();
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+                return result;
+            }
+        }
+
+        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
+        {
+            var result = new HandleState();
+            var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
-                        if (item.Id == Guid.Empty)
-                        {
-                            item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
-                            item.UserCreated = currentUser.UserID;
-                            item.Id = Guid.NewGuid();
-                            item.ExchangeDate = DateTime.Now;
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                        item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
+                        item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                        item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
-                            item.TransactionType = GetTransactionType(item.JobNo);
-                            if (item.Hblid != Guid.Empty)
-                            {
-                                if (item.TransactionType != "CL")
-                                {
-                                    CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
-                                    item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
-                                    item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
-                                }
-                                if (item.TransactionType == "CL")
-                                {
-                                    OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
-                                    item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
-                                    item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
-                                }
-                            }
-                            var t = DataContext.Add(item, true);
-                        }
-                        else
-                        {
-                            item.DatetimeModified = DateTime.Now;
-                            item.UserModified = currentUser.UserID;
-                            var d = DataContext.Update(item, x => x.Id == item.Id, true);
-                        }
+                        var d = DataContext.Update(item, x => x.Id == item.Id, false);
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
+                    return new HandleState();
                 }
                 catch (Exception ex)
                 {
@@ -488,17 +623,19 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<HousbillProfit> GetShipmentTotalProfit(Guid jobId)
         {
-            var results = new List<HousbillProfit>();
+            List<HousbillProfit> results = new List<HousbillProfit>();
             IQueryable<OpsTransaction> opsShipments = null;
             CsTransaction csShipment = null;
             IQueryable<HousbillProfit> hblids = null;
+
             opsShipments = opsTransRepository.Get(x => x.Id == jobId);
+
             if (opsShipments.Count() == 0)
             {
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
-                    var houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
                     //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
                     //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                     hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
@@ -510,9 +647,9 @@ namespace eFMS.API.Documentation.DL.Services
                 hblids = opsShipments.Select(x => new HousbillProfit { HBLID = x.Hblid, HBLNo = x.Hwbno });
             }
             if (hblids.Count() == 0) return results;
-            foreach (var item in hblids)
+            foreach (HousbillProfit item in hblids)
             {
-                var profit = GetHouseBillTotalProfit(item.HBLID);
+                HousbillProfit profit = GetHouseBillTotalProfit(item.HBLID);
                 profit.HBLNo = item.HBLNo;
                 results.Add(profit);
             }
@@ -522,30 +659,48 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
             // get charge info of newest shipment by charge type of an PIC and not existed in current shipment and by criteria: POL, POD, Customer, Shipping Line, Consignee
-            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            var shipment = csTransactionRepository.Get(x => x.PersonIncharge == criteria.PersonInCharge
-                                                        && x.TransactionType == transactionType
-                                                        && x.Id != criteria.CurrentJobId)?.OrderByDescending(x => x.DatetimeCreated)?.FirstOrDefault();
-            if (shipment == null) return null;
-            if (criteria.ShippingLine != null && shipment.ColoaderId != criteria.ShippingLine)
+            string transactionType = DataTypeEx.GetType(criteria.TransactionType);
+
+            Expression<Func<CsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
+                                                        && (x.AgentId == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
+                                                        && (x.ColoaderId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
+                                                        && x.TransactionType == transactionType);
+
+
+            if (queryShipmentNearest == null) return null;
+            List<Guid> houseIds = new List<Guid>();
+
+            if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
             {
-                return null;
+                if (criteria.ColoaderId == null) return null;
+                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
+
+                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
+                if (shipment == null) return null;
+
+                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.Id != criteria.HblId).Select(x => x.Id).ToList();
             }
-            var housebills = tranDetailRepository.Get(x => (x.Pol == criteria.POL || criteria.POL == null)
-                                                        && (x.Pod == criteria.POD || criteria.POD == null)
-                                                        && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                                                        && (x.ConsigneeId == criteria.ConsigneeId || string.IsNullOrEmpty(criteria.ConsigneeId))
-                                                        && x.JobId == shipment.Id
-                                                ).Select(x => x.Id).ToList();
-            if (housebills.Count == 0) return null;
-            var charges = DataContext.Get(x => housebills.Contains(x.Hblid)
-                            && (x.Type == criteria.ChargeType || string.IsNullOrEmpty(criteria.ChargeType))
-                            && (x.IsFromShipment == true));
+            else
+            {
+                if (criteria.CustomerId == null) return null;
+                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId);
+                IQueryable<CsTransaction> shipmentQuery = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).Take(1);
+                if (shipmentQuery == null) return null;
 
-            if (charges.Select(x => x.Id).Count() == 0) return null;
+                // Chỉ lấy house
+                foreach (var shipment in shipmentQuery)
+                {
+                    var houseId = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.CustomerId == criteria.CustomerId && x.Id != criteria.HblId).Select(x => x.Id).ToList();
+                    houseIds.AddRange(houseId);
+                }
+            }
 
-            var result = (
-                from surcharge in charges
+            if (houseIds.Count == 0) return null;
+            IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
+            if (csShipmentSurcharge == null) return null;
+
+            IQueryable<CsShipmentSurchargeDetailsModel> result = (
+                from surcharge in csShipmentSurcharge
                 join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
                 join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
                 from p1 in gp.DefaultIfEmpty()
@@ -581,7 +736,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                     ChargeNameEn = charge.ChargeNameEn,
                     ChargeCode = charge.Code,
-
                 });
             return result;
         }
@@ -1006,20 +1160,281 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return users;
         }
+        
+        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list)
+        {
+            var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
+            var listPartner = partnerRepository.Get(x => x.Active == true);
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.Hblno))
+                {
+                    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!opsTransRepository.Any(x => x.Hwbno == item.Hblno.Trim()))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                        item.IsValid = false;
+                    }
+
+                }
+                if (string.IsNullOrEmpty(item.Mblno))
+                {
+                    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno.Trim()))
+                    {
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.PartnerCode))
+                {
+                    item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!listPartner.Any(x => x.AccountNo.Trim() == item.PartnerCode.Replace("'", "").Trim()))
+                    {
+                        item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST], item.PartnerCode);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.ChargeCode))
+                {
+                    item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!catChargeRepository.Any(x => x.Code == item.ChargeCode.Trim()))
+                    {
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_NOT_EXIST], item.ChargeCode);
+                        item.IsValid = false;
+                    }
+                }
+
+                if (!item.Qty.HasValue)
+                {
+                    item.QtyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_QTY_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Unit))
+                {
+                    item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!unitRepository.Any(x => x.UnitNameEn.Trim() == item.Unit.Trim()))
+                    {
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_NOT_EXIST], item.Unit);
+                        item.IsValid = false;
+                    }
+                }
+                if (!item.UnitPrice.HasValue)
+                {
+                    item.UnitPriceError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_PRICE_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CurrencyId))
+                {
+                    item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (!item.Vatrate.HasValue)
+                {
+                    item.VatError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (!item.TotalAmount.HasValue)
+                {
+                    item.TotalAmountError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TOTAL_AMOUNT_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (!item.ExchangeDate.HasValue)
+                {
+                    item.ExchangeDateError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_EXCHANGE_DATE_EMPTY]);
+                    item.IsValid = false;
+                }
+
+                if (!item.FinalExchangeRate.HasValue)
+                {
+                    item.FinalExchangeRateError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_FINAL_EXCHANGE_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Type))
+                {
+                    item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "sell" && item.Type.ToLower() != "obh")
+                    {
+                        item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_NOT_VALID], item.Type);
+                        item.IsValid = false;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.Hblno))
+                {
+
+                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno && x.Hwbno == item.Hblno))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                        item.IsValid = false;
+
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.Mblno))
+                {
+                    if (!opsTransRepository.Any(x => x.Mblno.Trim() == item.Mblno.Trim()))
+                    {
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                        item.IsValid = false;
+                    }
+                }
+                if (item.IsValid)
+                {
+                    string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
+                    Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
+                    item.ChargeId = ChargeId;
+                    short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
+                    item.UnitId = UnitId;
+                    item.PaymentObjectId = PartnerId;
+                    Guid HblId = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim()).Select(t => t.Hblid).FirstOrDefault();
+                    item.Hblid = HblId;
+
+                    #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
+                    item.Quantity = (decimal)item.Qty;
+                    item.TransactionType = "CL";
+                    string jobNo = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
+                    if (item.Type.ToLower() == "obh")
+                    {
+                        item.PayerId = PartnerId;
+                    }
+                    if (item.Type.ToLower() == "buying")
+                    {
+                        item.Type = "BUY";
+                    }
+                    if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == item.Type))
+                    {
+                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                        item.IsValid = false;
+                    }
+                    if (!string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(item.InvoiceNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == item.Type))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                    }
+                }
+
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CsShipmentSurchargeImportModel> list)
+        {
+            foreach (var item in list)
+            {
+                switch (item.Type.ToLower())
+                {
+                    case "buying":
+                        item.Type = "BUY";
+                        break;
+                    case "obh":
+                        item.Type = item.Type.ToUpper();
+                        break;
+                    case "sell":
+                        item.Type = item.Type.ToUpper();
+                        break;
+                }
+                item.UserCreated = currentUser.UserID;
+                item.Id = Guid.NewGuid();
+                item.ExchangeDate = DateTime.Now.Date;
+                item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
+                item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+            }
+            var datas = mapper.Map<List<CsShipmentSurcharge>>(list);
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = DataContext.Add(datas);
+                    if (hs.Success)
+                    {
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                    }
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    Get();
+                    trans.Dispose();
+                }
+            }
+        }
 
         private string GetTransactionType(string jobNo)
         {
             string transactionType = null;
             if (!string.IsNullOrEmpty(jobNo))
             {
-                IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get(x => x.JobNo == jobNo);
+                IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                 if (docTransaction != null && docTransaction.Count() > 0)
                 {
                     transactionType = docTransaction?.FirstOrDefault()?.TransactionType;
                 }
                 else
                 {
-                    IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get(x => x.JobNo == jobNo);
+                    IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                     if (opsTransaction != null && opsTransaction.Count() > 0)
                     {
                         transactionType = "CL";

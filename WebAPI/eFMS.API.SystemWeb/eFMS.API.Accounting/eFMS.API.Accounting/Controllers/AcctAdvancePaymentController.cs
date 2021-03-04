@@ -680,9 +680,10 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAdvancesOfShipment")]
-        public IActionResult GetAdvancesOfShipment(string jobId)
+        [Authorize]
+        public IActionResult GetAdvancesOfShipment(string jobId, string settleCode = null)
         {
-            var data = acctAdvancePaymentService.GetAdvancesOfShipment().Where(x => x.JobId == jobId);
+            var data = acctAdvancePaymentService.GetAdvancesOfShipment(jobId, settleCode).Where(x => x.Requester == currentUser.UserID);
             return Ok(data);
         }
 
@@ -935,6 +936,22 @@ namespace eFMS.API.Accounting.Controllers
 
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Id };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
+        [HttpPut("DenyAdvancePayments")]
+        [Authorize]
+        public IActionResult DenyAdvances(List<Guid> Ids)
+        {
+            HandleState hs = acctAdvancePaymentService.DenyAdvancePayments(Ids);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
             if (!hs.Success)
             {
                 return BadRequest(result);

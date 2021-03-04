@@ -58,5 +58,8 @@ namespace eFMS.API.Accounting.Service.Models
         public string SalesDepartmentId { get; set; }
         public string SalesOfficeId { get; set; }
         public string SalesCompanyId { get; set; }
+        public string ServiceNo { get; set; }
+        public Guid? ServiceHblId { get; set; }
+        public string Note { get; set; }
     }
 }

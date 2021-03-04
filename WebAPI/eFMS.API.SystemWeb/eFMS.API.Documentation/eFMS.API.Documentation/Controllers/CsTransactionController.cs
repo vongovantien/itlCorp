@@ -152,15 +152,16 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// Get Air/Sea job no and hblId
         /// </summary>
+        /// <param name="mblNo">mbl no's ops</param>
         /// <param name="hblNo">hbl no's ops</param>
         /// <param name="serviceName">product service</param>
         /// <param name="serviceMode">service mode</param>
         /// <returns></returns>
         [HttpGet("GetLinkASInfomation")]
         [Authorize]
-        public IActionResult GetLinkASInfomation(string hblNo, string serviceName, string serviceMode)
+        public IActionResult GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode)
         {
-            var data = csTransactionService.GetLinkASInfomation(hblNo, serviceName, serviceMode);
+            var data = csTransactionService.GetLinkASInfomation(mblNo, hblNo, serviceName, serviceMode);
             return Ok(data);
         }
         #region -- INSERT & UPDATE
@@ -212,6 +213,13 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
+            string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
+            if(msgCheckUpdateMawb.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
             model.UserModified = currentUser.UserID;
             var hs = csTransactionService.UpdateCSTransaction(model);
             if (hs.Code == 403)
@@ -318,6 +326,10 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("CheckAllowDelete/{id}")]
         public IActionResult CheckAllowDelete(Guid id)
         {
+            if (!csTransactionService.CheckAllowDelete(id))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+            }
             return Ok(csTransactionService.CheckAllowDelete(id));
         }
 
@@ -497,7 +509,8 @@ namespace eFMS.API.Documentation.Controllers
                 if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
-                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1))
+                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1)) 
+                    && x.OfficeId == currentUser.OfficeID
                     && x.CurrentStatus != TermData.Canceled))
                     {
                         message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
@@ -511,6 +524,7 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
                         && x.TransactionType.Contains(model.TransactionType.Substring(0, 1))
+                        && x.OfficeId == currentUser.OfficeID
                         && x.Id != id
                         && x.CurrentStatus != TermData.Canceled))
                     {
@@ -604,6 +618,26 @@ namespace eFMS.API.Documentation.Controllers
             message = string.IsNullOrEmpty(model.PersonIncharge) ? stringLocalizer[DocumentationLanguageSub.MSG_PERSON_IN_CHARGE_REQUIRED].Value : message;
 
             return message;
+        }
+        
+        private string CheckHasMBLUpdatePermitted(CsTransactionEditModel model)
+        {
+            string errorMsg = string.Empty;
+            string mblNo = string.Empty;
+            List<string> advs = new List<string>();
+
+            int statusCode = csTransactionService.CheckUpdateMBL(model, out mblNo, out advs);
+            if (statusCode == 1)
+            {
+                errorMsg = String.Format("MBL {0} has Charges List that Synced to accounting system, Please you check Again!", mblNo);
+            }
+
+            if (statusCode == 2)
+            {
+                errorMsg = String.Format("MBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", mblNo, string.Join(", ", advs.ToArray()));
+            }
+
+            return errorMsg;
         }
         #endregion -- METHOD PRIVATE --
     }

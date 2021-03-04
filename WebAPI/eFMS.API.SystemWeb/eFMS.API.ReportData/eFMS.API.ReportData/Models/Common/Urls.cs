@@ -61,6 +61,7 @@
             public const string GetDataShipmentOverviewUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverview";
             public const string GetDataSummaryOfCostsIncurredUrl = "/Documentation/api/v1/en-US/Shipment/GetDataSummaryOfCostsIncurred";
             public const string GetDataSummaryOfRevenueIncurredUrl = "/Documentation/api/v1/en-US/Shipment/GetDataSummaryOfRevenueIncurred";
+            public const string GetDataSummaryOfCostsPartnerUrl = "/Documentation/api/v1/en-US/Shipment/GetDataCostsByPartner";
 
             public const string GetDataAccountingPLSheetUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportAccountingPlSheet";
             public const string GetDataStandardGeneralReportUrl = "/Documentation/api/v1/en-US/Shipment/QueryDataGeneralReport";
@@ -68,6 +69,7 @@
             public const string GetDataHousebillDailyExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
 
             public const string GetDataCDNoteExportUrl = "/Documentation/api/v1/en-US/AcctCDNote/ExportOpsCdNote?jobId=";
+            public const string GetDataCDNoteCombineExportUrl = "/Documentation/api/v1/en-US/AcctCDNote/ExportOpsCdNoteCombine";
 
             public const string GetDataCommissionPRReportUrl = "/Documentation/api/v1/en-US/Shipment/GetCommissionReport?userId=";
             public const string GetDataIncentiveReportUrl = "/Documentation/api/v1/en-US/Shipment/GetIncentiveReport?userId=";

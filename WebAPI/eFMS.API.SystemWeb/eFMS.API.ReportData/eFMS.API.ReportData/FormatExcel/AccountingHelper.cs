@@ -605,7 +605,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Người chứng từ\n(Ký, ghi rõ họ tên)", //31
                 "Trưởng bộ phận\n(Ký, ghi rõ họ tên)", //32
                 "Kế toán\n(Ký, ghi rõ họ tên)", //33
-                "Giám đốc\n(Ký, ghi rõ họ tên)" //34
+                "Giám đốc\n(Ký, ghi rõ họ tên)", //34
+                "Chứng từ:" //35
             };
 
             List<string> engHeaders = new List<string>()
@@ -644,7 +645,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Documentation Staff\n(Name, Signature)", //31
                 "Head of Department\n(Name, Signature)", //32
                 "Chief Accountant\n(Name, Signature)", //33
-                "Director\n(Name, Signature)" //34
+                "Director\n(Name, Signature)", //34
+                "Doc CS:" //35
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -775,16 +777,23 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[j, 2].Value = headers[23]; //Khách hàng
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].Customer;
+                workSheet.Cells[j, 3].Style.WrapText = true;
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[24]; //Công ty xuất
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].Shipper;
+                workSheet.Cells[j, 3].Style.WrapText = true;
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[25]; //Công ty nhập
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].Consignee;
+                workSheet.Cells[j, 3].Style.WrapText = true;
                 j = j + 1;
 
+                workSheet.Cells[j, 2].Value = headers[35]; //Chứng từ
+                workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].PersonInCharge;
+                workSheet.Cells[j, 3].Style.WrapText = true;
+                j = j + 1;
                 /////
                 workSheet.Cells[p, 1, j - 1, 1].Merge = true;
                 workSheet.Cells[p, 1, j - 1, 1].Value = i + 1; //Value STT
@@ -856,14 +865,14 @@ namespace eFMS.API.ReportData.FormatExcel
             
             //Clear border Shipment
             int r = 10;
-            int c = 16;
+            int c = 17;
             for (var i = 0; i < advanceExport.ShipmentsAdvance.Count; i++)
             {
                 workSheet.Cells["B" + r + ":C" + c].Style.Border.Bottom.Style = ExcelBorderStyle.None;//Xóa border bottom
                 workSheet.Cells["B" + r + ":B" + c].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right
                 workSheet.Cells["B" + r + ":B" + (c + 1)].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right (dư)
-                r = r + 8;
-                c = c + 8;
+                r = r + 9;
+                c = c + 9;
             }
 
             ////Bỏ qua 2 dòng
@@ -920,7 +929,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (advanceExport.InfoAdvance.RequestDate != null)
+            if (advanceExport.InfoAdvance.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }
@@ -1451,11 +1460,11 @@ namespace eFMS.API.ReportData.FormatExcel
                "Đơn Vị Tính/Đơn vị",
                "Số Tờ Khai/Customs Declaration No",
                "Số Vận Đơn/HBL No",
+               "Số HĐ/Invoice No",
                "Trọng Lượng/VOLUMNE",
                "Phí dịch vụ làm hàng/Customs clearance fee",
                "Phí thu hộ/Authorized fees",
                "Tổng cộng/Total",
-
             };
 
             List<string> subheaderTable = new List<string>()
@@ -1468,124 +1477,101 @@ namespace eFMS.API.ReportData.FormatExcel
                "Tổng cộng/Total"
             };
 
-            workSheet.Cells["P1:U1"].Merge = true;
-            workSheet.Cells["P1"].Value = headers[0];
-            workSheet.Cells["P1"].Style.Font.SetFromFont(new Font("Arial Black", 13));
-            workSheet.Cells["P1"].Style.Font.Italic = true;
-            workSheet.Cells["P2:U2"].Merge = true;
-            workSheet.Cells["P2:U2"].Style.WrapText = true;
-            workSheet.Cells["P2"].Value = headers[1];
-            workSheet.Cells["P2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
+            workSheet.Cells["Q1:V1"].Merge = true;
+            workSheet.Cells["Q1"].Value = headers[0];
+            workSheet.Cells["Q1"].Style.Font.SetFromFont(new Font("Arial Black", 13));
+            workSheet.Cells["Q1"].Style.Font.Italic = true;
+            workSheet.Cells["Q2:V2"].Merge = true;
+            workSheet.Cells["Q2:V2"].Style.WrapText = true;
+            workSheet.Cells["Q2"].Value = headers[1];
+            workSheet.Cells["Q2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
             workSheet.Row(2).Height = 50;
             //Title
-            workSheet.Cells["A4:U4"].Merge = true;
+            workSheet.Cells["A4:V4"].Merge = true;
             workSheet.Cells["A4"].Style.Font.SetFromFont(new Font("Times New Roman", 16));
             workSheet.Cells["A4"].Value = headers[2];
             workSheet.Cells["A4"].Style.Font.Size = 16;
             workSheet.Cells["A4"].Style.Font.Bold = true;
-            workSheet.Cells["A4"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-            workSheet.Cells["A5:U5"].Merge = true;
+            workSheet.Cells["A5:V5"].Merge = true;
             DateTime fromDate = lstSoa.FromDate ?? DateTime.Now;
             DateTime toDate = lstSoa.ToDate ?? DateTime.Now;
             workSheet.Cells["A5"].Style.Font.SetFromFont(new Font("Times New Roman", 14));
             workSheet.Cells["A5"].Value = "Từ Ngày: " + fromDate.ToString("dd/MM/yyyy") + " đến: " + toDate.ToString("dd/MM/yyyy");
             workSheet.Cells["A5"].Style.Font.Bold = true;
-            workSheet.Cells["A5"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-            workSheet.Cells["A6:U6"].Merge = true;
-            workSheet.Cells["A6"].Value = lstSoa.PartnerNameVN;
-            workSheet.Cells["A7:U7"].Merge = true;
-            workSheet.Cells["A7"].Value = lstSoa.BillingAddressVN;
+            workSheet.Cells["A6:V6"].Merge = true;
+            workSheet.Cells["A6"].Value = "SOA No: " + lstSoa.SoaNo?.ToUpper();
 
+            workSheet.Cells["A7:V7"].Merge = true;
+            workSheet.Cells["A7"].Value = lstSoa.PartnerNameVN;
+            workSheet.Cells["A8:V8"].Merge = true;
+            workSheet.Cells["A8"].Value = lstSoa.BillingAddressVN;
             workSheet.Cells["A6:A7"].Style.Font.SetFromFont(new Font("Times New Roman", 15));
 
-            workSheet.Cells["A6"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A6"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[4, 1, 8, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[4, 1, 8, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             decimal? totalALLValue = 0;
+           
+            workSheet.Cells["A9:A10"].Merge = true;
+            workSheet.Cells["B9:B10"].Merge = true;
+            workSheet.Cells["C9:C10"].Merge = true;
+            workSheet.Cells["D9:D10"].Merge = true;
+            workSheet.Cells["E9:E10"].Merge = true;
+            workSheet.Cells["F9:F10"].Merge = true;
+            workSheet.Cells["G9:G10"].Merge = true;
+            workSheet.Cells["H9:J9"].Merge = true;
+            workSheet.Cells["K9:M9"].Merge = true;
+            workSheet.Cells["N9:P9"].Merge = true;
+            workSheet.Cells["Q9:Q10"].Merge = true;
 
             // Tạo header
             for (int i = 0; i < headerTable.Count; i++)
             {
-                if (i == 7)
+                if (i <= 7)
                 {
-                    workSheet.Cells[8, i + 3].Value = headerTable[i];
-                }
-                if (i < 7)
-                {
-                    workSheet.Cells[8, i + 1].Value = headerTable[i];
-                }
-                if (i > 7)
-                {
-                    workSheet.Cells[8, i + 3].Value = headerTable[i];
-                    workSheet.Cells[8, i + 3].Style.Font.Bold = true;
-                }
-                if (i > 8)
-                {
-                    workSheet.Cells[8, i + 3].Value = headerTable[i];
-                    workSheet.Cells[8, i + 3].Style.Font.Bold = true;
+                    workSheet.Cells[9, i + 1].Value = headerTable[i];
                 }
 
                 if (i == 8)
                 {
-                    workSheet.Cells[8, i + 3].Value = headerTable[i];
+                    workSheet.Cells[9, i + 3].Value = headerTable[i];
+                }
+                if (i == 9)
+                {
+                    workSheet.Cells[9, i + 5].Value = headerTable[i];
                 }
 
-
-                workSheet.Cells[8, i + 1].Style.Font.Bold = true;
-                workSheet.Cells[8, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[8, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
+                if (i == 10)
+                {
+                    workSheet.Cells[9, i + 7].Value = headerTable[i];
+                }
             }
-            workSheet.Cells["A8:A9"].Merge = true;
-            workSheet.Cells["B8:B9"].Merge = true;
-            workSheet.Cells["C8:C9"].Merge = true;
-            workSheet.Cells["D8:D9"].Merge = true;
-            workSheet.Cells["E8:E9"].Merge = true;
-            workSheet.Cells["F8:F9"].Merge = true;
 
-            workSheet.Cells["G8:I8"].Merge = true;
-            workSheet.Cells["J8:L8"].Merge = true;
+            workSheet.Cells["H10"].Value = subheaderTable[0];
+            workSheet.Cells["I10"].Value = subheaderTable[1];
+            workSheet.Cells["J10"].Value = subheaderTable[2];
 
-            workSheet.Cells["M8:O8"].Merge = true;
+            workSheet.Cells["K10"].Value = subheaderTable[3];
+            workSheet.Cells["L10"].Value = subheaderTable[4];
+            workSheet.Cells["M10"].Value = subheaderTable[5];
 
-            workSheet.Cells["M8"].Value = headerTable[8];
-            workSheet.Cells["P8:P9"].Merge = true;
-            workSheet.Cells["P8"].Value = headerTable[9];
-            workSheet.Cells["M8:P8"].Style.Font.Bold = true;
+            workSheet.Cells["N10"].Value = subheaderTable[3];
+            workSheet.Cells["O10"].Value = subheaderTable[4];
+            workSheet.Cells["P10"].Value = subheaderTable[5];
 
-            workSheet.Cells["M8:P8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[9, 1, 10, 17].Style.Font.Bold = true;
+            workSheet.Cells[9, 1, 10, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[9, 1, 10, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[9, 1, 10, 17].Style.WrapText = true;
 
-            workSheet.Cells["M8:P8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-            workSheet.Cells["G9"].Value = subheaderTable[0];
-            workSheet.Cells["H9"].Value = subheaderTable[1];
-            workSheet.Cells["I9"].Value = subheaderTable[2];
-
-            workSheet.Cells["J9"].Value = subheaderTable[3];
-            workSheet.Cells["K9"].Value = subheaderTable[4];
-            workSheet.Cells["L9"].Value = subheaderTable[5];
-
-            workSheet.Cells["M9"].Value = subheaderTable[3];
-            workSheet.Cells["N9"].Value = subheaderTable[4];
-            workSheet.Cells["O9"].Value = subheaderTable[5];
-
-            workSheet.Cells["G9:O9"].Style.Font.Bold = true;
-            workSheet.Cells["G9:O9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["G9:O9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-            int addressStartContent = 10;
+            int addressStartContent = 11;
             Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#eab286");
             if (lstSoa.exportSOAOPs != null && lstSoa.exportSOAOPs.Count() > 0)
             {
                 for (int i = 0; i < lstSoa.exportSOAOPs.Count; i++)
                 {
-
                     var item = lstSoa.exportSOAOPs[i];
                     workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
                     workSheet.Cells[i + addressStartContent, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -1606,44 +1592,63 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 6].Value = item.HwbNo;
                     workSheet.Cells[i + addressStartContent, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 6].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 7].Value = item.GW;
+                    workSheet.Cells[i + addressStartContent, 7].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
                     workSheet.Cells[i + addressStartContent, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 7].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 8].Value = item.CBM;
+                    workSheet.Cells[i + addressStartContent, 6, i + addressStartContent, 7].Style.WrapText = true;
+
+                    workSheet.Cells[i + addressStartContent, 8].Value = item.GW;
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 9].Value = item.PackageContainer;
+
+                    workSheet.Cells[i + addressStartContent, 9].Value = item.CBM;
                     workSheet.Cells[i + addressStartContent, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 9].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 10].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
-                    workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+
+                    workSheet.Cells[i + addressStartContent, 10].Value = item.PackageContainer;
                     workSheet.Cells[i + addressStartContent, 10].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 10].Style.Fill.BackgroundColor.SetColor(colFromHex);
+
+                    workSheet.Cells[i + addressStartContent, 11].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
+                    workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
                     workSheet.Cells[i + addressStartContent, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 11].Style.Fill.BackgroundColor.SetColor(colFromHex);
+
                     workSheet.Cells[i + addressStartContent, 12].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 12].Style.Fill.BackgroundColor.SetColor(colFromHex);
+
                     workSheet.Cells[i + addressStartContent, 13].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 13].Style.Fill.BackgroundColor.SetColor(colFromHex);
+
                     workSheet.Cells[i + addressStartContent, 14].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 14].Style.Fill.BackgroundColor.SetColor(colFromHex);
+
                     workSheet.Cells[i + addressStartContent, 15].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 15].Style.Fill.BackgroundColor.SetColor(colFromHex);
+
                     workSheet.Cells[i + addressStartContent, 16].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 16].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 11].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount);
-                    workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
-                    workSheet.Cells[i + addressStartContent, 12].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
+
+                    workSheet.Cells[i + addressStartContent, 17].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    workSheet.Cells[i + addressStartContent, 17].Style.Fill.BackgroundColor.SetColor(colFromHex);
+
+                    workSheet.Cells[i + addressStartContent, 12].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0));
                     workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
 
-                    workSheet.Cells[i + addressStartContent, 16].Value = item.Charges.Sum(t => t.VATAmount) + item.Charges.Sum(t => t.NetAmount);
-                    workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
-                    workSheet.Cells[i + addressStartContent, 13].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
-                    workSheet.Cells[i + addressStartContent, 14].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.VATAmount);
-                    workSheet.Cells[i + addressStartContent, 15].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
+                    workSheet.Cells[i + addressStartContent, 13].Value = item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0)) + item.Charges.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
+
+                    workSheet.Cells[i + addressStartContent, 17].Value = item.Charges.Sum(t => Math.Abs(t.VATAmount ?? 0)) + item.Charges.Sum(t => t.NetAmount);
+                    workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat;
+
+                    workSheet.Cells[i + addressStartContent, 14].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
+
+                    workSheet.Cells[i + addressStartContent, 15].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0));
+
+                    workSheet.Cells[i + addressStartContent, 16].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => Math.Abs(t.VATAmount ?? 0)) + item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
                     workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
 
                     for (int j = 0; j < item.Charges.Count; j++)
                     {
@@ -1653,45 +1658,43 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[i + addressStartContent, 2].Value = itemCharge.ChargeName;
                         workSheet.Cells[i + addressStartContent, 3].Value = itemCharge.Quantity;
                         workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.Unit;
-                        workSheet.Cells[i + addressStartContent, 10].Value = itemCharge.NetAmount;
-                        workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+                        workSheet.Cells[i + addressStartContent, 7].Value = itemCharge.InvoiceNo;
+                        workSheet.Cells[i + addressStartContent, 11].Value = itemCharge.NetAmount;
+                        workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
 
                         if (itemCharge.VATAmount < 0)
                         {
-                            workSheet.Cells[i + addressStartContent, 11].Value = vatAmount;
-                            workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
-
-
+                            workSheet.Cells[i + addressStartContent, 12].Value = vatAmount;
+                            workSheet.Cells[i + addressStartContent, 15].Value = vatAmount;
                         }
                         else
                         {
-                            workSheet.Cells[i + addressStartContent, 11].Value = itemCharge.VATAmount;
-                            workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormatUSD;
+                            workSheet.Cells[i + addressStartContent, 12].Value = itemCharge.VATAmount;
+                            workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
                         }
-                        workSheet.Cells[i + addressStartContent, 12].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
-                        workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
-                        decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 12].Value);
-
+                        workSheet.Cells[i + addressStartContent, 13].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                        workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
 
                         if (itemCharge.Type.Contains("OBH"))
                         {
-                            workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.NetAmount;
-                            workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
-                            workSheet.Cells[i + addressStartContent, 15].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.NetAmount;
+                            workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
+                            workSheet.Cells[i + addressStartContent, 16].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                            workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
+                            workSheet.Cells[i + addressStartContent, 15].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
-                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
-                            workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormatUSD;
-                            workSheet.Cells[i + addressStartContent, 10].Value = null;
                             workSheet.Cells[i + addressStartContent, 11].Value = null;
                             workSheet.Cells[i + addressStartContent, 12].Value = null;
+                            workSheet.Cells[i + addressStartContent, 13].Value = null;
 
                         }
 
-                        decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 15].Value);
-                        workSheet.Cells[i + addressStartContent, 16].Value = TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
-                        workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
+                        decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 13].Value);
+                        decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 16].Value);
+                        workSheet.Cells[i + addressStartContent, 17].Value = TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
+                        workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat;
 
                         totalALLValue += TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
                     }
@@ -1700,9 +1703,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 addressStartContent = addressStartContent + lstSoa.exportSOAOPs.Count;
 
-                workSheet.Cells[8, 1, addressStartContent, 16].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[8, 1, addressStartContent, 16].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[8, 1, addressStartContent, 16].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 17].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 17].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 17].Style.Border.Top.Style = ExcelBorderStyle.Thin;
 
 
                 workSheet.Cells[addressStartContent, 1].Value = headers[3]; //Total
@@ -1712,14 +1715,14 @@ namespace eFMS.API.ReportData.FormatExcel
                 .Start
                 .Address;
                 string addressTotalMerge = workSheet
-                 .Cells[addressStartContent, 9].Start.Address;
+                 .Cells[addressStartContent, 10].Start.Address;
                 string addressToMerge = addressTotal + ":" + addressTotalMerge;
                 workSheet.Cells[addressToMerge].Merge = true;
                 workSheet.Cells[addressToMerge].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[addressToMerge].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 string addressTotalNext = workSheet
-               .Cells[addressStartContent, 10].Start.Address;
+               .Cells[addressStartContent, 11].Start.Address;
 
                 decimal? totalNetAmountNormalCharge = 0;
                 decimal? totalNetAmountOBHCharge = 0;
@@ -1736,13 +1739,13 @@ namespace eFMS.API.ReportData.FormatExcel
                         if (!it.Type.Contains("OBH"))
                         {
                             totalNetAmountNormalCharge += it.NetAmount.GetValueOrDefault(0M);
-                            totalVATNormalCharge += it.VATAmount.GetValueOrDefault(0M);
+                            totalVATNormalCharge += Math.Abs(it.VATAmount ?? 0);
                             totalNormalCharge = totalNetAmountNormalCharge.GetValueOrDefault(0M) + totalVATNormalCharge.GetValueOrDefault(0M);
                         }
                         else
                         {
                             totalNetAmountOBHCharge += it.NetAmount.GetValueOrDefault(0M);
-                            totalVATOBHCharge += it.VATAmount.GetValueOrDefault(0M);
+                            totalVATOBHCharge += Math.Abs(it.VATAmount ?? 0);
                             totalOBHCharge = totalNetAmountOBHCharge.GetValueOrDefault(0M) + totalVATOBHCharge.GetValueOrDefault(0M);
                         }
 
@@ -1755,28 +1758,28 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[addressTotalNext].Value = totalNetAmountNormalCharge;
                 workSheet.Cells[addressTotalNext].Style.Numberformat.Format = numberFormat;
 
-                string addressTotalVat = workSheet.Cells[addressStartContent, 11].Start.Address;
+                string addressTotalVat = workSheet.Cells[addressStartContent, 12].Start.Address;
                 workSheet.Cells[addressTotalVat].Value = totalVATNormalCharge;
                 workSheet.Cells[addressTotalVat].Style.Numberformat.Format = numberFormat;
 
-                string addressTotalNormalCharge = workSheet.Cells[addressStartContent, 12].Start.Address;
+                string addressTotalNormalCharge = workSheet.Cells[addressStartContent, 13].Start.Address;
                 workSheet.Cells[addressTotalNormalCharge].Value = totalNormalCharge;
                 workSheet.Cells[addressTotalNormalCharge].Style.Numberformat.Format = numberFormat;
 
-                string addressNetAmountCharge = workSheet.Cells[addressStartContent, 13].Start.Address;
+                string addressNetAmountCharge = workSheet.Cells[addressStartContent, 14].Start.Address;
                 workSheet.Cells[addressNetAmountCharge].Value = totalNetAmountOBHCharge;
                 workSheet.Cells[addressNetAmountCharge].Style.Numberformat.Format = numberFormat;
 
-                string addressVATChargeNext = workSheet.Cells[addressStartContent, 14].Start.Address;
+                string addressVATChargeNext = workSheet.Cells[addressStartContent, 15].Start.Address;
                 workSheet.Cells[addressVATChargeNext].Value = totalVATOBHCharge;
                 workSheet.Cells[addressVATChargeNext].Style.Numberformat.Format = numberFormat;
 
-                string addressTotalChargeNext = workSheet.Cells[addressStartContent, 15].Start.Address;
+                string addressTotalChargeNext = workSheet.Cells[addressStartContent, 16].Start.Address;
                 workSheet.Cells[addressTotalChargeNext].Value = totalOBHCharge;
                 workSheet.Cells[addressTotalChargeNext].Style.Numberformat.Format = numberFormat;
 
 
-                string addressTotalAll = workSheet.Cells[addressStartContent, 16].Start.Address;
+                string addressTotalAll = workSheet.Cells[addressStartContent, 17].Start.Address;
                 workSheet.Cells[addressTotalAll].Value = totalAll;
                 workSheet.Cells[addressTotalAll].Style.Numberformat.Format = numberFormat;
 
@@ -1787,6 +1790,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Column(4).Width = 20; //Cột D
                 workSheet.Column(5).Width = 35; //Cột E
                 workSheet.Column(6).Width = 30; //Cột F
+                workSheet.Column(7).Width = 20; //Cột G
                 workSheet.Column(10).Width = 35;//Cột J
                 workSheet.Column(11).Width = 20;//Cột K
                 workSheet.Column(12).Width = 20;//Cột L
@@ -1796,9 +1800,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Column(16).Width = 20;  //Cột O
                 workSheet.Column(17).Width = 20;   //Cột P
                 workSheet.Cells[addressTotal].Style.Font.Bold = true;
-                workSheet.Cells.AutoFitColumns();
-                //workSheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                //workSheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
         }
 
@@ -2682,7 +2683,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Người chứng từ\n(Ký, ghi rõ họ tên)", //33
                 "Trưởng bộ phận\n(Ký, ghi rõ họ tên)", //34
                 "Kế toán\n(Ký, ghi rõ họ tên)", //35
-                "Giám đốc\n(Ký, ghi rõ họ tên)" //36
+                "Giám đốc\n(Ký, ghi rõ họ tên)", //36
+                "Chứng từ:" //37
             };
 
             List<string> engHeaders = new List<string>()
@@ -2723,7 +2725,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Documentation Staff\n(Name, Signature)", //33
                 "Head of Department\n(Name, Signature)", //34
                 "Chief Accountant\n(Name, Signature)", //35
-                "Director\n(Name, Signature)" //36
+                "Director\n(Name, Signature)", //36
+                "Doc CS:" //37
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -2954,6 +2957,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j, 3].Style.WrapText = true;
                 workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].Consignee;
                 j = j + 1;
+
+                workSheet.Cells[j, 2].Value = headers[37]; //Chứng từ
+                workSheet.Cells[j, 3].Style.WrapText = true;
+                workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].PersonInCharge;
+                j = j + 1;
                 #endregion --- Thông tin chung ---
 
                 j = j + 1;
@@ -3120,7 +3128,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             p = p + 1;
 
-            if (settlementExport.InfoSettlement.RequestDate != null)
+            if (settlementExport.InfoSettlement.IsRequesterApproved)
             {
                 AddIconTick(workSheet, p, 2); //Tick Requester
             }
@@ -3169,7 +3177,8 @@ namespace eFMS.API.ReportData.FormatExcel
         private void AddIconTick(ExcelWorksheet workSheet, int row, int col)
         {
             workSheet.Cells[row, col].Value = char.ConvertFromUtf32(0x0050); //Mã code của Symbol tick
-            workSheet.Cells[row, col].Style.Font.SetFromFont(new Font("Wingdings 2", 28));
+            workSheet.Cells[row, col].Style.Font.Name = "Wingdings 2";
+            workSheet.Cells[row, col].Style.Font.Size = 28;
             workSheet.Cells[row, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
 

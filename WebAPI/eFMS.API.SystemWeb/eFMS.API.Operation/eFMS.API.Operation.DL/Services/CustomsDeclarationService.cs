@@ -43,6 +43,8 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CatPartner> customerRepository;
+        private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
+        readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -56,6 +58,8 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<OpsTransaction> opsTransaction,
             IContextBase<OpsStageAssigned> opsStageAssigned,
             IContextBase<SysUser> userRepo,
+            IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
+            IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -70,6 +74,8 @@ namespace eFMS.API.Operation.DL.Services
             opsStageAssignedRepo = opsStageAssigned;
             userRepository = userRepo;
             customerRepository = customerRepo;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
+            accAdvanceRequestRepository = accAdvanceRequestRepo;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -80,59 +86,99 @@ namespace eFMS.API.Operation.DL.Services
         public HandleState ImportClearancesFromEcus()
         {
             string userId = currentUser.UserID;
-            var connections = ecusCconnectionService.Get(x => x.UserId == userId);
+            var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
             var result = new HandleState();
             var lists = new List<CustomsDeclaration>();
-            foreach (var item in connections)
-            {
-                var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-                if (clearanceEcus == null)
-                {
-                    continue;
-                }
-                else
-                {
-                    var clearances = DataContext.Get();
-                    foreach (var clearance in clearanceEcus)
-                    {
-                        var clearanceNo = clearance.SOTK?.ToString().Trim();
-                        var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                        var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                        if (itemExisted == null && clearanceNo != null && countDuplicated < 2)
-                        {
-                            var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
-                            newClearance.Source = OperationConstants.FromEcus;
-                            lists.Add(newClearance);
-                        }
-                    }
-                }
-            }
             try
             {
+                foreach (var item in connections)
+                {
+                    var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+                    if (clearanceEcus == null)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        var clearances = DataContext.Get();
+                        var cleancesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
+                        if (cleancesNotExsitInFMS.Count() > 0)
+                        {
+                            foreach (var d in cleancesNotExsitInFMS)
+                            {
+                                var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
+                                newClearance.Source = OperationConstants.FromEcus;
+                                lists.Add(newClearance);
+                            }
+                        }
+                        //foreach (var clearance in clearanceEcus)
+                        //{
+                        //    var clearanceNo = clearance.SOTK?.ToString().Trim();
+                        //    var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                        //    var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                        //    if (itemExisted == null && clearanceNo != null && countDuplicated < 1)
+                        //    {
+                        //        var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
+                        //        newClearance.Source = OperationConstants.FromEcus;
+                        //        lists.Add(newClearance);
+                        //    }
+                        //}
+                    }
+                }
                 if (lists.Count > 0)
                 {
-                    DataContext.Add(lists);
-                    DataContext.SubmitChanges();
-                    result = new HandleState(true, lists.Count + stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
+                    HandleState hs = DataContext.Add(lists);
+                    if (hs.Success)
+                    {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, lists.Count]);
+
+                        string logErr = String.Format("Import Ecus thành công {0} \n {1} Tờ khai", currentUser.UserName, lists.Count);
+                        new LogHelper("ECUS", logErr);
+                    }
+                    else
+                    {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
+                    }
                 }
                 else
                 {
                     result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
+                    string logErr = String.Format("Import thất bại {0} \n {1} Tờ khai", currentUser.UserName, lists.Count);
+                    new LogHelper("ECUS", logErr);
                 }
-                return result;
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                string logErr = String.Format("Lỗi import Ecus {0} \n {1}", currentUser.UserID, ex.ToString());
+                new LogHelper("ECUS", logErr);
+                result = new HandleState(ex.Message);
             }
+            return result;
+        }
+
+        private bool checkExistEcusInEFMS(string tokhai)
+        {
+            var result = false;
+            var clearances = DataContext.Get();
+
+            var data = clearances.Where(x => x.ClearanceNo == tokhai).ToList();
+            if (data.Count > 0)
+            {
+                result = true;
+            }
+
+            return result;
         }
 
         private CustomsDeclaration MapEcusClearanceToCustom(DTOKHAIMD clearance, string clearanceNo)
         {
             var type = ClearanceConstants.Export_Type_Value;
-            if (clearance.XorN.Contains(ClearanceConstants.Import_Type))
+            if (clearance.XorN != null)
             {
-                type = ClearanceConstants.Import_Type_Value;
+                if (clearance.XorN.Contains(ClearanceConstants.Import_Type))
+                {
+                    type = ClearanceConstants.Import_Type_Value;
+                }
             }
             var serviceType = GetServiceType(clearance, out string cargoType);
             var route = clearance.PLUONG != null ? GetRouteType(clearance.PLUONG) : string.Empty;
@@ -157,7 +203,7 @@ namespace eFMS.API.Operation.DL.Services
                 ImportCountryCode = clearance.NUOC_NK,
                 Pcs = (int?)clearance.SO_KIEN ?? null,
                 UnitCode = clearance.DVT_KIEN,
-                QtyCont = clearance.SO_CONTAINER == null ? (int?)clearance.SO_CONTAINER : null,
+                QtyCont = (int?)clearance.SO_CONTAINER ?? null,
                 GrossWeight = clearance.TR_LUONG,
                 Route = route,
                 Type = type,
@@ -233,7 +279,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
-            if(rangeSearch == PermissionRange.None)
+            if (rangeSearch == PermissionRange.None)
             {
                 rowsCount = 0;
                 return null;
@@ -244,7 +290,7 @@ namespace eFMS.API.Operation.DL.Services
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
                                                                                     && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
-                                                                                    && (x.AccountNo == criteria.CustomerNo || string.IsNullOrEmpty(criteria.CustomerNo));
+                                                                                    && ((x.AccountNo ?? x.PartnerTaxCode) == criteria.CustomerNo || string.IsNullOrEmpty(criteria.CustomerNo));
 
             if (criteria.ImPorted == true)
             {
@@ -254,7 +300,7 @@ namespace eFMS.API.Operation.DL.Services
             {
                 query = query.And(x => x.JobNo == null);
             }
-            
+
             // Query with Permission Range.
             switch (rangeSearch)
             {
@@ -262,11 +308,11 @@ namespace eFMS.API.Operation.DL.Services
                     query = query.And(x => x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Group:
-                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                         || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Department:
-                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) 
+                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                         || x.UserCreated == currentUser.UserID);
                     break;
                 case PermissionRange.Office:
@@ -327,7 +373,7 @@ namespace eFMS.API.Operation.DL.Services
                                 );
 
 
-            var data = Get().Where(query); 
+            var data = Get().Where(query);
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
@@ -369,7 +415,14 @@ namespace eFMS.API.Operation.DL.Services
                 var exCountryCode = item.ExportCountryCode;
                 clearance.ImportCountryName = countries.FirstOrDefault(x => x.Code == imCountryCode)?.NameEn;
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
-                clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
+                if (item.AccountNo == null)
+                {
+                    clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.ShortName;
+                }
+                else
+                {
+                    clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
+                }
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
                 clearance.UserCreatedName = userRepository.Get(x => x.Id == item.UserCreated).FirstOrDefault()?.Username;
                 clearance.UserModifieddName = userRepository.Get(x => x.Id == item.UserModified).FirstOrDefault()?.Username;
@@ -406,7 +459,7 @@ namespace eFMS.API.Operation.DL.Services
                 foreach (var item in clearances)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
-                    if(clearance != null)
+                    if (clearance != null)
                     {
                         clearance.JobNo = item.JobNo;
                         clearance.ConvertTime = item.ConvertTime;
@@ -619,7 +672,7 @@ namespace eFMS.API.Operation.DL.Services
                     result = deleteMultipleModel(customs);
                     break;
                 default:
-                    return new HandleState(403,"");
+                    return new HandleState(403, "");
             }
 
             return result;
@@ -842,7 +895,7 @@ namespace eFMS.API.Operation.DL.Services
                         }
                         else
                         {
-                            item.GrossWeight = Math.Round(valueConvert, 2);
+                            item.GrossWeight = NumberHelper.RoundNumber(valueConvert, 2);
                             item.GrossWeightStr = item.GrossWeight.ToString();
                         }
                     }
@@ -871,7 +924,7 @@ namespace eFMS.API.Operation.DL.Services
                         }
                         else
                         {
-                            item.NetWeight = Math.Round(valueConvert, 2);
+                            item.NetWeight = NumberHelper.RoundNumber(valueConvert, 2);
                             item.NetWeightStr = item.NetWeight.ToString();
                         }
                     }
@@ -900,7 +953,7 @@ namespace eFMS.API.Operation.DL.Services
                         }
                         else
                         {
-                            item.Cbm = Math.Round(valueConvert, 2);
+                            item.Cbm = NumberHelper.RoundNumber(valueConvert, 2);
                             item.CbmStr = item.Cbm.ToString();
                         }
                     }
@@ -1131,7 +1184,7 @@ namespace eFMS.API.Operation.DL.Services
                     item.OfficeId = currentUser.OfficeID;
                     item.CompanyId = currentUser.CompanyID;
                 }
-               
+
                 var hs = Add(data);
                 return hs;
             }
@@ -1226,7 +1279,12 @@ namespace eFMS.API.Operation.DL.Services
         {
             CustomsDeclaration clearance = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (clearance == null) return null;
+            if (clearance.AccountNo == null)
+            {
+                clearance.AccountNo = clearance.PartnerTaxCode;
+            }
             var result = mapper.Map<CustomsDeclarationModel>(clearance);
+            result.CustomerName = customerRepository.Get(x => x.AccountNo == result.AccountNo).FirstOrDefault()?.ShortName;
             result.UserCreatedName = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
             result.UserModifieddName = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
@@ -1280,6 +1338,26 @@ namespace eFMS.API.Operation.DL.Services
             var data = mapper.Map<List<CustomsDeclarationModel>>(query);
             data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
             return data;
+        }
+        public bool CheckAllowUpdate(Guid? jobId)
+        {
+            var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
+            var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid &&
+                          (!string.IsNullOrEmpty(x.CreditNo)
+                          || !string.IsNullOrEmpty(x.DebitNo)
+                          || !string.IsNullOrEmpty(x.Soano)
+                          || !string.IsNullOrEmpty( x.PaymentRefNo)
+                          || !string.IsNullOrEmpty(x.AdvanceNo)
+                          || !string.IsNullOrEmpty(x.VoucherId)
+                          || !string.IsNullOrEmpty(x.PaySoano)
+                          || !string.IsNullOrEmpty(x.SettlementCode)
+                          || !string.IsNullOrEmpty(x.SyncedFrom))
+                          );
+            if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

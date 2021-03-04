@@ -33,6 +33,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? StatementDate { get; set; }
         public string CurrencyId { get; set; }
         public decimal? ExchangeRate { get; set; }
+        public decimal? ExcRateUsdToLocal { get; set; }
         public DateTime? CustomerConfirmDate { get; set; }
         public short? NumberDayOverDue { get; set; }
         public bool? AlertNumberDayOverDueEmail { get; set; }

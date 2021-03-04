@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -45,6 +46,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<SysCompany> sysCompanyRepo;
+        private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
+        private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
@@ -69,6 +72,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             IStringLocalizer<LanguageSub> localizer,
             IContextBase<SysCompany> sysCompany,
+            IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
+            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
@@ -92,6 +97,8 @@ namespace eFMS.API.Documentation.DL.Services
             stringLocalizer = localizer;
             sysCompanyRepo = sysCompany;
             userlevelRepository = userlevelRepo;
+            acctAdvancePaymentRepository = acctAdvancePaymentRepo;
+            acctAdvanceRequestRepository = acctAdvanceRequestRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -307,6 +314,9 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
                         var hsSurcharge = UpdateSurchargeOfHousebill(model);
+
+                        // Cập nhật MBL, HBL cho các phiếu tạm ứng
+                        HandleState hsAdvanceRq = UpdateHblAdvanceRequest(model);
                     }
                     trans.Commit();
                     return isUpdateDone;
@@ -314,6 +324,7 @@ namespace eFMS.API.Documentation.DL.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    new LogHelper("eFMS_Update_CsTrasactionDetail_Log", ex.ToString());
                     return new HandleState(ex.Message);
                 }
                 finally
@@ -329,9 +340,9 @@ namespace eFMS.API.Documentation.DL.Services
             var transactionType = DataTypeEx.GetType(transactionTypeEnum);
             if (transactionType == TermData.AirImport || transactionType == TermData.AirExport)
             {
+                //Không order theo DatetimeCreated, chỉ order giảm dần theo số HAWBNo
                 var hblNos = Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
-                    .OrderByDescending(o => o.DatetimeCreated)
-                    .ThenByDescending(o => o.Hwbno)
+                    .OrderByDescending(o => o.Hwbno)
                     .Select(s => s.Hwbno);
                 int count = 0;
                 if (hblNos != null && hblNos.Count() > 0)
@@ -470,8 +481,12 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.NotifyParty = resultNoti?.PartnerNameEn;
                     detail.POLName = pol?.NameEn;
                     detail.PODName = pod?.NameEn;
+                    detail.POLCode = pol?.Code;
+                    detail.PODCode = pod?.Code;
                     detail.ShipmentEta = shipment.Eta;
                     detail.TransactionType = shipment.TransactionType;
+                    detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
+                    detail.DeliveryPlace = shipment.DeliveryPlace == null ? string.Empty : catPlaceRepo.Get(x => x.Id == shipment.DeliveryPlace)?.FirstOrDefault()?.NameEn;
                     return detail;
                 }
             }
@@ -526,11 +541,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
-            List<string> authorizeUserIds = authorizationRepository.Get(x => x.Active == true
-                                                                 && x.AssignTo == currentUser.UserID
-                                                                 && (x.EndDate.HasValue ? x.EndDate.Value : DateTime.Now.Date) >= DateTime.Now.Date
-                                                                 && x.Services.Contains(transactionType)
-                                                                 )?.Select(x => x.UserId).ToList();
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             int code = PermissionEx.GetPermissionToUpdateHbl(model, permissionRange, currentUser, authorizeUserIds);
             return code;
         }
@@ -549,7 +560,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result = true;
                     break;
                 case PermissionRange.Owner:
-                    if (detail.SaleManId == currentUser.UserID || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if (detail.SaleManId == currentUser.UserID || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -560,7 +571,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Group:
                     if ((detail.GroupId == currentUser.GroupId && detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID || detail.UserCreated == currentUser.UserID)
-                        || authorizeUserIds.Contains(detail.SaleManId))
+                        || authorizeUserIds.Contains(detail.UserCreated))
                     {
                         result = true;
                     }
@@ -570,7 +581,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Department:
-                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if ((detail.DepartmentId == currentUser.DepartmentId && detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -580,7 +591,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Office:
-                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if ((detail.OfficeId == currentUser.OfficeID && detail.CompanyId == currentUser.CompanyID) || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -590,7 +601,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case PermissionRange.Company:
-                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.SaleManId) || detail.UserCreated == currentUser.UserID)
+                    if (detail.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(detail.UserCreated) || detail.UserCreated == currentUser.UserID)
                     {
                         result = true;
                     }
@@ -830,7 +841,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Owner:
                     houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 );
@@ -838,7 +849,7 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
                     houseBills = houseBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 || dataUserLevel.Contains(x.SaleManId)
@@ -847,7 +858,7 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
                     houseBills = houseBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 || dataUserLevelDepartment.Contains(x.SaleManId)
@@ -862,7 +873,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Company:
                     houseBills = houseBills.Where(x => x.CompanyId == currentUser.CompanyID
-                                                || authorizeUserIds.Contains(x.SaleManId)
+                                                || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID);
                     break;
@@ -1205,36 +1216,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         #region --- PREVIEW ---
-        public Crystal Preview(CsTransactionDetailModel model)
-        {
-            if (model == null)
-            {
-                return null;
-            }
-            Crystal result = null;
-            var parameter = new SeaHBillofLadingITLFrameParameter
-            {
-                Packages = model.PackageContainer,
-                GrossWeight = model.GW == null ? (decimal)model.GW : 0,
-                Measurement = string.Empty
-            };
-            result = new Crystal
-            {
-                ReportName = "SeaHBillofLadingITLFrame.rpt",
-                AllowPrint = true,
-                AllowExport = true
-            };
-            var housebills = new List<SeaHBillofLadingITLFrame>();
-            //continue
-            var freightCharges = new List<FreightCharge>();
-            if (freightCharges.Count == 0)
-                return null;
-            result.AddDataSource(housebills);
-            result.FormatType = ExportFormatType.PortableDocFormat;
-            result.AddSubReport("Freightcharges", freightCharges);
-            result.SetParameter(parameter);
-            return result;
-        }
         public Crystal PreviewProofOfDelivery(Guid Id)
         {
             var data = GetById(Id);
@@ -1462,9 +1443,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
                 housebill.NoPieces = string.Format("{0:n}", data.PackageQty) + " " + _packageType; // Package Qty & Package Type of HBL
-                // hbConstainers += " CONTAINER(S) S.T.C:";
-                housebill.Qty = (!string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper() ) + " CONTAINER(S) S.T.C:"; //Ưu tiên Package container >> List of good
-                housebill.MaskNos = markNo?.ToUpper();
+                housebill.ContSTC = "CONTAINER(S) S.T.C:";
+                housebill.SpecialText = "AT SHIPPER´S LOAD, COUNT, STOWAGE AND SEAL. THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER´S ACCOUNT";
+                housebill.Service = data.TransactionType;
+                housebill.Qty = !string.IsNullOrEmpty(data.PackageContainer) ? data.PackageContainer.ToUpper() : hbConstainers?.ToUpper(); //Ưu tiên Package container >> List of good
+                housebill.MaskNos = !string.IsNullOrEmpty(data.ContSealNo) ? data.ContSealNo : markNo?.ToUpper(); //Ưu tiên Container No/Container Type/Seal No của Housebill >> List of good [18/01/2021]
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 var _totalGwCont = conts.Select(s => s.Gw).Sum() ?? 0; //Tổng grossweight trong list cont;
                 var _totalGwHbl = data.GrossWeight ?? 0; //Grossweight of housebill
@@ -1502,6 +1485,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExportReferences = data.ExportReferenceNo; //NOT USE
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
                 housebill.Signature = data?.Hbltype?.ToUpper() ?? string.Empty; //HBL Type
+                housebill.AttachList = data.AttachList;
                 if (data?.SailingDate != null)
                 {
                     housebill.SailingDate = data.SailingDate.Value; //NOT USE
@@ -1523,6 +1507,9 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case DocumentConstants.HBLOFLANDING_FBL_FRAME:
                     _reportName = "SeaHBillofLadingFBLFrame.rpt";
+                    break;
+                case DocumentConstants.HBLOFLANDING_FBL_NOFRAME:
+                    _reportName = "SeaHBillofLadingVLA.rpt";
                     break;
                 case DocumentConstants.HBLOFLANDING_ITL_KESCO:
                     _reportName = "SeaHBillofLadingITL_KESCO.rpt";
@@ -1584,7 +1571,8 @@ namespace eFMS.API.Documentation.DL.Services
             if (reportType == DocumentConstants.HBLOFLANDING_ITL_KESCO
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO
-                || reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME)
+                || reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME
+                || reportType == DocumentConstants.HBLOFLANDING_FBL_NOFRAME)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
@@ -2020,7 +2008,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.Total = hbDetail.Total;
             result.DesOfGood = hbDetail.DesOfGoods;
             var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
-            string _dimensions = string.Join("\r\n", dimHbl.Select(s => Math.Round(s.Length.Value, 2) + "*" + Math.Round(s.Width.Value, 2) + "*" + Math.Round(s.Height.Value, 2) + "*" + Math.Round(s.Package.Value, 2)));
+            string _dimensions = string.Join("\r\n", dimHbl.Select(s => NumberHelper.RoundNumber(s.Length.Value, 2) + "*" + NumberHelper.RoundNumber(s.Width.Value, 2) + "*" + NumberHelper.RoundNumber(s.Height.Value, 2) + "*" + NumberHelper.RoundNumber(s.Package.Value, 2)));
             result.VolumeField = _dimensions;
             result.PrepaidTotal = hbDetail.TotalPp;
             result.CollectTotal = hbDetail.TotalCll;
@@ -2156,7 +2144,7 @@ namespace eFMS.API.Documentation.DL.Services
             return housebillDaily;
         }
 
-        private HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
+        public HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model)
         {
             try
             {
@@ -2167,6 +2155,8 @@ namespace eFMS.API.Documentation.DL.Services
                     surcharge.JobNo = masterbill?.JobNo;
                     surcharge.Mblno = !string.IsNullOrEmpty(masterbill?.Mawb) ? masterbill?.Mawb : model.Mawb;
                     surcharge.Hblno = model.Hwbno;
+                    surcharge.DatetimeModified = DateTime.Now;
+                    surcharge.UserModified = currentUser.UserID;
                     var hsUpdateSurcharge = surchareRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
                 }
                 var sm = surchareRepository.SubmitChanges();
@@ -2176,6 +2166,79 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public HandleState UpdateHblAdvanceRequest(CsTransactionDetailModel model)
+        {
+            HandleState hs = new HandleState();
+            try
+            {
+                IQueryable<AcctAdvanceRequest> advR = acctAdvanceRequestRepository.Get(x => x.Hblid == model.Id);
+                if (advR != null)
+                {
+                    foreach (var item in advR)
+                    {
+                        item.Hbl = model.Hwbno;
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = currentUser.UserID;
+
+                        acctAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
+                    }
+
+                    hs = acctAdvanceRequestRepository.SubmitChanges();
+                }
+                return hs;
+
+            }
+            catch (Exception ex)
+            {
+                string logErr = String.Format("Có lỗi khi cập nhật HBLNo {0} trong acctAdvanceRequest by {1} at {2} \n {3}",model.Hwbno, currentUser.UserName, DateTime.Now, ex.ToString());
+                new LogHelper("eFMS_Update_Advance_Log", logErr);
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs)
+        {
+            hblNo = string.Empty;
+            advs = new List<string>();
+            int errorCode = 0;  // 1|2
+            bool hasChargeSynced = false;
+            bool hasAdvanceRequest = false;
+
+            if (DataContext.Any(x => x.Id == model.Id  && (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? "")))
+            {
+                CsTransactionDetail houseBill = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
+                if (houseBill != null)
+                {
+                    hasChargeSynced = surchareRepository.Any(x => x.Hblid == houseBill.Id && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                }
+
+                if (hasChargeSynced)
+                {
+                    errorCode = 1;
+                    hblNo = houseBill.Hwbno;
+                }
+                else
+                {
+                    var query = from advR in acctAdvanceRequestRepository.Get(x => x.Hblid == houseBill.Id)
+                                join adv in acctAdvancePaymentRepository.Get(x => x.SyncStatus == "Synced") on advR.AdvanceNo equals adv.AdvanceNo
+                                select adv.AdvanceNo;
+
+                    if (query != null && query.Count() > 0)
+                    {
+                        hasAdvanceRequest = true;
+                        advs = query.Distinct().ToList();
+                    }
+                    if (hasAdvanceRequest)
+                    {
+                        errorCode = 2;
+                        hblNo = houseBill.Hwbno;
+                    }
+                }
+            }
+
+            return errorCode;
         }
     }
 }

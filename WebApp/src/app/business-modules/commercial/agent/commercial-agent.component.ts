@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
+import { Permission403PopupComponent, ConfirmPopupComponent, SearchOptionsComponent } from '@common';
 import { Partner, Contract } from '@models';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
@@ -12,7 +12,9 @@ import { RoutingConstants, SystemConstants } from '@constants';
 
 import { AppList } from 'src/app/app.list';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { IAgentState, getAgentSearchParamsState, SearchList } from './store';
 
 
 @Component({
@@ -23,9 +25,12 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
 
     agents: Partner[] = [];
     saleMans: Contract[] = [];
+
+    dataSearchs: any = [];
 
     selectedAgent: Partner;
 
@@ -34,9 +39,11 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
+        private _store: Store<IAgentState>,
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _router: Router,
+        private _cd: ChangeDetectorRef,
         private _exportRepo: ExportRepo) {
         super();
 
@@ -48,12 +55,27 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
 
     ngOnInit(): void {
+        this._store.select(getAgentSearchParamsState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (!!data && !!data.keyword) {
+                        this.dataSearchs = data;
+                        console.log(this.dataSearchs);
+                    }
+
+                }
+            );
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
+            { title: 'Salesman', field: 'username', sortable: true },
+            { title: 'Agreement Type', field: 'contractType', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
-            { title: 'Salesman', field: 'username', sortable: true },
+
             { title: 'Status', field: 'status', sortable: true },
             { title: 'CreateDate', field: 'createDate', sortable: true }
         ];
@@ -62,9 +84,9 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             { title: 'Name ABBR', field: 'shortName', sortable: true },
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
-            { title: 'Billing Address', field: 'addressVn', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
+            { title: 'Billing Address', field: 'addressVn', sortable: true },
         ];
 
         this.headerSearch = [
@@ -73,6 +95,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Salesman', field: 'Saleman', sortable: true },
+            { title: 'Agreement Type', field: 'contractType', sortable: true }
         ];
 
         this.configSearch = {
@@ -82,18 +105,27 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         localStorage.removeItem('success_add_sub');
         this.dataSearch = { All: '' };
         this.dataSearch.partnerType = 'Agent';
-        this.getPartners();
-
+        // this.getPartners();
+        this.onSearch(this.dataSearch);
     }
 
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
         this.dataSearch[event.field || "All"] = event.searchString || '';
         this.dataSearch.partnerType = 'Agent';
-        if (event.field === "userCreatedName") {
-            this.dataSearch.userCreated = event.searchString;
+        if (!!event.field && event.searchString === "") {
+            this.dataSearchs.keyword = "";
         }
+        const searchData: ISearchGroup = {
+            type: !!event.field ? event.field : this.dataSearchs.type,
+            keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
+        };
         this.page = 1;
+        this._store.dispatch(SearchList({ payload: searchData }));
+        if (Object.keys(this.dataSearchs).length > 0) {
+            const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
+            this.dataSearch[type] = this.dataSearchs.keyword;
+        }
         this.requestList();
     }
 
@@ -122,8 +154,18 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         }
     }
 
+    ngAfterViewInit() {
+        if (Object.keys(this.dataSearchs).length > 0) {
+            this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
+            this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
+            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type).title;
+        }
+        this._cd.detectChanges();
+    }
+
     resetSearch(event) {
         this.dataSearch = {};
+        this.dataSearchs = {};
         this.onSearch(event);
     }
 
@@ -228,5 +270,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     }
 
 }
-
+interface ISearchGroup {
+    type: string;
+    keyword: string;
+}
 

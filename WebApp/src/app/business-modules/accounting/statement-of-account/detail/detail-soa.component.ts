@@ -65,6 +65,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
+            { title: 'No.', field: 'i', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
@@ -79,6 +80,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
             { title: 'Synced From', field: 'syncedFromBy', sortable: true },
+            { title: 'ExcRate to Local', field: 'exchangeRate', sortable: true },
         ];
         this._activedRoute.queryParams.subscribe((params: any) => {
             if (!!params.no && params.currency) {
@@ -118,6 +120,7 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     exportExcelSOA() {
         this.isClickSubMenu = false;
+        this._progressRef.start();
         this._exportRepo.exportDetailSOA(this.soaNO, 'VND')
             .pipe(
                 catchError(this.catchError),
@@ -134,6 +137,7 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     exportSOAAF() {
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this._progressRef.start();
         this._exportRepo.exportSOAAirFreight(this.soaNO, userLogged.officeId)
             .pipe(
                 catchError(this.catchError),
@@ -152,6 +156,7 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     exportSOASupplierAF() {
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this._progressRef.start();
         this._exportRepo.exportSOASupplierAirFreight(this.soaNO, userLogged.officeId)
             .pipe(
                 catchError(this.catchError),
@@ -190,6 +195,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     export() {
+        this._progressRef.start();
         this._exportRepo.exportBravoSOA(this.soaNO)
             .pipe(
                 catchError(this.catchError),
@@ -203,6 +209,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     exportSOAOPS() {
+        this._progressRef.start();
         this._exportRepo.exportSOAOPS(this.soaNO)
             .pipe(
                 catchError(this.catchError),

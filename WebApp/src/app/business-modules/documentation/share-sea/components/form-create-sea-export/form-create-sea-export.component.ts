@@ -185,9 +185,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             pod: [],
             agent: [],
 
-            mbltype: [], // * select
+            mbltype: [null, Validators.required], // * select
             shipmentType: [this.shipmentTypes[0], Validators.required], // * select
-            typeOfService: [], // * select
+            typeOfService: [null, Validators.required], // * select
             personalIncharge: [],  // * select
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
@@ -238,6 +238,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':
+                this.supplierName = data.shortName;
                 this.coloader.setValue(data.id);
                 break;
             case 'pol':
@@ -247,6 +248,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                 this.pod.setValue(data.id);
                 break;
             case 'agent':
+                this.agentName = data.shortName;
                 this.agent.setValue(data.id);
                 break;
             default:

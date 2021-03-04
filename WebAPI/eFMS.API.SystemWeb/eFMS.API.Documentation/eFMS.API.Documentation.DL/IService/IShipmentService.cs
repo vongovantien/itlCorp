@@ -28,5 +28,6 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<Shipments> GetShipmentAssignPIC();
         CommissionExportResult GetCommissionReport(CommissionReportCriteria criteria, string userId, string rptType);
         CommissionExportResult GetIncentiveReport(CommissionReportCriteria criteria, string userId);
+        SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria);
     }
 }

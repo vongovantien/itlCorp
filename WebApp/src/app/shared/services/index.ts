@@ -7,7 +7,7 @@ export * from './jwt.service';
 export * from './previous-route';
 export * from './seo.service';
 export * from './signalr.service';
+export * from './destroy.service';
 
-;
 
 

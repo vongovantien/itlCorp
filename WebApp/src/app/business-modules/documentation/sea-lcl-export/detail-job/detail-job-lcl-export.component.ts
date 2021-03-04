@@ -80,8 +80,10 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
+                    this.isDuplicate = this.ACTION === 'COPY';
                 } else {
                     this.ACTION = null;
+                    this.isDuplicate = false;
                 }
 
                 this._cd.detectChanges();
@@ -116,6 +118,8 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                         if (this.ACTION === "COPY") {
                             this.formCreateComponent.getUserLogged();
                             this.headerComponent.resetBreadcrumb("Create Job");
+                        } else {
+                            this.headerComponent.resetBreadcrumb("Job Detail");
                         }
                     }
                 },
@@ -199,7 +203,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                 break;
             case 'cdNote':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });

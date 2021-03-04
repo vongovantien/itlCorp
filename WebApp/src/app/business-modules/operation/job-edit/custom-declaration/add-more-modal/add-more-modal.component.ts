@@ -127,8 +127,9 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         if (dataToUpdate.length > 0) {
             dataToUpdate.forEach(x => {
                 x.jobNo = this.currentJob.jobNo;
+                x.isDelete = false;
+                x.jobId = this.currentJob.id;
             });
-
             this._operationRepo.updateJobToClearances(dataToUpdate)
                 .pipe(finalize(() => this.hide()))
                 .subscribe(
@@ -141,7 +142,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                 );
         }
     }
-    
+
     onSearchAutoComplete(keyword: string) {
         this.term$.next(keyword.trim());
         if (this.customNo.value === '') {

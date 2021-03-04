@@ -31,7 +31,6 @@ namespace eFMS.API.Documentation.DL.IService
         object GetGoodSummaryOfAllHBLByJobId(Guid jobId);
         object ImportCSTransactionDetail(CsTransactionDetailModel model);
         //CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
-        Crystal Preview(CsTransactionDetailModel model);
         string GenerateHBLNoSeaExport(string podCode);
 
         int CheckDetailPermission(Guid id);
@@ -61,5 +60,8 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<CsTransactionDetailModel> GetDataHawbToCheckExisted();
         HandleState UpdateInputBKNote(BookingNoteCriteria criteria);
         List<HousebillDailyExportResult> GetHousebillsDailyExport(DateTime? issuedDate);
+        HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model);
+
+        int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs);
     }
 }

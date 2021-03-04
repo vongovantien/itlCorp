@@ -6,6 +6,7 @@ import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
+import _uniq from 'lodash/uniq';
 import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { Store } from '@ngrx/store';
@@ -13,17 +14,26 @@ import { TransactionActions } from '../../../store';
 import { combineLatest } from 'rxjs';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { ActivatedRoute } from '@angular/router';
+import { ReportPreviewComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
+import { delayTime } from '@decorators';
+import { Crystal } from '@models';
+import { ChargeConstants } from '@constants';
 
 @Component({
     selector: 'cd-note-list',
     templateUrl: './cd-note-list.component.html',
+    styleUrls: ['./cd-note-list.component.scss']
 })
 export class ShareBussinessCdNoteListComponent extends AppList {
     @ViewChild(ShareBussinessCdNoteAddPopupComponent) cdNoteAddPopupComponent: ShareBussinessCdNoteAddPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteDetailPopupComponent) cdNoteDetailPopupComponent: ShareBussinessCdNoteDetailPopupComponent;
-
+    @ViewChild('popupDataCombine') reportPrePopup: ReportPreviewComponent;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
     cdNoteGroups: any[] = [];
@@ -31,7 +41,8 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
-
+    cdNotePrint: AcctCDNote[] = [];
+    
     isDesc = true;
     sortKey: string = '';
 
@@ -112,6 +123,12 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 (res: any) => {
                     this.cdNoteGroups = res;
                     this.initGroup = res;
+                    const selected = { isSelected: false };
+                    this.cdNoteGroups.forEach(element => {
+                        element.listCDNote.forEach((item: any[]) => {
+                            Object.assign(item, selected);
+                        });
+                    });
                 },
             );
     }
@@ -205,5 +222,76 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         } else {
             this.cdNoteGroups = this.initGroup;
         }
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.reportContainerRef.viewContainerRef.clear();
+            });
+    }
+    
+    checkValidCDNote() {
+        this.cdNotePrint = [];
+        const listCheck = [];
+        this.cdNoteGroups.forEach(element => {
+            const item = element.listCDNote.filter(cdNote => cdNote.isSelected === true);
+            if (item.length > 0) {
+                listCheck.push(item);
+                this.cdNotePrint = item;
+            }
+        }
+        );
+
+        if (listCheck.length === 0) {
+            this._toastService.warning("Please select C/D Note to preview.");
+            return false;
+        }
+        const type = [];
+        listCheck.forEach(x => x.map(y => type.push(y.type)))
+        if (listCheck.length > 1 || _uniq(type).length > 1) {
+            this._toastService.warning("You can not print C/D Notes that are different type! Please check again");
+            return false;
+        }
+        return true;
+    }
+
+    previewCdNote(data: string) {
+        if (!this.checkValidCDNote()) {
+            return;
+        }
+
+        let transType = '';
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            transType = ChargeConstants.AI_CODE;
+        }else{
+            transType = ChargeConstants.SFI_CODE;
+        }
+
+        this._documentationRepo.previewASCdNoteList(this.cdNotePrint, data, transType)
+        .pipe(catchError(this.catchError))
+        .subscribe(
+            (res: Crystal) => {
+                this.dataReport = res;
+                if (res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                } else {
+                    this._toastService.warning('There is no data to display preview');
+                }
+            },
+        );
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Operation.DL.Helper;
@@ -200,7 +201,8 @@ namespace eFMS.API.Operation.DL.Services
 
         private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
         {
-            string queryString = @"SELECT TOP (1000) DTOKHAIMD.[_DToKhaiMDID] AS DToKhaiMDID
+            string queryString = @"DECLARE @eoMonth DATETIME = DATEADD(MONTH, 1, DATEADD(DAY, -(DAY(GETDATE())), GETDATE()))
+                                   SELECT TOP (1000) DTOKHAIMD.[_DToKhaiMDID] AS DToKhaiMDID
                                   ,[_XorN] AS XorN
                                   ,[SOTK]
                                   ,[SOTK_DAU_TIEN]
@@ -222,7 +224,8 @@ namespace eFMS.API.Operation.DL.Services
                               FROM " + database + @".[dbo].[DTOKHAIMD]
                                     INNER JOIN " + database + @".[dbo].[DTOKHAIMD_VNACCS2]
                                     ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID
-                              WHERE NAMDK = YEAR(GETDATE()) AND (MONTH(GETDATE()) - MONTH(NGAY_DK)) < 4";
+                              WHERE DATEADD(MONTH, -3, @eoMonth) < NGAY_DK AND NGAY_DK <= @eoMonth
+                              ORDER by NGAY_DK DESC";
 
             string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
             try
@@ -236,6 +239,8 @@ namespace eFMS.API.Operation.DL.Services
             }
             catch (Exception ex)
             {
+                string logErr = String.Format("Lỗi query Ecus {0} {1} {2} \n {3}", serverName, dbusername, database, ex.ToString());
+                new LogHelper("ECUS", logErr);
                 return null;
             }
             return null;

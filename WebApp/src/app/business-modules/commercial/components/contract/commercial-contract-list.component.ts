@@ -153,8 +153,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 );
         } else {
             if (this.contracts.length > 0) {
+                this.contract = new Contract(this.contracts[this.indexlstContract]);
                 this.formContractPopup.selectedContract = this.contracts[this.indexlstContract];
-                this.formContractPopup.contract = this.contracts[this.indexlstContract];
+                this.formContractPopup.contract = this.selectedContract;
                 this.formContractPopup.indexDetailContract = this.indexlstContract;
                 this.formContractPopup.fileList = this.formContractPopup.selectedContract.fileList;
             }
@@ -222,8 +223,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     onRequestContract($event: any) {
-        this.contract = $event;
-        this.selectedContract = new Contract(this.contract);
+        // this.contract = $event;
+        this.selectedContract = new Contract($event);
         const data = $event;
         if (!!this.selectedContract && !this.formContractPopup.isCreateNewCommercial) {
             this.getListContract(this.partnerId);
@@ -231,11 +232,13 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             const checkUpdate = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId) && x.index !== data.index);
             const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
             if (this.indexlstContract !== null) {
-                this.contracts[this.indexlstContract] = this.selectedContract;
                 if (!checkUpdate) {
+                    this.contracts[this.indexlstContract] = this.selectedContract;
                     this.contracts = [...this.contracts];
                     this.formContractPopup.hide();
                 } else {
+                    this.contracts[this.indexlstContract] = this.contract;
+                    this.contracts = [...this.contracts];
                     this._toastService.error('Duplicate service,office,salesman!');
                 }
             } else {
@@ -255,7 +258,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             }
         }
         this.formContractPopup.contracts = this.contracts;
-        this.onActiveContract.emit(this.contract.partnerStatus);
+        this.onActiveContract.emit(this.selectedContract);
     }
 
 

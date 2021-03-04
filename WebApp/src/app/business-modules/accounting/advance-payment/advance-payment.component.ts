@@ -5,7 +5,6 @@ import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { RoutingConstants } from '@constants';
 import { NgProgress } from '@ngx-progressbar/core';
-import { NgxSpinnerService } from 'ngx-spinner';
 
 import { AppList } from '@app';
 import { AccountingRepo, ExportRepo } from '@repositories';
@@ -14,14 +13,21 @@ import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
 import { AccountingConstants, SystemConstants } from '@constants';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
 
 
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
-import { catchError, finalize, map } from 'rxjs/operators';
-import _tets from 'lodash/concat';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import {
+    LoadListAdvancePayment,
+    getAdvancePaymentListState,
+    getAdvancePaymentSearchParamsState,
+    getAdvancePaymentListLoadingState,
+    getAdvancePaymentListPagingState
+} from './store';
 
 @Component({
     selector: 'app-advance-payment',
@@ -30,15 +36,13 @@ import _tets from 'lodash/concat';
 export class AdvancePaymentComponent extends AppList {
 
     @ViewChild(AdvancePaymentFormsearchComponent) formSearch: AdvancePaymentFormsearchComponent;
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(UpdatePaymentVoucherPopupComponent) popupUpdateVoucher: UpdatePaymentVoucherPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild('confirmExistedVoucher') confirmExistedVoucher: ConfirmPopupComponent;
     @ViewChild('confirmRemoveSelectedVoucher') confirmRemoveSelectedVoucher: ConfirmPopupComponent;
     @ViewChild(AdvancePaymentsPopupComponent) advancePaymentsPopup: AdvancePaymentsPopupComponent;
-    @ViewChild('confirmSyncAdvance') confirmSyncAdvancePopup: ConfirmPopupComponent;
 
+    @ViewChild(InjectViewContainerRefDirective) public confirmPopupContainerRef: InjectViewContainerRefDirective;
 
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
@@ -51,10 +55,9 @@ export class AdvancePaymentComponent extends AppList {
 
     advancePaymentIds: string[] = [];
 
-    paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
 
-    advanceSyncIds: any[] = ['sds  sd     '];
+    advanceSyncIds: any[] = [];
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -64,10 +67,9 @@ export class AdvancePaymentComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _router: Router,
         private _store: Store<IAppState>,
-        private _spinner: NgxSpinnerService,
     ) {
         super();
-        this.requestList = this.getListAdvancePayment;
+        this.requestList = this.requestLoadListAdvancePayment;
         this.requestSort = this.sortAdvancePayment;
         this._progressRef = this._progressService.ref();
     }
@@ -105,22 +107,39 @@ export class AdvancePaymentComponent extends AppList {
 
         this.getUserLogged();
 
+
+        this.getListAdvancePayment();
+
+        this._store.select(getAdvancePaymentSearchParamsState)
+            .pipe(
+                withLatestFrom(this._store.select(getAdvancePaymentListPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+
+                    this.requestLoadListAdvancePayment();
+                }
+            );
+
+        this.isLoading = this._store.select(getAdvancePaymentListLoadingState);
     }
 
-    onSearchAdvPayment(data: any) {
-        this.page = 1;
-        this.dataSearch = data; // Object.assign({}, data, { requester: this.userLogged.id });
-        this.getListAdvancePayment();
+    requestLoadListAdvancePayment() {
+        this._store.dispatch(LoadListAdvancePayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     getListAdvancePayment() {
-        this.isLoading = true;
-        this._progressRef.start();
-
-        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
+        this._store.select(getAdvancePaymentListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
                         data: !!data.data ? data.data.map((item: any) => new AdvancePayment(item)) : [],
@@ -131,8 +150,6 @@ export class AdvancePaymentComponent extends AppList {
                 (res: any) => {
                     this.advancePayments = res.data || [];
                     this.totalItems = res.totalItems || 0;
-                    const objPayment = this.advancePayments.find(x => x.statusApproval === 'Done');
-                    this.paymentHasStatusDone = !!objPayment ? true : false;
                 },
             );
     }
@@ -155,7 +172,6 @@ export class AdvancePaymentComponent extends AppList {
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
-                    this.confirmDeletePopup.hide();
                     this._progressRef.complete();
                 })
             )
@@ -163,7 +179,7 @@ export class AdvancePaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, 'Delete Success');
-                        this.getListAdvancePayment();
+                        this.requestLoadListAdvancePayment();
                     }
                 },
             );
@@ -174,7 +190,16 @@ export class AdvancePaymentComponent extends AppList {
             .subscribe((value: boolean) => {
                 if (value) {
                     this.selectedAdv = new AdvancePayment(selectedAdv);
-                    this.confirmDeletePopup.show();
+
+                    this.showPopupDynamicRender<ConfirmPopupComponent>(
+                        ConfirmPopupComponent,
+                        this.confirmPopupContainerRef.viewContainerRef, {
+                        body: 'Do you want to delete ?',
+                        labelConfirm: 'Yes',
+                        labelCancel: 'No'
+                    }, () => {
+                        this.onDeleteAdvPayment();
+                    })
                 } else {
                     this.permissionPopup.show();
                 }
@@ -185,12 +210,11 @@ export class AdvancePaymentComponent extends AppList {
         if (!!this.advancePayments[index].advanceRequests.length) {
             this.groupRequest = this.advancePayments[index].advanceRequests;
         } else {
-            this.isLoading = true;
             this._progressRef.start();
             this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
                 .pipe(
                     catchError(this.catchError),
-                    finalize(() => { this._progressRef.complete(); this.isLoading = false; })
+                    finalize(() => { this._progressRef.complete(); })
                 )
                 .subscribe(
                     (res: any) => {
@@ -274,7 +298,17 @@ export class AdvancePaymentComponent extends AppList {
                                 this.messageVoucherExisted += item.advanceNo + " has existed in " + item.voucherNo + "<br>";
                             });
                             this.messageVoucherExisted += "<br>" + " Would you like to keep updating?";
-                            this.confirmExistedVoucher.show();
+
+                            this.showPopupDynamicRender<ConfirmPopupComponent>(
+                                ConfirmPopupComponent,
+                                this.confirmPopupContainerRef.viewContainerRef, {
+                                title: 'Voucher Existed',
+                                body: this.messageVoucherExisted,
+                                labelConfirm: 'Yes',
+                                labelCancel: 'No'
+                            }, () => {
+                                this.popupUpdateVoucher.show();
+                            })
                         } else {
                             this.popupUpdateVoucher.show();
                         }
@@ -284,7 +318,6 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     onSubmitUpdateVoucher() {
-        this.confirmExistedVoucher.hide();
         this.popupUpdateVoucher.show();
     }
 
@@ -348,7 +381,7 @@ export class AdvancePaymentComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this.isCheckAll = false;
-                        this.getListAdvancePayment();
+                        this.requestLoadListAdvancePayment();
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -387,16 +420,26 @@ export class AdvancePaymentComponent extends AppList {
         if (!this.advanceSyncIds.length) {
             return;
         }
-        this.confirmSyncAdvancePopup.show();
+        // this.confirmSyncAdvancePopup.show();   // ! Before
+
+        // * After
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
+            {
+                body: 'Are you sure you want to sync data to accountant system ?',   // ? Config confirm popup
+                iconConfirm: 'la la-cloud-upload',
+                labelConfirm: 'Yes'
+            },
+            (v: boolean) => {                                   // ? Hàm Callback khi sumit
+                this.onSyncBravo(this.advanceSyncIds);
+            });
 
     }
 
-    onSyncBravo() {
-        this.confirmSyncAdvancePopup.hide();
-        this._spinner.show();
-        this._accoutingRepo.syncAdvanceToAccountant(this.advanceSyncIds)
+    onSyncBravo(advIds: AccountingInterface.IRequestGuid[]) {
+        this._accoutingRepo.syncAdvanceToAccountant(advIds)
             .pipe(
-                finalize(() => this._spinner.hide()),
                 catchError(this.catchError)
             )
             .subscribe(
@@ -404,7 +447,7 @@ export class AdvancePaymentComponent extends AppList {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
 
-                        this.getListAdvancePayment();
+                        this.requestLoadListAdvancePayment();
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
@@ -413,6 +456,50 @@ export class AdvancePaymentComponent extends AppList {
                     console.log(error);
                 }
             );
+    }
+
+    denyAdvance() {
+        const advancesDenyList = this.advancePayments.filter(x => x.isChecked && x.statusApproval !== AccountingConstants.STATUS_APPROVAL.NEW
+            && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED);
+        if (!advancesDenyList.length) {
+            this._toastService.warning("Please select correct advance payment to deny");
+            return;
+        }
+
+        const hasDenied: boolean = advancesDenyList.some(x => x.statusApproval === 'Denied');
+        if (hasDenied) {
+            const advanceHasDenied: string = advancesDenyList.filter(x => x.statusApproval === 'Denied').map(a => a.advanceNo).toString();
+            this._toastService.warning(`${advanceHasDenied} had denied, Please recheck!`);
+            return;
+        }
+
+        const advIds: string[] = advancesDenyList.map((x: AdvancePayment) => x.id);
+        if (!advIds.length) {
+            return;
+        }
+
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,
+            { body: 'Are you sure you want to deny advance payments ?' },
+            (v: boolean) => {
+                this.onDenyAdvance(advIds);
+            });
+    }
+
+    onDenyAdvance(advIds: string[]) {
+        this._accoutingRepo.denyAdvancePayments(advIds)
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.requestLoadListAdvancePayment();
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            )
     }
 }
 

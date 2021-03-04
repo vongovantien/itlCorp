@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
@@ -23,6 +23,7 @@ import { FormValidators } from '@validators';
 })
 export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppForm {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @Input() isUpdate: boolean = false;
 
     formGroup: FormGroup;
     customer: AbstractControl;
@@ -111,32 +112,33 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.getConfigComboGrid();
 
         this.initForm();
+        if (!this.isUpdate) {
+            this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: CsTransaction) => {
+                        this.shipmentDetail = res;
+                        this.jobId = this.shipmentDetail.id;
 
-        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: CsTransaction) => {
-                    this.shipmentDetail = res;
-                    this.jobId = this.shipmentDetail.id;
-
-                    const formData = {
-                        masterBill: this.shipmentDetail.mawb,
-                        servicetype: this.shipmentDetail.typeOfService,
-                        documentDate: { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) },
-                        supplier: this.shipmentDetail.coloaderId,
-                        issueHBLDate: { startDate: new Date(), endDate: new Date() },
-                        pol: this.shipmentDetail.pol,
-                        pod: this.shipmentDetail.pod,
-                        localVessel: this.shipmentDetail.flightVesselName,
-                        localVoyNo: this.shipmentDetail.voyNo,
-                        finalDestinationPlace: this.shipmentDetail.podName,
-                        eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
-                        etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
-                    };
-                    console.log(formData);
-                    this.formGroup.patchValue(formData);
-                }
-            );
+                        const formData = {
+                            masterBill: this.shipmentDetail.mawb,
+                            servicetype: this.shipmentDetail.typeOfService,
+                            documentDate: { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) },
+                            supplier: this.shipmentDetail.coloaderId,
+                            issueHBLDate: { startDate: new Date(), endDate: new Date() },
+                            pol: this.shipmentDetail.pol,
+                            pod: this.shipmentDetail.pod,
+                            localVessel: this.shipmentDetail.flightVesselName,
+                            localVoyNo: this.shipmentDetail.voyNo,
+                            finalDestination: this.shipmentDetail.podName,
+                            eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
+                            etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
+                        };
+                        console.log(formData);
+                        this.formGroup.patchValue(formData);
+                    }
+                );
+        }
     }
 
     getConfigComboGrid() {
@@ -178,10 +180,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.ports = this._store.select(getCataloguePortState);
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
         this.provinces = this._catalogueRepo.getAllProvinces();
-        this.suppliers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER });
-        this.shippers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.SHIPPER });
-        this.customers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER });
-        this.consignees = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CONSIGNEE });
+        this.suppliers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER, active: true });
+        this.shippers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.SHIPPER, active: true });
+        this.customers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER, active: true });
+        this.consignees = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CONSIGNEE, active: true });
         this.consigneesAndCustomers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
     }
 
@@ -326,8 +328,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             placeofReceipt: res.pickupPlace,
             finalDestination: res.finalDestinationPlace,
             shipper: res.shipperId,
-            feederVessel1: res.oceanVoyNo,
-            feederVoyageNo: res.oceanVessel,
+            feederVessel1: res.oceanVessel,
+            feederVoyageNo: res.oceanVoyNo,
             arrivalVoyage: res.localVoyNo,
             arrivalVessel: res.localVessel,
             documentNo: res.documentNo,

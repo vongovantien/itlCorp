@@ -43,8 +43,10 @@
                     </li>
                 </ul>
             </div>
+
             <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"
-                *ngIf="!(isLocked | async) && (permissionHblDetail | async)?.allowUpdate"></app-default-button>
+                *ngIf="(permissionHblDetail | async)?.allowUpdate"></app-default-button>
+
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>
@@ -52,7 +54,7 @@
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
-                    <app-form-create-hbl-sea-import></app-form-create-hbl-sea-import>
+                    <app-form-create-hbl-sea-import [isUpdate]="true"></app-form-create-hbl-sea-import>
                     <hbl-goods-summary-fcl>HBL Goods Summary</hbl-goods-summary-fcl>
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">

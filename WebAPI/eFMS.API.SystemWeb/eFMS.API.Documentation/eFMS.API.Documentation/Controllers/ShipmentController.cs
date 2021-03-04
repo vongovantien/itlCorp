@@ -227,6 +227,18 @@ namespace eFMS.API.Documentation.Controllers
             var data = shipmentService.GetDataSummaryOfRevenueIncurred(criteria);
             return Ok(data);
         }
+
+        /// Get data for export costs by partner
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataCostsByPartner")]
+        [Authorize]
+        public IActionResult GetDataCostsByPartner(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.GetDataCostsByPartner(criteria);
+            return Ok(data);
+        }
         /// <summary>
         /// get list of shipment assign or PIC is current user
         /// </summary>

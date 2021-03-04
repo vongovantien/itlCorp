@@ -461,6 +461,43 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// Export Shipment Overview
+        /// </summary>
+        /// <param name="criteria">Id of shipment</param>
+        /// <returns></returns>
+        [Route("ExportSummaryOfCostsPartner")]
+        [HttpPost]
+        public async Task<IActionResult> ExportSummaryOfCostsPartner(GeneralReportCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsPartnerUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Summary_Of_Revenue_Incurred,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<SummaryOfRevenueModel>();
+            if (dataObjects.Result == null || !dataObjects.Result.summaryOfRevenueExportResults.Any())
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateSummaryOfRevenueExcel(dataObjects.Result, criteria, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Costs By Partner.xlsx");
+            return fileContent;
+        }
+
         [Route("ExportHousebillDaily")]
         [HttpGet]
         public async Task<IActionResult> ExportHousebillDaily(DateTime? issuedDate)
@@ -507,7 +544,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            string fileName = "Export OPS Debit Note.xlsx";
+            string fileName = "Export OPS CD Note.xlsx";
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
             return fileContent;
         }
@@ -577,6 +614,31 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
             string fileName = "Incentive.xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
+        
+        /// <summary>
+        /// Export Combine Ops Debit Note
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportOpsCdNoteCombine")]
+        [HttpPost]
+        public async Task<IActionResult> ExportOpsCdNoteCombine(object model)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(model, aPis.HostStaging + Urls.Documentation.GetDataCDNoteCombineExportUrl);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<AcctCDNoteExportResult>();
+            if (dataObjects.Result == null)
+            {
+                return Ok();
+            }
+            var stream = new DocumentationHelper().GenerateCDNoteDetailExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            string fileName = "Export OPS CD Note.xlsx";
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
             return fileContent;
         }

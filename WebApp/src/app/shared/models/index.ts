@@ -5,6 +5,8 @@ export * from './operation/stage';
 export * from './operation/surcharge';
 export * from './operation/custom-declaration';
 export * from './operation/shipment';
+export * from './operation/advanceSettlement';
+
 export * from './catalogue/partner.model';
 export * from './catalogue/catCurrency.model';
 export * from './catalogue/catUnit.model';
@@ -64,6 +66,7 @@ export * from './document/csBookingnote';
 export * from './document/arrival-note-hbl';
 export * from './document/shippingInstruction.model';
 export * from './document/emailContent';
+export * from './document/arrival-note-hbl';
 
 export * from './tool-setting/tariff';
 export * from './tool-setting/ecus-connection';

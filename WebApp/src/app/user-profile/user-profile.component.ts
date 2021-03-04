@@ -42,8 +42,10 @@ export class UserProfilePageComponent extends AppForm {
     workingStatus: AbstractControl;
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
+    personalId: AbstractControl;
 
     photoUrl: string;
+
 
     constructor(
         private _ngProgressService: NgProgress,
@@ -75,6 +77,7 @@ export class UserProfilePageComponent extends AppForm {
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        console.log(res.data);
                         this.setUserForForm(res.data);
                     }
                 }
@@ -86,7 +89,8 @@ export class UserProfilePageComponent extends AppForm {
     }
 
     initImageLibary() {
-        this._zone.run(() => {
+        let selectImg = null;
+        this._zone.runOutsideAngular(() => {
             $(this.el.nativeElement).froalaEditor({
                 requestWithCORS: true,
                 language: 'vi',
@@ -95,14 +99,23 @@ export class UserProfilePageComponent extends AppForm {
                 imageAllowedTypes: ['jpeg', 'jpg', 'png'],
                 requestHeaders: {
                     Authorization: `Bearer ${localStorage.getItem(SystemConstants.ACCESS_TOKEN)}`,
-                    Module: 'User',
+                    Module: 'User', // thu muc anh chua anh cua user.
                     ObjectId: `${this.currentUserId}`,
                 },
                 imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
                 imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/User?userId=${this.currentUserId}`,
-
+                imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
+                imageManagerDeleteMethod: 'DELETE',
+                imageManagerDeleteParams: { id: selectImg?.id }
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
+            }).on('froalaEditor.imageManager.imageDeleted', (e, editor, data) => {
+                if (e.error) {
+                    this._toastService.error("Xóa thất bại");
+                } else
+                    this._toastService.success("Xóa thành công");
+
+
             }).on('froalaEditor.image.error', (e, editor, error, response) => {
                 console.log(error);
                 switch (error.code) {
@@ -116,7 +129,7 @@ export class UserProfilePageComponent extends AppForm {
                         this._toastService.error(error.message);
                         break;
                 }
-            });
+            })
         });
     }
 
@@ -146,6 +159,7 @@ export class UserProfilePageComponent extends AppForm {
             workingStatus: [],
             creditLimit: [],
             creditRate: [],
+            personalId: []
         });
         //
         this.employeeNameVn = this.formUser.controls['employeeNameVn'];
@@ -163,7 +177,7 @@ export class UserProfilePageComponent extends AppForm {
         this.workingStatus = this.formUser.controls['workingStatus'];
         this.creditLimit = this.formUser.controls['creditLimit'];
         this.creditRate = this.formUser.controls['creditRate'];
-
+        this.personalId = this.formUser.controls['personalId'];
     }
 
     setUserForForm(body: any) {
@@ -181,6 +195,7 @@ export class UserProfilePageComponent extends AppForm {
             workingStatus: body.workingStatus,
             creditLimit: body.creditLimit,
             creditRate: body.creditRate,
+            personalId: !!body.sysEmployeeModel ? body.sysEmployeeModel.personalId : null
         });
         this.photoUrl = body.avatar;
     }
@@ -198,7 +213,8 @@ export class UserProfilePageComponent extends AppForm {
             bankName: !form.bankName ? '' : form.bankName,
             tel: !form.tel ? '' : form.tel,
             description: !form.description ? '' : form.description,
-            avatar: this.photoUrl
+            avatar: this.photoUrl,
+            personalId: form.personalId
         };
         this.onUpdate(body);
     }

@@ -57,8 +57,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     selectedFreightCharge: ArrivalFreightCharge;
     hblid: string;
 
-    isInvalidFirstNote: boolean = false;
-    isInvalidSecondNote: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -114,7 +112,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     this.hblArrivalNote.hblid = data.hblid;
 
                     if (!data.arrivalNo) {
-                        return this._store.select(getTransactionDetailCsTransactionState);  // * Stream 2: get shipment detail
+                        return this._store.select(getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe));  // * Stream 2: get shipment detail
                     } else {
                         this.hblArrivalNote.arrivalNo = data.arrivalNo;
                         this.hblArrivalNote.arrivalFirstNotice = !!data.arrivalFirstNotice ? {
@@ -318,59 +316,29 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
         return (_firstNote < _eta) ? true : false;
     }
 
-    checkValidateFirstNote() {
-        if (!this.validateEta_FirstNotice(this.hbl.eta, this.hblArrivalNote.arrivalFirstNotice)) {
-            this.isInvalidFirstNote = false;
-        } else {
-            this.isInvalidFirstNote = true;
-        }
-
-        return !this.isInvalidFirstNote;
-    }
-
-    checkValidateSecondtNote() {
-        if (!this.validateFirst_SecondNotice(this.hblArrivalNote.arrivalFirstNotice, this.hblArrivalNote.arrivalSecondNotice)) {
-            this.isInvalidSecondNote = false;
-        } else {
-            this.isInvalidSecondNote = true;
-        }
-
-        return !this.isInvalidSecondNote;
-    }
-
     saveArrivalNote() {
         this.isSubmitted = true;
         const dateNotice = {
             arrivalFirstNotice: !!this.hblArrivalNote.arrivalFirstNotice && !!this.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
             arrivalSecondNotice: !!this.hblArrivalNote.arrivalSecondNotice && <any>!!this.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
         };
-        const isCheckFN_SN = this.validateFirst_SecondNotice(this.hblArrivalNote.arrivalFirstNotice, this.hblArrivalNote.arrivalSecondNotice);
-        const isCheckETA_FN = this.validateEta_FirstNotice(this.hbl.eta, this.hblArrivalNote.arrivalFirstNotice);
-        if (!isCheckFN_SN && !isCheckETA_FN) {
-            this._progressRef.start();
-            this._documentRepo.updateArrivalInfo(Object.assign({}, this.hblArrivalNote, dateNotice))
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
-                )
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastService.success(res.message);
 
-                            // * Dispatch for detail HBL to update HBL state.
-                            this._store.dispatch(new GetDetailHBLAction(this.hblArrivalNote.hblid));
-                        }
+        this._progressRef.start();
+        this._documentRepo.updateArrivalInfo(Object.assign({}, this.hblArrivalNote, dateNotice))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+
+                        // * Dispatch for detail HBL to update HBL state.
+                        this._store.dispatch(new GetDetailHBLAction(this.hblArrivalNote.hblid));
                     }
-                );
-        } else {
-            if (isCheckFN_SN) {
-                this._toastService.error('The Second Notice date must be equal to or after the First Notice date');
-            }
-            if (isCheckETA_FN) {
-                this._toastService.error('The First Notice date must be equal to or after the Eta');
-            }
-        }
+                }
+            );
     }
 
     setDefaultHeadeFooter() {

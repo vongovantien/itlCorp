@@ -18,6 +18,8 @@
                         <div class="dropdown-menu" role="menu" aria-labelledby="button-nested">
                             <a class="dropdown-item pointer" (click)="preview(false)">Preview with USD/VND</a>
                             <a class="dropdown-item pointer" (click)="preview(true)">Preview with Original</a>
+                            <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
+                            <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
                             <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a>
                         </div>
                     </div>
@@ -265,9 +267,7 @@
 
 <info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>
 
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>
 
 <payment-method-popup (onApply)="onApplyPaymentMethod($event)"></payment-method-popup>
 <info-popup #validateSyncedCDNotePopup [body]="messageValidate" [title]="'Alert'">

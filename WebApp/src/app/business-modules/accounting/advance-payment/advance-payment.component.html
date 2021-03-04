@@ -7,7 +7,7 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-        <adv-payment-form-search (onSearch)="onSearchAdvPayment($event)"></adv-payment-form-search>
+        <adv-payment-form-search></adv-payment-form-search>
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="m-form">
@@ -68,6 +68,17 @@
                                             </span>
                                         </span>
                                     </button>
+
+                                    <button class="btn btn-danger  m-btn--icon m-btn--uppercase" title="Deny"
+                                        *ngIf="menuSpecialPermission | async | specialPermission:'DenyAdvance'"
+                                        (click)="denyAdvance()">
+                                        <span>
+                                            <i class="la la-times"></i>
+                                            <span>
+                                                Deny
+                                            </span>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -78,10 +89,9 @@
                             <table class="table table-brand table-hover dataTable">
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                    <th class="m--w-50 first">
+                                    <th class="m--w-50 first" *ngIf="!!advancePayments.length">
                                         <label class="m-checkbox">
                                             <input type="checkbox" name="" [checked]="isCheckAll"
-                                                [disabled]="!paymentHasStatusDone"
                                                 (change)="isCheckAll=!isCheckAll; checkAllChange()">
                                             <span></span>
                                         </label>
@@ -117,11 +127,16 @@
                                                         </button>
                                                         <ng-container
                                                             *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
-                                                            <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
+                                                            <!-- <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                                 title="Delete advance payment"
                                                                 (click)="prepareDeleteAdvance(advancePayment)">
                                                                 <i class="la la-trash text-danger"></i>
-                                                            </button>
+                                                            </button> -->
+                                                            <app-permission-button type="delete"
+                                                                (onClick)="prepareDeleteAdvance(advancePayment)"
+                                                                [user]="advancePayment.userCreated" class="icon"
+                                                                icon="la la-trash text-danger">
+                                                            </app-permission-button>
                                                         </ng-container>
                                                     </div>
                                                 </td>
@@ -179,7 +194,9 @@
                                                         {{advancePayment.syncStatus}}
                                                     </div>
                                                     <div *ngSwitchDefault class="text-danger">
-                                                        {{advancePayment.syncStatus}}{{advancePayment.reasonReject ? ' - ' +advancePayment.reasonReject : ''}}
+                                                        {{advancePayment.syncStatus}}
+                                                        {{advancePayment.reasonReject ? ' - '
+                                                        +advancePayment.reasonReject : ''}}
                                                     </div>
                                                 </td>
                                                 <td>
@@ -194,7 +211,8 @@
                                                         (onClick)="sortByCollapse($event)">
                                                     </thead>
                                                     <tbody>
-                                                        <ng-container *ngIf="!isLoading && !!groupRequest.length">
+                                                        <ng-container
+                                                            *ngIf="!(isLoading | async)  && !!groupRequest.length">
                                                             <tr class=""
                                                                 *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
                                                                 <td>{{request.jobId}}</td>
@@ -222,7 +240,7 @@
                                                                 </td>
                                                             </tr>
                                                         </ng-container>
-                                                        <tr *ngIf="!isLoading && !groupRequest.length"
+                                                        <tr *ngIf="!(isLoading | async) && !groupRequest.length"
                                                             app-table-none-record>
                                                         </tr>
                                                     </tbody>
@@ -231,10 +249,10 @@
                                         </ng-container>
 
                                     </ng-container>
-                                    <tr *ngIf="!isLoading && !advancePayments.length" app-table-none-record
+                                    <tr *ngIf="!(isLoading | async)  && !advancePayments.length" app-table-none-record
                                         [colspan]="headers.length + 1">
                                     </tr>
-                                    <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
+                                    <tr class="loading-wrapper" *ngIf="(isLoading | async) " app-table-row-loading>
                                     </tr>
                                 </tbody>
                             </table>
@@ -249,21 +267,11 @@
     </div>
 </div>
 
-<confirm-popup #confirmDelete (onSubmit)="onDeleteAdvPayment()" [body]="'Do you want to delete ?'"
-    [labelConfirm]="'Yes'" [labelCancel]="'No'"></confirm-popup>
-
-<confirm-popup #confirmExistedVoucher (onSubmit)="onSubmitUpdateVoucher()" [labelConfirm]="'Yes'"
-    [body]="messageVoucherExisted" [labelCancel]="'No'" title="Voucher Existed">
-</confirm-popup>
 
 <confirm-popup #confirmRemoveSelectedVoucher (onSubmit)="onRemoveSelectedVoucher()" [labelConfirm]="'Yes'"
     [body]="'Are you sure you want to remove selected payment vouchers?'" [labelCancel]="'No'"
     title="Confirm remove selected voucher">
 </confirm-popup>
-
-<confirm-popup #confirmSyncAdvance (onSubmit)="onSyncBravo()" [labelConfirm]="'Yes'"
-    body="Are you sure you want to sync data to accountant system ?" iconConfirm="la la-cloud-upload"></confirm-popup>
-
 
 <permission-403-popup></permission-403-popup>
 
@@ -272,3 +280,5 @@
 <info-popup body="Opps, Please check an advance to update voucher !!'" [title]="'Cannot Update Voucher'"></info-popup>
 
 <advance-payments-popup></advance-payments-popup>
+
+<ng-template inject></ng-template>

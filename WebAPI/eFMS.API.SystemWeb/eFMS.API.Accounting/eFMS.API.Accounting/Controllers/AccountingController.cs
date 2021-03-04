@@ -12,6 +12,7 @@ using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -81,6 +82,9 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> GetListInvoicePaymentToSync(List<RequestGuidListModel> request)
         {
+            var _startDateProgress = DateTime.Now;
+            if (!ModelState.IsValid) return BadRequest();
+
             try
             {
                 // 1. Login
@@ -116,7 +120,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -134,7 +140,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -165,6 +173,9 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> GetListObhPaymentToSync(List<RequestIntListModel> request)
         {
+            var _startDateProgress = DateTime.Now;
+            if (!ModelState.IsValid) return BadRequest();
+
             try
             {
                 // 1. Login
@@ -200,7 +211,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -218,7 +231,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -249,6 +264,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> SyncAdvanceToAccountantSystem(List<RequestGuidListModel> request)
         {
+            var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
 
             try
@@ -286,7 +302,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSAdvanceSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
-                            Major = "Nghiệp Vụ Tạm Ứng"
+                            Major = "Nghiệp Vụ Tạm Ứng",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -304,7 +322,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSAdvanceSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
-                            Major = "Nghiệp Vụ Tạm Ứng"
+                            Major = "Nghiệp Vụ Tạm Ứng",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -326,10 +346,12 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
 
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -338,6 +360,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> SyncSettlementToAccountantSystem(List<RequestGuidListModel> request)
         {
+            var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
 
             try
@@ -375,7 +398,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -393,7 +418,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -413,10 +440,12 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -425,6 +454,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> SyncVoucherToAccountantSystem(List<RequestGuidListModel> request)
         {
+            var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
 
             try
@@ -462,7 +492,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -480,7 +512,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -500,10 +534,12 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -517,6 +553,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> SyncListCdNoteToAccountant(List<RequestGuidTypeListModel> requests)
         {
+            var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
 
             try
@@ -579,7 +616,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSInvoiceDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd_NVHD),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel_NVHD),
-                            Major = "Nghiệp Vụ Hóa Đơn"
+                            Major = "Nghiệp Vụ Hóa Đơn",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -597,7 +636,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSInvoiceDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate_NVHD),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel_NVHD),
-                            Major = "Nghiệp Vụ Hóa Đơn"
+                            Major = "Nghiệp Vụ Hóa Đơn",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -616,7 +657,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd_NVCP_SameCurrLocal),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel_NVCP),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -635,7 +678,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate_NVCP_SameCurrLocal),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel_NVCP),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -665,11 +710,13 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(result);
                     }
                 }
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
 
@@ -682,6 +729,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> SyncListSoaToAccountant(List<RequestIntTypeListModel> requests)
         {
+            var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
 
             try
@@ -745,7 +793,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSInvoiceDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd_NVHD),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel_NVHD),
-                            Major = "Nghiệp Vụ Hóa Đơn"
+                            Major = "Nghiệp Vụ Hóa Đơn",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -763,7 +813,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSInvoiceDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate_NVHD),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel_NVHD),
-                            Major = "Nghiệp Vụ Hóa Đơn"
+                            Major = "Nghiệp Vụ Hóa Đơn",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -782,7 +834,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd_NVCP_SameCurrLocal),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel_NVCP),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -801,7 +855,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSVoucherDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate_NVCP_SameCurrLocal),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel_NVCP),
-                            Major = "Nghiệp Vụ Chi Phí"
+                            Major = "Nghiệp Vụ Chi Phí",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -831,10 +887,12 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(result);
                     }
                 }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
@@ -875,6 +933,9 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> GiaLapDataPhieuThu(List<PaymentModel> paymentModels, [Required] ACTION action)
         {
+            var _startDateProgress = DateTime.Now;
+            if (!ModelState.IsValid) return BadRequest();
+
             if (paymentModels.Count == 0)
             {
                 ResultHandle result = new ResultHandle { Status = false, Message = "paymentModels bắt buộc phải có data!", Data = paymentModels };
@@ -907,7 +968,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(paymentModels),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -925,7 +988,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(paymentModels),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -973,6 +1038,9 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> SyncListReceiptToAccountant(List<RequestGuidListModel> request)
         {
+            var _startDateProgress = DateTime.Now;
+            if (!ModelState.IsValid) return BadRequest();
+
             try
             {
                 // 1. Login
@@ -1008,7 +1076,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncAdd",
                             ObjectRequest = JsonConvert.SerializeObject(listAdd),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -1026,7 +1096,9 @@ namespace eFMS.API.Accounting.Controllers
                             FuncPartner = "EFMSReceiptDataSyncUpdate",
                             ObjectRequest = JsonConvert.SerializeObject(listUpdate),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
-                            Major = "Nghiệp Vụ Phiếu Thu"
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
                         };
                         var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                         #endregion
@@ -1052,11 +1124,13 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(result);
                     }
                 }
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Sync fail");
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
             }
         }
 

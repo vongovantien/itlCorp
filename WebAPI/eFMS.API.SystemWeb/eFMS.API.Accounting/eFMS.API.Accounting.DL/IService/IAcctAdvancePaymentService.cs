@@ -52,7 +52,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<DeniedInfoResult> GetHistoryDeniedAdvance(string advanceNo);
 
-        List<AcctAdvanceRequestModel> GetAdvancesOfShipment();
+        List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string jobId, string settlementCode = null);
 
         LockedLogResultModel GetAdvanceToUnlock(List<string> keyWords);
 
@@ -71,6 +71,8 @@ namespace eFMS.API.Accounting.DL.IService
         AdvanceExport AdvancePaymentExport(Guid advanceId, string language);
 
         void UpdateStatusPaymentOfAdvanceRequest(string settlementCode);
+
+        void UpdateStatusPaymentNotSettledOfAdvanceRequest(Guid hblId, string advanceNo);
 
         HandleState RecallRequest(Guid advanceId);
 
@@ -92,6 +94,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState UpdatePaymentTerm(Guid Id, decimal days);
         List<CatContractModel> GetAgreementDatasByAdvanceNo(string advanceNo);
+
+        HandleState DenyAdvancePayments(List<Guid> Ids);
 
     }
 }

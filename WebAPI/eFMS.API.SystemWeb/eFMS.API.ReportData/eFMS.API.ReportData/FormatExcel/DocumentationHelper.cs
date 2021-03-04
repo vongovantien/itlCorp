@@ -21,6 +21,8 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormats = "#,##0";
         const string CURRENCY_LOCAL = "VND";
         const string CURRENCY_USD = "USD";
+        const string _formatVNDNew = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)"; // format number VND with brackets if neg
+        const string _formatNew = "_(* #,##0.000_);_(* (#,##0.000);_(* \"-\"??_);_(@_)"; // format number diff VND with brackets if neg
 
         public Stream CreateEManifestExcelFile(CsTransactionDetailModel transactionDetail, Stream stream = null)
         {
@@ -28,7 +30,7 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
-                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    excelPackage.Workbook.Worksheets.Add("List of House bill of lading");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
                     GenerateEManifestExcel(workSheet, transactionDetail);
                     excelPackage.Save();
@@ -58,25 +60,24 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Số hiệu cont \nCont. number",
                 "Số Seal cont \nSeal number"
             };
+
             Color colTitleFromHex = System.Drawing.ColorTranslator.FromHtml("#00b0f0");
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 12));
             workSheet.Cells["A1"].Value = headers[0];
             FormatTitleHeader(workSheet, "A1", "Times New Roman");
             workSheet.Cells[1, 1, 1, 8].Merge = true;
             workSheet.Cells[1, 1, 1, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
             workSheet.Cells[1, 1, 1, 8].Style.Fill.BackgroundColor.SetColor(colTitleFromHex);
-            workSheet.Cells["A1"].AutoFitColumns();
 
             workSheet.Cells["A2"].Value = headers[1];
             FormatTitleHeader(workSheet, "A2", "Times New Roman");
             workSheet.Cells[2, 1, 2, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
             workSheet.Cells[2, 1, 2, 8].Style.Fill.BackgroundColor.SetColor(colTitleFromHex);
             workSheet.Cells[2, 1, 2, 8].Merge = true;
-            workSheet.Cells["A2"].Style.WrapText = true;
-            workSheet.Cells["A2"].AutoFitColumns();
 
             List<TitleModel> houseTitles = new List<TitleModel>()
             {
-                new TitleModel { VNTitle = "STT", ENTitle = "No"},
+                new TitleModel { VNTitle = "STT (*) ", ENTitle = "No"},
                 new TitleModel { VNTitle = "Số hồ sơ ", ENTitle =  "Document's No"},
                 new TitleModel { VNTitle = "Năm đăng ký hồ sơ ", ENTitle = "Document's Year"},
                 new TitleModel { VNTitle = "Chức năng của chứng từ ", ENTitle = "Document's function"},
@@ -84,7 +85,23 @@ namespace eFMS.API.ReportData.FormatExcel
                 new TitleModel { VNTitle = "Người nhận hàng* ", ENTitle = "Consignee"},
                 new TitleModel { VNTitle = "Người được thông báo 1", ENTitle = "Notify Party 1"},
                 new TitleModel { VNTitle = "Người được thông báo 2", ENTitle = "Notify Party 2"},
-                new TitleModel { VNTitle = "Mã Cảng chuyển tải/ quá cảnh", ENTitle = "Code of Port of transhipment/transit"}
+                new TitleModel { VNTitle = "Mã Cảng chuyển tải/ quá cảnh", ENTitle = "Code of Port of transhipment/transit"},
+                // Update column E manifest
+                new TitleModel { VNTitle = "Mã Cảng giao hàng/cảng đích", ENTitle = "Final destination"},
+                new TitleModel { VNTitle = "Mã Cảng xếp hàng", ENTitle = "Code of Port of Loading"},
+                new TitleModel { VNTitle = "Mã Cảng dỡ hàng", ENTitle = "Port of unloading/discharging"},
+                new TitleModel { VNTitle = "Địa điểm giao hàng* ", ENTitle = "Place of Delivery"},
+                new TitleModel { VNTitle = "Loại hàng* ", ENTitle = "Cargo Type/Terms of Shipment"},
+                new TitleModel { VNTitle = "Số vận đơn * ", ENTitle = "Bill of lading number"},
+                new TitleModel { VNTitle = "Ngày phát hành vận đơn* ", ENTitle = "Date of house bill of lading"},
+                new TitleModel { VNTitle = "Số vận đơn gốc* ", ENTitle = "Master bill of lading number"},
+                new TitleModel { VNTitle = "Ngày phát hành vận đơn gốc*", ENTitle = "Date of master bill of lading"},
+                new TitleModel { VNTitle = "Ngày khởi hành* ", ENTitle = "Departure date"},
+                new TitleModel { VNTitle = "Tổng số kiện* ", ENTitle = "Number of packages"},
+                new TitleModel { VNTitle = "Loại kiện* ", ENTitle = "Kind of packages"},
+                new TitleModel { VNTitle = "Tổng trọng lượng* ", ENTitle = "Total gross weight"},
+                new TitleModel { VNTitle = "Đơn vị tính tổng trọng lượng* ", ENTitle = "Total gross weight unit"},
+                new TitleModel { VNTitle = "Ghi chú", ENTitle = "Remark"}
             };
             int addressStartContent = 3;
             for (int i = 0; i < houseTitles.Count; i++)
@@ -92,7 +109,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[addressStartContent, i + 1].Style.WrapText = true;
                 workSheet.Cells[addressStartContent, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[addressStartContent, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                workSheet.Cells[addressStartContent, i + 1].Style.Font.SetFromFont(new Font("Times New Roman", 12));
+
                 workSheet.Cells[addressStartContent, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 workSheet.Cells[addressStartContent, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#d9e1f2"));
                 BorderDashItem(workSheet, addressStartContent, i + 1);
@@ -102,20 +119,52 @@ namespace eFMS.API.ReportData.FormatExcel
                 ert = workSheet.Cells[addressStartContent, i + 1].RichText.Add(" \n" + houseTitles[i].ENTitle);
                 ert.Color = System.Drawing.Color.Black;
                 workSheet.Column(i + 1).Width = 25;
-            }
 
-            workSheet.Cells[4, 1, 4, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
-            workSheet.Cells[4, 1, 4, 9].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffff00"));
-            workSheet.Cells[4, 1].Value = 01;
-            workSheet.Cells[4, 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffd966"));
-            workSheet.Cells[4, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
-            workSheet.Cells[4, 3].Value = DateTime.Now.Year;
-            workSheet.Cells[4, 4].Value = "CN01";
-            workSheet.Cells[4, 5].Value = transactionDetail.ShipperDescription;
-            workSheet.Cells[4, 6].Value = transactionDetail.ConsigneeDescription;
-            workSheet.Cells[4, 7].Value = transactionDetail.NotifyPartyDescription;
-            workSheet.Cells[4, 8].Value = transactionDetail.AlsoNotifyPartyDescription;
-            workSheet.Cells[4, 9].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffd966"));
+                // Set row no.4
+                workSheet.Cells[addressStartContent + 1, i + 1].Style.WrapText = true;
+                workSheet.Cells[addressStartContent + 1, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[addressStartContent + 1, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffff00"));
+                workSheet.Cells[addressStartContent + 1, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[addressStartContent + 1, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+            // Set detail row 4
+            workSheet.Cells[addressStartContent + 1, 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+            workSheet.Cells[4, 1].Value = 1; // 1
+            workSheet.Cells[4, 2].Style.Font.Bold = true; // 2
+            workSheet.Cells[4, 3].Value = DateTime.Now.Year; // 3
+            workSheet.Cells[4, 3].Style.Font.Bold = true;
+            workSheet.Cells[4, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[4, 4].Value = "CN01"; // 4
+            workSheet.Cells[4, 4].Style.Font.Bold = true;
+            workSheet.Cells[4, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[4, 4].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffd966"));
+            workSheet.Cells[4, 5].Value = transactionDetail.ShipperDescription; // 5
+            workSheet.Cells[4, 6].Value = transactionDetail.ConsigneeDescription; // 6
+            workSheet.Cells[4, 7].Value = transactionDetail.NotifyPartyDescription; // 7
+            workSheet.Cells[4, 8].Value = transactionDetail.AlsoNotifyPartyDescription; // 8
+            workSheet.Cells[4, 10].Value = transactionDetail.FinalDestinationPlace; // 10
+            workSheet.Cells[4, 11].Value = transactionDetail.POLCode; // 11
+            workSheet.Cells[4, 12].Value = transactionDetail.PODCode; // 12
+            workSheet.Cells[4, 9, 4, 12].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#ffd966")); // 9->12
+            workSheet.Cells[4, 13].Value = transactionDetail.DeliveryPlace; // 13
+            workSheet.Cells[4, 14].Value = transactionDetail.ServiceType; // 14
+            workSheet.Cells[4, 15].Value = transactionDetail.Hwbno; // 15
+            workSheet.Cells[4, 16].Value = transactionDetail.IssueHbldate?.ToString("dd/MM/yyyy"); // 16
+            workSheet.Cells[4, 17].Value = transactionDetail.Mawb; // 17
+            workSheet.Cells[4, 18].Value = transactionDetail.IssueHbldate?.ToString("dd/MM/yyyy"); // 18
+            workSheet.Cells[4, 19].Value = transactionDetail.Etd?.ToString("dd/MM/yyyy"); // 19
+            workSheet.Cells[4, 20].Value = transactionDetail.PackageQty; // 20
+            workSheet.Cells[4, 21].Value = transactionDetail.PackageTypeName; // 21
+            workSheet.Cells[4, 22].Value = transactionDetail.GrossWeight; // 22
+            workSheet.Cells[4, 23].Value = "KGM"; // 23: Total gross weight unit để tạm là Kgm
+            workSheet.Cells[4, 24].Value = transactionDetail.DesOfGoods; // 24            
+            workSheet.Row(4).Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells[4, 1, 4, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[4, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[4, 19, 4, 21].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells[5, 4].Value = "Xóa bản khai (Delete)";
             List<TitleModel> containerTitles = new List<TitleModel>()
             {
                 new TitleModel { VNTitle = "Mã hàng", ENTitle = "HS code if avail" },
@@ -131,7 +180,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[addressStartContent, i + 2].Style.WrapText = true;
                 workSheet.Cells[addressStartContent, i + 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[addressStartContent, i + 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                workSheet.Cells[addressStartContent, i + 2].Style.Font.SetFromFont(new Font("Times New Roman", 12));
                 workSheet.Cells[addressStartContent, i + 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 workSheet.Cells[addressStartContent, i + 2].Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#d9e1f2"));
                 BorderDashItem(workSheet, addressStartContent, i + 2);
@@ -140,7 +188,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 ert.Color = System.Drawing.Color.Red;
                 ert = workSheet.Cells[addressStartContent, i + 2].RichText.Add(" \n" + containerTitles[i].ENTitle);
                 ert.Color = System.Drawing.Color.Black;
-                workSheet.Column(i + 2).Width = 25;
             }
             addressStartContent = 7;
             if (transactionDetail.CsMawbcontainers != null)
@@ -163,6 +210,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     }
                     addressStartContent = addressStartContent + 1;
                 }
+                workSheet.Cells[7, 8].Value = "Container List or List of Goods";
             }
         }
 
@@ -1262,6 +1310,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "FREIGHT",
                 "TRUCKING",
                 "HANDLING FEE",
+                "CUSTOMS",
                 "OTHERS",
                 "TOTAL",
                 "COM."
@@ -1293,7 +1342,7 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 if (i == 26)
                 {
-                    workSheet.Cells[9, i + 5].Value = headersTable[i];
+                    workSheet.Cells[9, i + 6].Value = headersTable[i];
                 }
                 if (i < 26)
                 {
@@ -1301,8 +1350,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 if (i > 26)
                 {
-                    workSheet.Cells[9, i + 10].Value = headersTable[i];
-                    workSheet.Cells[9, i + 10].Style.Font.Bold = true;
+                    workSheet.Cells[9, i + 12].Value = headersTable[i];
+                    workSheet.Cells[9, i + 12].Style.Font.Bold = true;
                 }
                 workSheet.Cells[9, i + 1].Style.Font.Bold = true;
                 workSheet.Cells[9, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -1310,13 +1359,13 @@ namespace eFMS.API.ReportData.FormatExcel
 
             }
 
-            for (int i = 28; i < headersTable.Count; i++)
-            {
-                workSheet.Cells[9, i + 10].Value = headersTable[i];
-                workSheet.Cells[9, i + 10].Style.Font.Bold = true;
-                workSheet.Cells[9, i + 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[9, i + 10].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            }
+            //for (int i = 28; i < headersTable.Count; i++)
+            //{
+            //    workSheet.Cells[9, i + 10].Value = headersTable[i];
+            //    workSheet.Cells[9, i + 10].Style.Font.Bold = true;
+            //    workSheet.Cells[9, i + 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            //    workSheet.Cells[9, i + 10].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            //}
             //workSheet.Cells["AD9:AI9"].Merge = true;
             //workSheet.Cells["AA9:AE9"].Merge = true;
             //workSheet.Cells["AA9"].Value = headersTable[24];
@@ -1358,6 +1407,59 @@ namespace eFMS.API.ReportData.FormatExcel
             //workSheet.Cells["AK9:AK10"].Merge = true;
             //workSheet.Cells["AL9:AL10"].Merge = true;
             //workSheet.Cells["AM9:AM10"].Merge = true;
+            workSheet.Cells["AN9:AN10"].Merge = true;
+            workSheet.Cells["AO9:AO10"].Merge = true;
+            workSheet.Cells["AP9:AP10"].Merge = true;
+            workSheet.Cells["AQ9:AQ10"].Merge = true;
+            workSheet.Cells["AR9:AR10"].Merge = true;
+            workSheet.Cells["AS9:AS10"].Merge = true;
+            workSheet.Cells["AT9:AT10"].Merge = true;
+            workSheet.Cells["AU9:AU10"].Merge = true;
+            workSheet.Cells["AV9:AV10"].Merge = true;
+            workSheet.Cells["AW9:AW10"].Merge = true;
+            workSheet.Cells["AX9:AX10"].Merge = true;
+            workSheet.Cells["AY9:AY10"].Merge = true;
+            workSheet.Cells["AZ9:AZ10"].Merge = true;
+            workSheet.Cells["BA9:BA10"].Merge = true;
+            workSheet.Cells["BB9:BB10"].Merge = true;
+            workSheet.Cells["BC9:BC10"].Merge = true;
+            workSheet.Cells["BD9:BD10"].Merge = true;
+            workSheet.Cells["BE9:BE10"].Merge = true;
+            //workSheet.Cells["Y10"].Value = subheadersTable[0];
+            //workSheet.Cells["Z10"].Value = subheadersTable[1];
+            //workSheet.Cells["AA10"].Value = subheadersTable[2];
+            //workSheet.Cells["AB10"].Value = subheadersTable[3];
+            //workSheet.Cells["AC10"].Value = subheadersTable[4];
+
+            workSheet.Cells["AA10"].Value = subheadersTable[0];
+            workSheet.Cells["AB10"].Value = subheadersTable[1];
+            workSheet.Cells["AC10"].Value = subheadersTable[2];
+            workSheet.Cells["AD10"].Value = subheadersTable[3];
+            workSheet.Cells["AE10"].Value = subheadersTable[4];
+            workSheet.Cells["AF10"].Value = subheadersTable[5];
+            //workSheet.Cells["AI10"].Value = subheadersTable[4];
+
+            //workSheet.Cells["Y10:AI10"].Style.Font.Bold = true;
+
+            workSheet.Cells["AU9:BE9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["AU9:BE9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells["AA10:AM10"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["AA10:AM10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["AA10:AM10"].Style.Font.Bold = true;
+
+            workSheet.Cells["AG10"].Value = subheadersTable[0];
+            workSheet.Cells["AH10"].Value = subheadersTable[1];
+            workSheet.Cells["AI10"].Value = subheadersTable[2];
+            workSheet.Cells["AJ10"].Value = subheadersTable[3];
+
+            workSheet.Cells["AK10"].Value = subheadersTable[6];
+            //workSheet.Cells["AM10"].Value = subheadersTable[6];
+            workSheet.Cells["AL10"].Value = subheadersTable[4];
+            workSheet.Cells["AM10"].Value = subheadersTable[5];
+            workSheet.Cells["AA9:AF9"].Merge = true;
+            workSheet.Cells["AG9:AM9"].Merge = true;
+            ////workSheet.Cells["AM9:AM10"].Merge = true;
             //workSheet.Cells["AN9:AN10"].Merge = true;
             //workSheet.Cells["AO9:AO10"].Merge = true;
             //workSheet.Cells["AP9:AP10"].Merge = true;
@@ -1376,59 +1478,8 @@ namespace eFMS.API.ReportData.FormatExcel
             //workSheet.Cells["BC9:BC10"].Merge = true;
             //workSheet.Cells["BD9:BD10"].Merge = true;
 
-            //workSheet.Cells["Y10"].Value = subheadersTable[0];
-            //workSheet.Cells["Z10"].Value = subheadersTable[1];
-            //workSheet.Cells["AA10"].Value = subheadersTable[2];
-            //workSheet.Cells["AB10"].Value = subheadersTable[3];
-            //workSheet.Cells["AC10"].Value = subheadersTable[4];
-
-            workSheet.Cells["AA10"].Value = subheadersTable[0];
-            workSheet.Cells["AB10"].Value = subheadersTable[1];
-            workSheet.Cells["AC10"].Value = subheadersTable[2];
-            workSheet.Cells["AD10"].Value = subheadersTable[3];
-            workSheet.Cells["AE10"].Value = subheadersTable[4];
-            //workSheet.Cells["AI10"].Value = subheadersTable[4];
-
-            //workSheet.Cells["Y10:AI10"].Style.Font.Bold = true;
-
-            workSheet.Cells["AW9:BD9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["AW9:BD9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
-            workSheet.Cells["AA10:AK10"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["AA10:AK10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["AA10:AK10"].Style.Font.Bold = true;
-
-            workSheet.Cells["AF10"].Value = subheadersTable[0];
-            workSheet.Cells["AG10"].Value = subheadersTable[1];
-            workSheet.Cells["AH10"].Value = subheadersTable[2];
-            workSheet.Cells["AI10"].Value = subheadersTable[5];
-            workSheet.Cells["AJ10"].Value = subheadersTable[3];
-            workSheet.Cells["AK10"].Value = subheadersTable[4];
-
-            workSheet.Cells["AA9:AE9"].Merge = true;
-            workSheet.Cells["AF9:AK9"].Merge = true;
-            workSheet.Cells["AL9:AL10"].Merge = true;
-            workSheet.Cells["AM9:AM10"].Merge = true;
-            workSheet.Cells["AN9:AN10"].Merge = true;
-            workSheet.Cells["AO9:AO10"].Merge = true;
-            workSheet.Cells["AP9:AP10"].Merge = true;
-            workSheet.Cells["AQ9:AQ10"].Merge = true;
-            workSheet.Cells["AR9:AR10"].Merge = true;
-            workSheet.Cells["AS9:AS10"].Merge = true;
-            workSheet.Cells["AT9:AT10"].Merge = true;
-            workSheet.Cells["AU9:AU10"].Merge = true;
-            workSheet.Cells["AV9:AV10"].Merge = true;
-            workSheet.Cells["AW9:AW10"].Merge = true;
-            workSheet.Cells["AX9:AX10"].Merge = true;
-            workSheet.Cells["AY9:AY10"].Merge = true;
-            workSheet.Cells["AZ9:AZ10"].Merge = true;
-            workSheet.Cells["BA9:BA10"].Merge = true;
-            workSheet.Cells["BB9:BB10"].Merge = true;
-            workSheet.Cells["BC9:BC10"].Merge = true;
-            workSheet.Cells["BD9:BD10"].Merge = true;
-
             workSheet.Cells["AA9"].Value = headersTable[26];
-            workSheet.Cells["AF9"].Value = headersTable[27];
+            workSheet.Cells["AG9"].Value = headersTable[27];
 
             int addressStartContent = 11;
             int positionStart = 1;
@@ -1472,56 +1523,62 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j + addressStartContent, 29].Value = item.TotalSellHandling;
                 workSheet.Cells[j + addressStartContent, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 30].Value = item.TotalSellOthers;
+                workSheet.Cells[j + addressStartContent, 30].Value = item.TotalCustomSell;
                 workSheet.Cells[j + addressStartContent, 30].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 31].Value = item.TotalSell;
+                workSheet.Cells[j + addressStartContent, 31].Value = item.TotalSellOthers;
                 workSheet.Cells[j + addressStartContent, 31].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 32].Value = item.TotalBuyFreight;
+                workSheet.Cells[j + addressStartContent, 32].Value = item.TotalSell;
                 workSheet.Cells[j + addressStartContent, 32].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 33].Value = item.TotalBuyTrucking;
+                workSheet.Cells[j + addressStartContent, 33].Value = item.TotalBuyFreight;
                 workSheet.Cells[j + addressStartContent, 33].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 34].Value = item.TotalBuyHandling;
+                workSheet.Cells[j + addressStartContent, 34].Value = item.TotalBuyTrucking;
                 workSheet.Cells[j + addressStartContent, 34].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 35].Value = item.TotalBuyKB;
+                workSheet.Cells[j + addressStartContent, 35].Value = item.TotalBuyHandling;
                 workSheet.Cells[j + addressStartContent, 35].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 36].Value = item.TotalBuyOthers;
+                workSheet.Cells[j + addressStartContent, 36].Value = item.TotalCustomBuy;
                 workSheet.Cells[j + addressStartContent, 36].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 37].Value = item.TotalBuy;
+                workSheet.Cells[j + addressStartContent, 37].Value = item.TotalBuyKB;
                 workSheet.Cells[j + addressStartContent, 37].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 38].Value = item.Profit;
+                workSheet.Cells[j + addressStartContent, 38].Value = item.TotalBuyOthers;
                 workSheet.Cells[j + addressStartContent, 38].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 39].Value = item.AmountOBH;
+                workSheet.Cells[j + addressStartContent, 39].Value = item.TotalBuy;
                 workSheet.Cells[j + addressStartContent, 39].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 40].Value = item.AmountOBH;
+                workSheet.Cells[j + addressStartContent, 40].Value = item.Profit;
                 workSheet.Cells[j + addressStartContent, 40].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 41].Value = item.Destination;
-                workSheet.Cells[j + addressStartContent, 42].Value = item.CustomerId;
-                workSheet.Cells[j + addressStartContent, 43].Value = item.CustomerName;
-                workSheet.Cells[j + addressStartContent, 44].Value = item.RalatedHblHawb;
-                workSheet.Cells[j + addressStartContent, 45].Value = item.RalatedJobNo;
-                workSheet.Cells[j + addressStartContent, 46].Value = item.HandleOffice;
-                workSheet.Cells[j + addressStartContent, 47].Value = item.SalesOffice;
-                workSheet.Cells[j + addressStartContent, 48].Value = item.Creator;
-                workSheet.Cells[j + addressStartContent, 49].Value = item.POINV;
-                workSheet.Cells[j + addressStartContent, 50].Value = item.BKRefNo;
-                workSheet.Cells[j + addressStartContent, 51].Value = item.Commodity;
-                workSheet.Cells[j + addressStartContent, 52].Value = item.ServiceMode;
-                //workSheet.Cells[i + addressStartContent, 53].Value = item.ShipmentType;
-                workSheet.Cells[j + addressStartContent, 53].Value = item.PMTerm;
-                workSheet.Cells[j + addressStartContent, 54].Value = item.ShipmentNotes;
-                workSheet.Cells[j + addressStartContent, 55].Value = item.Created.HasValue ? item.Created.Value.ToString("dd/MM/yyyy") : "";
+                workSheet.Cells[j + addressStartContent, 41].Value = item.AmountOBH;
+                workSheet.Cells[j + addressStartContent, 41].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
+                workSheet.Cells[j + addressStartContent, 42].Value = item.AmountOBH;
+                workSheet.Cells[j + addressStartContent, 42].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+
+                workSheet.Cells[j + addressStartContent, 43].Value = item.Destination;
+                workSheet.Cells[j + addressStartContent, 44].Value = item.CustomerId;
+                workSheet.Cells[j + addressStartContent, 45].Value = item.CustomerName;
+                workSheet.Cells[j + addressStartContent, 46].Value = item.RalatedHblHawb;
+                workSheet.Cells[j + addressStartContent, 47].Value = item.RalatedJobNo;
+                workSheet.Cells[j + addressStartContent, 48].Value = item.HandleOffice;
+                workSheet.Cells[j + addressStartContent, 49].Value = item.SalesOffice;
+                workSheet.Cells[j + addressStartContent, 50].Value = item.Creator;
+                workSheet.Cells[j + addressStartContent, 51].Value = item.POINV;
+                workSheet.Cells[j + addressStartContent, 52].Value = item.BKRefNo;
+                workSheet.Cells[j + addressStartContent, 53].Value = item.Commodity;
+                workSheet.Cells[j + addressStartContent, 54].Value = item.ServiceMode;
+                //workSheet.Cells[i + addressStartContent, 53].Value = item.ShipmentType;
+                workSheet.Cells[j + addressStartContent, 55].Value = item.PMTerm;
+                workSheet.Cells[j + addressStartContent, 56].Value = item.ShipmentNotes;
+                workSheet.Cells[j + addressStartContent, 57].Value = item.Created.HasValue ? item.Created.Value.ToString("dd/MM/yyyy") : "";
+              
                 j++;
                 positionStart++;
             }
@@ -1568,47 +1625,56 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressTotalSellHandling].Value = overview.Select(t => t.TotalSellHandling).Sum();
             workSheet.Cells[addressTotalSellHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalSellOther = workSheet.Cells[address, 30].Start.Address;
+            string addressTotalSellCustom = workSheet.Cells[address, 30].Start.Address;
+            workSheet.Cells[addressTotalSellCustom].Value = overview.Select(t => t.TotalCustomSell).Sum();
+            workSheet.Cells[addressTotalSellCustom].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+
+            string addressTotalSellOther = workSheet.Cells[address, 31].Start.Address;
             workSheet.Cells[addressTotalSellOther].Value = overview.Select(t => t.TotalSellOthers).Sum();
             workSheet.Cells[addressTotalSellOther].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalSell = workSheet.Cells[address, 31].Start.Address;
+            string addressTotalSell = workSheet.Cells[address, 32].Start.Address;
             workSheet.Cells[addressTotalSell].Value = overview.Select(t => t.TotalSell).Sum();
             workSheet.Cells[addressTotalSell].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyFreight = workSheet.Cells[address, 32].Start.Address;
+            string addressTotalBuyFreight = workSheet.Cells[address, 33].Start.Address;
             workSheet.Cells[addressTotalBuyFreight].Value = overview.Select(t => t.TotalBuyFreight).Sum();
             workSheet.Cells[addressTotalBuyFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyTrucking = workSheet.Cells[address, 33].Start.Address;
+            string addressTotalBuyTrucking = workSheet.Cells[address, 34].Start.Address;
             workSheet.Cells[addressTotalBuyTrucking].Value = overview.Select(t => t.TotalBuyTrucking).Sum();
             workSheet.Cells[addressTotalBuyTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyHandling = workSheet.Cells[address, 34].Start.Address;
+            string addressTotalBuyHandling = workSheet.Cells[address, 35].Start.Address;
             workSheet.Cells[addressTotalBuyHandling].Value = overview.Select(t => t.TotalBuyHandling).Sum();
             workSheet.Cells[addressTotalBuyHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyKB = workSheet.Cells[address, 35].Start.Address;
+            string addressTotalBuyCustom= workSheet.Cells[address, 36].Start.Address;
+            workSheet.Cells[addressTotalBuyCustom].Value = overview.Select(t => t.TotalCustomBuy).Sum();
+            workSheet.Cells[addressTotalBuyCustom].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+
+
+            string addressTotalBuyKB = workSheet.Cells[address, 37].Start.Address;
             workSheet.Cells[addressTotalBuyKB].Value = overview.Select(t => t.TotalBuyKB).Sum();
             workSheet.Cells[addressTotalBuyKB].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyOthers = workSheet.Cells[address, 36].Start.Address;
+            string addressTotalBuyOthers = workSheet.Cells[address, 38].Start.Address;
             workSheet.Cells[addressTotalBuyOthers].Value = overview.Select(t => t.TotalBuyOthers).Sum();
             workSheet.Cells[addressTotalBuyOthers].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuy = workSheet.Cells[address, 37].Start.Address;
+            string addressTotalBuy = workSheet.Cells[address, 39].Start.Address;
             workSheet.Cells[addressTotalBuy].Value = overview.Select(t => t.TotalBuy).Sum();
             workSheet.Cells[addressTotalBuy].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressProfit = workSheet.Cells[address, 38].Start.Address;
+            string addressProfit = workSheet.Cells[address, 40].Start.Address;
             workSheet.Cells[addressProfit].Value = overview.Select(t => t.Profit).Sum();
             workSheet.Cells[addressProfit].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressAmountOBH = workSheet.Cells[address, 39].Start.Address;
+            string addressAmountOBH = workSheet.Cells[address, 41].Start.Address;
             workSheet.Cells[addressAmountOBH].Value = overview.Select(t => t.AmountOBH).Sum();
             workSheet.Cells[addressAmountOBH].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressAmountOBHR = workSheet.Cells[address, 40].Start.Address;
+            string addressAmountOBHR = workSheet.Cells[address, 42].Start.Address;
             workSheet.Cells[addressAmountOBHR].Value = overview.Select(t => t.AmountOBH).Sum();
             workSheet.Cells[addressAmountOBHR].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
@@ -1623,9 +1689,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(8).Width = 20;
             workSheet.Column(16).Width = 20;
 
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 55].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 55].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 55].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 57].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 57].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 57].Style.Border.Top.Style = ExcelBorderStyle.Thin;
         }
 
         #endregion
@@ -1691,6 +1757,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(30).Width = 19; //Cột AD
             workSheet.Column(31).Width = 19; //Cột AE
             workSheet.Column(32).Width = 24; //Cột AF
+            workSheet.Column(33).Width = 25; //Cột AF
         }
         /// <summary>
         /// 
@@ -1901,7 +1968,8 @@ namespace eFMS.API.ReportData.FormatExcel
                "Paid Date", //29
                "A/C Voucher No.", //30
                "P/M Voucher No.", //31
-               "Service" //32
+               "Service" ,//32
+               "Cd Note" //33
             };
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -1937,9 +2005,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             //Header table
-            workSheet.Cells["A7:AF8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7:AF8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7:AF8"].Style.Font.Bold = true;
+            workSheet.Cells["A7:AG8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AG8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AG8"].Style.Font.Bold = true;
 
             workSheet.Cells["A7:A8"].Merge = true;
             workSheet.Cells["A7"].Value = headers[3]; // Date
@@ -2016,7 +2084,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AE7"].Value = headers[31]; //P/M Voucher No.
 
             workSheet.Cells["AF7:AF8"].Merge = true;
+            workSheet.Cells["AG7:AG8"].Merge = true;
             workSheet.Cells["AF7"].Value = headers[32]; //Service
+            workSheet.Cells["AG7"].Value = headers[33]; //CD NOTE
             //Header table
 
             int rowStart = 9;
@@ -2105,7 +2175,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (listData[i].Balance != null && listData[i].Balance != 0)
                 {
                     workSheet.Cells[rowStart, 26].Value = listData[i].Balance;
-                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
                 }
 
                 workSheet.Cells[rowStart, 27].Value = listData[i].InvNoObh;
@@ -2120,12 +2190,12 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 30].Value = listData[i].AcVoucherNo;
                 workSheet.Cells[rowStart, 31].Value = listData[i].PmVoucherNo;
                 workSheet.Cells[rowStart, 32].Value = listData[i].Service;
-
+                workSheet.Cells[rowStart, 33].Value = listData[i].CdNote;
                 rowStart += 1;
 
             }
 
-            workSheet.Cells[rowStart, 1, rowStart, 32].Style.Font.Bold = true;
+            workSheet.Cells[rowStart, 1, rowStart, 33].Style.Font.Bold = true;
             workSheet.Cells[rowStart, 1, rowStart, 11].Merge = true;
             workSheet.Cells[rowStart, 1, rowStart, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[rowStart, 1].Value = headers[19];
@@ -2149,13 +2219,13 @@ namespace eFMS.API.ReportData.FormatExcel
             }
 
             workSheet.Cells[rowStart, 26].Value = listData.Select(s => s.Balance).Sum(); // Sum Total Balance
-            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            workSheet.Cells[6, 1, 6, 32].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 32].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 32].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, 6, 33].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 33].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 33].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[rowStart + 2, 1, rowStart + 2, 32].Merge = true;
             workSheet.Cells[rowStart + 2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
@@ -3178,7 +3248,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Title
             workSheet.Cells["A8:J8"].Merge = true;
             workSheet.Cells["A8"].Style.Font.SetFromFont(new Font("Arial", 16, FontStyle.Bold));
-            workSheet.Cells["A8"].Value = titles[0];
+            workSheet.Cells["A8"].Value = cdNoteModel.CdNoteType;
             workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             workSheet.Cells["A9:J9"].Merge = true;
@@ -3281,11 +3351,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartGroup1, 2, i + addressStartGroup1, 5].Merge = true;
                     workSheet.Cells[i + addressStartGroup1, 6].Value = item.VATInvoiceNo;
                     workSheet.Cells[i + addressStartGroup1, 7].Value = item.Amount;
-                    workSheet.Cells[i + addressStartGroup1, 7].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 7].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup1, 8].Value = item.VATAmount;
-                    workSheet.Cells[i + addressStartGroup1, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 8].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup1, 9].Value = item.TotalAmount;
-                    workSheet.Cells[i + addressStartGroup1, 9].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup1, 9].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup1, 10].Value = item.Notes;
                 }
                 // Border
@@ -3299,11 +3369,11 @@ namespace eFMS.API.ReportData.FormatExcel
             sumFee += totalFee;
             sumVat += totalVat;
             workSheet.Cells["G20"].Value = totalFee;
-            workSheet.Cells["G20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["G20"].Style.Numberformat.Format = numberFormats;
             workSheet.Cells["H20"].Value = totalVat;
-            workSheet.Cells["H20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["H20"].Style.Numberformat.Format = numberFormats;
             workSheet.Cells["I20"].Value = total;
-            workSheet.Cells["I20"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["I20"].Style.Numberformat.Format = numberFormats;
             // Border
             workSheet.Cells[17, 1, 20, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[17, 1, 20, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -3323,11 +3393,11 @@ namespace eFMS.API.ReportData.FormatExcel
             sumFee += totalFee;
             sumVat += totalVat;
             workSheet.Cells[addressStartGroup2, 7].Value = totalFee;
-            workSheet.Cells[addressStartGroup2, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 7].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressStartGroup2, 8].Value = totalVat;
-            workSheet.Cells[addressStartGroup2, 8].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 8].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressStartGroup2, 9].Value = total;
-            workSheet.Cells[addressStartGroup2, 9].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressStartGroup2, 9].Style.Numberformat.Format = numberFormats;
             // Border
             workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressStartGroup2, 1, addressStartGroup2, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -3352,11 +3422,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartGroup2, 2, i + addressStartGroup2, 5].Merge = true;
                     workSheet.Cells[i + addressStartGroup2, 6].Value = item.VATInvoiceNo;
                     workSheet.Cells[i + addressStartGroup2, 7].Value = item.Amount;
-                    workSheet.Cells[i + addressStartGroup2, 7].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 7].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup2, 8].Value = item.VATAmount;
-                    workSheet.Cells[i + addressStartGroup2, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 8].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup2, 9].Value = item.TotalAmount;
-                    workSheet.Cells[i + addressStartGroup2, 9].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[i + addressStartGroup2, 9].Style.Numberformat.Format = numberFormats;
                     workSheet.Cells[i + addressStartGroup2, 10].Value = item.Notes;
                 }
             }
@@ -3367,11 +3437,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressOfTotal, 2, addressOfTotal, 5].Merge = true;
             workSheet.Cells[addressOfTotal, 2].Value = "Tổng chi phí / Total in charge (I) + (II):";
             workSheet.Cells[addressOfTotal, 7].Value = sumFee;
-            workSheet.Cells[addressOfTotal, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 7].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressOfTotal, 8].Value = sumVat;
-            workSheet.Cells[addressOfTotal, 8].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 8].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressOfTotal, 9].Value = sumFee + sumVat;
-            workSheet.Cells[addressOfTotal, 9].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[addressOfTotal, 9].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[addressOfTotal, 1, addressOfTotal, 10].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;

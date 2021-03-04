@@ -34,7 +34,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> officeRepo;
         private readonly IContextBase<SysCompany> companyRepo;
         private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
-
+        private decimal _decimalNumber = Constants.DecimalNumber;
 
         ICsTransactionDetailService houseBills;
 
@@ -335,8 +335,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         charge.DateConfirm = DateTime.Now;
                         charge.DatePackage = DateTime.Now;
-                        charge.LocalVessel = houserBill.OceanVessel?.ToUpper();//Ocean Vessel of HBL
-                        charge.ContSealNo = houserBill.OceanVoyNo?.ToUpper();// Ocean Voy No of HBL
+                        charge.LocalVessel = houserBill.LocalVessel?.ToUpper();//Arrival Vessel of HBL [CR: 29/12/2020]
+                        charge.ContSealNo = houserBill.LocalVoyNo?.ToUpper();// Arrival Voy No of HBL [CR: 29/12/2020]
                         charge.ForCarrier = string.Empty;
                         charge.DepartureAirport = polName?.ToUpper();//POL of HBL
                         charge.PortofDischarge = podName?.ToUpper();//POD of HBL
@@ -398,8 +398,8 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     charge.DateConfirm = DateTime.Now;
                     charge.DatePackage = DateTime.Now;
-                    charge.LocalVessel = houserBill.OceanVessel?.ToUpper();//Ocean Vessel of HBL
-                    charge.ContSealNo = houserBill.OceanVoyNo?.ToUpper();// Ocean Voy No of HBL
+                    charge.LocalVessel = houserBill.LocalVessel?.ToUpper();//Arrival Vessel of HBL [CR: 29/12/2020]
+                    charge.ContSealNo = houserBill.LocalVoyNo?.ToUpper();// Arrival Voy No of HBL [CR: 29/12/2020]
                     charge.ForCarrier = string.Empty;
                     charge.DepartureAirport = polName?.ToUpper();//POL of HBL
                     charge.PortofDischarge = podName?.ToUpper();//POD of HBL
@@ -495,6 +495,25 @@ namespace eFMS.API.Documentation.DL.Services
                 var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
                 var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
 
+                string warehouseName = string.Empty;
+                if(houseBill.WarehouseId != Guid.Empty)
+                {
+                    warehouseName = placeRepository.Get(x => x.Id == houseBill.WarehouseId)?.FirstOrDefault()?.DisplayName;
+                }
+
+                string _sipperInfo = string.Empty;
+                if (!string.IsNullOrEmpty(houseBill.ShipperDescription))
+                {
+                    _sipperInfo = houseBill.ShipperDescription;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(houseBill.ShipperId))
+                    {
+                        _sipperInfo = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
+                    }
+                }
+                
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
                     foreach (var frieght in arrival.CsArrivalFrieghtCharges)
@@ -508,6 +527,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                         charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
                         charge.LastDestination = _podName?.ToUpper(); //Destination Air Port (POD)
+                        charge.WarehouseDestination = !string.IsNullOrEmpty(warehouseName) ? string.Format(@"(WH: {0})", warehouseName) : null;
                         charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader (Không UpperCase)
                         charge.DatePackage = DateTime.Now; //Current Date
                         charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty
@@ -517,14 +537,14 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.blnStick = frieght.IsTick ?? false;//isStick of charge arrival
                         charge.blnRoot = frieght.IsFull ?? false; //isRoot of charge arrival
                         charge.FreightCharge = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
-                        charge.Qty = frieght.Quantity ?? 0;//Quantity of charge
+                        charge.Qty = (frieght.Quantity ?? 0) + _decimalNumber;//Quantity of charge
                         charge.Unit = frieght.UnitName;//Unit name of charge arrival
-                        charge.TotalValue = frieght.UnitPrice ?? 0;//Unit price of charge arrival
+                        charge.TotalValue = (frieght.UnitPrice ?? 0) + _decimalNumber;//Unit price of charge arrival
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
-                        charge.VAT = frieght.Vatrate ?? 0; //VAT of charge arrival
+                        charge.VAT = (frieght.Vatrate ?? 0) + _decimalNumber; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
                         charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer (Không UpperCase)
-                        charge.Shipper = _shipperName?.ToUpper(); //Shipper Name
+                        charge.Shipper = _sipperInfo?.ToUpper(); //Shipper Name
                         charge.CBM = houseBill.ChargeWeight ?? 0; //C.W (ChargeWeight)
                         charge.AOL = string.Empty; //NOT USE
                         charge.KilosUnit = string.Empty; //NOT USE
@@ -551,6 +571,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                     charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
                     charge.LastDestination = _podName?.ToUpper(); //Destination Air Port (POD)
+                    charge.WarehouseDestination = !string.IsNullOrEmpty(warehouseName) ? string.Format(@"(WH: {0})", warehouseName) : null;
                     charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader (Không UpperCase)
                     charge.DatePackage = DateTime.Now; //Current Date
                     charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty; //Quantity + Unit Qty
@@ -567,7 +588,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.VAT = 0; //VAT of charge
                     charge.Notes = string.Empty;//Note of charge
                     charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer (Không UpperCase)
-                    charge.Shipper = _shipperName?.ToUpper(); //Shipper
+                    charge.Shipper = _sipperInfo?.ToUpper(); //Shipper
                     charge.CBM = houseBill.ChargeWeight ?? 0; //C.W (ChargeWeight)
                     charge.AOL = string.Empty; //NOT USE
                     charge.KilosUnit = string.Empty; //NOT USE

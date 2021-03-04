@@ -470,5 +470,18 @@ namespace eFMS.API.System.Controllers
             var results = userLevelService.GetUsersByType(criteria);
             return Ok(results);
         }
+
+        /// <summary>
+        /// Get user by company of current user
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetListUsersByCurrentCompany")]
+        public IActionResult GetListUsersByCurrentCompany(SysUserLevelModel model)
+        {
+            var results = userLevelService.GetListUsersByCurrentCompany(model);
+            return Ok(results);
+        }
     }
 }

@@ -27,7 +27,7 @@
         <div class="m-form">
             <div class="m-portlet__body">
 
-                <settle-payment-list-charge (onChangeType)="updateSettlement()"></settle-payment-list-charge>
+                <settle-payment-list-charge></settle-payment-list-charge>
 
                 <div class="row height-row-12" *ngIf="!!settlementPayment">
                     <div class="col-12">
@@ -66,7 +66,5 @@
     </div>
 </div>
 
-<!-- <ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container> -->
+
 <ng-template inject></ng-template>

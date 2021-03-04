@@ -9,6 +9,7 @@
                     <a class="dropdown-item pointer" (click)="preview('ITL_FRAME')">ITL (Frame) H-B/L Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('ITL')">ITL H-B/L Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('FBL_FRAME')">VLA (Frame) H-B/L Preview</a>
+                    <a class="dropdown-item pointer" (click)="preview('FBL_NOFRAME')">VLA H-B/L Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('ITL_SEKO')">ITL H-B/L SEKO Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_KESCO')">ITL (Frame) H-B/L KESCO
                         Preview</a>
@@ -19,7 +20,7 @@
                 </div>
             </div>
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
-                *ngIf="!(isLocked | async) && (permissionHblDetail | async)?.allowUpdate"></app-default-button>
+                *ngIf="(permissionHblDetail | async)?.allowUpdate"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>

@@ -7,7 +7,7 @@ import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
 import { formatDate } from "@angular/common";
-import { catchError, finalize, takeUntil } from "rxjs/operators";
+import { catchError, finalize, map, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
@@ -92,6 +92,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     ];
     serviceList: any[] = [];
     serviceActive: any[] = [];
+    customerActive: any[] = [];
     currencyList: any[] = [];
     officeList: any[] = [];
     officeActive: any[] = [];
@@ -106,7 +107,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET, text: 'Accountant P/L Sheet' },
         { id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS, text: 'Job Profit Analysis' },
         { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST, text: 'Summary Of Costs Incurred' },
-        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' }
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE, text: 'Summary Of Revenue Incurred' },
+        { id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.COSTS_BY_PARTNER, text: 'Costs By Partner' }
     ];
 
     typeReportList: ReportInterface.INg2Select[] = [
@@ -150,7 +152,7 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.initFormSearch();
         if (this.isSheetDebitRpt) { // Partner for Accountant Report
             // Get All Partner
-            this.customers = this._catalogueRepo.getPartnerByGroups(null, null);
+            this.customers = this._catalogueRepo.getPartnerByGroups(null, null)
         } else {
             this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
             this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
@@ -186,11 +188,11 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     initFormSearch() {
-        const staffTypeInit = this.isGeneralReport ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
+        const staffTypeInit = this.isGeneralReport || this.isSheetDebitRpt ? [this.staffTypeList[0].id] : [this.staffTypeList[1].id];
         this.formSearch = this._fb.group({
             serviceDate: [{
-                startDate: this.createMoment().startOf('month').toDate(),
-                endDate: this.createMoment().endOf('month').toDate(),
+                startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             }],
             dateType: [this.dateTypeList[0].id],
             customer: this.isCommissionIncentive ? [null, Validators.compose([
@@ -264,9 +266,6 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
-            case 'customer':
-                this.customer.setValue(data.id);
-                break;
             case 'carrier':
                 this.carrier.setValue(data.id);
                 break;
@@ -337,9 +336,10 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     onRemoveDataFormInfo(data: any, type: string) {
-        if (type === 'service') {
-            this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === data.id), 1);
-        }
+        // if (type === 'service') {
+        //     const id = !!data.id ? data.id : data.value.id;
+        //     this.serviceActive.splice(this.serviceActive.findIndex((item) => item.id === id), 1);
+        // }
         if (type === 'office') {
             this.officeActive.splice(this.officeActive.findIndex((item) => item.id === data.id), 1);
             if (this.officeActive.length === 0) {
@@ -427,13 +427,15 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     getService() {
-        this._catalogueRepo.getListService()
+        this._systemRepo.getListServiceByPermision()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (!!res) {
                         this.serviceList = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                        this.serviceList = this.serviceList.sort((one, two) => (one.text > two.text ? 1 : -1));
                         this.serviceList.unshift({ id: 'All', text: 'All' });
+                        console.log(this.serviceList);
                         this.serviceActive = [this.serviceList[0].id];
                     }
                 },
@@ -521,23 +523,28 @@ export class ShareFormSearchReportComponent extends AppForm {
                 officeSelected = this.officeActive.map(i => i);
             }
             data = data.filter(f => f.departmentId !== null && officeSelected.includes(f.officeId));
-        } else {
-            data = [];
+        }
+        else {
+            // Nếu Office không selected giá trị -> Lấy tất cả các Department có trong list Office hiện tại
+            officeSelected = this.officeList.map(i => i.id);
+            data = data.filter(f => f.departmentId !== null && officeSelected.includes(f.officeId));
         }
 
         this.departmentList = data
             .map((item: any) => ({ text: item.departmentAbbrName, id: item.departmentId.toString() }))
             .filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct department
 
-        if (this.departmentList.length > 0 && this.officeActive.length > 0) {
+        if (this.departmentList.length > 0) {
             this.departmentList.unshift({ id: 'All', text: 'All' });
-            if (this.menuPermission.list === 'Department'
-                || this.menuPermission.list === 'Office'
-                || this.menuPermission.list === 'Company'
-                || this.menuPermission.list === 'All') {
-                this.departmentActive = [this.departmentList[0].id];
-            } else {
-                this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0].id];
+            if (this.officeActive.length > 0) {
+                if (this.menuPermission.list === 'Department'
+                    || this.menuPermission.list === 'Office'
+                    || this.menuPermission.list === 'Company'
+                    || this.menuPermission.list === 'All') {
+                    this.departmentActive = [this.departmentList[0].id];
+                } else {
+                    this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0].id];
+                }
             }
         } else {
             this.departmentActive = [];
@@ -555,24 +562,29 @@ export class ShareFormSearchReportComponent extends AppForm {
                 deparmentSelected = this.departmentActive.map(i => i);
             }
             data = data.filter(f => f.groupId !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
-        } else {
-            data = [];
+        }
+        else {
+            // Nếu Department không selected giá trị -> Lấy tất cả các Group có trong list Group hiện tại
+            deparmentSelected = this.departmentList.map(i => i.id);
+            data = data.filter(f => f.groupId !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
         }
 
         this.groupList = data
             .map((item: any) => ({ text: item.groupAbbrName, id: item.groupId.toString() }))
             .filter((g, i, arr) => arr.findIndex(t => t.id === g.id) === i); // Distinct group
 
-        if (this.groupList.length > 0 && this.departmentActive.length > 0) {
+        if (this.groupList.length > 0) {
             this.groupList.unshift({ id: 'All', text: 'All' });
-            if (this.menuPermission.list === 'Group'
-                || this.menuPermission.list === 'Department'
-                || this.menuPermission.list === 'Office'
-                || this.menuPermission.list === 'Company'
-                || this.menuPermission.list === 'All') {
-                this.groupActive = [this.groupList[0].id];
-            } else {
-                this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
+            if (this.departmentActive.length > 0) {
+                if (this.menuPermission.list === 'Group'
+                    || this.menuPermission.list === 'Department'
+                    || this.menuPermission.list === 'Office'
+                    || this.menuPermission.list === 'Company'
+                    || this.menuPermission.list === 'All') {
+                    this.groupActive = [this.groupList[0].id];
+                } else {
+                    this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
+                }
             }
         } else {
             this.groupActive = [];
@@ -597,13 +609,13 @@ export class ShareFormSearchReportComponent extends AppForm {
                 } else {
                     deparmentSelected = this.departmentActive.map(i => i);
                 }
+            } else {
+                deparmentSelected = this.departmentList.map(i => i.id);
             }
 
             data = data.filter(f => f.userId !== null && f.groupId !== null && f.departmentId !== null
                 && deparmentSelected.includes(f.departmentId.toString())
                 && groupSelected.includes(f.groupId.toString()));
-        } else {
-            data = [];
         }
 
         this.staffList = data
@@ -612,10 +624,12 @@ export class ShareFormSearchReportComponent extends AppForm {
 
         if (this.staffList.length > 0) {
             this.staffList.unshift({ id: 'All', text: 'All' });
-            if (this.menuPermission.list === 'Owner') {
-                this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0].id];
-            } else {
-                this.staffActive = [this.staffList[0].id];
+            if (this.groupActive.length > 0) {
+                if (this.menuPermission.list === 'Owner') {
+                    this.staffActive = [this.staffList.filter(stf => stf.id === this.userLogged.id)[0].id];
+                } else {
+                    this.staffActive = [this.staffList[0].id];
+                }
             }
         } else {
             this.staffActive = [];
@@ -642,7 +656,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customer.value,
+            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
             currency: this.currency.value, // ---**
             jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
@@ -668,7 +682,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customer.value,
+            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
             currency: this.currency.value, // ---**
             jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
@@ -728,6 +742,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             } else {
                 result = dataSelected.map((item: any) => item).toString().replace(/(?:,)/g, ';');
             }
+        } else {
+            const list = dataList.filter(f => f.id !== 'All');
+            result = list.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
         }
         return result;
     }
@@ -776,8 +793,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         }
 
         this.serviceDate.setValue({
-            startDate: this.createMoment().startOf('month').toDate(),
-            endDate: this.createMoment().endOf('month').toDate(),
+            startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
         });
 
         if (this.isCommissionIncentive) {
@@ -812,9 +829,6 @@ export class ShareFormSearchReportComponent extends AppForm {
                 (department: any) => {
                     if (!!department) {
                         department = department.map((item: any) => ({ officeId: item.branchId, departmentId: item.id, departmentAbbrName: item.deptNameAbbr }));
-                        department.forEach(element => {
-                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
-                        });
                         this.departmentsInit = department;
                         this.getDepartment(department);
                     }
@@ -833,6 +847,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                         group = group.map((item: any) => ({ departmentId: item.departmentId, groupId: item.id, groupAbbrName: item.shortName }));
                         group.forEach(element => {
                             this.groupSpecial.push({ departmentId: element.departmentId, groupId: element.groupId, groupAbbrName: element.groupAbbrName });
+                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
                         });
                         this.groupsInit = this.groupSpecial;
                         this.getGroup(this.groupSpecial);

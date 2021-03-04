@@ -30,6 +30,7 @@ namespace eFMS.API.Setting.DL.Services
         readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
         readonly IContextBase<AcctApproveAdvance> approveAdvanceRepo;
         readonly IContextBase<AcctApproveSettlement> approveSettlementRepo;
+        readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
 
         public UnlockRequestApproveService(
             IContextBase<SetUnlockRequestApprove> repository,
@@ -45,7 +46,8 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<AcctAdvancePayment> advancePayment,
             IContextBase<AcctSettlementPayment> settlementPayment,
             IContextBase<AcctApproveAdvance> approveAdvance,
-            IContextBase<AcctApproveSettlement> approveSettlement) : base(repository, mapper)
+            IContextBase<AcctApproveSettlement> approveSettlement,
+            IContextBase<SysSentEmailHistory> sentEmailHistory) : base(repository, mapper)
         {
             webUrl = wUrl;
             apiUrl = aUrl;
@@ -59,6 +61,7 @@ namespace eFMS.API.Setting.DL.Services
             settlementPaymentRepo = settlementPayment;
             approveAdvanceRepo = approveAdvance;
             approveSettlementRepo = approveSettlement;
+            sentEmailHistoryRepo = sentEmailHistory;
         }
 
         public SetUnlockRequestApproveModel GetInfoApproveUnlockRequest(Guid id)
@@ -667,6 +670,8 @@ namespace eFMS.API.Setting.DL.Services
             var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
             var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
 
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
             if (approve == null)
             {
                 if ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup) || leaderLevel.UserDeputies.Contains(userCurrent.UserID)) //Leader
@@ -677,7 +682,7 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     isManagerOrLeader = true;
                 }
-                else if ((isAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) //Accountant Manager
+                else if (((isAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) && isDeptAccountant) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -705,10 +710,11 @@ namespace eFMS.API.Setting.DL.Services
                     isManagerOrLeader = true;
                 }
                 else if (
-                            (userCurrent.GroupId == SettingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                            ( (userCurrent.GroupId == SettingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                           ||
-                            accountantLevel.UserDeputies.Contains(currentUser.UserID)
-                        ) //Accountant Manager
+                            accountantLevel.UserDeputies.Contains(currentUser.UserID) )
+                          && isDeptAccountant
+                        ) //Accountant Manager or Deputy Accountant thuộc Dept Accountant
                 {
                     isManagerOrLeader = true;
                 }
@@ -775,9 +781,10 @@ namespace eFMS.API.Setting.DL.Services
                 }
             }
             else if (
-                       ((isAccountant && isDeptAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                       ( ((isAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
                       ||
-                        accountantLevel.UserDeputies.Contains(currentUser.UserID))
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID)) )
+                      && isDeptAccountant
                     ) //Accountant Manager
             {
                 if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (managerLevel.Role == SettingConstants.ROLE_NONE && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE))
@@ -1495,6 +1502,22 @@ namespace eFMS.API.Setting.DL.Services
             emailCCs.Add(emailRequester);
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1536,6 +1559,22 @@ namespace eFMS.API.Setting.DL.Services
             emailCCs.Add(emailRequester);
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1576,6 +1615,22 @@ namespace eFMS.API.Setting.DL.Services
             emailCCs.Add(emailRequester);
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1632,6 +1687,22 @@ namespace eFMS.API.Setting.DL.Services
             List<string> emailCCs = new List<string>();
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1666,6 +1737,22 @@ namespace eFMS.API.Setting.DL.Services
             List<string> emailCCs = new List<string>();
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1699,6 +1786,22 @@ namespace eFMS.API.Setting.DL.Services
             List<string> emailCCs = new List<string>();
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1756,6 +1859,22 @@ namespace eFMS.API.Setting.DL.Services
             List<string> emailCCs = new List<string>();
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1792,6 +1911,22 @@ namespace eFMS.API.Setting.DL.Services
             List<string> emailCCs = new List<string>();
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 
@@ -1827,6 +1962,22 @@ namespace eFMS.API.Setting.DL.Services
             List<string> emailCCs = new List<string>();
 
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+
+            #region --- Ghi Log Send Mail ---
+            var logSendMail = new SysSentEmailHistory
+            {
+                SentUser = SendMail._emailFrom,
+                Receivers = string.Join("; ", toEmails),
+                Ccs = string.Join("; ", emailCCs),
+                Subject = subject,
+                Sent = sendMailResult,
+                SentDateTime = DateTime.Now,
+                Body = body
+            };
+            var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+            var hsSm = sentEmailHistoryRepo.SubmitChanges();
+            #endregion --- Ghi Log Send Mail ---
+
             return sendMailResult;
         }
 

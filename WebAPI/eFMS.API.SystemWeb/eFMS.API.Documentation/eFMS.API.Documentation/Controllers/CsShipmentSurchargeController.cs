@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -11,8 +15,11 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
@@ -29,6 +36,9 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeService;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ICurrencyExchangeService currencyExchangeService;
+        private IMapper mapper;
 
         /// <summary>
         /// constructor
@@ -36,11 +46,15 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, ICurrentUser user)
+        /// <param name="hostingEnvironment"></param>
+        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, ICurrencyExchangeService currencyExchange, IMapper _mapper)
         {
             stringLocalizer = localizer;
             csShipmentSurchargeService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
+            currencyExchangeService = currencyExchange;
+            mapper = _mapper;
         }
 
         /// <summary>
@@ -139,7 +153,19 @@ namespace eFMS.API.Documentation.Controllers
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             model.DatetimeCreated = DateTime.Now;
-            model.Total = Math.Round(model.Total, model.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0);
+
+            var surcharge = mapper.Map<CsShipmentSurcharge>(model);
+            #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+            model.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+            model.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+            model.FinalExchangeRate =amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+            model.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+            model.VatAmountVnd =amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+            model.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+            model.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+            #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
             var hs = csShipmentSurchargeService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -157,14 +183,14 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("AddAndUpdate")]
         [Authorize]
-        public IActionResult Add([FromBody]List<CsShipmentSurchargeModel> list)
+        public IActionResult AddAndUpdate([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
 
             string type = list.Select(t => t.Type).FirstOrDefault();
-            if(type == "BUY" || type == "OBH")
+            if(type == DocumentConstants.CHARGE_BUY_TYPE || type == DocumentConstants.CHARGE_OBH_TYPE)
             {
-                var query = list.Where(x => !isSurchargeSpecialCase(x) && !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
+                var query = list.Where(x => !isSurchargeSpecialCase(x) && !string.IsNullOrEmpty(x.InvoiceNo) && !string.IsNullOrEmpty(x.Notes)).GroupBy(x => new { x.InvoiceNo, x.ChargeId, x.Notes })
                              .Where(g => g.Count() > 1)
                              .Select(y => y.Key);
 
@@ -173,10 +199,11 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            list.ForEach(fe => {
-                fe.Total = Math.Round(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0); //Làm tròn charge VND
-            });
-            var hs = csShipmentSurchargeService.AddAndUpate(list);
+            // list.ForEach(fe => {
+                // fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
+                // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
+            //});
+            var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -243,6 +270,44 @@ namespace eFMS.API.Documentation.Controllers
             object rs = csShipmentSurchargeService.CheckAccountReceivable(list);
             return Ok(rs);
         }
+        
+        private decimal CalculateTotal(decimal? unitPrice, decimal quantity, decimal? vat, string currency)
+        {
+            decimal? totalAmount = 0;
+            decimal vatrate = vat ?? 0;
+            if (vat < 0)
+            {
+                if(currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                   
+                    totalAmount = NumberHelper.RoundNumber(unitPrice * quantity ?? 0) + NumberHelper.RoundNumber(Math.Abs(vatrate), 0);
+                }
+                else
+                {
+                    totalAmount = NumberHelper.RoundNumber(unitPrice * quantity ?? 0) + NumberHelper.RoundNumber(Math.Abs(vatrate), 2);
+                }
+            }
+            else
+            {
+                if (currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 0);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100) ,0);
+
+                    totalAmount = netAmount + vatAmount;
+                }
+                else
+                {
+                    var netAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0), 2);
+                    var vatAmount = NumberHelper.RoundNumber((unitPrice * quantity ?? 0) * (vatrate / 100), 2);
+
+                    totalAmount = netAmount + vatAmount;
+                }
+            }
+
+            return totalAmount ?? 0;
+        }
+
         /// <summary>
         /// update an existed surcharge
         /// </summary>
@@ -256,7 +321,19 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
-            model.Total = Math.Round(model.Total, model.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 3 : 0);
+
+            var surcharge = mapper.Map<CsShipmentSurcharge>(model);
+            #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+            model.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+            model.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+            model.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+            model.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+            model.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+            model.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+            model.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+            #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
             var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -368,12 +445,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("GetRecentlyCharges")]
+        [Authorize]
         public IActionResult GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
-            if( criteria.PersonInCharge == null)
-            {
-                return Ok(null);
-            }
             var results = csShipmentSurchargeService.GetRecentlyCharges(criteria);
             return Ok(results);
         }
@@ -386,6 +460,154 @@ namespace eFMS.API.Documentation.Controllers
             || !string.IsNullOrEmpty(charge.SettlementCode)
             || !string.IsNullOrEmpty(charge.VoucherId)
             ;
+        }
+        #region import 
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string fileName = Templates.SurCharge.ExcelImportFileName;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                DateTime temp;
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CsShipmentSurchargeImportModel> list = new List<CsShipmentSurchargeImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string ExchangeDate = worksheet.Cells[row, 12].Value?.ToString().Trim();
+                    DateTime? dateToPase = null;
+                    if (DateTime.TryParse(ExchangeDate, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPase = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        if (ExchangeDate != null)
+                        {
+                            dateToPase = DateTime.Parse(ExchangeDate, culture);
+                        }
+                    }
+
+                    string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
+                    if(!string.IsNullOrEmpty(InvoiceDate))
+                    {
+                        DateTime? dateToPaseInvoice = null;
+                        if (DateTime.TryParse(InvoiceDate, out temp))
+                        {
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            dateToPaseInvoice = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                        }
+                        else
+                        {
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            if (ExchangeDate != null)
+                            {
+                                dateToPaseInvoice = DateTime.Parse(InvoiceDate, culture);
+                            }
+                        }
+                    }
+              
+                    double? UnitPrice = worksheet.Cells[row, 8].Value != null ? (double?)worksheet.Cells[row, 8].Value : (double?)null;
+                    double? Vatrate = worksheet.Cells[row, 10].Value != null ? (double?)worksheet.Cells[row, 10].Value : (double?)null;
+                    double? TotalAmount = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;
+                    double? FinalExchangeRate = worksheet.Cells[row, 13].Value != null ? (double?)worksheet.Cells[row, 13].Value : (double?)null;
+                    var surcharge = new CsShipmentSurchargeImportModel
+                    {
+                        IsValid = true,
+                        Hblno = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        Mblno = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        ClearanceNo = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        PartnerCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        ChargeCode = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        Qty = worksheet.Cells[row, 6].Value != null ? (double?) worksheet.Cells[row, 6].Value : (double?)null,
+                        Unit = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                        UnitPrice = (decimal?)UnitPrice,
+                        CurrencyId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        Vatrate = (decimal?)Vatrate,
+                        TotalAmount = (decimal?)TotalAmount,
+                        ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
+                        FinalExchangeRate = (decimal?)FinalExchangeRate, 
+                        InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPase : (DateTime?)null,
+                        SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
+                        Type = worksheet.Cells[row, 17].Value?.ToString().Trim(),
+                        Notes = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                    };
+                    list.Add(surcharge);
+                }
+                var data = csShipmentSurchargeService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
+        /// import list partner
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<CsShipmentSurchargeImportModel> data)
+        {
+            var hs = csShipmentSurchargeService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
+        #endregion
+
+        /// <summary>
+        /// Only Use for Dev
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("UpdateFieldNetAmount_AmountUSD_VatAmountUSD")]
+        public IActionResult UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField()
+        {
+            var hs = csShipmentSurchargeService.UpdateFieldNetAmount_AmountUSD_VatAmountUSD();
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Update Success" };
+            if (!hs.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
+                return BadRequest(_result);
+            }
+            return Ok(result);
         }
     }
 }

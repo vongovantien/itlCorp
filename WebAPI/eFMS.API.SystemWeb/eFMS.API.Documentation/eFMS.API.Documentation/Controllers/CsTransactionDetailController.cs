@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -156,6 +157,13 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
+            string msgCheckUpdateMawb = CheckHasHBLUpdatePermitted(model);
+            if (msgCheckUpdateMawb.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = csTransactionDetailService.UpdateTransactionDetail(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -235,14 +243,14 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     if (model.Id == Guid.Empty)
                     {
-                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID))
                         {
                             message = "Housebill of Lading No is existed !";
                         }
                     }
                     else
                     {
-                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
                             message = "Housebill of Lading No is existed !";
                         }
@@ -253,14 +261,14 @@ namespace eFMS.API.Documentation.Controllers
                     if(model.Id == Guid.Empty)
                     {
 
-                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId ))
+                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID))
                         {
                             message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                         }
                     }
                     else
                     {
-                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.Id != model.Id ))
+                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id ))
                         {
                             message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                         }
@@ -295,14 +303,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
-
-        [HttpPost]
-        [Route("PreviewSeaHBofLading")]
-        public IActionResult PreviewSeaHBofLading(CsTransactionDetailModel model)
-        {
-            var result = csTransactionDetailService.Preview(model);
-            return Ok(result);
-        }
+        
         [HttpGet]
         [Route("GetGoodSummaryOfAllHblByJobId")]
         public IActionResult GetGoodSummaryOfAllHBLByJobId(Guid jobId)
@@ -458,6 +459,26 @@ namespace eFMS.API.Documentation.Controllers
         {
             var data = csTransactionDetailService.GetHousebillsDailyExport(issuedDate);
             return Ok(data);
+        }
+
+        private string CheckHasHBLUpdatePermitted(CsTransactionDetailModel model)
+        {
+            string errorMsg = string.Empty;
+            string hblNo = string.Empty;
+            List<string> advs = new List<string>();
+
+            int statusCode = csTransactionDetailService.CheckUpdateHBL(model, out hblNo, out advs);
+            if (statusCode == 1)
+            {
+                errorMsg = String.Format("HBL {0} has Charges List that Synced to accounting system, Please you check Again!", hblNo);
+            }
+
+            if (statusCode == 2)
+            {
+                errorMsg = String.Format("HBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", hblNo, string.Join(",", advs.ToArray()));
+            }
+
+            return errorMsg;
         }
     }
 }

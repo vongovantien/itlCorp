@@ -3,6 +3,7 @@ using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,5 +28,6 @@ namespace eFMS.API.Operation.DL.IService
         int CheckDetailPermission(int id);
         CustomsDeclarationModel GetDetail(int id);
         List<CustomsDeclarationModel> GetListCustomNoAsignPIC();
+        bool CheckAllowUpdate(Guid? jobId);
     }
 }

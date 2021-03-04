@@ -41,6 +41,8 @@ export class SOA {
     reasonReject: string = '';
     creditPayment: string = '';
     isExistChgCurrDiffLocalCurr: boolean = false;
+    totalCharge: number = 0;
+    staffType: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

@@ -277,7 +277,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     removeCharge() {
         const chargeToDelete: ChargeOfAccountingManagementModel[] = this.charges.filter(x => x.isSelected);
         if (!!chargeToDelete.length) {
-            this.contentConfirmRemoveCharge = `Are you sure you want to remove ${this.getSoaNo(chargeToDelete)} ${this.getCdNote(chargeToDelete)} ?`;
+            this.contentConfirmRemoveCharge = `Are you sure you want to remove ${this.getDataRemove(chargeToDelete, 'soaNo')} ${this.getDataRemove(chargeToDelete, 'cdNoteNo')} ?`;
             this.confirmRemovePopup.show();
         } else {
             return;
@@ -296,20 +296,12 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         this.totalAmountVat = totalData.totalAmountVat;
     }
 
-    getSoaNo(charges: ChargeOfAccountingManagementModel[]): string {
-        const soaNo: string[] = charges.filter(x => Boolean(x.soaNo)).map(i => i.soaNo);
-        if (!soaNo.length) {
+    getDataRemove(charges: ChargeOfAccountingManagementModel[], key: string): string {
+        const data: string[] = charges.filter(x => Boolean(x[key])).map(i => i[key]);
+        if (!data.length) {
             return '';
         }
-        return soaNo.join(",\n");
-    }
-
-    getCdNote(charges: ChargeOfAccountingManagementModel[]) {
-        const cdNoteNo: string[] = charges.filter(x => Boolean(x.cdNoteNo)).map(i => i.cdNoteNo);
-        if (!cdNoteNo.length) {
-            return '';
-        }
-        return cdNoteNo.join(",\n");
+        return data.join(",\n");
     }
 
     refreshListCharge() {
@@ -317,7 +309,6 @@ export class AccountingManagementListChargeComponent extends AppList implements 
             .pipe(takeUntil(this.ngUnsubscribe),
                 switchMap(
                     (listChargeInStore: ChargeOfAccountingManagementModel[]) => {
-                        console.log("list charge in store: ", listChargeInStore);
                         if (!!listChargeInStore.length) {
                             return this._accountingRepo.calculateListChargeAccountingMngt(listChargeInStore);
                         }
@@ -328,7 +319,6 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 (data: IChargeAccountingMngtTotal | any) => {
                     if (!!data) {
                         this.charges = cloneDeep([...(data.charges)]);
-                        console.log("list charge after calculate: ", this.charges);
 
                         this.totalAmountVnd = data.totalAmountVnd;
                         this.totalAmountVat = data.totalAmountVat;
@@ -393,11 +383,14 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         if (charge.currency === 'VND') {
             return;
         }
-        charge.amountVnd = +(charge.orgAmount * exc).toFixed(2);
-        charge.vatAmountVnd = +(charge.orgVatAmount * exc).toFixed(2);
+        charge.amountVnd = Math.round(charge.orgAmount * exc);
 
+        if (charge.vat > 0 && charge.vat <= 100) {
+            charge.vatAmountVnd = Math.round(charge.amountVnd * (charge.vat / 100));
+        } else {
+            charge.vatAmountVnd = Math.round(Math.abs(charge.vat) * exc);
+        }
     }
-
 }
 
 interface ITotalAmountVatVnd {

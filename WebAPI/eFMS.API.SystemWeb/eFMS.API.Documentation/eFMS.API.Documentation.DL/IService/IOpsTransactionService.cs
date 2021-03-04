@@ -8,6 +8,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -19,17 +20,22 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckDetailPermission(Guid id);
         OpsTransactionModel GetDetails(Guid id);
         bool CheckAllowDelete(Guid jobId);
+        bool CheckAllowDeleteJobUsed(Guid jobId);
         //HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
         HandleState ConvertClearanceToJob(CustomsDeclarationModel model);
         //HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
         HandleState ConvertExistedClearancesToJobs(List<CustomsDeclarationModel> list);
         HandleState SoftDeleteJob(Guid id);
-        string CheckExist(OpsTransactionModel model);
+        string CheckExist(OpsTransactionModel model, string mblNo, string hblNo);
         Crystal PreviewFormPLsheet(Guid id, string currency);
         HandleState Update(OpsTransactionModel model);
         IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
         ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list);
         HandleState LockOpsTransaction(Guid jobId);
         ResultHandle ImportDuplicateJob(OpsTransactionModel model);
+        HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
+        int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
+        List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID);
+       
     }
 }

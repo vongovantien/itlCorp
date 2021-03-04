@@ -5,7 +5,6 @@ import { takeUntil, distinctUntilChanged, catchError, map, debounceTime } from '
 import { BehaviorSubject } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
-import { DataService } from 'src/app/shared/services';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -103,7 +102,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     constructor(
         private _documentRepo: DocumentationRepo,
         private _accoutingRepo: AccountingRepo,
-        private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
         private _operationRepo: OperationRepo,
         private _fb: FormBuilder,
@@ -363,18 +361,13 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     getPartner() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
-            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
-        } else {
-            this._catalogueRepo.getListPartner(null, null, { active: true })
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataPartner: any) => {
-                        this.getPartnerData(dataPartner);
-                        this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
-                    },
-                );
-        }
+        this._catalogueRepo.getListPartner(null, null, { active: true })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (dataPartner: any) => {
+                    this.getPartnerData(dataPartner);
+                },
+            );
     }
 
     getPartnerData(data: any) {
@@ -461,11 +454,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         }
         if (this.selectedCharge.type === 'OBH') {
             const dataChargeOBH = {
-                payerId: this.selectedPayer.value,
-                paymentObjectId: this.selectedOBHPartner.value,
+                payerId: this.selectedPayer?.value,
+                paymentObjectId: this.selectedOBHPartner?.value,
                 objectBePaid: null,
-                payer: this.selectedPayerData.shortName,
-                obhPartnerName: this.selectedOBHData.shortName
+                payer: this.selectedPayerData?.shortName,
+                obhPartnerName: this.selectedOBHData?.shortName
             };
             Object.assign(body, dataChargeOBH);
         }
@@ -588,7 +581,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             partner: body.paymentObjectId || body.payerId,
             customNo: body.clearanceNo,
             invoiceNo: body.invoiceNo,
-            contNo: body.contNo
+            contNo: body.contNo,
+            notes: body.notes
         };
 
         this._accoutingRepo.checkDuplicateShipmentSettlement(bodyToValidate)
@@ -669,4 +663,5 @@ interface IShipmentValidate {
     customNo: string;
     invoiceNo: string;
     contNo: string;
+    notes: string;
 }

@@ -35,7 +35,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
 
-        ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria);
+        ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria, out List<DuplicateShipmentSettlementResultModel> data);
 
         HandleState AddSettlementPayment(CreateUpdateSettlementModel model);
 
@@ -83,6 +83,10 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState CheckValidateMailByUserId(string userId);
 
-        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);     
+        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+
+        HandleState DenySettlePayments(List<Guid> Ids);
+
+        bool CheckValidateDeleteSettle(string settlementNo);
     }
 }

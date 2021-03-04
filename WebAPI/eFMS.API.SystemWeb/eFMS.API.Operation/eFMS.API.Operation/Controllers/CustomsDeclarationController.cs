@@ -102,7 +102,7 @@ namespace eFMS.API.Operation.Controllers
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
-        
+
         /// <summary>
         /// get and paging the list of custom declarations by conditions
         /// </summary>
@@ -228,11 +228,12 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost("ImportClearancesFromEcus")]
         public IActionResult ImportClearancesFromEcus()
         {
+          
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
             if (code == 403) return Forbid();
             var hs = customsDeclarationService.ImportClearancesFromEcus();
-            var message = HandleError.GetMessage(hs, Crud.Update);
+            var message = hs.Message?.ToString();
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
             {
@@ -259,8 +260,16 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("UpdateJobToClearances")]
-        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances )
         {
+            if (clearances.Any(x => x.isDelete == true))
+            {
+                if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t => t.jobId).FirstOrDefault()) == false)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[OperationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+                }
+            }
+          
             var result = customsDeclarationService.UpdateJobToClearances(clearances);
             return Ok(result);
         }

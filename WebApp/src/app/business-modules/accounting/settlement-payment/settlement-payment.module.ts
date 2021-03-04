@@ -11,6 +11,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 import { SettlementPaymentComponent } from './settlement-payment.component';
 import { SettlementFormSearchComponent } from './components/form-search-settlement/form-search-settlement.component';
@@ -31,9 +32,10 @@ import { SettlementTableListChargePopupComponent } from './components/popup/tabl
 import { ShareAccountingModule } from '../share-accouting.module';
 import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 import { ReportPreviewComponent } from '@common';
-import { reducers } from './components/store';
+import { reducers, settleEffects } from './components/store';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
+import { SettlePaymentEffect } from './components/store/effects/settlement-payment.effect';
 
 const routing: Routes = [
     {
@@ -103,6 +105,7 @@ const customCurrencyMaskConfig = {
         ShareAccountingModule,
         NgSelectModule,
         StoreModule.forFeature('settlement-payment', reducers),
+        EffectsModule.forFeature([SettlePaymentEffect]),
         ShareModulesModule
     ],
     exports: [],
@@ -116,6 +119,8 @@ const customCurrencyMaskConfig = {
     entryComponents: [
         ReportPreviewComponent
     ],
-    providers: [],
+    providers: [
+
+    ],
 })
 export class SettlementPaymentModule { }

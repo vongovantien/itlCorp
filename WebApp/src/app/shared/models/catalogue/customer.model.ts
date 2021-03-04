@@ -53,6 +53,7 @@ export class Customer {
     inactiveOn?: string = '';
     workPlaceId: string = '';
     userCreatedName: string = '';
+    taxCodeAbbrName:string = '';
     saleManRequests: SaleManRequest[] = [];
 
     constructor(data?: any) {

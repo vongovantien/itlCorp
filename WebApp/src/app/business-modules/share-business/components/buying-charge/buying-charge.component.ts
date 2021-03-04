@@ -190,8 +190,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
-            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
-            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
+            { title: 'Net Amount', field: 'netAmount', sortable: true },
         ];
     }
 
@@ -466,7 +465,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 charge.invoiceDate = null;
             }
 
-            charge.unitPrice = +charge.unitPrice;
+            // ! round unitPrice
+            // charge.unitPrice = +(+(charge.unitPrice)).toFixed(3);
+
 
             // Update HBL ID,Type
             if (!!this.hbl && !!this.hbl.id) {
@@ -528,7 +529,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.grossWeight;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW) : this.getDataHint(CommonEnum.QUANTITY_TYPE.GW);
+                    // chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
@@ -541,7 +543,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.netWeight;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW) : this.getDataHint(CommonEnum.QUANTITY_TYPE.NW);
+                    // chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
@@ -554,13 +557,15 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.cbm;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM) : this.getDataHint(CommonEnum.QUANTITY_TYPE.CBM);
+                    // chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
 
                 chargeItem = this.updateUnitSurcharge(chargeItem, 'CBM');
                 break;
             case CommonEnum.QUANTITY_TYPE.CONT:
-                chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
+                chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'quantity') : this.getDataHint('quantity');
+                // chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
                 break;
             case CommonEnum.QUANTITY_TYPE.CW:
                 // * Update UnitPrice to KGS
@@ -576,7 +581,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.chargeWeight;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'chargeAbleWeight') : this.getDataHint('chargeAbleWeight');
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.PACKAGE:
@@ -589,7 +594,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.packageQty;
                 } else {
-                    chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
+                    chargeItem.quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'packageQuantity') : this.getDataHint('packageQuantity');
+                    // chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
                 }
                 break;
             default:
@@ -605,6 +611,58 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         let total: number = 0;
         total = containers.reduce((acc: any, curr: Container) => acc += curr[key], 0);
         return total;
+    }
+
+    getDataHint(key: string) {
+        let data: number = null;
+        switch (key) {
+            case 'chargeAbleWeight':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.chargeWeight;
+                } else {
+                    data = this.hbl.chargeWeight || this.hbl.cw;
+                }
+                break;
+            case 'gw':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.grossWeight;
+                } else {
+                    data = this.hbl.grossWeight || this.hbl.gw;
+                }
+                break;
+            case 'nw':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.netWeight;
+                } else {
+                    data = this.hbl.netWeight;
+                }
+                break;
+            case 'cbm':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.cbm;
+                } else {
+                    data = this.hbl.cbm;
+                }
+                break;
+            case 'packageQuantity':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.packageQty;
+                } else {
+                    data = this.hbl.packageQty;
+                }
+                break;
+            case 'quantity':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.chargeWeight;
+                } else {
+                    data = this.hbl.chargeWeight;
+                }
+                break;
+            default:
+                break;
+        }
+
+        return data;
     }
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
@@ -654,6 +712,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             charge.duplicateInvoice = false;
             if (this.checkSpecialCaseCharge(charge)) {
                 valid = true;
+                continue;
             }
             if (
                 !charge.paymentObjectId
@@ -692,7 +751,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
         const listChargeToDectect = this.charges.filter(c => !this.checkSpecialCaseCharge(c));
         const chargeInvoiceGrps = listChargeToDectect.map(c => {
-            if (!!c.invoiceNo) return c.chargeId + c.invoiceNo;
+            if (!!c.invoiceNo) {
+                if (!!c.notes) {
+                    return c.chargeId + c.invoiceNo + c.notes;
+                }
+                return c.chargeId + c.invoiceNo;
+            }
             return null;
         }).filter(x => Boolean(x));
 
@@ -701,16 +765,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         if (isDuplicate) {
             valid = false;
             const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeInvoiceGrps))];
+            let isDup: boolean = false;
+
             this.charges.filter(c => !this.checkSpecialCaseCharge(c)).forEach((c: CsShipmentSurcharge) => {
-                if (arrayDuplicates.includes(c.chargeId + c.invoiceNo)) {
-                    c.duplicateCharge = true;
-                    c.duplicateInvoice = true;
+                if (!!c.notes) {
+                    isDup = arrayDuplicates.includes(c.chargeId + c.invoiceNo + c.notes);
                 } else {
-                    c.duplicateCharge = false;
-                    c.duplicateInvoice = false;
+                    isDup = arrayDuplicates.includes(c.chargeId + c.invoiceNo);
+                }
+                if (isDup) {
+                    [c.duplicateCharge, c.duplicateInvoice] = [true, true];
+                } else {
+                    [c.duplicateCharge, c.duplicateInvoice] = [false, false];
                 }
             });
-            console.log(arrayDuplicates);
         } else valid = true;
 
         return valid;
@@ -1042,14 +1110,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     getRecentlyCharge() {
         const body: IRecentlyCharge = {
-            currentJobId: this.shipment.id,
-            personInCharge: this.shipment.personIncharge,
+            hblId: this.hbl.id,
+            jobId: this.shipment.id,
             transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
-            shippingLine: this.shipment.coloaderId,
-
-            consigneeId: this.hbl.consigneeId,
-            pol: this.hbl.pol,
-            pod: this.hbl.pod,
+            coloaderId: this.shipment.coloaderId,
+            agentId: this.shipment.agentId,
             chargeType: this.TYPE,
             customerId: this.hbl.customerId,
         };
@@ -1231,13 +1296,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 }
 
 interface IRecentlyCharge {
-    currentJobId: string;
-    personInCharge: string;
+    hblId: string;
     transactionType: number;
-    shippingLine: string;
-    customerId: string;
-    consigneeId: string;
-    pol: string;
-    pod: string;
+    customerId: string; // * HBL
+    agentId: string; // * MBL
+    coloaderId: string; // * MBL
     chargeType: string; // * BUY/SELL/OBH
+    jobId: string;
 }

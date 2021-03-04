@@ -278,6 +278,29 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("UpdatePassword")]
+        [Authorize]
+        public IActionResult UpdatePassword(string password)
+        {
+            SysUserModel item = sysUserService.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            if(item == null)
+            {
+                return BadRequest(new ResultHandle { Message = "Not Found Data" });
+            }
+            item.Password = password;
+            item.Password = BCrypt.Net.BCrypt.HashPassword(item.Password);
+            HandleState hs = sysUserService.Update(item, x => x.Id == currentUser.UserID);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpPut]
         [Route("UpdateProfile")]
         [Authorize]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -27,14 +28,14 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    [Authorize]
+    // [Authorize]
     public class OpsTransactionController : CustomAuthcontroller
     {
         private readonly IStringLocalizer stringLocalizer;
         private ICurrentUser currentUser;
         private readonly IOpsTransactionService transactionService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -93,7 +94,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
             return Ok(result);
         }
-        
+
         /// <summary>
         /// get and paging the list of countries by conditions
         /// </summary>
@@ -121,8 +122,8 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Add(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            
-            var existedMessage = transactionService.CheckExist(model);
+
+            var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
                 return Ok(new ResultHandle { Status = false, Message = existedMessage });
@@ -149,10 +150,15 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Update(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var existedMessage = transactionService.CheckExist(model);
+            var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+            }
+            string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
+            if (msgCheckUpdateMawb.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
             }
 
             var hs = transactionService.Update(model);
@@ -176,7 +182,8 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult InsertDuplicateJob(OpsTransactionModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var existedMessage = transactionService.CheckExist(model);
+            model.Id = Guid.NewGuid();
+            var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
                 return Ok(new ResultHandle { Status = false, Message = existedMessage });
@@ -195,7 +202,7 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(Guid id)
         {
-            if (transactionService.CheckAllowDelete(id) == false)
+            if (transactionService.CheckAllowDeleteJobUsed(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
@@ -305,5 +312,32 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+        private string CheckHasMBLUpdatePermitted(OpsTransactionModel model)
+        {
+            string errorMsg = string.Empty;
+            string mblNo = string.Empty;
+            List<string> advs = new List<string>();
+
+            int statusCode = transactionService.CheckUpdateMBL(model, out mblNo, out advs);
+            if (statusCode == 1)
+            {
+                errorMsg = String.Format("MBL {0} has Charges List that Synced to accounting system, Please you check Again!", mblNo);
+            }
+
+            if (statusCode == 2)
+            {
+                errorMsg = String.Format("MBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", mblNo, string.Join(",", advs.ToArray()));
+            }
+
+            return errorMsg;
+        }
+        [HttpGet("AdvanceSettlement")]
+        // [Authorize]
+        public IActionResult opsAdvanceSettlements(Guid JobID)
+        {
+            var job =  transactionService.opsAdvanceSettlements(JobID);
+            return Ok(job);
+        }
+        
     }
 }

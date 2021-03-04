@@ -15,6 +15,9 @@ import { ConfirmPopupComponent } from '@common';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommonEnum } from '@enums';
+import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
+import { Store } from '@ngrx/store';
+import { IAppState } from '@store';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -35,8 +38,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         private _activedRoute: ActivatedRoute,
         private _cd: ChangeDetectorRef,
         protected _ngProgressService: NgProgress,
+        protected _store: Store<IAppState>
     ) {
-        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute);
+        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute, _store);
     }
 
     ngOnInit(): void {
@@ -69,8 +73,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     this.partnerList.parentId = this.partnerId;
 
                     this.getDetailCustomer(this.partnerId);
+                    this.partnerEmailList.getEmailPartner(this.partnerId);
                     if (!this.isAddSubPartner) {
                         this.contractList.partnerId = this.partnerId;
+                        this.partnerEmailList.partnerId = this.partnerId;
                         this.contractList.getListContract(this.partnerId);
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
@@ -93,26 +99,36 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         this._catalogueRepo.getDetailPartner(partnerId)
             .subscribe(
                 (res: Partner) => {
-                    this.partner = res;
-                    console.log("detail partner:", this.partner);
-                    this.formCreate.isBranchSub = this.isAddSubPartner;
-                    this.setDataForm(this.partner);
-                    if (this.isAddSubPartner) {
-                        this.formCreate.isUpdate = false;
-                        this.formCreate.getACRefName(this.partner.id);
-                    } else {
-                        this.formCreate.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, true, this.partner.id);
-                        this.formCreate.getACRefName(this.partner.parentId);
-                    }
-                    // this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
+                    if (!!res) {
+                        this.partner = res;
+                        console.log("detail partner:", this.partner);
+                        this.formCreate.isBranchSub = this.isAddSubPartner;
+                        this.setDataForm(this.partner);
+                        if (this.isAddSubPartner) {
+                            this.formCreate.isUpdate = false;
+                            this.formCreate.getACRefName(this.partner.id);
+                        } else {
+                            this.formCreate.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, true, this.partner.id);
+                            this.formCreate.getACRefName(this.partner.parentId);
+                        }
+                        // this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
 
-                    this.formCreate.getShippingProvinces(res.countryShippingId);
-                    this.formCreate.getBillingProvinces(res.countryId);
+                        this.formCreate.getShippingProvinces(res.countryShippingId);
+                        this.formCreate.getBillingProvinces(res.countryId);
+                    }
+                    else {
+                        this.back();
+                    }
+
                 }
             );
     }
 
     setDataForm(partner: Partner) {
+        this.formCreate.provinceShippingIdName = partner.provinceShippingName;
+        this.formCreate.countryShippingIdName = partner.countryShippingName;
+        this.formCreate.provinceIdName = partner.provinceName;
+        this.formCreate.countryIdName = partner.countryName;
         this.formCreate.formGroup.patchValue({
             accountNo: this.isAddSubPartner ? null : partner.accountNo,
             partnerNameEn: partner.partnerNameEn,
@@ -216,8 +232,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     updateStatusPartner($event) {
-        if (this.partner.active === false) {
-            this.partner.active = $event;
+        const obj = $event;
+        if (obj.partnerStatus === true && (obj.isRequestApproval === false || obj.isRequestApproval === null)) {
+            this.partner.active = true;
         }
     }
 

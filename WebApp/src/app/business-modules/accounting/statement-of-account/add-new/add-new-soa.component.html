@@ -23,14 +23,15 @@
                     <div class="col-lg-3">
                         <div class="m--margin-top-15">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <span class="m--font-bolder">Total Shipment:</span><span
-                                        class="m--font-brand m--margin-left-5">{{totalShipment}}</span>
+                                <div class="col-md-12">
+                                    <span class="m--font-bolder">Total Shipment/Charge:</span><span
+                                        class="m--font-brand m--margin-left-5">{{totalShipment | number:
+                                        '.0-3'}}/{{listCharges.length | number: '.0-3'}}</span>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <span class="m--font-bolder">Total Charge:</span><span
                                         class="m--font-brand m--margin-left-5">{{totalCharge}}</span>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -83,6 +84,7 @@
                                         </label>
                                     </div>
                                 </td>
+                                <td class="text-center">{{i + 1}}</td>
                                 <td>
                                     <span>{{charge.chargeCode}}</span>
                                 </td>
@@ -102,10 +104,10 @@
                                 <td>
                                     <span>{{charge.customNo}}</span>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <span>{{charge.debit | number: '.0-3'}}</span>
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <span>{{charge.credit | number: '.0-3'}}</span>
                                 </td>
                                 <td>
@@ -118,7 +120,8 @@
                                     <span>{{charge.cdNote}}</span>
                                 </td>
                                 <td>
-                                    <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
+                                    <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') :
+                                        ''}}</span>
                                 </td>
                                 <td>
                                     <span>{{charge.note}}</span>

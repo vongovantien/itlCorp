@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="col-lg-12 text-center py-3">
                             <img #image [src]="photoUrl" onerror="this.src = 'assets/app/media/img/emptydata.png'"
-                                width="160px" class="rounded-circle" alt="Cinque Terre">
+                                class="rounded-circle auto_image" alt="Cinque Terre">
                         </div>
                         <h4 class="col-lg-12 text-center font-weight-bold" style="color: #5a7391; font-weight: 600;">
                             {{employeeNameVn.value}}</h4>
@@ -123,6 +123,13 @@
                                 <label>Phone Number: </label>
                                 <input type="input" class="form-control" formControlName="tel"
                                     placeholder="Please Enter Phone Number">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <label>Personal ID: </label>
+                                <input type="input" class="form-control" formControlName="personalId"
+                                    placeholder="Please Enter Personal ID">
                             </div>
                         </div>
                         <div class="col-lg-12">

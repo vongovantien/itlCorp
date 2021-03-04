@@ -265,7 +265,8 @@
                                         <label>Credit Limit</label>
                                         <input
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true || !isUpdate ?  null : 'disabled'"
-                                            type="number" class="form-control" formControlName="creditLimit">
+                                            type="number" autoFormatCurrency class="form-control"
+                                            formControlName="creditLimit">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -388,7 +389,7 @@
                         </span>
                     </button>
                     <button (click)="onSubmit(true)"
-                        *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active) )  "
+                        *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active && !isCreateNewCommercial) )  "
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-send"></i>
@@ -412,7 +413,7 @@
                         </span>
                     </button>
                     <button
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                        *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                         type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
                         (click)="showRejectCommentPopup()">
                         <span>

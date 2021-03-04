@@ -82,14 +82,14 @@ export class FormAddChargeComponent extends AppForm {
             code: [null, Validators.required],
             nameEn: [null, Validators.required],
             nameVn: [null, Validators.required],
-            unit: [null, Validators.required],
-            unitPrice: [null, Validators.required],
-            currency: [null, Validators.required],
-            vat: [null, Validators.required],
+            unit: [],
+            unitPrice: [],
+            currency: [],
+            vat: [],
             type: [null, Validators.required],
             service: [null, Validators.required],
             debitCharge: [],
-            chargeGroup: [null],
+            chargeGroup: [],
             active: [true],
             generateSelling: [true],
             productDept: []
@@ -110,9 +110,9 @@ export class FormAddChargeComponent extends AppForm {
         this.generateSelling = this.formGroup.controls["generateSelling"];
         this.type.valueChanges
             .subscribe(
-                (value: CommonInterface.INg2Select[]) => {
+                (value: any) => {
                     if (!!value && !!value.length) {
-                        if (value[0].id.toLowerCase() === CommonEnum.CHARGE_TYPE.CREDIT.toLowerCase()) {
+                        if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.CREDIT.toLowerCase()) {
                             this.isShowMappingSelling = true;
                         } else {
                             this.isShowMappingSelling = false;
@@ -162,11 +162,6 @@ export class FormAddChargeComponent extends AppForm {
             if (!!res) {
                 const chargeGroup = res;
                 this.ngDataChargeGroup = chargeGroup.map(x => ({ text: x.name, id: x.id }));
-
-                if (this.isUpdate === false) {
-                    this.chargeGroup.setValue({ id: this.ngDataChargeGroup.find(x => x.text === 'Other').id, text: 'Other' });
-
-                }
             }
         });
     }
@@ -199,15 +194,15 @@ export class FormAddChargeComponent extends AppForm {
             nameEn: res.charge.chargeNameEn,
             nameVn: res.charge.chargeNameVn,
             unitPrice: res.charge.unitPrice,
-            currency: { text: this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId).text, id: res.charge.currencyId },
+            currency: res.charge.currencyId,
             vat: res.charge.vatrate,
             type: res.charge.type,
             service: this.activeServices,
             debitCharge: res.charge.debitCharge,
-            chargeGroup: { id: res.charge.chargeGroup, text: this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup).text },
+            chargeGroup: res.charge.chargeGroup,
             active: res.charge.active,
             productDept: res.charge.productDept,
-            unit: { text: this.ngDataUnit.find(x => x.id === res.charge.unitId).text, id: res.charge.unitId }
+            unit: res.charge.unitId,
         });
     }
 }

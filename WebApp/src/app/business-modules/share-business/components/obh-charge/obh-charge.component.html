@@ -138,8 +138,7 @@
                                         <input type="text" class="dropdown-toggle form-control" readonly
                                             [(ngModel)]="charge.receiverName" placeholder="Partner Name"
                                             [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                            (click)="loadDynamicComoGrid(charge,i)"
-                                            [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
+                                            (click)="loadDynamicComoGrid(charge,i)">
                                         <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                             charge.receiverName = null" (onDropdown)="loadDynamicComoGrid(charge,i)"
                                             [showDelete]="!!charge.receiverName 
@@ -476,17 +475,10 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control text-primary" disabled
-                                        [(ngModel)]="charge.voucherIdre">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.netAmount" readonly
+                                        disabled currencyMask placeholder="Net Amount">
                                 </div>
                             </td>
-                            <td class="disabled">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" disabled
-                                        [value]="charge.voucherIdredate | date: 'dd/MM/yyyy'">
-                                </div>
-                            </td>
-
                         </tr>
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">

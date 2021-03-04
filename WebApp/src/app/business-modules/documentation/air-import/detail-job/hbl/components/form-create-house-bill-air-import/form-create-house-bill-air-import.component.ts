@@ -142,7 +142,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.jobId = shipment.id;
-
                         this.formCreate.patchValue({
                             mawb: shipment.mawb,
                             pod: shipment.pod,
@@ -158,7 +157,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             packageQty: shipment.packageQty,
                             grossWeight: shipment.grossWeight,
                             chargeWeight: shipment.chargeWeight,
-                            packageType: shipment.packageType
+                            packageType: +shipment.packageType
                         });
                     }
                 }
@@ -277,6 +276,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     onSelectDataFormInfo(data: any, type: string) {
+        console.log(data)
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
@@ -315,11 +315,16 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             case 'agent':
                 this.forwardingAgentId.setValue(data.id);
                 break;
+            case 'packageType':
+                this.packageType.setValue(data.id);
+
+                break;
             case 'sale':
                 this.saleManId.setValue(data.id);
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+
                 break;
             case 'pod':
                 this.pod.setValue(data.id);

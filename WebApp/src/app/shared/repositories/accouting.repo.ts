@@ -22,7 +22,7 @@ export class AccountingRepo {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/paging`, body, {
                 pageNumber: '' + page,
                 pageSize: '' + size
-            }).pipe(
+            }, { "hideSpinner": "true" }).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
@@ -155,7 +155,7 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/paging`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
@@ -217,7 +217,7 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/paging`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
@@ -325,8 +325,8 @@ export class AccountingRepo {
         );
     }
 
-    getAdvanceOfShipment(jobNo: string): Observable<any> {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancesOfShipment`, { jobId: jobNo }).pipe(
+    getAdvanceOfShipment(jobNo: string, settleCode: string = null): Observable<any> {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancesOfShipment`, { jobId: jobNo, settleCode: settleCode }).pipe(
             map((data: any) => data)
         );
     }
@@ -806,6 +806,14 @@ export class AccountingRepo {
 
     checkVoucherSynced(id: any) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/CheckVoucherSynced/${id}`);
+    }
+
+    denyAdvancePayments(Ids: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/DenyAdvancePayments`, Ids);
+    }
+
+    denySettlePayments(Ids: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/DenySettlePayments`, Ids);
     }
 }
 

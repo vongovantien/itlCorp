@@ -86,7 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
 
 
         private IQueryable<MonthlySaleReportResult> GetOpsSaleReport(SaleReportCriteria criteria)
-        {            
+        {
             List<MonthlySaleReportResult> results = null;
             IQueryable<OpsTransaction> data = QueryOpsSaleReport(criteria);
             if (data == null) return null;
@@ -133,7 +133,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //Tổng amount Trước thuế của phí tick chon Kick Back
                 report.SharedProfit = GetShareProfit(item.Hblid, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 var contInfo = GetContainer(containerData, null, item.Hblid);
-                if(contInfo != null)
+                if (contInfo != null)
                 {
                     report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
                     report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
@@ -147,22 +147,28 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var hasSalesman = criteria.SalesMan != null; // Check if Type=Salesman
             Expression<Func<OpsTransaction, bool>> queryOpsTrans = x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
-                                                                 && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
-                                                                 && (x.Mblno.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
-                                                                 && (x.JobNo.IndexOf(criteria.JobId, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.JobId))
-                                                                 && (x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Hawb))
-                                                                 && (x.Pod == criteria.Pod || criteria.Pod == null)
-                                                                 && (x.Pol == criteria.Pol || criteria.Pol == null)
-                                                                 && (x.SupplierId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesOfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
-                                                                                : (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
-                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesDepartmentId) || string.IsNullOrEmpty(criteria.DepartmentId))
-                                                                                : (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
-                                                                 && hasSalesman ? (!string.IsNullOrEmpty(x.SalesGroupId) || string.IsNullOrEmpty(criteria.GroupId))
-                                                                                : (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId))
-                                                                 && (criteria.PersonInCharge.Contains(x.BillingOpsId) || string.IsNullOrEmpty(criteria.PersonInCharge))
-                                                                 && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator)
-                                                                 && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan)));
+                                                                         && (x.AgentId == criteria.AgentId || criteria.AgentId == null)
+                                                                         && (x.Mblno.IndexOf(criteria.Mawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Mawb))
+                                                                         && (x.JobNo.IndexOf(criteria.JobId, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.JobId))
+                                                                         && (x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1 || string.IsNullOrEmpty(criteria.Hawb))
+                                                                         && (x.Pod == criteria.Pod || criteria.Pod == null)
+                                                                         && (x.Pol == criteria.Pol || criteria.Pol == null)
+                                                                         && (x.SupplierId == criteria.CarrierId || criteria.CarrierId == null)
+                                                                         && (criteria.PersonInCharge.Contains(x.BillingOpsId) || string.IsNullOrEmpty(criteria.PersonInCharge))
+                                                                         && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator))
+                                                                         && (criteria.SalesMan.Contains(x.SalemanId) || string.IsNullOrEmpty(criteria.SalesMan));
+            if (hasSalesman)
+            {
+                queryOpsTrans = queryOpsTrans.And(x => (!string.IsNullOrEmpty(x.SalesOfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                && (!string.IsNullOrEmpty(x.SalesDepartmentId) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                && (!string.IsNullOrEmpty(x.SalesGroupId) || string.IsNullOrEmpty(criteria.GroupId)));
+            }
+            else
+            {
+                queryOpsTrans = queryOpsTrans.And(x => (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId))
+                                                && (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId))
+                                                && (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId)));
+            }
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
                 queryOpsTrans = queryOpsTrans.And(x => x.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && x.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date);
@@ -170,6 +176,11 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
             {
                 queryOpsTrans = queryOpsTrans.And(x => x.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date);
+            }
+            // Search Customer
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                queryOpsTrans = queryOpsTrans.And(x => !string.IsNullOrEmpty(x.CustomerId) && criteria.CustomerId.Contains(x.CustomerId));
             }
             var data = opsRepository.Get(queryOpsTrans);
             var shipmentList = new List<OpsTransaction>();
@@ -255,7 +266,7 @@ namespace eFMS.API.Documentation.DL.Services
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TypeOfService = item.TypeOfService != null? (item.TypeOfService.Contains("LCL")?"LCL": string.Empty): string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
+                    TypeOfService = item.TypeOfService != null ? (item.TypeOfService.Contains("LCL") ? "LCL" : string.Empty) : string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
                     //Shipper = item.ShipperDescription,
                     Shipper = catPartnerRepository.Get(x => x.Id == item.ShipperId).FirstOrDefault()?.PartnerNameEn, //CR: Get Shipper Name En [25-09-2020]
                     //Consignee = item.ConsigneeDescription,
@@ -274,7 +285,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //Tổng Amount Trước thuế của phí tick chon Kick Back
                 report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 var contInfo = GetContainer(containerData, null, item.HBLID);
-                if(contInfo != null)
+                if (contInfo != null)
                 {
                     report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
                     report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
@@ -290,13 +301,13 @@ namespace eFMS.API.Documentation.DL.Services
             // Search Customer
             if (!string.IsNullOrEmpty(criteria.CustomerId))
             {
-                queryTranDetail = x => x.CustomerId == criteria.CustomerId;
+                queryTranDetail = x => !string.IsNullOrEmpty(x.CustomerId) ? criteria.CustomerId.Contains(x.CustomerId) : true;
             }
             // Search Hawb
             if (!string.IsNullOrEmpty(criteria.Hawb))
             {
-                queryTranDetail = queryTranDetail == null ? (x => x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1)
-                                                        : queryTranDetail.And(x => x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1);
+                queryTranDetail = queryTranDetail == null ? (x => !string.IsNullOrEmpty(x.Hwbno) && x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1)
+                                                        : queryTranDetail.And(x => !string.IsNullOrEmpty(x.Hwbno) && x.Hwbno.IndexOf(criteria.Hawb, StringComparison.OrdinalIgnoreCase) > -1);
             }
             var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             if (hasSalesman)
@@ -359,11 +370,14 @@ namespace eFMS.API.Documentation.DL.Services
                                                                  && (x.Pod == criteria.Pod || criteria.Pod == null)
                                                                  && (x.Pol == criteria.Pol || criteria.Pol == null)
                                                                  && (x.ColoaderId == criteria.CarrierId || criteria.CarrierId == null)
-                                                                 && !hasSalesman ? (criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId)) : true
-                                                                 && !hasSalesman ? (criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId)) : true
-                                                                 && !hasSalesman ? (criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId)) : true
                                                                  && (criteria.PersonInCharge.Contains(x.PersonIncharge) || string.IsNullOrEmpty(criteria.PersonInCharge))
                                                                  && (criteria.Creator.Contains(x.UserCreated) || string.IsNullOrEmpty(criteria.Creator));
+            if (!hasSalesman)
+            {
+                queryTrans = queryTrans.And(x => criteria.OfficeId.Contains(x.OfficeId.ToString()) || string.IsNullOrEmpty(criteria.OfficeId)
+                                            && criteria.DepartmentId.Contains(x.DepartmentId.ToString()) || string.IsNullOrEmpty(criteria.DepartmentId)
+                                            && criteria.GroupId.Contains(x.GroupId.ToString()) || string.IsNullOrEmpty(criteria.GroupId));
+            }
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
                 queryTrans = queryTrans.And(x => x.TransactionType.Contains("E") ?
@@ -489,7 +503,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);//charge.FinalExchangeRate;
-                    
+
                     revenue += charge.Quantity * charge.UnitPrice * rate ?? 0;
                 }
             }
@@ -531,12 +545,12 @@ namespace eFMS.API.Documentation.DL.Services
                 var company = companyRepository.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
                 DateTime? dateFrom = null;
                 DateTime? dateTo = null;
-                if(criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
+                if (criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
                 {
                     dateFrom = criteria.CreatedDateFrom;
                     dateTo = criteria.CreatedDateTo;
                 }
-                else if(criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+                else if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
                 {
                     dateFrom = criteria.ServiceDateFrom;
                     dateTo = criteria.ServiceDateTo;
@@ -605,7 +619,7 @@ namespace eFMS.API.Documentation.DL.Services
         private List<string> GetCompanyManager(Guid? companyId)
         {
             var companyManager = userLevelRepository.Get(x => x.GroupId == 11
-                                                    && x.DepartmentId == null 
+                                                    && x.DepartmentId == null
                                                     && x.OfficeId == null
                                                     && x.CompanyId == companyId
                                                     && x.Position == "Manager-Leader")
@@ -620,6 +634,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<OpsTransaction> data = QueryOpsSaleReport(criteria);
             if (data == null) return null;
             results = new List<QuaterSaleReportResult>();
+            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             foreach (var item in data)
             {
                 string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
@@ -673,10 +688,10 @@ namespace eFMS.API.Documentation.DL.Services
                     _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                 }
                 #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
-
+                string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
                 var report = new QuaterSaleReportResult
                 {
-                    Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
+                    Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
                     ContactName = _contactName, // Sale Full Name
                     SalesManager = _saleManager, // Sale Manager
                     PartnerName = string.Empty,
@@ -721,7 +736,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
             if (shipments == null) return null;
             IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
-
+            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
             var data = (from shipment in shipments
                         join housebill in housebills on shipment.Id equals housebill.JobId
                         select new
@@ -747,7 +762,8 @@ namespace eFMS.API.Documentation.DL.Services
                             shipment.Etd,
                             housebill.OfficeId,
                             housebill.CompanyId,
-                            DepartmentIdHbl = housebill.DepartmentId
+                            DepartmentIdHbl = housebill.DepartmentId,
+                            housebill.SalesDepartmentId
                         });
             if (data == null) return null;
             var results = new List<QuaterSaleReportResult>();
@@ -804,10 +820,10 @@ namespace eFMS.API.Documentation.DL.Services
                     _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                 }
                 #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
-
+                string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
                 var report = new QuaterSaleReportResult
                 {
-                    Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
+                    Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
                     ContactName = _contactName, // Sale Full Name
                     SalesManager = _saleManager, // Sale Manager
                     PartnerName = string.Empty,
@@ -1015,7 +1031,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             csShipments = GetCsShipmentReport(criteria);
-            if(opsShipments == null)
+            if (opsShipments == null)
             {
                 if (csShipments == null)
                 {
@@ -1056,7 +1072,7 @@ namespace eFMS.API.Documentation.DL.Services
                             housebill.Cbm,
                             housebill.SaleManId,
                             shipment.TypeOfService
-                       
+
                         });
             if (data == null) return null;
 
@@ -1067,7 +1083,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var report = new SummarySaleReportResult
                 {
                     Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn,
-                 
+
                     PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
                     Description = GetShipmentTypeForPreviewPL(item.TransactionType),
                     Assigned = item.ShipmentType == "Nominated" ? true : false,
@@ -1092,7 +1108,7 @@ namespace eFMS.API.Documentation.DL.Services
                 // Share-Profit (Sử dụng hàm trên 28092020)
                 // report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
 
-                var contInfo = GetContainer(containerData,null,item.HBLID);
+                var contInfo = GetContainer(containerData, null, item.HBLID);
 
                 report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
                 report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
@@ -1165,7 +1181,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public Crystal PreviewSummarySaleReport(SaleReportCriteria criteria)
         {
-           IQueryable<SummarySaleReportResult> data = GetSummarySaleReport(criteria);
+            IQueryable<SummarySaleReportResult> data = GetSummarySaleReport(criteria);
 
             Crystal crystal = null;
 
@@ -1234,7 +1250,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             IQueryable<OpsTransaction> shipment = QueryOpsSaleReport(criteria);
             if (shipment == null) return null;
-            
+
             IQueryable<CatUnit> containerData = uniRepository.Get(x => x.UnitType == "Container");
 
             foreach (var item in shipment)

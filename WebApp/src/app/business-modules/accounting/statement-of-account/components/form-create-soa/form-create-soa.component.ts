@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { Charge, SOASearchCharge, User } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil, take, skip } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
@@ -11,6 +11,8 @@ import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService, SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserPermissionState } from '@store';
 
 @Component({
     selector: 'soa-form-create',
@@ -75,24 +77,67 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     numberOfShipment: number = 0;
     airlineCode: string = '';
 
+    userLogged: any;
+
+    staffTypes: any = [];
+    selectedStaffType: any = null;
+
     constructor(
         private _toastService: ToastrService,
         private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
         private _sysRepo: SystemRepo,
         private _sortService: SortService,
+        private _store: Store<IAppState>,
     ) {
         super();
     }
 
     ngOnInit() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.initBasicData();
+        this.getUserLevel();
         this.getPartner();
         this.getCurrency();
-        this.getUser();
+        //this.getUser();
         this.getCharge();
         this.getService();
         this.getCommondity();
+    }
+
+    getUserLevel() {
+        this._store.select(getMenuUserPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe), skip(1)) //* skip(1) - tránh case load 2 lần */
+            .subscribe((menuPermission: SystemInterface.IUserPermission) => {
+                if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
+                    console.log(menuPermission);
+                    if (menuPermission.detail !== 'None') {
+                        if (menuPermission.detail === 'All') {
+                            this.getUserLevelByType({});
+                        } else if (menuPermission.detail === 'Company') {
+                            this.getUserLevelByType({ type: 'company', companyId: this.userLogged.companyId });
+                        } else if (menuPermission.detail === 'Office') {
+                            this.getUserLevelByType({ type: 'office', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId });
+                        } else if (menuPermission.detail === 'Department') {
+                            this.getUserLevelByType({ type: 'department', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId });
+                        } else if (menuPermission.detail === 'Group') {
+                            this.getUserLevelByType({ type: 'group', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId });
+                        } else {
+                            this.getUserLevelByType({ type: 'owner', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId, userId: this.userLogged.id });
+                        }
+                    }
+                }
+            });
+    }
+
+    getUserLevelByType(body: any) {
+        this._sysRepo.getUserLevelByType(body).pipe(catchError(this.catchError))
+            .subscribe(
+                (dataUser: any) => {
+                    this.getCurrencyUser(dataUser);
+                    console.log(dataUser)
+                },
+            );
     }
 
     getCommondity() {
@@ -140,8 +185,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCurrencyUser(data: any) {
-        this.users = (data || []).map((item: User) => ({ id: item.id, text: item.username }));
-
+        //this.users = (data || []).map((item: User) => ({ id: item.id, text: item.username }));
+        this.users = (data || []).map((item: any) => ({ id: item.userId, text: item.userName })).filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct Users
         const userLogged: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.selectedUser = [this.users.filter((i: CommonInterface.INg2Select) => i.text.toLowerCase() === userLogged.userName.toLowerCase())[0]];
 
@@ -163,6 +208,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                         this.services.unshift({ id: 'All', text: 'All' });
 
                         this.selectedService = [this.services[0].id];
+
+                        /* */
+                        this.dataSearch.strServices = this.services.filter(service => service.id !== 'All').map(service => service.id).toString();
+                        this.dataSearch.serviceTypeId = this.dataSearch.strServices.replace(/(?:,)/g, ';');
                     } else {
                         this.handleError(null, (data) => {
                             this._toastService.error(data.message, data.title);
@@ -227,7 +276,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.dateModes = [
             { title: 'Created Date', value: 'CreatedDate' },
             { title: 'Service Date', value: 'ServiceDate' },
-            { title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' },
+            //{ title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' }, //Bỏ ra [20/01/2021]
         ];
         this.selectedDateMode = this.dateModes[1];
 
@@ -243,6 +292,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             { title: 'No', value: false }
         ];
         this.selectedObh = this.obhs[0];
+
+        this.staffTypes = [
+            { value: 'PersonInCharge', title: 'Person In Charge' },
+            { value: 'Salesman', title: 'Salesman' },
+            { value: 'Creator', title: 'Creator' }
+        ];
+        this.selectedStaffType = this.staffTypes[0];
+
         this.updateDataSearch('isOBH', this.selectedObh.value);
         this.updateDataSearch('dateType', this.selectedDateMode.value);
         this.updateDataSearch('type', this.selectedType.value);
@@ -271,6 +328,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.selectedObh = data;
                 this.updateDataSearch('isOBH', this.selectedObh.value);
                 break;
+            case 'staff-style':
+                this.selectedStaffType = data;
+                this.updateDataSearch('staffType', this.selectedStaffType.value);
+                break;
             case 'currency':
                 this.selectedCurrency = data;
                 this.updateDataSearch('currency', this.selectedCurrency.id);
@@ -285,8 +346,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.selectedService = [...this.selectedService, 'All'];
                     this.configCharge.dataSource = [...this.charges];
 
-                    this.updateDataSearch('serviceTypeId', "");
-
+                    this.updateDataSearch('serviceTypeId', this.services.filter(service => service.id !== 'All').map(service => service.id).toString().replace(/(?:,)/g, ';'));
+                    this.updateDataSearch('strServices', this.services.filter(service => service.id !== 'All').map(service => service.id).toString());
                 } else {
                     this.detectServiceWithAllOption(data.id);
 
@@ -295,6 +356,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.configCharge.dataSource = [...this.configCharge.dataSource, new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' })];
 
                     this.updateDataSearch('serviceTypeId', this.selectedService.toString().replace(/(?:,)/g, ';'));
+                    this.updateDataSearch('strServices', this.selectedService.toString());
                 }
 
                 break;
@@ -366,16 +428,17 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 type: this.selectedType.value,
                 isOBH: this.selectedObh.value,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
-                strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
+                strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
                 note: this.note,
-                serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0]) : this.mapServiceId('All'),
+                serviceTypeId: this.selectedService[0] === 'All' ? this.services.filter(service => service.id !== 'All').map(service => service.id).toString().replace(/(?:,)/g, ';') : this.selectedService.toString().replace(/(?:,)/g, ';'),
                 commodityGroupId: !!this.commodity ? this.commodity.id : null,
                 strServices: this.selectedService[0] === 'All' ? this.services.filter(service => service.id !== 'All').map(service => service.id).toString() : this.selectedService.toString(),
                 jobIds: this.mapShipment("JOBID"),
                 hbls: this.mapShipment("HBL"),
                 mbls: this.mapShipment("MBL"),
                 customNo: this.mapShipment("CustomNo"),
-                airlineCode: this.airlineCode
+                airlineCode: this.airlineCode,
+                staffType: this.selectedStaffType.value
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);

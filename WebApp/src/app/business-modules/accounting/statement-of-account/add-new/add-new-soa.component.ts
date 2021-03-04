@@ -51,6 +51,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
+            { title: 'No.', field: '', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
@@ -72,7 +73,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
         if (this.formCreate.isApplied && !this.formCreate.selectedRangeDate.startDate || !this.formCreate.selectedPartner.value) {
             return;
         } else {
-            this.addChargePopup.searchInfo = this.dataSearch;
+            this.dataSearch = this.formCreate.dataSearch;
+            this.addChargePopup.searchInfo = this.formCreate.dataSearch;
             this.addChargePopup.getListShipmentAndCDNote(this.formCreate.dataSearch);
 
             this.addChargePopup.charges = this.formCreate.charges;
@@ -114,12 +116,13 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currency: this.dataSearch.currency,
                 note: this.dataSearch.note,
                 dateType: this.dataSearch.dateType,
-                serviceTypeId: !!this.formCreate.selectedService.length ? this.formCreate.mapServiceId(this.formCreate.selectedService[0].id) : this.formCreate.mapServiceId('All'),
+                serviceTypeId: this.dataSearch.serviceTypeId,
                 customer: this.dataSearch.customerID,
                 type: this.dataSearch.type,
                 obh: this.dataSearch.isOBH,
                 creatorShipment: this.dataSearch.strCreators,
-                commodityGroupId: this.dataSearch.commodityGroupId
+                commodityGroupId: this.dataSearch.commodityGroupId,
+                staffType: this.dataSearch.staffType
             };
             this._progressRef.start();
             this._accountRepo.createSOA(body)
@@ -131,10 +134,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     (res: any) => {
                         if (res.status) {
                             this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
-
-                            // Tính công nợ
-                            this.calculatorReceivable(this.listCharges);
-
                             //  * go to detail page
                             this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail`], { queryParams: { no: res.data.soano, currency: 'VND' } });
 

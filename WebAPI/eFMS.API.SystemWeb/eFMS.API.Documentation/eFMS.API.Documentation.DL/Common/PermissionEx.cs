@@ -22,7 +22,9 @@ namespace eFMS.API.Documentation.DL.Common
                 case PermissionRange.Owner:
                     if (model.BillingOpsId == currentUser.UserID 
                         || model.SaleManId == currentUser.UserID
-                        || authorizeUserIds.Contains(model.BillingOpsId))
+                        || authorizeUserIds.Contains(model.BillingOpsId)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
@@ -34,7 +36,10 @@ namespace eFMS.API.Documentation.DL.Common
                             && model.DepartmentId == currentUser.DepartmentId
                             && model.OfficeId == currentUser.OfficeID
                             && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.BillingOpsId))
+                        || authorizeUserIds.Contains(model.BillingOpsId)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        || model.Groups.Any(x => model.SalemanIds.Contains(x))
+                        )
                     {
                         code = 200;
                     }
@@ -45,6 +50,8 @@ namespace eFMS.API.Documentation.DL.Common
                         || (model.DepartmentId == currentUser.DepartmentId 
                             && model.OfficeId == currentUser.OfficeID 
                             && model.CompanyId == currentUser.CompanyID)
+                        || model.Departments.Any(x => model.SalemanIds.Contains(x))
+                        || model.SalemanIds.Contains(currentUser.UserID)
                         || authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 200;
@@ -55,7 +62,9 @@ namespace eFMS.API.Documentation.DL.Common
                         || model.SaleManId == currentUser.UserID
                         || (model.OfficeId == currentUser.OfficeID 
                             && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.BillingOpsId))
+                        || authorizeUserIds.Contains(model.BillingOpsId)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
@@ -64,7 +73,9 @@ namespace eFMS.API.Documentation.DL.Common
                     if (model.BillingOpsId == currentUser.UserID
                         || model.SaleManId == currentUser.UserID
                         || model.CompanyId == currentUser.CompanyID
-                        || authorizeUserIds.Contains(model.BillingOpsId))
+                        || authorizeUserIds.Contains(model.BillingOpsId)
+                        || model.SalemanIds.Contains(currentUser.UserID)
+                        )
                     {
                         code = 200;
                     }
@@ -294,7 +305,7 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
                 case PermissionRange.Owner:
                     if (model.SaleManId == currentUser.UserID
-                        || authorizeUserIds.Contains(model.SaleManId)
+                        || authorizeUserIds.Contains(model.UserCreated)
                         || model.UserCreated == currentUser.UserID
                         || model.SaleManId == currentUser.UserID)
                     {
@@ -306,7 +317,7 @@ namespace eFMS.API.Documentation.DL.Common
                         && model.DepartmentId == currentUser.DepartmentId
                         && model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.SaleManId)
+                        || authorizeUserIds.Contains(model.UserCreated)
                         || model.UserCreated == currentUser.UserID
                         || model.SaleManId == currentUser.UserID
                         || model.Groups.Contains(model.SaleManId)
@@ -319,7 +330,7 @@ namespace eFMS.API.Documentation.DL.Common
                     if ((model.DepartmentId == currentUser.DepartmentId
                         && model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.SaleManId)
+                        || authorizeUserIds.Contains(model.UserCreated)
                         || model.UserCreated == currentUser.UserID
                         || model.SaleManId == currentUser.UserID
                         || model.Departments.Contains(model.SaleManId)
@@ -331,7 +342,7 @@ namespace eFMS.API.Documentation.DL.Common
                 case PermissionRange.Office:
                     if ((model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
-                        || authorizeUserIds.Contains(model.SaleManId)
+                        || authorizeUserIds.Contains(model.UserCreated)
                         || model.UserCreated == currentUser.UserID
                         || model.SaleManId == currentUser.UserID)
                     {
@@ -340,7 +351,7 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
                 case PermissionRange.Company:
                     if (model.CompanyId == currentUser.CompanyID
-                        || authorizeUserIds.Contains(model.SaleManId)
+                        || authorizeUserIds.Contains(model.UserCreated)
                         || model.UserCreated == currentUser.UserID
                         || model.SaleManId == currentUser.UserID)
                     {

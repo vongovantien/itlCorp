@@ -30,8 +30,10 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsRepo;
         private readonly IContextBase<SysUser> userRepo;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
+        readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
         private readonly IUnlockRequestApproveService unlockRequestApproveService;
         readonly IUserBaseService userBaseService;
+        private string typeApproval = "Unlock Shipment";
 
         public UnlockRequestService(
             IContextBase<SetUnlockRequest> repository,
@@ -47,6 +49,7 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<CustomsDeclaration> customs,
             IContextBase<SysUser> sysUser,
             IContextBase<CsShipmentSurcharge> surcharge,
+            IContextBase<SysAuthorizedApproval> authourizedApproval,
             IUnlockRequestApproveService unlockRequestApprove,
             IUserBaseService userBase) : base(repository, mapper)
         {
@@ -63,6 +66,7 @@ namespace eFMS.API.Setting.DL.Services
             surchargeRepo = surcharge;
             unlockRequestApproveService = unlockRequestApprove;
             userBaseService = userBase;
+            authourizedApprovalRepo = authourizedApproval;
         }
 
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
@@ -426,6 +430,11 @@ namespace eFMS.API.Setting.DL.Services
             var permissionRangeRequester = GetPermissionRangeOfRequester();
             var unlockRequests = DataContext.Get();
             var unlockRequestAprs = setUnlockRequestApproveRepo.Get(x => x.IsDeny == false);
+            var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
+            var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
+
+            var userCurrent = userRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+
             var data = from unlockRequest in unlockRequests
                        join unlockRequestApr in unlockRequestAprs on unlockRequest.Id equals unlockRequestApr.UnlockRequestId into unlockRequestApr2
                        from unlockRequestApr in unlockRequestApr2.DefaultIfEmpty()
@@ -458,7 +467,8 @@ namespace eFMS.API.Setting.DL.Services
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Leader == currentUser.UserID
                   || x.unlockRequestApr.LeaderApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Leader, x.unlockRequest.GroupId, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  //|| userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Leader, x.unlockRequest.GroupId, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.unlockRequestApr.Leader && w.OfficeCommissioner == x.unlockRequest.OfficeId).Any()
                 )
                 && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
@@ -471,9 +481,9 @@ namespace eFMS.API.Setting.DL.Services
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Manager == currentUser.UserID
                   || x.unlockRequestApr.ManagerApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Manager, null, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  //|| userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Manager, null, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.unlockRequestApr.Manager && w.OfficeCommissioner == x.unlockRequest.OfficeId).Any()
                   )
-                // && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
@@ -485,32 +495,35 @@ namespace eFMS.API.Setting.DL.Services
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Accountant == currentUser.UserID
                   || x.unlockRequestApr.AccountantApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                    //|| userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                    || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.unlockRequestApr.Accountant && w.OfficeCommissioner == x.unlockRequest.OfficeId).Any()
+                    || isAccountantDept
                   )
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
                 && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Buhead == currentUser.UserID
                   || x.unlockRequestApr.BuheadApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Buhead ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  //|| userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Buhead ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  || authorizedApvList.Where(w => w.Commissioner == currentUser.UserID && w.Authorizer == x.unlockRequestApr.Buhead && w.OfficeCommissioner == x.unlockRequest.OfficeId).Any()
                   )
-                // && x.unlockRequest.GroupId == currentUser.GroupId
-                // && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
-                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Accountant) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED : true)
                 && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
-                ) //BOD AND DEPUTY OF BOD                
+                ) //BOD AND DEPUTY OF BOD    
+                ||
+                (
+                 //userBaseService.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId) // Is User Admin
+                 (userCurrent.UserType == "Super Admin" || (userCurrent.UserType == "Local Admin" && currentUser.OfficeID == x.unlockRequest.OfficeId && currentUser.CompanyID == x.unlockRequest.CompanyId))
+                 &&
+                 (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //[CR: 22/02/2021]
             ).Select(s => s.unlockRequest);
 
             return result;

@@ -20,10 +20,12 @@ namespace eFMS.API.Setting.DL.IService
         bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId);
         SysSettingFlow GetSettingFlowUnlock(string type, Guid? officeId);
         string GetRoleByLevel(string level, string type, Guid? officeId);
-        List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer);
+        List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer, Guid? officeCommissioner);
         bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
         List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
         List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
         bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        bool CheckIsAccountantByOfficeDept(Guid? officeId, int? deptId);
+        bool CheckIsUserAdmin(string currUserId, Guid currOfficeId, Guid currCompanyId, Guid? objOfficeId, Guid? objCompanyId);
     }
 }

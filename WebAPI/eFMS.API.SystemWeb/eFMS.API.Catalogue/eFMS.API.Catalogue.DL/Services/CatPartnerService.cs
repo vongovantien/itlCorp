@@ -44,8 +44,9 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        private readonly IContextBase<CatPartnerEmail> catpartnerEmailRepository;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IOptions<ApiUrl> ApiUrl;
-
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -64,6 +65,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatDepartment> catDepartmentRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<CatPartnerEmail> emailRepo,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -81,6 +84,8 @@ namespace eFMS.API.Catalogue.DL.Services
             catDepartmentRepository = catDepartmentRepo;
             userlevelRepository = userlevelRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
+            catpartnerEmailRepository = emailRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
             ApiUrl = apiurl;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -133,26 +138,43 @@ namespace eFMS.API.Catalogue.DL.Services
 
                             if (hsContract.Success)
                             {
-                                foreach (var item in entity.Contracts)
+                                if(partner.IsRequestApproval == true)
                                 {
-                                    if (item.IsRequestApproval == true)
+                                    foreach (var item in entity.Contracts)
                                     {
-                                        entity.ContractService = item.SaleService;
                                         entity.ContractType = item.ContractType;
                                         entity.SalesmanId = item.SaleManId;
                                         entity.UserCreated = partner.UserCreated;
+                                        entity.ContractService = GetContractServicesName(item.SaleService);
+                                        entity.ContractNo = item.ContractNo;
                                         SendMailRequestApproval(entity);
                                     }
                                 }
+                              
                             }
 
                         }
-                        SendMailCreatedSuccess(partner);
+                        if (entity.PartnerEmails.Count > 0)
+                        {
+                            var emails = mapper.Map<List<CatPartnerEmail>>(entity.PartnerEmails);
+                            emails.ForEach(x =>
+                            {
+                                x.Id = Guid.NewGuid();
+                                x.PartnerId = partner.Id;
+                                x.DatetimeCreated = DateTime.Now;
+                                x.UserCreated = x.UserModified = currentUser.UserID;
+                            });
+                            var hsEmail = catpartnerEmailRepository.Add(emails);
+                        }
+                        trans.Commit();
+                        if (partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
+                        {
+                            SendMailCreatedSuccess(partner);
+                        }
                     }
                     ClearCache();
                     Get();
                     var result = hsTransPartner;
-                    trans.Commit();
                     return new { model = partner, result };
                 }
                 catch (Exception ex)
@@ -213,6 +235,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var creatorObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             string address = webUrl.Value.Url + "/en/#/" + "home/catalogue/partner-data/detail/" + partner.Id;
             subject = "Reject Partner - " + partner.PartnerNameVn;
@@ -231,10 +254,10 @@ namespace eFMS.API.Catalogue.DL.Services
                   "</br>"
                   + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
 
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            string UrlImage = UrlClone.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", UrlImage.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-            List<string> lstCc = ListMailCC();
+            List<string> lstCc = ListMailBCC();
             List<string> lstTo = new List<string>();
 
             lstTo.Add(creatorObj?.Email);
@@ -260,15 +283,27 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
+
+            string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
             List<string> lstTo = new List<string>();
+            List<string> lstToAcc = new List<string>();
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAccoutant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null && listEmailAR.Any())
             {
                 lstTo = listEmailAR.Split(";").ToList();
             }
+
+            if (listEmailAccoutant != null && listEmailAccoutant.Any())
+            {
+                lstToAcc = listEmailAccoutant.Split(";").ToList(); 
+            }
+
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoSalesman = sysEmployeeRepository.Get(e => e.Id == employeeIdSalemans)?.FirstOrDefault();
@@ -287,6 +322,9 @@ namespace eFMS.API.Catalogue.DL.Services
             string body = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
 
+            string title = string.Empty;
+            title = partner.PartnerType == "Customer" ? "Customer" : "Agent";
+
 
             linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
             linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
@@ -294,7 +332,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
-              "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
+              "<i> You have a " + title +" Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
               "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
 
               "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
@@ -311,14 +349,19 @@ namespace eFMS.API.Catalogue.DL.Services
               "<b> eFMS System, </b>" +
               "</br>"
               + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            string urlImage = UrlClone.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", urlImage + "/ReportPreview/Images/logo-eFMS.png");
 
-            List<string> lstCc = ListMailCC();
-
+            List<string> lstBCc = ListMailBCC();
+            List<string> lstCc = new List<string>();
             lstCc.Add(objInfoSalesman?.Email);
-
-            bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
+            lstCc.Add(objInfoCreator?.Email);
+            lstCc.Add(objInfoModified?.Email);
+            if (lstToAcc.Any())
+            {
+                lstTo.AddRange(lstToAcc);
+            }
+            bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
             {
@@ -342,21 +385,21 @@ namespace eFMS.API.Catalogue.DL.Services
             string url = string.Empty;
             List<string> lstToAR = new List<string>();
             List<string> lstToAccountant = new List<string>();
-            List<string> lstCc = ListMailCC();
+            List<string> lstCc = ListMailBCC();
             List<string> lstCcCreator = new List<string>();
-
+            string UrlClone = string.Copy(ApiUrl.Value.Url);
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
             var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null && listEmailAR.Any())
             {
-                lstToAR = listEmailAR.Split(";").ToList();
+                lstToAR = listEmailAR.Split(";").Select(x => x.ToLower().Trim()).ToList();
             }
 
             if (listEmailAccountant != null && listEmailAccountant.Any())
             {
-                lstToAccountant = listEmailAccountant.Split(";").ToList();
+                lstToAccountant = listEmailAccountant.Split(";").Select(x => x.ToLower().Trim()).ToList();
             }
 
             switch (partner.PartnerType)
@@ -388,8 +431,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "<b> eFMS System, </b>" + "</br>" +
                 "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-            ApiUrl.Value.Url = ApiUrl.Value.Url.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", ApiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            var urlTo = UrlClone.Replace("Catalogue", "");
+            body = body.Replace("[logoEFMS]", urlTo.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             lstCcCreator.Add(infoCreatetor?.Email);
             bool resultSenmail = false;
             if ((partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
@@ -407,6 +450,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (partner.PartnerType == "Customer" || partner.PartnerType == "Agent")
             {
                 lstToAccountant.AddRange(lstToAR);
+                lstToAccountant = lstToAccountant.Where(x => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrEmpty(x)).Distinct().ToList();
                 if (lstToAccountant.Any())
                 {
                     resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, lstCcCreator, lstCc);
@@ -429,7 +473,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return resultSenmail;
         }
 
-        private List<string> ListMailCC()
+        private List<string> ListMailBCC()
         {
             List<string> lstCc = new List<string>
             {
@@ -492,7 +536,7 @@ namespace eFMS.API.Catalogue.DL.Services
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
 
-            if (model.Contracts.Count > 0)
+            if (model.Contracts?.Count > 0)
             {
                 entity.SalePersonId = model.Contracts.FirstOrDefault().SaleManId.ToString();
             }
@@ -540,7 +584,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             if (!string.IsNullOrEmpty(id))
             {
-                if (transactionDetailRepository.Any(x => x.CustomerId == id))
+                var partner = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                var existClearance = customsDeclarationRepository.Any(x => (x.AccountNo ?? "").Contains(partner.AccountNo) || x.PartnerTaxCode.Contains(partner.TaxCode));
+                if (transactionDetailRepository.Any(x => x.CustomerId == id) || existClearance)
                 {
                     return new HandleState("This partner is already in use so you can not delete it");
                 }
@@ -829,7 +875,15 @@ namespace eFMS.API.Catalogue.DL.Services
                     _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
                     break;
             }
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            var permissionRange = new PermissionRange();
+            if (_user.UserMenuPermission == null)
+            {
+                permissionRange = PermissionRange.None;
+            }
+            else
+            {
+                permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            }
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
             if (code == 403) return new HandleState(403, "");
             return new HandleState();
@@ -894,6 +948,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var agreementData = contractRepository.Get();
             string salemans = string.IsNullOrEmpty(criteria.Saleman) ? criteria.All : criteria.Saleman;
             string SalemanId = sysUsers.Where(x => x.Username == salemans).Select(t => t.Id).FirstOrDefault();
+
+            string ContractType = string.IsNullOrEmpty(criteria.ContractType) ? criteria.All : criteria.ContractType.Trim();
             ClearCache();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             if (partners == null) return null;
@@ -902,7 +958,8 @@ namespace eFMS.API.Catalogue.DL.Services
                          join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user, partner, x  }
+                         join agreement in agreementData on partner.Id equals agreement.PartnerId into agreements
+                         select new { user, partner, x, agreements }
                         );
             if (string.IsNullOrEmpty(criteria.All))
             {
@@ -922,14 +979,21 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (!string.IsNullOrEmpty(SalemanId))
                 {
-                    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                    query = query.Where(x => x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
                 }
                 else if (!string.IsNullOrEmpty(criteria.Saleman))
                 {
                     query = null;
                 }
+                if (!string.IsNullOrEmpty(ContractType))
+                {
+                    query = query.Where(x => x.agreements.Any(y => y.ContractType.ToLower().Contains(ContractType.ToLower())));
+                }
+                else if (!string.IsNullOrEmpty(criteria.ContractType))
+                {
+                    query = null;
+                }
             }
-
             else
             {
                 query = query.Where(x =>
@@ -943,14 +1007,15 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                        //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id)))
+                           //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
+                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId))
+                           || x.agreements.Any(y => y != null && y.ContractType.ToLower().Contains(ContractType.ToLower()))
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
                 //if (!string.IsNullOrEmpty(SalemanId))
                 //{
-                //    query = query.Where(x => (contractRepository.Any(y => y.SaleManId.Equals(SalemanId) && y.PartnerId.Equals(x.partner.Id))));
+                //    query = query.Where(x => x.agreements.Any(y => y.SaleManId == SalemanId));
                 //}
 
             }
@@ -995,7 +1060,20 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             List<CatContract> salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
 
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            ICurrentUser _user = null;
+            switch (queryDetail.PartnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+                    break;
+            }
+
             PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             PermissionRange permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int checkDelete = GetPermissionToDelete(new ModelUpdate { GroupId = queryDetail.GroupId, OfficeId = queryDetail.OfficeId, CompanyId = queryDetail.CompanyId, UserCreator = queryDetail.UserCreated, Salemans = salemans, PartnerGroup = queryDetail.PartnerGroup }, permissionRangeDelete);
@@ -1730,6 +1808,60 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         #endregion
 
+        private string GetContractServicesName(string ContractService)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ContractService.Split(";").ToArray();
+            if (ContractServiceArr.Any())
+            {
+                foreach (var item in ContractServiceArr)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export; ";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import; ";
+                            break;
+                        case "SCE":
+                            ContractServicesName += "Sea Consol Export; ";
+                            break;
+                        case "SCI":
+                            ContractServicesName += "Sea Consol Import; ";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export; ";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export; ";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import; ";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic; ";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking; ";
+                            break;
+                        case "SFI":
+                            ContractServicesName += "Sea FCL Import; ";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            break;
+                    }
+                }
+
+            }
+            if (!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+            }
+            return ContractServicesName;
+        }
+
         public IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup)
         {
             ClearCache();
@@ -1785,8 +1917,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo
-            });
-            return results;
+            }).ToList();
+            results.ForEach(item => item.TaxCodeAbbrName = item.TaxCode + " - " + item.ShortName);
+            return results.AsQueryable();
         }
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
@@ -1817,8 +1950,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo
-            });
-            return results;
+            }).ToList();
+            results.ForEach(item => item.TaxCodeAbbrName = item.TaxCode + " - " + item.ShortName);
+            return results.AsQueryable();
         }
 
         /// <summary>
@@ -1857,6 +1991,41 @@ namespace eFMS.API.Catalogue.DL.Services
                 results.Add(item);
             }
             return results;
+        }
+
+        /// <summary>
+        /// Update info for partner
+        /// </summary>
+        /// <param name="model">CatPartnerModel</param>
+        /// <returns></returns>
+        public HandleState UpdatePartnerData(CatPartnerModel model)
+        {
+            var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            var entity = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+
+            if (entity == null) return new HandleState(403, "");
+            int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = entity.PartnerGroup }, permissionRange, null);
+            if (code == 403) return new HandleState(403, "");
+
+            var userUpdated = userlevelRepository.Get(x => x.UserId == model.UserCreated && x.CompanyId == model.CompanyId && x.OfficeId == model.OfficeId && x.GroupId == model.GroupId).FirstOrDefault();
+            if (userUpdated == null)
+            {
+                return new HandleState(false, "Update false, Please try again.");
+            }
+            entity.UserCreated = userUpdated.UserId; // change creator
+            entity.CompanyId = userUpdated.CompanyId;
+            entity.OfficeId = userUpdated.OfficeId;
+            entity.DepartmentId = userUpdated.DepartmentId;
+            entity.GroupId = userUpdated.GroupId;
+            var hs = DataContext.Update(entity, x => x.Id == model.Id);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
+            return hs;
         }
     }
 }

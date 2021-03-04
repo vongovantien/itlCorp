@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -10,6 +9,10 @@ using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 
@@ -131,6 +134,23 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Preview CD Note (OPS) Combine
+        /// </summary>
+        /// <param name="model">AcctCDNoteDetailsModel List</param>
+        /// <param name="isOrigin">Is Preview with Original</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewOpsCdNoteList")]
+        public IActionResult PreviewOpsCdNoteList(object model, bool isOrigin)
+        {
+            var data = JsonConvert.SerializeObject(model, Formatting.Indented);
+            List<AcctCdnoteModel> acctCdNoteList = JsonConvert.DeserializeObject<List<AcctCdnoteModel>>(data);
+            var cdNoteModel = cdNoteServices.GetDataPreviewCDNotes(acctCdNoteList);
+            var result = cdNoteServices.Preview(cdNoteModel, isOrigin);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Data Export Details CD Note
         /// </summary>
         /// <param name="jobId"></param>
@@ -141,8 +161,38 @@ namespace eFMS.API.Documentation.Controllers
         [Route("ExportOpsCdNote")]
         public IActionResult ExportOpsCdNote(Guid jobId, string cdNo, Guid officeId)
         {
-            var data = cdNoteServices.GetDataExportOpsCDNote(jobId, cdNo, officeId);
+            var cdNoteDetail = cdNoteServices.GetCDNoteDetails(jobId, cdNo);
+            var data = cdNoteServices.GetDataExportOpsCDNote(cdNoteDetail, officeId);
             return Ok(data);
+        }
+
+        /// <summary>
+        /// Export Excel Template of OPS CD Note Combine
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ExportOpsCdNoteCombine")]
+        public IActionResult ExportOpsCdNoteCombine(object model)
+        {
+            var cdData = JsonConvert.SerializeObject(model, Formatting.Indented);
+            List<AcctCdnoteModel> acctCdNoteList = JsonConvert.DeserializeObject<List<AcctCdnoteModel>>(cdData);
+            var cdNoteDetail = cdNoteServices.GetDataPreviewCDNotes(acctCdNoteList);
+            var data = cdNoteServices.GetDataExportOpsCDNote(cdNoteDetail, (Guid)cdNoteDetail.CDNote.OfficeId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Preview CD Note Local and USD currency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewOPSCDNoteWithCurrency")]
+        public IActionResult PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria)
+        {
+            var result = cdNoteServices.PreviewOPSCDNoteWithCurrency(criteria);
+            return Ok(result);
         }
 
         /// <summary>
@@ -165,7 +215,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("PreviewSIFCdNote")]
         public IActionResult PreviewSIFCdNote(PreviewCdNoteCriteria criteria)
         {
-            var result = cdNoteServices.PreviewSIF(criteria);
+            var data = cdNoteServices.GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
+            var result = cdNoteServices.PreviewSIF(data, criteria.Currency);
             return Ok(result);
         }
 
@@ -178,8 +229,37 @@ namespace eFMS.API.Documentation.Controllers
         [Route("PreviewAirCdNote")]
         public IActionResult PreviewAirCdNote(PreviewCdNoteCriteria criteria)
         {
-            var result = cdNoteServices.PreviewAir(criteria);
+            var data = cdNoteServices.GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
+            var result = cdNoteServices.PreviewAir(data, criteria.Currency);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Preview CD Note (OPS) Combine
+        /// </summary>
+        /// <param name="model">AcctCDNoteDetailsModel List</param>
+        /// <param name="currency"></param>
+        /// <param name="service"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewASCdNoteList")]
+        public IActionResult PreviewASCdNoteList(object model, string currency, string service)
+        {
+            var data = JsonConvert.SerializeObject(model, Formatting.Indented);
+            List<AcctCdnoteModel> acctCdNoteList = JsonConvert.DeserializeObject<List<AcctCdnoteModel>>(data);
+            var jobId = acctCdNoteList.FirstOrDefault() == null ? Guid.Empty : acctCdNoteList.FirstOrDefault().JobId;
+            var cdNoteModel = cdNoteServices.GetCDNoteDetails(jobId, string.Empty, acctCdNoteList);
+            if (service == DocumentConstants.AI_SHIPMENT)
+            {
+                var result = cdNoteServices.PreviewAir(cdNoteModel, currency);
+                return Ok(result);
+            }
+            else
+            {
+                var result = cdNoteServices.PreviewSIF(cdNoteModel, currency);
+                return Ok(result);
+            }
+            
         }
 
         /// <summary>

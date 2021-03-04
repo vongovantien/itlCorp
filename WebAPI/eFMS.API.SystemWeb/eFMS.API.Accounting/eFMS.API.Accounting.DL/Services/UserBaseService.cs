@@ -163,53 +163,7 @@ namespace eFMS.API.Accounting.DL.Services
             var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.Id == deptId).Any();
             return isAccountantDept;
         }
-
-        //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead dựa vào dept
-        public List<string> GetListUserDeputyByDept(string dept)
-        {
-            Dictionary<string, string> listUsers = new Dictionary<string, string> {
-                 { "7569a3ec-7d1c-41a6-9b02-79f7d13f0dc8", AccountingConstants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
-                 { "bc34e764-2fc3-4d7c-9d5e-7c6dc56a208f", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "5983f430-dc42-4276-8997-4c1fec1fa739", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-
-                 { "9945b553-1461-4cdd-8686-be4894736f58", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "3b46e144-469f-46b0-b514-0efd181ed840", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "81a2abcf-3b1a-4892-909d-604c23667b7d", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "197f66bf-f0a1-4449-9c25-a202ae50e8f9", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "ce7a4c55-a52c-4d55-8fed-e60ba68d75e5", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "850e6069-b5ea-4ab4-8864-a2332237b148", AccountingConstants.DEPT_CODE_ACCOUNTANT }, //User ủy quyền cho dept Accountant
-                 { "5a9f3b02-a105-4189-ab9e-0606bd089314", AccountingConstants.DEPT_CODE_ACCOUNTANT } //User ủy quyền cho dept Accountant
-            };
-            var list = listUsers.ToList();
-            var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();
-            return deputy;
-        }
-
-        public bool CheckDeputyManagerByUser(int? departmentId, string userId)
-        {
-            var result = false;
-            //Lấy ra dept code của user dựa vào user
-            var deptCodeOfUser = GetInfoDeptOfUser(departmentId)?.Code;
-            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptCodeOfUser != AccountingConstants.DEPT_CODE_ACCOUNTANT)
-            {
-                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(userId) ? true : false;
-            }
-            return result;
-        }
-
-        public bool CheckDeputyAccountantByUser(int? departmentId, string userId)
-        {
-            var result = false;
-            //Lấy ra dept code của user dựa vào user
-            var deptCodeOfUser = GetInfoDeptOfUser(departmentId)?.Code;
-            var deptTypeOfDept = GetInfoDeptOfUser(departmentId)?.DeptType;
-            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptTypeOfDept == AccountingConstants.DeptTypeAccountant)
-            {
-                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(userId) ? true : false;
-            }
-            return result;
-        }
-
+        
         public bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId)
         {
             var isBod = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
@@ -256,9 +210,9 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- SETTING FLOW APPROVAL ---
 
         #region --- AUTHORIZED APPROVAL ---
-        public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer)
+        public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer, Guid? officeCommissioner)
         {
-            var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
+            var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && x.OfficeCommissioner == officeCommissioner && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
             return userAuthorizedApprovals;
         }
         #endregion  --- AUTHORIZED APPROVAL ---
@@ -286,15 +240,11 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var userDeputies = new List<string>();
             if (string.IsNullOrEmpty(userId)) return userDeputies;
-            //Get list user authorized of user
-            var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(type, userId);
+            //Get list user authorized of user by type & office
+            var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(type, userId, officeId);
             foreach (var userAuth in userAuthorizedApprovals)
             {
-                //var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
-                //if (isSame)
-                {
-                    userDeputies.Add(userAuth);
-                }
+                userDeputies.Add(userAuth);
             }
             return userDeputies;
         }
@@ -317,8 +267,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public bool CheckIsUserDeputy(string type, string commissioner, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
-            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId).Where(x => x == commissioner);
-            return deputies.Any();
+            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId).Any(x => x == commissioner);
+            return deputies;
         }
 
         #endregion -- DEPUTY USER --
@@ -334,6 +284,36 @@ namespace eFMS.API.Accounting.DL.Services
                                                            && x.Id == deptId 
                                                            && x.BranchId == officeId).Any();
             return isDeptAccountant;
+        }
+
+        /// <summary>
+        /// Check is User Admin
+        /// </summary>
+        /// <param name="currUserId">ID of Current User</param>
+        /// <param name="currOfficeId">Office ID of Current User</param>
+        /// <param name="currCompanyId">Company ID of Current User</param>
+        /// <param name="objOfficeId">Office ID of Object</param>
+        /// <param name="objCompanyId">Company ID of Object</param>
+        /// <returns></returns>
+        public bool CheckIsUserAdmin(string currUserId, Guid currOfficeId, Guid currCompanyId, Guid? objOfficeId, Guid? objCompanyId)
+        {
+            var result = false;
+            var user = DataContext.Get(x => x.Id == currUserId).FirstOrDefault();
+            if (user != null)
+            {
+                if (user.UserType == "Super Admin")
+                {
+                    result = true;
+                }
+                if (objOfficeId != null && objCompanyId != null)
+                {
+                    if (user.UserType == "Local Admin" && currOfficeId == objOfficeId && currCompanyId == objCompanyId)
+                    {
+                        result = true;
+                    }
+                }
+            }
+            return result;
         }
     }
 }

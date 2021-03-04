@@ -61,7 +61,8 @@ import {
     ShareGoodsImportComponent,
     ShareBusinessAttachListHouseBillComponent,
     ShareBussinessInputDailyExportPopupComponent,
-    ShareBussinessPaymentMethodPopupComponent
+    ShareBussinessPaymentMethodPopupComponent,
+    ShareBussinessJobDetailButtonListComponent
 
 } from './components';
 
@@ -73,6 +74,7 @@ import { AppComboGridComponent } from '@common';
 import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
 import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ShareBusinessAdvanceSettlementInforComponent } from './components/advance-settlement-info/advance-settlement-info.component';
 
 
 
@@ -120,7 +122,9 @@ const COMPONENTS = [
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     ShareBusinessAttachListHouseBillComponent,
     ShareBussinessInputDailyExportPopupComponent,
-    ShareBussinessPaymentMethodPopupComponent
+    ShareBussinessPaymentMethodPopupComponent,
+    ShareBusinessAdvanceSettlementInforComponent,
+    ShareBussinessJobDetailButtonListComponent
 ];
 
 
@@ -130,7 +134,7 @@ const customCurrencyMaskConfig = {
     allowNegative: true,
     allowZero: true,
     decimal: ".",
-    precision: 3,
+    precision: 2,
     prefix: "",
     suffix: "",
     thousands: ",",

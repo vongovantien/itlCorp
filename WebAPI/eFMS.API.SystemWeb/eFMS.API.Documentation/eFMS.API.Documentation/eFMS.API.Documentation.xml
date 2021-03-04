@@ -33,6 +33,14 @@
             <param name="isOrigin">Is Preview with Original</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOpsCdNoteList(System.Object,System.Boolean)">
+            <summary>
+            Preview CD Note (OPS) Combine
+            </summary>
+            <param name="model">AcctCDNoteDetailsModel List</param>
+            <param name="isOrigin">Is Preview with Original</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.ExportOpsCdNote(System.Guid,System.String,System.Guid)">
             <summary>
             Data Export Details CD Note
@@ -40,6 +48,20 @@
             <param name="jobId"></param>
             <param name="cdNo"></param>
             <param name="officeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.ExportOpsCdNoteCombine(System.Object)">
+            <summary>
+            Export Excel Template of OPS CD Note Combine
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOPSCDNoteWithCurrency(eFMS.API.Documentation.DL.Models.PreviewCdNoteCriteria)">
+            <summary>
+            Preview CD Note Local and USD currency
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
@@ -61,6 +83,15 @@
             Preview CD Note (AIR)
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewASCdNoteList(System.Object,System.String,System.String)">
+            <summary>
+            Preview CD Note (OPS) Combine
+            </summary>
+            <param name="model">AcctCDNoteDetailsModel List</param>
+            <param name="currency"></param>
+            <param name="service"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.Paging(eFMS.API.Documentation.DL.Models.Criteria.CDNoteCriteria,System.Int32,System.Int32)">
@@ -369,13 +400,14 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Documentation.DL.IService.ICurrencyExchangeService,AutoMapper.IMapper)">
             <summary>
             constructor
             </summary>
             <param name="localizer"></param>
             <param name="service"></param>
             <param name="user"></param>
+            <param name="hostingEnvironment"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByHouseBill(System.Guid,System.String)">
             <summary>
@@ -431,7 +463,7 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Add(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.AddAndUpdate(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
             <summary>
             add list surcharge
             </summary>
@@ -514,6 +546,32 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.DownloadExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read data from file excel
+            </summary>
+            <param name="uploadedFile"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Import(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeImportModel})">
+            <summary>
+            import list partner
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField">
+            <summary>
+            Only Use for Dev
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShippingInstructionController.CheckExistSIExport(System.Guid)">
             <summary>
             Check if Exist Sea Export files attach
@@ -580,10 +638,11 @@
             <param name="id">id that want to retrieve transaction</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetLinkASInfomation(System.String,System.String,System.String)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetLinkASInfomation(System.String,System.String,System.String,System.String)">
             <summary>
             Get Air/Sea job no and hblId
             </summary>
+            <param name="mblNo">mbl no's ops</param>
             <param name="hblNo">hbl no's ops</param>
             <param name="serviceName">product service</param>
             <param name="serviceMode">service mode</param>
@@ -1032,6 +1091,7 @@
             <returns></returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataSummaryOfRevenueIncurred(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)" -->
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataCostsByPartner(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)" -->
         <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentAssignPIC">
             <summary>
             get list of shipment assign or PIC is current user

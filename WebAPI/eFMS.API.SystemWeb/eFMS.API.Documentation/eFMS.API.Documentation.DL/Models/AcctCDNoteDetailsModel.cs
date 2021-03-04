@@ -39,6 +39,8 @@ namespace eFMS.API.Documentation.DL.Models
         public DateTime? ServiceDate { get; set; }
         public decimal? CBM { get; set; }
         public decimal? GW { get; set; }
+        public decimal? NW { get; set; }
+        public short? CommodityGroupId { get; set; }
         public decimal? SumContainers { get; set; }
         public decimal? SumPackages { get; set; }
         public string WarehouseName { get; set; }
@@ -60,5 +62,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string ReasonReject { get; set; }
         public string CreditPayment { get; set; }
         public bool IsExistChgCurrDiffLocalCurr { get; set; }
+        public string PackageUnit { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public decimal? ExcRateUsdToLocal { get; set; }
     }
 }

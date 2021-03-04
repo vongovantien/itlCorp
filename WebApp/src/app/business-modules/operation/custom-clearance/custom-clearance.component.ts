@@ -281,13 +281,14 @@ export class CustomClearanceComponent extends AppList {
         }
         if (this.messageConvertError.length === 0) {
             const customCheckedHBL = customCheckedArray.map(x => x.hblid);
-            if (customCheckedHBL.some((c, index) => customCheckedHBL.indexOf(c) !== index)) {
-                this.messageConvertError = `Các clearance được chọn đang trùng số [HBL/HAWB] <br />`;
-            }
             const customCheckedMBL = customCheckedArray.map(x => x.mblid);
-            if (customCheckedMBL.some((c, index) => customCheckedMBL.indexOf(c) !== index)) {
-                this.messageConvertError += `Các clearance được chọn đang trùng số [MBL/MAWB] <br />`;
+            if (customCheckedHBL.some((c, index) => customCheckedHBL.indexOf(c) !== index)) {
+                if (customCheckedMBL.some((c, index) => customCheckedMBL.indexOf(c) !== index)) {
+                    this.messageConvertError += `Các clearance được chọn đang trùng số [MBL/MAWB] và [HBL/HAWB] <br />`;
+                }
+                // this.messageConvertError = `Các clearance được chọn đang trùng số [HBL/HAWB] <br />`;
             }
+
         }
         return customCheckedArray;
     }

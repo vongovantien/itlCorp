@@ -61,6 +61,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
+            { title: 'No.', field: '', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
@@ -132,7 +133,8 @@ export class StatementOfAccountEditComponent extends AppList {
                         strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ","),
                         jobIds: [],
                         hbls: [],
-                        mbls: []
+                        mbls: [],
+                        staffType: this.soa.staffType
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
                 },
@@ -203,7 +205,9 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     onUpdateMoreSOA(data: any) {
-        this.soa.chargeShipments = data.chargeShipments;
+        console.log(data)
+        this.soa.chargeShipments = [...this.soa.chargeShipments, ...data.chargeShipments]
+        console.log(this.soa.chargeShipments);
         this.dataSearch.chargeShipments = this.soa.chargeShipments;
         this.isCheckAllCharge = false;
     }
@@ -244,7 +248,8 @@ export class StatementOfAccountEditComponent extends AppList {
                 obh: this.soa.obh,
                 creatorShipment: this.soa.creatorShipment,
                 customer: this.soa.customer,
-                commodityGroupId: this.soa.commodityGroupId
+                commodityGroupId: this.soa.commodityGroupId,
+                staffType: this.soa.staffType
             };
             this._progressRef.start();
             this._accoutingRepo.updateSOA(body)
@@ -267,8 +272,6 @@ export class StatementOfAccountEditComponent extends AppList {
                             this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
                                 queryParams: { no: this.soaNO, currency: this.currencyLocal }
                             });
-
-
                         }
                     },
                 );
@@ -276,6 +279,19 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     addMoreCharge() {
+        const body = {
+            currency: this.soa.currency,
+            customerID: this.soa.customer,
+            dateType: this.soa.dateType,
+            fromDate: formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en'), //Lấy theo field Date của form Edit
+            toDate: formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en'), //Lấy theo field Date của form Edit
+            type: this.soa.type,
+            isOBH: this.soa.obh,
+            strServices: this.soa.serviceTypeId.replace(';', ','),
+            strCreators: this.soa.creatorShipment.replace(';', ','),
+            staffType: this.soa.staffType
+        };
+        this.dataSearch = new SOASearchCharge(body);
         this.addChargePopup.searchInfo = this.dataSearch;
         this.addChargePopup.getListShipmentAndCDNote(this.dataSearch);
 

@@ -231,9 +231,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
+                // * 15375
                 // Validators.pattern(/^(.{3}-\d{4} \d{4}|XXX-XXXX XXXX)$/)
-                Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                FormValidators.validateMAWB,
+                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                // FormValidators.validateMAWB,
 
             ])],
             flightVesselName: [],
@@ -378,6 +379,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 this.applyDIM = data.applyDim;
                 this.roundUp = data.roundUpMethod;
 
+                this.supplierName = data.shortName;
                 this.coloaderId.setValue(data.id);
 
                 // * if DIM had been saved
@@ -391,6 +393,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 this.pod.setValue(data.id);
                 break;
             case 'agent':
+                this.agentName = data.shortName;
                 this.agentId.setValue(data.id);
                 break;
             case 'warehouse':

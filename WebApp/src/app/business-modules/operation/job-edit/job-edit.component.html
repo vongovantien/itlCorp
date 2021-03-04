@@ -1,35 +1,25 @@
 <app-sub-header>
-    <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-        <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowLock">
-            <button type="button" class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10"
-                (click)="lockShipment()" [disabled]="isDuplicate">
-                <span>
-                    <i class="la la-lock"></i>
-                    <span>
-                        Lock
-                    </span>
-                </span>
-            </button>
-        </ng-container>
+    <ng-container *ngIf="!!opsTransaction && !opsTransaction?.isLocked; else lockTpl">
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
+                class="m--margin-right-10"
+                *ngIf="!!opsTransaction && opsTransaction.permission.allowLock && !isDuplicate">
+            </app-default-button>
+        </div>
+    </ng-container>
 
-    </div>
-    <span *ngIf="!!opsTransaction && !!opsTransaction.isLocked" class="m--margin-right-10">
-        <i class="fa fa-lock text-danger fa-3x"></i>
-    </span>
-    <div class="c-button-actions">
-        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="onOpePLPrint()" [disabled]="isDuplicate">
+    <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
+        (click)="onOpePLPrint()">
+        <span>
+            <i class="la la-print"></i>
             <span>
-                <i class="la la-print"></i>
-                <span>
-                    P/L Sheet
-                </span>
+                P/L Sheet
             </span>
-        </button>
-    </div>
-    <div class="c-button-actions">
+        </span>
+    </button>
+    <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="confirmDuplicate()" [disabled]="isDuplicate">
+            (click)="confirmDuplicate()">
             <span>
                 <i class="la la-search-plus"></i>
                 <span>
@@ -37,34 +27,42 @@
                 </span>
             </span>
         </button>
-    </div>
-    <ng-container *ngIf="!!opsTransaction && opsTransaction.isLocked === false">
-        <div class="c-button-actions">
-            <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
-                *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate" (click)="saveShipment()"
-                [disabled]="tab !== 'job-edit'">
-                <span>
-                    <i class="la la la-save"></i>
-                    <span>
-                        save
-                    </span>
-                </span>
-            </button>
-        </div>
-        <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
-                [disabled]="isDuplicate" (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete"
-                title="Shipment was deleted">
-                <span>
-                    <i class="la la-trash"></i>
-                    <span>
-                        delete
-                    </span>
-                </span>
-            </button>
-        </div>
     </ng-container>
 
+
+    <ng-container *ngIf="opsTransaction?.isLocked === false || isDuplicate">
+        <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete && !isDuplicate"
+            title="Shipment was deleted">
+            <span>
+                <i class="la la-trash"></i>
+                <span>
+                    delete
+                </span>
+            </span>
+        </button>
+        <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
+            *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate" (click)="saveShipment()"
+            [disabled]="tab !== 'job-edit'">
+            <span>
+                <i class="la la la-save"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
+
+        <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" *ngIf="isDuplicate"
+            (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
+            <span>
+                <i class="la la la-save"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
+
+    </ng-container>
 
     <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=handleCancelForm()></app-default-button>
 
@@ -75,7 +73,7 @@
         <div class="row">
             <div class="col-12">
                 <tabset type="tabs" class="custom-class-tab">
-                    <tab heading="Job detail" (selectTab)="selectTab('job-edit')">
+                    <tab heading="Job detail" (selectTab)="selectTab('job-edit')" [active]="tab === 'job-edit'">
                         <!-- <div *ngIf="tab === 'job-edit'"> -->
                         <div class="m-form m-form--state">
                             <div class="m-portlet">
@@ -91,7 +89,8 @@
                         <div class="m-portlet" style="position: relative;">
                             <div class="m-portlet__body">
                                 <tabset class="custom-class-tab">
-                                    <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
+                                    <tab heading="Buying" (selectTab)="getSurCharges('BUY')"
+                                        [active]="selectedTabSurcharge === 'BUY'">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <buying-charge [showGetCharge]="false" service="logistic"
@@ -121,7 +120,6 @@
                         </div>
 
                         <hbl-profit-summary></hbl-profit-summary>
-                        <!-- </div> -->
                     </tab>
                     <tab heading="Custom declaration" (selectTab)="selectTab('custom-declaration')"
                         [disabled]="isDuplicate">
@@ -136,6 +134,12 @@
                     <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab('stage')"
                         [disabled]="isDuplicate">
                         <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
+                        <!-- * old version lazy load component-->
+                    </tab>
+                    <tab heading="Advance/Settlement" [active]="tab === 'advance-settle'"
+                        (selectTab)="selectTab('advance-settle')" [disabled]="isDuplicate">
+                        <ng-container #advSettleContainer></ng-container>
+                        <!-- ? new version lazy load component -->
                     </tab>
                 </tabset>
             </div>
@@ -148,21 +152,6 @@
 
 <pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
 
-<confirm-popup #confirmCancelUpdate (onSubmit)="confirmCancel()"
-    [body]="'Unsaved data will be lost. Are you sure want to leave?'" [labelConfirm]="'Yes'"></confirm-popup>
-
-<confirm-popup *ngIf="!!opsTransaction" #confirmDelete (onSubmit)="onDeleteJob()" [body]="deleteMessage">
-</confirm-popup>
-
-<info-popup #notAllowDelete [body]="'You are not allow to delete this job'"></info-popup>
-
-<confirm-popup #confirmLockShipment (onSubmit)="onLockShipment()" [body]="'Do you want to lock this shipment ?'"
-    [labelConfirm]="'Yes'"></confirm-popup>
-
-<confirm-popup #duplicateconfirmTemplate (onSubmit)="onSubmitDuplicateConfirm()"
-    [body]="'The system will open the Job Create Screen. Do you want to leave?'" [title]="'Duplicate OPS detail'"
-    [labelConfirm]="'Yes'"></confirm-popup>
-
 <ng-template #placeholder>
     <div class="no-data">
         <i class="flaticon-coins"></i>
@@ -170,4 +159,10 @@
     </div>
 </ng-template>
 
-<info-popup #notAllowUpdate [body]="invalidFormText" [title]="'Cannot Create Job'"></info-popup>
+<ng-template inject></ng-template>
+
+<ng-template #lockTpl>
+    <span *ngIf="!!opsTransaction && !!opsTransaction.isLocked" class="m--margin-right-10">
+        <i class="fa fa-lock text-danger fa-3x"></i>
+    </span>
+</ng-template>

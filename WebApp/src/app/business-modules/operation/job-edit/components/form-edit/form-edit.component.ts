@@ -23,7 +23,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
     @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
-    @ViewChild('comfirmServiceInfo') infoServicePopup: InfoPopupComponent;
 
     opsTransaction: OpsTransaction = null;
 
@@ -60,6 +59,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     containerDescription: AbstractControl;
     packageTypeId: AbstractControl;
     shipmentType: AbstractControl;
+    note: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -76,7 +76,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     packageTypes: Observable<Unit[]>;
 
     shipmentNo: string = null;
-    shipmentNoti: string = '';
+    shipmentInfo: string = '';
+    customerName: string = '';
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
@@ -156,9 +157,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             commodityGroupId: this.opsTransaction.commodityGroupId,
             packageTypeId: this.opsTransaction.packageTypeId,
             shipmentType: this.opsTransaction.shipmentType,
+            note: this.opsTransaction.note
         });
 
-        this.shipmentNo = this.opsTransaction.serviceNo;
+        this.customerName = this.opsTransaction.customerName;
+        this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
 
     }
@@ -185,7 +188,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             pod: [],
             supplierId: [],
             agentId: [],
-            salemansId: [],
+            salemansId: [null, Validators.required],
             warehouseId: [],
             invoiceNo: [null],
             fieldOpsId: [null],
@@ -200,7 +203,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             sumPackages: [null],
             sumCbm: [null],
             containerDescription: [null],
-            packageTypeId: [null]
+            packageTypeId: [null],
+            note: [null],
         }, { validator: FormValidators.comparePort });
 
         this.jobNo = this.formEdit.controls['jobNo'];
@@ -235,7 +239,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.packageTypeId = this.formEdit.controls['packageTypeId'];
         this.commodityGroupId = this.formEdit.controls['commodityGroupId'];
         this.shipmentType = this.formEdit.controls['shipmentType'];
-
+        this.note = this.formEdit.controls['note'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -253,6 +257,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
+                this.customerName = data.shortName;
                 this.customerId.setValue(data.id);
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
                     if (!!res) {
@@ -294,8 +299,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     getASInfoToLink() {
-        if (!this.hwbno.value) {
-            this._toaster.warning("HBL No is empty. Please complete first!");
+        if (!this.hwbno.value || !this.mblno.value) {
+            this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
             return;
         }
 
@@ -303,17 +308,17 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
             this._toaster.warning("Service's not valid to link. Please select another!");
         } else {
-            this._documentRepo.getASTransactionInfo(this.hwbno.value, this.productService.value, this.serviceMode.value)
+            this._documentRepo.getASTransactionInfo(this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
                 .pipe(catchError(this.catchError))
                 .subscribe((res: any) => {
                     if (!!res) {
                         this.shipmentNo = res.jobNo;
                         if (!!res.jobNo) {
-                            this.shipmentNoti = "The valid shipment was linked to this job:<br>" + res.jobNo;
+                            this.shipmentInfo = res.jobNo;
                         } else {
-                            this.shipmentNoti = "There's no valid Job ID of Air/Sea to display. Please check again!";
+                            this.shipmentInfo = null;
+                            this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                         }
-                        this.infoServicePopup.show();
                     }
                 });
         }

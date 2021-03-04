@@ -13,9 +13,12 @@ import { CommercialFormCreateComponent } from '../components/form-create/form-cr
 import { CommercialContractListComponent } from '../components/contract/commercial-contract-list.component';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
+import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -27,9 +30,12 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     @ViewChild(CommercialFormCreateComponent) formCreate: CommercialFormCreateComponent;
     @ViewChild(CommercialContractListComponent) contractList: CommercialContractListComponent;
     @ViewChild(CommercialBranchSubListComponent) partnerList: CommercialBranchSubListComponent;
+    @ViewChild(CommercialEmailListComponent) partnerEmailList: CommercialEmailListComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild('taxCodeInfo') infoPopupTaxCode: InfoPopupComponent;
     @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
+
+    menuSpecialPermission: Observable<any[]>;
 
     invalidTaxCode: string;
 
@@ -43,7 +49,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         protected _toastService: ToastrService,
         protected _catalogueRepo: CatalogueRepo,
         protected _ngProgressService: NgProgress,
-        protected _activeRoute: ActivatedRoute
+        protected _activeRoute: ActivatedRoute,
+        protected _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -51,6 +58,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         if (localStorage.getItem('success_add_sub') === "true") {
             this.back();
         }
@@ -67,9 +75,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         }
     }
 
-    onSave() {
+    onSave(isRequestApproval: boolean) {
         this.formCreate.isSubmitted = true;
-
         if (!this.formCreate.formGroup.valid) {
             this.infoPopup.show();
             return;
@@ -86,8 +93,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         modelAdd.partnerType = this.type;
         this.type === 'Customer' ? modelAdd.partnerGroup = 'CUSTOMER' : modelAdd.partnerGroup = 'CUSTOMER; AGENT';
         modelAdd.contracts = [...this.contractList.contracts];
-
-
+        modelAdd.partnerEmails = [...this.partnerEmailList.partnerEmails];
+        modelAdd.isRequestApproval = isRequestApproval;
         this.saveCustomerCommercial(modelAdd);
     }
 

@@ -5,6 +5,7 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -47,6 +48,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatDepartment> departmentRepo;
         private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
         private readonly IContextBase<AcctReceipt> receiptRepository;
+        private readonly IContextBase<CatContract> contractRepository;
+        private readonly IContextBase<CatPartnerEmail> partnerEmailRepository;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IUserBaseService userBaseService;
         #endregion --Dependencies--
 
@@ -88,6 +92,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysUserLevel> sysUserLevel,
             IContextBase<AcctReceipt> receiptRepo,
+            IContextBase<CatContract> contractRepo,
+            IContextBase<CatPartnerEmail> partnerEmailRepo,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IUserBaseService userBase,
             ICurrentUser cUser,
             IMapper mapper) : base(repository, mapper)
@@ -120,6 +127,9 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserLevelRepo = sysUserLevel;
             receiptRepository = receiptRepo;
             userBaseService = userBase;
+            contractRepository = contractRepo;
+            partnerEmailRepository = partnerEmailRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
             // ---
 
             users = UserRepository.Get();
@@ -151,9 +161,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                              CurrencyCode = ad.AdvanceCurrency,
                                                              Description0 = ad.AdvanceNote,
                                                              CustomerName = employee.EmployeeNameVn,
-                                                             CustomerCode = employee.StaffCode,
+                                                             //CustomerCode = !string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode,
+                                                             CustomerCode = employee.StaffCode, //Chỉ lấy StaffCode [06/01/2021]
                                                              OfficeCode = office.Code,
-                                                             DocDate = ad.RequestDate,
+                                                             DocDate = ad.RequestDate.HasValue ? ad.RequestDate.Value.Date : ad.RequestDate, //Chỉ lấy Date (không lấy Time)
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
                                                              DueDate = ad.PaymentTerm,
                                                              PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod
@@ -206,7 +217,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                   CustomerName = p.PartnerNameVn,
                                                                   CustomerMode = p.PartnerMode,
                                                                   LocalBranchCode = p.InternalCode,
-                                                                  DocDate = voucher.Date,
+                                                                  DocDate = voucher.Date.HasValue ? voucher.Date.Value.Date : voucher.Date, //Chỉ lấy Date (không lấy Time)
                                                                   OfficeCode = office.Code,
                                                                   ReferenceNo = voucher.VoucherId,
                                                                   CurrencyCode = voucher.Currency,
@@ -260,7 +271,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                                                                       OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                       AtchDocNo = surcharge.InvoiceNo,
-                                                                                      AtchDocDate = surcharge.InvoiceDate,
+                                                                                      AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate, //Chỉ lấy Date (không lấy Time)
                                                                                       AtchDocSerialNo = surcharge.SeriesNo,
                                                                                       AccountNo = item.AccountNo, // AccountNo của voucher
                                                                                       ContracAccount = chgDef.CreditAccountNo,
@@ -304,10 +315,12 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
                                                                        Description0 = settle.Note,
                                                                        CustomerName = partner != null ? partner.ShortName : employee.EmployeeNameVn,
-                                                                       CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode,
+                                                                       // CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
+                                                                       CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode, //[06/01/2021]
                                                                        PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
                                                                        CustomerMode = partner != null ? partner.PartnerMode : "External",
-                                                                       LocalBranchCode = partner != null ? partner.InternalCode : null
+                                                                       LocalBranchCode = partner != null ? partner.InternalCode : null,
+                                                                       Payee = settle.Payee
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -339,14 +352,15 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Quantity9 = surcharge.Quantity,
                                                                                              OriginalUnitPrice = surcharge.UnitPrice,
                                                                                              TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
-                                                                                             OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 0) : Math.Round(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
+                                                                                             OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(surcharge.Quantity * surcharge.UnitPrice ?? 0, 0) : NumberHelper.RoundNumber(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
                                                                                              OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
-                                                                                             AtchDocDate = surcharge.InvoiceDate,
+                                                                                             AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate, //Chỉ lấy Date (không lấy Time)
                                                                                              AtchDocSerialNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
-                                                                                             CustomerCodeBook = obhP.AccountNo
+                                                                                             // CustomerCodeBook = obhP.AccountNo
+                                                                                             CustomerCodeBook = item.PaymentMethod == AccountingConstants.PAYMENT_METHOD_OTHER && !string.IsNullOrEmpty(item.Payee) ? GetPayeeCode(item.Payee) : obhP.AccountNo
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -380,7 +394,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
                 sync.Transcode = string.Empty;
-                sync.DocDate = cdNote.DatetimeCreated;
+                sync.DocDate = cdNote.DatetimeCreated.HasValue ? cdNote.DatetimeCreated.Value.Date : cdNote.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                 sync.ReferenceNo = cdNote.Code;
                 var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                 sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
@@ -390,12 +404,21 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = cdNote.Note;
-                sync.EmailEInvoice = cdNotePartner?.BillingEmail; //Tạm lấy BillingEmail của partner
+
+                //Lấy email của partner có type là Billing & office = office Debit Note (nếu ko có thì lấy Billing Email của Partner) [CR: 12/01/2021]
+                var emailPartner = partnerEmailRepository.Get(x => x.PartnerId == cdNote.PartnerId && x.OfficeId == cdNote.OfficeId && x.Type == "Billing").FirstOrDefault()?.Email;
+                var _billingEmailPartner = !string.IsNullOrEmpty(emailPartner) ? emailPartner : cdNotePartner?.BillingEmail;
+                var _emailEInvoice = !string.IsNullOrEmpty(_billingEmailPartner) ? _billingEmailPartner.Replace(";", ",") : null;
+                sync.EmailEInvoice = _emailEInvoice;
+
                 sync.DataType = "CDNOTE";
 
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
+                var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
+
                 foreach (var surcharge in surcharges)
                 {
                     var charge = new ChargeSyncModel();
@@ -403,7 +426,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn;
+                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.JobNo, surcharge.Mblno, surcharge.Hblno);
+                    charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -412,7 +436,6 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
 
-                    // var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault(); //CR: 24-11-2020
                     charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                     charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
@@ -430,12 +453,12 @@ namespace eFMS.API.Accounting.DL.Services
                         // Exchange Rate from currency original charge to currency debit note
                         var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, cdNote.CurrencyId);
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
-                        charge.OriginalUnitPrice = Math.Round(_unitPrice ?? 0, decimalRound); //Đơn giá
+                        charge.OriginalUnitPrice = _unitPrice ?? 0; //Đơn giá không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * _unitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
-                        charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế
+                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -450,11 +473,14 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); //Lấy giá trị FinalExchangeRate, nếu không có thì quy đổi về Currency Local theo ExchangeDate
                         charge.OriginalUnitPrice = surcharge.UnitPrice; //Đơn giá
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế
+                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
+
+                    charge.DueDate = _dueDate;
+
                     charges.Add(charge);
                 }
                 sync.Details = charges;
@@ -486,7 +512,7 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.BranchCode = string.Empty;
                     sync.OfficeCode = offices.Where(x => x.Id == cdNote.OfficeId).FirstOrDefault()?.Code;
                     sync.Transcode = string.Empty;
-                    sync.DocDate = cdNote.DatetimeCreated;
+                    sync.DocDate = cdNote.DatetimeCreated.HasValue ? cdNote.DatetimeCreated.Value.Date : cdNote.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                     sync.ReferenceNo = cdNote.Code;
                     var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                     sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
@@ -518,18 +544,18 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
-                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, "VND");
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
                         charge.BillEntryNo = surcharge.Hblno;
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                         charge.NganhCode = "FWD";
                         charge.Quantity9 = surcharge.Quantity;
-                        charge.OriginalUnitPrice = Math.Round(surcharge.UnitPrice ?? 0, decimalRound); //Đơn giá
+                        charge.OriginalUnitPrice = surcharge.UnitPrice ?? 0; //Đơn giá không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế
+                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
@@ -538,10 +564,10 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ContraAccount = string.Empty;
                         charge.VATAccount = string.Empty;
                         charge.AtchDocNo = surcharge.InvoiceNo;
-                        charge.AtchDocDate = surcharge.InvoiceDate;
+                        charge.AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate; //Chỉ lấy Date (không lấy Time)
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
-                        
+
                         charges.Add(charge);
                     }
                     sync.Details = charges;
@@ -571,7 +597,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
                 sync.Transcode = string.Empty;
-                sync.DocDate = soa.DatetimeCreated;
+                sync.DocDate = soa.DatetimeCreated.HasValue ? soa.DatetimeCreated.Value.Date : soa.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                 sync.ReferenceNo = soa.Soano;
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
@@ -581,12 +607,21 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CurrencyCode0 = soa.Currency;
                 sync.ExchangeRate0 = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = soa.Note;
-                sync.EmailEInvoice = soaPartner?.BillingEmail; //Tạm lấy BillingEmail của partner
+
+                //Lấy email của partner có type là Billing & office = office SOA (nếu ko có thì lấy Billing Email của Partner) [CR: 12/01/2021]
+                var emailPartner = partnerEmailRepository.Get(x => x.PartnerId == soa.Customer && x.OfficeId == soa.OfficeId && x.Type == "Billing").FirstOrDefault()?.Email;
+                var _billingEmailPartner = !string.IsNullOrEmpty(emailPartner) ? emailPartner : soaPartner?.BillingEmail;
+                var _emailEInvoice = !string.IsNullOrEmpty(_billingEmailPartner) ? _billingEmailPartner.Replace(";", ",") : null;
+                sync.EmailEInvoice = _emailEInvoice;
+
                 sync.DataType = "SOA";
 
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                var servicesOfSoaDebit = surcharges.Select(s => s.TransactionType).Distinct().ToList();
+                var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
+
                 foreach (var surcharge in surcharges)
                 {
                     var charge = new ChargeSyncModel();
@@ -594,7 +629,8 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    charge.Description = _charge?.ChargeNameVn;
+                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.JobNo, surcharge.Mblno, surcharge.Hblno);
+                    charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
                     charge.BillEntryNo = surcharge.Hblno;
@@ -603,7 +639,6 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.NganhCode = "FWD";
                     charge.Quantity9 = surcharge.Quantity;
 
-                    // var _partnerPayer = partners.Where(x => x.Id == surcharge.PayerId).FirstOrDefault();
                     var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault(); //CR: 24-11-2020
                     charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                     charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
@@ -621,12 +656,12 @@ namespace eFMS.API.Accounting.DL.Services
                         // Exchange Rate from currency original charge to currency SOA
                         var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, sync.CurrencyCode0);
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
-                        charge.OriginalUnitPrice = Math.Round(_unitPrice ?? 0, decimalRound); //Đơn giá
+                        charge.OriginalUnitPrice = _unitPrice ?? 0; //Đơn giá làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * _unitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
-                        charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế
+                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -641,14 +676,17 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); //Lấy giá trị FinalExchangeRate, nếu không có thì quy đổi về Currency Local theo ExchangeDate
                         charge.OriginalUnitPrice = surcharge.UnitPrice; //Đơn giá
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế
+                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
                     }
+
+                    charge.DueDate = _dueDate;
+
                     charges.Add(charge);
                 }
-                sync.Details = charges;
+                sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList(); // Sắp xếp theo số job giảm dần
 
                 data.Add(sync);
             }
@@ -676,7 +714,7 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.BranchCode = string.Empty;
                     sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
                     sync.Transcode = string.Empty;
-                    sync.DocDate = soa.DatetimeCreated;
+                    sync.DocDate = soa.DatetimeCreated.HasValue ? soa.DatetimeCreated.Value.Date : soa.DatetimeCreated; //Chỉ lấy Date (không lấy Time)
                     sync.ReferenceNo = soa.Soano;
                     var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                     sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
@@ -714,12 +752,12 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                         charge.NganhCode = "FWD";
                         charge.Quantity9 = surcharge.Quantity;
-                        charge.OriginalUnitPrice = Math.Round(surcharge.UnitPrice ?? 0, decimalRound);
+                        charge.OriginalUnitPrice = surcharge.UnitPrice ?? 0; //Không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _totalNoVat = surcharge.Quantity * surcharge.UnitPrice;
-                        charge.OriginalAmount = Math.Round(_totalNoVat ?? 0, decimalRound); //Thành tiền chưa thuế
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_totalNoVat * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = Math.Round(_taxMoney, decimalRound); //Tiền thuế
+                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
@@ -728,13 +766,13 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ContraAccount = string.Empty;
                         charge.VATAccount = string.Empty;
                         charge.AtchDocNo = surcharge.InvoiceNo;
-                        charge.AtchDocDate = surcharge.InvoiceDate;
+                        charge.AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate; //Chỉ lấy Date (không lấy Time)
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
 
                         charges.Add(charge);
                     }
-                    sync.Details = charges;
+                    sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList();  // Sắp xếp theo số job giảm dần
 
                     data.Add(sync);
                 }
@@ -754,7 +792,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.Stt = invoice.Id.ToString();
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == invoice.OfficeId).FirstOrDefault()?.Code;
-                sync.DocDate = invoice.Date; //Invoice Date
+                sync.DocDate = invoice.Date.HasValue ? invoice.Date.Value.Date : invoice.Date; //Invoice Date
                 sync.ReferenceNo = invoice.InvoiceNoReal; //Invoice No
                 var invoicePartner = partners.Where(x => x.Id == invoice.PartnerId).FirstOrDefault();
                 sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
@@ -801,7 +839,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.Stt = soa.Id.ToString();
                 sync.BranchCode = string.Empty;
                 sync.OfficeCode = offices.Where(x => x.Id == soa.OfficeId).FirstOrDefault()?.Code;
-                sync.DocDate = soa.DatetimeCreated; //Created Date SOA
+                sync.DocDate = soa.DatetimeCreated.HasValue ? soa.DatetimeCreated.Value.Date : soa.DatetimeCreated; //Created Date SOA
                 sync.ReferenceNo = soa.Soano; //SOA No
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
@@ -933,11 +971,33 @@ namespace eFMS.API.Accounting.DL.Services
                                 settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
                                 SettlementRepository.Update(settle, x => x.Id == id, false);
+
+                                IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == settle.SettlementNo);
+                                if(surcharges != null && surcharges.Count() > 0)
+                                {
+                                    foreach (var surcharge in surcharges)
+                                    {
+                                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                        {
+                                            //Charge OBH sẽ lưu vào PaySyncedFrom
+                                            surcharge.PaySyncedFrom = "SETTLEMENT";
+                                        }
+                                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                                        {
+                                            //Charge BUY sẽ lưu vào SyncedFrom
+                                            surcharge.SyncedFrom = "SETTLEMENT";
+                                        }
+                                        surcharge.UserModified = currentUser.UserID;
+                                        surcharge.DatetimeModified = DateTime.Now;
+
+                                        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                    }
+                                }
                             }
                         }
-
+                        HandleState hsCharge = SurchargeRepository.SubmitChanges();
                         result = SettlementRepository.SubmitChanges();
-                      
+
                         trans.Commit();
                         data = new List<Guid>();
                         return result;
@@ -1004,7 +1064,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         var smSurcharge = SurchargeRepository.SubmitChanges();
                         result = DataContext.SubmitChanges();
-                      
+
                         trans.Commit();
 
                         data = new List<Guid>();
@@ -1042,27 +1102,36 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.DatetimeModified = DateTime.Now;
                         cdNote.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         cdNote.LastSyncDate = DateTime.Now;
-                        var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
-
-                        //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
+                        
                         var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
-                        foreach(var surcharge in surcharges)
+                        //Tồn tại CDNote có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        if (cdNote.Type == "CREDIT" && (cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
                         {
-                            if (surcharge.Type == "OBH")
-                            {
-                                surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
-                                surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
-                            }
-                            else
-                            {
-                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
-                                surcharge.SyncedFrom = "CDNOTE";
-                            }
-                            surcharge.UserModified = currentUser.UserID;
-                            surcharge.DatetimeModified = DateTime.Now;
-                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            cdNote.Note += " Request Voucher";
                         }
+                        else
+                        {
+                            //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                {
+                                    surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
+                                    surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
+                                }
+                                else
+                                {
+                                    //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                    surcharge.SyncedFrom = "CDNOTE";
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                        }
+                        var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
                     }
+                    
                     var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
                     trans.Commit();
@@ -1094,26 +1163,34 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.DatetimeModified = DateTime.Now;
                         soa.SyncStatus = AccountingConstants.STATUS_SYNCED;
                         soa.LastSyncDate = DateTime.Now;
-                        var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
-
-                        //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
+                        
                         var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                        foreach(var surcharge in surcharges)
+                        //Tồn tại SOA có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        if (soa.Type == "Credit" && (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
                         {
-                            if (surcharge.Type == "OBH")
-                            {
-                                surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
-                                surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;
-                            }
-                            else
-                            {
-                                //Charge BUY or SELL sẽ lưu vào SyncedFrom
-                                surcharge.SyncedFrom = "SOA";
-                            }
-                            surcharge.UserModified = currentUser.UserID;
-                            surcharge.DatetimeModified = DateTime.Now;
-                            var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            soa.Note += " Request Voucher";
                         }
+                        else
+                        {
+                            //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                {
+                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
+                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;
+                                }
+                                else
+                                {
+                                    //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                                    surcharge.SyncedFrom = "SOA";
+                                }
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                        }
+                        var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
                     }
                     var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = soaRepository.SubmitChanges();
@@ -1151,38 +1228,55 @@ namespace eFMS.API.Accounting.DL.Services
 
             return exchangeRate;
         }
+
         private string GetDeptCode(string JobNo)
         {
             string deptCode = "ITLCS";
 
             if (JobNo.Contains("LOG"))
             {
-                //_deptCode = "OPS";
                 deptCode = "ITLOPS";
             }
             else if (JobNo.Contains("A"))
             {
-                //_deptCode = "AIR";
                 deptCode = "ITLAIR";
             }
             else if (JobNo.Contains("S"))
             {
-                //_deptCode = "SEA";
                 deptCode = "ITLCS";
             }
 
             return deptCode;
         }
+
         private decimal GetOrgVatAmount(decimal? vatrate, decimal? orgAmount, string currency)
         {
             decimal amount = 0;
-            amount = (vatrate != null) ? (vatrate < 101 & vatrate >= 0) ? Math.Round(((orgAmount * vatrate) / 100 ?? 0), 3) : Math.Abs(vatrate ?? 0) : 0;
+            amount = (vatrate != null) ? (vatrate < 101 & vatrate >= 0) ? NumberHelper.RoundNumber(((orgAmount * vatrate) / 100 ?? 0), 3) : Math.Abs(vatrate ?? 0) : 0;
             if (currency == AccountingConstants.CURRENCY_LOCAL)
             {
-                amount = Math.Round(amount, 0);
+                amount = CalculateRoundStandard(NumberHelper.RoundNumber(amount, 2));
             }
             return amount;
         }
+
+        public decimal CalculateRoundStandard(decimal num)
+        {
+            var d = (num % 1);
+            if ((double)d < 0.5)
+            {
+                return Math.Round(num);
+            }
+            else if ((double)d >= 0.5)
+            {
+                return Math.Ceiling(num);
+            }
+            else
+            {
+                return num;
+            }
+        }
+
         private string GetCustomerHBL(Guid? Id)
         {
             string customerName = "";
@@ -1194,6 +1288,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return customerName;
         }
+
         private string GetLinkCdNote(string cdNoteNo, Guid jobId)
         {
             string _link = string.Empty;
@@ -1244,12 +1339,13 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return _link;
         }
+
         private decimal GetOriginalUnitPriceWithAccountNo(decimal unitPrice, string accountNo, decimal finalExchange = 1)
         {
             decimal _unitPrice = 0;
             if (!string.IsNullOrEmpty(accountNo) && (accountNo == "3311" || accountNo == "3313"))
             {
-                _unitPrice = Math.Round(unitPrice * finalExchange);
+                _unitPrice = NumberHelper.RoundNumber(unitPrice * finalExchange);
             }
             else
             {
@@ -1258,6 +1354,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _unitPrice;
         }
+
         private decimal GetOriginAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _originAmount = 0;
@@ -1271,12 +1368,13 @@ namespace eFMS.API.Accounting.DL.Services
                 _originAmount = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
                 if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _originAmount = Math.Round(_originAmount, 0);
+                    _originAmount = NumberHelper.RoundNumber(_originAmount);
                 }
             }
 
             return _originAmount;
         }
+
         private decimal GetOrgVatAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _orgVatAmout = 0;
@@ -1292,6 +1390,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _orgVatAmout;
         }
+
         private string GetServiceNameOfCdNote(string cdNoteNo)
         {
             string _serviceName = string.Empty;
@@ -1339,6 +1438,79 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return _serviceName;
+        }
+
+        private string GetPayeeCode(string PayeeId)
+        {
+            string PayeeCode = string.Empty;
+            CatPartner payee = PartnerRepository.Get(x => x.Id == PayeeId)?.FirstOrDefault();
+            if(payee != null)
+            {
+                PayeeCode = payee.AccountNo;
+            }
+
+            return PayeeCode;
+        }
+
+        /// <summary>
+        /// Get due date by partner & service
+        /// </summary>
+        /// <param name="partner"></param>
+        /// <param name="service"></param>
+        /// <returns></returns>
+        private decimal? GetDueDate(CatPartner partner, List<string> services)
+        {
+            decimal? dueDate = 1;
+            if (partner != null)
+            {
+                var _partnerId = (partner.Id == partner.ParentId || string.IsNullOrEmpty(partner.ParentId)) ? partner.Id : partner.ParentId;
+                var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && services.Where(w => x.SaleService.Contains(w)).Any());
+                if (contracts != null)
+                {
+                    // Ưu tiên Official >> Trial >> Cash (Default là 1)
+                    var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();                    
+                    if (contractsOffice != null)
+                    {
+                        dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                        return dueDate;
+                    }
+                    else
+                    {
+                        var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
+                        if (contractsTrial != null)
+                        {
+                            dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                            return dueDate;
+                        }
+                        //else
+                        //{
+                        //    var contractCash = contracts.Where(x => x.ContractType == "Cash").FirstOrDefault();
+                        //    if (contractCash != null)
+                        //    {
+                        //        return dueDate;
+                        //    }
+                        //}
+                    }
+                }
+            }
+            return dueDate;
+        }
+
+        private string GetDescriptionForSyncAcct(string chargeName, string transactionType, string jobNo, string mblNo, string hblNo)
+        {
+            var _description = string.Empty;
+            if (transactionType == "CL")
+            {
+                var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+                var _customNo = !string.IsNullOrEmpty(customNos) ? string.Format("TK:{0}", customNos) : string.Empty;
+                _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
+            }
+            else
+            {
+                var _hblNo = !string.IsNullOrEmpty(hblNo) && !hblNo.Trim().Equals("N/H") ? hblNo : mblNo;
+                _description = string.Format("{0} {1}", chargeName, _hblNo); //Format: ChargeName + HBL [CR: 12-01-2020]
+            }
+            return _description;
         }
 
         #endregion -- Private Method --
@@ -1485,7 +1657,7 @@ namespace eFMS.API.Accounting.DL.Services
                         partnerEn = partner?.PartnerNameEn;
                         taxCode = partner?.TaxCode;
                         serviceName = GetServiceNameOfCdNote(debitNote.Code);
-                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.CreditNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
+                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.DebitNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
                         urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId);
 
@@ -1535,7 +1707,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _type1 = "VAT Invoice";
                 _type2 = "Invoice";
             }
-            
+
             string subject = string.Format(@"eFMS - {0} Request - {1} {2}", _type1, _type2, refNo);
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
                                             "<p><i>Dear Accountant Team,</i></p>" +
@@ -1704,7 +1876,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var officeCode = offices.Where(x => x.Id == receipt.OfficeId).FirstOrDefault()?.Code;
                 sync.BranchCode = officeCode;
                 sync.OfficeCode = officeCode;
-                sync.DocDate = receipt.PaymentDate; //Payment Date
+                sync.DocDate = receipt.PaymentDate.HasValue ? receipt.PaymentDate.Value.Date : receipt.PaymentDate; //Payment Date (Chỉ lấy Date, không lấy time)
                 sync.ReferenceNo = receipt.PaymentRefNo; //Receipt No
                 var invoicePartner = partners.Where(x => x.Id == receipt.CustomerId).FirstOrDefault();
                 sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
@@ -1771,7 +1943,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
-        
+
         public bool CheckCdNoteSynced(Guid idCdNote)
         {
             var cdNote = cdNoteRepository.Get(x => x.Id == idCdNote).FirstOrDefault();

@@ -20,7 +20,8 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                     [dataSources]="configShipment.dataSource"
                                     [displayFields]="configShipment.displayFields"
-                                    [selectedDisplayFields]="configShipment.selectedDisplayFields">
+                                    [selectedDisplayFields]="configShipment.selectedDisplayFields"
+                                    (remove)="selectedShipmentData = null">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -42,7 +43,7 @@
                                 <label class="form-control-label">
                                     Type
                                 </label>
-                                <select [(ngModel)]="selectedType" name="selectedType" class="form-control">
+                                <select [(ngModel)]="selectedType" name="selectedType" class="form-control" disabled>
                                     <option *ngFor="let item of types" [ngValue]="item">{{item.text}}</option>
                                 </select>
                             </div>
@@ -103,7 +104,7 @@
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <label class="form-control-label" for="">
+                            <!-- <label class="form-control-label" for="">
                                 Commodity Group
                             </label>
                             <select [(ngModel)]="commodity" class="form-control">
@@ -111,7 +112,7 @@
                                 <option *ngFor="let comodity of commodityGroup" [ngValue]="comodity">
                                     {{comodity.groupNameEn}}
                                 </option>
-                            </select>
+                            </select> -->
                         </div>
                         <div class="col-8">
                             <div class="form-actions m--align-right m--margin-top-10">
@@ -196,6 +197,7 @@
                                             </label>
                                         </div>
                                     </td>
+                                    <td class="text-center">{{i + 1}}</td>
                                     <td>
                                         <span>{{charge.chargeCode}}</span>
                                     </td>
@@ -214,10 +216,10 @@
                                     <td>
                                         <span>{{charge.customNo}}</span>
                                     </td>
-                                    <td>
+                                    <td class="text-right">
                                         <span>{{charge.debit | number: '.0-3'}}</span>
                                     </td>
-                                    <td>
+                                    <td class="text-right">
                                         <span>{{charge.credit | number: '.0-3'}}</span>
                                     </td>
                                     <td>
@@ -226,8 +228,12 @@
                                     <td>
                                         <span>{{charge.invoiceNo}}</span>
                                     </td>
+                                    <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
+                                        <span>{{charge.cdNote}}</span>
+                                    </td>
                                     <td>
-                                        <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
+                                        <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') :
+                                            ''}}</span>
                                     </td>
                                     <td>
                                         <span>{{charge.note}}</span>

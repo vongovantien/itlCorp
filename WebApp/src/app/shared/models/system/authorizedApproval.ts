@@ -24,6 +24,8 @@ export class AuthorizedApproval {
     nameUserModified: string = '';
     description: string = '';
     permission: PermissionShipment = new PermissionShipment();
+    officeCommissioner: string = '';
+    officeCommissionerName: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AppPage } from '@app';
 import { Surcharge } from '@models';
@@ -12,6 +13,7 @@ import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { DataService } from '@services';
 
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
@@ -41,6 +43,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         private _router: Router,
         private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
+        private _dataService: DataService
     ) {
         super();
 
@@ -85,11 +88,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         return settlement;
     }
 
-    updateSettlement() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+    formatInvoiceDateSurcharge() {
         this.requestSurchargeListComponent.surcharges.forEach(s => {
             if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
                 if (Object.prototype.toString.call(s.invoiceDate) === '[object Date]') {
@@ -97,6 +96,14 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 }
             }
         });
+    }
+
+    updateSettlement() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        this.formatInvoiceDateSurcharge();
         this._progressRef.start();
         const body: any = {
             settlement: this.getBodySettlement(),
@@ -112,6 +119,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         this.getDetailSettlement(this.settlementId, 'GROUP');
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
+                    }
+                },
+                (error) => {
+                    if (error instanceof HttpErrorResponse) {
+                        if (error.error?.data) {
+                            this._dataService.setData('duplicateChargeSettlement', error.error);
+                        }
                     }
                 }
             );
@@ -167,14 +181,19 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
                     this.requestSurchargeListComponent.isShowButtonCopyCharge = false;
 
-                    if (this.requestSurchargeListComponent.groupShipments.length) {
-                        this.requestSurchargeListComponent.openAllCharge.next(true);
-                    }
+                    // if (this.requestSurchargeListComponent.groupShipments.length) {
+                    //     this.requestSurchargeListComponent.openAllCharge.next(true);
+                    // }
                 },
             );
     }
 
     saveAndSendRequest() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        this.formatInvoiceDateSurcharge();
         this._progressRef.start();
         const body: any = {
             settlement: this.getBodySettlement(),
@@ -191,6 +210,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${res.data.settlement.id}/approve`]);
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
+                    }
+                },
+                (error) => {
+                    if (error instanceof HttpErrorResponse) {
+                        if (error.error?.data) {
+                            this._dataService.setData('duplicateChargeSettlement', error.error);
+                        }
                     }
                 }
             );

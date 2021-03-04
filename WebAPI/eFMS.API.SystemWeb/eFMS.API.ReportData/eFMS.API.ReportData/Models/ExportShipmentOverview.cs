@@ -64,5 +64,7 @@ namespace eFMS.API.ReportData.Models
         public Guid? HblId { get; set; }
         public string ProductService { get; set; }
         public string CustomNo { get; set; }
+        public decimal? TotalCustomSell { get; set; }
+        public decimal? TotalCustomBuy { get; set; }
     }
 }

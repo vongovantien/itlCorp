@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PARTNERDATACOLUMNSETTING } from './partner-data.columns';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -14,12 +14,14 @@ import { PartnerListComponent } from './components/partner-list/partner-list.com
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
 import { ExportRepo, CatalogueRepo } from '@repositories';
-import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+import { ConfirmPopupComponent, Permission403PopupComponent, SearchOptionsComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { RoutingConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { SearchList, IPartnerDataState, getPartnerDataSearchParamsState } from './store';
+import { Store } from '@ngrx/store';
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 
 
@@ -42,6 +44,7 @@ export class PartnerComponent extends AppList implements OnInit {
     @ViewChild(PartnerListComponent) allPartnerComponent: PartnerListComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: any;
     @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
+    @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
 
     pager: PagerSetting = PAGINGSETTING;
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
@@ -74,18 +77,34 @@ export class PartnerComponent extends AppList implements OnInit {
 
     allowDelete: boolean = false;
 
+    dataSearchs: any = [];
+
 
 
     constructor(private router: Router,
         private _ngProgressService: NgProgress,
         private _exportRepo: ExportRepo,
         private _catalogueRepo: CatalogueRepo,
-        private _toastService: ToastrService) {
+        private _store: Store<IPartnerDataState>,
+        private _toastService: ToastrService,
+        private _cd: ChangeDetectorRef) {
         super();
         this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() {
+        this._store.select(getPartnerDataSearchParamsState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (!!data && !!data.keyword) {
+                        this.dataSearchs = data;
+                    }
+
+                }
+            );
         this.headerSearch = [
             { title: 'Partner ID', field: 'accountNo', sortable: true },
             { title: 'Name ABBR', field: 'shortName', sortable: true },
@@ -100,7 +119,6 @@ export class PartnerComponent extends AppList implements OnInit {
             settingFields: this.headerSearch.map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
-
         this.tabSelect(this.activeTab);
     }
 
@@ -115,7 +133,7 @@ export class PartnerComponent extends AppList implements OnInit {
         if (event.field === "All") {
             this.criteria.all = event.searchString;
         } else {
-            if (event.field === "id") {
+            if (event.field === "accountNo") {
                 this.criteria.accountNo = event.searchString;
             }
             if (event.field === "shortName") {
@@ -143,7 +161,18 @@ export class PartnerComponent extends AppList implements OnInit {
 
         this.allPartnerComponent.dataSearch = this.criteria;
         this.allPartnerComponent.page = 1;
-        this.allPartnerComponent.getPartners();
+        if (!!event.field && event.searchString === "") {
+            this.dataSearchs.keyword = "";
+        }
+        const searchData: ISearchGroup = {
+            type: !!event.field ? event.field : this.dataSearchs.type,
+            keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword,
+            partnerGroup: this.criteria.partnerGroup
+        };
+        this.page = 1;
+        this._store.dispatch(SearchList({ payload: searchData }));
+
+        this.allPartnerComponent.requestList();
     }
     tabSelect(tabName) {
         this.pager.currentPage = 1;
@@ -168,6 +197,18 @@ export class PartnerComponent extends AppList implements OnInit {
         if (tabName === this.tabName.allTab) {
             this.criteria.partnerGroup = PartnerGroupEnum.ALL;
         }
+    }
+
+    ngAfterViewInit() {
+        if (Object.keys(this.dataSearchs).length > 0) {
+            this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
+            const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;
+            this.searchOptionsComponent.searchObject.field = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;
+            this.searchOptionsComponent.searchObject.displayName = this.dataSearchs.type !== "All" ? this.headerSearch.find(x => x.field === type).title : this.dataSearchs.type;
+            this.allPartnerComponent.dataSearch[this.dataSearchs.type] = this.dataSearchs.keyword;
+        }
+        // this.onSearch(this.dataSearch);
+        this._cd.detectChanges();
     }
 
     showConfirmDelete(event) {
@@ -266,4 +307,10 @@ export class PartnerComponent extends AppList implements OnInit {
                 }
             );
     }
+}
+
+interface ISearchGroup {
+    type: string;
+    keyword: string;
+    partnerGroup: string;
 }

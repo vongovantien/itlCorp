@@ -434,6 +434,12 @@
                                         [value]="charge.voucherIddate | date: 'dd/MM/yyyy'">
                                 </div>
                             </td>
+                            <td class="disabled">
+                                <div class="form-group ">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.netAmount" readonly
+                                        disabled currencyMask placeholder="Net Amount">
+                                </div>
+                            </td>
                         </tr>
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">

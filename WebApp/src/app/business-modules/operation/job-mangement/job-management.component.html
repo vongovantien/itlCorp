@@ -5,6 +5,16 @@
         </div>
         <div class="c-button-actions">
             <app-permission-button title="create new job" (onClick)="gotoCreateJob()"></app-permission-button>
+            <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
+                <app-permission-button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Import"
+                    type="import">
+                </app-permission-button>
+                <div class="dropdown-menu" aria-labelledby="">
+                    <a routerLink="/home/operation/job-management/import-charge" class="dropdown-item"
+                        href="javascript:void(0)">Import
+                        Charge</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -65,7 +75,7 @@
                                                         </button>
 
                                                         <app-permission-button (onClick)="showDetail(item.id)"
-                                                            type="detail">
+                                                            type="detail" [user]="item.userCreated">
                                                         </app-permission-button>
 
                                                         <button type="button" *ngIf="item.isLocked"
@@ -75,15 +85,15 @@
 
                                                         <ng-container *ngIf="!item.isLocked">
                                                             <app-permission-button (onClick)="deleteSipment(item)"
-                                                                type="delete">
+                                                                type="delete" [user]="item.userCreated">
                                                             </app-permission-button>
                                                         </ng-container>
 
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a href="javascript:void(0)"
-                                                        (click)="showDetail(item.id)">{{ item.jobNo }}
+                                                    <a href="javascript:void(0)" (click)="showDetail(item.id)">{{
+                                                        item.jobNo }}
                                                     </a>
                                                 </td>
                                                 <td>
@@ -139,7 +149,8 @@
                                                                     <span>{{ clearance.clearanceNo }}</span>
                                                                 </td>
                                                                 <td>
-                                                                    <span>{{ clearance.clearanceDate | date:'dd/MM/yyyy' }}</span>
+                                                                    <span>{{ clearance.clearanceDate | date:'dd/MM/yyyy'
+                                                                        }}</span>
                                                                 </td>
                                                                 <td>
                                                                     <span>{{ clearance.hblid }}</span>
