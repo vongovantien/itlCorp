@@ -9,6 +9,7 @@ import { UnlockAccountingComponent } from './components/unlock-accounting/unlock
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { UnlockHistoryPopupComponent } from './components/unlock-history/unlock-history.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { LockShipmentComponent } from './components/lock-shipment/lock-shipment.component';
 
 const routing: Route[] = [
     { path: '', component: UnlockComponent, data: { name: "" } },
@@ -29,7 +30,8 @@ const routing: Route[] = [
         UnlockComponent,
         UnlockShipmentComponent,
         UnlockAccountingComponent,
-        UnlockHistoryPopupComponent
+        UnlockHistoryPopupComponent,
+        LockShipmentComponent
     ],
     providers: [],
 })
