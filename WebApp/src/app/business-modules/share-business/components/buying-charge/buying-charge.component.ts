@@ -317,6 +317,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
                 // * CR: 14583
                 chargeItem.currencyId = data.currencyId || "VND";
+                // * CR: 15473
+                if (data.vatrate) {
+                    chargeItem.vatrate = data.vatrate;
+                    this.onChangeDataUpdateTotal(chargeItem);
+                }
                 break;
             case 'unit':
                 chargeItem.unitId = data.id;
