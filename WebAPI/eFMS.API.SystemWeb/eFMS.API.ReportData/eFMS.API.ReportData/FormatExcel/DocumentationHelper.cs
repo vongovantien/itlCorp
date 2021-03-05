@@ -4124,6 +4124,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             var monthGrp = resultData.Details.GroupBy(x => x.ServiceDate?.Month).OrderBy(x => x.Key).Select(x => x.Key);
             var startRow = 4;
+            string formatNumber = "_(* #,##0.00_);_(* (#,##0.00);_(* \" - \"??_);_(@_)";
             foreach (var mon in monthGrp)
             {
                 var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.JobId);
@@ -4146,16 +4147,16 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[startRow, 3].Value = shipment.MBLNo;
                     workSheet.Cells[startRow, 4].Value = shipment.HBLNo;
                     workSheet.Cells[startRow, 5].Value = shipment.BuyingRate - shipment.SellingRate;
+                    workSheet.Cells[startRow, 5].Style.Numberformat.Format = formatNumber;
                     startRow++;
                 }
                 workSheet.Cells[startGrp, 1, startRow - 1, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
-            workSheet.Cells[5, 5, startRow - 1, 5].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[startRow, 1].Value = "TOTAL(USD)";
             workSheet.Cells[startRow, 1, startRow, 3].Merge = true;
             var _statement = string.Format("SUM(E5:E{0})", startRow - 1);
-            workSheet.Cells[startRow, 5].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[startRow, 5].Formula = _statement;
+            workSheet.Cells[startRow, 5].Style.Numberformat.Format = formatNumber;
             workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             startRow++;
             workSheet.Cells[startRow, 1].Value = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate.ToString("#,##0"));
@@ -4163,7 +4164,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             _statement = string.Format("E{0}*0.1*{1}", startRow - 1, resultData.ExchangeRate);
             workSheet.Cells[startRow, 5].Formula = _statement;
-            workSheet.Cells[startRow, 5].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[startRow, 5].Style.Numberformat.Format = formatNumber;
             // Border
             workSheet.Cells[3, 1, startRow, 5].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[3, 1, startRow, 5].Style.Border.Right.Style = ExcelBorderStyle.Thin;
