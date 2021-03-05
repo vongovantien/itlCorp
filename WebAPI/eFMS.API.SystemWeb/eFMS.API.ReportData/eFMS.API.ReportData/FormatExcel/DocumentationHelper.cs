@@ -3707,7 +3707,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Header 1
             workSheet.Cells["A9:S9"].Merge = true;
             workSheet.Cells["A9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            //workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth);
+            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth?.ToUpper());
             workSheet.Cells["A9"].Style.Font.SetFromFont(new Font("Calibri", 11, FontStyle.Bold));
 
             workSheet.Cells["N10"].Value = "Ex.rate";
@@ -3733,15 +3733,6 @@ namespace eFMS.API.ReportData.FormatExcel
             int startRow = 13;
             var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.JobId);
             var years = resultData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate.Value.Year);
-            var forMonth = string.Empty;
-            foreach (var year in years)
-            {
-                var listFilter = listDetail.Where(x => x.ServiceDate.Value.Year == year).Select(x => x.ServiceDate.Value.ToString("MMM"));
-                forMonth += string.IsNullOrEmpty(forMonth) ? "" : ", ";
-                forMonth += string.Join(" - ", listFilter);
-                forMonth += (' ' + year);
-            }
-            workSheet.Cells["A9"].Value = string.Format(title[1], forMonth.ToUpper());
             var formatMonth = years.Count() > 1 ? "MMM-yyyy" : "MMM";
             foreach (var item in listDetail)
             {
@@ -3938,7 +3929,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Header 1
             workSheet.Cells["A9:R9"].Merge = true;
             workSheet.Cells["A9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth.ToUpper());
+            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth?.ToUpper());
             workSheet.Cells["A9"].Style.Font.SetFromFont(new Font("Calibri", 11, FontStyle.Bold));
 
             // Customer name
@@ -4111,7 +4102,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1"].Value = "DE NGHI THANH TOAN COMMISSION";
             workSheet.Cells["A1"].Style.Font.SetFromFont(new Font("VNI-Times", 14, FontStyle.Bold));
             workSheet.Cells["A2:E2"].Merge = true;
-            workSheet.Cells["A2"].Value = resultData.ForMonth.ToUpper();
+            workSheet.Cells["A2"].Value = resultData.ForMonth?.ToUpper();
             workSheet.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A2"].Style.Font.SetFromFont(new Font("VNI-Times", 14, FontStyle.Bold));
 
