@@ -348,25 +348,47 @@ namespace eFMS.API.Documentation.DL.Services
         public LockedLogResultModel GetShipmentToUnLock(ShipmentCriteria criteria)
         {
             LockedLogResultModel result = new LockedLogResultModel();
-            IQueryable<LockedLogModel> opShipments = null;
+            IQueryable<LockedLogModel> opShipments = Enumerable.Empty<LockedLogModel>().AsQueryable();
             string transactionType = string.Empty;
-            opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
-                                                    && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase) : true)
-                                                    || criteria.Keywords == null)
-                                                    &&
-                                                    (
-                                                            (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
-                                                        || (criteria.FromDate == null && criteria.ToDate == null)
-                                                    )
-                                                    )
-                .Select(x => new LockedLogModel
+
+            if ((criteria.TransactionType == 0 || criteria.TransactionType == TransactionTypeEnum.CustomLogistic) && criteria.ShipmentPropertySearch != ShipmentPropertySearch.CD)
+            {
+                opShipments = opsRepository.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
+                                                   && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase) : true)
+                                                   || criteria.Keywords == null)
+                                                   &&
+                                                   (
+                                                        criteria.OfficeIds.Contains(x.OfficeId.ToString())
+                                                        &&
+                                                       (((x.ServiceDate ?? null) >= (criteria.FromDate ?? null)) && ((x.ServiceDate ?? null) <= (criteria.ToDate ?? null)))
+                                                       || (criteria.FromDate == null && criteria.ToDate == null)
+                                                   ))
+                                                   .Select(x => new LockedLogModel
+                                                   {
+                                                       Id = x.Id,
+                                                       OPSShipmentNo = x.JobNo,
+                                                       UnLockedLog = x.UnLockedLog,
+                                                       IsLocked = x.IsLocked
+                                                   });
+            }
+            else if (criteria.TransactionType == 0 || criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+            {
+                var customs = customsDeclarationRepo.Get(x => criteria.Keywords.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase) && !string.IsNullOrEmpty(x.JobNo));
+                if (customs != null && customs.Count() > 0)
                 {
-                    Id = x.Id,
-                    OPSShipmentNo = x.JobNo,
-                    UnLockedLog = x.UnLockedLog,
-                    IsLocked = x.IsLocked
-                });
-            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
+                    opShipments = from cd in customs
+                                  join ops in opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED) on cd.JobNo equals ops.JobNo
+                                  select new LockedLogModel
+                                  {
+                                      Id = ops.Id,
+                                      IsLocked = ops.IsLocked,
+                                      OPSShipmentNo = ops.JobNo,
+                                      UnLockedLog = ops.UnLockedLog
+                                  };
+                }
+            }
+
+            if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic || criteria.ShipmentPropertySearch == ShipmentPropertySearch.CD)
             {
                 if (opShipments.Any())
                 {
@@ -386,25 +408,32 @@ namespace eFMS.API.Documentation.DL.Services
 
                 transactionType = DataTypeEx.GetType(criteria.TransactionType);
             }
-            var csTransactions = DataContext.Get(x => ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
-                                                 && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase) : true)
-                                                    || criteria.Keywords == null)
-                                                 && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
-                                              );
-            csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
-            if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
+            IQueryable<CsTransaction> csTransactions = Enumerable.Empty<CsTransaction>().AsQueryable();
+
+            csTransactions = DataContext.Get(x =>
+                                        ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
+                                         && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase) : true)
+                                            || criteria.Keywords == null)
+                                         && criteria.OfficeIds.Contains(x.OfficeId.ToString())
+                                         && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
+                                      );
+            if (csTransactions.Count() > 0)
             {
-                var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase));
-                csTransactions = csTransactions.Join(shipmentDetails, x => x.Id, y => y.JobId, (x, y) => x);
-            }
-            var csShipments = csTransactions
-                .Select(x => new LockedLogModel
+                csTransactions = GetShipmentServicesByTime(csTransactions, criteria);
+                if (criteria.ShipmentPropertySearch == ShipmentPropertySearch.HBL)
                 {
-                    Id = x.Id,
-                    CSShipmentNo = x.JobNo,
-                    UnLockedLog = x.UnLockedLog,
-                    IsLocked = x.IsLocked
-                });
+                    var shipmentDetails = detailRepository.Get(x => criteria.Keywords.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase));
+                    csTransactions = csTransactions.Join(shipmentDetails, x => x.Id, y => y.JobId, (x, y) => x);
+                }
+            }
+
+            IQueryable<LockedLogModel> csShipments = csTransactions.Select(x => new LockedLogModel
+            {
+                Id = x.Id,
+                CSShipmentNo = x.JobNo,
+                UnLockedLog = x.UnLockedLog,
+                IsLocked = x.IsLocked
+            });
 
             IQueryable<LockedLogModel> shipments = null;
 
@@ -505,6 +534,82 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public HandleState LockShipmentList(List<string> JobIds)
+        {
+            HandleState res = new HandleState();
+
+            if(JobIds.Count == 0)
+            {
+                return res;
+            }
+
+            List<string> jobOps = JobIds.Where(x => x.Contains("LOG")).ToList();
+            List<string> jobCs = JobIds.Where(x => !jobOps.Contains(x)).ToList();
+
+            if(jobOps.Count == 0 && jobCs.Count == 0)
+            {
+                return res;
+            }
+
+            List<OpsTransaction> opsShipments = new List<OpsTransaction>();
+            if(jobOps.Count > 0)
+            {
+                foreach (var item in jobOps)
+                {
+                    var shipment = opsRepository.Get(x => x.JobNo == item && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false)?.FirstOrDefault();
+                    if(shipment != null)
+                    {
+                        opsShipments.Add(shipment);
+                    }
+
+                }
+
+                if(opsShipments.Count() > 0)
+                {
+                    foreach (var job in opsShipments)
+                    {
+                        job.UserModified = currentUser.UserID;
+                        job.DatetimeModified = DateTime.Now;
+                        job.IsLocked = true;
+                        job.LockedDate = DateTime.Now;
+                        job.LockedUser = currentUser.UserName;
+
+                        opsRepository.Update(job, x => x.Id == job.Id, false);
+                    }
+                    res = opsRepository.SubmitChanges();
+                }
+            }
+            List<CsTransaction> csShipments = new List<CsTransaction>();
+
+            if (jobCs.Count > 0)
+            {
+                foreach (var item in jobCs)
+                {
+                    var shipment = DataContext.Get(x => x.JobNo == item && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false)?.FirstOrDefault();
+                    if(shipment != null)
+                    {
+                        csShipments.Add(shipment);
+                    }
+                }
+                if (csShipments.Count() > 0)
+                {
+                    foreach (var job in csShipments)
+                    {
+                        job.UserModified = currentUser.UserID;
+                        job.DatetimeModified = DateTime.Now;
+                        job.IsLocked = true;
+                        job.LockedDate = DateTime.Now;
+                        job.LockedUser = currentUser.UserName;
+
+                        DataContext.Update(job, x => x.Id == job.Id, false);
+                    }
+                    res = DataContext.SubmitChanges();
+                }
+            }
+
+            return res;
+
+        }
         public IQueryable<Shipments> GetShipmentNotDelete()
         {
             //Get list shipment operation: Current Status != 'Canceled'
@@ -785,7 +890,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             queryOpsTrans = queryOpsTrans.And(q => criteria.Service.Contains("CL") || string.IsNullOrEmpty(criteria.Service));
             // Search Customer
-            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost != true)
+            if (!string.IsNullOrEmpty(criteria.CustomerId) && fromCost == true)
             {
                 queryOpsTrans = queryOpsTrans.And(q => criteria.CustomerId.Contains(q.CustomerId));
             }
@@ -1004,8 +1109,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.MblMawb;
                 data.HblHawb = item.HblHawb;
-                data.PolPod = item.Pol != null && item.Pol != Guid.Empty ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty
-                    + "/" + (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
+                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
+
+                data.PolPod = ( item.Pod != null && item.Pod != Guid.Empty) ?  pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
                 data.Carrier = !string.IsNullOrEmpty(item.Carrier) ? LookupPartner[item.Carrier].FirstOrDefault()?.ShortName : string.Empty;
                 data.Agent = LookupPartner[item.Agent].FirstOrDefault()?.ShortName;
                 var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
@@ -1108,7 +1214,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
                 data.TotalCustomSell = _totalSellCustom;
-                if(data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
+                if (data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
                 {
                     data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
                 }
@@ -1313,8 +1419,8 @@ namespace eFMS.API.Documentation.DL.Services
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
                 data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                 data.JobNo = item.JobNo;
-                data.PolPod = item.Pol != null && item.Pol != Guid.Empty ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty
-                    + "/" + (item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : string.Empty);
+                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
                 data.Shipper = LookupPartner[item.Shipper].Select(t => t.PartnerNameEn).FirstOrDefault();
                 data.Consignee = item.Consignee;
                 data.MblMawb = item.Mblno;
@@ -1782,7 +1888,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, true);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -2128,9 +2234,9 @@ namespace eFMS.API.Documentation.DL.Services
             return queryShipment;
         }
 
-        private IQueryable<OpsTransaction> QueryDataOperationCost(GeneralReportCriteria criteria, bool fromCost)
+        private IQueryable<OpsTransaction> QueryDataOperationCost(GeneralReportCriteria criteria, bool? fromCost)
         {
-            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, true);
+            Expression<Func<OpsTransaction, bool>> query = GetQueryOPSTransactionOperation(criteria, null);
 
             var queryShipment = GetOpsTransactionWithSalesman(query, criteria);
             return queryShipment;
@@ -2815,7 +2921,7 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- Export Summary Of Costs Incurred
         private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurredOperation(GeneralReportCriteria criteria)
         {
-            var dataShipment = QueryDataOperationCost(criteria, true);
+            var dataShipment = QueryDataOperationCost(criteria, null);
             if (dataShipment == null) return null;
             var port = catPlaceRepo.Get();
             List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();

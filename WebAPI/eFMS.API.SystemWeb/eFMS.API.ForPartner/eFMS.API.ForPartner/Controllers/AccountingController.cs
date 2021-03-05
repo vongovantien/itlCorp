@@ -184,21 +184,21 @@ namespace eFMS.API.ForPartner.Controllers
             if (!string.IsNullOrEmpty(fieldRequireInvoice))
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Trường {0} không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireInvoice), Data = model };
-                return BadRequest(_result);
+                return Ok(_result);
             }
 
             var fieldRequireCharge = GetFieldRequireCharges(model.Charges);
             if (!string.IsNullOrEmpty(fieldRequireCharge))
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Các trường của ds charge: [{0}] không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireCharge), Data = model };
-                return BadRequest(_result);
+                return Ok(_result);
             }
 
             var debit_Obh_Charges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT || x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
             if (debit_Obh_Charges.Count == 0)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để tạo hóa đơn. Vui lòng kiểm tra lại!", Data = model };
-                return BadRequest(_result);
+                return Ok(_result);
             }
 
             var hs = accountingManagementService.InsertInvoice(model, apiKey);
@@ -215,7 +215,7 @@ namespace eFMS.API.ForPartner.Controllers
             #endregion -- Ghi Log --
 
             if (!hs.Success)
-                return BadRequest(result);
+                return Ok(result);
             return Ok(result);
         }
 
@@ -245,21 +245,21 @@ namespace eFMS.API.ForPartner.Controllers
             if (!string.IsNullOrEmpty(fieldRequireInvoice))
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Trường {0} không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireInvoice), Data = model };
-                return BadRequest(_result);
+                return Ok(_result);
             }
 
             var fieldRequireCharge = GetFieldRequireCharges(model.Charges);
             if (!string.IsNullOrEmpty(fieldRequireCharge))
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Các trường của ds phí: [{0}] không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequireCharge), Data = model };
-                return BadRequest(_result);
+                return Ok(_result);
             }
 
             var debit_Obh_Charges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT || x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
             if (debit_Obh_Charges.Count == 0)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để thay thế hóa đơn. Vui lòng kiểm tra lại!", Data = model };
-                return BadRequest(_result);
+                return Ok(_result);
             }
 
             #region --- Delete Invoice Old by PreReferenceNo ---
@@ -272,7 +272,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = string.Format("{0}. Xóa hóa đơn cũ thất bại", hsDeleteInvoice.Message.ToString()), Data = model };
                 actionFuncLogService.AddActionFuncLog("DeleteInvoice (ReplaceInvoiceData)", JsonConvert.SerializeObject(model), JsonConvert.SerializeObject(_result), "Xóa Hóa Đơn", _startDateProgress, DateTime.Now);
-                return BadRequest(_result);
+                return Ok(_result);
             }
             #endregion --- Delete Invoice Old by PreReferenceNo ---
 
@@ -307,7 +307,7 @@ namespace eFMS.API.ForPartner.Controllers
             #endregion -- Ghi Log --
 
             if (!hsInsertInvoice.Success)
-                return BadRequest(result);
+                return Ok(result);
             return Ok(result);
         }
 
@@ -347,7 +347,7 @@ namespace eFMS.API.ForPartner.Controllers
             #endregion -- Ghi Log --
 
             if (!hs.Success)
-                return BadRequest(result);
+                return Ok(result);
             return Ok(result);
         }
 
@@ -387,7 +387,7 @@ namespace eFMS.API.ForPartner.Controllers
             #endregion -- Ghi Log --
 
             if (!hs.Success)
-                return BadRequest(result);
+                return Ok(result);
             return Ok(result);
         }
 
@@ -426,7 +426,7 @@ namespace eFMS.API.ForPartner.Controllers
             #endregion -- Ghi Log --
 
             if (!hs.Success)
-                return BadRequest(result);
+                return Ok(result);
             return Ok(result);
         }
 
@@ -544,6 +544,6 @@ namespace eFMS.API.ForPartner.Controllers
             return message;
         }
         #endregion --- PRIVATE ---
-
+        
     }
 }
