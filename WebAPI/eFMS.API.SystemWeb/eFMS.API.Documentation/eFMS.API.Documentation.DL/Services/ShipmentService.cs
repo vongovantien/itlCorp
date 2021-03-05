@@ -3961,7 +3961,7 @@ namespace eFMS.API.Documentation.DL.Services
                         //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                         //var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
                         //revenue += charge.Quantity * charge.UnitPrice * rate ?? 0;
-                        revenue += currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0); // Selling(USD)
+                        revenue += (currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0)); // Selling trước thuế
                     }
                 }
             }
@@ -3991,7 +3991,7 @@ namespace eFMS.API.Documentation.DL.Services
                         //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                         //var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
                         //cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Buying trước thuế
-                        cost += currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0); // Phí Buying(USD) trước thuế
+                        cost += (currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0)); // Phí Buying trước thuế
                     }
                 }
             }
@@ -4020,7 +4020,7 @@ namespace eFMS.API.Documentation.DL.Services
                         //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                         //var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
                         //com += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Selling trước thuế
-                        com += currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0); // Phí Commission(USD) trước thuế
+                        com += (currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0)); // Phí Commission trước thuế
                     }
                 }
             }
