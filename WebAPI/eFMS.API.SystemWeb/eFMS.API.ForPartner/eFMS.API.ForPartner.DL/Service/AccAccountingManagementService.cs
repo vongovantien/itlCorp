@@ -748,37 +748,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             return _prefixVoucher;
         }
-
-        private decimal? CalculatorTotalAmount(List<ChargeInvoice> charges, string currencyInvoice)
-        {
-            decimal? total = 0;
-            int _roundDecimal = currencyInvoice == ForPartnerConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
-            var surchargesLookupId = surchargeRepo.Get().ToLookup(x => x.Id);
-            if (!string.IsNullOrEmpty(currencyInvoice))
-            {
-                charges.ForEach(fe =>
-                {
-                    var surcharge = surchargesLookupId[fe.ChargeId].FirstOrDefault();
-                    if (surcharge != null)
-                    {
-                        //Tỷ giá của Currency Charge so với Local
-                        var _exchangeForLocal = CalculatorExchangeRate(fe.ExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
-                        decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(_exchangeForLocal, surcharge.ExchangeDate, surcharge.CurrencyId, currencyInvoice);
-
-                        decimal _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * exchangeRate) ?? 0, _roundDecimal);
-                        decimal _vatAmount = 0;
-                        if (surcharge.Vatrate != null)
-                        {
-                            decimal vatAmount = surcharge.Vatrate < 0 ? Math.Abs(surcharge.Vatrate ?? 0) : ((surcharge.UnitPrice * surcharge.Quantity * surcharge.Vatrate) ?? 0) / 100;
-                            _vatAmount = NumberHelper.RoundNumber(vatAmount * exchangeRate, _roundDecimal);
-                        }
-                        total += _netAmount + _vatAmount;
-                    }
-                });
-            }
-            return total;
-        }
-
+        
         private string SetAccountNoForInvoice(string partnerMode, string currencyInvoice)
         {
             if (string.IsNullOrEmpty(partnerMode))
@@ -885,6 +855,38 @@ namespace eFMS.API.ForPartner.DL.Service
                 _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
             }
             return _link;
+        }
+
+        private string CheckChargeDebitExistInvoice(IQueryable<CsShipmentSurcharge> surcharges, string code)
+        {
+            string message = string.Empty;
+            var charge = surcharges.Where(x => x.AcctManagementId != null && x.AcctManagementId != Guid.Empty).FirstOrDefault();
+            if (charge != null)
+            {
+                var invoice = DataContext.Get(x => x.Id == charge.AcctManagementId).FirstOrDefault();
+                if (invoice != null)
+                {
+                    var createdDate = invoice.DatetimeCreated != null ? invoice.DatetimeCreated.Value.ToString("dd/MM/yyyy HH:ss:mm") : string.Empty;
+                    message = string.Format("Phiếu chứng từ {0} đã được đồng bộ Hóa đơn {1} vào ngày {2}. Vui lòng kiểm tra đồng bộ Hủy Hóa Đơn trước khi trả phiếu!", code, invoice.InvoiceNoReal, createdDate);
+                }
+            }
+            return message;
+        }
+
+        private sp_UpdateRejectCharge UpdateRejectCharge(List<RejectChargeTable> charges)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(charges),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[RejectChargeTable]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateRejectCharge>(parameters);
+            return result.FirstOrDefault();
         }
 
         #endregion --- PRIVATE METHOD ---
@@ -1201,11 +1203,6 @@ namespace eFMS.API.ForPartner.DL.Service
             var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
             if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
 
-            soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-            soa.UserModified = currentUser.UserID;
-            soa.DatetimeModified = DateTime.Now;
-            soa.ReasonReject = reason;
-
             IQueryable<CsShipmentSurcharge> surcharges = null;
             if (soa.Type == "Credit")
             {
@@ -1214,6 +1211,51 @@ namespace eFMS.API.ForPartner.DL.Service
             if (soa.Type == "Debit")
             {
                 surcharges = surchargeRepo.Get(x => x.Soano == soa.Soano);
+                //Check tồn tại phí đã đồng bộ Invoice from Bravo
+                var existInvoice = CheckChargeDebitExistInvoice(surcharges, soa.Soano);
+                if (!string.IsNullOrEmpty(existInvoice))
+                {
+                    return new HandleState((object)existInvoice);
+                }
+            }
+
+            soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+            soa.UserModified = currentUser.UserID;
+            soa.DatetimeModified = DateTime.Now;
+            soa.ReasonReject = reason;
+
+            //Update PaySyncedFrom or SyncedFrom equal NULL by SoaNo (Sử dụng Store Procudure để Update Charge)
+            if (surcharges != null)
+            {
+                var rejectCharges = new List<RejectChargeTable>();
+                foreach (var surcharge in surcharges)
+                {
+                    var rejectCharge = new RejectChargeTable();
+                    rejectCharge.Id = surcharge.Id;
+                    if (surcharge.Type == "OBH")
+                    {
+                        rejectCharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? null : surcharge.PaySyncedFrom;
+                        rejectCharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? null : surcharge.SyncedFrom;
+                    }
+                    else
+                    {
+                        rejectCharge.SyncedFrom = null;
+                    }
+                    rejectCharge.UserModified = currentUser.UserID;
+                    rejectCharge.DatetimeModified = DateTime.Now;
+                    rejectCharges.Add(rejectCharge);
+                }
+
+                var updateRejectCharge = UpdateRejectCharge(rejectCharges);
+                string logName = string.Format("Reject_SOA_{0}_UpdateCharge", soa.Soano);
+                string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                    JsonConvert.SerializeObject(rejectCharges),
+                    JsonConvert.SerializeObject(updateRejectCharge));
+                new LogHelper(logName, logMessage);
+                if (!updateRejectCharge.Status)
+                {
+                    return new HandleState((object)updateRejectCharge.Message);
+                }
             }
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -1260,7 +1302,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             sysUserNotificationRepository.Add(sysUserNotify);
 
                             //Update PaySyncedFrom or SyncedFrom equal NULL by SoaNo
-                            if (surcharges != null)
+                            /*if (surcharges != null)
                             {
                                 foreach (var surcharge in surcharges)
                                 {
@@ -1278,7 +1320,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                                 }
                                 var smSurcharge = surchargeRepo.SubmitChanges();
-                            }
+                            }*/
                         }
                         trans.Commit();
                     }
@@ -1303,13 +1345,23 @@ namespace eFMS.API.ForPartner.DL.Service
             var cdNote = acctCdNoteRepo.Get(x => x.Id == _id).FirstOrDefault();
             if (cdNote == null) return new HandleState((object)"Không tìm thấy CDNote");
 
+            var surcharges = surchargeRepo.Get(x => (cdNote.Type == "CREDIT" ? x.CreditNo : x.DebitNo) == cdNote.Code);
+
+            if (cdNote.Type != "CREDIT")
+            {
+                //Check tồn tại phí đã đồng bộ Invoice from Bravo
+                var existInvoice = CheckChargeDebitExistInvoice(surcharges, cdNote.Code);
+                if (!string.IsNullOrEmpty(existInvoice))
+                {
+                    return new HandleState((object)existInvoice);
+                }
+            }
+
             cdNote.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
             cdNote.UserModified = currentUser.UserID;
             cdNote.DatetimeModified = DateTime.Now;
             cdNote.ReasonReject = reason;
-
-            var surcharges = surchargeRepo.Get(x => (cdNote.Type == "CREDIT" ? x.CreditNo : x.DebitNo) == cdNote.Code);
-
+            
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
