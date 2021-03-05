@@ -30,7 +30,8 @@ export class CompanyInformationDetailComponent extends AppList {
         bunameVn: '',
         bunameAbbr: '',
         website: '',
-        active: true
+        active: true,
+        kbExchangeRate: null
     };
     companyId: string = '';
     company: Company;
@@ -100,6 +101,8 @@ export class CompanyInformationDetailComponent extends AppList {
         this.formData.bunameVn = company.bunameVn;
         this.formData.website = company.website;
         this.formData.active = company.active;
+        this.formData.kbExchangeRate = company.kbExchangeRate;
+
         this.formAddCompany.photoUrl = this.company.logoPath;
 
 
@@ -135,6 +138,7 @@ export class CompanyInformationDetailComponent extends AppList {
                 photoName: this.formAddCompany.code.value,
                 photoUrl: this.formAddCompany.photoUrl,
                 status: this.formAddCompany.active.value.value,
+                kbExchangeRate: this.formAddCompany.kbExchangeRate.value
             };
 
             this._progressRef.start();

@@ -20,16 +20,19 @@ namespace eFMS.IdentityServer
     {
         readonly IAuthenUserService authenUserService;
         readonly ISysEmployeeService employeeService;
-        IContextBase<SysUserLevel> userLevelRepository;
+        private readonly IContextBase<SysUserLevel> userLevelRepository;
+        private readonly IContextBase<SysCompany> sysCompanyRepository;
 
         public ProfileService(IAuthenUserService service, 
             ISysEmployeeService emService,
-            IContextBase<SysUserLevel> userLevelRepo
+            IContextBase<SysUserLevel> userLevelRepo,
+            IContextBase<SysCompany> sysCompanyRepo
             )
         {
             authenUserService = service;
             employeeService = emService;
             userLevelRepository = userLevelRepo;
+            sysCompanyRepository = sysCompanyRepo;
         }
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
@@ -42,8 +45,7 @@ namespace eFMS.IdentityServer
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
             var employee = employeeService.First(x => x.Id == user.EmployeeId);
-
-           
+            SysCompany company = sysCompanyRepository.Get(x => x.Id.ToString() == companyClaim.Value.ToString())?.FirstOrDefault();
             var claims = new List<Claim>
                 {
                     new Claim(JwtClaimTypes.Id, user.Id),
@@ -59,6 +61,7 @@ namespace eFMS.IdentityServer
                     new Claim("code", employee.StaffCode ?? ""),
                     new Claim("bankAccountNo", employee.BankAccountNo ?? ""),
                     new Claim("bankName", employee.BankName ?? ""),
+                    new Claim("kbExchangeRate", company.KbExchangeRate != null ? company.KbExchangeRate.ToString() : "0"),
                     companyClaim,
                     officeClaim,
                     departmentclaim,

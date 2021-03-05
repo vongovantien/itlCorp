@@ -12,6 +12,7 @@ export class Company {
     userModified: string = '';
     datetimeModified: string = '';
     active: boolean = true;
+    kbExchangeRate: number = null;
     sysBranch: any[] = [];
     nameUserCreated: string = '';
     nameUserModified: string = '';
