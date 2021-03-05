@@ -414,7 +414,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         ((criteria.ShipmentPropertySearch == ShipmentPropertySearch.JOBID ? criteria.Keywords.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) : true
                                          && criteria.ShipmentPropertySearch == ShipmentPropertySearch.MBL ? criteria.Keywords.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase) : true)
                                             || criteria.Keywords == null)
-                                         && criteria.OfficeIds.Contains(x.OfficeId.ToString())
+                                         && (criteria.OfficeIds != null ? criteria.OfficeIds.Contains(x.OfficeId.ToString()) : true)
                                          && (x.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                                       );
             if (csTransactions.Count() > 0)
