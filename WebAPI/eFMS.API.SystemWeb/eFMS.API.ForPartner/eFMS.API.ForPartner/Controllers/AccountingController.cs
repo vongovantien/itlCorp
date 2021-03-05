@@ -359,7 +359,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("RejectData")]
-        public IActionResult RejectData(RejectData model, [Required] string apiKey, [Required] string hash)
+        public IActionResult RejectData(RejectData model, [Required] string apiKey)//, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
 
@@ -367,10 +367,10 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
             }
-            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
-            {
-                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
-            }
+            //if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            //{
+            //    return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            //}
             if (!ModelState.IsValid) return BadRequest();
 
             var hs = accountingManagementService.RejectData(model, apiKey);
