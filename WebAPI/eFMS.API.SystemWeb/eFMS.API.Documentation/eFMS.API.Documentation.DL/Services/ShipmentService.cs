@@ -4,14 +4,18 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -2207,20 +2211,39 @@ namespace eFMS.API.Documentation.DL.Services
         #endregion -- GENERAL REPORT --     
 
         #region -- Export Accounting PL Sheet --
-        public List<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria)
+
+        private List<sp_GetDataExportAccountant> GetDataExportAccountant(GeneralReportCriteria criteria)
         {
-            var dataDocumentation = AcctPLSheetDocumentation(criteria);
-            IQueryable<AccountingPlSheetExportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
-            {
-                var dataOperation = AcctPLSheetOperation(criteria);
-                list = dataDocumentation.Union(dataOperation);
-            }
-            else
-            {
-                list = dataDocumentation;
-            }
-            return list.ToList();
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.ServiceDateFrom },
+                new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.ServiceDateTo },
+                new SqlParameter(){ ParameterName = "@createdDateFrom", Value = criteria.CreatedDateFrom },
+                new SqlParameter(){ ParameterName = "@createdDateTo", Value = criteria.CreatedDateTo },
+                new SqlParameter(){ ParameterName = "@customerId", Value = criteria.CustomerId },
+                new SqlParameter(){ ParameterName = "@service", Value = criteria.Service },
+                new SqlParameter(){ ParameterName = "@currency", Value = criteria.Currency },
+                new SqlParameter(){ ParameterName = "@jobId", Value = criteria.JobId },
+                new SqlParameter(){ ParameterName = "@mawb", Value = criteria.Mawb },
+                new SqlParameter(){ ParameterName = "@hawb", Value = criteria.Hawb },
+                new SqlParameter(){ ParameterName = "@officeId", Value = criteria.OfficeId },
+                new SqlParameter(){ ParameterName = "@departmentId", Value = criteria.DepartmentId },
+                new SqlParameter(){ ParameterName = "@groupId", Value = criteria.GroupId },
+                new SqlParameter(){ ParameterName = "@personalInCharge", Value = criteria.PersonInCharge },
+                new SqlParameter(){ ParameterName = "@salesMan", Value = criteria.SalesMan },
+                new SqlParameter(){ ParameterName = "@creator", Value = criteria.Creator },
+                new SqlParameter(){ ParameterName = "@carrierId", Value = criteria.CarrierId },
+                new SqlParameter(){ ParameterName = "@agentId", Value = criteria.AgentId },
+                new SqlParameter(){ ParameterName = "@pol", Value = criteria.Pol },
+                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod }
+            };
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataExportAccountant>(parameters);
+            return list;
+        }
+        public IQueryable<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria)
+        {
+            var list = GetDataExportAccountant(criteria);
+            var dataDocumentation = AcctPLSheetDocumentation(criteria, list);
+            return dataDocumentation;
         }
 
         private IQueryable<OpsTransaction> QueryDataOperationAcctPLSheet(GeneralReportCriteria criteria)
@@ -2759,55 +2782,23 @@ namespace eFMS.API.Documentation.DL.Services
                 return queryShipment;
             }
         }
-        private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria)
+        private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria, List<sp_GetDataExportAccountant> dataExportAccountants)
         {
             // Filter data without customerId
             var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
             var dataShipment = QueryDataDocumentationAcctPLSheet(criteriaNoCustomer);
-            if (!dataShipment.Any()) return dataShipment.AsQueryable();
+            if (!dataExportAccountants.Any()) return null;
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
-            var lstSurchage = surCharge.Get().Where(x => !string.IsNullOrEmpty(criteria.CustomerId) ? ((!string.IsNullOrEmpty(x.PaymentObjectId) && criteria.CustomerId.Contains(x.PaymentObjectId)) || (!string.IsNullOrEmpty(x.PayerId) && criteria.CustomerId.Contains(x.PayerId))) : true);
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
-            var DataCharge = (from d in dataShipment
-                              join sur in lstSurchage on d.Hblid equals sur.Hblid
-                              select new DataSurchargeResult
-                              {
-                                  JobId = d.JobId,
-                                  ServiceDate = d.ServiceDate,
-                                  Hblid = sur.Hblid,
-                                  InvoiceNo = sur.InvoiceNo,
-                                  DebitNo = sur.DebitNo,
-                                  AmountUsd = sur.AmountUsd,
-                                  AmountVnd = sur.AmountVnd,
-                                  VatAmountUsd = sur.VatAmountUsd,
-                                  VatAmountVnd = sur.VatAmountVnd,
-                                  VoucherId = sur.VoucherId,
-                                  Type = sur.Type,
-                                  KickBack = sur.KickBack,
-                                  CurrencyId = sur.CurrencyId,
-                                  ExchangeDate = sur.ExchangeDate,
-                                  Mblno = d.Mbl,
-                                  Hblno = d.Hbl,
-                                  ChargeId = sur.ChargeId,
-                                  Service = d.Service,
-                                  PaymentObjectId = sur.PaymentObjectId,
-                                  CreditNo = sur.CreditNo,
-                                  FinalExchangeRate = sur.FinalExchangeRate,
-                                  CustomerId = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
-                                  PayerId = sur.PayerId
-                              });
-            foreach (var charge in DataCharge)
+            foreach (var charge in dataExportAccountants)
             {
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                 data.ServiceDate = charge.ServiceDate;
-                data.JobId = charge.JobId;
-                data.Hblid = charge.Hblid;
-                var partnerId = !string.IsNullOrEmpty(charge.PayerId) && !string.IsNullOrEmpty(criteria.CustomerId) && criteria.CustomerId.Contains(charge.PayerId) ? charge.PayerId : charge.PaymentObjectId;
-                decimal? _exchangeRate = charge.CurrencyId != criteria.Currency ? currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency) : charge.FinalExchangeRate;
+                data.JobId = charge.JobNo;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;
                 decimal? _usdRevenue = 0;
@@ -2887,7 +2878,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalKickBack = charge.AmountUsd;
                     }
                 }
-                data.ExchangeRate = (decimal)(_exchangeRate ?? 0);
+                data.ExchangeRate = charge.FinalExchangeRate;
                 data.Balance = _totalRevenue - _totalCost - (data.TotalKickBack ?? 0);
                 data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
@@ -2903,12 +2894,11 @@ namespace eFMS.API.Documentation.DL.Services
                 data.UserExport = currentUser.UserName;
                 data.CurrencyId = charge.CurrencyId;
                 data.ExchangeDate = charge.ExchangeDate;
-                data.FinalExchangeRate = charge.FinalExchangeRate;
-                data.Mbl = charge.Mblno;
-                data.Hbl = charge.Hblno;
-                data.PartnerCode = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.AccountNo;
-                data.PartnerName = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.PartnerNameEn;
-                data.PartnerTaxCode = detailLookupPartner[partnerId == null ? charge.CustomerId : partnerId].FirstOrDefault()?.TaxCode;
+                data.Mbl = charge.MAWB;
+                data.Hbl = charge.HWBNo;
+                data.PartnerCode = detailLookupPartner[charge.PartnerId].FirstOrDefault()?.AccountNo;
+                data.PartnerName = detailLookupPartner[charge.PartnerId].FirstOrDefault()?.PartnerNameEn;
+                data.PartnerTaxCode = detailLookupPartner[charge.PartnerId].FirstOrDefault()?.TaxCode;
                 data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                 dataList.Add(data);
