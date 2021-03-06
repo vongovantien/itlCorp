@@ -2787,7 +2787,6 @@ namespace eFMS.API.Documentation.DL.Services
             // Filter data without customerId
             var criteriaNoCustomer = (GeneralReportCriteria)criteria.Clone();
             criteriaNoCustomer.CustomerId = null;
-            var dataShipment = QueryDataDocumentationAcctPLSheet(criteriaNoCustomer);
             if (!dataExportAccountants.Any()) return null;
             var lstPartner = catPartnerRepo.Get();
             var lstCharge = catChargeRepo.Get();
