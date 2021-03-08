@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter, Input } from "@angular/core";
+import { Component, Output, EventEmitter, ViewChild, Input } from "@angular/core";
 import { AppForm } from "src/app/app.form";
-import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
+import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
 import { Observable } from "rxjs";
-import { Customer, PortIndex } from "@models";
+import { Customer, PortIndex, Partner } from "@models";
 import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
@@ -11,6 +11,10 @@ import { catchError, finalize, map, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
+import { ShareModulesInputShipmentPopupComponent } from "src/app/business-modules/share-modules/components";
+import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
+import { FormValidators } from "@validators";
+
 
 @Component({
     selector: 'share-report-form-search',
@@ -18,8 +22,12 @@ import { ReportInterface } from "src/app/shared/interfaces/report-interface";
 })
 export class ShareFormSearchReportComponent extends AppForm {
     @Output() onSearch: EventEmitter<ReportInterface.ISaleReportCriteria> = new EventEmitter<ReportInterface.ISaleReportCriteria>();
+    @Output() onSearchCom: EventEmitter<ReportInterface.ICommissionReportCriteria> = new EventEmitter<ReportInterface.ICommissionReportCriteria>();
     @Output() onGeneralSearch: EventEmitter<ReportInterface.ISearchDataCriteria> = new EventEmitter<ReportInterface.ISearchDataCriteria>();
 
+    @ViewChild(ShareModulesInputShipmentPopupComponent, { static: false }) inputShipmentPopup: ShareModulesInputShipmentPopupComponent;
+
+    @Input() isCommissionIncentive: boolean = false;
     @Input() isGeneralReport: boolean = false;
     @Input() isSheetDebitRpt: boolean = false;
     menuPermission: SystemInterface.IUserPermission;
@@ -64,6 +72,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     carriers: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
+    partners: Observable<Partner[]>;
 
     dateTypeList: ReportInterface.INg2Select[] = [
         { id: "ServiceDate", text: "Service Date" },
@@ -111,6 +120,12 @@ export class ShareFormSearchReportComponent extends AppForm {
         { id: CommonEnum.SALE_REPORT_TYPE.SR_KICKBACK, text: 'Sale KickBack Report' }
     ];
 
+    typeComReportList: ReportInterface.INg2Select[] = [
+        { text: 'Commission PR for Air/Sea', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_AS },
+        { text: 'Commission PR for OPS', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.COMMISSION_PR_OPS },
+        { text: 'Incentive', id: CommonEnum.COMMISSION_INCENTIVE_TYPE.INCENTIVE_RPT }
+    ];
+
     typeReportActive: any[] = [];
 
     userLogged: any;
@@ -121,6 +136,8 @@ export class ShareFormSearchReportComponent extends AppForm {
     staffsInit: any[] = [];
 
     groupSpecial: any[] = [];
+    numberOfShipment: number = 0;
+    shipmentInput: OperationInteface.IInputShipment;
 
     constructor(
         private _fb: FormBuilder,
@@ -143,6 +160,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             this.carriers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
         }
         this.ports = this._catalogueRepo.getListPort({ placeType: CommonEnum.PlaceTypeEnum.Port });
+        if (this.isCommissionIncentive) {
+            this.partners = this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL });
+        }
 
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this._store.select(getMenuUserPermissionState)
@@ -176,7 +196,9 @@ export class ShareFormSearchReportComponent extends AppForm {
                 endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             }],
             dateType: [this.dateTypeList[0].id],
-            customer: [],
+            customer: this.isCommissionIncentive ? [null, Validators.compose([
+                FormValidators.required,
+            ])] : [],
             carrier: [],
             agent: [],
             service: [this.serviceActive],
@@ -227,6 +249,8 @@ export class ShareFormSearchReportComponent extends AppForm {
     getTypeReportList() {
         if (this.isSheetDebitRpt) {
             this.typeReportActive = this.typeAccReportList;
+        } else if (this.isCommissionIncentive) {
+            this.typeReportActive = this.typeComReportList;
         } else {
             this.typeReportActive = this.typeReportList;
         }
@@ -300,6 +324,9 @@ export class ShareFormSearchReportComponent extends AppForm {
                 } else {
                     this.detectServiceWithAllOption('staff', data);
                 }
+                break;
+            case 'typeReport':
+                this.typeReport.setValue(data.id);
                 break;
             case 'acPartner':
                 this.partnerAccount.setValue(data.id);
@@ -612,8 +639,13 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     searchReport() {
         this.isSubmitted = true;
+        if (this.isCommissionIncentive && (!this.customerActive || this.customerActive.length === 0)) {
+            return;
+        }
         if (this.isGeneralReport) {
             this.onGeneralSearch.emit(this.getGeneralSearchBody());
+        } else if (this.isCommissionIncentive) {
+            this.onSearchCom.emit(this.getCommissionSearchBody());
         } else {
             this.onSearch.emit(this.getSaleSearchBody());
         }
@@ -672,6 +704,36 @@ export class ShareFormSearchReportComponent extends AppForm {
         return body;
     }
 
+    getCommissionSearchBody() {
+        const body: ReportInterface.ICommissionReportCriteria = {
+            serviceDateFrom: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.toString() : null,
+            service: this.mapObject(this.serviceActive, this.serviceList),
+            currency: "USD",
+            jobId: this.mapShipment('JOBID'),
+            mawb: this.mapShipment('MBL'),
+            hawb: this.mapShipment('HBL'),
+            officeId: this.mapObject(this.officeActive, this.officeList),
+            departmentId: this.mapObject(this.departmentActive, this.departmentList),
+            groupId: this.mapObject(this.groupActive, this.groupList),
+            personInCharge: this.staffType.value === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null,
+            salesMan: this.staffType.value === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null,
+            creator: this.staffType.value === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null,
+            carrierId: this.carrier.value,
+            agentId: this.agent.value,
+            pol: this.pol.value,
+            pod: this.pod.value,
+            customNo: this.mapShipment('CustomNo'),
+            beneficiary: this.partnerAccount.value,
+            exchangeRate: this.exchangeRate.value === null ? 0 : this.exchangeRate.value,
+            typeReport: this.typeReport.value
+        };
+        return body;
+    }
+
     mapObject(dataSelected: any[], dataList: any[]) {
         let result = '';
         if (dataSelected.length > 0) {
@@ -689,6 +751,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     resetSearch() {
+        this.isSubmitted = false;
         this.formSearch.reset();
         this.resetFormControl(this.customer);
         this.resetFormControl(this.carrier);
@@ -697,6 +760,8 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.resetFormControl(this.pod);
         if (this.isGeneralReport) {
             this.onGeneralSearch.emit(<any>{});
+        } else if (this.isCommissionIncentive) {
+            this.onSearchCom.emit(<any>{});
         } else {
             this.onSearch.emit(<any>{});
         }
@@ -706,7 +771,9 @@ export class ShareFormSearchReportComponent extends AppForm {
         this.serviceActive = [this.serviceList[0].id];
         this.service.setValue(this.serviceActive);
 
-        this.currency.setValue(this.currencyList.filter((curr) => curr.id === "USD")[0].id);
+        if (!this.isCommissionIncentive) {
+            this.currency.setValue(this.currencyList.filter((curr) => curr.id === "USD")[0].id);
+        }
 
         this.refNoType.setValue(this.refNoTypeList[0].id);
 
@@ -730,6 +797,12 @@ export class ShareFormSearchReportComponent extends AppForm {
             startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
         });
+
+        if (this.isCommissionIncentive) {
+            this.resetFormControl(this.partnerAccount);
+            this.exchangeRate.setValue(20000);
+            this.resetFormShipmentInput();
+        }
     }
 
     getAllOffice() {
@@ -795,6 +868,39 @@ export class ShareFormSearchReportComponent extends AppForm {
                     this.getStaff(staff);
                 },
             );
+    }
+
+    openInputShipment() {
+        this.inputShipmentPopup.show();
+    }
+
+    onShipmentList(data: any) {
+        this.shipmentInput = data;
+        if (data) {
+            this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
+        } else {
+            this.numberOfShipment = 0;
+        }
+    }
+
+    resetFormShipmentInput() {
+        this.numberOfShipment = 0;
+        this.inputShipmentPopup.shipmentSearch = '';
+        this.shipmentInput = null;
+        this.inputShipmentPopup.selectedShipmentType = "JOBID";
+    }
+
+    mapShipment(type: string) {
+        let _shipment = '';
+        if (this.shipmentInput) {
+            if (this.shipmentInput.keyword.length > 0) {
+                const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).join(';');
+                if (this.shipmentInput.type === type) {
+                    _shipment = _keyword;
+                }
+            }
+        }
+        return _shipment;
     }
 }
 

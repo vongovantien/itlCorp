@@ -550,6 +550,75 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export Commission PR For OPS Report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="currentUserId"></param>
+        /// <param name="rptType"></param>
+        /// <returns></returns>
+        [Route("ExportCommissionPRReport")]
+        [HttpPost]
+        public async Task<IActionResult> ExportCommissionPRReport(CommissionReportCriteria criteria, string currentUserId, string rptType)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataCommissionPRReportUrl + currentUserId + "&rptType=" + rptType);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<CommissionExportResult>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            Stream stream;
+            if (rptType == "OPS")
+            {
+                stream = new DocumentationHelper().GenerateCommissionPROpsReportExcel(dataObjects.Result, criteria, null);
+            }
+            else
+            {
+                stream = new DocumentationHelper().GenerateCommissionPRReportExcel(dataObjects.Result, criteria, null);
+            }
+
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent;
+            if(rptType == "OPS")
+            {
+                fileContent = new FileHelper().ExportExcel(stream, "Commission OPS VND.xlsx");
+            }
+            else
+            {
+                fileContent = new FileHelper().ExportExcel(stream, "Commission PR.xlsx");
+            }
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export Incentive Report
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportIncentiveReport")]
+        [HttpPost]
+        public async Task<IActionResult> ExportIncentiveReport(CommissionReportCriteria criteria, string currentUserId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataIncentiveReportUrl + currentUserId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<CommissionExportResult>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            var stream = new DocumentationHelper().GenerateIncentiveReportExcel(dataObjects.Result, criteria, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            string fileName = "Incentive.xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
+        
+        /// <summary>
         /// Export Combine Ops Debit Note
         /// </summary>
         /// <returns></returns>

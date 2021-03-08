@@ -569,7 +569,7 @@ export class PartnerDetailComponent extends AppList {
 
     getListContract(partneId: string) {
         this.isLoading = true;
-        this._catalogueRepo.getListContract(partneId)
+        this._catalogueRepo.getListContract(partneId, false)
             .pipe(
                 finalize(() => this.isLoading = false)
             )

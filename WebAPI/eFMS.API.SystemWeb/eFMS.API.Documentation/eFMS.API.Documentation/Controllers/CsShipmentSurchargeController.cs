@@ -213,6 +213,64 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// check account receivable credit term
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("NotificationCreditTerm")]
+        [Authorize]
+        public IActionResult NotificationCreditTerm([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csShipmentSurchargeService.NotificationCreditTerm(list);
+            return Ok(hs.Success);
+        }
+
+
+        /// <summary>
+        /// check account receivable expired agreement
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("NotificationExpiredAgreement")]
+        [Authorize]
+        public IActionResult NotificationExpiredAgreement([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csShipmentSurchargeService.NotificationExpiredAgreement(list);
+            return Ok(hs.Success);
+        }
+
+
+        /// <summary>
+        /// check account receivable payment terrm
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("NotificationPaymentTerm")]
+        [Authorize]
+        public IActionResult CheckAccountReceivablePaymentTerm([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = csShipmentSurchargeService.NotificationPaymenTerm(list);
+            return Ok(hs.Success);
+        }
+
+        /// <summary>
+        /// check valid account receivable
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("CheckAccountReceivable")]
+        public IActionResult CheckValidAccountReceivable([FromBody]List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            object rs = csShipmentSurchargeService.CheckAccountReceivable(list);
+            return Ok(rs);
+        }
+        
         private decimal CalculateTotal(decimal? unitPrice, decimal quantity, decimal? vat, string currency)
         {
             decimal? totalAmount = 0;
