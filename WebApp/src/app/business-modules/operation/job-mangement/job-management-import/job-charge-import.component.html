@@ -127,10 +127,10 @@
                                 (click)="sort('vatrate')">
                                 <span>Vat*</span>
                             </th>
-                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'totalAmount'), 'sorting_desc': (!isDesc && sortKey == 'totalAmount') }"
+                            <!-- <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'totalAmount'), 'sorting_desc': (!isDesc && sortKey == 'totalAmount') }"
                                 (click)="sort('totalAmount')">
                                 <span>Total Amount*</span>
-                            </th>
+                            </th> -->
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exchangeDate'), 'sorting_desc': (!isDesc && sortKey == 'exchangeDate') }"
                                 (click)="sort('exchangeDate')">
                                 <span>Exchange Date*</span>
@@ -223,12 +223,12 @@
                                     <span class="m--font-danger" *ngIf="item.vatError !== null">{{item.vatError
                                         }}</span>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <span *ngIf="item.totalAmountError === null">{{ item.totalAmount }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.totalAmountError !== null">{{item.totalAmountError
                                         }}</span>
-                                </td>
+                                </td> -->
                                 <td>
                                     <span *ngIf="item.exchangeDateError === null">{{ item.exchangeDate | date:
                                         'dd/MM/yyyy' }}</span>
