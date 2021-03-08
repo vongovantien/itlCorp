@@ -156,7 +156,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                             ele.canEdit = true;
                             const setEdit= ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo): (!!ele.creditNo || !!ele.debitNo);
                             if (setEdit) {
-                                if ((!!ele.creditNo && !!ele.paySoano) || (!!ele.acctManagementId && !!ele.invoiceNo)) {
+                                if (!!ele.creditNo && !!ele.paySoano) {
                                     ele.canEdit = false;
                                 }
                                 if ((!!ele.debitNo && !!ele.soano) || !!ele.acctManagementId) {
