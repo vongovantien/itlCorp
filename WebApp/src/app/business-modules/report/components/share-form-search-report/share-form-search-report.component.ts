@@ -638,7 +638,7 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     searchReport() {
         this.isSubmitted = true;
-        if (this.isCommissionIncentive && this.customer.invalid) {
+        if (this.isCommissionIncentive && (!this.customerActive || this.customerActive.length === 0)) {
             return;
         }
         if (this.isGeneralReport) {
@@ -709,9 +709,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customer.value,
+            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.toString() : null,
             service: this.mapObject(this.serviceActive, this.serviceList),
-            currency: this.typeReport.value === this.typeComReportList[2].id ? "USD" : "VND",
+            currency: this.typeReport.value === this.typeComReportList[1].id ? "VND" : "USD",
             jobId: this.mapShipment('JOBID'),
             mawb: this.mapShipment('MBL'),
             hawb: this.mapShipment('HBL'),

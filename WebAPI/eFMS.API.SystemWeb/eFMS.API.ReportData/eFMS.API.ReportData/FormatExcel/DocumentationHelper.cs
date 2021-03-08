@@ -3707,7 +3707,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Header 1
             workSheet.Cells["A9:S9"].Merge = true;
             workSheet.Cells["A9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth);
+            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth?.ToUpper());
             workSheet.Cells["A9"].Style.Font.SetFromFont(new Font("Calibri", 11, FontStyle.Bold));
 
             workSheet.Cells["N10"].Value = "Ex.rate";
@@ -3732,9 +3732,11 @@ namespace eFMS.API.ReportData.FormatExcel
 
             int startRow = 13;
             var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.JobId);
+            var years = resultData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate.Value.Year);
+            var formatMonth = years.Count() > 1 ? "MMM-yyyy" : "MMM";
             foreach (var item in listDetail)
             {
-                workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString("MMM");
+                workSheet.Cells[startRow, 1].Value = item.ServiceDate?.ToString(formatMonth);
                 workSheet.Cells[startRow, 2].Value = resultData.CustomerName;
                 workSheet.Cells[startRow, 3].Value = item.JobId;
                 workSheet.Cells[startRow, 4].Value = item.CustomSheet;
@@ -3927,7 +3929,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Header 1
             workSheet.Cells["A9:R9"].Merge = true;
             workSheet.Cells["A9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth.ToUpper());
+            workSheet.Cells["A9"].Value = string.Format(title[1], resultData.ForMonth?.ToUpper());
             workSheet.Cells["A9"].Style.Font.SetFromFont(new Font("Calibri", 11, FontStyle.Bold));
 
             // Customer name
@@ -4100,7 +4102,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1"].Value = "DE NGHI THANH TOAN COMMISSION";
             workSheet.Cells["A1"].Style.Font.SetFromFont(new Font("VNI-Times", 14, FontStyle.Bold));
             workSheet.Cells["A2:E2"].Merge = true;
-            workSheet.Cells["A2"].Value = resultData.ForMonth.ToUpper();
+            workSheet.Cells["A2"].Value = resultData.ForMonth?.ToUpper();
             workSheet.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A2"].Style.Font.SetFromFont(new Font("VNI-Times", 14, FontStyle.Bold));
 
@@ -4113,6 +4115,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             var monthGrp = resultData.Details.GroupBy(x => x.ServiceDate?.Month).OrderBy(x => x.Key).Select(x => x.Key);
             var startRow = 4;
+            string formatNumber = "_(* #,##0.00_);_(* (#,##0.00);_(* \" - \"??_);_(@_)";
             foreach (var mon in monthGrp)
             {
                 var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.JobId);
@@ -4135,16 +4138,16 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[startRow, 3].Value = shipment.MBLNo;
                     workSheet.Cells[startRow, 4].Value = shipment.HBLNo;
                     workSheet.Cells[startRow, 5].Value = shipment.BuyingRate - shipment.SellingRate;
+                    workSheet.Cells[startRow, 5].Style.Numberformat.Format = formatNumber;
                     startRow++;
                 }
                 workSheet.Cells[startGrp, 1, startRow - 1, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
-            workSheet.Cells[5, 5, startRow - 1, 5].Style.Numberformat.Format = numberFormats;
             workSheet.Cells[startRow, 1].Value = "TOTAL(USD)";
             workSheet.Cells[startRow, 1, startRow, 3].Merge = true;
             var _statement = string.Format("SUM(E5:E{0})", startRow - 1);
-            workSheet.Cells[startRow, 5].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[startRow, 5].Formula = _statement;
+            workSheet.Cells[startRow, 5].Style.Numberformat.Format = formatNumber;
             workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             startRow++;
             workSheet.Cells[startRow, 1].Value = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate.ToString("#,##0"));
@@ -4152,7 +4155,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             _statement = string.Format("E{0}*0.1*{1}", startRow - 1, resultData.ExchangeRate);
             workSheet.Cells[startRow, 5].Formula = _statement;
-            workSheet.Cells[startRow, 5].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[startRow, 5].Style.Numberformat.Format = formatNumber;
             // Border
             workSheet.Cells[3, 1, startRow, 5].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[3, 1, startRow, 5].Style.Border.Right.Style = ExcelBorderStyle.Thin;
