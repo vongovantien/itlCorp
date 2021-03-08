@@ -128,7 +128,7 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
         this._documentRepo.getShipmentBySearchOption(this.selectedOption.value, keywords)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => { // IShipmentBySearch[]
+                (res: any) => {
                     if (!!res) {
                         this.shipments = res.data || [];
                         this.onChangeCheckBoxShipment();
