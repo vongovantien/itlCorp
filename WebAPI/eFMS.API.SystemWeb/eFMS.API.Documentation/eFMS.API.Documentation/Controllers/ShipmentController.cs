@@ -70,9 +70,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="searchOption"></param>
         /// <param name="keywords"></param>
         /// <returns></returns>
-        [HttpGet("GetShipmentsCopyListBySearchOption")]
+        [HttpPost("GetShipmentsCopyListBySearchOption")]
         [Authorize]
-        public IActionResult GetShipmentsCopyListBySearchOption(string searchOption, List<string> keywords)
+        public IActionResult GetShipmentsCopyListBySearchOption(string searchOption, [FromBody]List<string> keywords)
         {
             var data = shipmentService.GetListShipmentBySearchOptions(searchOption, keywords);
             List<string> shipmentNotExits = new List<string>();
