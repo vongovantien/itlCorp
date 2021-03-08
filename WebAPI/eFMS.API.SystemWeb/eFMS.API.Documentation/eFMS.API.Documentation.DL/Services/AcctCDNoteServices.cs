@@ -1535,7 +1535,7 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckAllowDelete(Guid cdNoteId)
         {
             var cdNote = DataContext.Get(x => x.Id == cdNoteId).FirstOrDefault();
-            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && (!string.IsNullOrEmpty(x.PaySoano) || x.AcctManagementId != null))
+            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && (!string.IsNullOrEmpty(x.PaySoano) || (x.AcctManagementId != null && x.InvoiceNo != null)))
                                                   || (x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.Soano) || x.AcctManagementId != null)));
 
             if (query.Any())
