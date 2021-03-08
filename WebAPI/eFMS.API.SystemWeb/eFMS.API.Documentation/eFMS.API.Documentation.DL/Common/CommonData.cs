@@ -14,7 +14,7 @@ namespace eFMS.API.Documentation.DL.Common
         //Define list services
         public static readonly List<CommonData> Services = new List<CommonData>
         {
-            new CommonData { Value = "LGT", DisplayName = "Logistic (operation)" },
+            new CommonData { Value = "CL", DisplayName = "Logistic (operation)" },
             new CommonData { Value = "AI", DisplayName = "Air Import" },
             new CommonData { Value = "AE", DisplayName = "Air Export" },
             new CommonData { Value = "SFE", DisplayName = "Sea FCL Export" },

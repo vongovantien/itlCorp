@@ -205,27 +205,53 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<ShipmentsCopy> GetListShipmentBySearchOptions(string searchOption, List<string> keywords)
         {
-            var userCurrent = currentUser.UserID;
+            string userCurrent = currentUser.UserID;
 
-            var dataList = new List<ShipmentsCopy>();
+            List<ShipmentsCopy> dataList = new List<ShipmentsCopy>();
 
             if (string.IsNullOrEmpty(searchOption) || keywords == null || keywords.Count == 0 || keywords.Any(x => x == null)) return dataList;
 
-            var surcharge = surCharge.Get();
+            IQueryable<CsShipmentSurcharge> surcharge = surCharge.Get();
 
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
-            var opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            IQueryable<OpsTransaction> opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
 
             //OPS assign
-            var opstranAssign = from ops in opstransaction
+            IQueryable<OpsTransaction> opstranAssign = from ops in opstransaction
                                 join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //So sánh bằng
                                 where osa.MainPersonInCharge == userCurrent
                                 select ops;
             //OPS is BillingOps
-            var opstranPic = opstransaction.Where(x => x.BillingOpsId == userCurrent);
-            var opstran = opstranAssign.Union(opstranPic);
-            var shipmentOperation = from ops in opstran
+            IQueryable<OpsTransaction> opstranPic = opstransaction.Where(x => x.BillingOpsId == userCurrent);
+            IQueryable<OpsTransaction> opstran = opstranAssign.Union(opstranPic);
+
+            IQueryable<ShipmentsCopy> shipmentOperation = Enumerable.Empty<ShipmentsCopy>().AsQueryable();
+
+            if (searchOption == "ClearanceNo")
+            {
+                shipmentOperation = from ops in opstran
+                                        join cd in customsDeclarationRepo.Get() on ops.JobNo equals cd.JobNo into cdGrps
+                                        from cdgrp in cdGrps.DefaultIfEmpty()
+                                        join sur in surcharge on ops.Hblid equals sur.Hblid into sur2
+                                        from sur in sur2.DefaultIfEmpty()
+                                        join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
+                                        from cus in cus2.DefaultIfEmpty()
+                                        where keywords.Contains(cdgrp.ClearanceNo, StringComparer.OrdinalIgnoreCase)
+                                        select new ShipmentsCopy
+                                        {
+                                            JobId = ops.JobNo,
+                                            Customer = cus.ShortName,
+                                            MBL = ops.Mblno,
+                                            HBL = ops.Hwbno,
+                                            HBLID = ops.Hblid,
+                                            CustomNo = cdgrp.ClearanceNo,
+                                            Service = "CL"
+                                        };
+            }
+            else
+            {
+                shipmentOperation = from ops in opstran
                                     join sur in surcharge on ops.Hblid equals sur.Hblid into sur2
                                     from sur in sur2.DefaultIfEmpty()
                                     join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
@@ -236,8 +262,6 @@ namespace eFMS.API.Documentation.DL.Services
                                         searchOption.Equals("Hwbno") ? keywords.Contains(ops.Hwbno, StringComparer.OrdinalIgnoreCase) : true
                                     &&
                                         searchOption.Equals("Mawb") ? keywords.Contains(ops.Mblno, StringComparer.OrdinalIgnoreCase) : true
-                                    &&
-                                        searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true
                                     select new ShipmentsCopy
                                     {
                                         JobId = ops.JobNo,
@@ -248,50 +272,62 @@ namespace eFMS.API.Documentation.DL.Services
                                         CustomNo = sur.ClearanceNo,
                                         Service = "CL"
                                     };
+            }
             shipmentOperation = shipmentOperation.Distinct();
-            //End change request
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
-            //Transaction assign
-            var cstranAssign = from cstd in transactions
-                               join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
-                               where osa.MainPersonInCharge == userCurrent
-                               select cstd;
-            //Transaction is Person In Charge
-            var cstranPic = transactions.Where(x => x.PersonIncharge == userCurrent);
-            var cstrans = cstranAssign.Union(cstranPic);
+            IQueryable<ShipmentsCopy> shipmentDoc = Enumerable.Empty<ShipmentsCopy>().AsQueryable();
 
-            var cstrandel = detailRepository.Get();
+            if (searchOption != "ClearanceNo")
+            {
+                IQueryable<CsTransaction> transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+                //Transaction assign
+                IQueryable<CsTransaction> cstranAssign = from cstd in transactions
+                                   join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
+                                   where osa.MainPersonInCharge == userCurrent
+                                   select cstd;
+                //Transaction is Person In Charge
+                IQueryable<CsTransaction> cstranPic = transactions.Where(x => x.PersonIncharge == userCurrent);
+                IQueryable<CsTransaction> cstrans = cstranAssign.Union(cstranPic);
 
-            var shipmentDoc = from cstd in cstrandel
-                              join cst in cstrans on cstd.JobId equals cst.Id into cst2
-                              from cst in cst2.DefaultIfEmpty()
-                              join sur in surcharge on cstd.Id equals sur.Hblid into sur2
-                              from sur in sur2.DefaultIfEmpty()
-                              join cus in catPartnerRepo.Get() on cstd.CustomerId equals cus.Id into cus2
-                              from cus in cus2.DefaultIfEmpty()
-                              where
-                                    searchOption.Equals("JobNo") ? keywords.Contains(cst.JobNo, StringComparer.OrdinalIgnoreCase) : true
-                                &&
-                                    searchOption.Equals("Hwbno") ? keywords.Contains(cstd.Hwbno, StringComparer.OrdinalIgnoreCase) : true
-                                &&
-                                    searchOption.Equals("Mawb") ? keywords.Contains(cstd.Mawb, StringComparer.OrdinalIgnoreCase) : true
-                                &&
-                                    searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true
-                              select new ShipmentsCopy
-                              {
-                                  JobId = cst.JobNo,
-                                  Customer = cus.ShortName,
-                                  MBL = cst.Mawb,
-                                  HBL = cstd.Hwbno,
-                                  HBLID = cstd.Id,
-                                  CustomNo = sur.ClearanceNo,
-                                  Service = cst.TransactionType
-                              };
-            shipmentDoc = shipmentDoc.Distinct();
+                IQueryable<CsTransactionDetail> cstrandel = detailRepository.Get();
 
-            var query = shipmentOperation.Union(shipmentDoc);
-            var listShipment = query.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+                shipmentDoc = from cstd in cstrandel
+                                  join cst in cstrans on cstd.JobId equals cst.Id into cst2
+                                  from cst in cst2.DefaultIfEmpty()
+                                  join sur in surcharge on cstd.Id equals sur.Hblid into sur2
+                                  from sur in sur2.DefaultIfEmpty()
+                                  join cus in catPartnerRepo.Get() on cstd.CustomerId equals cus.Id into cus2
+                                  from cus in cus2.DefaultIfEmpty()
+                                  where
+                                        searchOption.Equals("JobNo") ? keywords.Contains(cst.JobNo, StringComparer.OrdinalIgnoreCase) : true
+                                    &&
+                                        searchOption.Equals("Hwbno") ? keywords.Contains(cstd.Hwbno, StringComparer.OrdinalIgnoreCase) : true
+                                    &&
+                                        searchOption.Equals("Mawb") ? keywords.Contains(cstd.Mawb, StringComparer.OrdinalIgnoreCase) : true
+                                    //&&
+                                    //    searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true
+                                  select new ShipmentsCopy
+                                  {
+                                      JobId = cst.JobNo,
+                                      Customer = cus.ShortName,
+                                      MBL = cst.Mawb,
+                                      HBL = cstd.Hwbno,
+                                      HBLID = cstd.Id,
+                                      CustomNo = sur.ClearanceNo,
+                                      Service = cst.TransactionType
+                                  };
+                shipmentDoc = shipmentDoc.Distinct();
+            }
+            var queryUnion = Enumerable.Empty<ShipmentsCopy>().AsQueryable();
+            if (searchOption != "ClearanceNo")
+            {
+                queryUnion = shipmentOperation.Union(shipmentDoc);
+            }
+            else
+            {
+                queryUnion = shipmentOperation;
+            }
+            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
                             .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.HBLID, x.CustomNo, x.Service })
                             .Select(s => new ShipmentsCopy
                             {
@@ -542,7 +578,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             HandleState res = new HandleState();
 
-            if(JobIds.Count == 0)
+            if (JobIds.Count == 0)
             {
                 return res;
             }
@@ -550,25 +586,25 @@ namespace eFMS.API.Documentation.DL.Services
             List<string> jobOps = JobIds.Where(x => x.Contains("LOG")).ToList();
             List<string> jobCs = JobIds.Where(x => !jobOps.Contains(x)).ToList();
 
-            if(jobOps.Count == 0 && jobCs.Count == 0)
+            if (jobOps.Count == 0 && jobCs.Count == 0)
             {
                 return res;
             }
 
             List<OpsTransaction> opsShipments = new List<OpsTransaction>();
-            if(jobOps.Count > 0)
+            if (jobOps.Count > 0)
             {
                 foreach (var item in jobOps)
                 {
                     var shipment = opsRepository.Get(x => x.JobNo == item && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false)?.FirstOrDefault();
-                    if(shipment != null)
+                    if (shipment != null)
                     {
                         opsShipments.Add(shipment);
                     }
 
                 }
 
-                if(opsShipments.Count() > 0)
+                if (opsShipments.Count() > 0)
                 {
                     foreach (var job in opsShipments)
                     {
@@ -590,7 +626,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var item in jobCs)
                 {
                     var shipment = DataContext.Get(x => x.JobNo == item && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false)?.FirstOrDefault();
-                    if(shipment != null)
+                    if (shipment != null)
                     {
                         csShipments.Add(shipment);
                     }
@@ -1115,7 +1151,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.HblHawb = item.HblHawb;
                 string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
 
-                data.PolPod = ( item.Pod != null && item.Pod != Guid.Empty) ?  pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
+                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
                 data.Carrier = !string.IsNullOrEmpty(item.Carrier) ? LookupPartner[item.Carrier].FirstOrDefault()?.ShortName : string.Empty;
                 data.Agent = LookupPartner[item.Agent].FirstOrDefault()?.ShortName;
                 var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();

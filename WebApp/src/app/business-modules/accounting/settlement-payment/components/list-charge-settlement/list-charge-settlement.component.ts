@@ -491,10 +491,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                             chargeDup.hblNo = errorData?.hbl;
                         }
                         this.surcharges.forEach(c => {
-                            if (c.jobNo === chargeDup.jobNo
-                                && c.mblno === chargeDup.mblNo
-                                && c.hblno === chargeDup.hblNo
-                                && c.chargeId === chargeDup.chargeId) {
+                            if ((c.jobNo || c.jobId) === chargeDup.jobNo
+                                && (c.mblno || c.mbl) === chargeDup.mblNo
+                                && (c.hblno || c.hbl) === chargeDup.hblNo
+                                && (c.chargeId) === chargeDup.chargeId) {
                                 c.isDuplicate = true;
                             } else {
                                 c.isDuplicate = false;
