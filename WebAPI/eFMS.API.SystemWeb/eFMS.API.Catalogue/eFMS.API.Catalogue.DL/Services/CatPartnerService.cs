@@ -481,9 +481,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 "luis.quang@itlvn.com",
                 "andy.hoa@itlvn.com",
                 "cara.oanh@itlvn.com",
-                "lynne.loc@itlvn.com",
+                //"lynne.loc@itlvn.com",
                 "samuel.an@logtechub.com",
-                "kenny.thuong@itlvn.com"
+                //"kenny.thuong@itlvn.com"
             };
             return lstCc;
         }
@@ -567,6 +567,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
 
+            if (partner?.UserCreated == currentUser.UserID)
+            {
+                if (partner.Active == true)
+                {
+                    entity.Active = true;
+                }
+            }
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
             entity.GroupId = partner.GroupId;

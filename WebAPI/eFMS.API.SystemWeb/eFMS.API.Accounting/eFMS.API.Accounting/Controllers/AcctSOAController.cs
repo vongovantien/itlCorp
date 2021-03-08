@@ -62,7 +62,8 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = model };
+                return BadRequest(_result);
             }
             return Ok(result);
         }
@@ -95,7 +96,8 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = model };
+                return BadRequest(_result);
             }
             return Ok(result);
         }
@@ -145,8 +147,8 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge
-            acctSOAService.UpdateSOASurCharge(soaNo);
+            //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge (Đã xử lý bên trong hàm DeleteSOA)
+            //acctSOAService.UpdateSOASurCharge(soaNo);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
