@@ -12,6 +12,7 @@ namespace eFMS.IdentityServer.DL.UserManager
         Guid OfficeID { get; set; }
         int? DepartmentId { get; set; }
         short? GroupId { get; set; }
+        decimal? KbExchangeRate { get; set; }
         List<UserPermissionModel> UserPermissions { get; }
         UserPermissionModel UserMenuPermission { get; set; }
     }

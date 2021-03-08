@@ -470,6 +470,34 @@
             <param name="list"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.NotificationCreditTerm(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check account receivable credit term
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.NotificationExpiredAgreement(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check account receivable expired agreement
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckAccountReceivablePaymentTerm(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check account receivable payment terrm
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.CheckValidAccountReceivable(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            check valid account receivable
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Update(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
             <summary>
             update an existed surcharge
@@ -1082,6 +1110,22 @@
             Get data for export accounting P/L
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetCommissionReport(eFMS.API.Documentation.DL.Models.Criteria.CommissionReportCriteria,System.String,System.String)">
+            <summary>
+            Query data for commission report
+            </summary>
+            <param name="criteria"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetIncentiveReport(eFMS.API.Documentation.DL.Models.Criteria.CommissionReportCriteria,System.String)">
+            <summary>
+            Query data for incentive report
+            </summary>
+            <param name="criteria"></param>
+            <param name="userId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">

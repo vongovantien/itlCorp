@@ -21,11 +21,13 @@ namespace eFMS.API.Documentation.DL.IService
         List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria,int page,int size, out int rowCount);
         List<GeneralReportResult> QueryDataGeneralReport(GeneralReportCriteria criteria);
         IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria);
-        List<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria);
+        IQueryable<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria);
         List<JobProfitAnalysisExportResult> GetDataJobProfitAnalysis(GeneralReportCriteria criteria);
         List<SummaryOfCostsIncurredExportResult> GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria);
         SummaryOfRevenueModel GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria);
         IQueryable<Shipments> GetShipmentAssignPIC();
+        CommissionExportResult GetCommissionReport(CommissionReportCriteria criteria, string userId, string rptType);
+        CommissionExportResult GetIncentiveReport(CommissionReportCriteria criteria, string userId);
         SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria);
         HandleState LockShipmentList(List<string> JobIds);
     }

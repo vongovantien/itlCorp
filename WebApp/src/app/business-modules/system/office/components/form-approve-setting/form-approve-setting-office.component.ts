@@ -14,6 +14,7 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
 
     approvePayments: FlowSetting[] = [];
     unlockShipments: FlowSetting[] = [];
+    accountReceivable: FlowSetting = new FlowSetting();
 
     settings: CommonInterface.ICommonTitleValue[] = [
         { title: 'None', value: 'None' },
@@ -83,7 +84,7 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
     getSetting(officeId: string) {
         this._systemRepo.getSettingFlowByOffice(officeId)
             .subscribe(
-                (res: { lockingDateShipment: LockShipmentSetting[], approvals: FlowSetting[], unlocks: FlowSetting[] }) => {
+                (res: { lockingDateShipment: LockShipmentSetting[], approvals: FlowSetting[], unlocks: FlowSetting[], account: FlowSetting }) => {
 
                     if (!res.lockingDateShipment.length) {
                         this.initLockingShipmentSetting();
@@ -102,6 +103,12 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
                     } else {
                         this.unlockShipments = res.unlocks;
                     }
+                    if (!res.account) {
+                        this.accountReceivable = new FlowSetting();
+                        this.accountReceivable.type = 'AccountReceivable';
+                    } else {
+                        this.accountReceivable = res.account;
+                    }
                 }
             );
     }
@@ -113,11 +120,13 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
             this._toastService.warning(this.invalidFormText);
             return;
         }
+
         const body: ISettingFlowEditModel = {
             officeId: this.officeId,
             approvePayments: this.approvePayments,
             unlockShipments: this.unlockShipments,
-            lockShipmentDate: this.serviceLockSettings
+            lockShipmentDate: this.serviceLockSettings,
+            accountReceivable: this.accountReceivable
         };
 
         this._systemRepo.updateSettingFlow(body)
@@ -149,4 +158,5 @@ interface ISettingFlowEditModel {
     approvePayments: FlowSetting[];
     unlockShipments: FlowSetting[];
     lockShipmentDate: LockShipmentSetting[];
+    accountReceivable: FlowSetting;
 }

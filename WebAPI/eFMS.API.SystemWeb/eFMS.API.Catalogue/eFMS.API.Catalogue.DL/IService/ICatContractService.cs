@@ -21,7 +21,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Delete(Guid id);
         HandleState Update(CatContractModel model);
 
-        List<CatContractModel> GetBy(string partnerId);
+        List<CatContractModel> GetBy(string partnerId, bool? all);
         object GetContractIdByPartnerId(string partnerId, string jobId);
         Task<ResultHandle> UploadContractFile(ContractFileUploadModel model);
         //Task<ResultHandle> UploadMoreContractFile(UploadFileMoreContractModel model);
