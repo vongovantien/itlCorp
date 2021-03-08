@@ -95,9 +95,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
 
         [HttpGet("GetBy")]
-        public IActionResult GetBy(string partnerId)
+        [Authorize]
+        public IActionResult GetBy(string partnerId, bool? all)
         {
-            var results = catContractService.GetBy(partnerId.Trim());
+            var results = catContractService.GetBy(partnerId.Trim(), all);
             return Ok(results);
         }
 

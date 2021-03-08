@@ -22,6 +22,10 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteMultiple(List<Guid> listId);
         HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list);
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
+        object CheckAccountReceivable(List<CsShipmentSurchargeModel> list);
+        HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list);
+        HandleState NotificationExpiredAgreement(List<CsShipmentSurchargeModel> list);
+        HandleState NotificationPaymenTerm(List<CsShipmentSurchargeModel> list);
         List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
         HandleState Import(List<CsShipmentSurchargeImportModel> data);
         HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD();

@@ -306,8 +306,8 @@ export class CatalogueRepo {
 
     }
 
-    getListContract(partnerId: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetBy`, { partnerId: partnerId })
+    getListContract(partnerId: string, all: boolean = false) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetBy`, { partnerId: partnerId, all: all })
             .pipe(
                 map((data: any) => data)
             );

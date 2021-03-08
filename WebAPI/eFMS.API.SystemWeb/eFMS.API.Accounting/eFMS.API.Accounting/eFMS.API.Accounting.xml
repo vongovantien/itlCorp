@@ -112,6 +112,23 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.ConfirmBillingPaging(eFMS.API.Accounting.DL.Models.Criteria.ConfirmBillingCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Confirm Biling by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.UpdateConfirmBillingDate(System.Collections.Generic.List{System.Guid},System.Nullable{System.DateTime})">
+            <summary>
+            Update Confirm Billing Date for Invoice
+            </summary>
+            <param name="ids">List is of Invoice</param>
+            <param name="billingDate">Billing Date of Invoice</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingPaymentController">
             <summary>
             A base class for an MVC controller without view support.

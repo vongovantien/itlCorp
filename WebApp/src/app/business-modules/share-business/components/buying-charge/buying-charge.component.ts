@@ -13,8 +13,8 @@ import { ConfirmPopupComponent } from '@common';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from '@enums';
 
-import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, skip, map, shareReplay } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
+import { catchError, takeUntil, finalize, skip, map, shareReplay, mergeMap } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 
@@ -1260,7 +1260,25 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
         });
 
-        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).pipe(
+            mergeMap((res: CommonInterface.IResult) => {
+                if (!!res) {
+                    this.charges.forEach(item => {
+                        if (!!item.exchangeDate) {
+                            item.exchangeDate = item.exchangeDate.startDate;
+                        }
+                        if (!!item.invoiceDate) {
+                            item.invoiceDate = item.invoiceDate.startDate;
+                        }
+                    });
+                    const creditTerm = this._documentRepo.notificationAccountReceivableCreditTerm(this.charges);
+                    const paymentTerm = this._documentRepo.notificationReceivablePaymentTerm(this.charges);
+                    const expiredAgreement = this._documentRepo.notificationReceivableExpiredAgreement(this.charges);
+
+                    return forkJoin([creditTerm, paymentTerm, expiredAgreement]);
+                }
+            }),
+        ).subscribe();
     }
 
     handleChangeFeeType(event: any, charge: any) {
