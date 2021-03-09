@@ -62,7 +62,9 @@ export class FormAddChargeComponent extends AppForm {
     ];
 
     debitCharges: Observable<Charge[]>;
-    modes: string[] = ["INTERNAL", "EXTERNAL"];
+    modes: string[] = [
+        "INTERNAL" //, "EXTERNAL"
+    ];
 
     constructor(
         private _fb: FormBuilder,
