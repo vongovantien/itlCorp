@@ -1685,6 +1685,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         itemSceneUpdate.JobNo = itemScene.JobId;
                                         itemSceneUpdate.Mblno = itemScene.MBL;
                                         itemSceneUpdate.Hblno = itemScene.HBL;
+
+                                        itemScene.Hblid = itemScene.Hblid;
                                     }
                                 }
                             }
@@ -1715,6 +1717,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     sceneCharge.JobNo = item.JobNo;
                                     sceneCharge.Mblno = item.Mblno;
                                     sceneCharge.Hblno = item.Hblno;
+                                    sceneCharge.Hblid = item.Hblid;
 
                                     sceneCharge.UserModified = userCurrent;
                                     sceneCharge.DatetimeModified = DateTime.Now;
