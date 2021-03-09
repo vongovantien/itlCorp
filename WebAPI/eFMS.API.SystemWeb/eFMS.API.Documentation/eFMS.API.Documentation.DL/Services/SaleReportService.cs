@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models.ReportResults.Sales;
@@ -32,6 +33,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysOffice> officeRepository;
         readonly IContextBase<SysUserLevel> userLevelRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
         public SaleReportService(IContextBase<OpsTransaction> opsRepo,
@@ -50,7 +52,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> companyRepo,
             IContextBase<SysOffice> officeRepo,
             IContextBase<SysUserLevel> userLevelRepo,
-            ICurrencyExchangeService currencyExchange)
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<CatChargeGroup> catChargeGroup)
         {
             opsRepository = opsRepo;
             csRepository = csRepo;
@@ -69,6 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
             officeRepository = officeRepo;
             userLevelRepository = userLevelRepo;
             currencyExchangeService = currencyExchange;
+            catChargeGroupRepo = catChargeGroup;
         }
         private IQueryable<MonthlySaleReportResult> GetMonthlySaleReport(SaleReportCriteria criteria)
         {
@@ -536,7 +540,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var list = data.ToList();
                 var employeeId = userRepository.Get(x => x.Id == currentUser.UserID).FirstOrDefault()?.EmployeeId;
-                string employeeContact = string.Empty;
+                string employeeContact = currentUser.UserName;
                 if (employeeId == null)
                 {
                     var employee = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault();
@@ -1503,6 +1507,191 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return crystal;
 
+        }
+
+
+        private IQueryable<SaleKickBackReportResult> GetSaleKickBackReport(SaleReportCriteria criteria)
+        {
+            IQueryable<SaleKickBackReportResult> opsShipments = null;
+            IQueryable<SaleKickBackReportResult> csShipments = null;
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            {
+                opsShipments = GetOpsKBReport(criteria);
+            }
+            csShipments = GetCSKickBackReport(criteria);
+            if (opsShipments == null) return csShipments;
+            else if (csShipments == null) return opsShipments;
+            else return opsShipments.Union(csShipments);
+        }
+
+        private IQueryable<SaleKickBackReportResult> GetOpsKBReport(SaleReportCriteria criteria)
+        {
+            List<SaleKickBackReportResult> results = null;
+            IQueryable<OpsTransaction> dataShipment = QueryOpsSaleReport(criteria);
+            if (!dataShipment.Any()) return null;
+            results = new List<SaleKickBackReportResult>();
+            var detailLookupSur = surchargeRepository.Get().ToLookup(q => q.Hblid);
+            foreach (var item in dataShipment)
+            {
+                if (item.Hblid != null && item.Hblid != Guid.Empty)
+                {
+                    var comChargeGroup = catChargeGroupRepo.Get(x => x.Name == "Com").FirstOrDefault();
+                    var surcharge = detailLookupSur[item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
+                    var partner = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault();
+                    foreach (var charge in surcharge)
+                    {
+                        var report = new SaleKickBackReportResult
+                        {
+                            TransID = item.JobNo,
+                            HBLID = item.Hblid,
+                            HAWBNO = item.Hwbno,
+                            LoadingDate = item.ServiceDate,
+                            PartnerName = partner?.PartnerNameEn,
+                            Description = "Logistics",
+                            Quantity = charge.Quantity,
+                            Unit = uniRepository.Get(x => x.Id == charge.UnitId).Select(x => x.Code).FirstOrDefault() ?? string.Empty,
+                            UnitPrice = charge.UnitPrice ?? 0,
+                            TotalValue = 0,
+                            Currency = charge.CurrencyId,
+                            Status = string.Empty,
+                            // Total Amount phí buying kickback
+                            UsdExt = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
+                                                                                           : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2)),
+                            MAWB = item.Mblno ?? string.Empty,
+                            Shipper = item.Shipper ?? string.Empty,
+                            Consignee = item.Consignee ?? string.Empty,
+                            PartnerID = item.CustomerId,
+                            Category = partner?.PartnerType,
+                        };
+                        // Lấy tất cả Buying charge
+                        var chargeBuy = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
+                        report.Costs = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? chargeBuy.Sum(x => x.AmountVnd ?? 0) + _decimalNumber : chargeBuy.Sum(x => x.AmountUsd ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+                        // Lấy tất cả Selling charge
+                        var chargeSell = detailLookupSur[(Guid)item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                        report.Incomes = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? chargeSell.Sum(x => x.AmountVnd ?? 0) + _decimalNumber : chargeSell.Sum(x => x.AmountUsd ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+                        results.Add(report);
+                    }
+                }
+            }
+            return results.AsQueryable();
+        }
+
+        private IQueryable<SaleKickBackReportResult> GetCSKickBackReport(SaleReportCriteria criteria)
+        {
+            IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
+            if (!shipments.Any()) return null;
+            IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
+
+            var data = (from shipment in shipments
+                        join housebill in housebills on shipment.Id equals housebill.JobId
+                        select new
+                        {
+                            shipment.TransactionType,
+                            shipment.JobNo,
+                            MawbNo = shipment.Mawb ?? housebill.Mawb,
+                            shipment.ShipmentType,
+                            housebill.CustomerId,
+                            HBLID = housebill.Id,
+                            housebill.Hwbno,
+                            housebill.ShipperDescription,
+                            housebill.ConsigneeDescription,
+                            shipment.Eta,
+                            shipment.Etd,
+                            shipment.TypeOfService,
+                            housebill.ShipperId,
+                            housebill.ConsigneeId,
+                        });
+            if (!data.Any()) return null;
+            var results = new List<SaleKickBackReportResult>();
+            var detailLookupSur = surchargeRepository.Get().ToLookup(q => q.Hblid);
+            foreach (var item in data)
+            {
+                if (item.HBLID != null && item.HBLID != Guid.Empty)
+                {
+                    var comChargeGroup = catChargeGroupRepo.Get(x => x.Name == "Com").FirstOrDefault();
+                    var surcharge = detailLookupSur[item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
+                    var partner = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault();
+                    foreach (var charge in surcharge)
+                    {
+                        var report = new SaleKickBackReportResult
+                        {
+                            TransID = item.JobNo,
+                            HBLID = item.HBLID,
+                            HAWBNO = item.Hwbno,
+                            LoadingDate = item.TransactionType.Contains("I") ? item.Eta : item.Etd,
+                            PartnerName = partner?.PartnerNameEn,
+                            Description = API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == item.TransactionType)?.DisplayName,
+                            Quantity = charge.Quantity,
+                            Unit = uniRepository.Get(x => x.Id == charge.UnitId).Select(x => x.Code).FirstOrDefault() ?? string.Empty,
+                            UnitPrice = charge.UnitPrice ?? 0,
+                            TotalValue = 0,
+                            Currency = charge.CurrencyId,
+                            Status = string.Empty,
+                            // Total Amount phí buying kickback
+                            UsdExt = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
+                                                                                           : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2)),
+                            MAWB = item.MawbNo ?? string.Empty,
+                            Shipper = item.ShipperDescription,
+                            Consignee = item.ConsigneeDescription,
+                            PartnerID = item.CustomerId,
+                            Category = partner?.PartnerType,
+                        };
+                        // Lấy tất cả Buying charge
+                        var chargeBuy = detailLookupSur[(Guid)item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
+                        report.Costs = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? chargeBuy.Sum(x => x.AmountVnd ?? 0) + _decimalNumber : chargeBuy.Sum(x => x.AmountUsd ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+                        // Lấy tất cả Selling charge
+                        var chargeSell = detailLookupSur[(Guid)item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                        report.Incomes = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? chargeSell.Sum(x => x.AmountVnd ?? 0) + _decimalNumber : chargeSell.Sum(x => x.AmountUsd ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+
+                        results.Add(report);
+                    }
+                }
+            }
+            return results.AsQueryable();
+        }
+
+        public Crystal PreviewSaleKickBackReport(SaleReportCriteria criteria)
+        {
+
+            var data = GetSaleKickBackReport(criteria);
+            Crystal result = null;
+            if (data != null)
+            {
+                var list = data.OrderBy(x => x.PartnerName).ToList();
+                var total = list.GroupBy(x => new { x.TransID, x.HBLID }).Select(p => new { incomes = p.Select(q => q.Incomes).FirstOrDefault(), costs = p.Select(q => q.Costs).FirstOrDefault(), profit = p.Select(q => q.Incomes - q.Costs).FirstOrDefault() }).ToList();
+                var employeeId = userRepository.Get(x => x.Id == currentUser.UserID).FirstOrDefault()?.EmployeeId;
+                string employeeContact = currentUser.UserName;
+                if (employeeId == null)
+                {
+                    var employee = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault();
+                    employeeContact = employee != null ? employee.EmployeeNameVn ?? string.Empty : string.Empty;
+                }
+                var company = companyRepository.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+                var parameter = new SaleKickBackReportParameter
+                {
+                    CompanyName = company != null ? (company.BunameVn ?? string.Empty) : string.Empty,
+                    CompanyDescription = string.Empty,
+                    CompanyAddress1 = string.Empty,
+                    CompanyAddress2 = string.Empty,
+                    Website = string.Empty,
+                    Contact = employeeContact,
+                    Currency = criteria.Currency,
+                    TotalIncomes = total.Sum(x => x.incomes),
+                    TotalCosts = total.Sum(x => x.costs),
+                    TotalProfit = total.Sum(x => Math.Abs(x.profit))
+                };
+                result = new Crystal
+                {
+                    ReportName = "SaleKickBackReport.rpt",
+                    AllowPrint = true,
+                    AllowExport = true,
+                    IsLandscape = true
+                };
+                result.AddDataSource(list);
+                result.FormatType = ExportFormatType.PortableDocFormat;
+                result.SetParameter(parameter);
+            }
+            return result;
         }
 
         #endregion -- SALE REPORT SUMMARY --        

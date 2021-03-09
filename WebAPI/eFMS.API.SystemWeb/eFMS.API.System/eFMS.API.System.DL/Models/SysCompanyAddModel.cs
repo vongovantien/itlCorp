@@ -19,6 +19,7 @@ namespace eFMS.API.System.DL.Models
         public string PhotoName { get; set; }
         public string PhotoUrl { get; set; }
         public bool Status { get; set; }
+        public decimal? KbExchangeRate { get; set; }
 
     }
 }

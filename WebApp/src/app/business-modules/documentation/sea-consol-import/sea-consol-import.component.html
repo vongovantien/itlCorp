@@ -10,7 +10,7 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="table-wrapper table-scrollable" id="masterbill-list-table">
-                    <table class="table table-hover table-brand dataTable">
+                    <table class="table table-hover table-brand dataTable table-hover">
                         <thead app-table-header [headers]="headers"
                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                             <th class="table-actions-col no-sorting first">Actions</th>
@@ -27,7 +27,8 @@
                                                     title="Collapse" (click)="getListHouseBill(item.id, i)">
                                                     <i class="la la-angle-up"></i>
                                                 </button>
-                                                <app-permission-button (onClick)="viewDetail(item.id)" type="detail">
+                                                <app-permission-button (onClick)="viewDetail(item.id)" type="detail"
+                                                    [user]="item.userCreated">
                                                 </app-permission-button>
                                                 <button type="button" *ngIf="item.isLocked"
                                                     class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
@@ -35,7 +36,7 @@
                                                 </button>
                                                 <ng-container *ngIf="!item.isLocked">
                                                     <app-permission-button (onClick)="prepareDeleteShipment(item)"
-                                                        type="delete">
+                                                        type="delete" [user]="item.userCreated">
                                                     </app-permission-button>
                                                 </ng-container>
                                             </div>

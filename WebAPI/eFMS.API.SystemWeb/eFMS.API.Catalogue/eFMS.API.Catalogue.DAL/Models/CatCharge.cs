@@ -29,5 +29,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid? CompanyId { get; set; }
         public Guid? ChargeGroup { get; set; }
         public string ProductDept { get; set; }
+        public string Mode { get; set; }
     }
 }

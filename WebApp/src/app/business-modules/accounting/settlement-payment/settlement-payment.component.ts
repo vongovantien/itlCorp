@@ -88,7 +88,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             { title: 'Payment method', field: 'paymentMethod', sortable: true },
             { title: 'Voucher No', field: 'voucherNo', sortable: true },
             { title: 'Voucher Date', field: 'voucherDate', sortable: true },
-            { title: 'Description', field: 'note', sortable: true },
+            { title: 'General Reason', field: 'note', sortable: true },
             { title: 'Sync Date', field: 'lastSyncDate', sortable: true },
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
         ];

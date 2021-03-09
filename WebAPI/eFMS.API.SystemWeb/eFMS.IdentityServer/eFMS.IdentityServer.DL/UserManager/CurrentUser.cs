@@ -65,7 +65,7 @@ namespace eFMS.IdentityServer.DL.UserManager
             }
             set { officeId = value; }
         }
-        
+
         private short? groupId;
         public short? GroupId
         {
@@ -124,5 +124,28 @@ namespace eFMS.IdentityServer.DL.UserManager
         private UserPermissionModel userMenuPermission;
 
         public UserPermissionModel UserMenuPermission { get => userMenuPermission; set => userMenuPermission = value; }
+        private decimal? kbExc;
+        public decimal? KbExchangeRate
+        {
+            get
+            {
+                string kbExcR = currentUser.FirstOrDefault(x => x.Type == "kbExchangeRate").Value;
+
+                if (kbExcR != null)
+                {
+                    kbExc = Convert.ToDecimal(kbExcR);
+                }
+                else
+                {
+                    kbExc = 0;
+
+                }
+                return kbExc;
+            }
+            set
+            {
+                kbExc = value;
+            }
+        }
     }
 }

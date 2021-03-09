@@ -42,26 +42,26 @@
         <div class="row">
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Payee</label>
+                    <label>Payee:</label>
                     <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
                         (itemSelected)="payee.setValue($event.id)" [dataSources]="customers | async" [displayFields]="[
                         { field: 'shortName', label: 'Name ABBR' },
                         { field: 'partnerNameEn', label: 'Name EN' },
                         { field: 'taxCode', label: 'Tax Code' }]" [selectedDisplayFields]="['shortName']"
-                        [disabled]="isDisabled" placeholder="Select partner">
+                        [disabled]="isDisabled" placeholder="Select partner" (remove)="resetFormControl(payee)">
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Settlement Amount</label>
+                    <label>Settlement Amount:</label>
                     <input type="text" formControlName="amount" class="form-control"
                         [value]="amount.value | number:'.0-3'">
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Currency</label>
+                    <label>Currency:</label>
                     <select formControlName="currency" class="form-control">
                         <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}</option>
                     </select>
@@ -71,7 +71,7 @@
         <div class="row">
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Payment Method</label>
+                    <label>Payment Method:</label>
                     <select formControlName="paymentMethod" class="form-control">
                         <option *ngFor="let method of methods" [ngValue]="method">{{method.title}}</option>
                     </select>
@@ -80,7 +80,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label">
-                        Status Approval
+                        Status Approval:
                     </label>
                     <input type="text" class="form-control m-input m-input--square text-info"
                         placeholder="Status Approval" formControlName="statusApproval" readonly>
@@ -88,7 +88,7 @@
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Note</label>
+                    <label>General Reason:</label>
                     <textarea class="form-control" name="" id="" cols="30" rows="5" formControlName="note"></textarea>
                 </div>
             </div>

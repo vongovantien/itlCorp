@@ -56,6 +56,9 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
             case CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION:
                 this.previewCombinationStatictisReport(data);
                 break;
+            case CommonEnum.SALE_REPORT_TYPE.SR_KICKBACK:
+                this.previewSaleKickBackReport(data);
+                break;
         }
     }
     previewMonthlyReport(data: ReportInterface.ISaleReportCriteria) {
@@ -162,5 +165,24 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
             );
     }
 
-
+    previewSaleKickBackReport(data: ReportInterface.ISaleReportCriteria) {
+        this._spinnerService.show();
+        this._documentationRepo.previewSaleKickBackReport(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._spinnerService.hide(); })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res != null && res.dataSource.length > 0) {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            this.showReport();
+                        }
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
 }

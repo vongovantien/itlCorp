@@ -402,6 +402,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 } else {
                     this.headers = [...this.headers];
                     this.headers[8].required = true;
+
+                    // * Auto set cstomer for OBH Partner
+                    this.onSelectPartnerType(this.partnerType[0], chargeItem, 'obh-type');
                 }
                 break;
             case 'payer':

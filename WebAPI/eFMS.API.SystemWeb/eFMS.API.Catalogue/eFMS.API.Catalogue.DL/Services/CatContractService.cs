@@ -1168,9 +1168,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 "luis.quang@itlvn.com",
                 "andy.hoa@itlvn.com",
                 "cara.oanh@itlvn.com",
-                "lynne.loc@itlvn.com",
+                //"lynne.loc@itlvn.com",
                 "samuel.an@logtechub.com",
-                "kenny.thuong@itlvn.com",
+                //"kenny.thuong@itlvn.com",
             };
             return lstCc;
         }
@@ -1240,7 +1240,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(string.Empty, model.PartnerId);
                 List<SysImage> resultUrls = new List<SysImage>();
-                fileName = model.Files.FileName;
+                fileName = model.Files.FileName.Replace("+","_");
                 string objectId = model.PartnerId;
                 await ImageHelper.SaveFile(fileName, string.Empty, objectId, model.Files);
                 string urlImage = path + "/files/" + objectId + "/" + fileName;

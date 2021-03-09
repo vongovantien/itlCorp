@@ -6,6 +6,7 @@ import { OAuthService, OAuthEvent, OAuthInfoEvent, TokenResponse } from 'angular
 import { ToastrService } from 'ngx-toastr';
 import { JwtService, SEOService } from '@services';
 import { map, filter, mergeMap, tap } from 'rxjs/operators';
+import { SwUpdate } from '@angular/service-worker';
 
 @Component({
     selector: 'app-root',
@@ -25,6 +26,7 @@ export class AppComponent {
         private _jwt: JwtService,
         private _seoService: SEOService,
         private _activatedRoute: ActivatedRoute,
+        private _SwUpdates: SwUpdate
     ) {
         this.progressRef = this._ngProgressService.ref();
         this.oauthService.setStorage(localStorage);
@@ -87,6 +89,18 @@ export class AppComponent {
                 }
             });
 
+        // * Service Worker
+        if (this._SwUpdates.isEnabled) {
+            console.log("Service worker is anabled");
+        }
 
+        this._SwUpdates.available.subscribe(event => {
+            console.log('current version is', event.current);
+            console.log('available version is', event.available);
+        });
+        this._SwUpdates.activated.subscribe(event => {
+            console.log('old version was', event.previous);
+            console.log('new version is', event.current);
+        });
     }
 }

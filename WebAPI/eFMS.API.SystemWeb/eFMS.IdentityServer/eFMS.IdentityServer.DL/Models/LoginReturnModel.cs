@@ -23,5 +23,6 @@ namespace eFMS.API.System.DL.Models
         public string BankAccountNo { get; set; }
         public string Photo { get; set; }
         public string Title { get; set; }
+        public decimal? KbExchangeRate { get; set; } 
     }
 }

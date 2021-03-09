@@ -47,6 +47,7 @@ export class ChargeComponent extends AppList implements OnInit {
             { title: 'Name EN', field: 'chargeNameEn', sortable: true },
             { title: 'Name Local', field: 'chargeNameVn', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
+            { title: 'Mode', field: 'mode', sortable: true },
             { title: 'Status', field: 'active', sortable: true }
         ];
     }

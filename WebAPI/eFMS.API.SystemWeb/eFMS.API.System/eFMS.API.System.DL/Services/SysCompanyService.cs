@@ -110,6 +110,7 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState Update(Guid id, SysCompanyAddModel model)
         {
+            var hs = new HandleState();
             var userCurrent = currentUser.UserID;
 
             try
@@ -131,16 +132,16 @@ namespace eFMS.API.System.DL.Services
                 SysCompanyCurrent.BunameAbbr = model.CompanyNameAbbr;
                 SysCompanyCurrent.BunameEn = model.CompanyNameEn;
                 SysCompanyCurrent.BunameVn = model.CompanyNameVn;
+                SysCompanyCurrent.KbExchangeRate = model.KbExchangeRate;
 
-                DataContext.Update(SysCompanyCurrent, x => x.Id == id);
+                hs = DataContext.Update(SysCompanyCurrent, x => x.Id == id);
 
-                var hs = new HandleState();
+               
                 return hs;
             }
             catch (Exception ex)
             {
-                var hs = new HandleState(ex.Message);
-                return hs;
+                return new HandleState(ex.Message);
             }
         }
 
