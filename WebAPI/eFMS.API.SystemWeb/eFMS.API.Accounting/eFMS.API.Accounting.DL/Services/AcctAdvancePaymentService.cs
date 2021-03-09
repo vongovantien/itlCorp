@@ -1542,9 +1542,9 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
-                            // to do send notification
-                            var dataToSendNotification = GetAgreementDatasByAdvanceNo(advancePayment.AdvanceNo);
-                            SendNotificationAccountReceivable(dataToSendNotification);
+                            //// to do send notification
+                            //var dataToSendNotification = GetAgreementDatasByAdvanceNo(advancePayment.AdvanceNo);
+                            //SendNotificationAccountReceivable(dataToSendNotification);
                         }
                         else
                         {
