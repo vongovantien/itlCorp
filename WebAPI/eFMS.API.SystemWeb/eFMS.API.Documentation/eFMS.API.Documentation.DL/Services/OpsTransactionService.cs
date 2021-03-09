@@ -136,8 +136,54 @@ namespace eFMS.API.Documentation.DL.Services
             model.OfficeId = currentUser.OfficeID;
             model.CompanyId = currentUser.CompanyID;
 
-            var customer = partnerRepository.Get(x => x.Id == model.CustomerId).FirstOrDefault();
-            var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
+
+            SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(model.SalemanId);
+            model.SalesGroupId = salemanPermissionInfo.SalesGroupId;
+            model.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
+            model.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
+            model.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
+         
+            int dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+            if(dayStatus > 0)
+            {
+                model.CurrentStatus = TermData.InSchedule;
+            }
+            else
+            {
+                model.CurrentStatus = TermData.Processing;
+            }
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    model.JobNo = CreateJobNoOps();
+                    OpsTransaction entity = mapper.Map<OpsTransaction>(model);
+
+                    result = DataContext.Add(entity);
+
+                    trans.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+
+            return result;
+        }
+
+        private SaleManPermissionModel GetAndUpdateSaleManInfo(string SalemanId)
+        {
+            SaleManPermissionModel model = new SaleManPermissionModel();
+
+            List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == SalemanId).ToList();
             string SalesGroupId = string.Empty;
             string SalesDepartmentId = string.Empty;
             string SalesOfficeId = string.Empty;
@@ -145,7 +191,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
             {
-                var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                List<SysUserLevel> dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
                 if (dataGroup.Any())
                 {
                     SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
@@ -167,44 +213,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.SalesDepartmentId = !string.IsNullOrEmpty(SalesDepartmentId) ? SalesDepartmentId : null;
             model.SalesOfficeId = !string.IsNullOrEmpty(SalesOfficeId) ? SalesOfficeId : null;
             model.SalesCompanyId = !string.IsNullOrEmpty(SalesCompanyId) ? SalesCompanyId : null;
-            //if(customer != null)
-            //{
-            //    model.SalemanId = customer.SalePersonId;
-            //}
-            var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
-            if(dayStatus > 0)
-            {
-                model.CurrentStatus = TermData.InSchedule;
-            }
-            else
-            {
-                model.CurrentStatus = TermData.Processing;
-            }
 
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    model.JobNo = CreateJobNoOps();
-                    var entity = mapper.Map<OpsTransaction>(model);
-
-                    result = DataContext.Add(entity);
-
-                    trans.Commit();
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    result = new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
-            }
-
-            return result;
+            return model;
         }
 
         public string CreateJobNoOps()
@@ -664,9 +674,47 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                     return result;
                 }
-                
-                var opsTransaction = GetNewShipmentToConvert(productService, model);
+
+                // Check if customer existed
+                CatPartner customer = new CatPartner();
+                CatContract customerContract = new CatContract();
+
+                if (model.AccountNo == null)
+                {
+                    customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode)?.FirstOrDefault();
+                }
+                else
+                {
+                    customer = partnerRepository.Get(x => x.AccountNo == model.AccountNo)?.FirstOrDefault();
+                }
+                if (customer == null)
+                {
+                    var notFoundPartnerTaxCodeMessages = "Customer '" + (model.AccountNo ?? model.PartnerTaxCode) + "' Not found";
+                    return new HandleState(notFoundPartnerTaxCodeMessages);
+                }
+
+                // Check contract for that customer.
+                customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                && x.SaleService.Contains("CL")
+                && x.Active == true
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                if (customerContract == null)
+                {
+                    string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                    string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                    return new HandleState(errorContract);
+                }
+
+                OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model);
                 opsTransaction.JobNo = CreateJobNoOps();
+
+                opsTransaction.SalemanId = customerContract.SaleManId;
+                SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(customerContract.SaleManId);
+                opsTransaction.SalesGroupId = salemanPermissionInfo.SalesGroupId;
+                opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
+                opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
+                opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
+
                 DataContext.Add(opsTransaction);
 
                 if (model.Id > 0)
@@ -835,7 +883,7 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(notFoundPartnerTaxCodeMessages);
                     }
 
-                    // Check contract for that customer.
+                    // Check contract for that customer. TODO: TÁCH FUNCTION
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId 
                     && x.SaleService.Contains("CL") 
                     && x.Active == true 
@@ -882,7 +930,14 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
                                 opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+
+                                // Update salemanInfo
                                 opsTransaction.SalemanId = customerContract.SaleManId;
+                                SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(customerContract.SaleManId);
+                                opsTransaction.SalesGroupId = salemanPermissionInfo.SalesGroupId;
+                                opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
+                                opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
+                                opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
 
                                 DataContext.Add(opsTransaction);
 
