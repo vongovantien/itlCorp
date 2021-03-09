@@ -276,7 +276,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       AccountNo = item.AccountNo, // AccountNo của voucher
                                                                                       ContracAccount = chgDef.CreditAccountNo,
                                                                                       VATAccount = chgDef.CreditVat,
-                                                                                      ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
+                                                                                      ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                       CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo,
                                                                                       DueDate = item.PaymentTerm ?? 0
                                                                                   };
@@ -358,7 +358,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              AtchDocNo = surcharge.InvoiceNo,
                                                                                              AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate, //Chỉ lấy Date (không lấy Time)
                                                                                              AtchDocSerialNo = surcharge.SeriesNo,
-                                                                                             ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type),
+                                                                                             ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                              // CustomerCodeBook = obhP.AccountNo
                                                                                              CustomerCodeBook = item.PaymentMethod == AccountingConstants.PAYMENT_METHOD_OTHER && !string.IsNullOrEmpty(item.Payee) ? GetPayeeCode(item.Payee) : obhP.AccountNo
                                                                                          };
@@ -559,7 +559,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
-                        charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+                        charge.ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(_charge.Mode) ? "-" + _charge.Mode.ToUpper() : string.Empty) : surcharge.Type);
                         charge.AccountNo = string.Empty;
                         charge.ContraAccount = string.Empty;
                         charge.VATAccount = string.Empty;
@@ -761,7 +761,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
-                        charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
+                        charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(_charge.Mode) ? "-" + _charge.Mode.ToUpper() : string.Empty) : surcharge.Type);
                         charge.AccountNo = string.Empty;
                         charge.ContraAccount = string.Empty;
                         charge.VATAccount = string.Empty;
