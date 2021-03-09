@@ -153,10 +153,11 @@ namespace eFMS.API.Documentation.Controllers
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             model.DatetimeCreated = DateTime.Now;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
 
             var surcharge = mapper.Map<CsShipmentSurcharge>(model);
             #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
             model.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
             model.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
             model.FinalExchangeRate =amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -321,10 +322,11 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
 
             var surcharge = mapper.Map<CsShipmentSurcharge>(model);
             #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
             model.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
             model.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
             model.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
