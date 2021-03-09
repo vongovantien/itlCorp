@@ -661,14 +661,14 @@ namespace eFMS.API.Documentation.DL.Services
                                      select new Shipments
                                      {
                                          Id = ops.Id,
-                                         JobId = ops.JobNo,
-                                         HBL = ops.Hwbno,
-                                         MBL = ops.Mblno,
+                                         JobId = !string.IsNullOrEmpty(ops.JobNo) ? ops.JobNo.Trim() : ops.JobNo,
+                                         HBL = !string.IsNullOrEmpty(ops.Hwbno) ? ops.Hwbno.Trim() : ops.Hwbno,
+                                         MBL = !string.IsNullOrEmpty(ops.Mblno) ? ops.Mblno.Trim() : ops.Mblno,
                                          CustomerId = ops.CustomerId,
                                          AgentId = ops.AgentId,
                                          CarrierId = ops.SupplierId,
                                          HBLID = ops.Hblid,
-                                         CustomNo = cus.ClearanceNo
+                                         CustomNo = !string.IsNullOrEmpty(cus.ClearanceNo) ? cus.ClearanceNo.Trim() : cus.ClearanceNo
                                      };
             shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID, x.CustomNo }).Select(s => new Shipments
             {
