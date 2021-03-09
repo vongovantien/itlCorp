@@ -70,3 +70,5 @@ UnitPieaces	String	50
 TpyeofService	String	50	
 ShipmentSource	String	255	
 RealCost	Boolean		
+UnitPriceStr	String	150	
+		
