@@ -1025,19 +1025,25 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.HBL = surcharge.Hblno;
                 chg.MBL = surcharge.Mblno;
                 chg.Type = surcharge.Type;
-                chg.Debit = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
-                chg.Credit = surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
                 chg.Currency = surcharge.CurrencyId;
                 chg.InvoiceNo = surcharge.InvoiceNo;
                 chg.Note = surcharge.Notes;
                 chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
-                chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
-                chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_USD);
-                chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
-                chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
+                
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Debit = surcharge.Total;
+                    chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Credit = surcharge.Total;
+                    chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+
                 chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
 
                 string _pic = string.Empty;
@@ -1432,19 +1438,25 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.HBL = surcharge.Hblno;
                 chg.MBL = surcharge.Mblno;
                 chg.Type = surcharge.Type;
-                chg.Debit = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
-                chg.Credit = surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
                 chg.Currency = surcharge.CurrencyId;
                 chg.InvoiceNo = surcharge.InvoiceNo;
                 chg.Note = surcharge.Notes;
                 chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
-                chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
-                chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_USD);
-                chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
-                chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
+
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Debit = surcharge.Total;
+                    chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Credit = surcharge.Total;
+                    chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+
                 chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
                 chg.SOANo = criteria.Type == "Debit" ? surcharge.Soano : surcharge.PaySoano;
 
@@ -2737,30 +2749,6 @@ namespace eFMS.API.Accounting.DL.Services
                 _hwbNo = charge.Hblno;
                 _customNo = charge.TransactionType == "CL" ? GetTopClearanceNoByJobNo(charge.JobNo) : string.Empty;
                 _jobNo = charge.JobNo;
-
-                /*var ops = opsTransactionRepo.Get(x => x.Hblid == charge.Hblid).FirstOrDefault();
-                if (ops != null)
-                {
-                    _mawb = ops.Mblno;
-                    _hwbNo = ops.Hwbno;
-                    _customNo = GetTopClearanceNoByJobNo(ops.JobNo);
-                    _jobNo = ops.JobNo;
-                }
-                else
-                {
-                    var houseBillDoc = csTransactionDetailRepo.Get(x => x.Id == charge.Hblid).FirstOrDefault();
-                    if (houseBillDoc != null)
-                    {
-                        _hwbNo = houseBillDoc.Hwbno;
-                        var masterBillDoc = csTransactionRepo.Get(x => x.Id == houseBillDoc.JobId).FirstOrDefault();
-                        if (masterBillDoc != null)
-                        {
-                            _mawb = masterBillDoc.Mawb;
-                            _customNo = GetTopClearanceNoByJobNo(masterBillDoc.JobNo);
-                            _jobNo = masterBillDoc.JobNo;
-                        }
-                    }
-                }*/
                 #endregion -- Info MBL, HBL --
 
                 #region -- Info CD Note --
@@ -2768,8 +2756,6 @@ namespace eFMS.API.Accounting.DL.Services
                 #endregion -- Info CD Note --
 
                 // Exchange Rate from currency charge to current soa
-                //var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, soa.Currency?.Trim());
-                //var _amount = charge.Total * exchangeRate;
                 decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, soa.Currency);
 
                 var soaCharge = new AccountStatementFullReport();
