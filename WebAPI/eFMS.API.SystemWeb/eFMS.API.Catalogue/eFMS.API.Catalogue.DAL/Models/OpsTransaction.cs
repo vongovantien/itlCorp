@@ -60,5 +60,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public string SalesCompanyId { get; set; }
         public string ServiceNo { get; set; }
         public Guid? ServiceHblId { get; set; }
+        public string Note { get; set; }
     }
 }
