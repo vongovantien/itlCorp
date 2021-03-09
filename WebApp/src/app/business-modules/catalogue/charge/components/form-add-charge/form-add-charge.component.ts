@@ -31,6 +31,7 @@ export class FormAddChargeComponent extends AppForm {
     chargeGroup: AbstractControl;
     active: AbstractControl;
     generateSelling: AbstractControl;
+    mode: AbstractControl;
 
     ngDataUnit: any = [];
     ngDataCurrentcyUnit: any = [];
@@ -61,6 +62,7 @@ export class FormAddChargeComponent extends AppForm {
     ];
 
     debitCharges: Observable<Charge[]>;
+    modes: string[] = ["INTERNAL", "EXTERNAL"];
 
     constructor(
         private _fb: FormBuilder,
@@ -92,7 +94,8 @@ export class FormAddChargeComponent extends AppForm {
             chargeGroup: [],
             active: [true],
             generateSelling: [true],
-            productDept: []
+            productDept: [],
+            mode: []
         });
 
         this.code = this.formGroup.controls["code"];
@@ -108,6 +111,8 @@ export class FormAddChargeComponent extends AppForm {
         this.chargeGroup = this.formGroup.controls["chargeGroup"];
         this.active = this.formGroup.controls["active"];
         this.generateSelling = this.formGroup.controls["generateSelling"];
+        this.mode = this.formGroup.controls["mode"];
+
         this.type.valueChanges
             .subscribe(
                 (value: any) => {
@@ -203,6 +208,7 @@ export class FormAddChargeComponent extends AppForm {
             active: res.charge.active,
             productDept: res.charge.productDept,
             unit: res.charge.unitId,
+            mode: res.charge.mode
         });
     }
 }

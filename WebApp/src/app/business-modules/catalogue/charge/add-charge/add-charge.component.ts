@@ -57,6 +57,8 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.chargeGroup = this.formAddCharge.chargeGroup.value;
         this.ChargeToAdd.charge.active = this.formAddCharge.active.value;
         this.ChargeToAdd.charge.productDept = this.formAddCharge.formGroup.controls['productDept'].value;
+        this.ChargeToAdd.charge.mode = this.formAddCharge.formGroup.controls['mode'].value;
+
         let serviceTypeId = '';
         this.ChargeToAdd.charge.type = this.formAddCharge.type.value;
         if (this.formAddCharge.service.value !== null) {
@@ -126,11 +128,13 @@ export class AddChargeComponent extends AppPage {
             this.ChargeToAdd.charge.code = data.chargeCode;
             this.ChargeToAdd.charge.type = 'DEBIT';
             this.ChargeToAdd.listChargeDefaultAccount = [];
+
             const chargeDefault = new CatChargeDefaultAccount();
             chargeDefault.type = 'Công Nợ';
             chargeDefault.creditAccountNo = data.accountNo;
             chargeDefault.debitVat = data.accountNoVAT;
             !!chargeDefault.creditAccountNo || !!chargeDefault.debitVat ? this.ChargeToAdd.listChargeDefaultAccount.push(chargeDefault) : this.ChargeToAdd.listChargeDefaultAccount = [];
+
             this._catalogueRepo.addCharge(this.ChargeToAdd)
                 .pipe(
                     catchError(this.catchError),
