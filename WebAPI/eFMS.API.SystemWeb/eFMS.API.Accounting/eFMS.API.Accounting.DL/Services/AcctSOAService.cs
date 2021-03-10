@@ -429,11 +429,13 @@ namespace eFMS.API.Accounting.DL.Services
                 if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == customer))
                 {
                     soaCharge.PaySoano = soaNo;
+                    soaCharge.Soano = surcharge.Soano;
                 }
                 //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
                 else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == customer))
                 {
                     soaCharge.Soano = soaNo;
+                    soaCharge.PaySoano = surcharge.PaySoano;
                 }
 
                 soaCharge.ExchangeDate = surcharge.ExchangeDate;
