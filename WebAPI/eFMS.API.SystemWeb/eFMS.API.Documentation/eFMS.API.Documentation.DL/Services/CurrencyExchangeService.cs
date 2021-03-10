@@ -200,8 +200,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="surcharge"></param>
         /// <param name="currencyConvert"></param>
+        /// <param name="kickBackExcRate"></param>
         /// <returns></returns>
-        public AmountResult CalculatorAmountAccountingByCurrency(CsShipmentSurcharge surcharge, string currencyConvert)
+        public AmountResult CalculatorAmountAccountingByCurrency(CsShipmentSurcharge surcharge, string currencyConvert, decimal kickBackExcRate)
         {
             AmountResult amountResult = new AmountResult();
             int _roundDecimal = currencyConvert == DocumentConstants.CURRENCY_LOCAL ? 0 : 2; //Local round 0, ngoại tệ round 2
@@ -210,7 +211,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal _excRate = 0;
 
             //Tính tỉ giá Final Exchange Rate (Tỉ giá so với LOCAL)
-            var exchangeRateToLocal = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+            decimal exchangeRateToLocal = (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true) ? kickBackExcRate : CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);            
             _excRate = exchangeRateToLocal;
 
             if (surcharge.CurrencyId == currencyConvert)
@@ -224,7 +225,15 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var exchangeRate = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyConvert);
+                decimal exchangeRate = 0;
+                if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true && surcharge.CurrencyId == DocumentConstants.CURRENCY_USD && currencyConvert == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    exchangeRate = kickBackExcRate;
+                }
+                else
+                {
+                    exchangeRate = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyConvert);
+                }
                 _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * exchangeRate) ?? 0, _roundDecimal);
                 if (surcharge.Vatrate != null)
                 {
@@ -272,11 +281,12 @@ namespace eFMS.API.Documentation.DL.Services
         /// Tính toán giá trị các field: NetAmount, Total, FinalExchangeRate, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd
         /// </summary>
         /// <param name="surcharge"></param>
+        /// <param name="kickBackExcRate"></param>
         /// <returns></returns>
-        public AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge)
+        public AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge, decimal kickBackExcRate)
         {
             AmountSurchargeResult result = new AmountSurchargeResult();
-            var amountOriginal = CalculatorAmountAccountingByCurrency(surcharge, surcharge.CurrencyId);
+            var amountOriginal = CalculatorAmountAccountingByCurrency(surcharge, surcharge.CurrencyId, kickBackExcRate);
             result.NetAmountOrig = amountOriginal.NetAmount; //Thành tiền trước thuế (Original)
             result.VatAmountOrig = amountOriginal.VatAmount; //Tiền thuế (Original)
             result.GrossAmountOrig = amountOriginal.NetAmount + amountOriginal.VatAmount; //Thành tiền sau thuế (Original)
@@ -289,7 +299,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var amountLocal = CalculatorAmountAccountingByCurrency(surcharge, DocumentConstants.CURRENCY_LOCAL);
+                var amountLocal = CalculatorAmountAccountingByCurrency(surcharge, DocumentConstants.CURRENCY_LOCAL, kickBackExcRate);
                 result.AmountVnd = amountLocal.NetAmount; //Thành tiền trước thuế (Local)
                 result.VatAmountVnd = amountLocal.VatAmount; //Tiền thuế (Local)
             }
@@ -301,7 +311,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var amountUsd = CalculatorAmountAccountingByCurrency(surcharge, DocumentConstants.CURRENCY_USD);
+                var amountUsd = CalculatorAmountAccountingByCurrency(surcharge, DocumentConstants.CURRENCY_USD, kickBackExcRate);
                 result.AmountUsd = amountUsd.NetAmount; //Thành tiền trước thuế (USD)
                 result.VatAmountUsd = amountUsd.VatAmount; //Tiền thuế (USD)
             }

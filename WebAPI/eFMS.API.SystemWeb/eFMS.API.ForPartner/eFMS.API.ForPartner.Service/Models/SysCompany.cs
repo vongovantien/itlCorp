@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Documentation.Service.Models
+namespace eFMS.API.ForPartner.Service.Models
 {
     public partial class SysCompany
     {
-        public SysCompany()
-        {
-            SysOffice = new HashSet<SysOffice>();
-        }
-
         public Guid Id { get; set; }
         public string Code { get; set; }
         public string BunameVn { get; set; }
@@ -44,7 +39,5 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public decimal? KbExchangeRate { get; set; }
-
-        public virtual ICollection<SysOffice> SysOffice { get; set; }
     }
 }

@@ -284,6 +284,8 @@ namespace eFMS.API.Documentation.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
 
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
                 var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
@@ -347,7 +349,7 @@ namespace eFMS.API.Documentation.DL.Services
                             //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             charge.FinalExchangeRate = null;
 
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                             charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -429,6 +431,8 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.ReasonReject = cdNote.ReasonReject;
                 entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
 
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+                
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
                 var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
@@ -527,7 +531,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.FinalExchangeRate = null;
                             }
 
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                             charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
