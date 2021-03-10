@@ -91,7 +91,8 @@
                                         </td>
                                         <td>
                                             <div class="form-group col-md-12 dropdown-partner e--combogrid " dropdown
-                                                [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.paymentObjectId}">
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted 
+                                                && (!charge.paymentObjectId || charge.type === 'OBH' && charge.obhId === charge.paymentObjectId)}">
                                                 <input type="text" class="dropdown-toggle form-control" dropdownToggle
                                                     readonly placeholder="Please Select" [(ngModel)]="charge.payer">
                                                 <ng-container>
@@ -172,7 +173,9 @@
                                         </td>
                                         <td>
                                             <div class="form-group col-md-12 dropdown-partner e--combogrid" dropdown
-                                                [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.type === 'OBH' && !charge.obhId) }">
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted  
+                                                && (charge.type === 'OBH' && !charge.obhId 
+                                                || charge.type === 'OBH' && charge.obhId === charge.paymentObjectId)  }">
                                                 <input type="text" class="dropdown-toggle form-control" dropdownToggle
                                                     readonly placeholder="Please Select"
                                                     [(ngModel)]="charge.obhPartnerName"
