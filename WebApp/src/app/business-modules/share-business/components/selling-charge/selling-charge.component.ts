@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +17,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
-import { InfoPopupComponent } from '@common';
 
 
 @Component({
@@ -29,7 +28,6 @@ import { InfoPopupComponent } from '@common';
 })
 
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
-    @ViewChild('accountReceivablePopup', { static: false }) accountReceivablePopup: InfoPopupComponent;
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
@@ -161,62 +159,21 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         }
 
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
-        this._documentRepo.checkAccountReceivable(this.charges)
-            .pipe(catchError(this.catchError))
+        this._documentRepo.addShipmentSurcharges(this.charges)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        console.log(res);
-                        if (res.validCreditTerm === false) {
-                            this.messageCreditRate = 'The bellow partners are over Credit limit of ' + res.transactionTypes + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
-                            this.messageCreditRate += 'Những đối tượng bên dưới đã vượt quá hạn công nợ của Dịch Vụ ' + res.transactionTypes + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
-                            if (res.partnerAccountReceivables.length > 0) {
-                                res.partnerAccountReceivables.forEach(item => {
-                                    if (!!item.creditRate) {
-                                        this.messageCreditRate += item.shortName + ' - ' + item.creditRate + '<br>';
-                                    }
-                                });
-                            }
-                            this.accountReceivablePopup.show();
-                        } else if (res.validPaymentTerm === false) {
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success(result.message);
 
-                            this.messageCreditRate = 'The bellow partners have debit overdue ' + res.partnerAccountReceivables[0].paymentTerm + '<br>' + ' Please Contact to AR/Accountant team to check' + '<br>';
-                            this.messageCreditRate += 'Những đối tượng bên dưới có công nợ quá hạn ' + res.partnerAccountReceivables[0].paymentTerm + '<br>' + ' Vui Lòng liên hệ với bộ phận AR/Accountant để kiểm tra?' + '<br>';
-                            if (res.partnerAccountReceivables.length > 0) {
-                                res.partnerAccountReceivables.forEach(item => {
-                                    this.messageCreditRate += item.shortName + ' - ' + item.paymentTerm;
-                                });
-                            }
-                            this.accountReceivablePopup.show();
-                        } else {
-                            this._documentRepo.addShipmentSurcharges(this.charges)
-                                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                                .subscribe(
-                                    (result: CommonInterface.IResult) => {
-                                        if (result.status) {
-                                            this._toastService.success(result.message);
+                        this.getProfit();
 
-                                            // Tính công nợ
-                                            this.calculatorReceivable(this.charges);
-
-                                            //
-
-                                            this.getProfit();
-
-                                            this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
-
-                                            console.log(this.charges);
-                                        } else {
-                                            this._toastService.error(result.message);
-                                        }
-                                    }
-                                );
-                        }
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                    } else {
+                        this._toastService.error(result.message);
                     }
-                },
+                }
             );
-
-
     }
 
     syncFreightCharge() {
