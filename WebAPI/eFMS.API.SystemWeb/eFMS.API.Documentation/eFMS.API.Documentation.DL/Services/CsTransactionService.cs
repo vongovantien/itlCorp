@@ -2314,7 +2314,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = null;
             IQueryable<CsShipmentSurcharge> charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId && x.IsFromShipment == true); // Không lấy phí hiện trường
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {
                 surCharges = new List<CsShipmentSurcharge>();

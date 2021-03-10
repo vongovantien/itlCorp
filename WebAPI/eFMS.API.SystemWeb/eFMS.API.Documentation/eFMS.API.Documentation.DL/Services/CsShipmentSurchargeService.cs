@@ -435,7 +435,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var surchargesAdd = new List<CsShipmentSurcharge>();
             var surchargesUpdate = new List<CsShipmentSurcharge>();
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
             foreach (var item in surcharges)
             {
@@ -588,7 +588,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new HandleState();
             var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -1391,7 +1391,7 @@ namespace eFMS.API.Documentation.DL.Services
                 item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                 item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
 
-                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                 #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                 var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);

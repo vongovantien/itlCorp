@@ -1617,7 +1617,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = null;
             var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true);
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {
                 surCharges = new List<CsShipmentSurcharge>();

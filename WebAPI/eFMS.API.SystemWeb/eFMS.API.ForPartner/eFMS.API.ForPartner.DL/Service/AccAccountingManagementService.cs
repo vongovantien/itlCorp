@@ -44,6 +44,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<SysNotifications> sysNotificationRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
         private readonly IContextBase<AcctReceipt> receiptRepository;
+        private readonly IContextBase<SysCompany> companyRepository;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -65,7 +66,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<CatCurrencyExchange> currencyExchange,
             IContextBase<SysNotifications> sysNotifyRepo,
             IContextBase<SysUserNotification> sysUsernotifyRepo,
-            IContextBase<AcctReceipt> receiptRepo
+            IContextBase<AcctReceipt> receiptRepo,
+            IContextBase<SysCompany> companyRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -85,6 +87,7 @@ namespace eFMS.API.ForPartner.DL.Service
             sysNotificationRepository = sysNotifyRepo;
             sysUserNotificationRepository = sysUsernotifyRepo;
             receiptRepository = receiptRepo;
+            companyRepository = companyRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -154,6 +157,8 @@ namespace eFMS.API.ForPartner.DL.Service
             var invoiceDebit = new AccAccountingManagement();
             var invoicesObh = new List<AccAccountingManagement>();
 
+            decimal kickBackExcRate = companyRepository.Get(x => x.Id == _currentUser.CompanyID).FirstOrDefault()?.KbExchangeRate ?? 20000;
+
             HandleState hsDebit = new HandleState();
             HandleState hsObh = new HandleState();
             try
@@ -222,11 +227,11 @@ namespace eFMS.API.ForPartner.DL.Service
                         if (invoiceDebit.Currency != ForPartnerConstants.CURRENCY_LOCAL)
                         {
                             if (surchargeDebit.FinalExchangeRate != debitCharge.ExchangeRate)
-                            {
+                            {                               
                                 surchargeDebit.FinalExchangeRate = CalculatorExchangeRate(debitCharge.ExchangeRate, surchargeDebit.ExchangeDate, surchargeDebit.CurrencyId, invoiceDebit.Currency);
 
                                 #region -- Tính lại giá trị các field  dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeDebit);
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeDebit, kickBackExcRate);
                                 surchargeDebit.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                 surchargeDebit.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                                 surchargeDebit.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
@@ -274,7 +279,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 if (surchargeObh.FinalExchangeRate != obhCharge.ExchangeRate)
                                 {
                                     #region -- Tính lại giá trị các field dựa vào FinalExchangeRate mới: NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeObh);
+                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeObh, kickBackExcRate);
                                     surchargeObh.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                     surchargeObh.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                                     surchargeObh.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)

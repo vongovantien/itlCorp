@@ -284,7 +284,7 @@ namespace eFMS.API.Documentation.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
 
-                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
@@ -431,7 +431,7 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.ReasonReject = cdNote.ReasonReject;
                 entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
 
-                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
                 
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();

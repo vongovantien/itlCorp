@@ -127,7 +127,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (hs.Success)
                     {
                         var charges = surchargeRepo.Get(x => x.AcctManagementId == id);
-                        decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                        decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                         foreach (CsShipmentSurcharge item in charges)
                         {
@@ -1054,7 +1054,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.ServiceType = GetTransactionType(jobNoGrouped);
 
                 AccAccountingManagement accounting = mapper.Map<AccAccountingManagement>(model);
-                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -1231,7 +1231,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //Update lại
                         var chargesOfAcctUpdate = model.Charges;
                         decimal _totalAmount = 0;
-                        decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                        decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                         foreach (var chargeOfAcct in chargesOfAcctUpdate)
                         {

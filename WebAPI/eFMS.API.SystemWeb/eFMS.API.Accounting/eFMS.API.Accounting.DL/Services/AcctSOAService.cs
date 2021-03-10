@@ -148,7 +148,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
                     _totalCharge = surcharges.Count();
-                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                     foreach (var surcharge in surcharges)
                     {
@@ -264,7 +264,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
                     _totalCharge = surcharges.Count();
-                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                     foreach (var surcharge in surcharges)
                     {

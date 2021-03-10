@@ -1400,7 +1400,7 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.OfficeId = currentUser.OfficeID;
                 settlement.CompanyId = currentUser.CompanyID;
 
-                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -1560,7 +1560,7 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.ReasonReject = settlementCurrent.ReasonReject;
                 settlement.LockedLog = settlementCurrent.LockedLog;
 
-                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
