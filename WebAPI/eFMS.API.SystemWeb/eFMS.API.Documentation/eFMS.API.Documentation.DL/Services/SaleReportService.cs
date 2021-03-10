@@ -250,16 +250,13 @@ namespace eFMS.API.Documentation.DL.Services
             var lookupUser = listUser.ToLookup(q => q.Id);
             var listCharges = surchargeRepository.Get();
             var lookupSellingCharges = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(q => q.Hblid);
-            var lookupBuying = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
-                                                          && (x.KickBack == false || x.KickBack == null)).ToLookup(q => q.Hblid);
+            var lookupBuying = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == false || x.KickBack == null)).ToLookup(q => q.Hblid);
             var lookupShareProfit = listCharges.Where(x => x.KickBack == true).ToLookup(q => q.Hblid);
             var listDepartment = departmentRepository.Get();
             var departmentLookup = listDepartment.ToLookup(q => q.Id);
-            //var containerList = containerRepository.Get();
-            //var containerLookup = containerList.ToLookup(q => q.Hblid);
-
+            var containerList = containerRepository.Get();
+            var containerLookup = containerList.ToLookup(q => q.Hblid);
             var results = new List<MonthlySaleReportResult>();
-            var containerData = uniRepository.Get(x => x.UnitType == "Container");
             foreach (var item in list)
             {
                 var report = new MonthlySaleReportResult
@@ -299,21 +296,10 @@ namespace eFMS.API.Documentation.DL.Services
                 report.BuyingRate = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupBuying[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupBuying[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber; //Cộng thêm phần thập phân
                 //Tổng Amount Trước thuế của phí tick chon Kick Back
                 report.SharedProfit = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupShareProfit[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupShareProfit[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber; //Cộng thêm phần thập phân
-                //var contInfo = GetContainer(containerData, null, item.HblId);
-                //if (contInfo != null)
-                //{
-                //    report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
-                //    report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
-                //    report.Qty40 = (decimal)contInfo?.Qty40 + _decimalNumber;
-                //}
-                //var contData = containerLookup[item.HblId];
-                //var conts = contData.Join(containerData, x => x.ContainerTypeId, y => y.Id, (x, y) => new { x, y.Code });
-                //if(conts.Count() > 0)
-                //{
-                //    report.Cont40HC = (decimal)conts.Where(x => x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
-                //    report.Qty20 = (decimal)conts.Where(x => x.Code.Contains("20") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
-                //    report.Qty40 = (decimal)conts.Where(x => x.Code.Contains("40") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
-                //}
+
+                report.Cont40HC = item.Cont40HC ?? 0 + _decimalNumber;
+                report.Qty20 = item.Qty20 ?? 0 + _decimalNumber;
+                report.Qty40 = item.Qty40 ?? 0 + _decimalNumber;
                 results.Add(report);
             }
             return results.AsQueryable();
@@ -553,16 +539,20 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewGetMonthlySaleReport(SaleReportCriteria criteria)
         {
             var data = GetMonthlySaleReport(criteria);
+            var listEmployee = employeeRepository.Get();
+            var lookupEmployee = listEmployee.ToLookup(q => q.Id);
+            var listUser = userRepository.Get();
+            var lookupUser = listUser.ToLookup(q => q.Id);
             Crystal result = new Crystal();
             if (data == null) result = null;
             else
             {
                 var list = data.ToList();
-                var employeeId = userRepository.Get(x => x.Id == currentUser.UserID).FirstOrDefault()?.EmployeeId;
+                var employeeId = lookupUser[currentUser.UserID].FirstOrDefault()?.EmployeeId;
                 string employeeContact = currentUser.UserName;
                 if (employeeId == null)
                 {
-                    var employee = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault();
+                    var employee = lookupEmployee[employeeId].FirstOrDefault();
                     employeeContact = employee != null ? employee.EmployeeNameVn ?? string.Empty : string.Empty;
                 }
                 var company = companyRepository.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();

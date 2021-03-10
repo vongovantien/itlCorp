@@ -2835,7 +2835,7 @@ namespace eFMS.API.Documentation.DL.Services
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobNo;
-                data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment1(charge.JobNo,dataCustom); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
+                data.CustomNo = charge.ClearanceNo;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;
                 decimal? _usdRevenue = 0;

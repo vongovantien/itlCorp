@@ -29,6 +29,10 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string TypeOfService { get; set; }
         public string ShipperId { get; set; }
         public string ConsigneeId { get; set; }
+        public int? Cont40HC { get; set; }
+        public int? Qty20 { get; set; }
+        public int? Qty40 { get; set; }
+
 
     }
 }
