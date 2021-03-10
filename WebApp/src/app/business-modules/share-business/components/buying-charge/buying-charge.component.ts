@@ -416,12 +416,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         if (res.status) {
                             this._toastService.success(res.message);
                             if (this.selectedIndexCharge > -1) {
-                                // this.charges = [...this.charges.slice(0, this.selectedIndexCharge), ...this.charges.slice(this.selectedIndexCharge + 1)];
-                                // this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(this.selectedIndexCharge));
-
-                                // Tính công nợ
-                                // this.charges.filter(f => f.id === this.selectedSurcharge.id)
-                                this.calculatorReceivable([this.selectedSurcharge]);
 
                                 this.deleteChargeWithType(type, this.selectedIndexCharge);
 
@@ -507,9 +501,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-
-                        // Tính công nợ
-                        this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(type);
@@ -1250,35 +1241,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 }
                 break;
         }
-    }
-
-    calculatorReceivable(charges: CsShipmentSurcharge[]) {
-        const objReceivable = charges.map((item: any) => ({ surchargeId: item.id, partnerId: item.paymentObjectId, office: (!!item.officeId ? item.officeId : this.userLogged.officeId), service: (!!item.transactionType ? item.transactionType : this.serviceTypeId) }));
-        charges.forEach((element: any) => {
-            if (element.type === 'OBH') {
-                objReceivable.push({ surchargeId: element.id, partnerId: element.payerId, office: (!!element.officeId ? element.officeId : this.userLogged.officeId), service: (!!element.transactionType ? element.transactionType : this.serviceTypeId) });
-            }
-        });
-
-        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).pipe(
-            mergeMap((res: CommonInterface.IResult) => {
-                if (!!res) {
-                    this.charges.forEach(item => {
-                        if (!!item.exchangeDate) {
-                            item.exchangeDate = item.exchangeDate.startDate;
-                        }
-                        if (!!item.invoiceDate) {
-                            item.invoiceDate = item.invoiceDate.startDate;
-                        }
-                    });
-                    const creditTerm = this._documentRepo.notificationAccountReceivableCreditTerm(this.charges);
-                    const paymentTerm = this._documentRepo.notificationReceivablePaymentTerm(this.charges);
-                    const expiredAgreement = this._documentRepo.notificationReceivableExpiredAgreement(this.charges);
-
-                    return forkJoin([creditTerm, paymentTerm, expiredAgreement]);
-                }
-            }),
-        ).subscribe();
     }
 
     handleChangeFeeType(event: any, charge: any) {
