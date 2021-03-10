@@ -9,12 +9,19 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using eFMS.API.Documentation.Service.Contexts;
+using eFMS.API.Documentation.Service.ViewModels;
+using AutoMapper;
+using ITL.NetCore.Connection.BL;
+using eFMS.API.Documentation.DL.Models;
+using ITL.NetCore.Connection;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class SaleReportService : ISaleReportService
+    public class SaleReportService : RepositoryBase<OpsTransaction, OpsTransactionModel> ,ISaleReportService
     {
         readonly IContextBase<OpsTransaction> opsRepository;
         readonly IContextBase<CsTransaction> csRepository;
@@ -37,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalNumber = Constants.DecimalNumber;
 
         public SaleReportService(IContextBase<OpsTransaction> opsRepo,
+            IMapper mapper,
             IContextBase<CsTransaction> csRepo,
             IContextBase<CsTransactionDetail> detailRepo,
             IContextBase<CatDepartment> departmentRepo,
@@ -53,7 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> officeRepo,
             IContextBase<SysUserLevel> userLevelRepo,
             ICurrencyExchangeService currencyExchange,
-            IContextBase<CatChargeGroup> catChargeGroup)
+            IContextBase<CatChargeGroup> catChargeGroup) : base(opsRepo, mapper)
         {
             opsRepository = opsRepo;
             csRepository = csRepo;
@@ -76,18 +84,38 @@ namespace eFMS.API.Documentation.DL.Services
         }
         private IQueryable<MonthlySaleReportResult> GetMonthlySaleReport(SaleReportCriteria criteria)
         {
-            IQueryable<MonthlySaleReportResult> opsShipments = null;
             IQueryable<MonthlySaleReportResult> csShipments = null;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
-            {
-                opsShipments = GetOpsSaleReport(criteria);
-            }
             csShipments = GetCSSaleReport(criteria);
-            if (opsShipments == null) return csShipments;
-            else if (csShipments == null) return opsShipments;
-            else return opsShipments.Union(csShipments);
+            return csShipments;
         }
 
+        private List<sp_GetDataSaleReport> GetDataSaleReport(SaleReportCriteria criteria)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.ServiceDateFrom },
+                new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.ServiceDateTo },
+                new SqlParameter(){ ParameterName = "@createdDateFrom", Value = criteria.CreatedDateFrom },
+                new SqlParameter(){ ParameterName = "@createdDateTo", Value = criteria.CreatedDateTo },
+                new SqlParameter(){ ParameterName = "@customerId", Value = criteria.CustomerId },
+                new SqlParameter(){ ParameterName = "@service", Value = criteria.Service },
+                new SqlParameter(){ ParameterName = "@currency", Value = criteria.Currency },
+                new SqlParameter(){ ParameterName = "@jobId", Value = criteria.JobId },
+                new SqlParameter(){ ParameterName = "@mawb", Value = criteria.Mawb },
+                new SqlParameter(){ ParameterName = "@hawb", Value = criteria.Hawb },
+                new SqlParameter(){ ParameterName = "@officeId", Value = criteria.OfficeId },
+                new SqlParameter(){ ParameterName = "@departmentId", Value = criteria.DepartmentId },
+                new SqlParameter(){ ParameterName = "@groupId", Value = criteria.GroupId },
+                new SqlParameter(){ ParameterName = "@personalInCharge", Value = criteria.PersonInCharge },
+                new SqlParameter(){ ParameterName = "@salesMan", Value = criteria.SalesMan },
+                new SqlParameter(){ ParameterName = "@creator", Value = criteria.Creator },
+                new SqlParameter(){ ParameterName = "@carrierId", Value = criteria.CarrierId },
+                new SqlParameter(){ ParameterName = "@agentId", Value = criteria.AgentId },
+                new SqlParameter(){ ParameterName = "@pol", Value = criteria.Pol },
+                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod }
+            };
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataSaleReport>(parameters);
+            return list;
+        }
 
         private IQueryable<MonthlySaleReportResult> GetOpsSaleReport(SaleReportCriteria criteria)
         {
@@ -210,91 +238,82 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<MonthlySaleReportResult> GetCSSaleReport(SaleReportCriteria criteria)
         {
-            IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
-            if (shipments == null) return null;
-            IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
+            var list = GetDataSaleReport(criteria);
+            if (list == null) return null;
+            var listPartner = catPartnerRepository.Get();
+            var partnerLookup = listPartner.ToLookup(q => q.Id);
+            var listPlace = catPlaceRepository.Get();
+            var placeLookup = listPlace.ToLookup(q => q.Id);
+            var listEmployee = employeeRepository.Get();
+            var lookupEmployee = listEmployee.ToLookup(q => q.Id);
+            var listUser = userRepository.Get();
+            var lookupUser = listUser.ToLookup(q => q.Id);
+            var listCharges = surchargeRepository.Get();
+            var lookupSellingCharges = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(q => q.Hblid);
+            var lookupBuying = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+                                                          && (x.KickBack == false || x.KickBack == null)).ToLookup(q => q.Hblid);
+            var lookupShareProfit = listCharges.Where(x => x.KickBack == true).ToLookup(q => q.Hblid);
+            var listDepartment = departmentRepository.Get();
+            var departmentLookup = listDepartment.ToLookup(q => q.Id);
+            //var containerList = containerRepository.Get();
+            //var containerLookup = containerList.ToLookup(q => q.Hblid);
 
-            var data = (from shipment in shipments
-                        join housebill in housebills on shipment.Id equals housebill.JobId
-                        select new
-                        {
-                            shipment.DepartmentId,
-                            shipment.TransactionType,
-                            shipment.JobNo,
-                            shipment.ShipmentType,
-                            shipment.Pol,
-                            shipment.Pod,
-                            shipment.ColoaderId,
-                            shipment.AgentId,
-                            housebill.CustomerId,
-                            housebill.NotifyPartyDescription,
-                            HBLID = housebill.Id,
-                            housebill.Hwbno,
-                            housebill.GrossWeight,
-                            housebill.ChargeWeight,
-                            housebill.Cbm,
-                            housebill.ShipperDescription,
-                            housebill.ConsigneeDescription,
-                            housebill.SaleManId,
-                            shipment.Eta,
-                            shipment.Etd,
-                            shipment.TypeOfService,
-                            housebill.ShipperId,
-                            housebill.ConsigneeId,
-                        });
-            if (data == null) return null;
             var results = new List<MonthlySaleReportResult>();
             var containerData = uniRepository.Get(x => x.UnitType == "Container");
-            foreach (var item in data)
+            foreach (var item in list)
             {
                 var report = new MonthlySaleReportResult
                 {
-                    Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn,
-                    //ContactName = "An Mai Loan",
+                    Department = item.DepartmentId != null ? departmentLookup[(int)item.DepartmentId].FirstOrDefault()?.DeptNameEn : string.Empty,
                     SalesManager = string.Empty,
-                    PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
-                    Description = API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == item.TransactionType)?.DisplayName,
+                    PartnerName = partnerLookup[item.CustomerId].FirstOrDefault()?.PartnerNameEn,
+                    Description = item.TransactionType == "CL"? "Logistics" : API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == item.TransactionType)?.DisplayName,
                     Area = string.Empty,
-                    POL = item.Pol != null ? catPlaceRepository.Get(x => x.Id == item.Pol).FirstOrDefault()?.NameEn : string.Empty,
-                    POD = item.Pod != null ? catPlaceRepository.Get(x => x.Id == item.Pod).FirstOrDefault()?.NameEn : string.Empty,
-                    Lines = item.ColoaderId != null ? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn : string.Empty,
-                    Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
-                    NominationParty = item.NotifyPartyDescription ?? string.Empty,
-                    assigned = item.ShipmentType == "Nominated",
+                    POL = item.Pol != null ? placeLookup[(Guid)item.Pol].FirstOrDefault()?.NameEn : string.Empty,
+                    POD = item.Pod != null ? placeLookup[(Guid)item.Pod].FirstOrDefault()?.NameEn : string.Empty,
+                    Lines = item.TransactionType == "CL" ? partnerLookup[item.ColoaderId].FirstOrDefault()?.PartnerNameEn :  item.ColoaderId != null ? partnerLookup[item.ColoaderId].FirstOrDefault()?.PartnerNameEn : string.Empty,
+                    Agent = item.AgentId != null ? partnerLookup[item.AgentId].FirstOrDefault()?.PartnerNameEn : string.Empty,
+                    NominationParty = item.NominationParty ?? string.Empty,
+                    assigned = item.TransactionType == "CL" ? false: item.ShipmentType == "Nominated",
                     TransID = item.JobNo,
-                    HWBNO = item.Hwbno,
-                    //KGS = item.GrossWeight == null ? 0 : (decimal)item.GrossWeight,
-                    KGS = (item.TransactionType.Contains("A") ? (item.ChargeWeight ?? 0) : (item.GrossWeight ?? 0)) + _decimalNumber, //CR: CW đối với hàng Air, GW các hàng còn lại [25-09-2020]
-                    CBM = (item.Cbm ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
+                    HWBNO = item.HwbNo,
+                    KGS = item.TransactionType == "CL" ? (item.GrossWeight ?? 0) + _decimalNumber : (item.TransactionType.Contains("A") ? (item.ChargeWeight ?? 0) : (item.GrossWeight ?? 0)) + _decimalNumber, //CR: CW đối với hàng Air, GW các hàng còn lại [25-09-2020]
+                    CBM = (item.CBM ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                     SharedProfit = 0,
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TypeOfService = item.TypeOfService != null ? (item.TypeOfService.Contains("LCL") ? "LCL" : string.Empty) : string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
-                    //Shipper = item.ShipperDescription,
-                    Shipper = catPartnerRepository.Get(x => x.Id == item.ShipperId).FirstOrDefault()?.PartnerNameEn, //CR: Get Shipper Name En [25-09-2020]
-                    //Consignee = item.ConsigneeDescription,
-                    Consignee = catPartnerRepository.Get(x => x.Id == item.ConsigneeId).FirstOrDefault()?.PartnerNameEn, //CR: Get Consignee Name En [25-09-2020]
-                    LoadingDate = item.TransactionType.Contains("I") ? item.Eta : item.Etd
+                    TypeOfService = item.TransactionType == "CL" ? "CL"  : (item.TypeOfService != null) ? (item.TypeOfService.Contains("LCL") ? "LCL" : string.Empty) : string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
+                    Shipper = item.TransactionType == "CL" ? item.ShipperId : partnerLookup[item.ShipperId].FirstOrDefault()?.PartnerNameEn, //CR: Get Shipper Name En [25-09-2020]
+                    Consignee = item.TransactionType == "CL" ? item.ConsigneeId : partnerLookup[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn, //CR: Get Consignee Name En [25-09-2020]
+                    LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd
                 };
-                string employeeId = userRepository.Get(x => x.Id == item.SaleManId).FirstOrDefault()?.EmployeeId;
+                string employeeId = lookupUser[item.SalemanId].FirstOrDefault()?.EmployeeId;
                 if (employeeId != null)
                 {
-                    report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                    report.ContactName = lookupEmployee[employeeId].FirstOrDefault()?.EmployeeNameVn;
                 }
                 //Tổng amount trước thuế selling của HBL
-                report.SellingRate = GetSellingRate(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
+                report.SellingRate = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupSellingCharges[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupSellingCharges[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber;//GetSellingRate(item.HblId, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 //Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB)
-                report.BuyingRate = GetBuyingRate(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
+                report.BuyingRate = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupBuying[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupBuying[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber; //Cộng thêm phần thập phân
                 //Tổng Amount Trước thuế của phí tick chon Kick Back
-                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
-                var contInfo = GetContainer(containerData, null, item.HBLID);
-                if (contInfo != null)
-                {
-                    report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
-                    report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
-                    report.Qty40 = (decimal)contInfo?.Qty40 + _decimalNumber;
-                }
+                report.SharedProfit = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupShareProfit[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupShareProfit[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber; //Cộng thêm phần thập phân
+                //var contInfo = GetContainer(containerData, null, item.HblId);
+                //if (contInfo != null)
+                //{
+                //    report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
+                //    report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
+                //    report.Qty40 = (decimal)contInfo?.Qty40 + _decimalNumber;
+                //}
+                //var contData = containerLookup[item.HblId];
+                //var conts = contData.Join(containerData, x => x.ContainerTypeId, y => y.Id, (x, y) => new { x, y.Code });
+                //if(conts.Count() > 0)
+                //{
+                //    report.Cont40HC = (decimal)conts.Where(x => x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
+                //    report.Qty20 = (decimal)conts.Where(x => x.Code.Contains("20") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
+                //    report.Qty40 = (decimal)conts.Where(x => x.Code.Contains("40") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
+                //}
                 results.Add(report);
             }
             return results.AsQueryable();

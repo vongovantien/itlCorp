@@ -24,8 +24,8 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ShipperDescription { get; set; }
         public string ConsigneeDescription { get; set; }
         public string SalemanId { get; set; }
-        public DateTime? ETA { get; set; }
-        public DateTime? ETD { get; set; }
+        public DateTime? Eta { get; set; }
+        public DateTime? Etd { get; set; }
         public string TypeOfService { get; set; }
         public string ShipperId { get; set; }
         public string ConsigneeId { get; set; }
