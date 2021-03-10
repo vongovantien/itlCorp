@@ -2585,11 +2585,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 
-                entity.Property(e => e.PodDescription).HasMaxLength(150);
-
                 entity.Property(e => e.Pol).HasColumnName("POL");
-
-                entity.Property(e => e.PolDescription).HasMaxLength(150);
 
                 entity.Property(e => e.Pono)
                     .HasColumnName("PONo")

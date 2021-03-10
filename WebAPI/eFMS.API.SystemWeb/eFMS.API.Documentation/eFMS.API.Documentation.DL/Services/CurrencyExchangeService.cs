@@ -281,6 +281,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// Tính toán giá trị các field: NetAmount, Total, FinalExchangeRate, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd
         /// </summary>
         /// <param name="surcharge"></param>
+        /// <param name="kickBackExcRate"></param>
         /// <returns></returns>
         public AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge, decimal kickBackExcRate)
         {
