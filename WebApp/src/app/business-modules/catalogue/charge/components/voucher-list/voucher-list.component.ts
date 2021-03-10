@@ -14,7 +14,7 @@ import { CatalogueRepo } from '@repositories';
 
 export class VoucherListComponent extends AppList implements OnInit {
 
-    ngDataTypeChargeDefault: Array<string> = ["Công-Nợ", "Giải-Chi", "Loại Khác"];
+    ngDataTypeChargeDefault: Array<string> = ["Công Nợ", "Giải Chi", "Loại Khác"];
     isAddNewLine: boolean = false;
 
     value: any = {};

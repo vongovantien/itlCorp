@@ -1352,7 +1352,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 1].Style.Numberformat.Format = "dd/mm/yyyy";
                         worksheet.Cells[i + addressStartContent, 2].Value = item.SOANo;
                         worksheet.Cells[i + addressStartContent, 3].Value = string.Empty; // tạm thời để trống
-                        worksheet.Cells[i + addressStartContent, 4].Value = item.Service;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.ChargeName;
                         worksheet.Cells[i + addressStartContent, 5].Value = item.PartnerCode;
                         worksheet.Cells[i + addressStartContent, 6].Value = item.Debit;
                         //worksheet.Cells[i + addressStartContent, 6].Style.Numberformat.Format = numberFormat;
@@ -1360,7 +1360,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         //worksheet.Cells[i + addressStartContent, 7].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[i + addressStartContent, 8].Value = item.ChargeCode;
                         worksheet.Cells[i + addressStartContent, 9].Value = item.OriginalCurrency;
-                        worksheet.Cells[i + addressStartContent, 10].Value = amountStr;
+                        worksheet.Cells[i + addressStartContent, 10].Value = item.OriginalAmount;
                         worksheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[i + addressStartContent, 11].Value = item.CreditExchange;
                         worksheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
@@ -1374,9 +1374,9 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[i + addressStartContent, 17].Value = item.AmountVNDVAT;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat;
-                        worksheet.Cells[i + addressStartContent, 18].Value = string.Empty; // tạm thời để trống
-                        worksheet.Cells[i + addressStartContent, 19].Value = string.Empty; // tạm thời để trống
-                        worksheet.Cells[i + addressStartContent, 20].Value = string.Empty; // tạm thời để trống
+                        worksheet.Cells[i + addressStartContent, 18].Value = item.InvoiceNo; // invoice no
+                        worksheet.Cells[i + addressStartContent, 19].Value = item.InvoiceDate?.ToString("dd/MM/yyyy"); // invoice date
+                        worksheet.Cells[i + addressStartContent, 20].Value = item.SeriesNo; // SeriesNo
                         worksheet.Cells[i + addressStartContent, 21].Value = item.Commodity;
                         worksheet.Cells[i + addressStartContent, 22].Value = item.CustomerName;
                         worksheet.Cells[i + addressStartContent, 23].Value = item.TaxCode;
