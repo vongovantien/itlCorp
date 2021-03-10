@@ -659,14 +659,14 @@ namespace eFMS.API.Documentation.DL.Services
                                      select new Shipments
                                      {
                                          Id = ops.Id,
-                                         JobId = ops.JobNo,
-                                         HBL = ops.Hwbno,
-                                         MBL = ops.Mblno,
+                                         JobId = !string.IsNullOrEmpty(ops.JobNo) ? ops.JobNo.Trim() : ops.JobNo,
+                                         HBL = !string.IsNullOrEmpty(ops.Hwbno) ? ops.Hwbno.Trim() : ops.Hwbno,
+                                         MBL = !string.IsNullOrEmpty(ops.Mblno) ? ops.Mblno.Trim() : ops.Mblno,
                                          CustomerId = ops.CustomerId,
                                          AgentId = ops.AgentId,
                                          CarrierId = ops.SupplierId,
                                          HBLID = ops.Hblid,
-                                         CustomNo = cus.ClearanceNo
+                                         CustomNo = !string.IsNullOrEmpty(cus.ClearanceNo) ? cus.ClearanceNo.Trim() : cus.ClearanceNo
                                      };
             shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID, x.CustomNo }).Select(s => new Shipments
             {
@@ -2828,12 +2828,14 @@ namespace eFMS.API.Documentation.DL.Services
             var lstCharge = catChargeRepo.Get();
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
+            var dataCustom = customsDeclarationRepo.Get().ToList();
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
             foreach (var charge in dataExportAccountants)
             {
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobNo;
+                data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment1(charge.JobNo,dataCustom); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;
                 decimal? _usdRevenue = 0;
@@ -3267,6 +3269,15 @@ namespace eFMS.API.Documentation.DL.Services
                 .FirstOrDefault()?.ClearanceNo;
             return clearanceNo;
         }
+
+        private string GetCustomNoOldOfShipment1(string JobNo, List<CustomsDeclaration> customsDeclarations)
+        {
+            var clearanceNo = customsDeclarations.Where(x => x.JobNo != null && x.JobNo == JobNo)
+                .OrderBy(o => o.DatetimeModified)
+                .FirstOrDefault()?.ClearanceNo;
+            return clearanceNo;
+        }
+
         private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
             var dataShipment = QueryDataSummaryOfCostsIncurred(criteria);

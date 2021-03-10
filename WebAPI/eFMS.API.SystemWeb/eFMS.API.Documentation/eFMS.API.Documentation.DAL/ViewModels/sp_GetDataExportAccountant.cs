@@ -28,6 +28,8 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public DateTime? ServiceDate { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Quantity { get; set; }
+        public string ClearanceNo { get; set; }
+
 
     }
 }
