@@ -110,23 +110,26 @@ namespace eFMS.API.Documentation.Controllers
         {
             var listShipment = shipmentService.GetShipmentNotDelete();
             List<string> shipmentNotExits = new List<string>();
-            if(typeSearch == "JOBID")
+            if (shipments != null && shipments.Count > 0)
             {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+                shipments = shipments.Select(s => s.Trim()).ToList();
+                if (typeSearch == "JOBID")
+                {
+                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+                }
+                else if (typeSearch == "MBL")
+                {
+                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
+                }
+                else if (typeSearch == "HBL")
+                {
+                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
+                }
+                else if (typeSearch == "CustomNo")
+                {
+                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.CustomNo).Contains(x)).Select(s => s).ToList();
+                }
             }
-            else if (typeSearch == "MBL")
-            {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
-            }
-            else if (typeSearch == "HBL")
-            {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
-            }
-            else if(typeSearch == "CustomNo")
-            {
-                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.CustomNo).Contains(x)).Select(s => s).ToList();
-            }
-
             var _status = false;
             var _message = string.Empty;
             if(shipmentNotExits.Count > 0)
