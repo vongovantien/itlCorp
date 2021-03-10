@@ -2585,7 +2585,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 userApproveNext = buHeadLevel.UserId;
                                 mailUserApproveNext = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
-                                if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                //Nếu Role BUHead là Auto or Special thì chuyển trạng thái Done
+                                if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
                                 {
                                     settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
                                     approve.BuheadApr = buHeadLevel.UserId;
