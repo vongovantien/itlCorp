@@ -1446,6 +1446,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         itemSceneAdd.JobNo = itemScene.JobId;
                                         itemSceneAdd.Mblno = itemScene.MBL;
                                         itemSceneAdd.Hblno = itemScene.HBL;
+
+                                        itemSceneAdd.Hblid = itemScene.Hblid;
                                     }
                                 }
                             }
