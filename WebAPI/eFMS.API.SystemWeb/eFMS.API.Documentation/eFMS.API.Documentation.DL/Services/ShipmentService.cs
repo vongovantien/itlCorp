@@ -12,14 +12,12 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2837,7 +2835,7 @@ namespace eFMS.API.Documentation.DL.Services
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobNo;
-                data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment1(charge.JobNo,dataCustom); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
+                data.CustomNo = charge.ClearanceNo;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;
                 decimal? _usdRevenue = 0;
