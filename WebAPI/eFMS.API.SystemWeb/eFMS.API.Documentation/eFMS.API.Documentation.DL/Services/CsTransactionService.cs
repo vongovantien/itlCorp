@@ -2714,7 +2714,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.CurrDecimalNo = 3;
+            parameter.CurrDecimalNo = 2;
             parameter.DecimalNo = 0;
             parameter.HBLList = _hblNoList?.ToUpper();
 
