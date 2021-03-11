@@ -25,6 +25,7 @@ namespace eFMS.API.ForPartner.Service.Models
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
+        public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
@@ -1039,6 +1040,121 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysCompany>(entity =>
+            {
+                entity.ToTable("sysCompany");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.AccountName).HasMaxLength(4000);
+
+                entity.Property(e => e.AccountNoOverSea)
+                    .HasColumnName("AccountNo_OverSea")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountNoVn)
+                    .HasColumnName("AccountNo_VN")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AddressEn)
+                    .HasColumnName("Address_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.AddressVn)
+                    .HasColumnName("Address_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.AreaId)
+                    .HasColumnName("AreaID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankAddress).HasMaxLength(4000);
+
+                entity.Property(e => e.BankName).HasMaxLength(4000);
+
+                entity.Property(e => e.BunameAbbr)
+                    .HasColumnName("BUName_ABBR")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.BunameEn)
+                    .HasColumnName("BUName_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.BunameVn)
+                    .HasColumnName("BUName_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DescriptionEn)
+                    .HasColumnName("Description_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.DescriptionVn)
+                    .HasColumnName("Description_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.Email).HasMaxLength(4000);
+
+                entity.Property(e => e.Fax).HasMaxLength(1600);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.KbExchangeRate).HasColumnType("decimal(18, 3)");
+
+                entity.Property(e => e.Logo).HasColumnType("image");
+
+                entity.Property(e => e.LogoPath).IsUnicode(false);
+
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Notes).HasMaxLength(4000);
+
+                entity.Property(e => e.Tax)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TaxAccount).HasMaxLength(1600);
+
+                entity.Property(e => e.Taxcode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Tel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Website).HasMaxLength(1600);
             });
 
             modelBuilder.Entity<SysNotifications>(entity =>

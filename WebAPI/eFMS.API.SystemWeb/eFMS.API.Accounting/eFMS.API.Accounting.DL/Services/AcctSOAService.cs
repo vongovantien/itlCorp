@@ -148,6 +148,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
                     _totalCharge = surcharges.Count();
+                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                     foreach (var surcharge in surcharges)
                     {
                         surcharge.UserModified = userCurrent;
@@ -160,7 +162,7 @@ namespace eFMS.API.Accounting.DL.Services
                             surcharge.FinalExchangeRate = null;
 
                             #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
                             surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -262,6 +264,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
                     _totalCharge = surcharges.Count();
+                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                     foreach (var surcharge in surcharges)
                     {
                         surcharge.UserModified = userCurrent;
@@ -285,7 +289,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
 
                             #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
                             surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local

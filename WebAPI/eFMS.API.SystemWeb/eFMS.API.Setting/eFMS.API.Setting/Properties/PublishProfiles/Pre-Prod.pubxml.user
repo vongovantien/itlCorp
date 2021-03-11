@@ -8,4 +8,222 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <_PublishTargetUrl>\\192.168.0.120\inetpub\efms-api\Setting</_PublishTargetUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="appsettings.Dev.json">
+      <publishTime>07/16/2020 15:39:15</publishTime>
+    </File>
+    <File Include="appsettings.json">
+      <publishTime>03/10/2021 15:37:42</publishTime>
+    </File>
+    <File Include="appsettings.Pre-Prod.json">
+      <publishTime>11/25/2020 09:32:59</publishTime>
+    </File>
+    <File Include="appsettings.Prod.json">
+      <publishTime>12/25/2020 14:51:52</publishTime>
+    </File>
+    <File Include="appsettings.Staging.json">
+      <publishTime>07/17/2020 16:12:52</publishTime>
+    </File>
+    <File Include="appsettings.Test.json">
+      <publishTime>07/17/2020 16:12:52</publishTime>
+    </File>
+    <File Include="AutoMapper.dll">
+      <publishTime>11/17/2018 10:14:56</publishTime>
+    </File>
+    <File Include="AutoMapper.Extensions.Microsoft.DependencyInjection.dll">
+      <publishTime>11/18/2018 08:27:48</publishTime>
+    </File>
+    <File Include="DnsClient.dll">
+      <publishTime>05/01/2017 09:09:22</publishTime>
+    </File>
+    <File Include="dotnet-aspnet-codegenerator-design.dll">
+      <publishTime>03/02/2019 19:52:30</publishTime>
+    </File>
+    <File Include="eFMS.API.Common.dll">
+      <publishTime>03/10/2021 12:05:53</publishTime>
+    </File>
+    <File Include="eFMS.API.Common.pdb">
+      <publishTime>03/10/2021 12:05:53</publishTime>
+    </File>
+    <File Include="eFMS.API.Infrastructure.dll">
+      <publishTime>03/10/2021 12:06:14</publishTime>
+    </File>
+    <File Include="eFMS.API.Infrastructure.pdb">
+      <publishTime>03/10/2021 12:06:14</publishTime>
+    </File>
+    <File Include="eFMS.API.Provider.dll">
+      <publishTime>03/10/2021 12:06:19</publishTime>
+    </File>
+    <File Include="eFMS.API.Provider.pdb">
+      <publishTime>03/10/2021 12:06:19</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.deps.json">
+      <publishTime>03/10/2021 16:10:56</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.DL.dll">
+      <publishTime>03/10/2021 16:10:15</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.DL.pdb">
+      <publishTime>03/10/2021 16:10:15</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.dll">
+      <publishTime>03/10/2021 16:10:54</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.pdb">
+      <publishTime>03/10/2021 16:10:54</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.runtimeconfig.json">
+      <publishTime>03/10/2021 16:10:56</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.Service.dll">
+      <publishTime>03/10/2021 16:10:08</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.Service.pdb">
+      <publishTime>03/10/2021 16:10:08</publishTime>
+    </File>
+    <File Include="eFMS.API.Setting.xml">
+      <publishTime>03/10/2021 16:10:39</publishTime>
+    </File>
+    <File Include="eFMS.IdentityServer.DL.dll">
+      <publishTime>03/10/2021 12:06:09</publishTime>
+    </File>
+    <File Include="eFMS.IdentityServer.DL.pdb">
+      <publishTime>03/10/2021 12:06:09</publishTime>
+    </File>
+    <File Include="eFMS.IdentityServer.Service.dll">
+      <publishTime>03/10/2021 12:06:07</publishTime>
+    </File>
+    <File Include="eFMS.IdentityServer.Service.pdb">
+      <publishTime>03/10/2021 12:06:07</publishTime>
+    </File>
+    <File Include="EPPlus.Core.dll">
+      <publishTime>11/30/2017 09:51:26</publishTime>
+    </File>
+    <File Include="IdentityModel.AspNetCore.OAuth2Introspection.dll">
+      <publishTime>11/15/2018 09:53:52</publishTime>
+    </File>
+    <File Include="IdentityModel.dll">
+      <publishTime>10/02/2018 09:31:14</publishTime>
+    </File>
+    <File Include="IdentityServer4.AccessTokenValidation.dll">
+      <publishTime>11/17/2018 10:22:12</publishTime>
+    </File>
+    <File Include="ITL.NetCore.Common.dll">
+      <publishTime>07/16/2020 15:39:05</publishTime>
+    </File>
+    <File Include="ITL.NetCore.Common.pdb">
+      <publishTime>07/16/2020 15:39:05</publishTime>
+    </File>
+    <File Include="ITL.NetCore.Connection.dll">
+      <publishTime>07/16/2020 15:39:05</publishTime>
+    </File>
+    <File Include="ITL.NetCore.Connection.pdb">
+      <publishTime>07/16/2020 15:39:05</publishTime>
+    </File>
+    <File Include="LinqKit.Microsoft.EntityFrameworkCore.dll">
+      <publishTime>02/21/2018 18:21:20</publishTime>
+    </File>
+    <File Include="LocalizationCultureCore.dll">
+      <publishTime>11/29/2017 14:17:54</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.dll">
+      <publishTime>02/09/2018 11:37:32</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Mvc.Versioning.dll">
+      <publishTime>01/05/2018 09:51:56</publishTime>
+    </File>
+    <File Include="Microsoft.CodeAnalysis.CSharp.Workspaces.dll">
+      <publishTime>02/19/2021 12:02:15</publishTime>
+    </File>
+    <File Include="Microsoft.CodeAnalysis.Workspaces.dll">
+      <publishTime>02/19/2021 12:02:18</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Caching.Redis.dll">
+      <publishTime>06/17/2019 16:12:02</publishTime>
+    </File>
+    <File Include="Microsoft.VisualStudio.Web.CodeGeneration.Contracts.dll">
+      <publishTime>03/02/2019 19:51:56</publishTime>
+    </File>
+    <File Include="Microsoft.VisualStudio.Web.CodeGeneration.Core.dll">
+      <publishTime>03/02/2019 19:52:00</publishTime>
+    </File>
+    <File Include="Microsoft.VisualStudio.Web.CodeGeneration.dll">
+      <publishTime>03/02/2019 19:52:04</publishTime>
+    </File>
+    <File Include="Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore.dll">
+      <publishTime>03/02/2019 19:52:02</publishTime>
+    </File>
+    <File Include="Microsoft.VisualStudio.Web.CodeGeneration.Templating.dll">
+      <publishTime>03/02/2019 19:51:58</publishTime>
+    </File>
+    <File Include="Microsoft.VisualStudio.Web.CodeGeneration.Utils.dll">
+      <publishTime>03/02/2019 19:51:56</publishTime>
+    </File>
+    <File Include="Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll">
+      <publishTime>03/02/2019 19:52:04</publishTime>
+    </File>
+    <File Include="MongoDB.Bson.dll">
+      <publishTime>11/10/2018 00:37:54</publishTime>
+    </File>
+    <File Include="MongoDB.Driver.Core.dll">
+      <publishTime>11/10/2018 00:38:02</publishTime>
+    </File>
+    <File Include="MongoDB.Driver.dll">
+      <publishTime>11/10/2018 00:38:10</publishTime>
+    </File>
+    <File Include="NuGet.Frameworks.dll">
+      <publishTime>02/19/2021 12:02:17</publishTime>
+    </File>
+    <File Include="Resources/en-US.json">
+      <publishTime>07/16/2020 15:39:15</publishTime>
+    </File>
+    <File Include="Resources/vi-VN.json">
+      <publishTime>07/16/2020 15:39:15</publishTime>
+    </File>
+    <File Include="runtimes/unix/lib/netcoreapp2.0/System.Drawing.Common.dll">
+      <publishTime>11/14/2017 15:14:46</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/netcoreapp2.0/System.Drawing.Common.dll">
+      <publishTime>11/14/2017 15:14:46</publishTime>
+    </File>
+    <File Include="StackExchange.Redis.StrongName.dll">
+      <publishTime>06/17/2019 16:12:11</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.dll">
+      <publishTime>07/06/2018 17:09:06</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.Swagger.dll">
+      <publishTime>07/06/2018 17:09:02</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.SwaggerGen.dll">
+      <publishTime>07/06/2018 17:09:02</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.SwaggerUI.dll">
+      <publishTime>07/06/2018 17:09:04</publishTime>
+    </File>
+    <File Include="System.Composition.AttributedModel.dll">
+      <publishTime>02/19/2021 12:02:27</publishTime>
+    </File>
+    <File Include="System.Composition.Convention.dll">
+      <publishTime>02/19/2021 12:02:27</publishTime>
+    </File>
+    <File Include="System.Composition.Hosting.dll">
+      <publishTime>02/19/2021 12:02:27</publishTime>
+    </File>
+    <File Include="System.Composition.Runtime.dll">
+      <publishTime>02/19/2021 12:02:27</publishTime>
+    </File>
+    <File Include="System.Composition.TypedParts.dll">
+      <publishTime>02/19/2021 12:02:27</publishTime>
+    </File>
+    <File Include="System.Drawing.Common.dll">
+      <publishTime>11/14/2017 15:14:46</publishTime>
+    </File>
+    <File Include="System.Xml.XPath.XmlDocument.dll">
+      <publishTime>11/05/2016 04:57:34</publishTime>
+    </File>
+    <File Include="web.config">
+      <publishTime>03/10/2021 16:10:56</publishTime>
+    </File>
+  </ItemGroup>
 </Project>

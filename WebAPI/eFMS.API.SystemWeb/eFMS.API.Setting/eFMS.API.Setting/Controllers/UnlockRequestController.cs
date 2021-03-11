@@ -116,6 +116,7 @@ namespace eFMS.API.Setting.Controllers
         }
 
         [HttpGet("GetById")]
+        [Authorize]
         public IActionResult GetDetailById(Guid id)
         {            
             var detail = unlockRequestService.GetDetailUnlockRequest(id);
