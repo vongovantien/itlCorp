@@ -56,8 +56,12 @@
             </div>
         </div>
         <div [ngClass]="!!STATE && STATE === 'WRITE' && TYPE === 'LIST' ? 'col-lg-8' : 'col-lg-12'">
+            <div class="float-right badge badge-primary" *ngIf="!!groupShipments.length">
+                {{TYPE === 'LIST' ? groupShipments.length : surcharges.length}}
+            </div>
             <div class="m--align-right foat-right">
-                <a class="pointer icon-switch" (click)="switchToGroup()">
+                <a class="pointer icon-switch" (click)="switchToGroup()"
+                    [title]="TYPE === 'LIST' ? 'Group View' : 'List View'">
                     <i class="la la-list" *ngIf="TYPE === 'GROUP' else list"></i>
                     <ng-template #list> <i class="la la-sitemap"></i></ng-template>
                 </a>
