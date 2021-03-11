@@ -1528,9 +1528,9 @@ namespace eFMS.API.Documentation.DL.Services
                 opsShipments = GetOpsKBReport(criteria);
             }
             csShipments = GetCSKickBackReport(criteria);
-            if (opsShipments == null) return csShipments;
-            else if (csShipments == null) return opsShipments;
-            else return opsShipments.Union(csShipments);
+            if (opsShipments == null) return csShipments.OrderBy(x => x.PartnerName);
+            else if (csShipments == null) return opsShipments.OrderBy(x => x.PartnerName);
+            else return opsShipments.Union(csShipments).OrderBy(x => x.PartnerName);
         }
 
         private IQueryable<SaleKickBackReportResult> GetOpsKBReport(SaleReportCriteria criteria)
