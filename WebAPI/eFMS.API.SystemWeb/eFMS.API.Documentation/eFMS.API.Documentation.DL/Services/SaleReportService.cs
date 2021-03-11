@@ -1545,10 +1545,10 @@ namespace eFMS.API.Documentation.DL.Services
                 if (item.Hblid != null && item.Hblid != Guid.Empty)
                 {
                     var comChargeGroup = catChargeGroupRepo.Get(x => x.Name == "Com").FirstOrDefault();
-                    var surcharge = detailLookupSur[item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
-                    var partner = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault();
+                    var surcharge = detailLookupSur[item.Hblid].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));                  
                     foreach (var charge in surcharge)
                     {
+                        var partner = catPartnerRepository.Get(x => x.Id == charge.PaymentObjectId).FirstOrDefault();
                         var report = new SaleKickBackReportResult
                         {
                             TransID = item.JobNo,
@@ -1569,7 +1569,7 @@ namespace eFMS.API.Documentation.DL.Services
                             MAWB = item.Mblno ?? string.Empty,
                             Shipper = item.Shipper ?? string.Empty,
                             Consignee = item.Consignee ?? string.Empty,
-                            PartnerID = item.CustomerId,
+                            PartnerID = partner?.AccountNo,
                             Category = partner?.PartnerType,
                         };
                         // Lấy tất cả Buying charge
@@ -1618,10 +1618,10 @@ namespace eFMS.API.Documentation.DL.Services
                 if (item.HBLID != null && item.HBLID != Guid.Empty)
                 {
                     var comChargeGroup = catChargeGroupRepo.Get(x => x.Name == "Com").FirstOrDefault();
-                    var surcharge = detailLookupSur[item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
-                    var partner = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault();
+                    var surcharge = detailLookupSur[item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));                    
                     foreach (var charge in surcharge)
                     {
+                        var partner = catPartnerRepository.Get(x => x.Id == charge.PaymentObjectId).FirstOrDefault();
                         var report = new SaleKickBackReportResult
                         {
                             TransID = item.JobNo,
@@ -1642,7 +1642,7 @@ namespace eFMS.API.Documentation.DL.Services
                             MAWB = item.MawbNo ?? string.Empty,
                             Shipper = item.ShipperDescription,
                             Consignee = item.ConsigneeDescription,
-                            PartnerID = item.CustomerId,
+                            PartnerID = partner?.AccountNo,
                             Category = partner?.PartnerType,
                         };
                         // Lấy tất cả Buying charge
