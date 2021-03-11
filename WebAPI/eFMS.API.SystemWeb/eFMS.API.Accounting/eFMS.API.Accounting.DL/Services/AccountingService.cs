@@ -332,6 +332,9 @@ namespace eFMS.API.Accounting.DL.Services
                             // Ds Surcharge của settlement.
                             IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
 
+                            //*Note: Nếu charge là OBH thì OriginalAmount = Thành tiền trước thuế + Tiền thuế; OriginalAmount3 = 0; 
+                            //Ngược lại OriginalAmount = Thành tiền trước thuế, OriginalAmount3 = Tiền thuế
+
                             IQueryable<BravoSettlementRequestModel> querySettlementReq = from surcharge in surcharges
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
                                                                                          join obhP in partners on surcharge.PaymentObjectId equals obhP.Id into obhPGrps
@@ -352,8 +355,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Quantity9 = surcharge.Quantity,
                                                                                              OriginalUnitPrice = surcharge.UnitPrice,
                                                                                              TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
-                                                                                             OriginalAmount = surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(surcharge.Quantity * surcharge.UnitPrice ?? 0, 0) : NumberHelper.RoundNumber(surcharge.Quantity * surcharge.UnitPrice ?? 0, 2),
-                                                                                             OriginalAmount3 = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
+                                                                                             OriginalAmount = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? NumberHelper.RoundNumber(surcharge.Total, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)) + NumberHelper.RoundNumber((surcharge.Total - surcharge.NetAmount) ?? 0, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)) : NumberHelper.RoundNumber(surcharge.Total, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)),
+                                                                                             OriginalAmount3 = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? 0 : GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId),
                                                                                              OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? obhP.AccountNo : null,
                                                                                              AtchDocNo = surcharge.InvoiceNo,
                                                                                              AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate, //Chỉ lấy Date (không lấy Time)
@@ -455,10 +458,37 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
                         charge.OriginalUnitPrice = _unitPrice ?? 0; //Đơn giá không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
-                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
-                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        //var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        //charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        //var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                        //charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+
+                        decimal _netAmount = 0;
+                        decimal _taxMoney = 0;
+                        if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_LOCAL)
+                        {
+                            _netAmount = surcharge.AmountVnd ?? 0;
+                            _taxMoney = surcharge.VatAmountVnd ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_USD)
+                        {
+                            _netAmount = surcharge.AmountUsd ?? 0;
+                            _taxMoney = surcharge.VatAmountUsd ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == surcharge.CurrencyId)
+                        {
+                            _netAmount = surcharge.NetAmount ?? 0;
+                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        }
+                        else
+                        {
+                            _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                            _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                            _taxMoney = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        }
+
+                        charge.OriginalAmount = _netAmount; //Thành tiến chưa thuế
+                        charge.OriginalAmount3 = _taxMoney; //Tiền thuế
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -473,10 +503,37 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); //Lấy giá trị FinalExchangeRate, nếu không có thì quy đổi về Currency Local theo ExchangeDate
                         charge.OriginalUnitPrice = surcharge.UnitPrice; //Đơn giá
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
-                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        //var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        //charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        //var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        //charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+
+                        //Đối với phí OBH thì OriginalAmount sẽ là thành tiền sau thuế (thành tiến trước thuế + tiền thuế), OriginalAmount3 gán bằng 0
+                        decimal _amount = 0;
+                        if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_LOCAL)
+                        {
+                            _amount = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_USD)
+                        {
+                            _amount = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == surcharge.CurrencyId)
+                        {
+                            _amount = surcharge.Total;
+                        }
+                        else
+                        {
+                            var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                            var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                            _amount = _netAmount + _taxMoney;
+                        }
+
+                        charge.OriginalAmount = _amount;
+                        charge.OriginalAmount3 = 0;
+
+                        charge.AtchDocNo = surcharge.InvoiceNo; //Số Invoice trên phiếu OBH
+                        charge.AtchDocSerialNo = surcharge.SeriesNo; //Số Serie trên phiếu OBH
                     }
 
                     charge.DueDate = _dueDate;
@@ -552,10 +609,46 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Quantity9 = surcharge.Quantity;
                         charge.OriginalUnitPrice = surcharge.UnitPrice ?? 0; //Đơn giá không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
-                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        //var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        //charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        //var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        //charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+
+                        decimal _netAmount = 0;
+                        decimal _taxMoney = 0;
+                        if (sync.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
+                        {
+                            _netAmount = surcharge.AmountVnd ?? 0;
+                            _taxMoney = surcharge.VatAmountVnd ?? 0;
+                        }
+                        else if (sync.CurrencyCode == AccountingConstants.CURRENCY_USD)
+                        {
+                            _netAmount = surcharge.AmountUsd ?? 0;
+                            _taxMoney = surcharge.VatAmountUsd ?? 0;
+                        }
+                        else if (sync.CurrencyCode == surcharge.CurrencyId)
+                        {
+                            _netAmount = surcharge.NetAmount ?? 0;
+                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        }
+                        else
+                        {
+                            _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                            _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                            _taxMoney = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        }
+
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                        {
+                            charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế
+                            charge.OriginalAmount3 = _taxMoney; //Tiền thuế
+                        }
+
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                        {
+                            charge.OriginalAmount = _netAmount + _taxMoney; //Thành tiền chưa thuế + Tiền thuế
+                            charge.OriginalAmount3 = 0;
+                        }
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
@@ -658,10 +751,33 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
                         charge.OriginalUnitPrice = _unitPrice ?? 0; //Đơn giá làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
-                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
-                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+
+                        decimal _netAmount = 0;
+                        decimal _taxMoney = 0;
+                        if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_LOCAL)
+                        {
+                            _netAmount = surcharge.AmountVnd ?? 0;
+                            _taxMoney = surcharge.VatAmountVnd ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_USD)
+                        {
+                            _netAmount = surcharge.AmountUsd ?? 0;
+                            _taxMoney = surcharge.VatAmountUsd ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == surcharge.CurrencyId)
+                        {
+                            _netAmount = surcharge.NetAmount ?? 0;
+                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        }
+                        else
+                        {
+                            _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * _unitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                            _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate * _exchargeRate ?? 0) : 0;
+                            _taxMoney = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        }
+
+                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế
+                        charge.OriginalAmount3 = _taxMoney; //Tiền thuế
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -676,10 +792,37 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); //Lấy giá trị FinalExchangeRate, nếu không có thì quy đổi về Currency Local theo ExchangeDate
                         charge.OriginalUnitPrice = surcharge.UnitPrice; //Đơn giá
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
-                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        //var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        //charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        //var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        //charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+
+                        //Đối với phí OBH thì OriginalAmount sẽ là thành tiền sau thuế (thành tiến trước thuế + tiền thuế), OriginalAmount3 gán bằng 0
+                        decimal _amount = 0;
+                        if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_LOCAL)
+                        {
+                            _amount = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_USD)
+                        {
+                            _amount = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                        }
+                        else if (sync.CurrencyCode0 == surcharge.CurrencyId)
+                        {
+                            _amount = surcharge.Total;
+                        }
+                        else
+                        {
+                            var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                            var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                            _amount = _netAmount + _taxMoney;
+                        }
+
+                        charge.OriginalAmount = _amount;
+                        charge.OriginalAmount3 = 0;
+
+                        charge.AtchDocNo = surcharge.InvoiceNo; //Số Invoice trên phiếu OBH
+                        charge.AtchDocSerialNo = surcharge.SeriesNo; //Số Serie trên phiếu OBH
                     }
 
                     charge.DueDate = _dueDate;
@@ -754,10 +897,46 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Quantity9 = surcharge.Quantity;
                         charge.OriginalUnitPrice = surcharge.UnitPrice ?? 0; //Không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
-                        var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
-                        charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
-                        var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
-                        charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        //var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                        //charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
+                        //var _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                        //charge.OriginalAmount3 = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+
+                        decimal _netAmount = 0;
+                        decimal _taxMoney = 0;
+                        if (sync.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
+                        {
+                            _netAmount = surcharge.AmountVnd ?? 0;
+                            _taxMoney = surcharge.VatAmountVnd ?? 0;
+                        }
+                        else if (sync.CurrencyCode == AccountingConstants.CURRENCY_USD)
+                        {
+                            _netAmount = surcharge.AmountUsd ?? 0;
+                            _taxMoney = surcharge.VatAmountUsd ?? 0;
+                        }
+                        else if (sync.CurrencyCode == surcharge.CurrencyId)
+                        {
+                            _netAmount = surcharge.NetAmount ?? 0;
+                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        }
+                        else
+                        {
+                            _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
+                            _taxMoney = (surcharge.Vatrate != null) ? (surcharge.Vatrate < 101 & surcharge.Vatrate >= 0) ? ((_netAmount * surcharge.Vatrate) / 100 ?? 0) : Math.Abs(surcharge.Vatrate ?? 0) : 0;
+                            _taxMoney = NumberHelper.RoundNumber(_taxMoney, decimalRound); //Tiền thuế (có làm tròn)
+                        }
+
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                        {
+                            charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế
+                            charge.OriginalAmount3 = _taxMoney; //Tiền thuế
+                        }
+
+                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                        {
+                            charge.OriginalAmount = _netAmount + _taxMoney; //Thành tiền chưa thuế + Tiền thuế
+                            charge.OriginalAmount3 = 0;
+                        }
 
                         var _partnerPaymentObject = partners.Where(x => x.Id == surcharge.PaymentObjectId).FirstOrDefault();
                         charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
@@ -1361,16 +1540,42 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(accountNo) && (accountNo == "3311" || accountNo == "3313"))
             {
                 _originAmount = surcharge.AmountVnd ?? 0;
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    _originAmount = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                }
             }
             else
             {
                 // Tính toán như cũ
-                _originAmount = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
+                //_originAmount = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
                 if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _originAmount = NumberHelper.RoundNumber(_originAmount);
+                    //_originAmount = NumberHelper.RoundNumber(_originAmount);
+                    _originAmount = surcharge.AmountVnd ?? 0;
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        _originAmount = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    }
+                }
+                else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                {
+                    _originAmount = surcharge.AmountUsd ?? 0;
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        _originAmount = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                    }
+                }
+                else
+                {
+                    _originAmount = surcharge.NetAmount ?? 0;
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        _originAmount = surcharge.Total;
+                    }
                 }
             }
+
 
             return _originAmount;
         }
@@ -1381,11 +1586,39 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(accountNo) && (accountNo == "3311" || accountNo == "3313"))
             {
                 _orgVatAmout = surcharge.VatAmountVnd ?? 0;
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    _orgVatAmout = 0;
+                }
             }
             else
             {
                 // Tính toán như cũ
-                _orgVatAmout = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId);
+                //_orgVatAmout = GetOrgVatAmount(surcharge.Vatrate, surcharge.Quantity * surcharge.UnitPrice, surcharge.CurrencyId);
+                if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    _orgVatAmout = surcharge.VatAmountVnd ?? 0;
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        _orgVatAmout = 0;
+                    }
+                }
+                else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                {
+                    _orgVatAmout = surcharge.VatAmountUsd ?? 0;
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        _orgVatAmout = 0;
+                    }
+                }
+                else
+                {
+                    _orgVatAmout = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    {
+                        _orgVatAmout = 0;
+                    }
+                }
             }
 
             return _orgVatAmout;
