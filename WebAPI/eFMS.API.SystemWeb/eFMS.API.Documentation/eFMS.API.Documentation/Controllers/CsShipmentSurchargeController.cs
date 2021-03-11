@@ -200,9 +200,11 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
             // list.ForEach(fe => {
-                // fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
-                // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
+            // fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
+            // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
             //});
+            currentUser.Action = "AddAndUpdate";
+
             var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -355,6 +357,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid chargId)
         {
+            currentUser.Action = "DeleteCsShipmentSurcharge";
             var hs = csShipmentSurchargeService.DeleteCharge(chargId);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
