@@ -32,7 +32,11 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public int? Cont40HC { get; set; }
         public int? Qty20 { get; set; }
         public int? Qty40 { get; set; }
-
+        public string SalesDepartmentId { get; set; }
+        public string DepartSaleManager { get; set; }
+        public string DepartmentSale { get; set; }
+        public decimal? Cbm { get; set; }
+        public decimal? NetWeight { get; set; }
 
     }
 }

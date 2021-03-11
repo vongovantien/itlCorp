@@ -640,203 +640,160 @@ namespace eFMS.API.Documentation.DL.Services
             return companyManager;
         }
 
-        #region -- SALE REPORT BY QUATER --        
-        private IQueryable<QuaterSaleReportResult> GetQuaterOpsSaleReport(SaleReportCriteria criteria)
+        #region -- SALE REPORT BY QUATER --    
+        // comment improve
+        //private IQueryable<QuaterSaleReportResult> GetQuaterOpsSaleReport(SaleReportCriteria criteria)
+        //{
+        //    List<QuaterSaleReportResult> results = null;
+        //    IQueryable<OpsTransaction> data = QueryOpsSaleReport(criteria);
+        //    if (data == null) return null;
+        //    results = new List<QuaterSaleReportResult>();
+        //    var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
+        //    foreach (var item in data)
+        //    {
+        //        string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
+        //        string _contactName = string.Empty;
+        //        if (employeeId != null)
+        //        {
+        //            _contactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+        //        }
+
+        //        string _deptManagerSale = GetDeptManager(item.CompanyId, item.OfficeId, item.DepartmentId).FirstOrDefault();
+        //        string _employeeIdDeptManagerSale = userRepository.Get(x => x.Id == _deptManagerSale).FirstOrDefault()?.EmployeeId;
+        //        string _saleManager = string.Empty;
+        //        if (_employeeIdDeptManagerSale != null)
+        //        {
+        //            _saleManager = employeeRepository.Get(x => x.Id == _employeeIdDeptManagerSale).FirstOrDefault()?.EmployeeNameVn;
+        //        }
+
+        //        #region -- Tổng amount trước thuế selling của HBL --               
+        //        decimal _sellingRate = 0;
+        //        var _chargeSell = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
+        //        foreach (var charge in _chargeSell)
+        //        {
+        //            //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+        //            var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+        //            _sellingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+        //        }
+        //        #endregion -- Tổng amount trước thuế selling của HBL --
+
+        //        #region -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
+        //        decimal _buyingRate = 0;
+        //        var _chargeBuy = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+        //                                                    && x.Hblid == item.Hblid
+        //                                                    && (x.KickBack == false || x.KickBack == null));
+        //        foreach (var charge in _chargeBuy)
+        //        {
+        //            //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+        //            var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+        //            _buyingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+        //        }
+        //        #endregion -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
+
+        //        #region -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
+        //        decimal _sharedProfit = 0;
+        //        var _chargeBuyKB = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+        //                                                    && x.Hblid == item.Hblid
+        //                                                    && x.KickBack == true);
+        //        foreach (var charge in _chargeBuyKB)
+        //        {
+        //            //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+        //            var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+        //            _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+        //        }
+        //        #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
+        //        string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
+        //        var report = new QuaterSaleReportResult
+        //        {
+        //            Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
+        //            ContactName = _contactName, // Sale Full Name
+        //            SalesManager = _saleManager, // Sale Manager
+        //            PartnerName = string.Empty,
+        //            Description = string.Empty,
+        //            Area = string.Empty,
+        //            POL = string.Empty,
+        //            POD = string.Empty,
+        //            Lines = string.Empty,
+        //            Agent = string.Empty,
+        //            NominationParty = string.Empty,
+        //            assigned = false,
+        //            TransID = string.Empty,
+        //            LoadingDate = item.ServiceDate,
+        //            HWBNO = string.Empty,
+        //            Volumne = string.Empty,
+        //            Qty20 = 0,
+        //            Qty40 = 0,
+        //            Cont40HC = 0,
+        //            KGS = 0,
+        //            CBM = 0,
+        //            SellingRate = _sellingRate + _decimalNumber, // Total Amount Selling
+        //            SharedProfit = _sharedProfit + _decimalNumber, // Total Amount Buying có Check Kick Back
+        //            BuyingRate = _buyingRate + _decimalNumber, // Total Amount Buying ko có Check Kick Back
+        //            OtherCharges = 0, // Default bằng 0
+        //            SalesTarget = 0, // Default bằng 0
+        //            Bonus = 0, // Default bằng 0
+        //            DptSalesTarget = 0, // Default bằng 0
+        //            DptBonus = 0, // Default bằng 0
+        //            KeyContact = string.Empty,
+        //            MBLNO = string.Empty,
+        //            Vessel = string.Empty,
+        //            TpyeofService = string.Empty,
+        //        };
+
+        //        results.Add(report);
+        //    }
+        //    return results.AsQueryable();
+        //}
+
+        private IQueryable<QuaterSaleReportResult> GetDataQuaterCSSaleReport(SaleReportCriteria criteria)
         {
-            List<QuaterSaleReportResult> results = null;
-            IQueryable<OpsTransaction> data = QueryOpsSaleReport(criteria);
+            var data = GetDataSaleReport(criteria);
             if (data == null) return null;
-            results = new List<QuaterSaleReportResult>();
-            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
-            foreach (var item in data)
-            {
-                string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
-                string _contactName = string.Empty;
-                if (employeeId != null)
-                {
-                    _contactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
-                }
-
-                string _deptManagerSale = GetDeptManager(item.CompanyId, item.OfficeId, item.DepartmentId).FirstOrDefault();
-                string _employeeIdDeptManagerSale = userRepository.Get(x => x.Id == _deptManagerSale).FirstOrDefault()?.EmployeeId;
-                string _saleManager = string.Empty;
-                if (_employeeIdDeptManagerSale != null)
-                {
-                    _saleManager = employeeRepository.Get(x => x.Id == _employeeIdDeptManagerSale).FirstOrDefault()?.EmployeeNameVn;
-                }
-
-                #region -- Tổng amount trước thuế selling của HBL --               
-                decimal _sellingRate = 0;
-                var _chargeSell = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
-                foreach (var charge in _chargeSell)
-                {
-                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _sellingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-                }
-                #endregion -- Tổng amount trước thuế selling của HBL --
-
-                #region -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
-                decimal _buyingRate = 0;
-                var _chargeBuy = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
-                                                            && x.Hblid == item.Hblid
-                                                            && (x.KickBack == false || x.KickBack == null));
-                foreach (var charge in _chargeBuy)
-                {
-                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _buyingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-                }
-                #endregion -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
-
-                #region -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
-                decimal _sharedProfit = 0;
-                var _chargeBuyKB = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
-                                                            && x.Hblid == item.Hblid
-                                                            && x.KickBack == true);
-                foreach (var charge in _chargeBuyKB)
-                {
-                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-                }
-                #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
-                string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
-                var report = new QuaterSaleReportResult
-                {
-                    Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
-                    ContactName = _contactName, // Sale Full Name
-                    SalesManager = _saleManager, // Sale Manager
-                    PartnerName = string.Empty,
-                    Description = string.Empty,
-                    Area = string.Empty,
-                    POL = string.Empty,
-                    POD = string.Empty,
-                    Lines = string.Empty,
-                    Agent = string.Empty,
-                    NominationParty = string.Empty,
-                    assigned = false,
-                    TransID = string.Empty,
-                    LoadingDate = item.ServiceDate,
-                    HWBNO = string.Empty,
-                    Volumne = string.Empty,
-                    Qty20 = 0,
-                    Qty40 = 0,
-                    Cont40HC = 0,
-                    KGS = 0,
-                    CBM = 0,
-                    SellingRate = _sellingRate + _decimalNumber, // Total Amount Selling
-                    SharedProfit = _sharedProfit + _decimalNumber, // Total Amount Buying có Check Kick Back
-                    BuyingRate = _buyingRate + _decimalNumber, // Total Amount Buying ko có Check Kick Back
-                    OtherCharges = 0, // Default bằng 0
-                    SalesTarget = 0, // Default bằng 0
-                    Bonus = 0, // Default bằng 0
-                    DptSalesTarget = 0, // Default bằng 0
-                    DptBonus = 0, // Default bằng 0
-                    KeyContact = string.Empty,
-                    MBLNO = string.Empty,
-                    Vessel = string.Empty,
-                    TpyeofService = string.Empty,
-                };
-
-                results.Add(report);
-            }
-            return results.AsQueryable();
-        }
-
-        private IQueryable<QuaterSaleReportResult> GetQuaterCSSaleReport(SaleReportCriteria criteria)
-        {
-            IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
-            if (shipments == null) return null;
-            IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
-            var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
-            var data = (from shipment in shipments
-                        join housebill in housebills on shipment.Id equals housebill.JobId
-                        select new
-                        {
-                            shipment.DepartmentId,
-                            shipment.TransactionType,
-                            shipment.JobNo,
-                            shipment.ShipmentType,
-                            shipment.Pol,
-                            shipment.Pod,
-                            shipment.ColoaderId,
-                            shipment.AgentId,
-                            housebill.CustomerId,
-                            housebill.NotifyPartyDescription,
-                            HBLID = housebill.Id,
-                            housebill.Hwbno,
-                            housebill.NetWeight,
-                            housebill.Cbm,
-                            housebill.ShipperDescription,
-                            housebill.ConsigneeDescription,
-                            housebill.SaleManId,
-                            shipment.Eta,
-                            shipment.Etd,
-                            housebill.OfficeId,
-                            housebill.CompanyId,
-                            DepartmentIdHbl = housebill.DepartmentId,
-                            housebill.SalesDepartmentId
-                        });
-            if (data == null) return null;
+            var listEmployee = employeeRepository.Get();
+            var lookupEmployee = listEmployee.ToLookup(q => q.Id);
+            var listUser = userRepository.Get();
+            var lookupUser = listUser.ToLookup(q => q.Id);
+            var listCharges = surchargeRepository.Get();
+            var lookupSellingCharges = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(q => q.Hblid);
+            var lookupBuying = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == false || x.KickBack == null)).ToLookup(q => q.Hblid);
+            var lookupBuyKB = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.KickBack == true).ToLookup(q => q.Hblid);
+            bool hasSalesman = criteria.SalesMan != null;
             var results = new List<QuaterSaleReportResult>();
             foreach (var item in data)
             {
-                string employeeId = userRepository.Get(x => x.Id == item.SaleManId).FirstOrDefault()?.EmployeeId;
+                string employeeId = lookupUser[item.SalemanId].FirstOrDefault()?.EmployeeId;
                 string _contactName = string.Empty;
                 if (employeeId != null)
                 {
-                    _contactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                    _contactName = lookupEmployee[employeeId].FirstOrDefault()?.EmployeeNameVn;
                 }
 
-                string _deptManagerSale = GetDeptManager(item.CompanyId, item.OfficeId, item.DepartmentIdHbl).FirstOrDefault();
-                string _employeeIdDeptManagerSale = userRepository.Get(x => x.Id == _deptManagerSale).FirstOrDefault()?.EmployeeId;
+                string _employeeIdDeptManagerSale = lookupUser[item.DepartSaleManager].FirstOrDefault()?.EmployeeId;
                 string _saleManager = string.Empty;
                 if (_employeeIdDeptManagerSale != null)
                 {
-                    _saleManager = employeeRepository.Get(x => x.Id == _employeeIdDeptManagerSale).FirstOrDefault()?.EmployeeNameVn;
+                    _saleManager = lookupEmployee[_employeeIdDeptManagerSale].FirstOrDefault()?.EmployeeNameVn;
                 }
 
                 #region -- Tổng amount trước thuế selling của HBL --               
                 decimal _sellingRate = 0;
-                var _chargeSell = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HBLID);
-                foreach (var charge in _chargeSell)
-                {
-                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _sellingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-                }
+                _sellingRate = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupSellingCharges[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupSellingCharges[item.HblId].Sum(x => x.AmountUsd);
                 #endregion -- Tổng amount trước thuế selling của HBL --
 
                 #region -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
                 decimal _buyingRate = 0;
-                var _chargeBuy = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
-                                                            && x.Hblid == item.HBLID
-                                                            && (x.KickBack == false || x.KickBack == null));
-                foreach (var charge in _chargeBuy)
-                {
-                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _buyingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-                }
+                _buyingRate = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupBuying[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupBuying[item.HblId].Sum(x => x.AmountUsd);
+
                 #endregion -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
 
                 #region -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
                 decimal _sharedProfit = 0;
-                var _chargeBuyKB = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
-                                                            && x.Hblid == item.HBLID
-                                                            && x.KickBack == true);
-                foreach (var charge in _chargeBuyKB)
-                {
-                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
-                }
+                _sharedProfit = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupBuyKB[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupBuyKB[item.HblId].Sum(x => x.AmountUsd);
                 #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
                 string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
                 var report = new QuaterSaleReportResult
                 {
-                    Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
+                    Department = item.DepartmentSale,
                     ContactName = _contactName, // Sale Full Name
                     SalesManager = _saleManager, // Sale Manager
                     PartnerName = string.Empty,
@@ -849,7 +806,7 @@ namespace eFMS.API.Documentation.DL.Services
                     NominationParty = string.Empty,
                     assigned = false,
                     TransID = string.Empty,
-                    LoadingDate = item.TransactionType.Contains("I") ? item.Eta : item.Etd,
+                    LoadingDate = item.TransactionType == "CL" ? item.Etd : ( item.TransactionType.Contains("I") ? item.Eta : item.Etd),
                     HWBNO = string.Empty,
                     Volumne = string.Empty,
                     Qty20 = 0,
@@ -875,6 +832,138 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results.AsQueryable();
         }
+        // Comment improve
+        //private IQueryable<QuaterSaleReportResult> GetQuaterCSSaleReport(SaleReportCriteria criteria)
+        //{
+        //    IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
+        //    if (shipments == null) return null;
+        //    IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
+        //    var hasSalesman = criteria.SalesMan != null; // Check if Type = Salesman
+        //    var data = (from shipment in shipments
+        //                join housebill in housebills on shipment.Id equals housebill.JobId
+        //                select new
+        //                {
+        //                    shipment.DepartmentId,
+        //                    shipment.TransactionType,
+        //                    shipment.JobNo,
+        //                    shipment.ShipmentType,
+        //                    shipment.Pol,
+        //                    shipment.Pod,
+        //                    shipment.ColoaderId,
+        //                    shipment.AgentId,
+        //                    housebill.CustomerId,
+        //                    housebill.NotifyPartyDescription,
+        //                    HBLID = housebill.Id,
+        //                    housebill.Hwbno,
+        //                    housebill.NetWeight,
+        //                    housebill.Cbm,
+        //                    housebill.ShipperDescription,
+        //                    housebill.ConsigneeDescription,
+        //                    housebill.SaleManId,
+        //                    shipment.Eta,
+        //                    shipment.Etd,
+        //                    housebill.OfficeId,
+        //                    housebill.CompanyId,
+        //                    DepartmentIdHbl = housebill.DepartmentId,
+        //                    housebill.SalesDepartmentId
+        //                });
+        //    if (data == null) return null;
+        //    var results = new List<QuaterSaleReportResult>();
+        //    foreach (var item in data)
+        //    {
+        //        string employeeId = userRepository.Get(x => x.Id == item.SaleManId).FirstOrDefault()?.EmployeeId;
+        //        string _contactName = string.Empty;
+        //        if (employeeId != null)
+        //        {
+        //            _contactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+        //        }
+
+        //        string _deptManagerSale = GetDeptManager(item.CompanyId, item.OfficeId, item.DepartmentIdHbl).FirstOrDefault();
+        //        string _employeeIdDeptManagerSale = userRepository.Get(x => x.Id == _deptManagerSale).FirstOrDefault()?.EmployeeId;
+        //        string _saleManager = string.Empty;
+        //        if (_employeeIdDeptManagerSale != null)
+        //        {
+        //            _saleManager = employeeRepository.Get(x => x.Id == _employeeIdDeptManagerSale).FirstOrDefault()?.EmployeeNameVn;
+        //        }
+
+        //        #region -- Tổng amount trước thuế selling của HBL --               
+        //        decimal _sellingRate = 0;
+        //        var _chargeSell = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HBLID);
+        //        foreach (var charge in _chargeSell)
+        //        {
+        //            //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+        //            var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+        //            _sellingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+        //        }
+        //        #endregion -- Tổng amount trước thuế selling của HBL --
+
+        //        #region -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
+        //        decimal _buyingRate = 0;
+        //        var _chargeBuy = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+        //                                                    && x.Hblid == item.HBLID
+        //                                                    && (x.KickBack == false || x.KickBack == null));
+        //        foreach (var charge in _chargeBuy)
+        //        {
+        //            //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+        //            var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+        //            _buyingRate += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+        //        }
+        //        #endregion -- Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB) --
+
+        //        #region -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
+        //        decimal _sharedProfit = 0;
+        //        var _chargeBuyKB = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+        //                                                    && x.Hblid == item.HBLID
+        //                                                    && x.KickBack == true);
+        //        foreach (var charge in _chargeBuyKB)
+        //        {
+        //            //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+        //            var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+        //            _sharedProfit += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+        //        }
+        //        #endregion -- Tổng amount trước thuế Buying của HBL (lấy phí có tick Kick Back) --
+        //        string Depart = hasSalesman == true ? item.SalesDepartmentId : item.DepartmentId.ToString();
+        //        var report = new QuaterSaleReportResult
+        //        {
+        //            Department = departmentRepository.Get(x => Depart.Contains(x.Id.ToString())).FirstOrDefault()?.DeptNameEn, // Department của Sale lô hàng đó
+        //            ContactName = _contactName, // Sale Full Name
+        //            SalesManager = _saleManager, // Sale Manager
+        //            PartnerName = string.Empty,
+        //            Description = string.Empty,
+        //            Area = string.Empty,
+        //            POL = string.Empty,
+        //            POD = string.Empty,
+        //            Lines = string.Empty,
+        //            Agent = string.Empty,
+        //            NominationParty = string.Empty,
+        //            assigned = false,
+        //            TransID = string.Empty,
+        //            LoadingDate = item.TransactionType.Contains("I") ? item.Eta : item.Etd,
+        //            HWBNO = string.Empty,
+        //            Volumne = string.Empty,
+        //            Qty20 = 0,
+        //            Qty40 = 0,
+        //            Cont40HC = 0,
+        //            KGS = 0,
+        //            CBM = 0,
+        //            SellingRate = _sellingRate + _decimalNumber, // Total Amount Selling
+        //            SharedProfit = _sharedProfit + _decimalNumber, // Total Amount Buying có Check Kick Back
+        //            BuyingRate = _buyingRate + _decimalNumber, // Total Amount Buying ko có Check Kick Back
+        //            OtherCharges = 0, // Default bằng 0
+        //            SalesTarget = 0, // Default bằng 0
+        //            Bonus = 0, // Default bằng 0
+        //            DptSalesTarget = 0, // Default bằng 0
+        //            DptBonus = 0, // Default bằng 0
+        //            KeyContact = string.Empty,
+        //            MBLNO = string.Empty,
+        //            Vessel = string.Empty,
+        //            TpyeofService = string.Empty,
+        //        };
+
+        //        results.Add(report);
+        //    }
+        //    return results.AsQueryable();
+        //}
 
         #endregion -- SALE REPORT BY QUATER -- 
 
@@ -946,16 +1035,9 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<QuaterSaleReportResult> GetQuaterSaleReport(SaleReportCriteria criteria)
         {
-            IQueryable<QuaterSaleReportResult> opsShipments = null;
             IQueryable<QuaterSaleReportResult> csShipments = null;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
-            {
-                opsShipments = GetQuaterOpsSaleReport(criteria);
-            }
-            csShipments = GetQuaterCSSaleReport(criteria);
-            if (opsShipments == null) return csShipments;
-            else if (csShipments == null) return opsShipments;
-            else return opsShipments.Union(csShipments);
+            csShipments = GetDataQuaterCSSaleReport(criteria);
+            return csShipments;
         }
 
         public Crystal PreviewGetQuaterSaleReport(SaleReportCriteria criteria)
@@ -1036,33 +1118,84 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummarySaleReportResult> GetSummarySaleReport(SaleReportCriteria criteria)
         {
 
-            IQueryable<SummarySaleReportResult> opsShipments = null;
+            //IQueryable<SummarySaleReportResult> opsShipments = null;
             IQueryable<SummarySaleReportResult> csShipments = null;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
-            {
-                opsShipments = GetOpsShipmentReport(criteria);
-            }
+            //if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            //{
+            //    opsShipments = GetOpsShipmentReport(criteria);
+            //}
 
-            csShipments = GetCsShipmentReport(criteria);
-            if (opsShipments == null)
+            //csShipments = GetCsShipmentReport(criteria);
+            //if (opsShipments == null)
+            //{
+            //    if (csShipments == null)
+            //    {
+            //        return null;
+            //    }
+            //    return csShipments;
+            //}
+            //else
+            //{
+            //    if (csShipments == null)
+            //    {
+            //        return opsShipments;
+            //    }
+            //    else
+            //    {
+            //        return opsShipments.Union(csShipments);
+            //    }
+            //}
+            csShipments = GetDataCsShipmentReport(criteria);
+            return csShipments;
+        }
+
+        private IQueryable<SummarySaleReportResult> GetDataCsShipmentReport(SaleReportCriteria criteria)
+        {
+            var data = GetDataSaleReport(criteria);
+            if (data == null) return null;
+            var listEmployee = employeeRepository.Get();
+            var lookupEmployee = listEmployee.ToLookup(q => q.Id);
+            var listUser = userRepository.Get();
+            var lookupUser = listUser.ToLookup(q => q.Id);
+            var listCharges = surchargeRepository.Get();
+            var lookupSellingCharges = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(q => q.Hblid);
+            var lookupBuying = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == false || x.KickBack == null)).ToLookup(q => q.Hblid);
+            var lookupShareProfit= listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.KickBack == true).ToLookup(q => q.Hblid);
+            bool hasSalesman = criteria.SalesMan != null;
+            var results = new List<SummarySaleReportResult>();
+            foreach (var item in data)
             {
-                if (csShipments == null)
+                var report = new SummarySaleReportResult
                 {
-                    return null;
+                    Department = item.DepartmentSale,
+                    PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
+                    Description = GetShipmentTypeForPreviewPL(item.TransactionType),
+                    Assigned = item.ShipmentType == "Nominated" ? true : false,
+                    TransID = item.JobNo,
+                    KGS = (item.NetWeight ?? 0) + _decimalNumber,
+                    CBM = (item.Cbm ?? 0) + _decimalNumber,
+                    SharedProfit = 0,
+                    OtherCharges = 0,
+                    TpyeofService = item.TypeOfService
+                };
+                string employeeId = lookupUser[item.SalemanId].FirstOrDefault()?.EmployeeId;
+                if (employeeId != null)
+                {
+                    report.ContactName = lookupEmployee[employeeId].FirstOrDefault()?.EmployeeNameVn;
                 }
-                return csShipments;
+                // Selling
+                report.SellingRate = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupSellingCharges[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupSellingCharges[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber;//GetSellingRate(item.HblId, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
+                //Buying without kickBack.
+                report.BuyingRate = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupBuying[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupBuying[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber; //Cộng thêm phần thập phân
+                //KickBack
+                report.SharedProfit = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (decimal)lookupShareProfit[item.HblId].Sum(x => x.AmountVnd) : (decimal)lookupShareProfit[item.HblId].Sum(x => x.AmountUsd) + _decimalNumber; //Cộng thêm phần thập phân
+
+                report.Cont40HC = item.Cont40HC != null ?(decimal)item.Cont40HC + _decimalNumber : 0 ;
+                report.Qty20 = item.Qty20 != null ? (decimal)item.Qty20 + _decimalNumber : 0;
+                report.Qty40 = item.Qty40 != null ? (decimal)item.Qty40 + _decimalNumber : 0;
+                results.Add(report);
             }
-            else
-            {
-                if (csShipments == null)
-                {
-                    return opsShipments;
-                }
-                else
-                {
-                    return opsShipments.Union(csShipments);
-                }
-            }
+            return results.AsQueryable();
         }
 
         private IQueryable<SummarySaleReportResult> GetCsShipmentReport(SaleReportCriteria criteria)
