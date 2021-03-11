@@ -486,7 +486,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.ShipmentEta = shipment.Eta;
                     detail.TransactionType = shipment.TransactionType;
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
-                    detail.DeliveryPlace = shipment.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
+                    //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     return detail;
                 }
             }
@@ -2184,7 +2184,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         acctAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
                     }
-
+                    
                     hs = acctAdvanceRequestRepository.SubmitChanges();
                 }
                 return hs;
