@@ -62,10 +62,11 @@ namespace eFMS.API.Infrastructure.NoSql
                                 CompanyId = true? currentUser.CompanyID.ToString(): string.Empty,
                                 OfficeId = true? currentUser.OfficeID.ToString(): string.Empty,
                                 DepartmentId = currentUser.DepartmentId,
-                                GroupId = currentUser.GroupId
+                                GroupId = currentUser.GroupId,
                                 // UserModified = change.CurrentValues["UserModified"]?.ToString()
                             };
                             log.ItemObject = change.Entity;
+                            log.Function = currentUser.Action;
                             log.ChangedProperties = changedProperties;
                             var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                             listLog.Add(objectLog);
@@ -100,9 +101,10 @@ namespace eFMS.API.Infrastructure.NoSql
                         CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
                         OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
                         DepartmentId = currentUser.DepartmentId,
-                        GroupId = currentUser.GroupId
+                        GroupId = currentUser.GroupId,
                     };
                     log.ItemObject = add.Entity;
+                    log.Function = currentUser.Action;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                     listLog.Add(objectLog);
                 }
@@ -135,9 +137,10 @@ namespace eFMS.API.Infrastructure.NoSql
                         CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
                         OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
                         DepartmentId = currentUser.DepartmentId,
-                        GroupId = currentUser.GroupId
+                        GroupId = currentUser.GroupId,
                     };
                     log.ItemObject = delete.Entity;
+                    log.Function = currentUser.Action;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                     listLog.Add(objectLog);
                 }

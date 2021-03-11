@@ -141,6 +141,8 @@ namespace eFMS.API.Accounting.Controllers
         [Route("Delete")]
         public IActionResult Delete(string settlementNo)
         {
+            currentUser.Action = "DeleteAcctSettlementPayment";
+
             var isAllowDelete = acctSettlementPaymentService.CheckDeletePermissionBySettlementNo(settlementNo);
             if (isAllowDelete == false)
             {
@@ -369,6 +371,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Update(CreateUpdateSettlementModel model)
         {
+            currentUser.Action = "UpdateAcctSettlementPayment";
             if (!ModelState.IsValid) return BadRequest();
 
             var isAllowUpdate = acctSettlementPaymentService.CheckUpdatePermissionBySettlementId(model.Settlement.Id);
@@ -453,6 +456,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult SaveAndSendRequest(CreateUpdateSettlementModel model)
         {
+            currentUser.Action = "SaveAndSendRequestAcctSettlementPayment";
+
             if (!ModelState.IsValid) return BadRequest();
 
             //Check duplicate
