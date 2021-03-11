@@ -147,7 +147,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Add(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-
+            currentUser.Action = "AddAcctAdvancePayment";
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
@@ -238,6 +238,8 @@ namespace eFMS.API.Accounting.Controllers
         [Route("Delete")]
         public IActionResult Delete(string advanceNo)
         {
+            currentUser.Action = "DeleteAdvancePayment";
+
             var isAllowDelete = acctAdvancePaymentService.CheckDeletePermissionByAdvanceNo(advanceNo);
             if (isAllowDelete == false)
             {
@@ -331,6 +333,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Update(AcctAdvancePaymentModel model)
         {
+            currentUser.Action = "UpdateAdvancePayment";
+
             if (!ModelState.IsValid) return BadRequest();
 
             var isAllowUpdate = acctAdvancePaymentService.CheckUpdatePermissionByAdvanceId(model.Id);
@@ -423,6 +427,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult SaveAndSendRequest(AcctAdvancePaymentModel model)
         {
+            currentUser.Action = "SaveAndSendRequestAdvancePayment";
+
             if (!ModelState.IsValid) return BadRequest();
 
             if (model.AdvanceRequests.Count > 0)
@@ -760,6 +766,8 @@ namespace eFMS.API.Accounting.Controllers
         [Route("UpdatePaymentVoucher")]
         public IActionResult UpdatePaymentVoucher(AcctAdvancePaymentModel model)
         {
+            currentUser.Action = "UpdatePaymentVoucherAdvancePayment";
+
             HandleState updatePayment = acctAdvancePaymentService.UpdatePaymentVoucher(model);
             ResultHandle result;
             if (!updatePayment.Success)
@@ -932,6 +940,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult UpdatePaymentTerm(Guid Id, decimal days)
         {
+            currentUser.Action = "UpdatePaymentTermAdvancePayment";
+
             HandleState hs = acctAdvancePaymentService.UpdatePaymentTerm(Id,days);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
@@ -948,6 +958,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult DenyAdvances(List<Guid> Ids)
         {
+            currentUser.Action = "DenyAdvancePaymentsAdvancePayment";
+
             HandleState hs = acctAdvancePaymentService.DenyAdvancePayments(Ids);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
