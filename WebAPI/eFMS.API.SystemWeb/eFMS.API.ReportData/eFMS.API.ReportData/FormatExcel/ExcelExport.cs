@@ -67,9 +67,9 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             name = string.Format("{{{0}}}", name);
             var result = from cell in Worksheet.Cells[StartRow, StartCol, EndRow, EndCol]
-                       where cell.Value != null && cell.Value?.ToString().Contains(name) == true
-                       select cell;
-            if(result.Count() > 0)
+                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                         select cell;
+            if (result.Count() > 0)
             {
                 var address = result.FirstOrDefault().ToString();
                 if (value == null)
@@ -88,10 +88,18 @@ namespace eFMS.API.ReportData.FormatExcel
                         {
                             var splitString = value.ToString().Split('\n');
                             int i = 0;
-                            foreach (var text in splitString)
+                            for (int strIndex = 0; strIndex < splitString.Length; strIndex++)
                             {
                                 var addressVal = ExcelCellBase.TranslateFromR1C1(ExcelCellBase.TranslateToR1C1(address, -i, 0), 0, 0);
-                                Worksheet.Cells[addressVal].Value = text;
+                                if (Worksheet.Cells[addressVal].Style.WrapText)
+                                {
+                                    Worksheet.Cells[addressVal].Value = string.Join("", splitString.Skip(strIndex).Take(splitString.Length - strIndex));
+                                    strIndex = splitString.Length;
+                                }
+                                else
+                                {
+                                    Worksheet.Cells[addressVal].Value = splitString[strIndex];
+                                }
                                 i++;
                             }
                         }
