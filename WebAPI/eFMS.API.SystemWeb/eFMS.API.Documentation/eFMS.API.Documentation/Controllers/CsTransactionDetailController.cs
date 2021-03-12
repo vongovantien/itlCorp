@@ -94,6 +94,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
+            currentUser.Action = "AddNewCSTransactionDetail";
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model);
             if (checkExistMessage.Length > 0)
@@ -115,6 +116,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
+            currentUser.Action = "DeleteCSTransactionDetail";
+
             var hs = csTransactionDetailService.DeleteTransactionDetail(id);
             var message = hs.Success == true ? HandleError.GetMessage(hs, Crud.Delete) : hs.Message?.ToString();
             if(hs.Code == 403)
@@ -135,6 +138,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Import")]
         public IActionResult Import(CsTransactionDetailModel model)
         {
+            currentUser.Action = "ImportCSTransactionDetail";
+
             if (!ModelState.IsValid) return BadRequest();
             string checkExistMessage = CheckExist(model);
             if (checkExistMessage.Length > 0)
@@ -151,6 +156,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
+            currentUser.Action = "UpdateCSTransactionDetail";
+
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model);
             if (checkExistMessage.Length > 0)
@@ -439,6 +446,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult UpdateInputBKNote(BookingNoteCriteria criteria)
         {
+            currentUser.Action = "UpdateInputBKNote";
+
             var hs = csTransactionDetailService.UpdateInputBKNote(criteria);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

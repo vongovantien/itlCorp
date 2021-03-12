@@ -7,6 +7,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -35,22 +36,26 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAccountingManagementService accountingService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IAccAccountReceivableService accAccountReceivableService;
+        private readonly ICurrentUser currentUser;
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="accService"></param>
+        /// <param name="currUser"></param>
         /// <param name="accAccountReceivable"></param>
         public AccountingManagementController(
             IStringLocalizer<LanguageSub> localizer,
-             IHostingEnvironment hostingEnvironment,
+            IHostingEnvironment hostingEnvironment,
             IAccountingManagementService accService,
+            ICurrentUser currUser,
             IAccAccountReceivableService accAccountReceivable)
         {
             stringLocalizer = localizer;
             accountingService = accService;
             _hostingEnvironment = hostingEnvironment;
+            currentUser = currUser;
             accAccountReceivableService = accAccountReceivable;
         }
 
@@ -70,6 +75,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
+            currentUser.Action = "DeleteAcctMngt";
+
             var surchargeIds = accountingService.GetSurchargeIdByAcctMngtId(id);
 
             HandleState hs = accountingService.Delete(id);
@@ -145,6 +152,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Add(AccAccountingManagementModel model)
         {
+            currentUser.Action = "AddAcctMngt";
+
             if (!ModelState.IsValid) return BadRequest();
 
             var isExisedVoucherId = CheckExistedVoucherId(model.VoucherId, model.Id);
@@ -198,6 +207,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Update(AccAccountingManagementModel model)
         {
+            currentUser.Action = "UpdateAcctMngt";
+
             if (!ModelState.IsValid) return BadRequest();
             var isExisedVoucherId = CheckExistedVoucherId(model.VoucherId, model.Id);
             if (isExisedVoucherId)

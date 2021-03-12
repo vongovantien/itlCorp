@@ -15,5 +15,6 @@ namespace eFMS.IdentityServer.DL.UserManager
         decimal? KbExchangeRate { get; set; }
         List<UserPermissionModel> UserPermissions { get; }
         UserPermissionModel UserMenuPermission { get; set; }
+        string Action { get; set; }
     }
 }

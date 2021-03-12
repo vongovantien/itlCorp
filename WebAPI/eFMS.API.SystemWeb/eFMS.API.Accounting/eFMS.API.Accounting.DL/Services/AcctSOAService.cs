@@ -2016,16 +2016,11 @@ namespace eFMS.API.Accounting.DL.Services
                                  CurrencySOA = s.Currency,
                                  CurrencyCharge = chg.Currency,
                                  FinalExchangeRate = chg.FinalExchangeRate,
-                                 ExchangeDate = chg.ExchangeDate
+                                 ExchangeDate = chg.ExchangeDate,
+                                 CreditExchange = (s.Currency == AccountingConstants.CURRENCY_LOCAL ? chg.CreditLocal : chg.CreditUSD) ?? 0,
+                                 DebitExchange = (s.Currency == AccountingConstants.CURRENCY_LOCAL ? chg.DebitLocal : chg.DebitUSD) ?? 0
                              };
-            List<ExportSOAModel> _result = dataResult.ToList();
-            _result.ForEach(fe =>
-            {
-                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.CurrencyCharge, fe.CurrencySOA);
-                fe.CreditExchange = _exchangeRate * (fe.Credit ?? 0);
-                fe.DebitExchange = _exchangeRate * (fe.Debit ?? 0);
-            });
-            return _result.AsQueryable();
+            return dataResult;
         }
 
         public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo, string officeId)
