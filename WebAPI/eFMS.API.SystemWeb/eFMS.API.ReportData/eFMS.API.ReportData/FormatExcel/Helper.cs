@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace eFMS.API.ReportData
 {
@@ -23,7 +24,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForCountryExcel(workSheet, list);
                     excelPackage.Save();
@@ -56,7 +57,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Incoterm List");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "INCOTERM INFORMATION");
                     for (int i = 0; i < listObj.Count; i++)
@@ -105,7 +106,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Potential Customer List");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "POTENTIAL CUSTOMER INFORMATION");
                     for (int i = 0; i < listObj.Count; i++)
@@ -174,7 +175,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForProvinceExcel(workSheet, list);
                     excelPackage.Save();
@@ -230,7 +231,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForTownWardExcel(workSheet, list);
                     excelPackage.Save();
@@ -289,7 +290,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[3, 1].LoadFromCollection(list, true, TableStyles.None);
                     BindingFormatForCatChargeExcel(workSheet, list);
                     excelPackage.Save();
@@ -376,7 +377,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForCatCurrencyExcel(workSheet, list);
                     excelPackage.Save();
@@ -431,7 +432,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForDistrictExcel(workSheet, list);
                     excelPackage.Save();
@@ -490,7 +491,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatCommoditylistExcel(workSheet, list);
                     excelPackage.Save();
@@ -544,7 +545,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatCommodityGroupExcel(workSheet, list);
                     excelPackage.Save();
@@ -595,7 +596,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForWareHourseExcel(workSheet, list);
                     excelPackage.Save();
@@ -657,7 +658,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForPortIndexExcel(workSheet, list);
                     excelPackage.Save();
@@ -715,7 +716,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells["A1"].Value = "Partner Data - " + partnerType;
                     workSheet.Cells["A1"].Style.Font.Bold = true;
                     workSheet.Cells[1, 1, 2, 4].Merge = true;
@@ -784,7 +785,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatStageExcel(workSheet, list);
                     excelPackage.Save();
@@ -844,7 +845,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingUnitStageExcel(workSheet, list);
                     excelPackage.Save();
@@ -904,7 +905,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForCustomClearanceExcel(workSheet, list);
                     excelPackage.Save();
@@ -970,7 +971,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[3, 1].LoadFromCollection(list, true, TableStyles.None);
                     BindingFormatForDepartmentExcel(workSheet, list);
                     excelPackage.Save();
@@ -1063,7 +1064,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "COMPANY INFORMATION");
 
@@ -1151,7 +1152,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "OFFICE INFORMATION");
 
@@ -1213,7 +1214,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "GROUP INFORMATION");
 
@@ -1288,7 +1289,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "USER INFORMATION");
 
@@ -1336,7 +1337,7 @@ namespace eFMS.API.ReportData
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForCatChartOfAccountsExcel(workSheet, list);
                     excelPackage.Save();

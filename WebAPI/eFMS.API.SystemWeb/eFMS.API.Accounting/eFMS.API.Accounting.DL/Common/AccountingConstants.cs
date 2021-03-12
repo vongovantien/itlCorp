@@ -25,6 +25,10 @@
         public static readonly string TYPE_CHARGE_OBH_SELL = "OBH-SELL";
         #endregion -- TYPE CHARGE --
 
+        #region -- TYPE CHARGE DEFAULT --
+        public static readonly string CHARGE_DEFAULT_CONG_NO = @"Công Nợ";
+        #endregion
+
         #region -- STATUS PAYMENT --
         public static readonly string STATUS_PAYMENT_NOTSETTLED = "NotSettled";
         public static readonly string STATUS_PAYMENT_SETTLED = "Settled";

@@ -302,6 +302,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Add(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            currentUser.Action = "AddAcctSettlementPayment";
 
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)

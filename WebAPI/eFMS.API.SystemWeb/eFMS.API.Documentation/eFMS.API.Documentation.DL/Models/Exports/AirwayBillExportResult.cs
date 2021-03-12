@@ -9,6 +9,7 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public string MawbNo2 { get; set; }
         public string MawbNo3 { get; set; }
         public string AolCode { get; set; }
+        public string AodCode { get; set; }
         public string HawbNo { get; set; }
         public string Shipper { set; get; }
         public string Consignee { get; set; }
@@ -29,6 +30,7 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public string IssuranceAmount {get;set;}
         public string HandingInfo { get; set; }
         public decimal? Pieces { get; set; }
+        public string PackageUnit { get; set; }
         public decimal? Gw { get; set; }
         public decimal? Cw { get; set; }
         public decimal? RateCharge { get; set; }
@@ -47,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public string CollectTax { get; set; }
         public string PrepaidDueToCarrier { get; set; }
         public string CollectDueToCarrier { get; set; }
+        public string Route { get; set; }
         public List<CsShipmentOtherChargeModel> OtherCharges { get; set; }
     }
 }

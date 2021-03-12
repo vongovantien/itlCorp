@@ -71,5 +71,6 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? AmountUSD { get; set; }
         public string PIC { get; set; }
         public bool IsSynced { get; set; }
+        public string SeriesNo { get; set; }
     }
 }

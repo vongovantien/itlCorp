@@ -91,7 +91,12 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
                 if (charge == null)
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
-                if (charge != null && (charge.CreditNo != null || charge.Soano != null || charge.DebitNo != null || charge.PaySoano != null))
+                if (charge != null
+                    && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.CreditNo)
+                    || !string.IsNullOrEmpty(charge.DebitNo)
+                    || !string.IsNullOrEmpty(charge.SettlementCode)
+                    || !string.IsNullOrEmpty(charge.VoucherId)))
                 {
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }
