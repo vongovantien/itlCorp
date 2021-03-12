@@ -1443,7 +1443,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (CsShipmentSurcharge itemSceneAdd in listChargeSceneAdd)
                                 {
-                                    if (itemSceneAdd.Id == itemScene.Id)
+                                    if (itemSceneAdd.Id == itemScene.Id && itemSceneAdd.Hblid == itemScene.Hblid)
                                     {
                                         itemSceneAdd.JobNo = itemScene.JobId;
                                         itemSceneAdd.Mblno = itemScene.MBL;
@@ -1629,7 +1629,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (CsShipmentSurcharge itemSceneAdd in listChargeSceneAdd)
                                 {
-                                    if (itemSceneAdd.Id == itemScene.Id)
+                                    if (itemSceneAdd.Id == itemScene.Id && itemSceneAdd.Hblid == itemScene.Hblid)
                                     {
                                         itemSceneAdd.JobNo = itemScene.JobId;
                                         itemSceneAdd.Mblno = itemScene.MBL;
