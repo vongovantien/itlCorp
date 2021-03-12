@@ -56,7 +56,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Advance Payment");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "ADVANCE PAYMENT INFORMATION");
 
@@ -135,7 +135,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Advance Payment");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "Advance Payment");
                     SetWidthColumnExcelAdvancePaymentShipment(worksheet);
@@ -205,7 +205,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Settlement Payment");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "SETTLEMENT PAYMENT INFORMATION");
 
@@ -264,7 +264,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Settlement Payment");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "SETTLEMENT PAYMENT INFORMATION");
 
@@ -371,7 +371,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Invoice Payment");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers,"INVOICE PAYMENT INFORMATION");
                     for(int i = 0; i < listObj.Count; i++)
@@ -434,7 +434,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("OBH Payment");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers,"OBH PAYMENT INFORMATION");
                     for (int i = 0; i < listObj.Count; i++)
@@ -541,7 +541,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     string sheetName = language == "VN" ? "(V)" : "(E)";
                     excelPackage.Workbook.Worksheets.Add("Đề nghị tạm ứng " + sheetName);
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataDetailAdvancePaymentExcel(workSheet, advanceExport, language);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -979,7 +979,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("SOA " + detailSOAModel.SOANo);
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataDetailSOAExcel(workSheet, detailSOAModel);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1334,7 +1334,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("SOA");
-                    var worksheet = excelPackage.Workbook.Worksheets[1];
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
 
                     BuildHeader(worksheet, headers, "SOA");
 
@@ -1422,7 +1422,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("SOA OPS");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDatalSOAOPS(workSheet, lstSoa);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1811,7 +1811,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Air freight");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataDetailSOAAirfreight(workSheet, soaAir);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1832,7 +1832,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Air freight");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataDetailSOASupplierAirfreight(workSheet, soaAir);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -2615,7 +2615,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     string sheetName = language == "VN" ? "(V)" : "(E)";
                     excelPackage.Workbook.Worksheets.Add("Đề nghị thanh toán " + sheetName);
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataDetailSettlementPaymentExcel(workSheet, settlementExport, language);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3192,7 +3192,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataAccoutingManagementExcel(workSheet, acctMngts, typeOfAcctMngt);
                     excelPackage.Save();
                     return excelPackage.Stream;

@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using Microsoft.Office;
+using Font = System.Drawing.Font;
+using Microsoft.Office.Interop.Excel;
 
 namespace eFMS.API.ReportData.FormatExcel
 {
@@ -31,7 +34,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("List of House bill of lading");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     GenerateEManifestExcel(workSheet, transactionDetail);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -221,7 +224,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     GenerateDangerousGoods(workSheet, transactionDetail);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -351,7 +354,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     GenerateGoodsDeclare(workSheet, transactionDetail);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -627,7 +630,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("MAWB");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataMAWBAirExportExcel(workSheet, airwayBillExport);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -932,7 +935,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("HAWB");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataHAWBAirExportExcel(workSheet, airwayBillExport);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1124,7 +1127,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("SCSC");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataSCSCAirExportExcel(workSheet, airwayBillExport);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1184,7 +1187,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("TCS");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataTCSAirExportExcel(workSheet, airwayBillExport);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1224,6 +1227,74 @@ namespace eFMS.API.ReportData.FormatExcel
         }
         #endregion -- Export SCSC & TCS Air Export --
 
+        #region -- Export ACS-NCTS&ALS MAWB --
+        /// <summary>
+        /// Get Data Export ACS Excel For MAWB
+        /// </summary>
+        /// <param name="airwayBillExport"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream GenerateACSAirExportExcel(AirwayBillExportResult airwayBillExport, string fileName)
+        {
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                excel.SetData("MawbNo", airwayBillExport.MawbNo1 + airwayBillExport.MawbNo3);
+                excel.SetData("FlightNo", airwayBillExport.FlightNo);
+                excel.SetData("FlightDate", airwayBillExport.FlightDate);
+                excel.SetData("Route", airwayBillExport.Route);
+                excel.SetData("POL", airwayBillExport.AolCode);
+                excel.SetData("POD", airwayBillExport.AodCode);
+                excel.SetData("Shipper", airwayBillExport.Shipper);
+                excel.SetData("Consignee", airwayBillExport.Consignee);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }           
+        }
+
+        /// <summary>
+        /// Get Data Export NCTS-ALS Excel For MAWB
+        /// </summary>
+        /// <param name="airwayBillExport"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream GenerateNCTSALSAirExportExcel(AirwayBillExportResult airwayBillExport, string fileName)
+        {
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                excel.SetData("Shipper", airwayBillExport.Shipper);
+                excel.SetData("Consignee", airwayBillExport.Consignee);
+                excel.SetData("MAWB", airwayBillExport.MawbNo1 + airwayBillExport.MawbNo3);
+                excel.SetData("FlightNo", airwayBillExport.FlightNo);
+                excel.SetData("Route", airwayBillExport.Route);
+                excel.SetData("POL", airwayBillExport.AolCode);
+                excel.SetData("POD", airwayBillExport.AodCode);
+                excel.SetData("PackageUnit", airwayBillExport.PackageUnit);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
+
         #region MONTHY REPORT
         /// <returns></returns>
         public Stream GenerateShipmentOverviewExcel(List<ExportShipmentOverview> overview, GeneralReportCriteria criteria, Stream stream = null)
@@ -1233,7 +1304,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Shipment Overview");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataShipmentOverview(workSheet, overview, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1710,7 +1781,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Accounting PL Sheet (" + criteria.Currency + ")");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataAccountingPLSheetExportExcel(workSheet, listData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -1773,7 +1844,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Accounting PL Sheet (" + criteria.Currency + ")");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataAJobProfitAnalysisExportExcel(workSheet, listData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -2248,7 +2319,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add(string.Format(@"Standard Report ({0})", criteria.Currency));
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataStandardGeneralReport(workSheet, listData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -2401,7 +2472,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Summary Of Costs");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDatalSummaryOfCostsIncurred(workSheet, criteria, lst);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -2672,7 +2743,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Summary Of Revenue");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataSummaryOfRevenue(workSheet, criteria, obj);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3075,7 +3146,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add(issuedDate.Value.ToString("dd MMM").ToUpper());
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BindingDataHousebillDailyExportExcel(workSheet, housebillDailyExport, issuedDate);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3184,7 +3255,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Debit Note");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataCDNoteDetailExport(workSheet, cdNoteModel);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3509,7 +3580,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Commission PR for OPS");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataCommissionPROpsReport(workSheet, resultData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3537,7 +3608,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Commission PR");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataCommissionPRReport(workSheet, resultData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3565,7 +3636,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Incentive");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataIncentiveReport(workSheet, resultData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;

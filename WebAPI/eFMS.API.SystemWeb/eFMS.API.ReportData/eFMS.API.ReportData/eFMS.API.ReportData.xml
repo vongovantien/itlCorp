@@ -265,6 +265,20 @@
             <param name="jobId">Id of shipment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportACSAirExport(System.String)">
+            <summary>
+            Export ACS Excel For MAWB
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportNCTSALSAirExport(System.String)">
+            <summary>
+            Export NCTS-ALS Excel For MAWB
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOverview(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Export Shipment Overview
@@ -452,6 +466,22 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateACSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.String)">
+            <summary>
+            Get Data Export ACS Excel For MAWB
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateNCTSALSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.String)">
+            <summary>
+            Get Data Export NCTS-ALS Excel For MAWB
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateShipmentOverviewExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.ExportShipmentOverview},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
             <returns></returns>
         </member>
@@ -483,6 +513,67 @@
             <returns></returns>
             
         </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.Worksheet">
+            <summary>Excel Worksheet</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.PackageExcel">
+            <summary>Excel Package</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartRow">
+            <summary>Start of row in excel</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.EndRow">
+            <summary>End of row in excel</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartCol">
+            <summary>Start of column in excel</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.EndCol">
+            <summary>End of column in excel</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.GroupRowCopy">
+            <summary>Row of group copied</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.DetailRowCopy">
+            <summary>Row of detail copied</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartDetailTable">
+            <summary>Start index of table</summary>
+        </member>
+        <member name="F:eFMS.API.ReportData.FormatExcel.ExcelExport._groupRowValue">
+            <summary>Values of group copied</summary>
+        </member>
+        <member name="F:eFMS.API.ReportData.FormatExcel.ExcelExport._detailRowValue">
+            <summary>Values of detail copied</summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.#ctor(System.String)">
+            <summary>
+            Init for excel file to export
+            </summary>
+            <param name="fileName"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.String,System.Object,System.String)">
+            <summary>
+            Set data for cell
+            </summary>
+            <param name="name">name of cell to set value</param>
+            <param name="value">value set to cell</param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetGroupsTable">
+            <summary>
+            Set Group Headers/Footers Of Table (use if have multigroup)
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetDataTable">
+            <summary>
+            Set detail data for table
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.ExcelStream">
+            <summary>
+            Save excel and return file stream
+            </summary>
+            <returns></returns>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPROpsReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
             <summary>
             Generate Commission Ops Report Excel
