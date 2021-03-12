@@ -3580,7 +3580,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Commission PR for OPS");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataCommissionPROpsReport(workSheet, resultData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3608,7 +3608,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Commission PR");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataCommissionPRReport(workSheet, resultData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -3636,7 +3636,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Incentive");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
                     BinddingDataIncentiveReport(workSheet, resultData, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
