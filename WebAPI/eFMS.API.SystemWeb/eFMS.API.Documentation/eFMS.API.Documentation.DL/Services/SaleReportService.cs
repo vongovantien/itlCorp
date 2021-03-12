@@ -1741,22 +1741,17 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-<<<<<<< HEAD
-                    var comChargeGroup = catChargeGroupRepo.Get(x => x.Name == "Com").FirstOrDefault();
-                    var surcharge = detailLookupSur[item.HBLID].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));                    
-=======
-                    var surcharge = detailLookupSur[item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
->>>>>>> origin/uat/improve-sale-report
+                    var surcharge = detailLookupSur[item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));                    
                     foreach (var charge in surcharge)
                     {
-                        var partner = catPartnerRepository.Get(x => x.Id == charge.PaymentObjectId).FirstOrDefault();
+                        var partner = lookupPartner[charge.PaymentObjectId].FirstOrDefault();
                         var report = new SaleKickBackReportResult
                         {
                             TransID = item.JobNo,
                             HBLID = item.HblId,
                             HAWBNO = item.HwbNo,
                             LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd,
-                            PartnerName = lookupPartner[item.CustomerId].FirstOrDefault()?.PartnerNameEn,
+                            PartnerName = partner?.PartnerNameEn,
                             Description = item.TransactionType == "CL" ? "Logistics" : API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == item.TransactionType)?.DisplayName,
                             Quantity = charge.Quantity,
                             Unit = unitLookup[charge.UnitId].Select(t=>t.Code).FirstOrDefault() ?? string.Empty,
@@ -1771,7 +1766,7 @@ namespace eFMS.API.Documentation.DL.Services
                             Shipper = item.ShipperDescription,
                             Consignee = item.ConsigneeDescription,
                             PartnerID = item.CustomerId,
-                            Category = lookupPartner[item.CustomerId].FirstOrDefault()?.PartnerType,
+                            Category = partner?.PartnerType,
                         };
                         // Lấy tất cả Buying charge
                         var chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
