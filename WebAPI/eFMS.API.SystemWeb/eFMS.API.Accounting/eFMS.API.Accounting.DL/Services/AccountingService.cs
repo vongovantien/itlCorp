@@ -363,7 +363,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              AtchDocSerialNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                              // CustomerCodeBook = obhP.AccountNo
-                                                                                             CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo) //CR: 15500
+                                                                                             CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo, surcharge.Type, surcharge.PayerId) //CR: 15500
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -1679,17 +1679,36 @@ namespace eFMS.API.Accounting.DL.Services
             return _serviceName;
         }
         
-        private string GetPayeeCode(string PayeeId, string paymentMethod, string accountNo)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="PayeeId">Payee of Settlement</param>
+        /// <param name="paymentMethod">Payment Method of Settlement</param>
+        /// <param name="accountNo">Account No of PaymentObjectID (Surcharge)</param>
+        /// <param name="typeCharge">Type of Surcharge</param>
+        /// <param name="payerId">PayerId of Surcharge</param>
+        /// <returns></returns>
+        private string GetPayeeCode(string PayeeId, string paymentMethod, string accountNo, string typeCharge, string payerId)
         {
             string PayeeCode = string.Empty;
             CatPartner payee = PartnerRepository.Get(x => x.Id == PayeeId)?.FirstOrDefault();
+            //Nếu Payment Method của Settle là Other & Partner Mode của đối tượng Payee (Settlement) là External thì lấy AccountNo theo đối tượng Payee của Settment
             if (paymentMethod == AccountingConstants.PAYMENT_METHOD_OTHER && !string.IsNullOrEmpty(PayeeId) && payee?.PartnerMode == "External")
             {
                 PayeeCode = payee.AccountNo;
             }
             else
             {
-                PayeeCode = accountNo;
+                //Nếu Type là OBH thì AccountNo lấy theo đối tượng PayerID của Surcharge; Ngược lại lấy theo đối tượng PaymentObjectID
+                if (typeCharge == AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    var payer = PartnerRepository.Get(x => x.Id == payerId)?.FirstOrDefault();
+                    PayeeCode = payer?.AccountNo;
+                }
+                else
+                {
+                    PayeeCode = accountNo;
+                }
             }
             return PayeeCode;
         }
