@@ -486,7 +486,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.ShipmentEta = shipment.Eta;
                     detail.TransactionType = shipment.TransactionType;
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
-                    detail.DeliveryPlace = shipment.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
+                    //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     return detail;
                 }
             }
@@ -1181,16 +1181,21 @@ namespace eFMS.API.Documentation.DL.Services
                     if (code == 403) return new HandleState(403, "");
 
                     var charges = surchareRepository.Get(x => x.Hblid == hbl.Id).ToList();
-                    var isSOA = false;
+                    bool isSpecialCase = false;
                     foreach (var item in charges)
                     {
-                        if (item.CreditNo != null || item.DebitNo != null || item.Soano != null)
+                        if (
+                            !string.IsNullOrEmpty(item.Soano)
+                            || !string.IsNullOrEmpty(item.CreditNo)
+                            || !string.IsNullOrEmpty(item.DebitNo)
+                            || !string.IsNullOrEmpty(item.SettlementCode)
+                            || !string.IsNullOrEmpty(item.VoucherId))
                         {
-                            isSOA = true;
+                            isSpecialCase = true;
                             break;
                         }
                     }
-                    if (isSOA == true)
+                    if (isSpecialCase == true)
                     {
                         hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA]);
                     }
@@ -2184,7 +2189,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         acctAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
                     }
-
+                    
                     hs = acctAdvanceRequestRepository.SubmitChanges();
                 }
                 return hs;

@@ -14,10 +14,10 @@ namespace eFMS.API.Accounting.DL.IService
 
         decimal CalculatorAmount(decimal? amount, decimal? finalExchangeRate, DateTime? exchangeDate, string currencyFrom, string currencyTo, int? roundCurr);
 
-        AmountResult CalculatorAmountAccountingByCurrency(CsShipmentSurcharge surcharge, string currencyConvert);
+        AmountResult CalculatorAmountAccountingByCurrency(CsShipmentSurcharge surcharge, string currencyConvert, decimal kickBackExcRate);
 
         decimal ConvertAmountChargeToAmountObj(CsShipmentSurcharge surcharge, string currencyObject);
 
-        AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge);
+        AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge, decimal kickBackExcRate);
     }
 }

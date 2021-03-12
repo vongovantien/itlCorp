@@ -127,6 +127,8 @@ namespace eFMS.API.Accounting.DL.Services
                     if (hs.Success)
                     {
                         var charges = surchargeRepo.Get(x => x.AcctManagementId == id);
+                        decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                         foreach (CsShipmentSurcharge item in charges)
                         {
                             item.AcctManagementId = null;
@@ -138,7 +140,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             // item.AmountVnd = item.VatAmountVnd = null;
                             // Tính lại do 2 field kế toán edit
-                            AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                            AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                           
                             item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
                             item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
@@ -1052,6 +1054,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.ServiceType = GetTransactionType(jobNoGrouped);
 
                 AccAccountingManagement accounting = mapper.Map<AccAccountingManagement>(model);
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -1066,7 +1069,7 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
 
                             #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                             charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
@@ -1228,6 +1231,8 @@ namespace eFMS.API.Accounting.DL.Services
                         //Update lại
                         var chargesOfAcctUpdate = model.Charges;
                         decimal _totalAmount = 0;
+                        decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                         foreach (var chargeOfAcct in chargesOfAcctUpdate)
                         {
                             var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
@@ -1235,7 +1240,7 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
 
                             #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                             charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)

@@ -147,5 +147,17 @@ namespace eFMS.IdentityServer.DL.UserManager
                 kbExc = value;
             }
         }
+        private string _action;
+        public string Action
+        {
+            get
+            {
+                return _action;
+            }
+            set
+            {
+                _action = value;
+            }
+        }
     }
 }

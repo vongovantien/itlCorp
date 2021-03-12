@@ -24,6 +24,7 @@ namespace eFMS.API.Common.Globals
         public string OfficeId { get; set; }
         public int? DepartmentId { get; set; }
         public int? GroupId { get; set; }
+        public string Function { get; set; }
         public object ItemObject { get; set; }
     }
     //public class PropertyCommon

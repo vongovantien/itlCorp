@@ -1400,6 +1400,8 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.OfficeId = currentUser.OfficeID;
                 settlement.CompanyId = currentUser.CompanyID;
 
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -1459,7 +1461,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.ExchangeDate = DateTime.Now;
 
                                 #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                                 charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                 charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                                 charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -1558,6 +1560,8 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.ReasonReject = settlementCurrent.ReasonReject;
                 settlement.LockedLog = settlementCurrent.LockedLog;
 
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && settlementCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
@@ -1630,6 +1634,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         itemSceneAdd.JobNo = itemScene.JobId;
                                         itemSceneAdd.Mblno = itemScene.MBL;
                                         itemSceneAdd.Hblno = itemScene.HBL;
+                                        // itemSceneAdd.Hblid = itemScene.Hblid;
+
                                     }
                                 }
                             }
@@ -1645,7 +1651,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.CompanyId = currentUser.CompanyID;
 
                                 #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                                 charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                 charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                                 charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -1685,8 +1691,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         itemSceneUpdate.JobNo = itemScene.JobId;
                                         itemSceneUpdate.Mblno = itemScene.MBL;
                                         itemSceneUpdate.Hblno = itemScene.HBL;
-
-                                        itemScene.Hblid = itemScene.Hblid;
+                                        itemSceneUpdate.Hblid = itemScene.Hblid;
                                     }
                                 }
                             }
@@ -1723,7 +1728,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     sceneCharge.DatetimeModified = DateTime.Now;
 
                                     #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(sceneCharge);
+                                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(sceneCharge, kickBackExcRate);
                                     sceneCharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                     sceneCharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                                     sceneCharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -2581,7 +2586,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 userApproveNext = buHeadLevel.UserId;
                                 mailUserApproveNext = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
-                                if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                //Nếu Role BUHead là Auto or Special thì chuyển trạng thái Done
+                                if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
                                 {
                                     settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
                                     approve.BuheadApr = buHeadLevel.UserId;

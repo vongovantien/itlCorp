@@ -1617,6 +1617,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = null;
             var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true);
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {
                 surCharges = new List<CsShipmentSurcharge>();
@@ -1649,7 +1650,7 @@ namespace eFMS.API.Documentation.DL.Services
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                     item.FinalExchangeRate = null;
 
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                     item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                     item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
