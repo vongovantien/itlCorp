@@ -50,8 +50,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult AddNew(AcctSoaModel model)
         {
+            currentUser.Action = "AddAcctSoaPayment";
             if (!ModelState.IsValid) return BadRequest();
-
             var hs = acctSOAService.AddSOA(model);
             if (hs.Code == 403)
             {
@@ -78,6 +78,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult UpdateSOA(AcctSoaModel model)
         {
+            currentUser.Action = "UpdateSoaPayment";
+
             if (!ModelState.IsValid) return BadRequest();
 
             var isAllowUpdate = acctSOAService.CheckUpdatePermission(model.Soano);
@@ -136,6 +138,8 @@ namespace eFMS.API.Accounting.Controllers
         [Route("Delete")]
         public IActionResult Delete(string soaNo)
         {
+            currentUser.Action = "DeleteSoaPayment";
+
             var isAllowDelete = acctSOAService.CheckDeletePermission(soaNo);
             if (isAllowDelete == false)
             {
@@ -405,6 +409,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult RejectSoaCredit(RejectSoaModel model)
         {
+            currentUser.Action = "RejectSoaCredit";
+
             var reject = acctSOAService.RejectSoaCredit(model);
             if (!reject.Success)
             {
