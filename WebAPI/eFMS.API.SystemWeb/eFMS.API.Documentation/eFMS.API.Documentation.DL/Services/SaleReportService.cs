@@ -1135,6 +1135,8 @@ namespace eFMS.API.Documentation.DL.Services
             var lookupSellingCharges = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(q => q.Hblid);
             var lookupBuying = listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == false || x.KickBack == null)).ToLookup(q => q.Hblid);
             var lookupShareProfit= listCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.KickBack == true).ToLookup(q => q.Hblid);
+            var listPartner = catPartnerRepository.Get();
+            var partnerLookup = listPartner.ToLookup(q => q.Id);
             bool hasSalesman = criteria.SalesMan != null;
             var results = new List<SummarySaleReportResult>();
             foreach (var item in data)
@@ -1142,7 +1144,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var report = new SummarySaleReportResult
                 {
                     Department = item.DepartmentSale,
-                    PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
+                    PartnerName = partnerLookup[item.CustomerId].FirstOrDefault()?.PartnerNameEn,
                     Description = GetShipmentTypeForPreviewPL(item.TransactionType),
                     Assigned = item.ShipmentType == "Nominated" ? true : false,
                     TransID = item.JobNo,
