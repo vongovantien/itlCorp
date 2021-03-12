@@ -37,6 +37,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string DepartmentSale { get; set; }
         public decimal? Cbm { get; set; }
         public decimal? NetWeight { get; set; }
+        public string Mawb { get; set; }
 
     }
 }
