@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult AddNew(AcctCdnoteModel model)
         {
+            currentUser.Action = "AddNewCDNote";
             if (!ModelState.IsValid) return BadRequest();
             var hs = cdNoteServices.AddNewCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -66,6 +67,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Update(AcctCdnoteModel model)
         {
+            currentUser.Action = "UpdateCDNote";
+
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
@@ -89,6 +92,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid cdNoteId)
         {
+            currentUser.Action = "DeleteCDNote";
+
             var hs = cdNoteServices.DeleteCDNote(cdNoteId);
             ResultHandle result = new ResultHandle();
             if (!hs.Success)
@@ -288,6 +293,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult RejectCreditNote(RejectCreditNoteModel model)
         {
+            currentUser.Action = "RejectCreditNote";
+
             var reject = cdNoteServices.RejectCreditNote(model);
             if (!reject.Success)
             {

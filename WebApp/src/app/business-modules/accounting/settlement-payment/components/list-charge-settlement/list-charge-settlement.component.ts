@@ -127,8 +127,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
         if (charges.length) {
             this.selectedIndexSurcharge = -1;
-            const hblIds: string[] = charges.map(x => x.hblid);
 
+            const surchargeFromShipment = this.surcharges.filter(x => x.isFromShipment);
+
+            const hblIds: string[] = charges.map(x => x.hblid);
             if (charges[0].isChangeShipment) {
                 this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && x.isChangeShipment === false);
             } else {
@@ -300,7 +302,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             return;
         }
         if (charge.isFromShipment) {
-            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isFromShipment);
+            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 
             this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
             this.listChargeFromShipmentPopup.show();
@@ -311,7 +313,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment);
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 
@@ -385,8 +387,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.selectedIndexSurcharge = null;
 
         const surChargeisNotFromShipment = this.surcharges.filter(x => !x.isFromShipment);
+        const hblidsSurchargefromshipmentUpdate = surchargeFromShipment.map(x => x.hblid);
+
+        const surChargeFromShipmentAnother = this.surcharges.filter(x => x.isFromShipment && !hblidsSurchargefromshipmentUpdate.includes(x.hblid));
+
         this.surcharges.length = 0;
-        this.surcharges = [...surChargeisNotFromShipment, ...surchargeFromShipment];
+        this.surcharges = [...surChargeisNotFromShipment, ...surchargeFromShipment, ...surChargeFromShipmentAnother];
 
     }
 
