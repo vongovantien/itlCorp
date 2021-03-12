@@ -2146,7 +2146,12 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
+                var surchargesCdNote = surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno)).Select(s => s.DebitNo ?? s.CreditNo).ToList();
                 query = query.And(x => refNos.Any(a => a == x.Code));
+                if (surchargesCdNote.Count > 0)
+                {
+                    query = query.Or(x => surchargesCdNote.Any(a => a == x.Code));
+                }
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
