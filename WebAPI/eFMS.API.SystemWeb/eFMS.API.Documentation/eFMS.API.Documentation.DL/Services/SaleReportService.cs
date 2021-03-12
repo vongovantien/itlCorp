@@ -1118,33 +1118,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<SummarySaleReportResult> GetSummarySaleReport(SaleReportCriteria criteria)
         {
 
-            //IQueryable<SummarySaleReportResult> opsShipments = null;
             IQueryable<SummarySaleReportResult> csShipments = null;
-            //if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
-            //{
-            //    opsShipments = GetOpsShipmentReport(criteria);
-            //}
-
-            //csShipments = GetCsShipmentReport(criteria);
-            //if (opsShipments == null)
-            //{
-            //    if (csShipments == null)
-            //    {
-            //        return null;
-            //    }
-            //    return csShipments;
-            //}
-            //else
-            //{
-            //    if (csShipments == null)
-            //    {
-            //        return opsShipments;
-            //    }
-            //    else
-            //    {
-            //        return opsShipments.Union(csShipments);
-            //    }
-            //}
             csShipments = GetDataCsShipmentReport(criteria);
             return csShipments;
         }
