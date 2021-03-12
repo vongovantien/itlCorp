@@ -2696,7 +2696,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  VAT = chg.VATRate,
                                  AccountDebitNoVAT = cd.DebitAccountNo,
                                  AccountCreditNoVAT = cd.CreditAccountNo,
-                                 AmountVAT = chg.VATRate,
+                                 AmountVAT = chg.Currency == AccountingConstants.CURRENCY_LOCAL ? chg.VATAmountLocal ?? 0 : chg.VATAmountUSD ?? 0,
                                  AmountVNDVAT = chg.VATAmountLocal,
                                  Commodity = chg.Commodity,
                                  CustomerName = pat.PartnerNameVn,
@@ -2718,7 +2718,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  InvoiceNo = chg.InvoiceNo,
                                  InvoiceDate = chg.InvoiceIssuedDate,
                                  SeriesNo = chg.SeriesNo,
-                                 
+
                                  //CustomNo = chg.CustomNo,
                                  //CreditDebitNo = chg.CreditDebitNo,
                                  //CurrencySOA = s.Currency,
