@@ -195,16 +195,16 @@ namespace eFMS.API.Documentation.DL.Services
                 if (dataGroup.Any())
                 {
                     SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
-                    SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
-                    SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
-                    SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataGroup.Where(x => x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataGroup.Where(x => x.OfficeId != null).Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataGroup.Where(x => x.CompanyId != null).Select(t => t.CompanyId).Distinct());
                 }
                 else
                 {
                     SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
-                    SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
-                    SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
-                    SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataUserLevels.Where(x=>x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataUserLevels.Where(x=>x.OfficeId != null).Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataUserLevels.Where(x=>x.CompanyId != null).Select(t => t.CompanyId).Distinct());
                 }
 
             }
