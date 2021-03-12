@@ -2535,7 +2535,7 @@ namespace eFMS.API.Accounting.DL.Services
                     CustomerID = sur.PaymentObjectId,
                     ServiceDate = _serviceDate,
                     CreatedDate = _createdDate,
-                    InvoiceIssuedDate = null,
+                    InvoiceIssuedDate = sur.InvoiceDate,
                     TransactionType = _service,
                     UserCreated = _userCreated,
                     Commodity = _commodity,
@@ -2567,7 +2567,9 @@ namespace eFMS.API.Accounting.DL.Services
                     IsSynced = _isSynced,
                     NetAmount = sur.NetAmount,
                     AmountVND = sur.AmountVnd,
-                    AmountUSD = sur.AmountUsd
+                    AmountUSD = sur.AmountUsd,
+                    SeriesNo = sur.SeriesNo,
+                    TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? catPartnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty
                 };
                 result.Add(chg);
             }
@@ -2667,7 +2669,7 @@ namespace eFMS.API.Accounting.DL.Services
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
             // Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
-            var chargeDefaults = chargeDefaultRepo.Get(x => x.Type == "Công Nợ");
+            var chargeDefaults = chargeDefaultRepo.Get(x => x.Type == AccountingConstants.CHARGE_DEFAULT_CONG_NO);
             var charge = GetChargeExportForSOA(soa.FirstOrDefault());
             var customerId = soa.FirstOrDefault()?.Customer;
             var partner = catPartnerRepo.Get(x => x.Id == customerId);
@@ -2689,18 +2691,19 @@ namespace eFMS.API.Accounting.DL.Services
                                  Credit = cd.CreditAccountNo,
                                  ChargeCode = chg.ChargeCode,
                                  OriginalCurrency = chg.Currency,
-                                 OriginalAmount = chg.Debit - chg.Credit,
-                                 CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                                 ?
-                                     GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                                 :
-                                     GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                                 AmountVND = chg.Credit * (chg.Debit - chg.Credit),
+                                 OriginalAmount = chg.NetAmount,
+                                 //CreditExchange = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
+                                 //?
+                                 //    GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
+                                 //:
+                                 //    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
+                                 CreditExchange = chg.FinalExchangeRate,
+                                 AmountVND = chg.AmountVND,
                                  VAT = chg.VATRate,
                                  AccountDebitNoVAT = cd.DebitAccountNo,
                                  AccountCreditNoVAT = cd.CreditAccountNo,
-                                 AmountVAT = (chg.Debit - chg.Credit) * chg.VATRate,
-                                 AmountVNDVAT = (chg.Credit * (chg.Debit - chg.Credit)) * chg.VATRate,
+                                 AmountVAT = chg.Currency == AccountingConstants.CURRENCY_LOCAL ? chg.VATAmountLocal ?? 0 : chg.VATAmountUSD ?? 0,
+                                 AmountVNDVAT = chg.VATAmountLocal,
                                  Commodity = chg.Commodity,
                                  CustomerName = pat.PartnerNameVn,
                                  TaxCode = pat.TaxCode,
@@ -2717,7 +2720,11 @@ namespace eFMS.API.Accounting.DL.Services
                                  MBL = chg.MBL,
                                  Email = pat.Email,
                                  TaxCodeOBH = chg.TaxCodeOBH,
-                                 CustomNo = chg.CustomNo
+                                 CustomNo = chg.CustomNo,
+                                 InvoiceNo = chg.InvoiceNo,
+                                 InvoiceDate = chg.InvoiceIssuedDate,
+                                 SeriesNo = chg.SeriesNo,
+
                                  //CustomNo = chg.CustomNo,
                                  //CreditDebitNo = chg.CreditDebitNo,
                                  //CurrencySOA = s.Currency,

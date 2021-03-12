@@ -41,7 +41,9 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? Quantity { get; set; }
         public string Email { get; set; }
         public string TaxCodeOBH { get; set; }
-
+        public string InvoiceNo { get; set; }
+        public DateTime? InvoiceDate { get; set; }
+        public string SeriesNo { get; set; }
 
 
     }

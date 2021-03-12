@@ -9,6 +9,7 @@ namespace eFMS.API.ReportData.Models.Documentation
         public string MawbNo2 { get; set; }
         public string MawbNo3 { get; set; }
         public string AolCode { get; set; }
+        public string AodCode { get; set; }
         public string HawbNo { get; set; }
         public string Shipper { set; get; }
         public string Consignee { get; set; }
@@ -47,6 +48,8 @@ namespace eFMS.API.ReportData.Models.Documentation
         public string CollectTax { get; set; }
         public string PrepaidDueToCarrier { get; set; }
         public string CollectDueToCarrier { get; set; }
+        public string Route { get; set; }
+        public string PackageUnit { get; set; }
         public List<CsShipmentOtherChargeModel> OtherCharges { get; set; }
     }
 }
