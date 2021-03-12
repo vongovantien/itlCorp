@@ -14,11 +14,7 @@ import { RoutingConstants } from '@constants';
     styleUrls: ['./detail-charge.component.scss']
 })
 export class DetailChargeComponent extends AddChargeComponent {
-    isAddNewLine: boolean = false;
-    isMaximumAccountRow: boolean = false;
-    isSameVoucherType: boolean = false;
-    ngDataUnit: any = [];
-    ngDataCurrency: any = [];
+
     Charge: CatChargeToAddOrUpdate = null;
     isSubmitted = false;
     id: string = '';
@@ -29,14 +25,6 @@ export class DetailChargeComponent extends AddChargeComponent {
     ];
     ngDataTypeChargeDefault: Array<string> = ["Công-Nợ", "Giải-Chi", "Loại Khác"];
 
-    activeUnit: any = [];
-    activeCurrency: any = [];
-    activeType: any = [];
-    activeServices: any = [];
-
-    /**
-     * Need to update ngDataServices by get data from databse after implement documentation module
-     */
     ngDataService = [
         { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
         { text: ChargeConstants.AI_DES, id: ChargeConstants.AI_CODE },
@@ -56,7 +44,7 @@ export class DetailChargeComponent extends AddChargeComponent {
         protected router: Router,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
-        protected _progressService: NgProgress,) {
+        protected _progressService: NgProgress, ) {
         super(router, _catalogueRepo, _toastService, _progressService);
     }
 
@@ -117,7 +105,7 @@ export class DetailChargeComponent extends AddChargeComponent {
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
                                 this._toastService.success(res.message, '');
-                                this.router.navigate([`${RoutingConstants.CATALOGUE.CHARGE}`]);
+                                // this.router.navigate([`${RoutingConstants.CATALOGUE.CHARGE}`]);
                             } else {
                                 this._toastService.error(res.message, '');
                             }
@@ -125,9 +113,6 @@ export class DetailChargeComponent extends AddChargeComponent {
                     );
             }
         }
-        //  else {
-        //     this._toastService.error("Please add voucher charge");
-        // }
     }
 
     ngOnDestroy() {

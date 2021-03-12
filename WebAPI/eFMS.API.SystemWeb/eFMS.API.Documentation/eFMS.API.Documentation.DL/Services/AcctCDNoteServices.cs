@@ -284,6 +284,8 @@ namespace eFMS.API.Documentation.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
 
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
                 var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
@@ -347,7 +349,7 @@ namespace eFMS.API.Documentation.DL.Services
                             //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             charge.FinalExchangeRate = null;
 
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                             charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -429,6 +431,8 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.ReasonReject = cdNote.ReasonReject;
                 entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
 
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+                
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
                 var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
@@ -527,7 +531,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.FinalExchangeRate = null;
                             }
 
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                             charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -1535,7 +1539,7 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckAllowDelete(Guid cdNoteId)
         {
             var cdNote = DataContext.Get(x => x.Id == cdNoteId).FirstOrDefault();
-            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && (!string.IsNullOrEmpty(x.PaySoano) || x.AcctManagementId != null))
+            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySoano))
                                                   || (x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.Soano) || x.AcctManagementId != null)));
 
             if (query.Any())
@@ -2142,7 +2146,12 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
+                var surchargesCdNote = surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno)).Select(s => s.DebitNo ?? s.CreditNo).ToList();
                 query = query.And(x => refNos.Any(a => a == x.Code));
+                if (surchargesCdNote.Count > 0)
+                {
+                    query = query.Or(x => surchargesCdNote.Any(a => a == x.Code));
+                }
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)

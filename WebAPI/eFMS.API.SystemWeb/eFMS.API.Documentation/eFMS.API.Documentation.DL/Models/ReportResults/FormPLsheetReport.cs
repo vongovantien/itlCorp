@@ -76,6 +76,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string TpyeofService { get; set; }	
         public string ShipmentSource { get; set; }
         public bool RealCost { get; set; }
+        public string UnitPriceStr { get; set; }
     }
 
     public class FormPLsheetReportParameter

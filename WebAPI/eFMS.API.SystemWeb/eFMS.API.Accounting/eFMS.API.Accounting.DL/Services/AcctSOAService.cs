@@ -4,17 +4,24 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ReportResults;
+using eFMS.API.Accounting.DL.ViewModel;
+using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -141,6 +148,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
                     _totalCharge = surcharges.Count();
+                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                     foreach (var surcharge in surcharges)
                     {
                         surcharge.UserModified = userCurrent;
@@ -153,7 +162,7 @@ namespace eFMS.API.Accounting.DL.Services
                             surcharge.FinalExchangeRate = null;
 
                             #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
                             surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -181,52 +190,19 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.DebitAmount = _debitAmount;
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
+                soa.Soano = model.Soano = CreateSoaNo();
+                var hs = DataContext.Add(soa);
 
-                using (var trans = DataContext.DC.Database.BeginTransaction())
+                if (hs.Success && surchargesSoa != null)
                 {
-                    try
-                    {
-                        soa.Soano = model.Soano = CreateSoaNo();
-                        var hs = DataContext.Add(soa, false);
-
-                        if (surchargesSoa != null)
-                        {
-                            foreach (var surcharge in surchargesSoa)
-                            {
-                                //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == model.Customer))
-                                {
-                                    surcharge.PaySoano = soa.Soano;
-                                }
-                                //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
-                                else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
-                                {
-                                    surcharge.Soano = soa.Soano;
-                                }
-                                
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
-                            }
-                        }                      
-                        
-                        csShipmentSurchargeRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
-                        trans.Commit();
-                        return hs;
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        return new HandleState(ex.Message);
-                    }
-                    finally
-                    {
-                        trans.Dispose();
-                    }
+                    var updateChargeSoa = UpdateSoaCharge(soa.Soano, surchargesSoa, soa.Customer, "AddSOA");
                 }
+                return hs;
+                
             }
             catch (Exception ex)
             {
-                var hs = new HandleState(ex.Message);
+                var hs = new HandleState((object)ex.Message);
                 return hs;
             }
         }
@@ -241,23 +217,8 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrent = currentUser.UserID;
 
                 //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
-                var surchargesOld = csShipmentSurchargeRepo.Get(x => (model.Type == "Debit" ? x.Soano : x.PaySoano) == model.Soano);
-                foreach (var surchargeOld in surchargesOld)
-                {
-                    //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
-                    if (model.Type == "Debit")
-                    {
-                        surchargeOld.Soano = null;
-                    }
-                    else
-                    {
-                        surchargeOld.PaySoano = null;
-                    }
-                    surchargeOld.UserModified = currentUser.UserID;
-                    surchargeOld.DatetimeModified = DateTime.Now;
-                    var hsUpdateSurchargeSOANoEqualNull = csShipmentSurchargeRepo.Update(surchargeOld, x => x.Id == surchargeOld.Id);
-                }
-
+                var clearChargeOld = ClearSoaCharge(model.Soano, model.Type, "ClearChargeOldUpdateSOA");
+                
                 var soa = mapper.Map<AcctSoa>(model);
                 var soaCurrent = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
                 soa.DatetimeModified = DateTime.Now;
@@ -303,6 +264,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
                     _totalCharge = surcharges.Count();
+                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
                     foreach (var surcharge in surcharges)
                     {
                         surcharge.UserModified = userCurrent;
@@ -326,7 +289,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
 
                             #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
                             surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                             surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                             surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -356,47 +319,19 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
 
-                using (var trans = DataContext.DC.Database.BeginTransaction())
+                var hs = DataContext.Update(soa, x => x.Id == soa.Id);
+
+                if (hs.Success && surchargesSoa != null)
                 {
-                    try
-                    {
-                        var hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
-                        
-                        foreach (var surcharge in surchargesSoa)
-                        {
-                            //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
-                            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == model.Customer))
-                            {
-                                surcharge.PaySoano = soa.Soano;
-                            }
-                            //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
-                            else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == model.Customer))
-                            {
-                                surcharge.Soano = soa.Soano;
-                            }
-
-                            var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
-                        }
-
-                        csShipmentSurchargeRepo.SubmitChanges();
-                        DataContext.SubmitChanges();
-                        trans.Commit();
-                        return hs;
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        return new HandleState(ex.Message);
-                    }
-                    finally
-                    {
-                        trans.Dispose();
-                    }
+                    var updateChargeSoa = UpdateSoaCharge(soa.Soano, surchargesSoa, soa.Customer, "UpdateSOA");
                 }
+
+                return hs;
+                
             }
             catch (Exception ex)
             {
-                var hs = new HandleState(ex.Message);
+                var hs = new HandleState((object)ex.Message);
                 return hs;
             }
         }
@@ -457,11 +392,128 @@ namespace eFMS.API.Accounting.DL.Services
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
+            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
+            if (soa == null)
+            {
+                string message = "Not found SOA " + soaNo;
+                return new HandleState((object)message);
+            }
+
+            if (soa.SyncStatus == "Synced")
+            {
+                string message = string.Format("Not allow delete. SOA {0} have been synchronized", soaNo);
+                return new HandleState((object)message);
+            }
+
+            //Clear Charge of SOA
+            var hsClearCharge = ClearSoaCharge(soaNo, soa.Type, "DeleteSoa");
+
             var hs = DataContext.Delete(x => x.Soano == soaNo);
             return hs;
         }
 
-        public HandleState UpdateSOASurCharge(string soaNo)
+        /// <summary>
+        /// Update Soa Surcharge (Using Store Procedure)
+        /// </summary>
+        /// <param name="soaNo"></param>
+        /// <param name="surchargesSoa"></param>
+        /// <param name="customer"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private HandleState UpdateSoaCharge(string soaNo, List<CsShipmentSurcharge> surchargesSoa, string customer, string action)
+        {
+            var hs = new HandleState();
+            var soaCharges = new List<ChargeSoaUpdateTable>();
+            foreach (var surcharge in surchargesSoa)
+            {
+                var soaCharge = new ChargeSoaUpdateTable();
+                soaCharge.Id = surcharge.Id;
+
+                //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == customer))
+                {
+                    soaCharge.PaySoano = soaNo;
+                    soaCharge.Soano = surcharge.Soano;
+                }
+                //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
+                else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == customer))
+                {
+                    soaCharge.Soano = soaNo;
+                    soaCharge.PaySoano = surcharge.PaySoano;
+                }
+
+                soaCharge.ExchangeDate = surcharge.ExchangeDate;
+                soaCharge.FinalExchangeRate = surcharge.FinalExchangeRate;
+                soaCharge.NetAmount = surcharge.NetAmount;
+                soaCharge.Total = surcharge.Total;
+                soaCharge.AmountVnd = surcharge.AmountVnd;
+                soaCharge.VatAmountVnd = surcharge.VatAmountVnd;
+                soaCharge.AmountUsd = surcharge.AmountUsd;
+                soaCharge.VatAmountUsd = surcharge.VatAmountUsd;
+                soaCharge.UserModified = surcharge.UserModified;
+                soaCharge.DatetimeModified = surcharge.DatetimeModified;
+                soaCharges.Add(soaCharge);
+            }
+
+            if (soaCharges.Count > 0)
+            {
+                var updateSoaCharge = UpdateSurchargeForSoa(soaCharges);
+                string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
+                string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                    JsonConvert.SerializeObject(soaCharges),
+                    JsonConvert.SerializeObject(updateSoaCharge));
+                new LogHelper(logName, logMessage);
+                if (!updateSoaCharge.Status)
+                {
+                    hs = new HandleState((object)updateSoaCharge.Message);
+                }
+            }
+            return hs;
+        }
+
+        /// <summary>
+        /// Clear SoaNo, PaySoaNo of surcharge (Using Store Procedure)
+        /// </summary>
+        /// <param name="soaNo"></param>
+        /// <param name="soaType"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private HandleState ClearSoaCharge(string soaNo, string soaType, string action)
+        {
+            var hs = new HandleState();
+            var surcharges = csShipmentSurchargeRepo.Get(x => (soaType == "Debit" ? x.Soano : x.PaySoano) == soaNo);
+            if (surcharges != null)
+            {
+                var soaCharges = new List<ClearChargeSoaTable>();
+                foreach(var surcharge in surcharges)
+                {
+                    var soaCharge = new ClearChargeSoaTable();
+                    soaCharge.Id = surcharge.Id;
+                    soaCharge.PaySoano = (soaType == "Credit") ? null : surcharge.PaySoano;
+                    soaCharge.Soano = (soaType == "Debit") ? null : surcharge.Soano;
+                    soaCharge.UserModified = currentUser.UserID;
+                    soaCharge.DatetimeModified = DateTime.Now;
+                    soaCharges.Add(soaCharge);
+                }
+
+                if (soaCharges.Count > 0)
+                {
+                    var clearSoaCharge = ClearSurchargeForSoa(soaCharges);
+                    string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
+                    string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                        JsonConvert.SerializeObject(soaCharges),
+                        JsonConvert.SerializeObject(clearSoaCharge));
+                    new LogHelper(logName, logMessage);
+                    if (!clearSoaCharge.Status)
+                    {
+                        hs = new HandleState((object)clearSoaCharge.Message);
+                    }
+                }
+            }
+            return hs;
+        }
+
+        /*public HandleState UpdateSOASurCharge(string soaNo)
         {
             try
             {
@@ -511,7 +563,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
-        }
+        }*/
 
         private string CreateSoaNo()
         {
@@ -979,19 +1031,25 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.HBL = surcharge.Hblno;
                 chg.MBL = surcharge.Mblno;
                 chg.Type = surcharge.Type;
-                chg.Debit = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
-                chg.Credit = surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
                 chg.Currency = surcharge.CurrencyId;
                 chg.InvoiceNo = surcharge.InvoiceNo;
                 chg.Note = surcharge.Notes;
                 chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
-                chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
-                chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_USD);
-                chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
-                chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
+                
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Debit = surcharge.Total;
+                    chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Credit = surcharge.Total;
+                    chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+
                 chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
 
                 string _pic = string.Empty;
@@ -1386,19 +1444,25 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.HBL = surcharge.Hblno;
                 chg.MBL = surcharge.Mblno;
                 chg.Type = surcharge.Type;
-                chg.Debit = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
-                chg.Credit = surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)surcharge.Total : null;
                 chg.Currency = surcharge.CurrencyId;
                 chg.InvoiceNo = surcharge.InvoiceNo;
                 chg.Note = surcharge.Notes;
                 chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
-                chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
-                chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_USD);
-                chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
-                chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
+
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Debit = surcharge.Total;
+                    chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                {
+                    chg.Credit = surcharge.Total;
+                    chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+                    chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+                }
+
                 chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
                 chg.SOANo = criteria.Type == "Debit" ? surcharge.Soano : surcharge.PaySoano;
 
@@ -1952,16 +2016,11 @@ namespace eFMS.API.Accounting.DL.Services
                                  CurrencySOA = s.Currency,
                                  CurrencyCharge = chg.Currency,
                                  FinalExchangeRate = chg.FinalExchangeRate,
-                                 ExchangeDate = chg.ExchangeDate
+                                 ExchangeDate = chg.ExchangeDate,
+                                 CreditExchange = (s.Currency == AccountingConstants.CURRENCY_LOCAL ? chg.CreditLocal : chg.CreditUSD) ?? 0,
+                                 DebitExchange = (s.Currency == AccountingConstants.CURRENCY_LOCAL ? chg.DebitLocal : chg.DebitUSD) ?? 0
                              };
-            List<ExportSOAModel> _result = dataResult.ToList();
-            _result.ForEach(fe =>
-            {
-                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.CurrencyCharge, fe.CurrencySOA);
-                fe.CreditExchange = _exchangeRate * (fe.Credit ?? 0);
-                fe.DebitExchange = _exchangeRate * (fe.Debit ?? 0);
-            });
-            return _result.AsQueryable();
+            return dataResult;
         }
 
         public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo, string officeId)
@@ -2017,23 +2076,27 @@ namespace eFMS.API.Accounting.DL.Services
 
                     air.TotalAmount = 0;
                     // Airfrieght
-                    var lstAirfrieght = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstAirfrieght = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE);
                     if (lstAirfrieght.Count() == 0)
                     {
-                        lstAirfrieght = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstAirfrieght = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()));
                     }
                     if (lstAirfrieght.Count() > 0)
                     {
-                        air.Rate = NumberHelper.RoundNumber(lstAirfrieght.Select(t => t.UnitPrice ?? 0).Sum(), 2);
-                        air.AirFreight = NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.DebitUSD).Sum(), 2);
+                        air.Rate = NumberHelper.RoundNumber(lstAirfrieght.Where(x => x.Currency == AccountingConstants.CURRENCY_USD).Sum(t => t.UnitPrice ?? 0), 2);
+                        foreach (var airFr in lstAirfrieght.Where(x => x.Currency != AccountingConstants.CURRENCY_USD))
+                        {
+                            var _rate = currencyExchangeService.CurrencyExchangeRateConvert(airFr.FinalExchangeRate, airFr.ExchangeDate, airFr.Currency, AccountingConstants.CURRENCY_USD);
+                            air.Rate += NumberHelper.RoundNumber((airFr.UnitPrice * _rate) ?? 0, 2);
+                        }
+                        air.AirFreight = NumberHelper.RoundNumber(lstAirfrieght.Sum(t => t.DebitUSD ?? 0), 2);
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.DebitLocal).Sum());
                     }
                     // FuelSurcharge
-                    var lstFuelSurcharge = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstFuelSurcharge = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE);
                     if (lstFuelSurcharge.Count() == 0)
                     {
-                        lstFuelSurcharge = charge.Where(x => x.HBLID == item &&
-                                                        (x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstFuelSurcharge = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower());
                     }
                     if (lstFuelSurcharge.Count() > 0)
                     {
@@ -2041,10 +2104,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstFuelSurcharge.Select(t => t.DebitLocal).Sum());
                     }
                     // WariskSurcharge
-                    var lstWariskSurcharge = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstWariskSurcharge = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE);
                     if (lstWariskSurcharge.Count() == 0)
                     {
-                        lstWariskSurcharge = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstWariskSurcharge = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower());
                     }
                     if(lstWariskSurcharge.Count() > 0)
                     {
@@ -2052,12 +2115,11 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstWariskSurcharge.Select(t => t.DebitLocal).Sum());
                     }
                     // ScreeningFee
-                    var lstScreeningFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SCREENING_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstScreeningFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SCREENING_CODE);
                     if (lstScreeningFee.Count() == 0)
                     {
                         lstScreeningFee = charge.Where(x => x.HBLID == item &&
-                                                        (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_X_RAY.ToLower()) &&
-                                                        x.Currency == AccountingConstants.CURRENCY_USD);
+                                                        (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_X_RAY.ToLower()));
                     }
                     if (lstScreeningFee.Count() > 0)
                     {
@@ -2065,12 +2127,11 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstScreeningFee.Select(t => t.DebitLocal).Sum());
                     }
                     // AWBFee
-                    var lstAWBFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AWB_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstAWBFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AWB_FEE_CODE);
                     if (lstAWBFee.Count() == 0)
                     {
                         lstAWBFee = charge.Where(x => x.HBLID == item &&
-                                                (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB.ToLower()) &&
-                                                x.Currency == AccountingConstants.CURRENCY_USD);
+                                                (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB.ToLower()));
                     }
                     if (lstAWBFee.Count() > 0)
                     {
@@ -2078,10 +2139,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAWBFee.Select(t => t.DebitLocal).Sum());
                     }
                     // AMSFee
-                    var lstAMSFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AMS_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstAMSFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_AMS_FEE_CODE);
                     if (lstAMSFee.Count() == 0)
                     {
-                        lstAMSFee = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstAMSFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower());
                     }
                     if (lstAMSFee.Count() > 0)
                     {
@@ -2089,10 +2150,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstAMSFee.Select(t => t.DebitLocal).Sum());
                     }
                     // Dangerous fee
-                    var lstDANFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_DAN_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstDANFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_DAN_AIR_CODE );
                     if (lstDANFee.Count() == 0)
                     {
-                        lstDANFee = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstDANFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower());
                     }
                     if (lstDANFee.Count() > 0)
                     {
@@ -2100,10 +2161,10 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstDANFee.Select(t => t.DebitLocal).Sum());
                     }
                     // Other fee
-                    var lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE);
                     if (lstOTHFee.Count() == 0)
                     {
-                        lstOTHFee = charge.Where(x => x.HBLID == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower());
                     }
                     if (lstOTHFee.Count() == 0)
                     {
@@ -2123,7 +2184,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()
                                                                     && x.ChargeCode != AccountingConstants.CHARGE_SA_HDL_AIR_CODE
                                                                     && x.ChargeName.ToLower() != AccountingConstants.CHARGE_HANDLING_FEE.ToLower()
-                        ) && x.Currency == AccountingConstants.CURRENCY_USD);
+                        ));
                     }
                     if (lstOTHFee.Count() > 0)
                     {
@@ -2131,7 +2192,7 @@ namespace eFMS.API.Accounting.DL.Services
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstOTHFee.Select(t => t.DebitLocal).Sum());
                     }
                     // HandlingFee
-                    var lstHandlingFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_HANDLING_FEE) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstHandlingFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_HANDLING_FEE));
                     if (lstHandlingFee.Count() > 0)
                     {
                         air.HandlingFee = NumberHelper.RoundNumber((decimal)lstHandlingFee.Select(t => t.DebitUSD).Sum(), 2);
@@ -2249,7 +2310,12 @@ namespace eFMS.API.Accounting.DL.Services
                     var lstAirfrieght = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE ||
                                         (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())));
                     // Rate
-                    air.Rate = lstAirfrieght.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.UnitPrice).Sum(), 2) : (decimal?)null;
+                    air.Rate = lstAirfrieght.Count() > 0 ? NumberHelper.RoundNumber(lstAirfrieght.Where(x => x.Currency == AccountingConstants.CURRENCY_USD).Sum(t => t.UnitPrice ?? 0), 2) : (decimal?)null;
+                    foreach (var airFr in lstAirfrieght.Where(x => x.Currency != AccountingConstants.CURRENCY_USD))
+                    {
+                        var _rate = currencyExchangeService.CurrencyExchangeRateConvert(airFr.FinalExchangeRate, airFr.ExchangeDate, airFr.Currency, AccountingConstants.CURRENCY_USD);
+                        air.Rate += NumberHelper.RoundNumber((airFr.UnitPrice * _rate) ?? 0, 2);
+                    }
                     air.NetAmount = 0;
                     // Air Freight
                     air.AirFreight = lstAirfrieght.Count() > 0 ? NumberHelper.RoundNumber((decimal)lstAirfrieght.Select(t => t.CreditUSD).Sum(), 2) : (decimal?)null;
@@ -2674,7 +2740,7 @@ namespace eFMS.API.Accounting.DL.Services
             Crystal result = null;
             var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
             if (soa == null) return null;
-            var chargesOfSOA = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo);
+            var chargesOfSOA = csShipmentSurchargeRepo.Get(x => (soa.Type == "Debit" ? x.Soano : x.PaySoano) == soaNo);
             var partner = catPartnerRepo.Get(x => x.Id == soa.Customer).FirstOrDefault();
             var grpInvCdNoteByHbl = chargesOfSOA.GroupBy(g => new { g.Hblid, g.InvoiceNo, g.CreditNo, g.DebitNo }).Select(s => new { s.Key.Hblid, s.Key.InvoiceNo, CdNote = s.Key.CreditNo ?? s.Key.DebitNo });
 
@@ -2685,39 +2751,19 @@ namespace eFMS.API.Accounting.DL.Services
                 string _hwbNo = string.Empty;
                 string _customNo = string.Empty;
                 string _jobNo = string.Empty;
+
                 #region -- Info MBL, HBL --
-                var ops = opsTransactionRepo.Get(x => x.Hblid == charge.Hblid).FirstOrDefault();
-                if (ops != null)
-                {
-                    _mawb = ops.Mblno;
-                    _hwbNo = ops.Hwbno;
-                    _customNo = GetTopClearanceNoByJobNo(ops.JobNo);
-                    _jobNo = ops.JobNo;
-                }
-                else
-                {
-                    var houseBillDoc = csTransactionDetailRepo.Get(x => x.Id == charge.Hblid).FirstOrDefault();
-                    if (houseBillDoc != null)
-                    {
-                        _hwbNo = houseBillDoc.Hwbno;
-                        var masterBillDoc = csTransactionRepo.Get(x => x.Id == houseBillDoc.JobId).FirstOrDefault();
-                        if (masterBillDoc != null)
-                        {
-                            _mawb = masterBillDoc.Mawb;
-                            _customNo = GetTopClearanceNoByJobNo(masterBillDoc.JobNo);
-                            _jobNo = masterBillDoc.JobNo;
-                        }
-                    }
-                }
+                _mawb = charge.Mblno;
+                _hwbNo = charge.Hblno;
+                _customNo = charge.TransactionType == "CL" ? GetTopClearanceNoByJobNo(charge.JobNo) : string.Empty;
+                _jobNo = charge.JobNo;
                 #endregion -- Info MBL, HBL --
 
                 #region -- Info CD Note --
-                var cdNote = acctCdnoteRepo.Get(x => x.Code == charge.DebitNo || x.Code == charge.CreditNo).FirstOrDefault();
+                var cdNote = acctCdnoteRepo.Get(x => (soa.Type == "Debit" ? charge.DebitNo : charge.CreditNo) == x.Code).FirstOrDefault();
                 #endregion -- Info CD Note --
 
                 // Exchange Rate from currency charge to current soa
-                //var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, soa.Currency?.Trim());
-                //var _amount = charge.Total * exchangeRate;
                 decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, soa.Currency);
 
                 var soaCharge = new AccountStatementFullReport();
@@ -2764,7 +2810,11 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.CustomNo = _customNo;
                 soaCharge.JobNo = _jobNo;
                 soaCharge.CdCode = cdNote?.Code;
-                soaCharge.Docs = string.Join("\r\n", grpInvCdNoteByHbl.Where(w => w.Hblid == charge.Hblid).Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Where(w => !string.IsNullOrEmpty(w)).ToList().Distinct()); //Ưu tiên: Invoice No >> CD Note Code
+                var grpInvCdNote = grpInvCdNoteByHbl.Where(w => (!string.IsNullOrEmpty(w.InvoiceNo) || !string.IsNullOrEmpty(w.CdNote)) && w.Hblid == charge.Hblid).ToList();
+                if (grpInvCdNote.Count > 0)
+                {
+                    soaCharge.Docs = string.Join("\r\n", grpInvCdNote.Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
+                }
 
                 soaCharges.Add(soaCharge);
             }
@@ -2822,19 +2872,63 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState RejectSoaCredit(RejectSoaModel model)
         {
+            var soa = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+            if (soa == null) return new HandleState((object)"Not found SOA");
+
+            soa.SyncStatus = string.Empty;
+            soa.UserModified = currentUser.UserID;
+            soa.DatetimeModified = DateTime.Now;
+            soa.ReasonReject = model.Reason;
+            soa.Note += " Rejected from Accountant";
+
+            IQueryable<CsShipmentSurcharge> surcharges = null;
+            if (soa.Type == "Credit")
+            {
+                surcharges = csShipmentSurchargeRepo.Get(x => x.PaySoano == soa.Soano);
+            }
+            if (soa.Type == "Debit")
+            {
+                surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soa.Soano);
+            }
+
+            //Update PaySyncedFrom or SyncedFrom equal NULL by SoaNo (Sử dụng Store Procudure để Update Charge)
+            if (surcharges != null)
+            {
+                var rejectCharges = new List<RejectChargeTable>();
+                foreach (var surcharge in surcharges)
+                {
+                    var rejectCharge = new RejectChargeTable();
+                    rejectCharge.Id = surcharge.Id;
+                    if (surcharge.Type == "OBH")
+                    {
+                        rejectCharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? null : surcharge.PaySyncedFrom;
+                        rejectCharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? null : surcharge.SyncedFrom;
+                    }
+                    else
+                    {
+                        rejectCharge.SyncedFrom = null;
+                    }
+                    rejectCharge.UserModified = currentUser.UserID;
+                    rejectCharge.DatetimeModified = DateTime.Now;
+                    rejectCharges.Add(rejectCharge);
+                }
+
+                var updateRejectCharge = UpdateRejectCharge(rejectCharges);
+                string logName = string.Format("Reject_SOACredit_{0}_UpdateCharge", soa.Soano);
+                string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                    JsonConvert.SerializeObject(rejectCharges),
+                    JsonConvert.SerializeObject(updateRejectCharge));
+                new LogHelper(logName, logMessage);
+                if (!updateRejectCharge.Status)
+                {
+                    return new HandleState((object)updateRejectCharge.Message);
+                }
+            }
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
-                {
-                    var soa = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-                    if (soa == null) return new HandleState((object)"Not found SOA");
-
-                    soa.SyncStatus = "";
-                    soa.UserModified = currentUser.UserID;
-                    soa.DatetimeModified = DateTime.Now;
-                    soa.ReasonReject = model.Reason;
-                    soa.Note += " Rejected from Accountant";
-
+                {                   
                     HandleState hs = DataContext.Update(soa, x => x.Id == soa.Id, false);
                     if (hs.Success)
                     {
@@ -2874,7 +2968,7 @@ namespace eFMS.API.Accounting.DL.Services
                             sysUserNotificationRepository.Add(sysUserNotify);
 
                             //Update PaySyncedFrom or SyncedFrom equal NULL by SOA No
-                            var surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                            /*var surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
                             foreach (var surcharge in surcharges)
                             {
                                 if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
@@ -2890,7 +2984,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 surcharge.DatetimeModified = DateTime.Now;
                                 var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
-                            var smSurcharge = csShipmentSurchargeRepo.SubmitChanges();
+                            var smSurcharge = csShipmentSurchargeRepo.SubmitChanges();*/
                         }
                         trans.Commit();
                     }
@@ -2907,5 +3001,55 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+
+        #region --- PRIVATE METHOD ---
+        private sp_UpdateRejectCharge UpdateRejectCharge(List<RejectChargeTable> charges)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(charges),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[RejectChargeTable]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateRejectCharge>(parameters);
+            return result.FirstOrDefault();
+        }
+
+        private sp_UpdateChargeSoaUpdate UpdateSurchargeForSoa(List<ChargeSoaUpdateTable> charges)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(charges),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[ChargeSoaUpdateTable]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateChargeSoaUpdate>(parameters);
+            return result.FirstOrDefault();
+        }
+
+        private sp_ClearChargeSoaUpdate ClearSurchargeForSoa(List<ClearChargeSoaTable> charges)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(charges),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[ClearChargeSoaTable]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_ClearChargeSoaUpdate>(parameters);
+            return result.FirstOrDefault();
+        }
+        #endregion --- PRIVATE METHOD ---
     }
 }

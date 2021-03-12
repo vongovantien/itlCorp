@@ -2314,7 +2314,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = null;
             IQueryable<CsShipmentSurcharge> charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId && x.IsFromShipment == true); // Không lấy phí hiện trường
-
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {
                 surCharges = new List<CsShipmentSurcharge>();
@@ -2350,7 +2350,7 @@ namespace eFMS.API.Documentation.DL.Services
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                     item.FinalExchangeRate = null;
 
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                     item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                     item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -2609,6 +2609,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Quantity = surcharge.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                         // charge.UnitPrice = (surcharge.UnitPrice ?? 0);
                         charge.UnitPrice = (surcharge.UnitPrice ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân nhỏ riêng trường hợp này
+                        charge.UnitPriceStr = surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}",(surcharge.UnitPrice ?? 0)) : string.Format("{0:n3}",(surcharge.UnitPrice ?? 0));
                         charge.Unit = unitCode;
                         charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;
@@ -2713,7 +2714,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.CurrDecimalNo = 3;
+            parameter.CurrDecimalNo = 2;
             parameter.DecimalNo = 0;
             parameter.HBLList = _hblNoList?.ToUpper();
 

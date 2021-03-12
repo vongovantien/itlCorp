@@ -253,7 +253,7 @@ export class DocumentationRepo {
     }
 
     getShipmentBySearchOption(searchOption: string, keywords: string[] = []) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentsCopyListBySearchOption`, { searchOption: searchOption, keywords: keywords }).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentsCopyListBySearchOption`, keywords, { searchOption: searchOption }).pipe(
             map((data: any) => data)
         );
     }

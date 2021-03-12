@@ -284,7 +284,7 @@ export class FormAddPartnerComponent extends AppForm {
             partnerAccountRef: [],
             taxCode: [null, Validators.compose([
                 Validators.maxLength(14),
-                Validators.minLength(8),
+                Validators.minLength(7),
                 Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
                 Validators.required
             ])],

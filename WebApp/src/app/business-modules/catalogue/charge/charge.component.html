@@ -65,6 +65,9 @@
                                     <span>{{item.type}}</span>
                                 </td>
                                 <td>
+                                    <span>{{item.mode}}</span>
+                                </td>
+                                <td>
                                     <span [ngClass]="item.active ? 'text-success' : 'text-danger'">
                                         {{ item.active ? 'Active' : 'Inactive'}}
                                     </span>

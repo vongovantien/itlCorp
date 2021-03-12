@@ -178,6 +178,8 @@ namespace eFMS.API.Documentation.Controllers
             string checkExistMessage = CheckExist(model.Id, model);
 
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
+            currentUser.Action = "AddCsTransaction";
+
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None)
             {
@@ -202,6 +204,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Put(CsTransactionEditModel model)
         {
+            currentUser.Action = "UpdateCsTransaction";
+
             if (!ModelState.IsValid) return BadRequest();
             if (!csTransactionService.Any(x => x.Id == model.Id))
             {
@@ -359,6 +363,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
+            currentUser.Action = "DeleteCsTransaction";
             if (!ModelState.IsValid) return BadRequest();
             if (!csTransactionService.Any(x => x.Id == id))
             {
@@ -396,6 +401,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Import")]
         public IActionResult Import(CsTransactionEditModel model)
         {
+            currentUser.Action = "DuplicateCsTransaction";
+
             if (!ModelState.IsValid) return BadRequest();
             string checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
@@ -439,6 +446,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("SyncHBLByShipment/{id}")]
         public IActionResult SyncHBL(Guid id, CsTransactionSyncHBLCriteria model)
         {
+            currentUser.Action = "SyncHBLByShipment";
+
             if (!ModelState.IsValid) return BadRequest();
             var result = csTransactionService.SyncHouseBills(id, model);
             return Ok(result);
@@ -449,6 +458,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("SyncShipmentByAirWayBill/{id}")]
         public IActionResult SyncShipmentByAirWayBill(Guid id, csTransactionSyncAirWayBill model)
         {
+            currentUser.Action = "SyncShipmentByAirWayBill";
+
             if (!ModelState.IsValid) return BadRequest();
             HandleState hs = csTransactionService.SyncShipmentByAirWayBill(id, model);
 
@@ -466,6 +477,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult LockCsTransaction(Guid id)
         {
+            currentUser.Action = "LockCsTransaction";
+
             HandleState hs = csTransactionService.LockCsTransaction(id);
 
             string message = HandleError.GetMessage(hs, Crud.Update);

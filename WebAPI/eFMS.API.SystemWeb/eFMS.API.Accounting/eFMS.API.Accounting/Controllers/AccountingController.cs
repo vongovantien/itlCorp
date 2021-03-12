@@ -14,6 +14,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,21 +34,22 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAccountingService accountingService;
         private readonly IOptions<ESBUrl> webUrl;
         private readonly IActionFuncLogService actionFuncLogService;
-
+        private readonly ICurrentUser currentUser;
         private readonly BravoLoginModel loginInfo;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
             IAccountingService service,
             IOptions<ESBUrl> appSettings,
-            IActionFuncLogService actionFuncLog
+            IActionFuncLogService actionFuncLog,
+            ICurrentUser currUser
             )
         {
             stringLocalizer = localizer;
             accountingService = service;
             webUrl = appSettings;
             actionFuncLogService = actionFuncLog;
-
+            currentUser = currUser;
             loginInfo = new BravoLoginModel
             {
                 UserName = "bravo",
@@ -266,7 +268,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
-
+            currentUser.Action = "SyncAdvanceToAccountantSystem";
             try
             {
                 // 1. LOGIN
@@ -362,6 +364,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
+            currentUser.Action = "SyncSettlementToAccountantSystem";
 
             try
             {
@@ -456,6 +459,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
+            currentUser.Action = "SyncVoucherToAccountantSystem";
 
             try
             {
@@ -555,6 +559,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
+            currentUser.Action = "SyncListCdNoteToAccountant";
 
             try
             {
@@ -731,6 +736,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
+            currentUser.Action = "SyncListSoaToAccountant";
 
             try
             {

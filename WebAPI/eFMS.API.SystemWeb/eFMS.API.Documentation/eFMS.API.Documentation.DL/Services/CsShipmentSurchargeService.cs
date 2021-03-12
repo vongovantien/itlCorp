@@ -435,6 +435,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var surchargesAdd = new List<CsShipmentSurcharge>();
             var surchargesUpdate = new List<CsShipmentSurcharge>();
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
             foreach (var item in surcharges)
             {
@@ -442,7 +443,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                     item.FinalExchangeRate = null;
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                     item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                     item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -525,7 +526,7 @@ namespace eFMS.API.Documentation.DL.Services
                             surcharge.ExchangeDate = item.ExchangeDate;
                         }
 
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
                         surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -587,13 +588,14 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new HandleState();
             var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                         item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
@@ -1254,11 +1256,11 @@ namespace eFMS.API.Documentation.DL.Services
                     item.VatError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_EMPTY]);
                     item.IsValid = false;
                 }
-                if (!item.TotalAmount.HasValue)
-                {
-                    item.TotalAmountError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TOTAL_AMOUNT_EMPTY]);
-                    item.IsValid = false;
-                }
+                //if (!item.TotalAmount.HasValue)
+                //{
+                //    item.TotalAmountError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TOTAL_AMOUNT_EMPTY]);
+                //    item.IsValid = false;
+                //}
                 if (!item.ExchangeDate.HasValue)
                 {
                     item.ExchangeDateError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_EXCHANGE_DATE_EMPTY]);
@@ -1277,7 +1279,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "sell" && item.Type.ToLower() != "obh")
+                    if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "selling" && item.Type.ToLower() != "obh")
                     {
                         item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_NOT_VALID], item.Type);
                         item.IsValid = false;
@@ -1311,37 +1313,33 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaymentObjectId = PartnerId;
                     Guid HblId = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim()).Select(t => t.Hblid).FirstOrDefault();
                     item.Hblid = HblId;
-
-                    #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
-                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                    #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-
                     item.Quantity = (decimal)item.Qty;
+                    
+                    item.JobNo = opsTransRepository.Get(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
                     item.TransactionType = "CL";
                     string jobNo = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
                     if (item.Type.ToLower() == "obh")
                     {
                         item.PayerId = PartnerId;
                     }
+                    string TypeCompare = string.Empty;
                     if (item.Type.ToLower() == "buying")
                     {
-                        item.Type = "BUY";
+                        TypeCompare = "BUY";
                     }
-                    if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == item.Type))
+                    if (item.Type.ToLower() == "selling")
+                    {
+                        TypeCompare = "SELL";
+                    }
+
+                    if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
                     {
                         item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
                         item.IsValid = false;
                     }
                     if (!string.IsNullOrEmpty(item.SeriesNo))
                     {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
                             item.IsValid = false;
@@ -1349,7 +1347,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (!string.IsNullOrEmpty(item.InvoiceNo))
                     {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == item.Type))
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == TypeCompare))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
                             item.IsValid = false;
@@ -1357,7 +1355,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
                     {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == item.Type))
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
                             item.IsValid = false;
@@ -1385,13 +1383,35 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Type = item.Type.ToUpper();
                         break;
                 }
-                item.UserCreated = currentUser.UserID;
+                item.UserCreated = item.UserModified = currentUser.UserID;
                 item.Id = Guid.NewGuid();
                 item.ExchangeDate = DateTime.Now.Date;
                 item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                 OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                 item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                 item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
+                #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
+                item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
+                if (item.Type.ToLower() == "buying")
+                {
+                    item.Type = "BUY";
+                }
+                if (item.Type.ToLower() == "selling")
+                {
+                    item.Type = "SELL";
+                }
             }
             var datas = mapper.Map<List<CsShipmentSurcharge>>(list);
             using (var trans = DataContext.DC.Database.BeginTransaction())

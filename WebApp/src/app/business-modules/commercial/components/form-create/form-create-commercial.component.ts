@@ -103,7 +103,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             shortName: [null, Validators.required],
             taxCode: [null, Validators.compose([
                 Validators.maxLength(14),
-                Validators.minLength(8),
+                Validators.minLength(7),
                 // Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
                 Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
                 Validators.required

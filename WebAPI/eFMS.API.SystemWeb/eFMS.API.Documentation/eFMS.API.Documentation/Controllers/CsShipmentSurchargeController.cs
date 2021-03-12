@@ -153,10 +153,11 @@ namespace eFMS.API.Documentation.Controllers
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             model.DatetimeCreated = DateTime.Now;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
 
             var surcharge = mapper.Map<CsShipmentSurcharge>(model);
             #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
             model.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
             model.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
             model.FinalExchangeRate =amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -200,9 +201,11 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
             // list.ForEach(fe => {
-                // fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
-                // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
+            // fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
+            // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
             //});
+            currentUser.Action = "AddAndUpdate";
+
             var hs = csShipmentSurchargeService.AddAndUpdate(list);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -321,10 +324,11 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 0;
 
             var surcharge = mapper.Map<CsShipmentSurcharge>(model);
             #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
             model.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
             model.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
             model.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -355,6 +359,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid chargId)
         {
+            currentUser.Action = "DeleteCsShipmentSurcharge";
             var hs = csShipmentSurchargeService.DeleteCharge(chargId);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -502,7 +507,7 @@ namespace eFMS.API.Documentation.Controllers
                 List<CsShipmentSurchargeImportModel> list = new List<CsShipmentSurchargeImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    string ExchangeDate = worksheet.Cells[row, 12].Value?.ToString().Trim();
+                    string ExchangeDate = worksheet.Cells[row, 11].Value?.ToString().Trim();
                     DateTime? dateToPase = null;
                     if (DateTime.TryParse(ExchangeDate, out temp))
                     {
@@ -518,7 +523,7 @@ namespace eFMS.API.Documentation.Controllers
                         }
                     }
 
-                    string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
+                    string InvoiceDate = worksheet.Cells[row, 14].Value?.ToString().Trim();
                     if(!string.IsNullOrEmpty(InvoiceDate))
                     {
                         DateTime? dateToPaseInvoice = null;
@@ -539,8 +544,8 @@ namespace eFMS.API.Documentation.Controllers
               
                     double? UnitPrice = worksheet.Cells[row, 8].Value != null ? (double?)worksheet.Cells[row, 8].Value : (double?)null;
                     double? Vatrate = worksheet.Cells[row, 10].Value != null ? (double?)worksheet.Cells[row, 10].Value : (double?)null;
-                    double? TotalAmount = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;
-                    double? FinalExchangeRate = worksheet.Cells[row, 13].Value != null ? (double?)worksheet.Cells[row, 13].Value : (double?)null;
+                    //double? TotalAmount = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;
+                    double? FinalExchangeRate = worksheet.Cells[row, 12].Value != null ? (double?)worksheet.Cells[row, 12].Value : (double?)null;
                     var surcharge = new CsShipmentSurchargeImportModel
                     {
                         IsValid = true,
@@ -554,14 +559,14 @@ namespace eFMS.API.Documentation.Controllers
                         UnitPrice = (decimal?)UnitPrice,
                         CurrencyId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         Vatrate = (decimal?)Vatrate,
-                        TotalAmount = (decimal?)TotalAmount,
+                        //TotalAmount = (decimal?)TotalAmount,
                         ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
                         FinalExchangeRate = (decimal?)FinalExchangeRate, 
-                        InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        InvoiceNo = worksheet.Cells[row, 13].Value?.ToString().Trim(),
                         InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPase : (DateTime?)null,
-                        SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
-                        Type = worksheet.Cells[row, 17].Value?.ToString().Trim(),
-                        Notes = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                        SeriesNo = worksheet.Cells[row, 15].Value?.ToString().Trim(),
+                        Type = worksheet.Cells[row, 16].Value?.ToString().Trim(),
+                        Notes = worksheet.Cells[row, 17].Value?.ToString().Trim(),
                     };
                     list.Add(surcharge);
                 }

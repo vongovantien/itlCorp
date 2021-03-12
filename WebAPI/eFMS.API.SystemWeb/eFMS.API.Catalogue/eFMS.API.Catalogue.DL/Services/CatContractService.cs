@@ -124,6 +124,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
+                saleman.CreatorCompanyId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.CompanyId == currentUser.CompanyID).Select(t => t.CompanyId).FirstOrDefault();
+                saleman.CreatorOfficeId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.OfficeId == currentUser.OfficeID).Select(t => t.OfficeId).FirstOrDefault();
+                saleman.CreatorDepartmentId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.DepartmentId == currentUser.DepartmentId).Select(t => t.DepartmentId).FirstOrDefault();
+                saleman.CreatorGroupId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.DepartmentId == currentUser.GroupId).Select(t => t.GroupId).FirstOrDefault();
                 results.Add(saleman);
             }
             if (all == true) return results;
@@ -142,7 +146,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);
                     break;
             }
-
 
             PermissionRange rangeSearch = 0;
 
@@ -1168,9 +1171,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 "luis.quang@itlvn.com",
                 "andy.hoa@itlvn.com",
                 "cara.oanh@itlvn.com",
-                "lynne.loc@itlvn.com",
+                //"lynne.loc@itlvn.com",
                 "samuel.an@logtechub.com",
-                "kenny.thuong@itlvn.com",
+                //"kenny.thuong@itlvn.com",
             };
             return lstCc;
         }
@@ -1240,7 +1243,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(string.Empty, model.PartnerId);
                 List<SysImage> resultUrls = new List<SysImage>();
-                fileName = model.Files.FileName;
+                fileName = model.Files.FileName.Replace("+","_");
                 string objectId = model.PartnerId;
                 await ImageHelper.SaveFile(fileName, string.Empty, objectId, model.Files);
                 string urlImage = path + "/files/" + objectId + "/" + fileName;
