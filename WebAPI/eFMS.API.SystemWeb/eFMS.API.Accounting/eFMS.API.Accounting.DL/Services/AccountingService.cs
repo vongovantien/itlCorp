@@ -1702,8 +1702,9 @@ namespace eFMS.API.Accounting.DL.Services
                 //Nếu Type là OBH thì AccountNo lấy theo đối tượng PayerID của Surcharge; Ngược lại lấy theo đối tượng PaymentObjectID
                 if (typeCharge == AccountingConstants.TYPE_CHARGE_OBH)
                 {
-                    var payer = PartnerRepository.Get(x => x.Id == payerId)?.FirstOrDefault();
-                    PayeeCode = payer?.AccountNo;
+                    //var payer = PartnerRepository.Get(x => x.Id == payerId)?.FirstOrDefault();
+                    //PayeeCode = payer?.AccountNo;
+                    PayeeCode = payee.AccountNo;
                 }
                 else
                 {
