@@ -18,6 +18,7 @@
     "build:uat": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-en && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-vi",
     "build:prod": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=prod-en && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=prod-vi",
     "build:stats": "ng build --stats-json",
+    "build:sw": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=sw",
     "local": "ng serve --c=local",
     "test": "ng serve --c=test",
     "build test": "ng test",

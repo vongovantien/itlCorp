@@ -35,7 +35,7 @@ export class AppComponent {
 
     ngOnInit() {
 
-        // * Router Event
+        //#region Router Event
         this.router.events.pipe(
             tap((event: Event) => {
                 switch (true) {
@@ -71,8 +71,9 @@ export class AppComponent {
                 this._seoService.updateTitle(routeData.title || 'eFMS');
             }
         );
+        //#endregion
 
-        // * Oauth    
+        //#region Oauth    
         this.oauthService.events.subscribe(
             (e: OAuthEvent) => {
                 if (e instanceof OAuthInfoEvent) {
@@ -88,19 +89,25 @@ export class AppComponent {
                     }
                 }
             });
+        //#endregion
 
-        // * Service Worker
+        //#region service worker
         if (this._SwUpdates.isEnabled) {
             console.log("Service worker is anabled");
         }
 
-        this._SwUpdates.available.subscribe(event => {
-            console.log('current version is', event.current);
-            console.log('available version is', event.available);
+        this._SwUpdates.available.subscribe((event) => {
+            console.log(`current`, event.current, `available `, event.available);
+            if (confirm('update available for eFMS, Reload to update')) {
+                this._SwUpdates.activateUpdate().then(() => location.reload());
+            }
         });
         this._SwUpdates.activated.subscribe(event => {
             console.log('old version was', event.previous);
             console.log('new version is', event.current);
         });
+
+
+        //#endregion
     }
 }
