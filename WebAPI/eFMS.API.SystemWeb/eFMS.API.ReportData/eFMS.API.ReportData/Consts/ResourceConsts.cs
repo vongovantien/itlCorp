@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace eFMS.API.ReportData.Consts
@@ -18,5 +20,8 @@ namespace eFMS.API.ReportData.Consts
         public const string Job_Profit_Analysis = "Job Profit Analysis";
         public const string Summary_Of_Costs_Incurred = "Summary Of Costs Incurred";
         public const string Summary_Of_Revenue_Incurred = "Summary Of Revenue Incurred";
+
+        //Template folder
+        public static string PathOfTemplateExcel = Path.Combine(Directory.GetCurrentDirectory(), @"FormatExcel\TemplateExport");
     }
 }

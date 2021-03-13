@@ -145,6 +145,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.DepartmentId = _currentUser.DepartmentId;
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "InsertInvoice";
 
             var hsInsertInvoice = InsertInvoice(model, currentUser);
             return hsInsertInvoice;
@@ -518,6 +519,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.DepartmentId = _currentUser.DepartmentId;
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "DeleteInvoice";
 
             var hsDeleteInvoice = DeleteInvoice(model, currentUser);
             return hsDeleteInvoice;
@@ -905,6 +907,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.DepartmentId = _currentUser.DepartmentId;
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "RemoveVoucherAdvance";
 
             var hsRemoveVoucherAdvance = RemoveVoucherAdvance(voucherNo, currentUser);
             return hsRemoveVoucherAdvance;
@@ -961,6 +964,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.DepartmentId = _currentUser.DepartmentId;
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "UpdateVoucherAdvance";
 
             var hsUpdateVoucherAdvance = UpdateVoucherAdvance(model, currentUser);
             return hsUpdateVoucherAdvance;
@@ -1023,21 +1027,27 @@ namespace eFMS.API.ForPartner.DL.Service
             switch (model.Type?.ToUpper())
             {
                 case "ADVANCE":
+                    currentUser.Action = "RejectDataAdvance";
                     result = RejectAdvance(model.ReferenceID, model.Reason);
                     break;
                 case "SETTLEMENT":
+                    currentUser.Action = "RejectDataSettlement";
                     result = RejectSettlement(model.ReferenceID, model.Reason);
                     break;
                 case "SOA":
+                    currentUser.Action = "RejectDataSOA";
                     result = RejectSoa(model.ReferenceID, model.Reason);
                     break;
                 case "CDNOTE":
+                    currentUser.Action = "RejectDataCDNOTE";
                     result = RejectCdNote(model.ReferenceID, model.Reason);
                     break;
                 case "VOUCHER":
+                    currentUser.Action = "RejectDataVoucher";
                     result = RejectVoucher(model.ReferenceID, model.Reason);
                     break;
                 case "PAYMENT":
+                    currentUser.Action = "RejectDataPayment";
                     result = RejectPayment(model.ReferenceID, model.Reason);
                     break;
                 default:

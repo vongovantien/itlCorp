@@ -142,5 +142,5 @@
   "MSG_EXCHANGE_RATE_ACCOUNTING_PAYMENT_INVALID": "Exchange rate {0} invalid",
 
   // -----------------start Settlement
-  "MSG_SETTLE_NOT_ALLOW_DELETE": "Settlement {0} have OBH charge has issued CDNote/SOA/VOucher"
+  "MSG_SETTLE_NOT_ALLOW_DELETE": "Settlement {0} have OBH charge has issued CDNote/SOA/Voucher"
 }
