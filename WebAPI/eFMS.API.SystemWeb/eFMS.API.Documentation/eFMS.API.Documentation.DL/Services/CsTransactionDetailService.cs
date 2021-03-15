@@ -486,6 +486,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.ShipmentEta = shipment.Eta;
                     detail.TransactionType = shipment.TransactionType;
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
+                    detail.ShipmentPIC = shipment.PersonIncharge;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     return detail;
                 }
@@ -1258,12 +1259,19 @@ namespace eFMS.API.Documentation.DL.Services
                 listProof.Add(proofOfDelivery);
             }
 
+            var userInfo = userlevelRepository.Get(x => x.UserId == data.ShipmentPIC).FirstOrDefault();
+            if (userInfo == null)
+            {
+                userInfo = userlevelRepository.Get(x => x.UserId == currentUser.UserID).FirstOrDefault();
+            }
+            var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
             var parameter = new ProofOfDeliveryReportParams();
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyName = companyUser?.BunameVn;// DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = officeUser?.AddressVn;// DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty);// DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = companyUser.Website ?? officeUser.Website;// DocumentConstants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
@@ -1313,12 +1321,20 @@ namespace eFMS.API.Documentation.DL.Services
                 listProof.Add(proofOfDelivery);
             }
 
+            var userInfo = userlevelRepository.Get(x => x.UserId == data.ShipmentPIC).FirstOrDefault();
+            if (userInfo == null)
+            {
+                userInfo = userlevelRepository.Get(x => x.UserId == currentUser.UserID).FirstOrDefault();
+            }
+            var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
+
             var parameter = new ProofOfDeliveryReportParams();
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyName = companyUser?.BunameVn;// DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = officeUser?.AddressVn;// DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty);// DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = companyUser.Website ?? officeUser.Website;// DocumentConstants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
@@ -1360,14 +1376,21 @@ namespace eFMS.API.Documentation.DL.Services
                 documentRelease.WChargeable = data.ChargeWeight ?? 0;
                 listDocument.Add(documentRelease);
             }
+            var userInfo = userlevelRepository.Get(x => x.UserId == data.ShipmentPIC).FirstOrDefault();
+            if (userInfo == null)
+            {
+                userInfo = userlevelRepository.Get(x => x.UserId == currentUser.UserID).FirstOrDefault();
+            }
+            var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
 
             var parameter = new AirDocumentReleaseReportParams();
             parameter.MAWB = data?.Mawb?.ToUpper();
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyName = companyUser?.BunameEn;// DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = officeUser?.AddressEn;// DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
-            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty);// DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = companyUser.Website ?? officeUser.Website;// DocumentConstants.COMPANY_WEBSITE;
             parameter.Contact = _currentUser;//Get user name login
             parameter.DecimalNo = 0; // set 0  temporary
 
@@ -1807,8 +1830,14 @@ namespace eFMS.API.Documentation.DL.Services
                 authorizeLetters.Add(authorizeLetter);
             }
 
-            var companyUser = sysCompanyRepo.Get(x => x.Id == data.CompanyId).FirstOrDefault();
-            var officeUser = sysOfficeRepo.Get(x => x.Id == data.OfficeId).FirstOrDefault();
+            // Get company, office info
+            var userInfo = userlevelRepository.Get(x => x.UserId == data.ShipmentPIC).FirstOrDefault();
+            if (userInfo == null)
+            {
+                userInfo = userlevelRepository.Get(x => x.UserId == currentUser.UserID).FirstOrDefault();
+            }
+            var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
@@ -1865,8 +1894,13 @@ namespace eFMS.API.Documentation.DL.Services
                 authorizeLetters.Add(authorizeLetter);
             }
 
-            var companyUser = sysCompanyRepo.Get(x => x.Id == data.CompanyId).FirstOrDefault();
-            var officeUser = sysOfficeRepo.Get(x => x.Id == data.OfficeId).FirstOrDefault();
+            var userInfo = userlevelRepository.Get(x => x.UserId == data.ShipmentPIC).FirstOrDefault();
+            if (userInfo == null)
+            {
+                userInfo = userlevelRepository.Get(x => x.UserId == currentUser.UserID).FirstOrDefault();
+            }
+            var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
+            var officeUser = sysOfficeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
