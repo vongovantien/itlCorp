@@ -724,7 +724,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Service = "CL"
             }).Distinct();
 
-            var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBL).Select(s => s.FirstOrDefault());
+            var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
             var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             //Shipment doc assign is current user
@@ -750,7 +750,7 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLID = x.y.Id,
                 Service = x.x.TransactionType
             });
-            var _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBL).Select(s => s.FirstOrDefault());
+            var _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
             var result = _shipmentsOperation.Union(_shipmentsDocumention);
             return result.OrderByDescending(o => o.MBL);
